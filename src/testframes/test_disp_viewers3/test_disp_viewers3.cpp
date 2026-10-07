@@ -41,15 +41,24 @@
 #include <disp/viewers/helpers/timerulerwidget.h>
 #include <disp/viewers/helpers/channellabelpanel.h>
 #include <disp/viewers/helpers/overviewbarwidget.h>
+#include <disp/viewers/helpers/channeldatamodel.h>
+#include <disp/viewers/helpers/channelrhiview.h>
 
 #include <fiff/fiff_ch_info.h>
+#include <fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtTest>
+#include <QApplication>
+#include <QHelpEvent>
+#include <QSignalSpy>
+#include <QToolTip>
 #include <QWidget>
+
+#include <memory>
 #include <QSettings>
 #include <QScopedPointer>
 
@@ -90,6 +99,8 @@ private slots:
     void construct_timeRulerWidget();
     void construct_channelLabelPanel();
     void construct_overviewBarWidget();
+    void channelLabelPanel_dragClickTooltipAndButterfly();
+    void timeRulerAndOverviewBar_mapSamplesAndPaint();
     void cleanupTestCase();
 };
 
@@ -265,6 +276,161 @@ void TestDispViewers3::construct_overviewBarWidget()
              "widget laid out to an empty geometry");
 
     delete pWidget;
+}
+
+//=============================================================================================================
+
+namespace
+{
+
+// Six channels: MEG0..MEG2 (one bad), EEG0, EEG1, STI; 1000 Hz, samples 0..1999.
+std::unique_ptr<ChannelDataModel> labelTestModel()
+{
+    QSharedPointer<FIFFLIB::FiffInfo> info(new FIFFLIB::FiffInfo);
+    info->sfreq = 1000.0f;
+    const QVector<std::pair<int, int>> kinds = {{FIFFV_MEG_CH, FIFF_UNIT_T}, {FIFFV_MEG_CH, FIFF_UNIT_T}, {FIFFV_MEG_CH, FIFF_UNIT_T}, {FIFFV_EEG_CH, FIFF_UNIT_V}, {FIFFV_EEG_CH, FIFF_UNIT_V}, {FIFFV_STIM_CH, FIFF_UNIT_NONE}};
+    const QStringList names = {"MEG0", "MEG1", "MEG2", "EEG0", "EEG1", "STI"};
+    for (int i = 0; i < kinds.size(); ++i) {
+        FIFFLIB::FiffChInfo ch;
+        ch.ch_name = names[i];
+        ch.kind = kinds[i].first;
+        ch.unit = kinds[i].second;
+        info->chs.append(ch);
+    }
+    info->ch_names = names;
+    info->nchan = names.size();
+    info->bads = {QStringLiteral("MEG1")};
+
+    auto model = std::make_unique<ChannelDataModel>();
+    model->init(info);
+    Eigen::MatrixXd data(6, 2000);
+    for (int s = 0; s < 2000; ++s) {
+        data.col(s) << 1e-12 * std::sin(0.01 * s), 0.0, 2e-12, 1e-5 * std::cos(0.02 * s), 0.0, (s % 500 == 0) ? 1.0 : 0.0;
+    }
+    model->setData(data, 0);
+    return model;
+}
+
+} // namespace
+
+//=============================================================================================================
+
+void TestDispViewers3::channelLabelPanel_dragClickTooltipAndButterfly()
+{
+    auto model = labelTestModel();
+    ChannelLabelPanel panel(m_pHolder.data());
+    panel.resize(120, 300);
+    panel.setModel(model.get());
+    panel.setVisibleChannelCount(3);
+    panel.setFirstVisibleChannel(1);
+    panel.setVisibleSampleRange(0, 2000);
+    panel.show();
+    QVERIFY(!panel.grab().isNull());
+
+    // Clicking a lane toggles that channel's bad flag; lane height is 300 / 3 = 100 px
+    QSignalSpy badSpy(&panel, &ChannelLabelPanel::channelBadToggled);
+    QTest::mouseClick(&panel, Qt::LeftButton, Qt::NoModifier, QPoint(50, 150));
+    QCOMPARE(badSpy.size(), 1);
+    QCOMPARE(badSpy.at(0).at(0).toInt(), 2);
+    QVERIFY(badSpy.at(0).at(1).toBool());
+    QVERIFY(model->channelInfo(2).bad);
+    QTest::mouseClick(&panel, Qt::LeftButton, Qt::NoModifier, QPoint(50, 50));
+    QVERIFY(!model->channelInfo(1).bad);
+
+    // Dragging scrolls channels: up by 150 px = 1.5 lanes -> first channel 1 + 1 = 2, clamped at 6 - 3 = 3
+    QSignalSpy scrollSpy(&panel, &ChannelLabelPanel::channelScrollRequested);
+    QTest::mousePress(&panel, Qt::LeftButton, Qt::NoModifier, QPoint(50, 200));
+    QTest::mouseMove(&panel, QPoint(50, 198));
+    QCOMPARE(scrollSpy.size(), 0);
+    QTest::mouseMove(&panel, QPoint(50, 50));
+    QCOMPARE(scrollSpy.last().at(0).toInt(), 2);
+    QTest::mouseMove(&panel, QPoint(50, -400));
+    QCOMPARE(scrollSpy.last().at(0).toInt(), 3);
+    QTest::mouseRelease(&panel, Qt::LeftButton, Qt::NoModifier, QPoint(50, -400));
+    QCOMPARE(badSpy.size(), 2);
+
+    // Hiding bad channels removes MEG2 from the lanes: lane 1 of {MEG1, EEG0, EEG1} is EEG0
+    panel.setHideBadChannels(true);
+    QTest::mouseClick(&panel, Qt::LeftButton, Qt::NoModifier, QPoint(50, 150));
+    QCOMPARE(badSpy.last().at(0).toInt(), 3);
+    panel.setHideBadChannels(false);
+    model->setChannelBad(2, false);
+    model->setChannelBad(3, false);
+
+    // An explicit channel subset, then the tooltip for its middle lane
+    panel.setChannelIndices({5, 3, 0});
+    panel.setFirstVisibleChannel(0);
+    QHelpEvent tip(QEvent::ToolTip, QPoint(50, 150), panel.mapToGlobal(QPoint(50, 150)));
+    QVERIFY(QApplication::sendEvent(&panel, &tip));
+    QTRY_VERIFY(QToolTip::isVisible());
+    QVERIFY(QToolTip::text().startsWith(QStringLiteral("<b>EEG0</b>")));
+    QVERIFY(QToolTip::text().contains(QStringLiteral("Type: EEG")));
+    QToolTip::hideText();
+    QVERIFY(!panel.grab().isNull());
+
+    panel.setButterflyMode(true);
+    QVERIFY(!panel.grab().isNull());
+    QVERIFY(panel.sizeHint().isValid());
+    QVERIFY(panel.minimumSizeHint().isValid());
+}
+
+//=============================================================================================================
+
+void TestDispViewers3::timeRulerAndOverviewBar_mapSamplesAndPaint()
+{
+    TimeRulerWidget ruler(m_pHolder.data());
+    ruler.resize(800, TimeRulerWidget::kTotalH);
+    ruler.setSfreq(1000.0);
+    ruler.setFirstFileSample(100);
+    ruler.setEvents({TimeRulerEventMark{300, Qt::red, QStringLiteral("1")},
+                     TimeRulerEventMark{302, Qt::blue, QString()},
+                     TimeRulerEventMark{900, Qt::green, QStringLiteral("2")}});
+    ruler.setReferenceMarkers({TimeRulerReferenceMark{400, Qt::magenta, QStringLiteral("M1")}});
+    ruler.show();
+    // Every zoom level from 50 ms to minutes per tick, with seconds and with clock labels
+    for (const float spp : {0.05f, 0.5f, 5.0f, 50.0f, 500.0f}) {
+        ruler.setSamplesPerPixel(spp);
+        ruler.setScrollSample(100.0f + 200.0f * spp);
+        for (const bool clock : {false, true}) {
+            ruler.setClockTimeFormat(clock);
+            QCOMPARE(ruler.clockTimeFormat(), clock);
+            QVERIFY(!ruler.grab().isNull());
+        }
+    }
+    ruler.toggleTimeFormat();
+    QVERIFY(!ruler.clockTimeFormat());
+
+    OverviewBarWidget bar(m_pHolder.data());
+    QSignalSpy scrollSpy(&bar, &OverviewBarWidget::scrollRequested);
+    bar.resize(400, bar.sizeHint().height());
+    QTest::mouseClick(&bar, Qt::LeftButton, Qt::NoModifier, QPoint(200, 5));
+    QCOMPARE(scrollSpy.takeLast().at(0).toFloat(), 0.0f);
+
+    auto model = labelTestModel();
+    bar.setModel(model.get());
+    bar.setSfreq(1000.0f);
+    bar.setFirstFileSample(0);
+    bar.setLastFileSample(2000);
+    bar.setViewport(500.0f, 200.0f);
+    bar.setEvents({ChannelRhiView::EventMarker{500, 1, Qt::red, QStringLiteral("1")}});
+    bar.setAnnotations({ChannelRhiView::AnnotationSpan{800, 1000, Qt::yellow, QStringLiteral("bad")}});
+    bar.show();
+    QVERIFY(!bar.grab().isNull());
+
+    // x maps linearly onto [first, last]; the request centres the viewport there
+    QTest::mousePress(&bar, Qt::LeftButton, Qt::NoModifier, QPoint(100, 5));
+    QCOMPARE(scrollSpy.takeLast().at(0).toFloat(), 500.0f - 100.0f);
+    QTest::mouseMove(&bar, QPoint(300, 5));
+    QCOMPARE(scrollSpy.takeLast().at(0).toFloat(), 1500.0f - 100.0f);
+    QTest::mouseMove(&bar, QPoint(900, 5));
+    QCOMPARE(scrollSpy.takeLast().at(0).toFloat(), 2000.0f - 100.0f);
+    QTest::mouseRelease(&bar, Qt::LeftButton, Qt::NoModifier, QPoint(900, 5));
+    QTest::mouseMove(&bar, QPoint(10, 5));
+    QVERIFY(scrollSpy.isEmpty());
+
+    bar.resize(600, bar.sizeHint().height());
+    QVERIFY(!bar.grab().isNull());
+    QVERIFY(bar.minimumSizeHint().isValid());
 }
 
 //=============================================================================================================
