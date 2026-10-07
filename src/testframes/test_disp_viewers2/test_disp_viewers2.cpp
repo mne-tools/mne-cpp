@@ -276,6 +276,7 @@ private slots:
         * Verifies ChannelRhiView public state, clamping, signals, and overlays without rendering.
      */
     void channelRhiView_stateContracts();
+    void channelRhiView_rendersAndDrawsOverlays();
 
     //=========================================================================================================
     /**
@@ -1011,6 +1012,116 @@ void TestDispViewers2::channelRhiView_stateContracts()
     QCOMPARE(rhiView->firstVisibleChannel(), 1);
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::channelRhiView_rendersAndDrawsOverlays()
+{
+    ChannelDataView view(QStringLiteral("test_disp_viewers2_rhi_render"));
+    view.resize(800, 400);
+    view.init(createBrowserTestInfo());
+    view.setFileBounds(100, 299);
+    view.setData(createBrowserTestData(), 100);
+    auto* rhiView = view.findChild<ChannelRhiView*>();
+    QVERIFY(rhiView != nullptr);
+    view.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&view));
+    rhiView->setSfreq(1000.0f);
+    rhiView->setFirstFileSample(100);
+    rhiView->setLastFileSample(299);
+    rhiView->setSamplesPerPixel(0.25f);
+    rhiView->setScrollSample(100.0f);
+    rhiView->setVisibleChannelCount(4);
+    rhiView->setEvents({ChannelRhiView::EventMarker{120, 1, Qt::red, QStringLiteral("event")}});
+    rhiView->setEpochMarkers({125, 150});
+    rhiView->setAnnotations({ChannelRhiView::AnnotationSpan{130, 145, Qt::yellow, QStringLiteral("annotation")}});
+    const int laneCenterY = rhiView->height() / 8;
+
+    QSignalSpy cursorSpy(rhiView, &ChannelRhiView::cursorDataChanged);
+    rhiView->setCrosshairEnabled(true);
+    rhiView->setScalebarsVisible(true);
+    for (const bool butterfly : {false, true}) {
+        rhiView->setButterflyMode(butterfly);
+        for (const bool zScore : {false, true}) {
+            rhiView->setZScoreMode(zScore);
+            QVERIFY(!view.grab().isNull());
+        }
+        // Crosshair over channel row 0 at x = 80 px -> sample 100 + 80 * 0.25 = 120
+        QMouseEvent hover(QEvent::MouseMove, QPointF(80, laneCenterY), rhiView->mapToGlobal(QPointF(80, laneCenterY)),
+                          Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+        QApplication::sendEvent(rhiView, &hover);
+        QVERIFY(!cursorSpy.isEmpty());
+        const QList<QVariant> args = cursorSpy.takeLast();
+        QCOMPARE(args.at(0).toFloat(), 0.02f);
+        if (butterfly) {
+            QCOMPARE(args.at(1).toFloat(), 0.0f);
+            QCOMPARE(args.at(3).toString(), QStringLiteral("T"));
+        } else {
+            QCOMPARE(args.at(2).toString(), QStringLiteral("MEG0111"));
+            QVERIFY(std::fabs(args.at(1).toFloat() - static_cast<float>(std::sin(20 * 0.05))) < 1e-5f);
+        }
+        QVERIFY(!view.grab().isNull());
+    }
+    rhiView->setButterflyMode(false);
+
+    // Ruler measurements: free, horizontal and vertical snapping
+    rhiView->setAnnotationSelectionEnabled(false);
+    for (const QPoint& end : {QPoint(103, 63), QPoint(300, 62), QPoint(102, 200), QPoint(200, 150)}) {
+        QTest::mousePress(rhiView, Qt::RightButton, Qt::NoModifier, QPoint(100, 60));
+        QTest::mouseMove(rhiView, end);
+        QVERIFY(!view.grab().isNull());
+        QTest::mouseRelease(rhiView, Qt::RightButton, Qt::NoModifier, end);
+    }
+
+    // Annotation range selection overlay
+    rhiView->setAnnotationSelectionEnabled(true);
+    QSignalSpy rangeSpy(rhiView, &ChannelRhiView::sampleRangeSelected);
+    QTest::mousePress(rhiView, Qt::RightButton, Qt::NoModifier, QPoint(200, 40));
+    QTest::mouseMove(rhiView, QPoint(240, 40));
+    QVERIFY(!view.grab().isNull());
+    QTest::mouseRelease(rhiView, Qt::RightButton, Qt::NoModifier, QPoint(240, 40));
+    QCOMPARE(rangeSpy.size(), 1);
+    QCOMPARE(rangeSpy.at(0).at(0).toInt(), 150);
+    QCOMPARE(rangeSpy.at(0).at(1).toInt(), 160);
+
+    // Hovering an annotation edge, then dragging it and double-clicking
+    QSignalSpy boundarySpy(rhiView, &ChannelRhiView::annotationBoundaryMoved);
+    QTest::mouseMove(rhiView, QPoint(180, 40));
+    QTest::mousePress(rhiView, Qt::LeftButton, Qt::NoModifier, QPoint(180, 40));
+    QTest::mouseMove(rhiView, QPoint(160, 40));
+    QTest::mouseRelease(rhiView, Qt::LeftButton, Qt::NoModifier, QPoint(160, 40));
+    QCOMPARE(boundarySpy.size(), 1);
+    QCOMPARE(boundarySpy.at(0).at(2).toInt(), 140);
+    QTest::mouseDClick(rhiView, Qt::LeftButton, Qt::NoModifier, QPoint(150, 40));
+
+    // Middle-button and left drags pan, with inertia
+    rhiView->setAnnotationSelectionEnabled(false);
+    rhiView->setSamplesPerPixel(0.05f);
+    const float before = rhiView->scrollSample();
+    QTest::mousePress(rhiView, Qt::LeftButton, Qt::NoModifier, QPoint(300, 40));
+    QTest::mouseMove(rhiView, QPoint(260, 40));
+    QTest::mouseMove(rhiView, QPoint(200, 40));
+    QTest::mouseRelease(rhiView, Qt::LeftButton, Qt::NoModifier, QPoint(200, 40));
+    QVERIFY(rhiView->scrollSample() > before);
+    QTest::mousePress(rhiView, Qt::MiddleButton, Qt::NoModifier, QPoint(200, 40));
+    QTest::mouseMove(rhiView, QPoint(260, 40));
+    QTest::mouseRelease(rhiView, Qt::MiddleButton, Qt::NoModifier, QPoint(260, 40));
+
+    // Wheel: time scroll and Ctrl-zoom
+    rhiView->setWheelScrollsChannels(false);
+    const float spp = rhiView->samplesPerPixel();
+    QWheelEvent zoom(QPointF(50, 40), QPointF(50, 40), QPoint(), QPoint(0, 120), Qt::NoButton, Qt::ControlModifier,
+                     Qt::NoScrollPhase, false);
+    QApplication::sendEvent(rhiView, &zoom);
+    QTRY_VERIFY(std::fabs(rhiView->samplesPerPixel() - 0.8f * spp) < 1e-6f);
+    QWheelEvent scroll(QPointF(50, 40), QPointF(50, 40), QPoint(), QPoint(0, -120), Qt::NoButton, Qt::NoModifier,
+                       Qt::NoScrollPhase, false);
+    QApplication::sendEvent(rhiView, &scroll);
+
+    view.resize(600, 300);
+    QApplication::processEvents();
+    QVERIFY(!view.grab().isNull());
 }
 
 //=============================================================================================================
