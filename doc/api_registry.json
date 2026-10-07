@@ -11461,7 +11461,8 @@
         "python": "mne.Dipole",
         "status": "implemented",
         "mne_cpp": "ECD (INVERSELIB)",
-        "note": ""
+        "note": "",
+        "test": "test_inv_dipole_fit_python"
       },
       {
         "python": "mne.DipoleFixed",
@@ -11479,7 +11480,8 @@
         "python": "mne.EvokedArray",
         "status": "implemented",
         "mne_cpp": "FiffEvoked (constructed directly)",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_io_evoked_info"
       },
       {
         "python": "mne.Label",
@@ -11533,19 +11535,22 @@
         "python": "mne.annotations_from_events",
         "status": "implemented",
         "mne_cpp": "FiffAnnotationEventUtils",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_annotation_event_utils"
       },
       {
         "python": "mne.apply_forward",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution apply",
-        "note": ""
+        "note": "",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.apply_forward_raw",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution apply",
-        "note": ""
+        "note": "",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.average_forward_solutions",
@@ -11587,13 +11592,15 @@
         "python": "mne.beamformer.apply_lcmv",
         "status": "implemented",
         "mne_cpp": "Lcmv",
-        "note": ""
+        "note": "",
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.apply_lcmv_cov",
         "status": "partial",
         "mne_cpp": "Lcmv (partial)",
-        "note": "covariance source power"
+        "note": "covariance source power",
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.apply_lcmv_epochs",
@@ -11611,13 +11618,15 @@
         "python": "mne.beamformer.make_dics",
         "status": "implemented",
         "mne_cpp": "Dics",
-        "note": ""
+        "note": "",
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.make_lcmv",
         "status": "implemented",
         "mne_cpp": "Lcmv",
-        "note": ""
+        "note": "",
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.make_lcmv_resolution_matrix",
@@ -11683,7 +11692,8 @@
         "python": "mne.channels.find_ch_adjacency",
         "status": "implemented",
         "mne_cpp": "StatsAdjacency",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.channels.find_layout",
@@ -11749,7 +11759,8 @@
         "python": "mne.channels.read_ch_adjacency",
         "status": "partial",
         "mne_cpp": "StatsAdjacency (partial)",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.channels.read_custom_montage",
@@ -11785,7 +11796,8 @@
         "python": "mne.channels.read_dig_fif",
         "status": "implemented",
         "mne_cpp": "FIFFLIB dig I/O",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_dig_point_python"
       },
       {
         "python": "mne.channels.read_dig_hpts",
@@ -11809,7 +11821,8 @@
         "python": "mne.channels.read_layout",
         "status": "implemented",
         "mne_cpp": "DISPLIB layout I/O",
-        "note": ""
+        "note": "",
+        "test": "test_mne_library"
       },
       {
         "python": "mne.channels.read_polhemus_fastscan",
@@ -11833,7 +11846,8 @@
         "python": "mne.channels.transform_to_head",
         "status": "implemented",
         "mne_cpp": "FiffCoordTrans",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_coord_trans"
       },
       {
         "python": "mne.channels.unify_bad_channels",
@@ -11845,19 +11859,22 @@
         "python": "mne.combine_evoked",
         "status": "implemented",
         "mne_cpp": "FiffEvoked arithmetic",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_io_evoked_info"
       },
       {
         "python": "mne.compute_covariance",
         "status": "implemented",
         "mne_cpp": "StsCovEstimators / RtCov",
-        "note": "epochs covariance"
+        "note": "epochs covariance",
+        "test": "test_sts_cov_estimators"
       },
       {
         "python": "mne.compute_proj_epochs",
         "status": "implemented",
         "mne_cpp": "DSPLIB SSP",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.compute_proj_evoked",
@@ -11881,7 +11898,8 @@
         "python": "mne.compute_raw_covariance",
         "status": "implemented",
         "mne_cpp": "StsCovEstimators",
-        "note": "raw covariance"
+        "note": "raw covariance",
+        "test": "test_sts_cov_estimators"
       },
       {
         "python": "mne.compute_source_morph",
@@ -11905,19 +11923,22 @@
         "python": "mne.concatenate_raws",
         "status": "implemented",
         "mne_cpp": "FiffRawData concatenation",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_raw_io"
       },
       {
         "python": "mne.convert_forward_solution",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution",
-        "note": "fixed/free orientation"
+        "note": "fixed/free orientation",
+        "test": "test_fwd_python"
       },
       {
         "python": "mne.count_annotations",
         "status": "implemented",
         "mne_cpp": "FiffAnnotations",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_annotations"
       },
       {
         "python": "mne.count_events",
@@ -11935,7 +11956,8 @@
         "python": "mne.create_info",
         "status": "implemented",
         "mne_cpp": "FiffInfo (constructed directly)",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_info"
       },
       {
         "python": "mne.decimate_surface",
@@ -11983,7 +12005,8 @@
         "python": "mne.decoding.PSDEstimator",
         "status": "partial",
         "mne_cpp": "Spectral (partial)",
-        "note": "no sklearn wrapper"
+        "note": "no sklearn wrapper",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.decoding.ReceptiveField",
@@ -12103,7 +12126,8 @@
         "python": "mne.events_from_annotations",
         "status": "implemented",
         "mne_cpp": "FiffAnnotationEventUtils",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_annotation_event_utils"
       },
       {
         "python": "mne.export.export_epochs",
@@ -12133,7 +12157,8 @@
         "python": "mne.find_events",
         "status": "implemented",
         "mne_cpp": "RTPROCESSINGLIB event detection",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.find_layout",
@@ -12151,13 +12176,15 @@
         "python": "mne.forward.apply_forward",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution apply",
-        "note": ""
+        "note": "",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.forward.apply_forward_raw",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution apply",
-        "note": ""
+        "note": "",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.forward.average_forward_solutions",
@@ -12181,13 +12208,15 @@
         "python": "mne.forward.convert_forward_solution",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution",
-        "note": ""
+        "note": "",
+        "test": "test_fwd_python"
       },
       {
         "python": "mne.forward.is_fixed_orient",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution",
-        "note": ""
+        "note": "",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.forward.make_field_map",
@@ -12199,19 +12228,22 @@
         "python": "mne.forward.make_forward_dipole",
         "status": "partial",
         "mne_cpp": "ComputeFwd (partial)",
-        "note": "dipole forward limited"
+        "note": "dipole forward limited",
+        "test": "test_tool_forward_generation"
       },
       {
         "python": "mne.forward.read_forward_solution",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::read",
-        "note": ""
+        "note": "",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.forward.restrict_forward_to_label",
         "status": "partial",
         "mne_cpp": "MNEForwardSolution (partial)",
-        "note": "label restriction limited"
+        "note": "label restriction limited",
+        "test": "test_mne_label_python"
       },
       {
         "python": "mne.forward.restrict_forward_to_stc",
@@ -12229,7 +12261,8 @@
         "python": "mne.forward.write_forward_solution",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::write",
-        "note": ""
+        "note": "",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.get_head_surf",
@@ -12241,7 +12274,8 @@
         "python": "mne.get_meg_helmet_surf",
         "status": "implemented",
         "mne_cpp": "FWDLIB helmet surface",
-        "note": ""
+        "note": "",
+        "test": "test_field_map"
       },
       {
         "python": "mne.get_volume_labels_from_aseg",
@@ -12265,13 +12299,15 @@
         "python": "mne.grade_to_vertices",
         "status": "implemented",
         "mne_cpp": "MNESourceSpace decimation",
-        "note": ""
+        "note": "",
+        "test": "test_mne_source_data"
       },
       {
         "python": "mne.grand_average",
         "status": "implemented",
         "mne_cpp": "FiffEvoked averaging",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_io_evoked_info"
       },
       {
         "python": "mne.grow_labels",
@@ -12283,13 +12319,15 @@
         "python": "mne.head_to_mni",
         "status": "partial",
         "mne_cpp": "FSLIB (partial)",
-        "note": "MNI transform limited"
+        "note": "MNI transform limited",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.head_to_mri",
         "status": "implemented",
         "mne_cpp": "FiffCoordTrans head->MRI",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_coord_trans"
       },
       {
         "python": "mne.inverse_sparse.gamma_map",
@@ -12319,13 +12357,15 @@
         "python": "mne.io.BaseRaw",
         "status": "implemented",
         "mne_cpp": "FiffRawData (BaseRaw)",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_raw_io"
       },
       {
         "python": "mne.io.RawArray",
         "status": "implemented",
         "mne_cpp": "FiffRawData (constructed directly)",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_raw_io"
       },
       {
         "python": "mne.io.anonymize_info",
@@ -12337,7 +12377,8 @@
         "python": "mne.io.concatenate_raws",
         "status": "implemented",
         "mne_cpp": "FiffRawData concatenation",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_raw_io"
       },
       {
         "python": "mne.io.get_channel_type_constants",
@@ -12397,7 +12438,8 @@
         "python": "mne.io.read_info",
         "status": "implemented",
         "mne_cpp": "FiffInfo::read",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_stream_python"
       },
       {
         "python": "mne.io.read_raw",
@@ -12499,7 +12541,8 @@
         "python": "mne.io.read_raw_fif",
         "status": "implemented",
         "mne_cpp": "FiffRawData",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_raw_formats_python"
       },
       {
         "python": "mne.io.read_raw_fil",
@@ -12589,7 +12632,8 @@
         "python": "mne.io.write_info",
         "status": "implemented",
         "mne_cpp": "FiffInfo::write",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_info"
       },
       {
         "python": "mne.label_sign_flip",
@@ -12607,7 +12651,8 @@
         "python": "mne.make_ad_hoc_cov",
         "status": "implemented",
         "mne_cpp": "FiffCov (ad-hoc)",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_cov"
       },
       {
         "python": "mne.make_bem_model",
@@ -12643,19 +12688,22 @@
         "python": "mne.make_forward_dipole",
         "status": "partial",
         "mne_cpp": "ComputeFwd (partial)",
-        "note": "dipole forward limited"
+        "note": "dipole forward limited",
+        "test": "test_tool_forward_generation"
       },
       {
         "python": "mne.make_forward_solution",
         "status": "implemented",
         "mne_cpp": "mne_forward_solution (CLI) / ComputeFwd",
-        "note": "forward pipeline"
+        "note": "forward pipeline",
+        "test": "test_fwd_python"
       },
       {
         "python": "mne.make_sphere_model",
         "status": "implemented",
         "mne_cpp": "mne_make_sphere_bem (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_fwd_python"
       },
       {
         "python": "mne.match_channel_orders",
@@ -12673,7 +12721,8 @@
         "python": "mne.minimum_norm.apply_inverse",
         "status": "implemented",
         "mne_cpp": "MinimumNorm",
-        "note": ""
+        "note": "",
+        "test": "test_inv_eloreta_python"
       },
       {
         "python": "mne.minimum_norm.apply_inverse_cov",
@@ -12691,7 +12740,8 @@
         "python": "mne.minimum_norm.apply_inverse_raw",
         "status": "implemented",
         "mne_cpp": "mne_compute_raw_inverse (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_inv_eloreta_python"
       },
       {
         "python": "mne.minimum_norm.apply_inverse_tfr_epochs",
@@ -12703,7 +12753,8 @@
         "python": "mne.minimum_norm.compute_rank_inverse",
         "status": "implemented",
         "mne_cpp": "MNEInverseOperator rank",
-        "note": ""
+        "note": "",
+        "test": "test_tool_inverse_operator"
       },
       {
         "python": "mne.minimum_norm.compute_source_psd",
@@ -12739,19 +12790,22 @@
         "python": "mne.minimum_norm.make_inverse_operator",
         "status": "implemented",
         "mne_cpp": "MNEInverseOperator",
-        "note": ""
+        "note": "",
+        "test": "test_inv_eloreta_python"
       },
       {
         "python": "mne.minimum_norm.prepare_inverse_operator",
         "status": "implemented",
         "mne_cpp": "MNEInverseOperator::prepare",
-        "note": ""
+        "note": "",
+        "test": "test_inv_eloreta_python"
       },
       {
         "python": "mne.minimum_norm.read_inverse_operator",
         "status": "implemented",
         "mne_cpp": "MNEInverseOperator::read",
-        "note": ""
+        "note": "",
+        "test": "test_tool_inverse_operator"
       },
       {
         "python": "mne.minimum_norm.resolution_metrics",
@@ -12775,7 +12829,8 @@
         "python": "mne.minimum_norm.write_inverse_operator",
         "status": "implemented",
         "mne_cpp": "MNEInverseOperator::write",
-        "note": ""
+        "note": "",
+        "test": "test_inv_eloreta_python"
       },
       {
         "python": "mne.morph_labels",
@@ -12805,13 +12860,15 @@
         "python": "mne.pick_channels_cov",
         "status": "implemented",
         "mne_cpp": "FiffCov picking",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_cov"
       },
       {
         "python": "mne.pick_channels_forward",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::pick_channels",
-        "note": ""
+        "note": "",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.pick_channels_regexp",
@@ -12829,7 +12886,8 @@
         "python": "mne.pick_info",
         "status": "implemented",
         "mne_cpp": "FiffInfo::pick_info",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_info"
       },
       {
         "python": "mne.pick_types",
@@ -12841,7 +12899,8 @@
         "python": "mne.pick_types_forward",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::pick_types",
-        "note": ""
+        "note": "",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.preprocessing.EOGRegression",
@@ -12913,7 +12972,8 @@
         "python": "mne.preprocessing.compute_maxwell_basis",
         "status": "implemented",
         "mne_cpp": "SSS basis (DSPLIB)",
-        "note": ""
+        "note": "",
+        "test": "test_dsp_sss"
       },
       {
         "python": "mne.preprocessing.compute_proj_ecg",
@@ -12967,7 +13027,8 @@
         "python": "mne.preprocessing.find_bad_channels_lof",
         "status": "implemented",
         "mne_cpp": "BadChannelsLof (skigen LOF)",
-        "note": ""
+        "note": "",
+        "test": "test_dsp_bad_channels_lof"
       },
       {
         "python": "mne.preprocessing.find_bad_channels_maxwell",
@@ -13009,7 +13070,8 @@
         "python": "mne.preprocessing.infomax",
         "status": "implemented",
         "mne_cpp": "Infomax ICA (DSPLIB)",
-        "note": ""
+        "note": "",
+        "test": "test_dsp_ica"
       },
       {
         "python": "mne.preprocessing.interpolate_bridged_electrodes",
@@ -13021,7 +13083,8 @@
         "python": "mne.preprocessing.maxwell_filter",
         "status": "partial",
         "mne_cpp": "SSS/tSSS (DSPLIB)",
-        "note": "no movement compensation"
+        "note": "no movement compensation",
+        "test": "test_dsp_sss"
       },
       {
         "python": "mne.preprocessing.maxwell_filter_prepare_emptyroom",
@@ -13081,7 +13144,8 @@
         "python": "mne.read_annotations",
         "status": "implemented",
         "mne_cpp": "FiffAnnotations",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_annotations"
       },
       {
         "python": "mne.read_bem_solution",
@@ -13093,13 +13157,15 @@
         "python": "mne.read_bem_surfaces",
         "status": "implemented",
         "mne_cpp": "mne_list_bem (CLI) / FWDLIB",
-        "note": ""
+        "note": "",
+        "test": "test_mne_source_space_ops_python"
       },
       {
         "python": "mne.read_cov",
         "status": "implemented",
         "mne_cpp": "FiffCov::FiffCov(io)",
-        "note": "FIFF covariance I/O"
+        "note": "FIFF covariance I/O",
+        "test": "test_fiff_cov_python"
       },
       {
         "python": "mne.read_dipole",
@@ -13111,7 +13177,8 @@
         "python": "mne.read_epochs",
         "status": "implemented",
         "mne_cpp": "FiffEpochs / MNEEpochDataList",
-        "note": ""
+        "note": "",
+        "test": "test_epochs"
       },
       {
         "python": "mne.read_epochs_eeglab",
@@ -13153,7 +13220,8 @@
         "python": "mne.read_evokeds",
         "status": "implemented",
         "mne_cpp": "FiffEvoked::read",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_evoked_python"
       },
       {
         "python": "mne.read_evokeds_mff",
@@ -13165,7 +13233,8 @@
         "python": "mne.read_forward_solution",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::read",
-        "note": "FIFF forward I/O"
+        "note": "FIFF forward I/O",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.read_freesurfer_lut",
@@ -13195,13 +13264,15 @@
         "python": "mne.read_morph_map",
         "status": "implemented",
         "mne_cpp": "mne_make_morph_maps (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_mne_source_space_ops_python"
       },
       {
         "python": "mne.read_proj",
         "status": "implemented",
         "mne_cpp": "FiffProj::read",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_stream_python"
       },
       {
         "python": "mne.read_reject_parameters",
@@ -13225,7 +13296,8 @@
         "python": "mne.read_source_spaces",
         "status": "implemented",
         "mne_cpp": "MNESourceSpace::read",
-        "note": "FIFF source-space I/O"
+        "note": "FIFF source-space I/O",
+        "test": "test_mne_source_space_python"
       },
       {
         "python": "mne.read_talxfm",
@@ -13237,7 +13309,8 @@
         "python": "mne.read_trans",
         "status": "implemented",
         "mne_cpp": "FiffCoordTrans::read",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_coord_trans"
       },
       {
         "python": "mne.read_tri",
@@ -13309,7 +13382,8 @@
         "python": "mne.setup_volume_source_space",
         "status": "implemented",
         "mne_cpp": "mne_volume_source_space (CLI)",
-        "note": "volume source space"
+        "note": "volume source space",
+        "test": "test_mne_source_space_ops_python"
       },
       {
         "python": "mne.simulation.SourceSimulator",
@@ -13393,7 +13467,8 @@
         "python": "mne.source_space.read_source_spaces",
         "status": "implemented",
         "mne_cpp": "MNESourceSpace::read",
-        "note": ""
+        "note": "",
+        "test": "test_mne_source_space_python"
       },
       {
         "python": "mne.source_space.setup_source_space",
@@ -13405,55 +13480,64 @@
         "python": "mne.source_space.setup_volume_source_space",
         "status": "implemented",
         "mne_cpp": "mne_volume_source_space (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_mne_source_space_ops_python"
       },
       {
         "python": "mne.source_space.write_source_spaces",
         "status": "implemented",
         "mne_cpp": "MNESourceSpace::write",
-        "note": ""
+        "note": "",
+        "test": "test_mne_source_data"
       },
       {
         "python": "mne.spatial_dist_adjacency",
         "status": "partial",
         "mne_cpp": "StatsAdjacency (partial)",
-        "note": "distance-based adjacency limited"
+        "note": "distance-based adjacency limited",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.spatial_inter_hemi_adjacency",
         "status": "partial",
         "mne_cpp": "StatsAdjacency (partial)",
-        "note": "inter-hemi adjacency limited"
+        "note": "inter-hemi adjacency limited",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.spatial_src_adjacency",
         "status": "implemented",
         "mne_cpp": "StatsAdjacency::fromSourceSpace",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.spatial_tris_adjacency",
         "status": "implemented",
         "mne_cpp": "StatsAdjacency",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.spatio_temporal_dist_adjacency",
         "status": "partial",
         "mne_cpp": "StatsAdjacency (partial)",
-        "note": "distance adjacency limited"
+        "note": "distance adjacency limited",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.spatio_temporal_src_adjacency",
         "status": "implemented",
         "mne_cpp": "StatsAdjacency::fromSourceSpaceTemporal",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.spatio_temporal_tris_adjacency",
         "status": "implemented",
         "mne_cpp": "StatsAdjacency",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.split_label",
@@ -13477,7 +13561,8 @@
         "python": "mne.stats.combine_adjacency",
         "status": "partial",
         "mne_cpp": "StatsAdjacency (partial)",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.f_mway_rm",
@@ -13489,7 +13574,8 @@
         "python": "mne.stats.f_oneway",
         "status": "implemented",
         "mne_cpp": "StatsCluster f-test",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.f_threshold_mway_rm",
@@ -13519,31 +13605,36 @@
         "python": "mne.stats.permutation_cluster_1samp_test",
         "status": "implemented",
         "mne_cpp": "StatsCluster::oneSamplePermutationTest",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.permutation_cluster_test",
         "status": "implemented",
         "mne_cpp": "StatsCluster::fTestPermutationTest",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.permutation_t_test",
         "status": "implemented",
         "mne_cpp": "StatsCluster::permutationTest",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.spatio_temporal_cluster_1samp_test",
         "status": "implemented",
         "mne_cpp": "StatsCluster",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.spatio_temporal_cluster_test",
         "status": "implemented",
         "mne_cpp": "StatsCluster",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.summarize_clusters_stc",
@@ -13555,13 +13646,15 @@
         "python": "mne.stats.ttest_1samp_no_p",
         "status": "implemented",
         "mne_cpp": "StatsCluster",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.ttest_ind_no_p",
         "status": "implemented",
         "mne_cpp": "StatsCluster t-test",
-        "note": ""
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stc_near_sensors",
@@ -13603,13 +13696,15 @@
         "python": "mne.time_frequency.EpochsSpectrum",
         "status": "partial",
         "mne_cpp": "Spectral (partial)",
-        "note": "epochs spectrum container"
+        "note": "epochs spectrum container",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.time_frequency.EpochsSpectrumArray",
         "status": "partial",
         "mne_cpp": "Spectral (partial)",
-        "note": ""
+        "note": "",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.time_frequency.EpochsTFR",
@@ -13639,19 +13734,22 @@
         "python": "mne.time_frequency.Spectrum",
         "status": "implemented",
         "mne_cpp": "Spectral (DSPLIB)",
-        "note": ""
+        "note": "",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.time_frequency.SpectrumArray",
         "status": "implemented",
         "mne_cpp": "Spectral (DSPLIB)",
-        "note": ""
+        "note": "",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.time_frequency.combine_spectrum",
         "status": "partial",
         "mne_cpp": "Spectral (partial)",
-        "note": ""
+        "note": "",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.time_frequency.combine_tfr",
@@ -13741,13 +13839,15 @@
         "python": "mne.time_frequency.psd_array_multitaper",
         "status": "implemented",
         "mne_cpp": "Spectral multitaper",
-        "note": ""
+        "note": "",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.time_frequency.psd_array_welch",
         "status": "implemented",
         "mne_cpp": "Spectral::psdWelch",
-        "note": ""
+        "note": "",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.time_frequency.read_csd",
@@ -13759,7 +13859,8 @@
         "python": "mne.time_frequency.read_spectrum",
         "status": "partial",
         "mne_cpp": "Spectral (partial)",
-        "note": "spectrum I/O limited"
+        "note": "spectrum I/O limited",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.time_frequency.read_tfrs",
@@ -13867,7 +13968,8 @@
         "python": "mne.write_cov",
         "status": "implemented",
         "mne_cpp": "FiffCov::write",
-        "note": "FIFF covariance I/O"
+        "note": "FIFF covariance I/O",
+        "test": "test_fiff_cov"
       },
       {
         "python": "mne.write_events",
@@ -13879,13 +13981,15 @@
         "python": "mne.write_evokeds",
         "status": "implemented",
         "mne_cpp": "FiffEvoked::write",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_io_evoked_info"
       },
       {
         "python": "mne.write_forward_solution",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::write",
-        "note": "FIFF forward I/O"
+        "note": "FIFF forward I/O",
+        "test": "test_mne_forward_solution"
       },
       {
         "python": "mne.write_head_bem",
@@ -13909,13 +14013,15 @@
         "python": "mne.write_proj",
         "status": "implemented",
         "mne_cpp": "FiffProj::write",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_stream_python"
       },
       {
         "python": "mne.write_source_spaces",
         "status": "implemented",
         "mne_cpp": "MNESourceSpace::write",
-        "note": "FIFF source-space I/O"
+        "note": "FIFF source-space I/O",
+        "test": "test_mne_source_data"
       },
       {
         "python": "mne.write_surface",
@@ -13927,7 +14033,8 @@
         "python": "mne.write_trans",
         "status": "implemented",
         "mne_cpp": "FiffCoordTrans::write",
-        "note": ""
+        "note": "",
+        "test": "test_fiff_coord_trans"
       }
     ]
   },

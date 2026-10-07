@@ -180,6 +180,21 @@ class TestTargetsAndMetadata(ExampleEvidenceTestCase):
         self.assert_issue("'example_mode' requires 'example'", self.check(record))
 
 
+class ParityTestFieldTestCase(unittest.TestCase):
+    def issues(self, **record) -> list[str]:
+        record = {"python": "mne.f", "status": "implemented", "mne_cpp": "F", **record}
+        return validator.validate_parity_block({"parity": {"mne_python_pinned": "1.11", "records": [record]}},
+                                               _REPO_ROOT)[1]
+
+    def test_existing_test_passes(self) -> None:
+        self.assertEqual(self.issues(test="test_fiff_core_python"), [])
+
+    def test_unknown_test_or_missing_record_fails(self) -> None:
+        self.assertIn("'test' must name an existing", self.issues(test="test_nope")[0])
+        self.assertIn("'test' must name an existing",
+                      self.issues(status="missing", mne_cpp="", test="test_fiff_core_python")[0])
+
+
 class TestRepositoryRegistry(unittest.TestCase):
     def test_committed_registry_passes(self) -> None:
         registry = json.loads((_REPO_ROOT / "doc" / "api_registry.json").read_text(encoding="utf-8"))

@@ -159,7 +159,7 @@ def validate_documented_flag(registry: Dict[str, Any]) -> Tuple[bool, List[str]]
 PARITY_STATUS_VALUES = {"implemented", "partial", "missing", "not-applicable"}
 
 
-def validate_parity_block(registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
+def validate_parity_block(registry: Dict[str, Any], repo_root: Path) -> Tuple[bool, List[str]]:
     """Enforce invariants on the ``parity`` block (v2.4.0 TASK T7.0/T7.3).
 
     * ``parity`` (when present) must be an object with a ``records`` list.
@@ -169,6 +169,8 @@ def validate_parity_block(registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
     * ``python`` keys must be unique.
     * ``implemented``/``partial`` records must name a non-empty ``mne_cpp``
       equivalent; ``missing``/``not-applicable`` must leave ``mne_cpp`` empty.
+    * An optional ``test`` (the evidence for an implemented/partial claim)
+      must name a ``src/testframes`` directory.
     """
     issues: List[str] = []
     parity = registry.get("parity")
@@ -212,6 +214,11 @@ def validate_parity_block(registry: Dict[str, Any]) -> Tuple[bool, List[str]]:
                 f"'{py}': status '{status}' must not name an 'mne_cpp' "
                 f"equivalent (found '{mne_cpp}')"
             )
+        test = rec.get("test")
+        if test is not None and (status not in ("implemented", "partial") or not isinstance(test, str)
+                                 or not (repo_root / "src" / "testframes" / test).is_dir()):
+            issues.append(f"'{py}': 'test' must name an existing src/testframes directory "
+                          f"on an implemented/partial record (found '{test}')")
     return (len(issues) == 0, issues)
 
 
@@ -468,7 +475,7 @@ def main() -> int:
         print(f"  OK ({doc_count} documented entries)")
 
     print("[6/8] Parity block invariants (TASK T7.0/T7.3)...")
-    ok, issues = validate_parity_block(registry)
+    ok, issues = validate_parity_block(registry, repo_root)
     if not ok:
         all_passed = False
         for i in issues:

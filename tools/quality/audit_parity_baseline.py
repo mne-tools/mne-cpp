@@ -150,8 +150,10 @@ def build_report(repo_root: Path = REPO_ROOT) -> dict[str, Any]:
     for record in registry.get("parity", {}).get("records", []):
         if record.get("status") not in {"implemented", "partial"}:
             continue
+        test = record.get("test")
+        level = evidence_by_test.get(test, "unverified") if test in registered else "unverified"
         claims.append({"source": "parity", "mne_cpp": record.get("mne_cpp") or None, "python": record["python"],
-                       "claimed": record["status"], "test": None, "evidence": "unverified"})
+                       "claimed": record["status"], "test": test, "evidence": level})
 
     levels = ("cross-validated-static", "cross-validated-live", "tested", "unverified")
     by_level = {level: sum(1 for c in claims if c["evidence"] == level) for level in levels}

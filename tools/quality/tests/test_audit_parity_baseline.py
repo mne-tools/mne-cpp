@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 import tempfile
 import unittest
@@ -60,6 +61,32 @@ class ClassifierTests(unittest.TestCase):
             (root / "README.md").write_text("Covers ~92 % of MNE-Python's core.\nFast.\n", encoding="utf-8")
             claims = audit.percent_claims(root)
         self.assertEqual([(c["line"], c["status"]) for c in claims], [(1, "unsupported")])
+
+
+class ParityRecordTests(unittest.TestCase):
+    def test_record_takes_the_evidence_of_its_registered_test(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            frames = root / "src" / "testframes"
+            for name, text in {"test_oracle": "// Reference values were produced with mne.read_events",
+                               "test_plain": "QVERIFY(true);", "test_orphan": "QVERIFY(true);"}.items():
+                (frames / name).mkdir(parents=True)
+                (frames / name / f"{name}.cpp").write_text(text, encoding="utf-8")
+            (frames / "CMakeLists.txt").write_text("add_subdirectory(test_oracle)\nadd_subdirectory(test_plain)\n",
+                                                   encoding="utf-8")
+            (root / "doc").mkdir()
+            records = [
+                {"python": "mne.a", "status": "implemented", "mne_cpp": "A", "test": "test_oracle"},
+                {"python": "mne.b", "status": "partial", "mne_cpp": "B", "test": "test_plain"},
+                {"python": "mne.c", "status": "implemented", "mne_cpp": "C", "test": "test_orphan"},
+                {"python": "mne.d", "status": "implemented", "mne_cpp": "D"},
+            ]
+            (root / "doc" / "api_registry.json").write_text(
+                json.dumps({"classes": [], "parity": {"records": records}}), encoding="utf-8")
+            report = audit.build_report(root)
+        self.assertEqual({c["python"]: c["evidence"] for c in report["claims"]}, {
+            "mne.a": "cross-validated-static", "mne.b": "tested", "mne.c": "unverified", "mne.d": "unverified",
+        })
 
 
 class RepositoryTests(unittest.TestCase):

@@ -22,10 +22,10 @@
   "summary": {
     "claims": 359,
     "by_evidence": {
-      "cross-validated-static": 5,
-      "cross-validated-live": 1,
-      "tested": 83,
-      "unverified": 270
+      "cross-validated-static": 36,
+      "cross-validated-live": 2,
+      "tested": 158,
+      "unverified": 163
     },
     "by_source": {
       "classes": {
@@ -35,10 +35,10 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 0,
-        "cross-validated-live": 0,
-        "tested": 0,
-        "unverified": 270
+        "cross-validated-static": 31,
+        "cross-validated-live": 1,
+        "tested": 75,
+        "unverified": 163
       }
     },
     "tests_by_relation": {
@@ -824,8 +824,8 @@
       "mne_cpp": "ECD (INVERSELIB)",
       "python": "mne.Dipole",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_dipole_fit_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -848,8 +848,8 @@
       "mne_cpp": "FiffEvoked (constructed directly)",
       "python": "mne.EvokedArray",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_io_evoked_info",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -880,24 +880,24 @@
       "mne_cpp": "FiffAnnotationEventUtils",
       "python": "mne.annotations_from_events",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_annotation_event_utils",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution apply",
       "python": "mne.apply_forward",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution apply",
       "python": "mne.apply_forward_raw",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -944,16 +944,16 @@
       "mne_cpp": "Lcmv",
       "python": "mne.beamformer.apply_lcmv",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "Lcmv (partial)",
       "python": "mne.beamformer.apply_lcmv_cov",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -976,16 +976,16 @@
       "mne_cpp": "Dics",
       "python": "mne.beamformer.make_dics",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "Lcmv",
       "python": "mne.beamformer.make_lcmv",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1056,8 +1056,8 @@
       "mne_cpp": "StatsAdjacency",
       "python": "mne.channels.find_ch_adjacency",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1112,8 +1112,8 @@
       "mne_cpp": "StatsAdjacency (partial)",
       "python": "mne.channels.read_ch_adjacency",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1128,8 +1128,8 @@
       "mne_cpp": "FIFFLIB dig I/O",
       "python": "mne.channels.read_dig_fif",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_dig_point_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1152,8 +1152,8 @@
       "mne_cpp": "DISPLIB layout I/O",
       "python": "mne.channels.read_layout",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_library",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1184,8 +1184,8 @@
       "mne_cpp": "FiffCoordTrans",
       "python": "mne.channels.transform_to_head",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_coord_trans",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1200,24 +1200,24 @@
       "mne_cpp": "FiffEvoked arithmetic",
       "python": "mne.combine_evoked",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_io_evoked_info",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StsCovEstimators / RtCov",
       "python": "mne.compute_covariance",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cov_estimators",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "DSPLIB SSP",
       "python": "mne.compute_proj_epochs",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1248,8 +1248,8 @@
       "mne_cpp": "StsCovEstimators",
       "python": "mne.compute_raw_covariance",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cov_estimators",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1280,24 +1280,24 @@
       "mne_cpp": "FiffRawData concatenation",
       "python": "mne.concatenate_raws",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_raw_io",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution",
       "python": "mne.convert_forward_solution",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fwd_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffAnnotations",
       "python": "mne.count_annotations",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_annotations",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1312,8 +1312,8 @@
       "mne_cpp": "FiffInfo (constructed directly)",
       "python": "mne.create_info",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_info",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1352,8 +1352,8 @@
       "mne_cpp": "Spectral (partial)",
       "python": "mne.decoding.PSDEstimator",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_utils_spectral",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1424,8 +1424,8 @@
       "mne_cpp": "FiffAnnotationEventUtils",
       "python": "mne.events_from_annotations",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_annotation_event_utils",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1456,8 +1456,8 @@
       "mne_cpp": "RTPROCESSINGLIB event detection",
       "python": "mne.find_events",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1480,16 +1480,16 @@
       "mne_cpp": "MNEForwardSolution apply",
       "python": "mne.forward.apply_forward",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution apply",
       "python": "mne.forward.apply_forward_raw",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1504,40 +1504,40 @@
       "mne_cpp": "MNEForwardSolution",
       "python": "mne.forward.convert_forward_solution",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fwd_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution",
       "python": "mne.forward.is_fixed_orient",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "ComputeFwd (partial)",
       "python": "mne.forward.make_forward_dipole",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_tool_forward_generation",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::read",
       "python": "mne.forward.read_forward_solution",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution (partial)",
       "python": "mne.forward.restrict_forward_to_label",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_label_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1552,8 +1552,8 @@
       "mne_cpp": "MNEForwardSolution::write",
       "python": "mne.forward.write_forward_solution",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1568,8 +1568,8 @@
       "mne_cpp": "FWDLIB helmet surface",
       "python": "mne.get_meg_helmet_surf",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_field_map",
+      "evidence": "cross-validated-live"
     },
     {
       "source": "parity",
@@ -1600,16 +1600,16 @@
       "mne_cpp": "MNESourceSpace decimation",
       "python": "mne.grade_to_vertices",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_source_data",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffEvoked averaging",
       "python": "mne.grand_average",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_io_evoked_info",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1624,16 +1624,16 @@
       "mne_cpp": "FSLIB (partial)",
       "python": "mne.head_to_mni",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffCoordTrans head->MRI",
       "python": "mne.head_to_mri",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_coord_trans",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1664,16 +1664,16 @@
       "mne_cpp": "FiffRawData (BaseRaw)",
       "python": "mne.io.BaseRaw",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_raw_io",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffRawData (constructed directly)",
       "python": "mne.io.RawArray",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_raw_io",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1688,8 +1688,8 @@
       "mne_cpp": "FiffRawData concatenation",
       "python": "mne.io.concatenate_raws",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_raw_io",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1720,8 +1720,8 @@
       "mne_cpp": "FiffInfo::read",
       "python": "mne.io.read_info",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_stream_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1776,8 +1776,8 @@
       "mne_cpp": "FiffRawData",
       "python": "mne.io.read_raw_fif",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_raw_formats_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1808,8 +1808,8 @@
       "mne_cpp": "FiffInfo::write",
       "python": "mne.io.write_info",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_info",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1832,8 +1832,8 @@
       "mne_cpp": "FiffCov (ad-hoc)",
       "python": "mne.make_ad_hoc_cov",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_cov",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1856,24 +1856,24 @@
       "mne_cpp": "ComputeFwd (partial)",
       "python": "mne.make_forward_dipole",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_tool_forward_generation",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_forward_solution (CLI) / ComputeFwd",
       "python": "mne.make_forward_solution",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fwd_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_make_sphere_bem (CLI)",
       "python": "mne.make_sphere_model",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fwd_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1896,8 +1896,8 @@
       "mne_cpp": "MinimumNorm",
       "python": "mne.minimum_norm.apply_inverse",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_eloreta_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1912,16 +1912,16 @@
       "mne_cpp": "mne_compute_raw_inverse (CLI)",
       "python": "mne.minimum_norm.apply_inverse_raw",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_eloreta_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEInverseOperator rank",
       "python": "mne.minimum_norm.compute_rank_inverse",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_tool_inverse_operator",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1936,32 +1936,32 @@
       "mne_cpp": "MNEInverseOperator",
       "python": "mne.minimum_norm.make_inverse_operator",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_eloreta_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEInverseOperator::prepare",
       "python": "mne.minimum_norm.prepare_inverse_operator",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_eloreta_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEInverseOperator::read",
       "python": "mne.minimum_norm.read_inverse_operator",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_tool_inverse_operator",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEInverseOperator::write",
       "python": "mne.minimum_norm.write_inverse_operator",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_eloreta_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1992,16 +1992,16 @@
       "mne_cpp": "FiffCov picking",
       "python": "mne.pick_channels_cov",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_cov",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::pick_channels",
       "python": "mne.pick_channels_forward",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2024,8 +2024,8 @@
       "mne_cpp": "FiffInfo::pick_info",
       "python": "mne.pick_info",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_info",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2040,8 +2040,8 @@
       "mne_cpp": "MNEForwardSolution::pick_types",
       "python": "mne.pick_types_forward",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2056,8 +2056,8 @@
       "mne_cpp": "SSS basis (DSPLIB)",
       "python": "mne.preprocessing.compute_maxwell_basis",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_dsp_sss",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2104,8 +2104,8 @@
       "mne_cpp": "BadChannelsLof (skigen LOF)",
       "python": "mne.preprocessing.find_bad_channels_lof",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_dsp_bad_channels_lof",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2144,24 +2144,24 @@
       "mne_cpp": "Infomax ICA (DSPLIB)",
       "python": "mne.preprocessing.infomax",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_dsp_ica",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "SSS/tSSS (DSPLIB)",
       "python": "mne.preprocessing.maxwell_filter",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_dsp_sss",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffAnnotations",
       "python": "mne.read_annotations",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_annotations",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2176,16 +2176,16 @@
       "mne_cpp": "mne_list_bem (CLI) / FWDLIB",
       "python": "mne.read_bem_surfaces",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_source_space_ops_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffCov::FiffCov(io)",
       "python": "mne.read_cov",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_cov_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2200,8 +2200,8 @@
       "mne_cpp": "FiffEpochs / MNEEpochDataList",
       "python": "mne.read_epochs",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_epochs",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2216,16 +2216,16 @@
       "mne_cpp": "FiffEvoked::read",
       "python": "mne.read_evokeds",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_evoked_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::read",
       "python": "mne.read_forward_solution",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2256,16 +2256,16 @@
       "mne_cpp": "mne_make_morph_maps (CLI)",
       "python": "mne.read_morph_map",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_source_space_ops_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffProj::read",
       "python": "mne.read_proj",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_stream_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2288,8 +2288,8 @@
       "mne_cpp": "MNESourceSpace::read",
       "python": "mne.read_source_spaces",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_source_space_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2304,8 +2304,8 @@
       "mne_cpp": "FiffCoordTrans::read",
       "python": "mne.read_trans",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_coord_trans",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2368,8 +2368,8 @@
       "mne_cpp": "mne_volume_source_space (CLI)",
       "python": "mne.setup_volume_source_space",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_source_space_ops_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2384,8 +2384,8 @@
       "mne_cpp": "MNESourceSpace::read",
       "python": "mne.source_space.read_source_spaces",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_source_space_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2400,72 +2400,72 @@
       "mne_cpp": "mne_volume_source_space (CLI)",
       "python": "mne.source_space.setup_volume_source_space",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_source_space_ops_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "MNESourceSpace::write",
       "python": "mne.source_space.write_source_spaces",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_source_data",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency (partial)",
       "python": "mne.spatial_dist_adjacency",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency (partial)",
       "python": "mne.spatial_inter_hemi_adjacency",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency::fromSourceSpace",
       "python": "mne.spatial_src_adjacency",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency",
       "python": "mne.spatial_tris_adjacency",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency (partial)",
       "python": "mne.spatio_temporal_dist_adjacency",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency::fromSourceSpaceTemporal",
       "python": "mne.spatio_temporal_src_adjacency",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency",
       "python": "mne.spatio_temporal_tris_adjacency",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2480,72 +2480,72 @@
       "mne_cpp": "StatsAdjacency (partial)",
       "python": "mne.stats.combine_adjacency",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster f-test",
       "python": "mne.stats.f_oneway",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster::oneSamplePermutationTest",
       "python": "mne.stats.permutation_cluster_1samp_test",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster::fTestPermutationTest",
       "python": "mne.stats.permutation_cluster_test",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster::permutationTest",
       "python": "mne.stats.permutation_t_test",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster",
       "python": "mne.stats.spatio_temporal_cluster_1samp_test",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster",
       "python": "mne.stats.spatio_temporal_cluster_test",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster",
       "python": "mne.stats.ttest_1samp_no_p",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster t-test",
       "python": "mne.stats.ttest_ind_no_p",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_sts_cluster",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2592,16 +2592,16 @@
       "mne_cpp": "Spectral (partial)",
       "python": "mne.time_frequency.EpochsSpectrum",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_utils_spectral",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "Spectral (partial)",
       "python": "mne.time_frequency.EpochsSpectrumArray",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_utils_spectral",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2640,24 +2640,24 @@
       "mne_cpp": "Spectral (DSPLIB)",
       "python": "mne.time_frequency.Spectrum",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_utils_spectral",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "Spectral (DSPLIB)",
       "python": "mne.time_frequency.SpectrumArray",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_utils_spectral",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "Spectral (partial)",
       "python": "mne.time_frequency.combine_spectrum",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_utils_spectral",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2752,16 +2752,16 @@
       "mne_cpp": "Spectral multitaper",
       "python": "mne.time_frequency.psd_array_multitaper",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_utils_spectral",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "Spectral::psdWelch",
       "python": "mne.time_frequency.psd_array_welch",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_utils_spectral",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2776,8 +2776,8 @@
       "mne_cpp": "Spectral (partial)",
       "python": "mne.time_frequency.read_spectrum",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_utils_spectral",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2880,8 +2880,8 @@
       "mne_cpp": "FiffCov::write",
       "python": "mne.write_cov",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_cov",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2896,16 +2896,16 @@
       "mne_cpp": "FiffEvoked::write",
       "python": "mne.write_evokeds",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_io_evoked_info",
+      "evidence": "tested"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::write",
       "python": "mne.write_forward_solution",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_forward_solution",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2936,16 +2936,16 @@
       "mne_cpp": "FiffProj::write",
       "python": "mne.write_proj",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_stream_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "MNESourceSpace::write",
       "python": "mne.write_source_spaces",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_source_data",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2960,8 +2960,8 @@
       "mne_cpp": "FiffCoordTrans::write",
       "python": "mne.write_trans",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_coord_trans",
+      "evidence": "tested"
     }
   ]
 }
