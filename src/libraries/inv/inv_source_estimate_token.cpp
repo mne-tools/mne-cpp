@@ -254,7 +254,7 @@ int stride(int total, int max)
 {
     if (max <= 0 || max >= total)
         return 1;
-    return std::max(1, total / max);
+    return (total + max - 1) / max; // ceiling, so at most max entries are kept
 }
 
 } // anonymous namespace

@@ -257,6 +257,14 @@ void TestInvSourceEstimateToken::subSamplingKeepsTimeAxis()
     for (int t = 0; t < 3; ++t)
         QVERIFY2(std::abs(back.times[t] - est.times[3 * t]) < 1e-6f,
                  qPrintable(QStringLiteral("sample %1 at %2 s, expected %3 s").arg(t).arg(back.times[t]).arg(est.times[3 * t])));
+
+    // The limits are maxima also when they do not divide the size: 10 of 421 samples, 4 of 10 sources.
+    InvSourceEstimate wide(MatrixXd::Ones(10, 421), verts, 0.0f, 0.001f);
+    opts.maxSources = 4;
+    opts.maxTimePoints = 10;
+    const InvSourceEstimate capped = fromTokens(tokenize(wide, opts));
+    QCOMPARE(capped.data.rows(), 4);
+    QCOMPARE(capped.data.cols(), 10);
 }
 
 //=============================================================================================================
