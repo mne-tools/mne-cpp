@@ -537,6 +537,12 @@ private slots:
      * Verifies the values shown by the ChannelRhiView scalebar, crosshair and ruler overlays.
      */
     void channelRhiView_overlayValues();
+
+    //=========================================================================================================
+    /**
+     * Verifies the ChannelDataView keyboard shortcuts: toggles, detrend cycling, navigation and zoom.
+     */
+    void channelDataView_keyboardShortcuts();
     void channelRhiView_rendersAndDrawsOverlays();
     void channelDataModel_bufferDetrendAndDecimation();
 
@@ -2642,6 +2648,113 @@ void TestDispViewers2::channelRhiView_renderToImage()
     }
 
     QVERIFY(view.renderToImage(QSize(0, 10)).isNull());
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::channelDataView_keyboardShortcuts()
+{
+    QSettings(QStringLiteral("MNECPP")).remove(QStringLiteral("test_disp_viewers2_keys"));
+    ChannelDataView view(QStringLiteral("test_disp_viewers2_keys"));
+    view.resize(800, 400);
+    view.init(createBrowserTestInfo());
+    view.setFileBounds(100, 299);
+    view.setData(createBrowserTestData(), 100);
+    view.setWindowSize(0.05f);
+    view.scrollToSample(100, false);
+    auto* rhiView = view.findChild<ChannelRhiView*>();
+    QVERIFY(rhiView != nullptr);
+    const auto pressKey = [&view](Qt::Key key, Qt::KeyboardModifiers modifiers = Qt::NoModifier) {
+        QKeyEvent event(QEvent::KeyPress, key, modifiers);
+        QApplication::sendEvent(&view, &event);
+    };
+
+    // Each toggle key flips its state and reports the new state
+    struct Toggle
+    {
+        Qt::Key key;
+        Qt::KeyboardModifiers modifiers;
+        std::function<bool()> state;
+        QSignalSpy* spy;
+    };
+    QSignalSpy butterflySpy(&view, &ChannelDataView::butterflyToggled);
+    QSignalSpy scalebarSpy(&view, &ChannelDataView::scalebarsToggled);
+    QSignalSpy crosshairSpy(&view, &ChannelDataView::crosshairToggled);
+    QSignalSpy eventsSpy(&view, &ChannelDataView::eventsVisibleToggled);
+    QSignalSpy epochSpy(&view, &ChannelDataView::epochMarkersToggled);
+    QSignalSpy clippingSpy(&view, &ChannelDataView::clippingToggled);
+    QSignalSpy zScoreSpy(&view, &ChannelDataView::zScoreModeToggled);
+    QSignalSpy annotationsSpy(&view, &ChannelDataView::annotationsVisibleToggled);
+    const QList<Toggle> toggles = {
+        {Qt::Key_B, Qt::NoModifier, [&view] { return view.butterflyMode(); }, &butterflySpy},
+        {Qt::Key_S, Qt::NoModifier, [&view] { return view.scalebarsVisible(); }, &scalebarSpy},
+        {Qt::Key_X, Qt::NoModifier, [&view] { return view.crosshairEnabled(); }, &crosshairSpy},
+        {Qt::Key_E, Qt::NoModifier, [&view] { return view.eventsVisible(); }, &eventsSpy},
+        {Qt::Key_G, Qt::NoModifier, [&view] { return view.epochMarkersVisible(); }, &epochSpy},
+        {Qt::Key_C, Qt::NoModifier, [&view] { return view.clippingVisible(); }, &clippingSpy},
+        {Qt::Key_Z, Qt::NoModifier, [&view] { return view.zScoreMode(); }, &zScoreSpy},
+        {Qt::Key_A, Qt::ShiftModifier, [&view] { return view.annotationsVisible(); }, &annotationsSpy},
+    };
+    for (const Toggle& toggle : toggles) {
+        for (int press = 0; press < 2; ++press) {
+            const bool before = toggle.state();
+            pressKey(toggle.key, toggle.modifiers);
+            QCOMPARE(toggle.state(), !before);
+            QCOMPARE(toggle.spy->takeLast().at(0).toBool(), !before);
+        }
+    }
+
+    // Plain A is not a shortcut
+    const bool annotationsVisible = view.annotationsVisible();
+    pressKey(Qt::Key_A);
+    QCOMPARE(view.annotationsVisible(), annotationsVisible);
+    QVERIFY(annotationsSpy.isEmpty());
+
+    // D cycles detrending None -> Mean -> Linear -> None
+    view.setDetrendMode(DetrendMode::None);
+    for (const DetrendMode mode : {DetrendMode::Mean, DetrendMode::Linear, DetrendMode::None}) {
+        pressKey(Qt::Key_D);
+        QCOMPARE(view.detrendMode(), mode);
+    }
+
+    // ] and [ change the scroll speed by a factor of 1.5
+    QSignalSpy speedSpy(&view, &ChannelDataView::scrollSpeedChanged);
+    const float speed = view.scrollSpeedFactor();
+    pressKey(Qt::Key_BracketRight);
+    QCOMPARE(view.scrollSpeedFactor(), speed * 1.5f);
+    pressKey(Qt::Key_BracketLeft);
+    QCOMPARE(view.scrollSpeedFactor(), speed);
+    QCOMPARE(speedSpy.size(), 2);
+
+    // T switches between seconds and clock time
+    const bool clock = view.clockTimeFormat();
+    pressKey(Qt::Key_T);
+    QCOMPARE(view.clockTimeFormat(), !clock);
+    pressKey(Qt::Key_T);
+
+    // Navigation: arrows step 10 %, page keys 90 % of the visible window; Home/End go to the file bounds
+    const int visible = rhiView->visibleSampleCount();
+    QVERIFY(visible > 0 && visible < 100);
+    const auto scrollsTo = [&pressKey, rhiView](Qt::Key key, float expected) {
+        pressKey(key);
+        return QTest::qWaitFor([&] { return std::fabs(rhiView->scrollSample() - expected) < 0.5f; }, 2000);
+    };
+    QVERIFY(scrollsTo(Qt::Key_End, 300.f - visible));
+    QVERIFY(scrollsTo(Qt::Key_Home, 100.f));
+    QVERIFY(scrollsTo(Qt::Key_Right, 100.f + 0.1f * visible));
+    QVERIFY(scrollsTo(Qt::Key_Left, 100.f));
+    QVERIFY(scrollsTo(Qt::Key_PageDown, 100.f + 0.9f * visible));
+    QVERIFY(scrollsTo(Qt::Key_PageUp, 100.f));
+
+    // + / = zoom in to 75 %, - zooms out by 1.33
+    const auto zoomsTo = [&pressKey, rhiView](Qt::Key key, float expected) {
+        pressKey(key);
+        return QTest::qWaitFor([&] { return std::fabs(rhiView->samplesPerPixel() / expected - 1.f) < 1e-4f; }, 2000);
+    };
+    const float spp = rhiView->samplesPerPixel();
+    QVERIFY(zoomsTo(Qt::Key_Plus, spp * 0.75f));
+    QVERIFY(zoomsTo(Qt::Key_Minus, spp * 0.75f * 1.33f));
+    QVERIFY(zoomsTo(Qt::Key_Equal, spp * 0.75f * 1.33f * 0.75f));
 }
 
 //=============================================================================================================
