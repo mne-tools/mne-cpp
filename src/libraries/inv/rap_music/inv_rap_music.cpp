@@ -658,12 +658,13 @@ double InvRapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Ve
         MatrixX6T Cor_H(t_matCor.cols(), 6);
         Cor_H = t_matCor.adjoint(); //for complex it has to be adjunct
 
-        Eigen::JacobiSVD<MatrixXT> svdOfCor_H(Cor_H, Eigen::ComputeThinV);
+        // Thin SVDs need dynamic sizes; Eigen asserts on the fixed 6-row/column types
+        Eigen::JacobiSVD<MatrixXT> svdOfCor_H(MatrixXT(Cor_H), Eigen::ComputeThinV);
 
         U_C = svdOfCor_H.matrixV(); //because t_matCor Hermitesch U and V are exchanged
         sigma_C = svdOfCor_H.singularValues();
     } else {
-        Eigen::JacobiSVD<MatrixXT> svdOfCor(t_matCor, Eigen::ComputeThinU);
+        Eigen::JacobiSVD<MatrixXT> svdOfCor(MatrixXT(t_matCor), Eigen::ComputeThinU);
 
         U_C = svdOfCor.matrixU();
         sigma_C = svdOfCor.singularValues();
