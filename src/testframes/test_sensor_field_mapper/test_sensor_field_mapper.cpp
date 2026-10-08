@@ -16,6 +16,8 @@
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_evoked.h>
+#include <disp3D/renderable/brainsurface.h>
 
 #include <Eigen/Core>
 
@@ -53,6 +55,7 @@ private slots:
     void contourStep_data();
     void contourStep();
     void sphereFit();
+    void eegFieldMatchesPython();
 };
 
 void TestSensorFieldMapper::defaultsAndBaseline()
@@ -184,6 +187,59 @@ void TestSensorFieldMapper::sphereFit()
     const Vector3f sampleCenter = SensorFieldMapper::fitSphereOrigin(raw.info, &radius);
     QVERIFY((sampleCenter - Vector3f(-0.004151959f, 0.016358261f, 0.051831485f)).norm() < 1.0e-6f);
     QVERIFY(std::abs(radius - 0.091177324f) < 1.0e-6f);
+}
+
+void TestSensorFieldMapper::eegFieldMatchesPython()
+{
+    QFile file(QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"));
+    const FiffEvoked evoked(file, 0);
+    QVERIFY(!evoked.isEmpty());
+
+    // Six scalp points in head coordinates as the "bem_head" surface
+    MatrixX3f rr(6, 3);
+    rr << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f, 0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.05f, 0.05f, 0.1f;
+    MatrixX3i tris(4, 3);
+    tris << 0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4;
+    auto head = std::make_shared<BrainSurface>();
+    head->createFromData(rr, tris, Qt::gray);
+    QMap<QString, std::shared_ptr<BrainSurface>> surfaces{{QStringLiteral("bem_head"), head}};
+
+    SensorFieldMapper mapper;
+    mapper.setEvoked(evoked);
+    QVERIFY(mapper.buildMapping(surfaces, FiffCoordTrans(), false));
+    QCOMPARE(mapper.eegSurfaceKey(), QStringLiteral("bem_head"));
+    QVERIFY(mapper.eegMapping());
+    QCOMPARE(mapper.eegPick().size(), 59);
+    QVERIFY(mapper.hasMappingFor(evoked));
+
+    // MNE-Python 1.x: _make_surface_mapping(info, surf, "eeg", origin="auto")["data"] @ data[picks, t]
+    // at t = 0.1 s (sample 180)
+    const int t = 180;
+    QVERIFY(std::abs(evoked.times(t) - 0.0998976f) < 1e-6f);
+    VectorXf meas(mapper.eegPick().size());
+    for (int i = 0; i < meas.size(); ++i) {
+        meas(i) = static_cast<float>(evoked.data(mapper.eegPick()(i), t));
+    }
+    const VectorXf mapped = *mapper.eegMapping() * meas;
+    VectorXf expected(6);
+    expected << -1.0463417311e-06f, 5.7346837125e-06f, -2.0194538723e-06f, 1.4068666640e-05f, 1.0317352023e-07f,
+        -1.6840728269e-05f;
+    QVERIFY2((mapped - expected).cwiseAbs().maxCoeff() < 1e-3f * expected.cwiseAbs().maxCoeff(),
+             qPrintable(QStringLiteral("max diff %1").arg((mapped - expected).cwiseAbs().maxCoeff())));
+
+    // Applying it colours the surface and shows the EEG contour lines; hiding the map hides them again
+    const uint32_t plain = head->vertexDataRef()[5].color;
+    SubView view;
+    view.visibility.eegFieldMap = true;
+    view.visibility.eegFieldContours = true;
+    mapper.setTimePoint(t);
+    mapper.apply(surfaces, view, {});
+    QVERIFY(head->vertexDataRef()[5].color != plain);
+    QVERIFY(surfaces.contains(QStringLiteral("sens_contour_eeg_neg")));
+    QVERIFY(surfaces.value(QStringLiteral("sens_contour_eeg_neg"))->isVisible());
+    view.visibility.eegFieldMap = false;
+    mapper.apply(surfaces, view, {});
+    QVERIFY(!surfaces.value(QStringLiteral("sens_contour_eeg_neg"))->isVisible());
 }
 
 QTEST_GUILESS_MAIN(TestSensorFieldMapper)
