@@ -2751,7 +2751,6 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
             }
         }
         menu->close();
-        menu->deleteLater();
     };
     QSignalSpy markSpy(&view, &RtFiffRawView::channelMarkingChanged);
     table->selectRow(2);
@@ -2792,6 +2791,9 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     QVERIFY(qAbs(eventSpy.at(1).at(0).toInt() - 600) <= 1.0 / dx + 1);
     QCOMPARE(eventSpy.at(0).at(0).toInt(), 1000 + static_cast<int>(xNew / dx));
     QCOMPARE(eventSpy.at(1).at(0).toInt(), static_cast<int>(xOld / dx));
+    // Closed context menus do not stay alive
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    QCOMPARE(view.findChildren<QMenu*>().size(), 0);
 
     const QString shot = QDir::temp().filePath(QStringLiteral("test_disp_viewers2_rawview.png"));
     view.takeScreenshot(shot);

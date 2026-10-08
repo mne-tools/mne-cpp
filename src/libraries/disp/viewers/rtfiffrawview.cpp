@@ -586,6 +586,7 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
 
     //create custom context menu and actions
     QMenu* menu = new QMenu(this);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
 
     menu->addSection("Events");
 
