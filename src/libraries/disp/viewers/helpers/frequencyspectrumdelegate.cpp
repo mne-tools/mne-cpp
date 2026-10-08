@@ -30,6 +30,8 @@
 #include <QTableView>
 #include <QPainterPath>
 
+#include <limits>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -206,16 +208,15 @@ void FrequencySpectrumDelegate::capturePoint(const QModelIndex& index, const QSt
         //qDebug() << "numbins" << numbins;
         //qDebug() << "lowerIdx" << lowerIdx << "upperIdx" << upperIdx;
 
-        // find the index for the current mouse cursor location
-        for (i = lowerIdx + 1; i <= upperIdx; ++i) {
-            //float tmp_rate = t_pModel->getFreqScale()[i]/t_pModel->getFreqScale()[numbins-1];
-
-            float tmp_rate = (vecFreqScale[i] - vecFreqScale[lowerIdx]) / (vecFreqScale[upperIdx] - vecFreqScale[lowerIdx]);
-
-            if (tmp_rate > m_x_rate) {
-                break;
+        // find the bin nearest to the current mouse cursor location
+        i = lowerIdx;
+        double dBestDistance = std::numeric_limits<double>::max();
+        for (qint32 j = lowerIdx; j <= upperIdx; ++j) {
+            const double dRate = (vecFreqScale[j] - vecFreqScale[lowerIdx]) / (vecFreqScale[upperIdx] - vecFreqScale[lowerIdx]);
+            if (std::abs(dRate - m_x_rate) < dBestDistance) {
+                dBestDistance = std::abs(dRate - m_x_rate);
+                i = j;
             }
-            //qDebug()<<"tmp_rate"<<tmp_rate<<"m_x_rate"<<m_x_rate<<"i"<<i;
         }
 
         /***************************************************

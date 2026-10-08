@@ -2914,6 +2914,17 @@ void TestDispViewers2::frequencySpectrumDelegate_paintsSpectrumAndReadout()
     }
     QVERIFY2(iMarker > 30, qPrintable(QString::number(iMarker)));
     QVERIFY(hasDarkPixelNear(image, cell.left() + 88, cell.top() + 42));
+    // At exactly 100 Hz the read-out names that bin: same pixels as the expected text drawn over the plain plot
+    QImage expected = image;
+    {
+        delegate.rcvMouseLoc(0, -1, -1, cell);
+        expected = render();
+        QPainter painter(&expected);
+        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+        painter.drawText(cell.left() + 88, cell.top() + 42, QStringLiteral("10 [DB], 100 [Hz]"));
+    }
+    const QRect textArea(cell.left() + 88, cell.top() + 25, 70, 20);
+    QCOMPARE(image.copy(textArea), expected.copy(textArea));
 
     // Other rows show no read-out; the name column is rotated text
     QStyleOptionViewItem option;
