@@ -1007,6 +1007,15 @@ void TestDispViewers2::artifactSettingsView_thresholds()
     QVERIFY(view.getDoArtifactThresholdRejection());
     QCOMPARE(view.getThresholdMap().value(QStringLiteral("Active")), 1.0);
 
+    // A new channel set replaces the rows and keeps the active state and the edited threshold
+    view.setChInfo({channel(FIFFV_MEG_CH, FIFF_UNIT_T_M), channel(FIFFV_EOG_CH, FIFF_UNIT_V)});
+    QCOMPARE(visible(), QStringList({"eog", "grad"}));
+    QCOMPARE(view.findChildren<QCheckBox*>().size(), 1);
+    QVERIFY(view.getDoArtifactThresholdRejection());
+    map = view.getThresholdMap();
+    QCOMPARE(map.keys(), QStringList({"Active", "eog", "grad"}));
+    QVERIFY(qAbs(map.value(QStringLiteral("grad")) - 4e-11) < 1e-20);
+
     view.saveSettings();
     view.loadSettings();
     view.clearView();

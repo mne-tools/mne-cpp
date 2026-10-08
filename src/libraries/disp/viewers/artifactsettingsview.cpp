@@ -32,6 +32,8 @@
 #include <QSpinBox>
 #include <QDebug>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -212,8 +214,14 @@ void ArtifactSettingsView::updateProcessingMode(ProcessingMode mode)
 void ArtifactSettingsView::redrawGUI()
 {
     if (QLayout* layout = this->layout()) {
+        // Deleting a layout leaves its widgets on the view
+        while (std::unique_ptr<QLayoutItem> pItem{layout->takeAt(0)}) {
+            std::unique_ptr<QWidget> pWidget{pItem->widget()};
+        }
         delete layout;
     }
+    m_mapChThresholdsDoubleSpinBoxes.clear();
+    m_mapChThresholdsSpinBoxes.clear();
 
     QGridLayout* pGroupBoxArtifactRejection = new QGridLayout();
     this->setLayout(pGroupBoxArtifactRejection);
