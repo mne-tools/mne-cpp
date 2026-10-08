@@ -1022,6 +1022,8 @@
         "windows-2025-vs2026": "run"
       },
       "registry_classes": [
+        "ChannelDataView",
+        "ChannelRhiView",
         "RtFiffRawView",
         "RtFiffRawViewDelegate",
         "RtFiffRawViewModel"

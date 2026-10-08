@@ -149,37 +149,6 @@ ChannelRhiView::ChannelRhiView(QWidget* parent)
     m_overlay->raise();
     m_overlay->show();
 
-    // ── Async tile rebuild: swap in finished tile without blocking paintEvent ──
-    connect(&m_tileWatcher, &QFutureWatcher<TileResult>::finished, this, [this]() {
-        m_tileRebuildPending = false;
-        // Check BEFORE we clear the flag: was data dirtied while we were building?
-        bool dirtiedDuringBuild = m_tileDirty;
-        bool tileAccepted = false;
-
-        if (!m_tileWatcher.isCanceled()) {
-            TileResult r = m_tileWatcher.result();
-            if (!r.image.isNull()) {
-                m_tileImage = std::move(r.image);
-                m_tileSampleFirst = r.sampleFirst;
-                m_tileSamplesPerPixel = r.samplesPerPixel;
-                m_tileFirstChannel = r.firstChannel;
-                m_tileVisibleCount = r.visibleCount;
-                m_tileDirty = false;
-                tileAccepted = true;
-            }
-        }
-
-        // Only repaint when we have something new to show: a freshly accepted tile,
-        // or new data that arrived while the build was in-flight (needs a fresh build).
-        // When the build returned null (no channels/data yet) and nothing changed,
-        // skipping update() avoids a CPU-burning infinite repaint loop.
-        if (tileAccepted || dirtiedDuringBuild) {
-            if (dirtiedDuringBuild)
-                m_tileDirty = true;
-            update();
-        }
-    });
-
     // Platform-specific backend selection
 #if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
     setApi(QRhiWidget::Api::OpenGL); // WebGL 2
@@ -222,13 +191,11 @@ void ChannelRhiView::setModel(ChannelDataModel* model)
     if (m_model) {
         connect(m_model, &ChannelDataModel::dataChanged, this, [this] {
             m_vboDirty = true;
-            m_tileDirty = true;
             update();
         });
         connect(m_model, &ChannelDataModel::metaChanged, this, [this] {
             m_vboDirty = true;
             m_pipelineDirty = true;
-            m_tileDirty = true;
             update();
         });
     }
@@ -258,18 +225,6 @@ void ChannelRhiView::setScrollSample(float sample)
         return;
 
     m_scrollSample = sample;
-
-    // Mark tile dirty when the new scroll position falls outside the tile's
-    // comfortable range.  This ensures a rebuild is queued even if another
-    // build is currently in-flight (the finished handler will see dirtiedDuringBuild
-    // and let the next paintEvent restart for the new position).
-    if (!m_tileImage.isNull() && m_tileSamplesPerPixel > 0.f) {
-        float vis = width() * m_samplesPerPixel;
-        float tileEnd = m_tileSampleFirst + m_tileImage.width() * m_tileSamplesPerPixel;
-        if (m_scrollSample < m_tileSampleFirst + vis ||
-            m_scrollSample + vis > tileEnd - vis)
-            m_tileDirty = true;
-    }
 
     // Check whether the prefetch window is still valid
     float visible = width() * m_samplesPerPixel;
@@ -302,7 +257,6 @@ void ChannelRhiView::setSamplesPerPixel(float spp)
     m_samplesPerPixel = spp;
     m_vboDirty = true; // zoom change → decimation changes
     m_overlayDirty = true;
-    m_tileDirty = true;
     emit samplesPerPixelChanged(m_samplesPerPixel);
     update();
 }
@@ -345,7 +299,6 @@ void ChannelRhiView::zoomTo(float targetSpp, int durationMs)
 void ChannelRhiView::setBackgroundColor(const QColor& color)
 {
     m_bgColor = color;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -380,7 +333,6 @@ void ChannelRhiView::setFirstVisibleChannel(int ch)
     if (ch == m_firstVisibleChannel)
         return;
     m_firstVisibleChannel = ch;
-    m_tileDirty = true;
     m_vboDirty = true;
     m_pipelineDirty = true;
     emit channelOffsetChanged(m_firstVisibleChannel);
@@ -395,7 +347,6 @@ void ChannelRhiView::setVisibleChannelCount(int count)
     if (count == m_visibleChannelCount)
         return;
     m_visibleChannelCount = count;
-    m_tileDirty = true;
     m_vboDirty = true;
     m_pipelineDirty = true;
     update();
@@ -419,7 +370,6 @@ void ChannelRhiView::setGridVisible(bool visible)
     if (visible == m_gridVisible)
         return;
     m_gridVisible = visible;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -429,7 +379,6 @@ void ChannelRhiView::setGridVisible(bool visible)
 void ChannelRhiView::setSfreq(float sfreq)
 {
     m_sfreq = qMax(sfreq, 0.f);
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -441,7 +390,6 @@ void ChannelRhiView::setFirstFileSample(int first)
     if (first == m_firstFileSample)
         return;
     m_firstFileSample = first;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -469,7 +417,6 @@ void ChannelRhiView::setHideBadChannels(bool hide)
     }
     m_vboDirty = true;
     m_pipelineDirty = true;
-    m_tileDirty = true;
     update();
 }
 
@@ -522,7 +469,6 @@ void ChannelRhiView::setButterflyMode(bool enabled)
     m_butterflyMode = enabled;
     m_vboDirty = true;
     m_pipelineDirty = true;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -590,7 +536,6 @@ void ChannelRhiView::setChannelIndices(const QVector<int>& indices)
     }
     m_vboDirty = true;
     m_pipelineDirty = true;
-    m_tileDirty = true;
     update();
 }
 
@@ -655,7 +600,6 @@ QVector<int> ChannelRhiView::effectiveChannelIndices() const
 void ChannelRhiView::setEvents(const QVector<EventMarker>& events)
 {
     m_events = events;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -665,7 +609,6 @@ void ChannelRhiView::setEvents(const QVector<EventMarker>& events)
 void ChannelRhiView::setEpochMarkers(const QVector<int>& triggerSamples)
 {
     m_epochTriggerSamples = triggerSamples;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -677,7 +620,6 @@ void ChannelRhiView::setEpochMarkersVisible(bool visible)
     if (m_bShowEpochMarkers == visible)
         return;
     m_bShowEpochMarkers = visible;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -689,7 +631,6 @@ void ChannelRhiView::setClippingVisible(bool visible)
     if (m_bShowClipping == visible)
         return;
     m_bShowClipping = visible;
-    m_tileDirty = true;
     update();
 }
 
@@ -701,7 +642,6 @@ void ChannelRhiView::setZScoreMode(bool enabled)
         return;
     m_bZScoreMode = enabled;
     m_vboDirty = true; // VBO data changes (z-score normalization)
-    m_tileDirty = true;
     update();
 }
 
@@ -710,7 +650,6 @@ void ChannelRhiView::setZScoreMode(bool enabled)
 void ChannelRhiView::setAnnotations(const QVector<AnnotationSpan>& annotations)
 {
     m_annotations = annotations;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -729,7 +668,6 @@ void ChannelRhiView::setEventsVisible(bool visible)
     if (m_bShowEvents == visible)
         return;
     m_bShowEvents = visible;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -746,7 +684,6 @@ void ChannelRhiView::setAnnotationsVisible(bool visible)
     if (m_bShowAnnotations == visible)
         return;
     m_bShowAnnotations = visible;
-    m_tileDirty = true;
     m_overlayDirty = true;
     update();
 }
@@ -1591,392 +1528,6 @@ void ChannelRhiView::paintEvent(QPaintEvent* event)
     drawOverlays();
 }
 
-//=============================================================================================================
-// Tile cache helpers retained for off-thread waveform staging.
-//=============================================================================================================
-
-bool ChannelRhiView::isTileFresh() const
-{
-    if (m_tileDirty || m_tileImage.isNull() || m_tileSamplesPerPixel <= 0.f)
-        return false;
-    if (!qFuzzyCompare(m_tileSamplesPerPixel, m_samplesPerPixel))
-        return false;
-    if (m_tileFirstChannel != m_firstVisibleChannel)
-        return false;
-    int totalCh = totalLogicalChannels();
-    int visibleCount = qMin(m_visibleChannelCount, totalCh - m_firstVisibleChannel);
-    if (m_tileVisibleCount != visibleCount)
-        return false;
-
-    // Tile is stale if current scroll is within one visible-width of either edge
-    float visibleSamples = width() * m_samplesPerPixel;
-    float tileEnd = m_tileSampleFirst + m_tileImage.width() * m_tileSamplesPerPixel;
-    if (m_scrollSample < m_tileSampleFirst + visibleSamples)
-        return false;
-    if (m_scrollSample + visibleSamples > tileEnd - visibleSamples)
-        return false;
-
-    return true;
-}
-
-//=============================================================================================================
-
-void ChannelRhiView::scheduleTileRebuild()
-{
-    // Guard: already a rebuild in flight — it will re-check m_tileDirty when done
-    if (m_tileRebuildPending)
-        return;
-
-    if (!m_model || totalLogicalChannels() == 0 || width() <= 0 || height() <= 0) {
-        // No model / no channels / zero-size: produce a stable blank tile synchronously.
-        // This prevents an infinite repaint loop: the async worker would return a null
-        // image → watcher fires update() → paintEvent → rebuild → repeat.
-        m_tileImage = QImage(qMax(width(), 1), qMax(height(), 1), QImage::Format_RGB32);
-        m_tileImage.fill(m_bgColor.rgb());
-        m_tileSampleFirst = m_scrollSample;
-        m_tileSamplesPerPixel = qMax(m_samplesPerPixel, 1e-4f);
-        m_tileFirstChannel = m_firstVisibleChannel;
-        m_tileVisibleCount = 0;
-        m_tileDirty = false;
-        return;
-    }
-
-    // Snapshot all view state for the worker (worker must NOT touch 'this')
-    ChannelDataModel* model = m_model.data();
-    float scrollSample = m_scrollSample;
-    float spp = m_samplesPerPixel;
-    int firstCh = m_firstVisibleChannel;
-    int visCnt = m_visibleChannelCount;
-    int pw = width();
-    int ph = height();
-    QColor bg = m_bgColor;
-    bool gridVis = m_gridVisible;
-    float sfreq = m_sfreq;
-    int firstFileSample = m_firstFileSample;
-    bool hideBad = m_hideBadChannels;
-    QVector<int> chIndices = m_filteredChannels; // snapshot for worker
-    QVector<EventMarker> eventsSnap = m_bShowEvents ? m_events : QVector<EventMarker>();
-    QVector<AnnotationSpan> annotationsSnap = m_bShowAnnotations ? m_annotations : QVector<AnnotationSpan>();
-    QVector<int> epochSnap = m_bShowEpochMarkers ? m_epochTriggerSamples : QVector<int>();
-    bool clipSnap = m_bShowClipping;
-    bool zscoreSnap = m_bZScoreMode;
-
-    m_tileDirty = false; // cleared now — any new event will set it true again
-    m_tileRebuildPending = true;
-    m_tileWatcher.setFuture(QtConcurrent::run([=]() {
-        return ChannelRhiView::buildTile(model, scrollSample, spp, firstCh, visCnt,
-                                         pw, ph, bg, gridVis, sfreq, firstFileSample,
-                                         hideBad, chIndices, eventsSnap, annotationsSnap, epochSnap,
-                                         clipSnap, zscoreSnap);
-    }));
-}
-
-//=============================================================================================================
-
-ChannelRhiView::TileResult ChannelRhiView::buildTile(
-    ChannelDataModel* model,
-    float scrollSample, float spp,
-    int firstCh, int visCnt,
-    int pw, int ph,
-    QColor bgColor, bool gridVisible,
-    float sfreq, int firstFileSample,
-    bool hideBadChannels,
-    const QVector<int>& channelIndices,
-    const QVector<EventMarker>& events,
-    const QVector<AnnotationSpan>& annotations,
-    const QVector<int>& epochMarkers,
-    bool showClipping,
-    bool zScoreMode)
-{
-    TileResult out;
-    out.samplesPerPixel = spp;
-    out.firstChannel = firstCh;
-
-    if (!model || pw <= 0 || ph <= 0 || spp <= 0.f)
-        return out;
-
-    int totalCh = channelIndices.isEmpty() ? model->channelCount() : channelIndices.size();
-    int visibleCount = qMin(visCnt, totalCh - firstCh);
-    if (visibleCount <= 0)
-        return out;
-
-    out.visibleCount = visibleCount;
-
-    const int kTileMult = 5;
-    int tilePixWidth = pw * kTileMult;
-    float visibleSamples = pw * spp;
-    float tileStart = scrollSample - 2.f * visibleSamples;
-
-    out.sampleFirst = tileStart;
-
-    QImage img(tilePixWidth, ph, QImage::Format_RGB32);
-    img.fill(bgColor.rgb());
-
-    QPainter p(&img);
-    p.setRenderHint(QPainter::Antialiasing, false);
-
-    float laneH = static_cast<float>(ph) / visibleCount;
-    int firstSample = static_cast<int>(tileStart);
-    int lastSample = firstSample + static_cast<int>(tilePixWidth * spp) + 1;
-
-    // ── Alternating per-second background bands ─────────────────────
-    // Draw subtle alternating grey/white bands every second, like MNE-Python browser.
-    if (sfreq > 0.f) {
-        float samplesPerSec = sfreq;
-        float firstBound = std::floor(
-                               (tileStart - static_cast<float>(firstFileSample)) / samplesPerSec) *
-                samplesPerSec +
-            static_cast<float>(firstFileSample);
-
-        // Determine parity of the first band (0 = even, 1 = odd)
-        long long bandIndex = static_cast<long long>(
-            (firstBound - static_cast<float>(firstFileSample)) / samplesPerSec);
-        bool oddBand = (bandIndex & 1) != 0;
-
-        // Compute a slightly darker shade for odd bands relative to bgColor
-        QColor altColor(
-            qBound(0, bgColor.red() - 10, 255),
-            qBound(0, bgColor.green() - 10, 255),
-            qBound(0, bgColor.blue() - 10, 255));
-
-        for (float s = firstBound; s < lastSample; s += samplesPerSec, oddBand = !oddBand) {
-            if (!oddBand)
-                continue; // even seconds use the regular bgColor already filled
-            float xStart = (s - tileStart) / spp;
-            float xEnd = xStart + samplesPerSec / spp;
-            xStart = qBound(0.f, xStart, static_cast<float>(tilePixWidth));
-            xEnd = qBound(0.f, xEnd, static_cast<float>(tilePixWidth));
-            if (xEnd > xStart)
-                p.fillRect(QRectF(xStart, 0, xEnd - xStart, ph), altColor);
-        }
-    }
-
-    // ── Grid pass ──────────────────────────────────────────────────────
-    if (gridVisible) {
-        for (int i = 0; i < visibleCount; ++i) {
-            float yMid = (i + 0.5f) * laneH;
-            float yTop = i * laneH;
-
-            if (i > 0) {
-                p.setPen(QPen(QColor(205, 205, 215), 1));
-                p.drawLine(QPointF(0, yTop), QPointF(tilePixWidth, yTop));
-            }
-
-            QPen guidePen(QColor(228, 228, 235), 1, Qt::DotLine);
-            guidePen.setDashPattern({3, 4});
-            p.setPen(guidePen);
-            p.drawLine(QPointF(0, yMid - laneH * 0.44f), QPointF(tilePixWidth, yMid - laneH * 0.44f));
-            p.drawLine(QPointF(0, yMid + laneH * 0.44f), QPointF(tilePixWidth, yMid + laneH * 0.44f));
-
-            p.setPen(QPen(QColor(210, 210, 218), 1));
-            p.drawLine(QPointF(0, yMid), QPointF(tilePixWidth, yMid));
-        }
-
-        if (sfreq > 0.f) {
-            static const float kNiceIntervals[] = {
-                0.05f, 0.1f, 0.2f, 0.5f, 1.f, 2.f, 5.f, 10.f, 30.f, 60.f};
-            float pxPerSecond = sfreq / spp;
-            float tickIntervalS = kNiceIntervals[0];
-            for (float iv : kNiceIntervals) {
-                tickIntervalS = iv;
-                if (iv * pxPerSecond >= 80.f)
-                    break;
-            }
-            float tickSamples = tickIntervalS * sfreq;
-            float origin = static_cast<float>(firstFileSample);
-            float firstTick = std::ceil((tileStart - origin) / tickSamples) * tickSamples + origin;
-
-            p.setPen(QPen(QColor(205, 205, 210), 1));
-            for (float s = firstTick; s < lastSample; s += tickSamples) {
-                float xPx = (s - tileStart) / spp;
-                p.drawLine(QPointF(xPx, 0), QPointF(xPx, ph));
-            }
-        }
-    }
-
-    // ── Annotation span pass ────────────────────────────────────────
-    if (!annotations.isEmpty()) {
-        QFont font = p.font();
-        font.setPointSizeF(8.0);
-        font.setBold(true);
-        p.setFont(font);
-
-        for (const AnnotationSpan& annotation : annotations) {
-            float xStart = (static_cast<float>(annotation.startSample) - tileStart) / spp;
-            float xEnd = (static_cast<float>(annotation.endSample + 1) - tileStart) / spp;
-
-            if (xEnd < -2.f || xStart > tilePixWidth + 2.f) {
-                continue;
-            }
-
-            xStart = qBound(0.f, xStart, static_cast<float>(tilePixWidth));
-            xEnd = qBound(0.f, xEnd, static_cast<float>(tilePixWidth));
-            if (xEnd <= xStart) {
-                continue;
-            }
-
-            QColor fillColor = annotation.color;
-            fillColor.setAlpha(48);
-            p.fillRect(QRectF(xStart, 0.f, xEnd - xStart, static_cast<float>(ph)), fillColor);
-
-            QColor borderColor = annotation.color;
-            borderColor.setAlpha(165);
-            p.setPen(QPen(borderColor, 1));
-            p.drawLine(QPointF(xStart, 0.f), QPointF(xStart, static_cast<float>(ph)));
-            p.drawLine(QPointF(xEnd, 0.f), QPointF(xEnd, static_cast<float>(ph)));
-
-            if (!annotation.label.trimmed().isEmpty()) {
-                const QString label = annotation.label.trimmed();
-                QFontMetrics metrics(font);
-                QRect labelRect = metrics.boundingRect(label);
-                labelRect.adjust(-6, -2, 6, 2);
-                const int labelX = qBound(4,
-                                          static_cast<int>(xStart) + 4,
-                                          qMax(4, tilePixWidth - labelRect.width() - 4));
-                labelRect.moveTopLeft(QPoint(labelX, 4));
-                QColor pillColor = annotation.color;
-                pillColor.setAlpha(215);
-                p.fillRect(labelRect, pillColor);
-                p.setPen(Qt::white);
-                p.drawText(labelRect, Qt::AlignCenter, label);
-            }
-        }
-    }
-
-    // ── Channel waveform pass ───────────────────────────────────────────
-    for (int i = 0; i < visibleCount; ++i) {
-        int logIdx = firstCh + i;
-        int ch = channelIndices.isEmpty() ? logIdx
-                                          : (logIdx < channelIndices.size() ? channelIndices[logIdx] : -1);
-        if (ch < 0)
-            continue;
-        auto info = model->channelInfo(ch);
-
-        // Skip trace for bad channels when hiding
-        if (hideBadChannels && info.bad)
-            continue;
-
-        int vboFirst = 0;
-        QVector<float> verts = model->decimatedVertices(
-            ch, firstSample, lastSample, tilePixWidth, vboFirst);
-        if (verts.size() < 4)
-            continue;
-
-        QColor col = info.bad ? QColor(190, 40, 40) : info.color;
-        QPen normalPen(col, 1.2);
-        QPen clipPen(QColor(255, 0, 0), 1.6);
-
-        float yMid = (i + 0.5f) * laneH;
-        int nVerts = verts.size() / 2;
-        float yScale;
-
-        // Z-score normalization: compute mean and std of visible amplitudes
-        float zMean = 0.f, zStd = 1.f;
-        if (zScoreMode && nVerts > 1) {
-            double sum = 0.0, sumSq = 0.0;
-            for (int v = 0; v < nVerts; ++v) {
-                double a = static_cast<double>(verts[v * 2 + 1]);
-                sum += a;
-                sumSq += a * a;
-            }
-            zMean = static_cast<float>(sum / nVerts);
-            double var = sumSq / nVerts - static_cast<double>(zMean) * zMean;
-            zStd = var > 0.0 ? static_cast<float>(qSqrt(var)) : 1.f;
-            // Map ±4 std devs to fill the lane
-            yScale = (laneH * 0.45f) / 4.f;
-        } else {
-            yScale = (laneH * 0.45f) / (info.amplitudeMax > 0.f ? info.amplitudeMax : 1.f);
-        }
-
-        // Threshold for clipping: 95% of max amplitude (disabled in z-score mode)
-        float clipThresh = 0.95f * info.amplitudeMax;
-        bool doClip = showClipping && !info.bad && !zScoreMode && clipThresh > 0.f;
-
-        if (!doClip) {
-            // Fast path: single polyline, no clipping check
-            p.setPen(normalPen);
-            QPolygonF poly;
-            poly.reserve(nVerts);
-            for (int v = 0; v < nVerts; ++v) {
-                float samplePos = vboFirst + verts[v * 2];
-                float xPx = (samplePos - tileStart) / spp;
-                float amp = verts[v * 2 + 1];
-                if (zScoreMode)
-                    amp = (amp - zMean) / zStd;
-                float yPx = yMid - amp * yScale;
-                poly.append(QPointF(xPx, yPx));
-            }
-            p.drawPolyline(poly);
-        } else {
-            // Clipping-aware path: split polyline into normal/clipped segments
-            QPolygonF seg;
-            seg.reserve(nVerts);
-            bool prevClipped = false;
-
-            for (int v = 0; v < nVerts; ++v) {
-                float amp = verts[v * 2 + 1];
-                float samplePos = vboFirst + verts[v * 2];
-                float xPx = (samplePos - tileStart) / spp;
-                float yPx = yMid - amp * yScale;
-                bool clipped = qAbs(amp) >= clipThresh;
-
-                if (v > 0 && clipped != prevClipped) {
-                    // State change — flush current segment, start new one
-                    // Include current point in the end of old segment for continuity
-                    seg.append(QPointF(xPx, yPx));
-                    p.setPen(prevClipped ? clipPen : normalPen);
-                    p.drawPolyline(seg);
-                    // Start new segment from current point
-                    seg.clear();
-                }
-                seg.append(QPointF(xPx, yPx));
-                prevClipped = clipped;
-            }
-            // Draw remaining segment
-            if (seg.size() > 1) {
-                p.setPen(prevClipped ? clipPen : normalPen);
-                p.drawPolyline(seg);
-            }
-        }
-    }
-
-    // ── Event / stimulus marker pass ─────────────────────────────────
-    // Draw coloured vertical lines spanning the full channel area.
-    // Label chips are shown in the TimeRulerWidget stim lane.
-    if (!events.isEmpty() && spp > 0.f) {
-        for (const EventMarker& ev : events) {
-            float xF = (static_cast<float>(ev.sample) - tileStart) / spp;
-            if (xF < -2.f || xF > tilePixWidth + 2.f)
-                continue;
-            int ix = static_cast<int>(xF);
-
-            QColor lineColor = ev.color;
-            lineColor.setAlpha(180);
-            p.setPen(QPen(lineColor, 1));
-            p.drawLine(ix, 0, ix, ph);
-        }
-    }
-
-    // ── Epoch trigger marker pass ────────────────────────────────────
-    // Draw dashed grey vertical lines at epoch trigger positions.
-    if (!epochMarkers.isEmpty() && spp > 0.f) {
-        QPen epochPen(QColor(100, 100, 100, 140), 1, Qt::DashLine);
-        p.setPen(epochPen);
-        for (int trigSample : epochMarkers) {
-            float xF = (static_cast<float>(trigSample) - tileStart) / spp;
-            if (xF < -2.f || xF > tilePixWidth + 2.f)
-                continue;
-            int ix = static_cast<int>(xF);
-            p.drawLine(ix, 0, ix, ph);
-        }
-    }
-
-    out.image = std::move(img);
-    return out;
-}
-
-//=============================================================================================================
-
 void ChannelRhiView::drawOverlays()
 {
     // Schedule an overlay repaint so crosshair/scalebars/ruler stay in sync
@@ -2431,7 +1982,6 @@ void ChannelRhiView::resizeEvent(QResizeEvent* event)
     QRhiWidget::resizeEvent(event);
     m_vboDirty = true;
     m_overlayDirty = true;
-    m_tileDirty = true;
     if (m_overlay)
         m_overlay->syncSize();
     emit viewResized(width(), height());
@@ -2572,7 +2122,6 @@ void ChannelRhiView::mouseMoveEvent(QMouseEvent* event)
             else
                 m_annotations[m_annDragIndex].endSample = newSample;
             m_overlayDirty = true;
-            m_tileDirty = true;
             update();
         }
         event->accept();

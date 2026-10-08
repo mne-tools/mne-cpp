@@ -34,7 +34,6 @@
 
 #include <QColor>
 #include <QElapsedTimer>
-#include <QFutureWatcher>
 #include <QImage>
 #include <QMouseEvent>
 #include <QPaintEvent>
@@ -43,7 +42,6 @@
 #include <QRhiWidget>
 #include <QResizeEvent>
 #include <QWheelEvent>
-#include <QtConcurrent>
 
 #include <memory>
 #include <vector>
@@ -560,45 +558,6 @@ private:
     float m_overlayFirstSample = 0.f;                     // first sample covered by overlay tex
     float m_overlayTotalSamples = 0.f;                    // total sample span of overlay tex
 
-    // ── Legacy async tile helpers retained for staging/reuse ──────────
-    struct TileResult
-    {
-        QImage image;
-        float sampleFirst = 0.f;
-        float samplesPerPixel = 0.f;
-        int firstChannel = 0;
-        int visibleCount = 0;
-    };
-
-    void scheduleTileRebuild();
-    static TileResult buildTile(ChannelDataModel* model,
-                                float scrollSample,
-                                float samplesPerPixel,
-                                int firstVisibleChannel,
-                                int visibleChannelCount,
-                                int viewWidth, int viewHeight,
-                                QColor bgColor,
-                                bool gridVisible,
-                                float sfreq,
-                                int firstFileSample,
-                                bool hideBadChannels,
-                                const QVector<int>& channelIndices,
-                                const QVector<EventMarker>& events,
-                                const QVector<AnnotationSpan>& annotations,
-                                const QVector<int>& epochMarkers,
-                                bool showClipping,
-                                bool zScoreMode);
-    bool isTileFresh() const;
-
-    QImage m_tileImage;
-    float m_tileSampleFirst = 0.f;
-    float m_tileSamplesPerPixel = 0.f;
-    int m_tileFirstChannel = -1;
-    int m_tileVisibleCount = 0;
-    bool m_tileDirty = true;
-
-    QFutureWatcher<TileResult> m_tileWatcher;
-    bool m_tileRebuildPending = false;
 
     std::unique_ptr<QRhiBuffer> m_ubo;
     std::unique_ptr<QRhiShaderResourceBindings> m_srb;
