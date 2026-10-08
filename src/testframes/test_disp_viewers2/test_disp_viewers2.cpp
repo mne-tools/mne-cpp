@@ -53,6 +53,7 @@
 #include <disp/viewers/helpers/selectionsceneitem.h>
 #include <disp/viewers/helpers/averagesceneitem.h>
 #include <disp/viewers/helpers/channeldatamodel.h>
+#include <disp/viewers/helpers/layoutscene.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
@@ -543,6 +544,12 @@ private slots:
      * Verifies the ChannelDataView keyboard shortcuts: toggles, detrend cycling, navigation and zoom.
      */
     void channelDataView_keyboardShortcuts();
+
+    //=========================================================================================================
+    /**
+     * Verifies LayoutScene wheel zoom, double-click fit, right-drag panning and rubber-band selection.
+     */
+    void layoutScene_zoomPanAndSelect();
     void channelRhiView_rendersAndDrawsOverlays();
     void channelDataModel_bufferDetrendAndDecimation();
 
@@ -2648,6 +2655,61 @@ void TestDispViewers2::channelRhiView_renderToImage()
     }
 
     QVERIFY(view.renderToImage(QSize(0, 10)).isNull());
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::layoutScene_zoomPanAndSelect()
+{
+    QGraphicsView view;
+    LayoutScene scene(&view);
+    view.setScene(&scene);
+    view.resize(200, 200);
+    scene.addRect(0, 0, 1000, 1000);
+    view.show();
+    QCoreApplication::processEvents();
+
+    // Wheel: one notch in zooms by 1.15, one notch out undoes it
+    const auto wheel = [&scene](int delta) {
+        QGraphicsSceneWheelEvent event(QEvent::GraphicsSceneWheel);
+        event.setDelta(delta);
+        QApplication::sendEvent(&scene, &event);
+    };
+    wheel(120);
+    QVERIFY(std::fabs(view.transform().m11() - 1.15) < 1e-9);
+    wheel(-120);
+    QVERIFY(std::fabs(view.transform().m11() - 1.0) < 1e-9);
+
+    // Double-click fits all items into the view
+    QGraphicsSceneMouseEvent doubleClick(QEvent::GraphicsSceneMouseDoubleClick);
+    doubleClick.setButton(Qt::LeftButton);
+    QApplication::sendEvent(&scene, &doubleClick);
+    QVERIFY(view.transform().m11() < 0.25);
+
+    // Right-drag pans the scroll bars against the mouse movement
+    view.resetTransform();
+    view.horizontalScrollBar()->setValue(300);
+    view.verticalScrollBar()->setValue(300);
+    const auto mouse = [&scene](QEvent::Type type, Qt::MouseButton button, const QPoint& screenPos) {
+        QGraphicsSceneMouseEvent event(type);
+        event.setButton(button);
+        event.setButtons(type == QEvent::GraphicsSceneMouseRelease ? Qt::NoButton : Qt::MouseButtons(button));
+        event.setScreenPos(screenPos);
+        QApplication::sendEvent(&scene, &event);
+    };
+    mouse(QEvent::GraphicsSceneMousePress, Qt::RightButton, QPoint(100, 100));
+    QCOMPARE(view.dragMode(), QGraphicsView::NoDrag);
+    mouse(QEvent::GraphicsSceneMouseMove, Qt::RightButton, QPoint(130, 80));
+    QCOMPARE(view.horizontalScrollBar()->value(), 270);
+    QCOMPARE(view.verticalScrollBar()->value(), 320);
+    mouse(QEvent::GraphicsSceneMouseRelease, Qt::RightButton, QPoint(130, 80));
+    mouse(QEvent::GraphicsSceneMouseMove, Qt::NoButton, QPoint(10, 10));
+    QCOMPARE(view.horizontalScrollBar()->value(), 270);
+
+    // Left press switches to rubber-band selection
+    mouse(QEvent::GraphicsSceneMousePress, Qt::LeftButton, QPoint(10, 10));
+    QCOMPARE(view.dragMode(), QGraphicsView::RubberBandDrag);
+    mouse(QEvent::GraphicsSceneMouseRelease, Qt::LeftButton, QPoint(10, 10));
 }
 
 //=============================================================================================================
