@@ -156,7 +156,7 @@ protected:
 
     QList<FIFFLIB::FiffChInfo> m_fiffChInfoList;
 
-    bool m_bDoArtifactThresholdReduction;
+    bool m_bDoArtifactThresholdReduction = false;
 
     QPointer<QCheckBox> m_pArtifactRejectionCheckBox;
 

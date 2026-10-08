@@ -978,7 +978,9 @@ void TestDispViewers2::artifactSettingsView_thresholds()
     QCOMPARE(visible(), QStringList({"eeg", "grad", "mag"}));
     QCOMPARE(thresholdSpy.count(), 1);
     QMap<QString, double> map = view.getThresholdMap();
+    QCOMPARE(map.value(QStringLiteral("Active")), 0.0);
     QCOMPARE(map.keys(), QStringList({"Active", "eeg", "grad", "mag"}));
+    QCOMPARE(map.value(QStringLiteral("grad")), 0.1);
 
     auto spin = [&view](int iRow, int iColumn) {
         auto* pLayout = qobject_cast<QGridLayout*>(view.layout());
@@ -997,6 +999,13 @@ void TestDispViewers2::artifactSettingsView_thresholds()
     qobject_cast<QSpinBox*>(spin(iGradRow, 2))->setValue(-11);
     QVERIFY(qAbs(view.getThresholdMap().value(QStringLiteral("grad")) - 4e-11) < 1e-20);
     QVERIFY(qAbs(thresholdSpy.last().at(0).value<QMap<QString, double>>().value(QStringLiteral("grad")) - 4e-11) < 1e-20);
+
+    // Activation is reported in the map
+    auto* pActive = qobject_cast<QCheckBox*>(spin(0, 0));
+    QVERIFY(pActive);
+    QTest::mouseClick(pActive, Qt::LeftButton);
+    QVERIFY(view.getDoArtifactThresholdRejection());
+    QCOMPARE(view.getThresholdMap().value(QStringLiteral("Active")), 1.0);
 
     view.saveSettings();
     view.loadSettings();

@@ -143,21 +143,6 @@ void ArtifactSettingsView::saveSettings()
 
 void ArtifactSettingsView::loadSettings()
 {
-    if (m_sSettingsPath.isEmpty()) {
-        return;
-    }
-
-    // Load Settings
-    QSettings settings("MNECPP");
-
-    m_bDoArtifactThresholdReduction = settings.value(m_sSettingsPath + QString("/ArtifactSettingsView/doArtifactThresholdReduction"), false).toBool();
-
-    if (m_bDoArtifactThresholdReduction) {
-        m_mapThresholds["Active"] = 1.0;
-    } else {
-        m_mapThresholds["Active"] = 0.0;
-    }
-
     m_mapThresholdsFirst["grad"] = 1.0;
     m_mapThresholdsFirst["mag"] = 1.0;
     m_mapThresholdsFirst["eeg"] = 1.0;
@@ -171,6 +156,17 @@ void ArtifactSettingsView::loadSettings()
     m_mapThresholdsSecond["ecg"] = -1;
     m_mapThresholdsSecond["emg"] = -1;
     m_mapThresholdsSecond["eog"] = -1;
+
+    if (m_sSettingsPath.isEmpty()) {
+        m_mapThresholds["Active"] = m_bDoArtifactThresholdReduction ? 1.0 : 0.0;
+        return;
+    }
+
+    // Load Settings
+    QSettings settings("MNECPP");
+
+    m_bDoArtifactThresholdReduction = settings.value(m_sSettingsPath + QString("/ArtifactSettingsView/doArtifactThresholdReduction"), false).toBool();
+    m_mapThresholds["Active"] = m_bDoArtifactThresholdReduction ? 1.0 : 0.0;
 
     settings.beginGroup(m_sSettingsPath + QString("/ArtifactSettingsView/artifactThresholdsFirst"));
     QStringList keys = settings.childKeys();
