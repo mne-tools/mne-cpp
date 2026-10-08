@@ -115,7 +115,8 @@ struct RegionData
         if (bUseWhitened) {
             t_kMeans.calculate(this->matRoiGWhitened, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
 
-            Eigen::MatrixXd newCtrs = Eigen::MatrixXd::Zero(p_RegionDataOut.ctrs.rows(), p_RegionDataOut.ctrs.cols());
+            // Centroids of the original gain: all channels, not only those the whitener kept
+            Eigen::MatrixXd newCtrs = Eigen::MatrixXd::Zero(p_RegionDataOut.ctrs.rows(), this->matRoiG.cols());
             for (qint32 c = 0; c < p_RegionDataOut.ctrs.rows(); ++c) {
                 qint32 num = 0;
 

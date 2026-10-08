@@ -548,15 +548,18 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
 
                     // Reshape Input data -> sources rows; sensors columns
                     t_sensG.matRoiG = MatrixXd(t_G.cols() / 3, 3 * nSens);
-                    if (t_bUseWhitened)
-                        t_sensG.matRoiGWhitened = MatrixXd(t_G_Whitened_Roi.cols() / 3, 3 * nSens);
-
                     for (qint32 j = 0; j < nSens; ++j) {
                         for (qint32 k = 0; k < t_sensG.matRoiG.rows(); ++k)
                             t_sensG.matRoiG.block(k, j * 3, 1, 3) = t_G.block(j, k * 3, 1, 3);
-                        if (t_bUseWhitened)
+                    }
+                    // The whitened gain only has the channels prepare_forward() kept, so fewer rows than t_G
+                    if (t_bUseWhitened) {
+                        const qint32 nSensWhitened = static_cast<qint32>(t_G_Whitened_Roi.rows());
+                        t_sensG.matRoiGWhitened = MatrixXd(t_G_Whitened_Roi.cols() / 3, 3 * nSensWhitened);
+                        for (qint32 j = 0; j < nSensWhitened; ++j) {
                             for (qint32 k = 0; k < t_sensG.matRoiGWhitened.rows(); ++k)
                                 t_sensG.matRoiGWhitened.block(k, j * 3, 1, 3) = t_G_Whitened_Roi.block(j, k * 3, 1, 3);
+                        }
                     }
 
                     t_sensG.bUseWhitened = t_bUseWhitened;
