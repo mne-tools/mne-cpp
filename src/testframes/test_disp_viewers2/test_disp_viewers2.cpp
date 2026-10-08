@@ -457,6 +457,13 @@ private slots:
 
     //=========================================================================================================
     /**
+     * Verifies FrequencySpectrumDelegate drawing: the spectrum curve rises with power, spans the frequency
+     * bounds, frequency grid labels, and the mouse read-out of frequency and value.
+     */
+    void frequencySpectrumDelegate_paintsSpectrumAndReadout();
+
+    //=========================================================================================================
+    /**
      * Verifies that Control3DView constructs headlessly and basic setters
      * do not crash.
      */
@@ -2813,6 +2820,110 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     view.takeScreenshot(shot);
     QVERIFY(QFile::exists(shot));
     QFile::remove(shot);
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::frequencySpectrumDelegate_paintsSpectrumAndReadout()
+{
+    // 4 channels, 101 bins over 0..500 Hz (5 Hz per bin); channel 0 is a peak at 100 Hz (bin 20)
+    auto info = createBrowserTestInfo();
+    FrequencySpectrumModel model;
+    model.setInfo(info);
+    Eigen::MatrixXd spectrum = Eigen::MatrixXd::Constant(4, 101, 1.0);
+    for (int b = 0; b < 101; ++b) {
+        spectrum(0, b) = 1.0 + 9.0 * std::exp(-0.5 * std::pow((b - 20) / 2.0, 2));
+    }
+    model.addData(spectrum);
+
+    QTableView table;
+    table.setModel(&model);
+    FrequencySpectrumDelegate delegate(&table);
+    table.setItemDelegate(&delegate);
+
+    // Paint row 0 into a 400 x 100 cell; SpectrumView hides the name column, so the plot cell starts at x = 0
+    const QRect cell(0, 20, 400, 100);
+    auto render = [&]() {
+        QImage image(cell.right() + 20, cell.bottom() + 20, QImage::Format_RGB32);
+        image.fill(Qt::white);
+        QPainter painter(&image);
+        QStyleOptionViewItem option;
+        option.rect = cell;
+        delegate.paint(&painter, option, model.index(0, 1));
+        return image;
+    };
+    auto curveRow = [](const QImage& image, int x) {
+        for (int y = 0; y < image.height(); ++y) {
+            const QRgb c = image.pixel(x, y);
+            if (qBlue(c) > qRed(c) + 60 && qBlue(c) > qGreen(c) + 60) {
+                return y;
+            }
+        }
+        return -1;
+    };
+
+    QImage image = render();
+    // The curve spans the cell width and deviates from the flat level only around the 100 Hz peak (x = 0.2 * 400)
+    const int yFlat = curveRow(image, cell.left() + 300);
+    QVERIFY2(yFlat >= cell.top() && yFlat <= cell.bottom(), qPrintable(QString::number(yFlat)));
+    QCOMPARE(curveRow(image, cell.left() + 2), yFlat);
+    QCOMPARE(curveRow(image, cell.right() - 2), yFlat);
+    QVERIFY(curveRow(image, cell.left() + 80) != yFlat);
+
+    // Grid: 5 linear divisions labelled at 100..400 Hz
+    auto hasDarkPixelNear = [](const QImage& image, int x, int y) {
+        for (int dx = -2; dx <= 20; ++dx) {
+            for (int dy = -12; dy <= 2; ++dy) {
+                if (qGray(image.pixel(x + dx, y + dy)) < 100) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    for (int f = 100; f <= 400; f += 100) {
+        QVERIFY2(hasDarkPixelNear(image, cell.left() + f * 400 / 500, cell.top()), qPrintable(QString::number(f)));
+    }
+
+    // Narrowing the bounds to 50..150 Hz stretches the band over the whole width: the peak moves to the centre
+    model.setBoundaries(50.0f, 150.0f);
+    QCOMPARE(model.getLowerFrqBound(), 9);
+    QCOMPARE(model.getUpperFrqBound(), 31);
+    image = render();
+    QVERIFY(curveRow(image, cell.left() + 200) != curveRow(image, cell.left() + 2));
+
+    // Mouse read-out over the cell: a vertical marker and the frequency/value text for the hovered row
+    model.setBoundaries(0.0f, 500.0f);
+    table.resize(500, 300);
+    delegate.rcvMouseLoc(0, cell.left() + 80, cell.top() + 50, cell);
+    image = render();
+    int iMarker = 0;
+    for (int y = cell.top(); y < cell.bottom(); ++y) {
+        const QRgb c = image.pixel(cell.left() + 80, y);
+        if (qGray(c) < 200 && std::abs(qRed(c) - qBlue(c)) < 20) {
+            ++iMarker;
+        }
+    }
+    QVERIFY2(iMarker > 30, qPrintable(QString::number(iMarker)));
+    QVERIFY(hasDarkPixelNear(image, cell.left() + 88, cell.top() + 42));
+
+    // Other rows show no read-out; the name column is rotated text
+    QStyleOptionViewItem option;
+    option.rect = cell;
+    QImage other(cell.right() + 20, cell.bottom() + 20, QImage::Format_RGB32);
+    other.fill(Qt::white);
+    {
+        QPainter painter(&other);
+        delegate.paint(&painter, option, model.index(1, 1));
+        delegate.paint(&painter, option, model.index(1, 0));
+    }
+    QVERIFY(!hasDarkPixelNear(other, cell.left() + 88, cell.top() + 42));
+    QCOMPARE(delegate.sizeHint(option, model.index(0, 0)), QSize(20, cell.height()));
+
+    // Log scale: decade grid lines
+    delegate.setScaleType(1);
+    image = render();
+    QVERIFY(curveRow(image, cell.left() + 300) >= 0);
 }
 
 //=============================================================================================================
