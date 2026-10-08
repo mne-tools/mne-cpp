@@ -2898,7 +2898,17 @@ void TestDispViewers2::control3dView_flagsSignalsAndTree()
     pLight->click();
     QCOMPARE(lightSpy.last().at(0).value<QColor>(), QColor(200, 100, 50));
     QVERIFY(pLight->styleSheet().contains(QStringLiteral("rgb(200, 100, 50)")));
+    QCOMPARE(view.findChildren<QColorDialog*>().size(), 0);
 
+    // Cancelling reverts the previewed color
+    pickColor(QColor(1, 2, 3), false);
+    pScene->click();
+    QCOMPARE(sceneSpy.last().at(0).value<QColor>(), QColor(20, 40, 60));
+    QVERIFY(pScene->styleSheet().contains(QStringLiteral("rgb(20, 40, 60)")));
+    pickColor(QColor(4, 5, 6), false);
+    pLight->click();
+    QCOMPARE(lightSpy.last().at(0).value<QColor>(), QColor(200, 100, 50));
+    QVERIFY(pLight->styleSheet().contains(QStringLiteral("rgb(200, 100, 50)")));
 
     // Data tree: header toggle and confirmed removal through the context menu
     view.setFlags({QStringLiteral("Data")});

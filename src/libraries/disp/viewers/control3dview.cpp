@@ -245,15 +245,17 @@ void Control3DView::onOpacityChange(qint32 value)
 
 void Control3DView::onSceneColorPicker()
 {
-    QColorDialog* pDialog = new QColorDialog(this);
-    pDialog->setCurrentColor(m_colCurrentSceneColor);
+    QColorDialog dialog(m_colCurrentSceneColor, this);
 
     //Update all connected View3D's scene colors
-    connect(pDialog, &QColorDialog::currentColorChanged,
+    connect(&dialog, &QColorDialog::currentColorChanged,
             this, &Control3DView::onSceneColorChanged);
 
-    pDialog->exec();
-    m_colCurrentSceneColor = pDialog->currentColor();
+    if (dialog.exec() == QDialog::Accepted) {
+        m_colCurrentSceneColor = dialog.currentColor();
+    } else {
+        onSceneColorChanged(m_colCurrentSceneColor);
+    }
 
     //Set color of button new new scene color
     m_pUi->m_pushButton_sceneColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentSceneColor.red()).arg(m_colCurrentSceneColor.green()).arg(m_colCurrentSceneColor.blue()));
@@ -334,15 +336,17 @@ void Control3DView::onCoordAxisClicked(bool checked)
 
 void Control3DView::onLightColorPicker()
 {
-    QColorDialog* pDialog = new QColorDialog(this);
-    pDialog->setCurrentColor(m_colCurrentLightColor);
+    QColorDialog dialog(m_colCurrentLightColor, this);
 
-    //Update all connected View3D's scene colors
-    connect(pDialog, &QColorDialog::currentColorChanged,
+    //Update all connected View3D's light colors
+    connect(&dialog, &QColorDialog::currentColorChanged,
             this, &Control3DView::onLightColorChanged);
 
-    pDialog->exec();
-    m_colCurrentLightColor = pDialog->currentColor();
+    if (dialog.exec() == QDialog::Accepted) {
+        m_colCurrentLightColor = dialog.currentColor();
+    } else {
+        onLightColorChanged(m_colCurrentLightColor);
+    }
 
     //Set color of button new new scene color
     m_pUi->m_pushButton_lightColorPicker->setStyleSheet(QString("background-color: rgb(%1, %2, %3);").arg(m_colCurrentLightColor.red()).arg(m_colCurrentLightColor.green()).arg(m_colCurrentLightColor.blue()));
