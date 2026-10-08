@@ -44,6 +44,7 @@
 #include <disp3D/renderable/networkobject.h>
 #include <disp3D/renderable/sourceestimateoverlay.h>
 #include <disp3D/renderable/sliceobject.h>
+#include <fiff/fiff_evoked.h>
 #include <disp/plots/helpers/colormap.h>
 #include <inv/inv_source_estimate.h>
 #include <disp3D/core/viewstate.h>
@@ -463,6 +464,49 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     worker.setMegFieldMapOnHead(false);
     worker.setBadChannels(QStringList() << "MEG0111" << "MEG0112");
     worker.setBadChannels(QStringList());
+
+    int eegCount = 0;
+    QString eegKey;
+    std::shared_ptr<Eigen::MatrixXf> mapping;
+    QVector<int> pick;
+    QObject::connect(&worker, &RtSensorInterpolationMatWorker::newEegMappingAvailable,
+                     [&](const QString& key, std::shared_ptr<Eigen::MatrixXf> mat, const QVector<int>& picked) {
+                         ++eegCount;
+                         eegKey = key;
+                         mapping = std::move(mat);
+                         pick = picked;
+                     });
+
+    // Without evoked data nothing is computed
+    worker.computeMapping();
+    QCOMPARE(eegCount, 0);
+
+    // EEG of the sample data onto a small scalp patch: one mapping row per vertex, one column per picked EEG channel
+    QFile file(QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"));
+    const FIFFLIB::FiffEvoked evoked(file, 0);
+    QVERIFY(!evoked.isEmpty());
+    Eigen::MatrixX3f scalp(6, 3);
+    scalp << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f, 0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.05f, 0.05f, 0.1f;
+    worker.setEvoked(evoked);
+    worker.setTransform(FIFFLIB::FiffCoordTrans(), false);
+    worker.setEegSurface(QStringLiteral("bem_head"), scalp);
+    worker.computeMapping();
+    QCOMPARE(eegCount, 1);
+    QCOMPARE(eegKey, QStringLiteral("bem_head"));
+    QVERIFY(mapping && mapping->rows() == scalp.rows() && mapping->cols() == pick.size());
+    for (int k : pick) {
+        QCOMPARE(evoked.info.chs[k].kind, FIFFV_EEG_CH);
+    }
+
+    // Channels passed as bad are left out
+    const QString firstEeg = evoked.info.chs[pick.first()].ch_name;
+    worker.setBadChannels({firstEeg});
+    worker.computeMapping();
+    QCOMPARE(eegCount, 2);
+    for (int k : pick) {
+        QVERIFY(evoked.info.chs[k].ch_name != firstEeg);
+    }
+    worker.setBadChannels({});
 
     QApplication::processEvents();
 }

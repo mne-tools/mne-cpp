@@ -29,7 +29,7 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/37300892424 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 19 |
-| test-data | 103 |
+| test-data | 104 |
 | GUI (`QTEST_MAIN`) | 33 |
 | Contains `QSKIP` | 73 |
 
