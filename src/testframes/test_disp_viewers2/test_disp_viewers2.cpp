@@ -80,6 +80,7 @@
 #include <QMenu>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QGraphicsSceneMouseEvent>
 #include <QGridLayout>
 #include <QScopeGuard>
 #include <QGroupBox>
@@ -446,6 +447,13 @@ private slots:
      * Verifies DipoleFitView parameter signals, the requested parameter set, model lists and the fit name.
      */
     void dipoleFitView_paramsModelsAndFit();
+
+    //=========================================================================================================
+    /**
+     * Verifies AverageSceneItem drawing: stim and zero line, scaling and clamping, per-average color and
+     * activation, bad-channel opacity and the press/release label size.
+     */
+    void averageSceneItem_paintsScaledClampedCurves();
 
     //=========================================================================================================
     /**
@@ -2805,6 +2813,100 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     view.takeScreenshot(shot);
     QVERIFY(QFile::exists(shot));
     QFile::remove(shot);
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::averageSceneItem_paintsScaledClampedCurves()
+{
+    // Channel 1 of 2, 120 samples, stimulus at sample 30; "aud" ramps to 2x full scale, "vis" is inactive
+    Eigen::MatrixXd aud = Eigen::MatrixXd::Zero(2, 120);
+    Eigen::MatrixXd vis = Eigen::MatrixXd::Zero(2, 120);
+    for (int s = 0; s < 120; ++s) {
+        aud(1, s) = (s < 60) ? 0.5e-12 : 2e-12;
+        vis(1, s) = -0.5e-12;
+    }
+    AverageSceneItem item(QStringLiteral("MEG0112"), 1, QPointF(0, 0), FIFFV_MEG_CH, FIFF_UNIT_T, Qt::darkGray);
+    item.m_iTotalNumberChannels = 2;
+    item.m_firstLastSample = qMakePair(-30, 90);
+    item.m_scaleMap = {{FIFF_UNIT_T, 1e-12f}};
+    item.m_lAverageData = {{QStringLiteral("aud"), RowVectorPair(aud.data(), 120)},
+                           {QStringLiteral("vis"), RowVectorPair(vis.data(), 120)}};
+    item.m_qMapAverageColor = {{QStringLiteral("aud"), Qt::blue}};
+    item.m_qMapAverageActivation = {{QStringLiteral("aud"), true}, {QStringLiteral("vis"), false}};
+    QCOMPARE(item.boundingRect(), QRectF(-60, -30, 120, 60));
+
+    // Render the 120 x 60 item 1:1 into an image whose origin is the item's top-left corner
+    auto render = [&item]() {
+        QImage image(120, 60, QImage::Format_RGB32);
+        image.fill(Qt::white);
+        QPainter painter(&image);
+        painter.translate(60, 30);
+        item.paint(&painter, nullptr, nullptr);
+        return image;
+    };
+    // Antialiased one-pixel lines fall between pixels and show at half intensity
+    auto isBlue = [](QRgb c) {
+        return qBlue(c) > 200 && qRed(c) < 160 && qGreen(c) < 160;
+    };
+    auto isRed = [](QRgb c) {
+        return qRed(c) > 200 && qGreen(c) < 160 && qBlue(c) < 160;
+    };
+    auto rowsWhere = [](const QImage& image, int x, const std::function<bool(QRgb)>& pred) {
+        QList<int> rows;
+        for (int y = 0; y < image.height(); ++y) {
+            if (pred(image.pixel(x, y))) {
+                rows << y;
+            }
+        }
+        return rows;
+    };
+
+    QImage image = render();
+    // Stimulus line at sample 30, i.e. x = 30; zero line at y = 30
+    QVERIFY(rowsWhere(image, 30, isRed).size() > 50);
+    QVERIFY(rowsWhere(image, 90, isRed).contains(30));
+    // Half of full scale is a quarter of the height above the centre; twice full scale is clamped to the top
+    QList<int> blue = rowsWhere(image, 45, isBlue);
+    QVERIFY2(!blue.isEmpty() && std::abs(blue.first() - 15) <= 1, qPrintable(QString::number(blue.value(0, -1))));
+    blue = rowsWhere(image, 100, isBlue);
+    QVERIFY2(!blue.isEmpty() && blue.first() <= 1, qPrintable(QString::number(blue.value(0, -1))));
+    // The inactive "vis" average (default color, below the centre) is not drawn
+    auto isGray = [](QRgb c) {
+        return qGray(c) < 220 && std::abs(qRed(c) - qBlue(c)) < 30 && std::abs(qRed(c) - qGreen(c)) < 30;
+    };
+    QVERIFY(rowsWhere(image, 45, isGray).isEmpty());
+
+    // Activating "vis" draws it in the default color a quarter below the centre
+    item.m_qMapAverageActivation[QStringLiteral("vis")] = true;
+    image = render();
+    const QList<int> gray = rowsWhere(image, 45, isGray);
+    QVERIFY2(!gray.isEmpty() && std::abs(gray.first() - 45) <= 1, qPrintable(QString::number(gray.value(0, -1))));
+    item.setDefaultColor(Qt::green);
+    image = render();
+    QVERIFY(!rowsWhere(image, 45, [](QRgb c) { return qGreen(c) > 100 && qRed(c) < qGreen(c) - 50 && qBlue(c) < qGreen(c) - 50; }).isEmpty());
+
+    // A bad channel is drawn faded
+    item.m_bIsBad = true;
+    image = render();
+    blue = rowsWhere(image, 45, [](QRgb c) { return qBlue(c) > qRed(c) + 20; });
+    QVERIFY(!blue.isEmpty());
+    QVERIFY(qRed(image.pixel(45, blue.first())) > 150);
+    item.m_bIsBad = false;
+
+    // Press enlarges the label, release restores it, both ask for a scene update
+    QSignalSpy updateSpy(&item, &AverageSceneItem::sceneUpdateRequested);
+    QGraphicsSceneMouseEvent press(QEvent::GraphicsSceneMousePress);
+    item.mousePressEvent(&press);
+    QCOMPARE(item.m_iFontTextSize, 6);
+    item.mouseReleaseEvent(&press);
+    QCOMPARE(item.m_iFontTextSize, 3);
+    QCOMPARE(updateSpy.count(), 2);
+
+    // Without data nothing but the label is drawn
+    item.m_lAverageData.clear();
+    image = render();
+    QVERIFY(rowsWhere(image, 90, isRed).isEmpty());
 }
 
 //=============================================================================================================
