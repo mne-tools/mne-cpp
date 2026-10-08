@@ -783,6 +783,13 @@ bool ChannelDataView::crosshairEnabled() const
 
 //=============================================================================================================
 
+QImage ChannelDataView::renderToImage(const QSize& size) const
+{
+    return m_pRhiView ? m_pRhiView->renderToImage(size) : QImage();
+}
+
+//=============================================================================================================
+
 void ChannelDataView::setScalebarsVisible(bool visible)
 {
     if (m_pRhiView)

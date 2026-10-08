@@ -446,6 +446,23 @@ Set whether the crosshair label uses clock time (mm:ss.ms) or seconds.
 
 ---
 
+### renderToImage(size)
+
+Render the current view (background bands, grid, annotations, traces, event and epoch markers) into an image with QPainter, without the GPU.
+
+Rows, scaling, butterfly layout, z-score mode and clipping highlight match the on-screen rendering, so this also works offscreen, e.g. for reports.
+
+**Parameters:**
+
+- **size** : *const QSize &*
+  Output size in pixels; the visible time span is stretched to fit. An invalid size (default) uses the widget size.
+
+**Returns:**
+
+- *QImage* — The rendered image (only the background if no channel is shown), or a null image if there is no model or the size is empty.
+
+---
+
 ### setScalebarsVisible(visible)
 
 Show or hide per-channel-type scalebars in the bottom-right corner.

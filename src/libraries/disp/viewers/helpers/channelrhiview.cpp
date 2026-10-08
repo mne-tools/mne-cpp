@@ -1528,6 +1528,283 @@ void ChannelRhiView::paintEvent(QPaintEvent* event)
     drawOverlays();
 }
 
+//=============================================================================================================
+
+QImage ChannelRhiView::renderToImage(const QSize& size) const
+{
+    const int pw = size.isValid() ? size.width() : width();
+    const int ph = size.isValid() ? size.height() : height();
+    if (!m_model || pw <= 0 || ph <= 0 || m_samplesPerPixel <= 0.f) {
+        return QImage();
+    }
+
+    // Same rows and horizontal scale as on screen: the time span shown stays the same at any output width
+    const float spp = m_samplesPerPixel * static_cast<float>(qMax(width(), 1)) / static_cast<float>(pw);
+    const float scrollSample = m_scrollSample;
+    const QColor bgColor = m_bgColor;
+    const bool gridVisible = m_gridVisible;
+    const float sfreq = m_sfreq;
+    const int firstFileSample = m_firstFileSample;
+    const bool zScoreMode = m_bZScoreMode;
+    const bool showClipping = m_bShowClipping;
+    const QVector<EventMarker> events = m_bShowEvents ? m_events : QVector<EventMarker>();
+    const QVector<AnnotationSpan> annotations = m_bShowAnnotations ? m_annotations : QVector<AnnotationSpan>();
+    const QVector<int> epochMarkers = m_bShowEpochMarkers ? m_epochTriggerSamples : QVector<int>();
+    const ChannelDataModel* model = m_model.data();
+
+    // (model channel, lane) for every trace to draw, laid out exactly like updateUBO()
+    QVector<QPair<int, int>> traces;
+    int laneCount = 0;
+    if (m_butterflyMode) {
+        const QVector<ButterflyTypeGroup> groups = butterflyTypeGroups();
+        laneCount = static_cast<int>(groups.size());
+        for (int lane = 0; lane < laneCount; ++lane) {
+            for (int ch : groups[lane].channelIndices) {
+                traces.append({ch, lane});
+            }
+        }
+    } else {
+        const QVector<int> channelIndices = effectiveChannelIndices();
+        const int firstCh = qBound(0, m_firstVisibleChannel, static_cast<int>(channelIndices.size()));
+        laneCount = qMin(m_visibleChannelCount, static_cast<int>(channelIndices.size()) - firstCh);
+        for (int lane = 0; lane < laneCount; ++lane) {
+            traces.append({channelIndices[firstCh + lane], lane});
+        }
+    }
+    if (laneCount <= 0) {
+        QImage blank(pw, ph, QImage::Format_RGB32);
+        blank.fill(bgColor.rgb());
+        return blank;
+    }
+
+    QImage img(pw, ph, QImage::Format_RGB32);
+    img.fill(bgColor.rgb());
+
+    QPainter p(&img);
+    p.setRenderHint(QPainter::Antialiasing, false);
+
+    const float laneH = static_cast<float>(ph) / static_cast<float>(laneCount);
+    int firstSample = static_cast<int>(scrollSample);
+    int lastSample = firstSample + static_cast<int>(pw * spp) + 1;
+
+    // ── Alternating per-second background bands ─────────────────────
+    // Draw subtle alternating grey/white bands every second, like MNE-Python browser.
+    if (sfreq > 0.f) {
+        float samplesPerSec = sfreq;
+        float firstBound = std::floor(
+                               (scrollSample - static_cast<float>(firstFileSample)) / samplesPerSec) *
+                samplesPerSec +
+            static_cast<float>(firstFileSample);
+
+        // Determine parity of the first band (0 = even, 1 = odd)
+        long long bandIndex = static_cast<long long>(
+            (firstBound - static_cast<float>(firstFileSample)) / samplesPerSec);
+        bool oddBand = (bandIndex & 1) != 0;
+
+        // Compute a slightly darker shade for odd bands relative to bgColor
+        QColor altColor(
+            qBound(0, bgColor.red() - 10, 255),
+            qBound(0, bgColor.green() - 10, 255),
+            qBound(0, bgColor.blue() - 10, 255));
+
+        for (float s = firstBound; s < lastSample; s += samplesPerSec, oddBand = !oddBand) {
+            if (!oddBand)
+                continue; // even seconds use the regular bgColor already filled
+            float xStart = (s - scrollSample) / spp;
+            float xEnd = xStart + samplesPerSec / spp;
+            xStart = qBound(0.f, xStart, static_cast<float>(pw));
+            xEnd = qBound(0.f, xEnd, static_cast<float>(pw));
+            if (xEnd > xStart)
+                p.fillRect(QRectF(xStart, 0, xEnd - xStart, ph), altColor);
+        }
+    }
+
+    // ── Grid pass ──────────────────────────────────────────────────────
+    if (gridVisible) {
+        for (int i = 0; i < laneCount; ++i) {
+            float yMid = (i + 0.5f) * laneH;
+            float yTop = i * laneH;
+
+            if (i > 0) {
+                p.setPen(QPen(QColor(205, 205, 215), 1));
+                p.drawLine(QPointF(0, yTop), QPointF(pw, yTop));
+            }
+
+            QPen guidePen(QColor(228, 228, 235), 1, Qt::DotLine);
+            guidePen.setDashPattern({3, 4});
+            p.setPen(guidePen);
+            p.drawLine(QPointF(0, yMid - laneH * 0.44f), QPointF(pw, yMid - laneH * 0.44f));
+            p.drawLine(QPointF(0, yMid + laneH * 0.44f), QPointF(pw, yMid + laneH * 0.44f));
+
+            p.setPen(QPen(QColor(210, 210, 218), 1));
+            p.drawLine(QPointF(0, yMid), QPointF(pw, yMid));
+        }
+
+        if (sfreq > 0.f) {
+            static const float kNiceIntervals[] = {
+                0.05f, 0.1f, 0.2f, 0.5f, 1.f, 2.f, 5.f, 10.f, 30.f, 60.f};
+            float pxPerSecond = sfreq / spp;
+            float tickIntervalS = kNiceIntervals[0];
+            for (float iv : kNiceIntervals) {
+                tickIntervalS = iv;
+                if (iv * pxPerSecond >= 80.f)
+                    break;
+            }
+            float tickSamples = tickIntervalS * sfreq;
+            float origin = static_cast<float>(firstFileSample);
+            float firstTick = std::ceil((scrollSample - origin) / tickSamples) * tickSamples + origin;
+
+            p.setPen(QPen(QColor(205, 205, 210), 1));
+            for (float s = firstTick; s < lastSample; s += tickSamples) {
+                float xPx = (s - scrollSample) / spp;
+                p.drawLine(QPointF(xPx, 0), QPointF(xPx, ph));
+            }
+        }
+    }
+
+    // ── Annotation span pass ────────────────────────────────────────
+    if (!annotations.isEmpty()) {
+        QFont font = p.font();
+        font.setPointSizeF(8.0);
+        font.setBold(true);
+        p.setFont(font);
+
+        for (const AnnotationSpan& annotation : annotations) {
+            float xStart = (static_cast<float>(annotation.startSample) - scrollSample) / spp;
+            float xEnd = (static_cast<float>(annotation.endSample + 1) - scrollSample) / spp;
+
+            if (xEnd < -2.f || xStart > pw + 2.f) {
+                continue;
+            }
+
+            xStart = qBound(0.f, xStart, static_cast<float>(pw));
+            xEnd = qBound(0.f, xEnd, static_cast<float>(pw));
+            if (xEnd <= xStart) {
+                continue;
+            }
+
+            QColor fillColor = annotation.color;
+            fillColor.setAlpha(48);
+            p.fillRect(QRectF(xStart, 0.f, xEnd - xStart, static_cast<float>(ph)), fillColor);
+
+            QColor borderColor = annotation.color;
+            borderColor.setAlpha(165);
+            p.setPen(QPen(borderColor, 1));
+            p.drawLine(QPointF(xStart, 0.f), QPointF(xStart, static_cast<float>(ph)));
+            p.drawLine(QPointF(xEnd, 0.f), QPointF(xEnd, static_cast<float>(ph)));
+
+            if (!annotation.label.trimmed().isEmpty()) {
+                const QString label = annotation.label.trimmed();
+                QFontMetrics metrics(font);
+                QRect labelRect = metrics.boundingRect(label);
+                labelRect.adjust(-6, -2, 6, 2);
+                const int labelX = qBound(4,
+                                          static_cast<int>(xStart) + 4,
+                                          qMax(4, pw - labelRect.width() - 4));
+                labelRect.moveTopLeft(QPoint(labelX, 4));
+                QColor pillColor = annotation.color;
+                pillColor.setAlpha(215);
+                p.fillRect(labelRect, pillColor);
+                p.setPen(Qt::white);
+                p.drawText(labelRect, Qt::AlignCenter, label);
+            }
+        }
+    }
+
+    // ── Channel waveform pass (same mapping as channeldata.vert / .frag) ──
+    for (const auto& [ch, lane] : std::as_const(traces)) {
+        const ChannelDisplayInfo info = model->channelInfo(ch);
+
+        int vboFirst = 0;
+        QVector<float> verts = model->decimatedVertices(ch, firstSample, lastSample, pw, vboFirst);
+        const int nVerts = static_cast<int>(verts.size() / 2);
+        if (nVerts < 2) {
+            continue;
+        }
+
+        // Z-score mode: (y - mean) / std, with ±4 std filling the row like the GPU path
+        float offset = 0.f;
+        float amplitudeMax = info.amplitudeMax;
+        if (zScoreMode) {
+            double sum = 0.0;
+            double sumSq = 0.0;
+            for (int v = 0; v < nVerts; ++v) {
+                const double amp = static_cast<double>(verts[v * 2 + 1]);
+                sum += amp;
+                sumSq += amp * amp;
+            }
+            const double mean = sum / nVerts;
+            const double var = sumSq / nVerts - mean * mean;
+            offset = static_cast<float>(mean);
+            amplitudeMax = 4.f * (var > 0.0 ? static_cast<float>(qSqrt(var)) : 1.f);
+        }
+
+        const QPen normalPen(info.bad ? QColor(200, 60, 60, 180) : info.color, 1.2);
+        const QPen clipPen(QColor(255, 0, 0), 1.6);
+        const bool doClip = showClipping && !info.bad && !zScoreMode;
+        const float yMid = (static_cast<float>(lane) + 0.5f) * laneH;
+
+        QPolygonF seg;
+        seg.reserve(nVerts);
+        bool prevClipped = false;
+        for (int v = 0; v < nVerts; ++v) {
+            const float norm = amplitudeMax > 0.f
+                ? qBound(-2.f, (verts[v * 2 + 1] - offset) / amplitudeMax, 2.f)
+                : 0.f;
+            const QPointF pt((static_cast<float>(vboFirst) + verts[v * 2] - scrollSample) / spp,
+                             yMid - norm * 0.45f * laneH);
+            const bool clipped = doClip && qAbs(norm) >= 0.95f;
+            if (v > 0 && clipped != prevClipped) {
+                seg.append(pt);
+                p.setPen(prevClipped ? clipPen : normalPen);
+                p.drawPolyline(seg);
+                seg.clear();
+            }
+            seg.append(pt);
+            prevClipped = clipped;
+        }
+        if (seg.size() > 1) {
+            p.setPen(prevClipped ? clipPen : normalPen);
+            p.drawPolyline(seg);
+        }
+    }
+
+    // ── Event / stimulus marker pass ─────────────────────────────────
+    // Draw coloured vertical lines spanning the full channel area.
+    // Label chips are shown in the TimeRulerWidget stim lane.
+    if (!events.isEmpty() && spp > 0.f) {
+        for (const EventMarker& ev : events) {
+            float xF = (static_cast<float>(ev.sample) - scrollSample) / spp;
+            if (xF < -2.f || xF > pw + 2.f)
+                continue;
+            int ix = static_cast<int>(xF);
+
+            QColor lineColor = ev.color;
+            lineColor.setAlpha(180);
+            p.setPen(QPen(lineColor, 1));
+            p.drawLine(ix, 0, ix, ph);
+        }
+    }
+
+    // ── Epoch trigger marker pass ────────────────────────────────────
+    // Draw dashed grey vertical lines at epoch trigger positions.
+    if (!epochMarkers.isEmpty() && spp > 0.f) {
+        QPen epochPen(QColor(100, 100, 100, 140), 1, Qt::DashLine);
+        p.setPen(epochPen);
+        for (int trigSample : epochMarkers) {
+            float xF = (static_cast<float>(trigSample) - scrollSample) / spp;
+            if (xF < -2.f || xF > pw + 2.f)
+                continue;
+            int ix = static_cast<int>(xF);
+            p.drawLine(ix, 0, ix, ph);
+        }
+    }
+
+    return img;
+}
+
+//=============================================================================================================
+
 void ChannelRhiView::drawOverlays()
 {
     // Schedule an overlay repaint so crosshair/scalebars/ruler stay in sync

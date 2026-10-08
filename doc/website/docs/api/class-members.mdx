@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6250 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6247 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -1768,7 +1768,6 @@ Index of 6250 public class members (functions, variables, typedefs, enums) acros
 - **first_samp** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — First sample index in the file.
 - **first_samp_old** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — First sample index (old-version compatible value).
 - **first_sample_val** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Values at the first sample (for DC offset correction before filtering).
-- **firstChannel** `[var]` in `TileResult`
 - **firsts** `[var]` in [MNERawBufDef](/docs/api/mne/mne-raw-buf-def) — First sample index.
 - **firstSample** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model)
 - **firstVisibleChannel** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
@@ -2481,7 +2480,6 @@ Index of 6250 public class members (functions, variables, typedefs, enums) acros
 - **iLineFreq** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - **ImagCoherence** `[fn]` in [ImagCoherence](/docs/api/connectivity/imag-coherence) — Constructs a [`ImagCoherence`](/docs/api/connectivity/imag-coherence) object.
 - **image** `[fn]` in [SliceObject](/docs/api/disp3-d/slice-object)
-- **image** `[var]` in `TileResult`
 - **ImageSc** `[fn]` in [ImageSc](/docs/api/disp/image-sc) — Creates the scaled image view.
 - **ImageSc** `[fn]` in [ImageSc](/docs/api/disp/image-sc) — Creates the scaled image view with a given double matrix.
 - **ImageSc** `[fn]` in [ImageSc](/docs/api/disp/image-sc) — Creates the scaled image view with a given float matrix.
@@ -4301,6 +4299,8 @@ Index of 6250 public class members (functions, variables, typedefs, enums) acros
 - **renderNetwork** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Render a connectivity network using instanced rendering.
 - **renderPolyline** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Render a polyline as connected segments.
 - **renderSurface** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Render a single surface.
+- **renderToImage** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Render the channel traces as currently shown into an image, without the GPU (see `ChannelRhiView::renderToImage()`).
+- **renderToImage** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Render the current view (background bands, grid, annotations, traces, event and epoch markers) into an image with QPainter, without the GPU.
 - **renderVideoOverlay** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Render a live video overlay as a camera-facing textured quad.
 - **renderVideoOverlayOnSurface** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Render a live video overlay projected onto an existing surface mesh.
 - **repaintItems** `[fn]` in [AverageScene](/docs/api/disp/average-scene) — Repaints all items from the layout data in the scene.
@@ -4453,14 +4453,12 @@ Index of 6250 public class members (functions, variables, typedefs, enums) acros
 - **sampleClicked** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Emitted when the user clicks on a sample position.
 - **sampleClicked** `[signal]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Emitted whenever the user clicks; provides the sample index under the cursor.
 - **sampleCount** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
-- **sampleFirst** `[var]` in `TileResult`
 - **sampleRangeSelected** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Emitted when the user selected a sample range for annotation creation.
 - **sampleRangeSelected** `[signal]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Emitted when the user selects a time span with Shift+drag in annotation mode.
 - **samples** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Returns the number of samples.
 - **samples_available** `[fn]` in [stream_inlet](/docs/api/lsl/stream_inlet) — Check whether new samples are available in the internal buffer.
 - **samplesChanged** `[signal]` in [CovarianceSettingsView](/docs/api/disp/covariance-settings-view)
 - **samplesPerPixel** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
-- **samplesPerPixel** `[var]` in `TileResult`
 - **samplesPerPixelChanged** `[signal]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **samplesPerRecord** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - **sampleToViewportX** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Maps an absolute sample index to an x coordinate inside the signal viewport.
@@ -6119,7 +6117,6 @@ Index of 6250 public class members (functions, variables, typedefs, enums) acros
 - **visible** `[var]` in [SceneLayer](/docs/api/disp3-d/scene-layer)
 - **visibleArea** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns the area currently shown (the extent unless `confine()` zoomed in).
 - **visibleChannelCount** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
-- **visibleCount** `[var]` in `TileResult`
 - **visibleFirstSample** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Returns the absolute sample index currently shown at x = 0 (left edge).
 - **visibleSampleCount** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **visibleSampleCount** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Returns the number of samples currently visible.

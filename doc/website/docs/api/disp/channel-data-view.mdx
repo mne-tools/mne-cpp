@@ -396,6 +396,23 @@ Enable or disable the crosshair cursor with coordinate readout.
 
 ---
 
+### renderToImage(size)
+
+Render the channel traces as currently shown into an image, without the GPU (see `ChannelRhiView::renderToImage()`).
+
+Usable offscreen, e.g. for reports.
+
+**Parameters:**
+
+- **size** : *const QSize &*
+  Output size in pixels; an invalid size (default) uses the plot size.
+
+**Returns:**
+
+- *QImage* — The rendered image, or a null image if the size is empty.
+
+---
+
 ### setScalebarsVisible(visible)
 
 Show or hide per-channel-type amplitude scalebars.

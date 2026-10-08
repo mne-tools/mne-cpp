@@ -424,6 +424,12 @@ private slots:
         * Verifies ChannelRhiView public state, clamping, signals, and overlays without rendering.
      */
     void channelRhiView_stateContracts();
+
+    //=========================================================================================================
+    /**
+     * Verifies that ChannelRhiView::renderToImage() lays out rows and scales traces like the GPU path.
+     */
+    void channelRhiView_renderToImage();
     void channelRhiView_rendersAndDrawsOverlays();
     void channelDataModel_bufferDetrendAndDecimation();
 
@@ -2434,6 +2440,97 @@ void TestDispViewers2::channelRhiView_stateContracts()
     QCOMPARE(rhiView->firstVisibleChannel(), 1);
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::channelRhiView_renderToImage()
+{
+    ChannelDataView view(QStringLiteral("test_disp_viewers2_rhi_image"));
+    const QImage blank = view.renderToImage(QSize(20, 10));
+    QCOMPARE(blank.size(), QSize(20, 10));
+    QCOMPARE(blank.pixelColor(10, 5), view.findChild<ChannelRhiView*>()->backgroundColor());
+
+    view.init(createBrowserTestInfo());
+    const float amplitudeMax = view.model()->channelInfo(0).amplitudeMax;
+    QVERIFY(amplitudeMax > 0.f);
+
+    // Flat traces at known fractions of the row scale; MEG0112 is bad, STI014 stays at zero
+    Eigen::MatrixXd data = Eigen::MatrixXd::Zero(4, 200);
+    data.row(0).setConstant(0.5 * amplitudeMax);
+    data.row(1).setConstant(0.5 * amplitudeMax);
+    data.row(2).setConstant(-3.0 * amplitudeMax);
+    view.setFileBounds(100, 299);
+    view.setData(data, 100);
+
+    auto* rhiView = view.findChild<ChannelRhiView*>();
+    QVERIFY(rhiView != nullptr);
+    rhiView->resize(400, 200);
+    rhiView->setSamplesPerPixel(200.f / 400.f);
+    rhiView->setScrollSample(100.f);
+    rhiView->setGridVisible(false);
+    rhiView->setSfreq(0.f);
+    rhiView->setBackgroundColor(Qt::white);
+
+    // Rows of the drawn pixels in one column, with their colours
+    const auto traceRows = [](const QImage& image, int x) {
+        QList<QPair<int, QColor>> rows;
+        for (int y = 0; y < image.height(); ++y) {
+            const QColor color = image.pixelColor(x, y);
+            if (color != QColor(Qt::white)) {
+                rows.append({y, color});
+            }
+        }
+        return rows;
+    };
+    const auto isClipRed = [](const QColor& color) {
+        return color.red() > 240 && color.green() < 30 && color.blue() < 30;
+    };
+    const auto hasRowNear = [](const QList<QPair<int, QColor>>& rows, float y) {
+        return std::any_of(rows.cbegin(), rows.cend(), [y](const auto& row) { return qAbs(row.first - y) <= 1.f; });
+    };
+
+    // Four 50 px rows; +0.5 maps to 45 % of the half row, -3 is clamped to -2, which is clipped
+    QImage image = view.renderToImage(QSize(400, 200));
+    QCOMPARE(image.size(), QSize(400, 200));
+    auto rows = traceRows(image, 200);
+    QVERIFY2(hasRowNear(rows, 25.f - 0.5f * 22.5f), "positive trace above its row centre");
+    QVERIFY2(hasRowNear(rows, 75.f - 0.5f * 22.5f), "bad channel drawn at its scale");
+    QVERIFY2(hasRowNear(rows, 125.f + 2.f * 22.5f), "amplitude clamped to two row scales");
+    QVERIFY(hasRowNear(rows, 175.f));
+    for (const auto& [y, color] : rows) {
+        QCOMPARE(isClipRed(color), qAbs(y - 170) <= 1);
+        QVERIFY2(y < 190, "trace overflows into the next row");
+    }
+
+    // The time span is kept at any output size
+    image = view.renderToImage(QSize(800, 100));
+    QCOMPARE(image.size(), QSize(800, 100));
+    rows = traceRows(image, 790);
+    QVERIFY(hasRowNear(rows, 12.5f - 0.5f * 11.25f));
+
+    // Butterfly: one row per channel type, bad channels hidden like on screen
+    rhiView->setHideBadChannels(true);
+    rhiView->setButterflyMode(true);
+    rows = traceRows(view.renderToImage(QSize(400, 200)), 200);
+    QVERIFY(hasRowNear(rows, 50.f - 0.5f * 45.f));
+    QVERIFY(hasRowNear(rows, 50.f + 2.f * 45.f));
+    QVERIFY(hasRowNear(rows, 150.f));
+    for (const auto& [y, color] : rows) {
+        QVERIFY(qAbs(y - 27.5f) <= 1.f || qAbs(y - 140.f) <= 1.f || qAbs(y - 150.f) <= 1.f);
+    }
+
+    // Z-score: a flat trace has zero deviation and sits on the row centre, no clipping highlight
+    rhiView->setButterflyMode(false);
+    rhiView->setZScoreMode(true);
+    rows = traceRows(view.renderToImage(QSize(400, 150)), 200);
+    QVERIFY(!rows.isEmpty());
+    for (const auto& [y, color] : rows) {
+        QVERIFY(qAbs(y - 25) <= 1 || qAbs(y - 75) <= 1 || qAbs(y - 125) <= 1);
+        QVERIFY(!isClipRed(color));
+    }
+
+    QVERIFY(view.renderToImage(QSize(0, 10)).isNull());
 }
 
 //=============================================================================================================

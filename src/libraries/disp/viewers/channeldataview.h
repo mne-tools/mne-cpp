@@ -331,6 +331,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Render the channel traces as currently shown into an image, without the GPU
+     * (see ChannelRhiView::renderToImage()). Usable offscreen, e.g. for reports.
+     *
+     * @param[in] size  Output size in pixels; an invalid size (default) uses the plot size.
+     *
+     * @return The rendered image, or a null image if the size is empty.
+     */
+    QImage renderToImage(const QSize& size = QSize()) const;
+
+    //=========================================================================================================
+    /**
      * Show or hide per-channel-type amplitude scalebars.
      *
      * @param[in] visible  True to draw the scalebars.

@@ -420,6 +420,23 @@ public:
         return m_useClockTime;
     }
 
+    // ── Export ────────────────────────────────────────────────────────
+
+    //=========================================================================================================
+    /**
+     * Render the current view (background bands, grid, annotations, traces, event and epoch
+     * markers) into an image with QPainter, without the GPU. Rows, scaling, butterfly
+     * layout, z-score mode and clipping highlight match the on-screen rendering, so this
+     * also works offscreen, e.g. for reports.
+     *
+     * @param[in] size  Output size in pixels; the visible time span is stretched to fit.
+     *                  An invalid size (default) uses the widget size.
+     *
+     * @return The rendered image (only the background if no channel is shown), or a null
+     *         image if there is no model or the size is empty.
+     */
+    QImage renderToImage(const QSize& size = QSize()) const;
+
     // ── Scalebars ─────────────────────────────────────────────────────
 
     //=========================================================================================================
