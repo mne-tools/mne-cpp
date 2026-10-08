@@ -283,9 +283,11 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
     if (correctedVectorThreshold.x() < m_dMinAxisX || correctedVectorThreshold.y() < m_dMinAxisX || correctedVectorThreshold.z() < m_dMinAxisX ||
         correctedVectorThreshold.x() > m_dMaxAxisX || correctedVectorThreshold.y() > m_dMaxAxisX || correctedVectorThreshold.z() > m_dMaxAxisX) {
         qDebug() << "One or more of the values given are out of the minimum and maximum range. Changed to default thresholds.";
-        m_dLeftThreshold = 1.01 * m_dMinAxisX;
-        m_dMiddleThreshold = (m_dMinAxisX + m_dMaxAxisX) / 2.0;
-        m_dRightThreshold = 0.99 * m_dMaxAxisX;
+        // 1 % inside each end of the span; scaling the limits themselves leaves the axis for negative values
+        const double span = m_dMaxAxisX - m_dMinAxisX;
+        m_dLeftThreshold = m_dMinAxisX + 0.01 * span;
+        m_dMiddleThreshold = m_dMinAxisX + 0.5 * span;
+        m_dRightThreshold = m_dMaxAxisX - 0.01 * span;
     } else {
         // Sort the three values into left < middle < right
         double vals[3] = {static_cast<double>(correctedVectorThreshold.x()),

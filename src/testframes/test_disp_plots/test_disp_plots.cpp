@@ -511,6 +511,17 @@ void TestDispPlots::testSplineThreshold()
     QVector3D fallback = spline.getThreshold();
     QVERIFY(fallback.x() >= 0.0f && fallback.x() < fallback.y() && fallback.y() < fallback.z() && fallback.z() <= 4.0f);
 
+    // Negative limits: the fallback must stay inside [-4, -1]
+    VectorXd negative(4);
+    negative << -4.0, -3.0, -2.0, -1.0;
+    VectorXi negativeFreq(3);
+    negativeFreq << 1, 2, 3;
+    spline.setData(negative, negativeFreq);
+    spline.setThreshold(QVector3D(10.0f, 20.0f, 30.0f));
+    fallback = spline.getThreshold();
+    QVERIFY2(fallback.x() >= -4.0f && fallback.x() < fallback.y() && fallback.y() < fallback.z() && fallback.z() <= -1.0f,
+             qPrintable(QStringLiteral("%1 %2 %3").arg(fallback.x()).arg(fallback.y()).arg(fallback.z())));
+
     // Clicking sets a threshold at the clicked data value: left button sets the left one
     spline.setData(limits, freq);
     QSignalSpy borderSpy(&spline, &Spline::borderChanged);
