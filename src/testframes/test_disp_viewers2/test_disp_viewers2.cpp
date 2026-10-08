@@ -966,6 +966,18 @@ void TestDispViewers2::coregSettingsView_lifecycle()
 
 void TestDispViewers2::averagingSettingsView_controlsAndSettings()
 {
+    // Defaults without stored settings
+    {
+        AveragingSettingsView view(QString{});
+        QCOMPARE(view.getNumAverages(), 10);
+        QCOMPARE(view.getPreStimMSeconds(), 100);
+        QCOMPARE(view.getPostStimMSeconds(), 400);
+        QCOMPARE(view.getBaselineFromSeconds(), 0);
+        QCOMPARE(view.getBaselineToSeconds(), 0);
+        QVERIFY(!view.getDoBaselineCorrection());
+        QCOMPARE(view.getCurrentStimCh(), QStringLiteral("STI014"));
+    }
+
     // Stored settings
     const QString sPath = QStringLiteral("test_disp_viewers2_averaging_%1").arg(QCoreApplication::applicationPid());
     {

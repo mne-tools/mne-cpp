@@ -169,16 +169,16 @@ protected:
 
     Ui::AverageSettingsViewWidget* m_pUi; /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
-    QString m_sCurrentStimChan;
+    QString m_sCurrentStimChan = QStringLiteral("STI014");
 
     QMap<QString, int> m_mapStimChsIndexNames;
 
-    int m_iNumAverages;
-    int m_iPreStimSeconds;
-    int m_iPostStimSeconds;
-    int m_iBaselineFromSeconds;
-    int m_iBaselineToSeconds;
-    bool m_bDoBaselineCorrection;
+    int m_iNumAverages = 10;
+    int m_iPreStimSeconds = 100;
+    int m_iPostStimSeconds = 400;
+    int m_iBaselineFromSeconds = 0;
+    int m_iBaselineToSeconds = 0;
+    bool m_bDoBaselineCorrection = false;
 
 signals:
     void changePreStim(qint32 value);
