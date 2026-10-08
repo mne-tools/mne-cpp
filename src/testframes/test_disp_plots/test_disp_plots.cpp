@@ -459,6 +459,13 @@ void TestDispPlots::testImageScUpdateData()
     const QColor high = image.pixelColor(240, 150);
     QCOMPARE(low.rgb(), ColorMap::valueToColor(0.0, QStringLiteral("Jet")));
     QCOMPARE(high.rgb(), ColorMap::valueToColor(1.0, QStringLiteral("Jet")));
+
+    // A constant matrix has no range: it maps to one colour instead of NaN
+    MatrixXd constant = MatrixXd::Constant(2, 2, 7.0);
+    img.updateData(constant);
+    image = img.grab().toImage();
+    QCOMPARE(image.pixelColor(110, 150), image.pixelColor(240, 150));
+    QCOMPARE(image.pixelColor(110, 150).rgb(), ColorMap::valueToColor(0.0, QStringLiteral("Jet")));
 }
 
 //=============================================================================================================

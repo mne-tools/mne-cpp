@@ -121,7 +121,10 @@ void ImageSc::updateData(MatrixXd& p_dMat)
         double minValue = m_matCentNormData.minCoeff();
         m_matCentNormData.array() -= minValue;
         double maxValue = m_matCentNormData.maxCoeff();
-        m_matCentNormData.array() /= maxValue;
+        // A constant matrix has no range: keep it at 0 instead of dividing 0 by 0
+        if (maxValue > 0.0) {
+            m_matCentNormData.array() /= maxValue;
+        }
 
         updateMaps();
     }
@@ -179,6 +182,10 @@ void ImageSc::updateMaps()
 
         // --Scale Values--
         m_qVecScaleValues.clear();
+        if (m_dMaxValue <= m_dMinValue) {
+            update();
+            return;
+        }
 
         double scale = pow(10, floor(log(m_dMaxValue - m_dMinValue) / log(10.0)));
 
