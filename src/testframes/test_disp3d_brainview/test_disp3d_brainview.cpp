@@ -41,6 +41,7 @@
 #include <disp3D/input/cameracontroller.h>
 #include <disp3D/input/raypicker.h>
 #include <disp3D/renderable/dipoleobject.h>
+#include <disp3D/renderable/networkobject.h>
 #include <disp3D/core/viewstate.h>
 
 #include <fiff/fiff_dig_point.h>
@@ -48,6 +49,8 @@
 #include <inv/dipole_fit/inv_ecd_set.h>
 #include <inv/dipole_fit/inv_ecd.h>
 #include <connectivity/network/network.h>
+#include <connectivity/network/networknode.h>
+#include <connectivity/network/networkedge.h>
 #include <fs/fs_label.h>
 
 #include <Eigen/Core>
@@ -259,6 +262,12 @@ private slots:
      * debugFirstDipolePosition(), and intersect().
      */
     void dipoleObject_extended();
+
+    //=========================================================================================================
+    /**
+     * Verifies NetworkObject geometry and the node/edge instances kept by the threshold.
+     */
+    void networkObject_thresholdAndInstances();
 };
 
 //=============================================================================================================
@@ -1295,6 +1304,58 @@ void TestDisp3dBrainView::dipoleObject_extended()
     obj.setSelected(99, false); // out-of-range — safe
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::networkObject_thresholdAndInstances()
+{
+    NetworkObject obj;
+    QVERIFY(!obj.hasData());
+    QCOMPARE(obj.nodeInstanceCount(), 0);
+    QCOMPARE(obj.edgeInstanceCount(), 0);
+
+    // Chain 0 -- 1 -- 2 -- 3 with weights 0.2, 0.5, 1.0 and an isolated node 4
+    CONNECTIVITYLIB::Network network(QStringLiteral("Coherence"));
+    QList<CONNECTIVITYLIB::NetworkNode::SPtr> nodes;
+    for (int i = 0; i < 5; ++i) {
+        Eigen::RowVectorXf vert(3);
+        vert << 0.01f * static_cast<float>(i), 0.0f, 0.05f;
+        nodes.append(CONNECTIVITYLIB::NetworkNode::SPtr::create(static_cast<qint16>(i), vert));
+        network.append(nodes.last());
+    }
+    const double weights[] = {0.2, 0.5, 1.0};
+    for (int i = 0; i < 3; ++i) {
+        Eigen::MatrixXd weight(1, 1);
+        weight(0, 0) = weights[i];
+        auto edge = CONNECTIVITYLIB::NetworkEdge::SPtr::create(i, i + 1, weight);
+        network.append(edge);
+        nodes[i]->append(edge);
+        nodes[i + 1]->append(edge);
+    }
+
+    obj.load(network, QStringLiteral("Jet"));
+    QVERIFY(obj.hasData());
+    QVERIFY(obj.nodeIndexCount() > 0 && obj.nodeIndexCount() % 3 == 0);
+    QVERIFY(obj.edgeIndexCount() > 0 && obj.edgeIndexCount() % 3 == 0);
+
+    // Only connected nodes and kept edges are instanced; the threshold drops weak edges
+    obj.setThreshold(0.0);
+    QCOMPARE(obj.nodeInstanceCount(), 4);
+    QCOMPARE(obj.edgeInstanceCount(), 3);
+    obj.setThreshold(0.4);
+    QCOMPARE(obj.edgeInstanceCount(), 2);
+    QCOMPARE(obj.nodeInstanceCount(), 3);
+    obj.setThreshold(0.9);
+    QCOMPARE(obj.edgeInstanceCount(), 1);
+    QCOMPARE(obj.nodeInstanceCount(), 2);
+
+    // A colour map change keeps the instances
+    obj.setColormap(QStringLiteral("Hot"));
+    QCOMPARE(obj.edgeInstanceCount(), 1);
+
+    obj.setVisible(false);
+    QVERIFY(!obj.isVisible());
 }
 
 //=============================================================================================================
