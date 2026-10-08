@@ -975,6 +975,8 @@ void TestDispViewers2::triggerDetectionView_settingsAndSignals()
     QVERIFY(pCount);
     QVERIFY(pDetect);
 
+    // Re-initialising (new measurement info) must not duplicate the reactions
+    view.init(info);
     view.init(info);
     QCOMPARE(pChannels->count(), 2);
     QCOMPARE(pChannels->itemText(0), QStringLiteral("STI101"));

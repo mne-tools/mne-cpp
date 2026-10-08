@@ -80,7 +80,7 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
         m_pFiffInfo = pFiffInfo;
         //Trigger detection
         connect(m_pUi->m_checkBox_activateTriggerDetection, &QCheckBox::checkStateChanged,
-                this, &TriggerDetectionView::onTriggerInfoChanged);
+                this, &TriggerDetectionView::onTriggerInfoChanged, Qt::UniqueConnection);
 
         m_pUi->m_comboBox_triggerChannels->clear();
 
@@ -91,13 +91,13 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
         }
 
         connect(m_pUi->m_comboBox_triggerChannels, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-                this, &TriggerDetectionView::onTriggerInfoChanged);
+                this, &TriggerDetectionView::onTriggerInfoChanged, Qt::UniqueConnection);
 
         connect(m_pUi->m_comboBox_triggerColorType, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
-                this, &TriggerDetectionView::onRealTimeTriggerColorTypeChanged);
+                this, &TriggerDetectionView::onRealTimeTriggerColorTypeChanged, Qt::UniqueConnection);
 
         connect(m_pUi->m_pushButton_triggerColor, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &TriggerDetectionView::onRealTimeTriggerColorChanged);
+                this, &TriggerDetectionView::onRealTimeTriggerColorChanged, Qt::UniqueConnection);
 
         m_pUi->m_pushButton_triggerColor->setAutoFillBackground(true);
         m_pUi->m_pushButton_triggerColor->setFlat(true);
@@ -107,13 +107,13 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
         m_pUi->m_pushButton_triggerColor->update();
 
         connect(m_pUi->m_doubleSpinBox_detectionThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this, &TriggerDetectionView::onTriggerInfoChanged);
+                this, &TriggerDetectionView::onTriggerInfoChanged, Qt::UniqueConnection);
 
         connect(m_pUi->m_spinBox_detectionThresholdSecond, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-                this, &TriggerDetectionView::onTriggerInfoChanged);
+                this, &TriggerDetectionView::onTriggerInfoChanged, Qt::UniqueConnection);
 
         connect(m_pUi->m_pushButton_resetNumberTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &TriggerDetectionView::onResetTriggerNumbers);
+                this, &TriggerDetectionView::onResetTriggerNumbers, Qt::UniqueConnection);
 
         connect(m_pUi->m_pushButton_DetectTriggers, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &TriggerDetectionView::onDetectTriggers, Qt::UniqueConnection);
