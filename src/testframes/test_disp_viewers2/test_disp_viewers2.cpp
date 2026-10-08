@@ -63,6 +63,7 @@
 #include <fiff/fiff_named_matrix.h>
 #include <fiff/fiff_proj.h>
 #include <dsp/filterkernel.h>
+#include <dsp/filterio.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -125,6 +126,7 @@
 using namespace DISPLIB;
 using namespace FIFFLIB;
 using UTILSLIB::FilterKernel;
+using UTILSLIB::FilterIO;
 using Eigen::MatrixXd;
 
 namespace
@@ -920,6 +922,10 @@ void TestDispViewers2::filterDesignView_designExportLoad()
     chooseFileInNextDialog(sFile);
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_exportFilter")), Qt::LeftButton);
     QVERIFY(QFile::exists(sFile));
+    // The file is named after type, band and sampling rate, like the suggested file name
+    FilterKernel exported;
+    QVERIFY(FilterIO::readFilter(sFile, exported));
+    QCOMPARE(exported.getName(), QStringLiteral("%1_4_30_Fs%2").arg(kernel.getFilterType().getName()).arg(static_cast<int>(kernel.getSamplingFrequency())));
 
     view.setFrom(1.0);
     view.setTo(20.0);

@@ -488,7 +488,7 @@ void FilterDesignView::onBtnExportFilterCoefficients()
 
     //Do not pass m_filterKernel because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterKernel.
     FilterKernel filterWriteTemp = m_filterKernel;
-    filterWriteTemp.getName() = filtername;
+    filterWriteTemp.setName(filtername);
 
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save filter coefficients",
