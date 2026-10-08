@@ -267,18 +267,12 @@ void SourceEstimateOverlay::getDataRange(double& minVal, double& maxVal) const
     minVal = std::numeric_limits<double>::max();
     maxVal = std::numeric_limits<double>::lowest();
 
-    if (m_hasLh) {
-        double lhMin = m_stcLh.data.minCoeff();
-        double lhMax = m_stcLh.data.maxCoeff();
-        minVal = qMin(minVal, std::abs(lhMin));
-        maxVal = qMax(maxVal, std::abs(lhMax));
-    }
-
-    if (m_hasRh) {
-        double rhMin = m_stcRh.data.minCoeff();
-        double rhMax = m_stcRh.data.maxCoeff();
-        minVal = qMin(minVal, std::abs(rhMin));
-        maxVal = qMax(maxVal, std::abs(rhMax));
+    // applyToSurface() colours |data|, so the range is that of the magnitudes
+    for (const INVLIB::InvSourceEstimate* stc : {m_hasLh ? &m_stcLh : nullptr, m_hasRh ? &m_stcRh : nullptr}) {
+        if (stc && stc->data.size() > 0) {
+            minVal = qMin(minVal, stc->data.cwiseAbs().minCoeff());
+            maxVal = qMax(maxVal, stc->data.cwiseAbs().maxCoeff());
+        }
     }
 
     // If no data, set defaults

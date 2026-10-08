@@ -1389,8 +1389,11 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     QCOMPARE(overlay.tstep(), 0.01f);
     QVERIFY(std::fabs(overlay.timeAtIndex(1) - (-0.09f)) < 1e-6f);
 
-    overlay.setThresholds(1.0f, 2.5f, 4.0f);
+    // The automatic range spans the magnitudes the overlay colours: |data| from 1 to 4
+    overlay.updateThresholdsFromData();
+    QCOMPARE(overlay.thresholdMin(), 1.0f);
     QCOMPARE(overlay.thresholdMid(), 2.5f);
+    QCOMPARE(overlay.thresholdMax(), 4.0f);
 
     Eigen::MatrixX3f rr(4, 3);
     rr << 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0;
