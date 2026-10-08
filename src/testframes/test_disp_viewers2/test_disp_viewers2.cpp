@@ -491,6 +491,13 @@ private slots:
 
     //=========================================================================================================
     /**
+     * Verifies RtFiffRawViewDelegate drawing: signal scale and polarity, time cursor, trigger threshold, the
+     * bad-channel tint and the signal color.
+     */
+    void rtFiffRawViewDelegate_paintsSignalCursorAndThreshold();
+
+    //=========================================================================================================
+    /**
      * Verifies that EvokedSetModel responds to more API calls than the
      * baseline test covers (header data, flags, column count, etc.).
      */
@@ -3319,6 +3326,96 @@ void TestDispViewers2::applyToView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::rtFiffRawViewDelegate_paintsSignalCursorAndThreshold()
+{
+    // 100-sample buffer; MEG0111 holds +0.5 of full scale, the stim channel steps to 4
+    RtFiffRawViewModel model;
+    auto info = createBrowserTestInfo();
+    info->bads.clear();
+    model.setFiffInfo(info);
+    model.setSamplingInfo(100.0f, 1, true);
+    model.setScaling({{FIFF_UNIT_T, 1e-12f}, {FIFFV_STIM_CH, 5.0f}});
+    model.triggerInfoChanged({{4.0, Qt::red}}, true, QStringLiteral("STI014"), 2.5);
+    Eigen::MatrixXd block = Eigen::MatrixXd::Zero(4, 60);
+    block.row(0).setConstant(0.5e-12);
+    block.row(3).tail(30).setConstant(4.0);
+    model.addData({block});
+    QCOMPARE(model.getDetectedTriggers(), (QList<QPair<int, double>>{{30, 4.0}}));
+
+    RtFiffRawViewDelegate delegate(nullptr);
+    delegate.initPainterPaths(&model);
+    delegate.setUpperItemIndex(-1);
+
+    // The view hides the name column, so the plot cell starts at x = 0
+    const QRect cell(0, 0, 200, 100);
+    auto render = [&](int iRow) {
+        QImage image(cell.width(), cell.height(), QImage::Format_RGB32);
+        image.fill(Qt::white);
+        QPainter painter(&image);
+        QStyleOptionViewItem option;
+        option.rect = cell;
+        delegate.paint(&painter, option, model.index(iRow, 1));
+        return image;
+    };
+    auto rowsWhere = [](const QImage& image, int x, const std::function<bool(QRgb)>& pred) {
+        QList<int> rows;
+        for (int y = 0; y < image.height(); ++y) {
+            if (pred(image.pixel(x, y))) {
+                rows << y;
+            }
+        }
+        return rows;
+    };
+    auto isSignal = [](QRgb c) {
+        return qBlue(c) > qRed(c) + 50 && qBlue(c) > qGreen(c) + 50;
+    };
+    auto isMarker = [](QRgb c) {
+        return qRed(c) > qGreen(c) + 50 && qRed(c) > qBlue(c) + 50;
+    };
+
+    // +0.5 of full scale sits a quarter of the height above the centre: y = 50 - 25
+    QImage image = render(0);
+    QList<int> rows = rowsWhere(image, 40, isSignal);
+    QVERIFY2(!rows.isEmpty() && std::abs(rows.first() - 25) <= 1, qPrintable(QString::number(rows.value(0, -1))));
+    // The time cursor is at sample 60 of 100, i.e. x = 120
+    QVERIFY2(rowsWhere(image, 120, isMarker).size() > 50, qPrintable(QString::number(rowsWhere(image, 120, isMarker).size())));
+    QVERIFY(rowsWhere(image, 100, isMarker).isEmpty());
+
+    // Recolored signal
+    delegate.setSignalColor(Qt::darkGreen);
+    QCOMPARE(delegate.getSignalColor(), QColor(Qt::darkGreen));
+    image = render(0);
+    QVERIFY(rowsWhere(image, 40, isSignal).isEmpty());
+    QVERIFY(!rowsWhere(image, 40, [](QRgb c) { return qGreen(c) > qRed(c) + 40 && qGreen(c) > qBlue(c) + 40; }).isEmpty());
+
+    // The trigger channel shows its detection threshold: 2.5 of 5 full scale is a quarter above the centre
+    image = render(3);
+    int iThreshold = 0;
+    for (int x = 0; x < 100; ++x) {
+        const QRgb c = image.pixel(x, 25);
+        if (qRed(c) > 200 && qGreen(c) < 150) {
+            ++iThreshold;
+        }
+    }
+    QVERIFY2(iThreshold > 30, qPrintable(QString::number(iThreshold)));
+
+    // A bad channel gets a reddish tint over the whole cell
+    info->bads = {QStringLiteral("MEG0111")};
+    image = render(0);
+    const QRgb background = image.pixel(5, 90);
+    QVERIFY2(qRed(background) > qBlue(background) + 10, qPrintable(QColor(background).name()));
+
+    info->bads.clear();
+
+    // Name column and size hints
+    QStyleOptionViewItem option;
+    option.rect = cell;
+    QCOMPARE(delegate.sizeHint(option, model.index(0, 0)), QSize(20, cell.height()));
+    QCOMPARE(delegate.sizeHint(option, model.index(0, 1)), cell.size());
 }
 
 //=============================================================================================================
