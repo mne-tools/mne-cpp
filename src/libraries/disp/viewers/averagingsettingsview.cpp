@@ -292,7 +292,7 @@ void AveragingSettingsView::loadSettings()
         m_iBaselineFromSeconds = -1 * m_iPreStimSeconds;
     }
 
-    if (m_iBaselineToSeconds > m_iPostStimSeconds || m_iBaselineToSeconds < m_iPreStimSeconds) {
+    if (m_iBaselineToSeconds > m_iPostStimSeconds || m_iBaselineToSeconds < -1 * m_iPreStimSeconds) {
         m_iBaselineToSeconds = 0;
     }
 

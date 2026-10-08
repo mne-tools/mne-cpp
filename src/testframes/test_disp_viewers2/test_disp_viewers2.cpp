@@ -978,7 +978,7 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
         QCOMPARE(view.getCurrentStimCh(), QStringLiteral("STI014"));
     }
 
-    // Stored settings
+    // Stored settings, including a baseline that ends before the stimulus
     const QString sPath = QStringLiteral("test_disp_viewers2_averaging_%1").arg(QCoreApplication::applicationPid());
     {
         QSettings settings("MNECPP");
@@ -1013,6 +1013,8 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
     QCOMPARE(view.getPreStimMSeconds(), 200);
     QCOMPARE(view.getPostStimMSeconds(), 500);
     QCOMPARE(view.getBaselineFromSeconds(), -150);
+    QCOMPARE(view.getBaselineToSeconds(), -50);
+    QCOMPARE(pTo->value(), -50);
     QVERIFY(view.getDoBaselineCorrection());
 
     // Stim channel: the stored one is selected and its channel index is reported
