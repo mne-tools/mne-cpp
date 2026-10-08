@@ -15,6 +15,7 @@
 //=============================================================================================================
 
 #include "rtsensorinterpolationmatworker.h"
+#include "../scene/sensorfieldmapper.h"
 #include <fwd/fwd_field_map.h>
 
 #include <fiff/fiff_ch_info.h>
@@ -222,7 +223,8 @@ void RtSensorInterpolationMatWorker::computeMapping()
     constexpr float kIntrad = 0.06f;
     constexpr float kMegMiss = 1e-4f;
     constexpr float kEegMiss = 1e-3f;
-    const Eigen::Vector3f defaultOrigin(0.0f, 0.0f, 0.04f);
+    // origin="auto" of MNE-Python's make_field_map, as in SensorFieldMapper::buildMapping()
+    const Eigen::Vector3f fittedOrigin = SensorFieldMapper::fitSphereOrigin(evoked.info);
 
     FiffCoordTrans headMri = (applySensorTrans && !headToMriTrans.isEmpty())
         ? headToMriTrans
@@ -261,7 +263,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
                     devToTarget = devHead;
                 }
 
-                Eigen::Vector3f origin = defaultOrigin;
+                Eigen::Vector3f origin = fittedOrigin;
                 if (megOnHead && !headMri.isEmpty()) {
                     origin = applyTransform(origin, headMri);
                 }
@@ -287,7 +289,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
     // ── EEG mapping ────────────────────────────────────────────────────
     if (hasEegSurface && !eegChs.isEmpty()) {
         if (eegVerts.rows() > 0) {
-            Eigen::Vector3f origin = defaultOrigin;
+            Eigen::Vector3f origin = fittedOrigin;
             if (!headMri.isEmpty())
                 origin = applyTransform(origin, headMri);
 

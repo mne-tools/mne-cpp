@@ -44,7 +44,10 @@
 #include <disp3D/renderable/networkobject.h>
 #include <disp3D/renderable/sourceestimateoverlay.h>
 #include <disp3D/renderable/sliceobject.h>
+#include <disp3D/scene/sensorfieldmapper.h>
 #include <fiff/fiff_evoked.h>
+#include <fwd/fwd_coil_set.h>
+#include <fwd/fwd_field_map.h>
 #include <disp/plots/helpers/colormap.h>
 #include <inv/inv_source_estimate.h>
 #include <disp3D/core/viewstate.h>
@@ -500,6 +503,15 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
         QCOMPARE(evoked.info.chs[k].kind, FIFFV_EEG_CH);
         QVERIFY(!evoked.info.bads.contains(evoked.info.chs[k].ch_name));
     }
+
+    // Same mapping as FwdFieldMap with the origin fitted to the head shape (MNE-Python's make_field_map origin="auto")
+    QList<FIFFLIB::FiffChInfo> eegChs;
+    for (int k : pick) {
+        eegChs.append(evoked.info.chs[k]);
+    }
+    auto coils = FWDLIB::FwdCoilSet::create_eeg_els(eegChs, eegChs.size(), FIFFLIB::FiffCoordTrans());
+    const auto expected = FWDLIB::FwdFieldMap::computeEegMapping(*coils, scalp, SensorFieldMapper::fitSphereOrigin(evoked.info), 0.06f, 1e-3f);
+    QVERIFY((*mapping - *expected).cwiseAbs().maxCoeff() <= 1e-5f * expected->cwiseAbs().maxCoeff());
 
     // Channels passed as bad are left out
     const QString firstEeg = evoked.info.chs[pick.first()].ch_name;
