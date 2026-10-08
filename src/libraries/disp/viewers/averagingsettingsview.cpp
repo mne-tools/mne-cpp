@@ -74,20 +74,29 @@ void AveragingSettingsView::setStimChannels(const QMap<QString, int>& mapStimChs
 {
     if (!mapStimChsIndexNames.isEmpty()) {
         m_mapStimChsIndexNames = mapStimChsIndexNames;
+        fillStimChannels();
+    }
+}
 
+//=============================================================================================================
+
+void AveragingSettingsView::fillStimChannels()
+{
+    {
+        const QSignalBlocker blocker(m_pUi->m_pComboBoxChSelection);
         m_pUi->m_pComboBoxChSelection->clear();
 
-        QMapIterator<QString, int> i(mapStimChsIndexNames);
+        QMapIterator<QString, int> i(m_mapStimChsIndexNames);
         while (i.hasNext()) {
             i.next();
-            m_pUi->m_pComboBoxChSelection->insertItem(m_pUi->m_pComboBoxChSelection->count(), i.key());
+            m_pUi->m_pComboBoxChSelection->addItem(i.key(), i.value());
         }
 
         m_pUi->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
-
-        connect(m_pUi->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
-                this, &AveragingSettingsView::onChangeStimChannel);
     }
+
+    connect(m_pUi->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
+            this, &AveragingSettingsView::onChangeStimChannel, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -151,18 +160,7 @@ int AveragingSettingsView::getStimChannelIdx()
 void AveragingSettingsView::redrawGUI()
 {
     if (!m_mapStimChsIndexNames.isEmpty()) {
-        m_pUi->m_pComboBoxChSelection->clear();
-
-        QMapIterator<QString, int> i(m_mapStimChsIndexNames);
-        while (i.hasNext()) {
-            i.next();
-            m_pUi->m_pComboBoxChSelection->insertItem(m_pUi->m_pComboBoxChSelection->count(), i.key());
-        }
-
-        m_pUi->m_pComboBoxChSelection->setCurrentText(m_sCurrentStimChan);
-
-        connect(m_pUi->m_pComboBoxChSelection, &QComboBox::currentTextChanged,
-                this, &AveragingSettingsView::changeStimChannel);
+        fillStimChannels();
     }
 
     m_pUi->m_pSpinBoxNumAverages->setValue(m_iNumAverages);

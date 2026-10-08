@@ -1019,14 +1019,23 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
 
     // Stim channel: the stored one is selected and its channel index is reported
     QCOMPARE(pChannels->currentText(), QStringLiteral("STI101"));
+    QCOMPARE(view.getStimChannelIdx(), 312);
     QSignalSpy stimSpy(&view, &AveragingSettingsView::changeStimChannel);
     pChannels->setCurrentText(QStringLiteral("STI014"));
     QCOMPARE(stimSpy.count(), 1);
     QCOMPARE(stimSpy.last().at(0).toString(), QStringLiteral("STI014"));
+    QCOMPARE(view.getCurrentStimCh(), QStringLiteral("STI014"));
+    QCOMPARE(view.getStimChannelIdx(), 306);
 
-    // New stim channels replace the list
+    // New stim channels keep the selection and do not duplicate the reaction
     view.setStimChannels({{QStringLiteral("STI014"), 6}, {QStringLiteral("STI201"), 7}});
     QCOMPARE(pChannels->count(), 2);
+    QCOMPARE(view.getStimChannelIdx(), 6);
+    stimSpy.clear();
+    pChannels->setCurrentText(QStringLiteral("STI201"));
+    QCOMPARE(stimSpy.count(), 1);
+    QCOMPARE(view.getCurrentStimCh(), QStringLiteral("STI201"));
+    QCOMPARE(view.getStimChannelIdx(), 7);
 
     // Epoch window and baseline: finished edits emit and constrain the baseline range
     QSignalSpy preSpy(&view, &AveragingSettingsView::changePreStim);

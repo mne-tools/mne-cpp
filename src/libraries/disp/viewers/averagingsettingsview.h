@@ -159,6 +159,12 @@ protected:
      */
     void redrawGUI();
 
+    //=========================================================================================================
+    /**
+     * Fills the stim channel selection with the known stim channels and their channel indices.
+     */
+    void fillStimChannels();
+
     void onChangePreStim();
     void onChangePostStim();
     void onChangeBaselineFrom();
