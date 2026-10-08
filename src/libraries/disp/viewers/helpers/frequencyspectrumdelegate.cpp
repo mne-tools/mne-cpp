@@ -285,42 +285,29 @@ void FrequencySpectrumDelegate::createPlotPath(const QModelIndex& index, const Q
 {
     const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
 
-    float fMaxValue = data.maxCoeff();
-
-    float fValue;
-    float fScaleY = option.rect.height() / (fMaxValue * 0.5);
-
-    float y_base = path.currentPosition().y();
-    QPointF qSamplePosition;
-
     qint32 lowerIdx = t_pModel->getLowerFrqBound();
     qint32 upperIdx = t_pModel->getUpperFrqBound();
 
-    //Move to initial starting point
-    if (data.size() > 0) {
-        float val = 0;
-        fValue = val * fScaleY;
-
-        float newY = y_base + fValue;
-
-        qSamplePosition.setY(newY);
-        qSamplePosition.setX((double)option.rect.width() * t_pModel->getFreqScaleBound()[lowerIdx]);
-
-        path.moveTo(qSamplePosition);
+    if (data.size() == 0 || upperIdx < lowerIdx) {
+        return;
     }
 
-    //create lines from one to the next sample
-    qint32 i;
-    for (i = lowerIdx + 1; i <= upperIdx; ++i) {
-        float val = data[i] - data[0]; //remove first sample data[0] as offset
-        fValue = val * fScaleY;
+    // Map the visible range into the cell (1 px margin), larger values upwards. The path starts at the cell top and
+    // is drawn translated down by half the cell height, so the cell bottom is at top + height / 2 here.
+    const double dMin = data.segment(lowerIdx, upperIdx - lowerIdx + 1).minCoeff();
+    const double dMax = data.segment(lowerIdx, upperIdx - lowerIdx + 1).maxCoeff();
+    const double dRange = (dMax > dMin) ? dMax - dMin : 1.0;
+    const double dScaleY = (option.rect.height() - 2.0) / dRange;
+    const double dYBottom = path.currentPosition().y() + option.rect.height() / 2.0 - 1.0;
 
-        float newY = y_base + fValue;
-
-        qSamplePosition.setY(newY);
-        qSamplePosition.setX((double)option.rect.width() * t_pModel->getFreqScaleBound()[i]);
-
-        path.lineTo(qSamplePosition);
+    for (qint32 i = lowerIdx; i <= upperIdx; ++i) {
+        const QPointF qSamplePosition(option.rect.x() + option.rect.width() * t_pModel->getFreqScaleBound()[i],
+                                      dYBottom - (data[i] - dMin) * dScaleY);
+        if (i == lowerIdx) {
+            path.moveTo(qSamplePosition);
+        } else {
+            path.lineTo(qSamplePosition);
+        }
     }
 }
 

@@ -2869,6 +2869,14 @@ void TestDispViewers2::frequencySpectrumDelegate_paintsSpectrumAndReadout()
     QCOMPARE(curveRow(image, cell.left() + 2), yFlat);
     QCOMPARE(curveRow(image, cell.right() - 2), yFlat);
     QVERIFY(curveRow(image, cell.left() + 80) != yFlat);
+    // More power is drawn higher up, and the peak stays inside the cell
+    const int yPeak = curveRow(image, cell.left() + 80);
+    QVERIFY2(yPeak >= cell.top() && yPeak < yFlat - 20, qPrintable(QStringLiteral("peak %1 flat %2").arg(yPeak).arg(yFlat)));
+    for (int x = cell.left(); x < cell.right(); ++x) {
+        for (int y = cell.bottom() + 1; y < image.height(); ++y) {
+            QVERIFY2(qBlue(image.pixel(x, y)) <= qRed(image.pixel(x, y)) + 60, qPrintable(QStringLiteral("curve below the cell at %1,%2").arg(x).arg(y)));
+        }
+    }
 
     // Grid: 5 linear divisions labelled at 100..400 Hz
     auto hasDarkPixelNear = [](const QImage& image, int x, int y) {
