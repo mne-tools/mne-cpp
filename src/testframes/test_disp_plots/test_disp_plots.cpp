@@ -447,7 +447,18 @@ void TestDispPlots::testImageScUpdateData()
     MatrixXf matf(2, 2);
     matf << 1.0f, 0.0f, 0.0f, 1.0f;
     img.updateData(matf);
-    QVERIFY(true);
+
+    // A 1 x 2 matrix [min, max] fills the left half with the low end and the right half with the high end of the map
+    img.resize(400, 300);
+    img.setColorMap(QStringLiteral("Jet"));
+    MatrixXd gradient(1, 2);
+    gradient << -3.0, 5.0;
+    img.updateData(gradient);
+    QImage image = img.grab().toImage();
+    const QColor low = image.pixelColor(110, 150);
+    const QColor high = image.pixelColor(240, 150);
+    QCOMPARE(low.rgb(), ColorMap::valueToColor(0.0, QStringLiteral("Jet")));
+    QCOMPARE(high.rgb(), ColorMap::valueToColor(1.0, QStringLiteral("Jet")));
 }
 
 //=============================================================================================================
