@@ -337,7 +337,28 @@ void TestDispPlots::testLinePlotUpdateData()
     QVector<double> x2 = {0.0, 1.0, 2.0, 3.0};
     QVector<double> y2 = {0.0, 1.0, 4.0, 9.0};
     plot.updateData(x2, y2);
-    QVERIFY(true); // No crash
+
+    // The curve spans the plot area: (0, 0) at the bottom-left, (3, 9) at the top-right corner
+    plot.resize(280, 175);
+    const QImage image = plot.grab().toImage();
+    const auto isCurve = [&image](int x, int y) {
+        for (int dy = -2; dy <= 2; ++dy) {
+            const QColor c = image.pixelColor(x, y + dy);
+            if (c.blue() > c.red() + 60) {
+                return true;
+            }
+        }
+        return false;
+    };
+    // Plot area: left 60, right 20, top 35, bottom 40
+    QVERIFY(isCurve(61, 175 - 40 - 1));
+    QVERIFY(isCurve(280 - 20 - 1, 35 + 1));
+    // y = x^2: at x = 2 the curve is at 4/9 of the height
+    QVERIFY(isCurve(60 + 200 * 2 / 3, 35 + 100 - 100 * 4 / 9));
+
+    // A constant series is drawn instead of dividing by a zero range
+    plot.updateData(QVector<double>{5.0, 5.0, 5.0});
+    QVERIFY(!plot.grab().isNull());
 }
 
 //=============================================================================================================
