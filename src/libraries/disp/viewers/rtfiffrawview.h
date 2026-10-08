@@ -401,17 +401,18 @@ public:
 
     //=========================================================================================================
     /**
-     * Shows a crosshair at the mouse position and reports the value under it via crosshairMoved().
+     * Shows a crosshair at the mouse position and reports the value under it via cursorDataChanged(),
+     * like ChannelDataView.
      *
-     * @param[in] bEnabled  Whether the crosshair is shown.
+     * @param[in] enabled  Whether the crosshair is shown.
      */
-    void setCrosshairEnabled(bool bEnabled);
+    void setCrosshairEnabled(bool enabled);
 
     //=========================================================================================================
     /**
      * @return Whether the crosshair is shown.
      */
-    bool isCrosshairEnabled() const;
+    bool crosshairEnabled() const;
 
 protected:
     //=========================================================================================================
@@ -553,14 +554,16 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emitted while the crosshair is enabled and the mouse is over data.
+     * Emitted while the crosshair is enabled and the mouse is over data, with the same signature as
+     * ChannelDataView::cursorDataChanged().
      *
-     * @param[in] sChannelName  The channel under the mouse.
-     * @param[in] dTime         Time since the start of the stream in seconds.
-     * @param[in] dValue        Displayed value (after projectors, compensators and filters) in SI units.
-     * @param[in] iUnit         FIFF unit of the value (e.g. FIFF_UNIT_T, FIFF_UNIT_T_M, FIFF_UNIT_V).
+     * @param[in] timeSec     Time since the start of the stream in seconds.
+     * @param[in] amplitude   Displayed value (after projectors, compensators and filters) in SI units.
+     * @param[in] channelName Name of the channel under the cursor.
+     * @param[in] unitLabel   SI unit label ("T", "T/m", "V", "AU", ...).
      */
-    void crosshairMoved(const QString& sChannelName, double dTime, double dValue, int iUnit);
+    void cursorDataChanged(float timeSec, float amplitude,
+                           const QString& channelName, const QString& unitLabel);
 };
 } // NAMESPACE
 

@@ -24,6 +24,7 @@
 
 #include <dsp/filterkernel.h>
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_dir_node.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -232,11 +233,11 @@ bool RtFiffRawView::eventFilter(QObject* object, QEvent* event)
 
 //=============================================================================================================
 
-void RtFiffRawView::setCrosshairEnabled(bool bEnabled)
+void RtFiffRawView::setCrosshairEnabled(bool enabled)
 {
-    m_bCrosshairEnabled = bEnabled;
+    m_bCrosshairEnabled = enabled;
 
-    if (!bEnabled) {
+    if (!enabled) {
         emit markerMoved(QPoint(), -1);
         m_pTableView->viewport()->update();
     }
@@ -244,7 +245,7 @@ void RtFiffRawView::setCrosshairEnabled(bool bEnabled)
 
 //=============================================================================================================
 
-bool RtFiffRawView::isCrosshairEnabled() const
+bool RtFiffRawView::crosshairEnabled() const
 {
     return m_bCrosshairEnabled;
 }
@@ -272,10 +273,10 @@ void RtFiffRawView::updateCrosshair(const QPoint& position)
         return;
     }
 
-    emit crosshairMoved(m_pModel->data(m_pModel->index(iRow, 0)).toString(),
-                        iSample / static_cast<double>(m_fSamplingRate),
-                        m_pModel->getValueAtColumn(iRow, iColumn),
-                        m_pModel->getUnit(iRow));
+    emit cursorDataChanged(static_cast<float>(iSample / static_cast<double>(m_fSamplingRate)),
+                           static_cast<float>(m_pModel->getValueAtColumn(iRow, iColumn)),
+                           m_pModel->data(m_pModel->index(iRow, 0)).toString(),
+                           QString::fromLatin1(FiffDirNode::get_unit_name(m_pModel->getUnit(iRow))));
 }
 
 //=============================================================================================================

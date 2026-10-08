@@ -2824,7 +2824,7 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     QCOMPARE(view.findChildren<QMenu*>().size(), 0);
 
     // Crosshair: reports channel, time, displayed value and unit at the mouse, also in the previous sweep
-    QSignalSpy crosshairSpy(&view, &RtFiffRawView::crosshairMoved);
+    QSignalSpy crosshairSpy(&view, &RtFiffRawView::cursorDataChanged);
     auto hover = [table](const QPoint& pos) {
         QMouseEvent move(QEvent::MouseMove, QPointF(pos), table->viewport()->mapToGlobal(QPointF(pos)), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
         QApplication::sendEvent(table->viewport(), &move);
@@ -2832,23 +2832,23 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     const int yRow0 = table->visualRect(model->index(0, 1)).center().y();
     hover(QPoint(xNew, yRow0));
     QCOMPARE(crosshairSpy.size(), 0);
-    QVERIFY(!view.isCrosshairEnabled());
+    QVERIFY(!view.crosshairEnabled());
     view.setCrosshairEnabled(true);
-    QVERIFY(view.isCrosshairEnabled());
+    QVERIFY(view.crosshairEnabled());
     for (const int x : {xNew, xOld}) {
         hover(QPoint(x, yRow0));
         const int iSample = (x == xNew ? 1000 : 0) + static_cast<int>(x / dx);
         QVERIFY(!crosshairSpy.isEmpty());
-        QCOMPARE(crosshairSpy.last().at(0).toString(), QStringLiteral("MEG0111"));
-        QCOMPARE(crosshairSpy.last().at(1).toDouble(), iSample / 1000.0);
-        QVERIFY(std::abs(crosshairSpy.last().at(2).toDouble() - std::sin(0.02 * iSample)) < 1e-12);
-        QCOMPARE(crosshairSpy.last().at(3).toInt(), FIFF_UNIT_T);
+        QCOMPARE(crosshairSpy.last().at(2).toString(), QStringLiteral("MEG0111"));
+        QCOMPARE(crosshairSpy.last().at(0).toFloat(), static_cast<float>(iSample / 1000.0));
+        QCOMPARE(crosshairSpy.last().at(1).toFloat(), static_cast<float>(std::sin(0.02 * iSample)));
+        QCOMPARE(crosshairSpy.last().at(3).toString(), QStringLiteral("T"));
     }
     const int iBefore = crosshairSpy.size();
     hover(QPoint(xNew, table->visualRect(model->index(2, 1)).center().y()));
     QCOMPARE(crosshairSpy.size(), iBefore + 1);
-    QCOMPARE(crosshairSpy.last().at(0).toString(), QStringLiteral("MEG0113"));
-    QCOMPARE(crosshairSpy.last().at(2).toDouble(), 0.5);
+    QCOMPARE(crosshairSpy.last().at(2).toString(), QStringLiteral("MEG0113"));
+    QCOMPARE(crosshairSpy.last().at(1).toFloat(), 0.5f);
 
     // The crosshair is drawn: a vertical line in its own color at the mouse position
     hover(QPoint(xNew, yRow0));

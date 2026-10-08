@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6249 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6250 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -1120,7 +1120,7 @@ Index of 6249 public class members (functions, variables, typedefs, enums) acros
 - **CrossCorrelation** `[fn]` in [CrossCorrelation](/docs/api/connectivity/cross-correlation) — Constructs a [`CrossCorrelation`](/docs/api/connectivity/cross-correlation) object.
 - **crosshairEnabled** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **crosshairEnabled** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
-- **crosshairMoved** `[signal]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Emitted while the crosshair is enabled and the mouse is over data.
+- **crosshairEnabled** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view)
 - **crosshairToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **csdByFreq** `[var]` in [CsdResult](/docs/api/utils/csd-result) — One n_ch × n_ch CSD matrix per selected frequency bin.
 - **csdFromTaperedSpectra** `[fn]` in [Spectral](/docs/api/utils/spectral) — Calculates the cross-spectral density of the tapered spectra of seed and target.
@@ -1137,6 +1137,7 @@ Index of 6249 public class members (functions, variables, typedefs, enums) acros
 - **currentTimeSample** `[fn]` in [MultimodalScene](/docs/api/disp3-d/multimodal-scene)
 - **cursorDataChanged** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Forwarded from the underlying [`ChannelRhiView`](/docs/api/disp/channel-rhi-view) when the crosshair is active.
 - **cursorDataChanged** `[signal]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Emitted continuously when the crosshair is active and the mouse moves.
+- **cursorDataChanged** `[signal]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Emitted while the crosshair is enabled and the mouse is over data, with the same signature as `ChannelDataView::cursorDataChanged()`.
 - **cursorForHit** `[fn]` in [MultiViewLayout](/docs/api/disp3-d/multi-view-layout) — Return the Qt::CursorShape appropriate for a splitter hit.
 - **curv** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — FreeSurfer curvature.
 - **curv** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — The FreeSurfer curvature values (np elements).
@@ -2025,6 +2026,7 @@ Index of 6249 public class members (functions, variables, typedefs, enums) acros
 - **get_meas_info** `[fn]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Reads measurement information from the nearest FIFFB_MEAS_INFO parent of a node.
 - **get_meas_info** `[fn]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Overload that does not return the measurement start time.
 - **get_tag_explanation** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Get textual explanation of a tag.
+- **get_unit_name** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Get the SI symbol of a FIFF unit, e.g.
 - **get_vertno** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces) — Returns the Zero based (different to MATLAB) indices of the used vertices of both hemispheres.
 - **get_whitener** `[fn]` in [Linalg](/docs/api/math/linalg) — Returns the whitener of a given matrix.
 - **get_whitener** `[fn]` in [Linalg](/docs/api/math/linalg) — Returns the whitener of a given matrix.
@@ -2672,7 +2674,6 @@ Index of 6249 public class members (functions, variables, typedefs, enums) acros
 - **isClustered** `[fn]` in [MNEHemisphere](/docs/api/mne/mne-hemisphere) — is hemisphere clustered?
 - **isComputed** `[fn]` in [SourceMorph](/docs/api/inv/source-morph) — Check if the morph has been computed.
 - **isConnected** `[fn]` in [PolhemusConnection](/docs/api/utils/polhemus-connection)
-- **isCrosshairEnabled** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view)
 - **isDepthEnabled** `[fn]` in [VideoOverlay](/docs/api/disp3-d/video-overlay)
 - **isDipole** `[var]` in [RayHit](/docs/api/disp3-d/ray-hit) — True if a dipole was hit.
 - **isEmpty** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
@@ -4731,7 +4732,7 @@ Index of 6249 public class members (functions, variables, typedefs, enums) acros
 - **setContactValues** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Apply per-contact scalar overlay values and map them to a color gradient.
 - **setCrosshairEnabled** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Enable or disable the crosshair cursor with coordinate readout.
 - **setCrosshairEnabled** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Enable or disable the crosshair cursor overlay.
-- **setCrosshairEnabled** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Shows a crosshair at the mouse position and reports the value under it via `crosshairMoved()`.
+- **setCrosshairEnabled** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Shows a crosshair at the mouse position and reports the value under it via `cursorDataChanged()`, like [`ChannelDataView`](/docs/api/disp/channel-data-view).
 - **setCurrentLayoutFile** `[fn]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — Sets the current layout file.
 - **setCurrentlyMappedFiffChannels** `[fn]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — Sets the currently mapped fiff channels.
 - **setCurrentSamples** `[fn]` in [CovarianceSettingsView](/docs/api/disp/covariance-settings-view) — Set current samples to gather until a new covariance is calculated.

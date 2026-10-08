@@ -426,18 +426,18 @@ Getter fcn for Sampling Frequency member.
 
 ---
 
-### setCrosshairEnabled(bEnabled)
+### setCrosshairEnabled(enabled)
 
-Shows a crosshair at the mouse position and reports the value under it via `crosshairMoved()`.
+Shows a crosshair at the mouse position and reports the value under it via `cursorDataChanged()`, like [`ChannelDataView`](/docs/api/disp/channel-data-view).
 
 **Parameters:**
 
-- **bEnabled** : *bool*
+- **enabled** : *bool*
   Whether the crosshair is shown.
 
 ---
 
-### isCrosshairEnabled()
+### crosshairEnabled()
 
 **Returns:**
 
