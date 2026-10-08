@@ -3409,7 +3409,37 @@ void TestDispViewers2::rtFiffRawViewDelegate_paintsSignalCursorAndThreshold()
     const QRgb background = image.pixel(5, 90);
     QVERIFY2(qRed(background) > qBlue(background) + 10, qPrintable(QColor(background).name()));
 
+    // A cell that does not start at x = 0 (name column shown) draws the cursor at the same place within the cell
     info->bads.clear();
+    {
+        QImage shifted(300, cell.height(), QImage::Format_RGB32);
+        shifted.fill(Qt::white);
+        QPainter painter(&shifted);
+        QStyleOptionViewItem option;
+        option.rect = QRect(100, 0, 200, 100);
+        delegate.paint(&painter, option, model.index(0, 1));
+        painter.end();
+        QVERIFY2(rowsWhere(shifted, 100 + 120, isMarker).size() > 50, qPrintable(QString::number(rowsWhere(shifted, 220, isMarker).size())));
+    }
+    // ... and so do detected triggers (stim step at sample 30) and added events (sample 50)
+    model.setEventCallbacks([](int) {}, [](int, int) { return std::vector<int>{50}; });
+    {
+        QImage shifted(300, cell.height(), QImage::Format_RGB32);
+        shifted.fill(Qt::white);
+        QPainter painter(&shifted);
+        QStyleOptionViewItem option;
+        option.rect = QRect(100, 0, 200, 100);
+        delegate.paint(&painter, option, model.index(3, 1));
+        painter.end();
+        auto isTrigger = [](QRgb c) {
+            return qRed(c) > 150 && qGreen(c) < 100 && qBlue(c) < 100;
+        };
+        auto isEvent = [](QRgb c) {
+            return qGreen(c) > qRed(c) + 60 && qGreen(c) > qBlue(c) + 60;
+        };
+        QVERIFY2(rowsWhere(shifted, 100 + 60, isTrigger).size() > 50, qPrintable(QString::number(rowsWhere(shifted, 160, isTrigger).size())));
+        QVERIFY2(rowsWhere(shifted, 100 + 100, isEvent).size() > 50, qPrintable(QString::number(rowsWhere(shifted, 200, isEvent).size())));
+    }
 
     // Name column and size hints
     QStyleOptionViewItem option;

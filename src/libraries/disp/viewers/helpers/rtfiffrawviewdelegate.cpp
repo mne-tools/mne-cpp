@@ -451,9 +451,8 @@ void RtFiffRawViewDelegate::createCurrentPositionMarkerPath(const QModelIndex& i
 {
     const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
-    float currentSampleIndex = option.rect.x() + t_pModel->getCurrentSampleIndex();
     float dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
-    currentSampleIndex = currentSampleIndex * dDx;
+    float currentSampleIndex = option.rect.x() + t_pModel->getCurrentSampleIndex() * dDx;
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
@@ -548,8 +547,8 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter* painter,
         }
 
         if (triggerPos <= currentSampleIndex + t_pModel->getCurrentOverlapAddDelay()) {
-            markerPath.moveTo(static_cast<qreal>(triggerPos) * dDx, yStart);
-            markerPath.lineTo(static_cast<qreal>(triggerPos) * dDx, yEnd);
+            markerPath.moveTo(option.rect.x() + static_cast<qreal>(triggerPos) * dDx, yStart);
+            markerPath.lineTo(option.rect.x() + static_cast<qreal>(triggerPos) * dDx, yEnd);
         }
 
         painter->drawPath(markerPath);
@@ -569,8 +568,8 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter* painter,
                 painter->setPen(QPen(mapTriggerTypeColors[detectedTriggersOld[u].second], 1.5, Qt::SolidLine));
             }
 
-            markerPath.moveTo(static_cast<qreal>(triggerPos) * dDx, yStart);
-            markerPath.lineTo(static_cast<qreal>(triggerPos) * dDx, yEnd);
+            markerPath.moveTo(option.rect.x() + static_cast<qreal>(triggerPos) * dDx, yStart);
+            markerPath.lineTo(option.rect.x() + static_cast<qreal>(triggerPos) * dDx, yEnd);
 
             painter->drawPath(markerPath);
             painter->restore();
@@ -638,7 +637,7 @@ void RtFiffRawViewDelegate::createMarkerPath(const QModelIndex& index,
         int iLastStartingSample = iOffset - iMaxSample;
         int iDrawPositionInSamples = (iEventSample - iLastStartingSample) % iMaxSample;
 
-        float iPositionInPixels = static_cast<float>(iDrawPositionInSamples) * dDx;
+        float iPositionInPixels = option.rect.x() + static_cast<float>(iDrawPositionInSamples) * dDx;
 
         path.moveTo(iPositionInPixels, yStart);
         path.lineTo(iPositionInPixels, yEnd);
