@@ -2644,13 +2644,15 @@ void TestDispViewers2::channelRhiView_renderToImage()
 
 void TestDispViewers2::channelRhiView_overlayValues()
 {
-    ChannelDataView view(QStringLiteral("test_disp_viewers2_rhi_overlay"));
-    view.init(createBrowserTestInfo());
-    view.setFileBounds(100, 299);
-    view.setData(createBrowserTestData(), 100);
-    auto* rhiView = view.findChild<ChannelRhiView*>();
-    QVERIFY(rhiView != nullptr);
+    ChannelDataModel model;
+    model.init(createBrowserTestInfo());
+    model.setData(createBrowserTestData(), 100);
+    ChannelRhiView view;
+    ChannelRhiView* rhiView = &view;
+    rhiView->setModel(&model);
     rhiView->resize(400, 400);
+    rhiView->setAttribute(Qt::WA_DontShowOnScreen);
+    rhiView->show();
     rhiView->setSfreq(1000.f);
     rhiView->setFirstFileSample(100);
     rhiView->setSamplesPerPixel(0.5f);
@@ -2661,6 +2663,12 @@ void TestDispViewers2::channelRhiView_overlayValues()
     QCOMPARE(children.size(), 1);
     QWidget* overlay = children.first();
     overlay->resize(rhiView->size());
+
+    const auto sendMouse = [rhiView](QEvent::Type type, Qt::MouseButton button, const QPoint& pos) {
+        QMouseEvent event(type, pos, rhiView->mapToGlobal(pos), type == QEvent::MouseMove ? Qt::NoButton : button,
+                          type == QEvent::MouseButtonRelease ? Qt::NoButton : button, Qt::NoModifier);
+        QApplication::sendEvent(rhiView, &event);
+    };
 
     struct Recording
     {
@@ -2673,7 +2681,16 @@ void TestDispViewers2::channelRhiView_overlayValues()
             QPainter painter(&recorder);
             overlay->render(&painter);
         }
-        return Recording{recorder.texts(), recorder.lines()};
+        // Glyphs from a fallback font (e.g. the ruler's delta) arrive as separate items: rejoin them
+        QStringList texts;
+        for (const QString& text : recorder.texts()) {
+            if (!texts.isEmpty() && texts.last() == QStringLiteral("\u0394")) {
+                texts.last() += text;
+            } else {
+                texts.append(text);
+            }
+        }
+        return Recording{texts, recorder.lines()};
     };
     const auto textStartingWith = [](const QStringList& texts, const QString& prefix) {
         for (const QString& text : texts) {
@@ -2688,7 +2705,7 @@ void TestDispViewers2::channelRhiView_overlayValues()
     // trace scale, where amplitudeMax spans 45 % of a 100 px row
     rhiView->setScalebarsVisible(true);
     Recording rec = paintOverlay();
-    const float magScale = view.model()->channelInfo(0).amplitudeMax;
+    const float magScale = model.channelInfo(0).amplitudeMax;
     const QString magLabel = textStartingWith(rec.texts, QStringLiteral("MEG mag: "));
     QVERIFY2(!magLabel.isEmpty(), qPrintable(rec.texts.join(u'|')));
     float barPx = 0.f;
@@ -2701,6 +2718,34 @@ void TestDispViewers2::channelRhiView_overlayValues()
     const float expectedPicoTesla = magScale * barPx / 45.f * 1e12f;
     QCOMPARE(magLabel, QStringLiteral("MEG mag: %1 pT").arg(QString::number(expectedPicoTesla, 'f', 1)));
     rhiView->setScalebarsVisible(false);
+
+    // Crosshair in row 0 at x = 40 px: sample 120, 20 ms after the first sample, value sin(20 * 0.05) T
+    rhiView->setCrosshairEnabled(true);
+    sendMouse(QEvent::MouseMove, Qt::NoButton, QPoint(40, 50));
+    rec = paintOverlay();
+    QCOMPARE(textStartingWith(rec.texts, QStringLiteral("MEG0111")),
+             QStringLiteral("MEG0111  0.020 s  %1 mT").arg(QString::number(std::sin(1.0) * 1e3, 'f', 1)));
+    rhiView->setClockTimeFormat(true);
+    QCOMPARE(textStartingWith(paintOverlay().texts, QStringLiteral("MEG0111")),
+             QStringLiteral("MEG0111  00:00.020  %1 mT").arg(QString::number(std::sin(1.0) * 1e3, 'f', 1)));
+    rhiView->setCrosshairEnabled(false);
+
+    // Ruler held from (100, 30) to (180, 75) in row 0: 80 px = 40 samples = 40 ms, -45 px = -amplitudeMax
+    sendMouse(QEvent::MouseButtonPress, Qt::RightButton, QPoint(100, 30));
+    sendMouse(QEvent::MouseMove, Qt::RightButton, QPoint(180, 75));
+    rec = paintOverlay();
+    QCOMPARE(textStartingWith(rec.texts, QStringLiteral("\u0394T")), QStringLiteral("\u0394T = 40.0 ms"));
+    QCOMPARE(textStartingWith(rec.texts, QStringLiteral("\u0394A")),
+             QStringLiteral("\u0394A = %1 nT").arg(QString::number(-magScale * 1e9f, 'f', 3)));
+    sendMouse(QEvent::MouseButtonRelease, Qt::RightButton, QPoint(180, 75));
+    QVERIFY(textStartingWith(paintOverlay().texts, QStringLiteral("\u0394T")).isEmpty());
+
+    // Annotation selection from 100 to 160 px: 30 samples = 30 ms
+    rhiView->setAnnotationSelectionEnabled(true);
+    sendMouse(QEvent::MouseButtonPress, Qt::RightButton, QPoint(100, 30));
+    sendMouse(QEvent::MouseMove, Qt::RightButton, QPoint(160, 30));
+    QVERIFY(paintOverlay().texts.contains(QStringLiteral("30 ms")));
+    sendMouse(QEvent::MouseButtonRelease, Qt::RightButton, QPoint(160, 30));
 }
 
 //=============================================================================================================
