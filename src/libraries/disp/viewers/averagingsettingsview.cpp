@@ -179,7 +179,7 @@ void AveragingSettingsView::redrawGUI()
     //Baseline Correction
     m_pUi->m_pcheckBoxBaselineCorrection->setChecked(m_bDoBaselineCorrection);
     connect(m_pUi->m_pcheckBoxBaselineCorrection, &QCheckBox::clicked,
-            this, &AveragingSettingsView::changeBaselineActive);
+            this, &AveragingSettingsView::onChangeBaselineActive);
 
     m_pUi->m_pSpinBoxBaselineFromMSeconds->setMinimum(m_pUi->m_pSpinBoxPreStimMSeconds->value() * -1);
     m_pUi->m_pSpinBoxBaselineFromMSeconds->setMaximum(m_pUi->m_pSpinBoxPostStimMSeconds->value());
@@ -403,6 +403,17 @@ void AveragingSettingsView::onChangeNumAverages()
     m_iNumAverages = m_pUi->m_pSpinBoxNumAverages->value();
 
     emit changeNumAverages(m_pUi->m_pSpinBoxNumAverages->value());
+
+    saveSettings();
+}
+
+//=============================================================================================================
+
+void AveragingSettingsView::onChangeBaselineActive(bool bActive)
+{
+    m_bDoBaselineCorrection = bActive;
+
+    emit changeBaselineActive(bActive);
 
     saveSettings();
 }

@@ -1070,6 +1070,7 @@ void TestDispViewers2::averagingSettingsView_controlsAndSettings()
     pBaseline->click();
     QCOMPARE(baselineSpy.count(), 1);
     QCOMPARE(baselineSpy.last().at(0).toBool(), pBaseline->isChecked());
+    QCOMPARE(view.getDoBaselineCorrection(), pBaseline->isChecked());
     QSignalSpy resetSpy(&view, &AveragingSettingsView::resetAverage);
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_reset")), Qt::LeftButton);
     QCOMPARE(resetSpy.count(), 1);

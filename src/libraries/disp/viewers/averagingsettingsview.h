@@ -170,6 +170,7 @@ protected:
     void onChangeBaselineFrom();
     void onChangeBaselineTo();
     void onChangeNumAverages();
+    void onChangeBaselineActive(bool bActive);
     void onChangeStimChannel();
     void onChangeGroupSelect(int iIndex);
 
