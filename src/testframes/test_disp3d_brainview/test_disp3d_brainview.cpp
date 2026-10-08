@@ -579,6 +579,60 @@ void TestDisp3dBrainView::stcLoadingWorker_basics()
     QVERIFY(worker.interpolationMatLh().isNull());
     QVERIFY(worker.interpolationMatRh().isNull());
 
+    // Neither file exists: two read errors, then failure
+    QSignalSpy errorSpy(&worker, &StcLoadingWorker::error);
+    QSignalSpy finishedSpy(&worker, &StcLoadingWorker::finished);
+    worker.process();
+    QCOMPARE(errorSpy.size(), 3);
+    QCOMPARE(finishedSpy.size(), 1);
+    QVERIFY(!finishedSpy.at(0).at(0).toBool());
+
+    // A left-hemisphere STC with sources at two vertices of a 4-vertex surface; the right one is missing
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString lhPath = dir.filePath(QStringLiteral("test-lh.stc"));
+    Eigen::MatrixXd data(2, 3);
+    data << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0;
+    Eigen::VectorXi vertices(2);
+    vertices << 0, 3;
+    {
+        QFile out(lhPath);
+        QVERIFY(INVLIB::InvSourceEstimate(data, vertices, 0.0f, 0.001f).write(out));
+    }
+    Eigen::MatrixX3f rr(4, 3);
+    rr << 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.01f, 0.01f, 0.0f;
+    Eigen::MatrixX3i tris(2, 3);
+    tris << 0, 1, 2, 1, 3, 2;
+    lhSurface.createFromData(rr, tris, Qt::gray);
+    StcLoadingWorker loader(lhPath, QString(), &lhSurface, &rhSurface, 0.05);
+    QSignalSpy loadedSpy(&loader, &StcLoadingWorker::finished);
+    QSignalSpy progressSpy(&loader, &StcLoadingWorker::progress);
+    loader.process();
+    QCOMPARE(loadedSpy.size(), 1);
+    QVERIFY(loadedSpy.at(0).at(0).toBool());
+    QVERIFY(loader.hasLh());
+    QVERIFY(!loader.hasRh());
+    QCOMPARE(loader.stcLh().data, data);
+    // One row per surface vertex, one column per source; each source vertex takes its own value
+    const auto mat = loader.interpolationMatLh();
+    QVERIFY(mat);
+    QCOMPARE(mat->rows(), Eigen::Index(4));
+    QCOMPARE(mat->cols(), Eigen::Index(2));
+    QVERIFY(std::fabs(mat->coeff(0, 0) - 1.0f) < 1e-6f);
+    QVERIFY(std::fabs(mat->coeff(3, 1) - 1.0f) < 1e-6f);
+    QVERIFY(progressSpy.size() > 2);
+    QCOMPARE(progressSpy.last().at(0).toInt(), 100);
+
+    // Cancelled before it starts: no matrix, failure
+    StcLoadingWorker cancelled(lhPath, QString(), &lhSurface, &rhSurface, 0.05);
+    QSignalSpy cancelledSpy(&cancelled, &StcLoadingWorker::finished);
+    cancelled.requestCancel();
+    QVERIFY(cancelled.isCancelled());
+    cancelled.process();
+    QCOMPARE(cancelledSpy.size(), 1);
+    QVERIFY(!cancelledSpy.at(0).at(0).toBool());
+    QVERIFY(cancelled.interpolationMatLh().isNull());
+
     QApplication::processEvents();
 }
 
