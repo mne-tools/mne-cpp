@@ -1690,15 +1690,72 @@ void TestDispViewers2::averageLayoutView_lifecycle()
 
 void TestDispViewers2::averageSelectionView_lifecycle()
 {
-    AverageSelectionView view("test_disp_viewers2");
+    const QString settingsPath = QStringLiteral("test_disp_viewers2_avgsel");
+    QSettings(QStringLiteral("MNECPP")).remove(settingsPath);
+    auto view = std::make_unique<AverageSelectionView>(settingsPath);
 
-    view.setGuiMode(AbstractView::GuiMode::Research);
-    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
-    view.saveSettings();
-    view.loadSettings();
-    view.clearView();
+    view->setGuiMode(AbstractView::GuiMode::Research);
+    view->setProcessingMode(AbstractView::ProcessingMode::Offline);
+    view->clearView();
 
+    // One checkbox and one colour button per average
+    auto colors = QSharedPointer<QMap<QString, QColor>>::create();
+    auto activation = QSharedPointer<QMap<QString, bool>>::create();
+    colors->insert(QStringLiteral("aud"), Qt::red);
+    colors->insert(QStringLiteral("vis"), Qt::blue);
+    activation->insert(QStringLiteral("aud"), true);
+    activation->insert(QStringLiteral("vis"), false);
+    view->setAverageActivation(activation);
+    view->setAverageColor(colors);
+    QCOMPARE(view->getAverageColor(), colors);
+    QCOMPARE(view->getAverageActivation(), activation);
+    QCOMPARE(view->findChildren<QCheckBox*>().size(), 2);
+    auto* visBox = view->findChild<QCheckBox*>(QStringLiteral("vis"));
+    QVERIFY(visBox && !visBox->isChecked());
+    QVERIFY(view->findChild<QCheckBox*>(QStringLiteral("aud"))->isChecked());
+
+    // Toggling a checkbox updates the activation map
+    QSignalSpy activationSpy(view.get(), &AverageSelectionView::newAverageActivationMap);
+    visBox->click();
+    QCOMPARE(activationSpy.size(), 1);
+    QVERIFY(activation->value(QStringLiteral("vis")));
+
+    // Picking a colour stores it
+    QSignalSpy colorSpy(view.get(), &AverageSelectionView::newAverageColorMap);
+    auto* visButton = view->findChild<QPushButton*>(QStringLiteral("vis"));
+    answerNextModal([](QWidget* pModal) {
+        auto* pDialog = qobject_cast<QColorDialog*>(pModal);
+        QVERIFY(pDialog);
+        pDialog->setCurrentColor(QColor(10, 200, 30));
+        static_cast<QDialog*>(pDialog)->accept();
+    });
+    visButton->click();
+    QCOMPARE(colors->value(QStringLiteral("vis")), QColor(10, 200, 30));
+    QCOMPARE(colorSpy.size(), 1);
+
+    // Colours and activation are restored by a new view with the same settings path
+    view.reset();
+    view = std::make_unique<AverageSelectionView>(settingsPath);
+    QCOMPARE(view->getAverageColor()->value(QStringLiteral("vis")), QColor(10, 200, 30));
+    QVERIFY(view->getAverageActivation()->value(QStringLiteral("vis")));
+    QCOMPARE(view->findChildren<QCheckBox*>().size(), 2);
+
+    // At most 10 averages are listed; maps of different size are not drawn
+    for (int i = 0; i < 12; ++i) {
+        colors->insert(QStringLiteral("avg%1").arg(i, 2, 10, QLatin1Char('0')), Qt::green);
+        activation->insert(QStringLiteral("avg%1").arg(i, 2, 10, QLatin1Char('0')), true);
+    }
+    view->setAverageActivation(activation);
+    view->setAverageColor(colors);
     QApplication::processEvents();
+    QCOMPARE(view->findChildren<QCheckBox*>().size(), 10);
+    activation->remove(QStringLiteral("aud"));
+    view->setAverageActivation(activation);
+    QApplication::processEvents();
+    QCOMPARE(view->findChildren<QCheckBox*>().size(), 10);
+
+    view.reset();
+    QSettings(QStringLiteral("MNECPP")).remove(settingsPath);
 }
 
 //=============================================================================================================
