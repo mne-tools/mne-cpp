@@ -42,6 +42,9 @@
 #include <disp3D/input/raypicker.h>
 #include <disp3D/renderable/dipoleobject.h>
 #include <disp3D/renderable/networkobject.h>
+#include <disp3D/renderable/sourceestimateoverlay.h>
+#include <disp/plots/helpers/colormap.h>
+#include <inv/inv_source_estimate.h>
 #include <disp3D/core/viewstate.h>
 
 #include <fiff/fiff_dig_point.h>
@@ -268,6 +271,12 @@ private slots:
      * Verifies NetworkObject geometry and the node/edge instances kept by the threshold.
      */
     void networkObject_thresholdAndInstances();
+
+    //=========================================================================================================
+    /**
+     * Verifies SourceEstimateOverlay thresholds, time access and per-vertex colours on a surface.
+     */
+    void sourceEstimateOverlay_colorsSurface();
 };
 
 //=============================================================================================================
@@ -1356,6 +1365,79 @@ void TestDisp3dBrainView::networkObject_thresholdAndInstances()
 
     obj.setVisible(false);
     QVERIFY(!obj.isVisible());
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
+{
+    SourceEstimateOverlay overlay;
+    QVERIFY(!overlay.isLoaded());
+    QCOMPARE(overlay.numTimePoints(), 0);
+    QVERIFY(!overlay.loadStc(QStringLiteral("/nonexistent-lh.stc"), 0));
+
+    // Left hemisphere: sources at vertices 0 and 2 of a 4-vertex surface, two time points
+    Eigen::MatrixXd data(2, 2);
+    data << 1.0, -4.0,
+        4.0, 2.0;
+    Eigen::VectorXi vertices(2);
+    vertices << 0, 2;
+    overlay.setStcData(INVLIB::InvSourceEstimate(data, vertices, -0.1f, 0.01f), 0);
+    QVERIFY(overlay.isLoaded());
+    QCOMPARE(overlay.numTimePoints(), 2);
+    QCOMPARE(overlay.tmin(), -0.1f);
+    QCOMPARE(overlay.tstep(), 0.01f);
+    QVERIFY(std::fabs(overlay.timeAtIndex(1) - (-0.09f)) < 1e-6f);
+
+    overlay.setThresholds(1.0f, 2.5f, 4.0f);
+    QCOMPARE(overlay.thresholdMid(), 2.5f);
+
+    Eigen::MatrixX3f rr(4, 3);
+    rr << 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0;
+    Eigen::MatrixX3i tris(2, 3);
+    tris << 0, 1, 2, 1, 3, 2;
+    BrainSurface surface;
+    surface.createFromData(rr, tris, Qt::gray);
+    surface.setHemi(0);
+
+    // Time 0: vertex 2 is at the maximum (opaque, top of the map); vertex 0 at the minimum is transparent
+    overlay.setColormap(QStringLiteral("Hot"));
+    overlay.applyToSurface(&surface, 0);
+    const auto& vertexData = surface.vertexDataRef();
+    const QRgb top = DISPLIB::ColorMap::valueToColor(1.0, QStringLiteral("Hot"));
+    const uint32_t vertex2 = vertexData[2].color;
+    QCOMPARE(static_cast<int>(vertex2 & 0xFFu), qRed(top));
+    QCOMPARE(static_cast<int>((vertex2 >> 8) & 0xFFu), qGreen(top));
+    QCOMPARE(static_cast<int>((vertex2 >> 16) & 0xFFu), qBlue(top));
+    QCOMPARE(vertexData[0].color & 0xFFFFFFu, vertexData[1].color & 0xFFFFFFu);
+
+    // Time 1 uses |-4| = 4 for vertex 0; out-of-range indices are clamped to the last time
+    overlay.applyToSurface(&surface, 99);
+    QCOMPARE(surface.vertexDataRef()[0].color & 0xFFFFFFu, vertex2 & 0xFFFFFFu);
+
+    // The data column concatenates both hemispheres
+    Eigen::MatrixXd rhData(1, 2);
+    rhData << 5.0, 6.0;
+    Eigen::VectorXi rhVertices(1);
+    rhVertices << 1;
+    overlay.setStcData(INVLIB::InvSourceEstimate(rhData, rhVertices, -0.1f, 0.01f), 1);
+    const Eigen::VectorXd column = overlay.sourceDataColumn(1);
+    QCOMPARE(column.size(), Eigen::Index(3));
+    QCOMPARE(column(0), -4.0);
+    QCOMPARE(column(2), 6.0);
+    double minVal = 0.0;
+    double maxVal = 0.0;
+    overlay.getDataRange(minVal, maxVal);
+    QCOMPARE(maxVal, 6.0);
+
+    // A surface of the other hemisphere without data stays untouched
+    BrainSurface other;
+    other.createFromData(rr, tris, Qt::gray);
+    other.setHemi(2);
+    const uint32_t before = other.vertexDataRef()[0].color;
+    overlay.applyToSurface(&other, 0);
+    QCOMPARE(other.vertexDataRef()[0].color, before);
+    overlay.applyToSurface(nullptr, 0);
 }
 
 //=============================================================================================================

@@ -10,7 +10,7 @@
     "registered_function_modules": 13,
     "registered_header_only": 35,
     "registered_stale": 0,
-    "registered_with_test": 143,
+    "registered_with_test": 144,
     "registered_test_unresolved": 0,
     "registered_with_example": 367,
     "registered_example_not_built": 0,
@@ -74,7 +74,7 @@
     "disp3D": {
       "public": 48,
       "registered": 48,
-      "with_test": 28,
+      "with_test": 29,
       "eligible": 20,
       "eligible_with_registry_example": 20,
       "eligible_used_by_example": 19,
@@ -3882,8 +3882,8 @@
       "exported": true,
       "registered": true,
       "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
+      "test": "test_disp3d_brainview",
+      "test_resolves": true,
       "example": "ex_disp3d_scene",
       "example_state": "built",
       "including_examples": [

@@ -833,6 +833,7 @@
         "RayPicker",
         "RtSensorStreamManager",
         "SourceEstimateManager",
+        "SourceEstimateOverlay",
         "SourceSpaceTreeItem",
         "StcLoadingWorker",
         "SurfaceTreeItem"
