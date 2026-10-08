@@ -794,6 +794,68 @@ void TestDisp3dBrainView::rayPicker_basics()
     RayHit noHit;
     QVERIFY(noHit.displayLabel().isEmpty());
 
+    // A perspective camera at z = 5 looking down -z: the pane centre unprojects to the view axis,
+    // and a corner ray passes through the point that projects onto that corner
+    QMatrix4x4 proj;
+    proj.perspective(60.0f, 4.0f / 3.0f, 0.1f, 100.0f);
+    QMatrix4x4 viewMat;
+    viewMat.lookAt(QVector3D(0, 0, 5), QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+    const QMatrix4x4 camera = proj * viewMat;
+    QVERIFY(RayPicker::unproject(QPoint(400, 300), paneRect, camera, origin, dir));
+    QVERIFY((dir - QVector3D(0, 0, -1)).length() < 1e-4f);
+    QVERIFY(std::fabs(origin.x()) < 1e-4f && std::fabs(origin.y()) < 1e-4f);
+    const QVector3D target(0.5f, -0.4f, 1.0f);
+    const QVector3D ndc = camera.map(target);
+    const QPoint screen(qRound((ndc.x() + 1.0f) * 400.0f) + 100, qRound((1.0f - ndc.y()) * 300.0f) + 50);
+    QVERIFY(RayPicker::unproject(screen, QRect(100, 50, 800, 600), camera, origin, dir));
+    const QVector3D toTarget = (target - origin).normalized();
+    QVERIFY(QVector3D::crossProduct(toTarget, dir).length() < 5e-3f);
+    QVERIFY(!RayPicker::unproject(QPoint(0, 0), paneRect, QMatrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), origin, dir));
+
+    // Two BEM planes at z = 1 and z = -1: a ray from z = 5 down -z hits the nearer one at distance 4
+    const auto plane = [](float z) {
+        Eigen::MatrixX3f rr(4, 3);
+        rr << -1, -1, z, 1, -1, z, -1, 1, z, 1, 1, z;
+        Eigen::MatrixX3i tris(2, 3);
+        tris << 0, 1, 2, 1, 3, 2;
+        auto surface = std::make_shared<BrainSurface>();
+        surface->createFromData(rr, tris, Qt::gray);
+        return surface;
+    };
+    surfaces.insert(QStringLiteral("bem_outer_skin"), plane(1.0f));
+    surfaces.insert(QStringLiteral("bem_inner_skull"), plane(-1.0f));
+    result = RayPicker::pick(QVector3D(0.2f, 0.1f, 5.0f), QVector3D(0, 0, -1), sv, surfaces, itemSurfaceMap, itemDipoleMap);
+    QVERIFY(result.hit);
+    QCOMPARE(result.surfaceKey, QStringLiteral("bem_outer_skin"));
+    QVERIFY(std::fabs(result.distance - 4.0f) < 1e-4f);
+    QVERIFY((result.hitPoint - QVector3D(0.2f, 0.1f, 1.0f)).length() < 1e-4f);
+    QCOMPARE(RayPicker::buildLabel(result, itemSurfaceMap, surfaces), QStringLiteral("BEM: Outer skin"));
+    QCOMPARE(result.displayLabel(), QStringLiteral("bem_outer_skin"));
+
+    // Hidden surfaces are not picked; a ray beside the planes misses
+    surfaces.value(QStringLiteral("bem_outer_skin"))->setVisible(false);
+    result = RayPicker::pick(QVector3D(0.2f, 0.1f, 5.0f), QVector3D(0, 0, -1), sv, surfaces, itemSurfaceMap, itemDipoleMap);
+    QCOMPARE(result.surfaceKey, QStringLiteral("bem_inner_skull"));
+    QVERIFY(!RayPicker::pick(QVector3D(3.0f, 0.0f, 5.0f), QVector3D(0, 0, -1), sv, surfaces, itemSurfaceMap, itemDipoleMap).hit);
+
+    // Labels for the other surface kinds
+    RayHit hit;
+    hit.hit = true;
+    hit.surfaceKey = QStringLiteral("sens_surface_meg");
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("MEG Helmet"));
+    hit.surfaceKey = QStringLiteral("dig_cardinal");
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("Digitizer (Cardinal)"));
+    hit.surfaceKey = QStringLiteral("rh_pial");
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("Right Hemisphere"));
+    hit.regionName = QStringLiteral("precentral");
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("Region: precentral (rh)"));
+    QCOMPARE(hit.displayLabel(), QStringLiteral("Region: precentral (rh)"));
+    hit.regionName.clear();
+    hit.isDipole = true;
+    hit.dipoleIndex = 3;
+    QCOMPARE(RayPicker::buildLabel(hit, itemSurfaceMap, surfaces), QStringLiteral("Dipole (Dipole 3)"));
+    QCOMPARE(hit.displayLabel(), QStringLiteral("Dipole 3"));
+
     QApplication::processEvents();
 }
 
