@@ -118,8 +118,12 @@ void DipoleFitView::requestParams()
     emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
                         m_pUi->doubleSpinBox_grid->value());
 
-    emit baselineChanged(m_pUi->spinBox_bmax->value(),
-                         m_pUi->spinBox_bmax->value());
+    if (m_pUi->spinBox_bmin->value() != m_pUi->spinBox_bmax->value()) {
+        emit baselineChanged(m_pUi->spinBox_bmin->value(),
+                             m_pUi->spinBox_bmax->value());
+    } else {
+        emit baselineChanged(1e6, 1e6);
+    }
 
     emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
                       m_pUi->doubleSpinBox_magnoise->value(),

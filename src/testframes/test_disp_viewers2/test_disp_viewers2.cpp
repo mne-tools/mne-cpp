@@ -2872,9 +2872,7 @@ void TestDispViewers2::dipoleFitView_paramsModelsAndFit()
     view.requestParams();
     for (int i = 0; i < spies.size(); ++i) {
         QCOMPARE(spies.at(i)->count(), 1);
-        if (spies.at(i) != &baselineSpy) {
-            QCOMPARE(spies.at(i)->last(), lastReported.at(i));
-        }
+        QCOMPARE(spies.at(i)->last(), lastReported.at(i));
     }
 
     // Model lists; the measurement selection derives the fit name
