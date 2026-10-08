@@ -93,6 +93,7 @@
 #include <QTemporaryDir>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QColorDialog>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QLocale>
@@ -998,6 +999,25 @@ void TestDispViewers2::triggerDetectionView_settingsAndSignals()
     view.setNumberDetectedTriggersAndTypes(3, {{3, {{10, 1.0}, {20, 4.0}, {30, 1.0}}}});
     QCOMPARE(pCount->text(), QStringLiteral("3"));
     QCOMPARE(pTypes->count(), 2);
+
+    // The color button shows the color of the selected type; picking a color stores it for that type
+    auto* pColor = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_triggerColor"));
+    QVERIFY(pColor);
+    pTypes->setCurrentIndex(1);
+    answerNextModal([](QWidget* pModal) {
+        auto* pDialog = qobject_cast<QColorDialog*>(pModal);
+        QVERIFY(pDialog);
+        pDialog->setCurrentColor(QColor(10, 200, 30));
+        static_cast<QDialog*>(pDialog)->accept();
+    });
+    QTest::mouseClick(pColor, Qt::LeftButton);
+    QCOMPARE(pColor->palette().color(QPalette::Button), QColor(10, 200, 30));
+    using ColorMap = QMap<double, QColor>;
+    QCOMPARE(infoSpy.last().at(0).value<ColorMap>().value(4.0), QColor(10, 200, 30));
+    pTypes->setCurrentIndex(0);
+    QVERIFY(pColor->palette().color(QPalette::Button) != QColor(10, 200, 30));
+    pTypes->setCurrentIndex(1);
+    QCOMPARE(pColor->palette().color(QPalette::Button), QColor(10, 200, 30));
 
     QSignalSpy resetSpy(&view, &TriggerDetectionView::resetTriggerCounter);
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_resetNumberTriggers")), Qt::LeftButton);
