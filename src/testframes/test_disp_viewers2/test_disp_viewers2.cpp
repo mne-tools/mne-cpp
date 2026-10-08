@@ -78,6 +78,7 @@
 #include <QMenu>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QGridLayout>
 #include <QPainter>
 #include <QCheckBox>
 #include <QComboBox>
@@ -277,6 +278,12 @@ private slots:
      * Verifies that ArtifactSettingsView constructs and survives all lifecycle transitions.
      */
     void artifactSettingsView_lifecycle();
+
+    //=========================================================================================================
+    /**
+     * Verifies ArtifactSettingsView rows per channel type, threshold composition, activation and rebuilds.
+     */
+    void artifactSettingsView_thresholds();
 
     //=========================================================================================================
     /**
@@ -933,6 +940,67 @@ void TestDispViewers2::coregSettingsView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::artifactSettingsView_thresholds()
+{
+    auto channel = [](int kind, int unit) {
+        FiffChInfo ch;
+        ch.kind = kind;
+        ch.unit = unit;
+        return ch;
+    };
+    const QList<FiffChInfo> megEeg = {channel(FIFFV_MEG_CH, FIFF_UNIT_T_M), channel(FIFFV_MEG_CH, FIFF_UNIT_T),
+                                      channel(FIFFV_MEG_CH, FIFF_UNIT_T_M), channel(FIFFV_EEG_CH, FIFF_UNIT_V),
+                                      channel(FIFFV_STIM_CH, FIFF_UNIT_NONE)};
+
+    ArtifactSettingsView view(QString{});
+    view.show();
+    QVERIFY(view.findChildren<QDoubleSpinBox*>().isEmpty());
+    QVERIFY(!view.getDoArtifactThresholdRejection());
+
+    // One row per present type; mantissa and exponent compose the threshold
+    QSignalSpy thresholdSpy(&view, &ArtifactSettingsView::changeArtifactThreshold);
+    view.setChInfo(megEeg);
+    auto visible = [&view]() {
+        QApplication::processEvents();
+        QStringList labels;
+        for (QLabel* pLabel : view.findChildren<QLabel*>()) {
+            if (!pLabel->isHidden()) {
+                labels << pLabel->text();
+            }
+        }
+        labels.sort();
+        return labels;
+    };
+    QCOMPARE(visible(), QStringList({"eeg", "grad", "mag"}));
+    QCOMPARE(thresholdSpy.count(), 1);
+    QMap<QString, double> map = view.getThresholdMap();
+    QCOMPARE(map.keys(), QStringList({"Active", "eeg", "grad", "mag"}));
+
+    auto spin = [&view](int iRow, int iColumn) {
+        auto* pLayout = qobject_cast<QGridLayout*>(view.layout());
+        return pLayout->itemAtPosition(iRow, iColumn)->widget();
+    };
+    auto* pLayout = qobject_cast<QGridLayout*>(view.layout());
+    QVERIFY(pLayout);
+    int iGradRow = -1;
+    for (int r = 1; r < pLayout->rowCount(); ++r) {
+        if (qobject_cast<QLabel*>(spin(r, 0))->text() == QStringLiteral("grad")) {
+            iGradRow = r;
+        }
+    }
+    QVERIFY(iGradRow > 0);
+    qobject_cast<QDoubleSpinBox*>(spin(iGradRow, 1))->setValue(4.0);
+    qobject_cast<QSpinBox*>(spin(iGradRow, 2))->setValue(-11);
+    QVERIFY(qAbs(view.getThresholdMap().value(QStringLiteral("grad")) - 4e-11) < 1e-20);
+    QVERIFY(qAbs(thresholdSpy.last().at(0).value<QMap<QString, double>>().value(QStringLiteral("grad")) - 4e-11) < 1e-20);
+
+    view.saveSettings();
+    view.loadSettings();
+    view.clearView();
 }
 
 //=============================================================================================================
