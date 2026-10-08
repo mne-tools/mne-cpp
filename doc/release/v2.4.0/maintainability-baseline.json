@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 395539,
+  "scanned_lines": 395559,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -548,11 +548,11 @@
       }
     },
     "qt_new_unparented": {
-      "total": 823,
-      "files": 81,
+      "total": 820,
+      "files": 80,
       "by_scope": {
         "applications": 713,
-        "libraries": 108,
+        "libraries": 105,
         "tools": 2
       },
       "suppressed": [],
@@ -649,7 +649,6 @@
         "src/libraries/disp/viewers/rtfiffrawview.cpp": 3,
         "src/libraries/disp/viewers/spectrumsettingsview.cpp": 5,
         "src/libraries/disp/viewers/spectrumview.cpp": 1,
-        "src/libraries/disp/viewers/triggerdetectionview.cpp": 3,
         "src/libraries/disp3D/model/braintreemodel.cpp": 4,
         "src/libraries/fwd/compute_fwd/compute_fwd.cpp": 1,
         "src/libraries/lsl/lsl_stream_inlet.cpp": 1,
