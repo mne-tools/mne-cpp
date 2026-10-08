@@ -2685,6 +2685,7 @@ void TestDispViewers2::channelDataView_keyboardShortcuts()
     QSignalSpy clippingSpy(&view, &ChannelDataView::clippingToggled);
     QSignalSpy zScoreSpy(&view, &ChannelDataView::zScoreModeToggled);
     QSignalSpy annotationsSpy(&view, &ChannelDataView::annotationsVisibleToggled);
+    QSignalSpy overviewSpy(&view, &ChannelDataView::overviewBarToggled);
     const QList<Toggle> toggles = {
         {Qt::Key_B, Qt::NoModifier, [&view] { return view.butterflyMode(); }, &butterflySpy},
         {Qt::Key_S, Qt::NoModifier, [&view] { return view.scalebarsVisible(); }, &scalebarSpy},
@@ -2694,6 +2695,7 @@ void TestDispViewers2::channelDataView_keyboardShortcuts()
         {Qt::Key_C, Qt::NoModifier, [&view] { return view.clippingVisible(); }, &clippingSpy},
         {Qt::Key_Z, Qt::NoModifier, [&view] { return view.zScoreMode(); }, &zScoreSpy},
         {Qt::Key_A, Qt::ShiftModifier, [&view] { return view.annotationsVisible(); }, &annotationsSpy},
+        {Qt::Key_O, Qt::NoModifier, [&view] { return view.overviewBarVisible(); }, &overviewSpy},
     };
     for (const Toggle& toggle : toggles) {
         for (int press = 0; press < 2; ++press) {

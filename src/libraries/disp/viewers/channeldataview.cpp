@@ -711,7 +711,8 @@ void ChannelDataView::setOverviewBarVisible(bool visible)
 
 bool ChannelDataView::overviewBarVisible() const
 {
-    return m_pOverviewBar ? m_pOverviewBar->isVisible() : true;
+    // The bar's own setting; isVisible() is also false while the view itself is hidden
+    return m_pOverviewBar ? !m_pOverviewBar->isHidden() : true;
 }
 
 //=============================================================================================================
