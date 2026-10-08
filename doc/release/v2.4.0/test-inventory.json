@@ -20,7 +20,7 @@
       "freesurfer": 2,
       "python": 9,
       "sample-data": 19,
-      "test-data": 102
+      "test-data": 103
     },
     "gui": 33,
     "with_qskip": 73,
@@ -6455,7 +6455,9 @@
         "unit"
       ],
       "timeout": 60,
-      "requirements": [],
+      "requirements": [
+        "test-data"
+      ],
       "gui": false,
       "qskip_sites": 0,
       "spawns_processes": false,

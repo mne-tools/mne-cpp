@@ -65,6 +65,7 @@
         "test_mne_raw_data_python",
         "test_mne_source_space_ops_python",
         "test_mne_source_space_python",
+        "test_sensor_field_mapper",
         "test_spectral_connectivity",
         "test_sts_cluster",
         "test_tool_list_source_space"

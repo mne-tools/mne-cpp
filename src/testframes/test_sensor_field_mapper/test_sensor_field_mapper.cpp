@@ -15,6 +15,7 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_raw_data.h>
 
 #include <Eigen/Core>
 
@@ -176,6 +177,13 @@ void TestSensorFieldMapper::sphereFit()
     const Vector3f fittedCenter = SensorFieldMapper::fitSphereOrigin(info, &radius);
     QVERIFY((fittedCenter - center).norm() < 1.0e-5f);
     QVERIFY(std::abs(radius - expectedRadius) < 1.0e-5f);
+
+    // Sample head shape: mne.bem.fit_sphere_to_headshape(info, units="m") gives these values
+    QFile file(QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif"));
+    const FiffRawData raw(file);
+    const Vector3f sampleCenter = SensorFieldMapper::fitSphereOrigin(raw.info, &radius);
+    QVERIFY((sampleCenter - Vector3f(-0.004151959f, 0.016358261f, 0.051831485f)).norm() < 1.0e-6f);
+    QVERIFY(std::abs(radius - 0.091177324f) < 1.0e-6f);
 }
 
 QTEST_GUILESS_MAIN(TestSensorFieldMapper)
