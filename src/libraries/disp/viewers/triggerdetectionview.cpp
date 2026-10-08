@@ -101,9 +101,9 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
 
         m_pUi->m_pushButton_triggerColor->setAutoFillBackground(true);
         m_pUi->m_pushButton_triggerColor->setFlat(true);
-        QPalette* palette1 = new QPalette();
-        palette1->setColor(QPalette::Button, QColor(177, 0, 0));
-        m_pUi->m_pushButton_triggerColor->setPalette(*palette1);
+        QPalette palette = m_pUi->m_pushButton_triggerColor->palette();
+        palette.setColor(QPalette::Button, QColor(177, 0, 0));
+        m_pUi->m_pushButton_triggerColor->setPalette(palette);
         m_pUi->m_pushButton_triggerColor->update();
 
         connect(m_pUi->m_doubleSpinBox_detectionThresholdFirst, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -254,9 +254,9 @@ void TriggerDetectionView::onRealTimeTriggerColorChanged(bool state)
     QColor color = QColorDialog::getColor(m_qMapTriggerColor[m_pUi->m_comboBox_triggerColorType->currentText().toDouble()], this, "Set trigger color");
 
     //Change color of pushbutton
-    QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button, color);
-    m_pUi->m_pushButton_triggerColor->setPalette(*palette1);
+    QPalette palette = m_pUi->m_pushButton_triggerColor->palette();
+    palette.setColor(QPalette::Button, color);
+    m_pUi->m_pushButton_triggerColor->setPalette(palette);
     m_pUi->m_pushButton_triggerColor->update();
 
     m_qMapTriggerColor[m_pUi->m_comboBox_triggerColorType->currentText().toDouble()] = color;
@@ -269,9 +269,9 @@ void TriggerDetectionView::onRealTimeTriggerColorChanged(bool state)
 void TriggerDetectionView::onRealTimeTriggerColorTypeChanged(const QString& value)
 {
     //Change color of pushbutton
-    QPalette* palette1 = new QPalette();
-    palette1->setColor(QPalette::Button, m_qMapTriggerColor[value.toDouble()]);
-    m_pUi->m_pushButton_triggerColor->setPalette(*palette1);
+    QPalette palette = m_pUi->m_pushButton_triggerColor->palette();
+    palette.setColor(QPalette::Button, m_qMapTriggerColor[value.toDouble()]);
+    m_pUi->m_pushButton_triggerColor->setPalette(palette);
     m_pUi->m_pushButton_triggerColor->update();
 }
 
