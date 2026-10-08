@@ -91,17 +91,12 @@ QVariant FrequencySpectrumModel::data(const QModelIndex& index, int role) const
             switch (role) {
                 case Qt::DisplayRole: {
                     //pack all adjacent (after reload) RowVectorPairs into a QList
-                    RowVectorXd vec;
-
-                    if (m_bIsFreezed) {
-                        // data freeze
-                        vec = m_dataCurrentFreeze.row(r);
-                        v.setValue(vec);
-                    } else {
-                        // data
-                        vec = m_dataCurrent.row(r);
-                        v.setValue(vec);
+                    const MatrixXd& data = m_bIsFreezed ? m_dataCurrentFreeze : m_dataCurrent;
+                    // Rows exist from setInfo() on; the spectrum only once data has arrived
+                    if (r < 0 || r >= data.rows()) {
+                        return QVariant();
                     }
+                    v.setValue(RowVectorXd(data.row(r)));
                     return v;
                 }
                 case Qt::BackgroundRole: {

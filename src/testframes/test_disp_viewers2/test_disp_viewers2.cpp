@@ -3202,6 +3202,12 @@ void TestDispViewers2::frequencySpectrumDelegate_paintsSpectrumAndReadout()
     auto info = createBrowserTestInfo();
     FrequencySpectrumModel model;
     model.setInfo(info);
+    // Rows exist before the first spectrum: no data yet
+    QCOMPARE(model.rowCount(), 4);
+    QVERIFY(!model.data(model.index(0, 1)).isValid());
+    model.toggleFreeze(QModelIndex());
+    QVERIFY(!model.data(model.index(0, 1)).isValid());
+    model.toggleFreeze(QModelIndex());
     Eigen::MatrixXd spectrum = Eigen::MatrixXd::Constant(4, 101, 1.0);
     for (int b = 0; b < 101; ++b) {
         spectrum(0, b) = 1.0 + 9.0 * std::exp(-0.5 * std::pow((b - 20) / 2.0, 2));
