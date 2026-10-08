@@ -2842,6 +2842,8 @@ void TestDispViewers2::control3dView_flagsSignalsAndTree()
     QVERIFY(pViewBox->isHidden());
     QVERIFY(pLightBox->isHidden());
 
+    // Enabling the tools (again) shows them and wires each control exactly once
+    view.setFlags({QStringLiteral("View"), QStringLiteral("Light")});
     view.setFlags({QStringLiteral("View"), QStringLiteral("Light")});
     QVERIFY(pTree->isHidden());
     QVERIFY(!pViewBox->isHidden());

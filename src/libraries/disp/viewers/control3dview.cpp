@@ -100,24 +100,24 @@ void Control3DView::setFlags(const QStringList& slFlags)
         m_pUi->m_groupBox_viewOptions->show();
 
         connect(m_pUi->m_pushButton_sceneColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &Control3DView::onSceneColorPicker);
+                this, &Control3DView::onSceneColorPicker, Qt::UniqueConnection);
         connect(m_pUi->m_checkBox_showFullScreen, &QCheckBox::clicked,
-                this, &Control3DView::onShowFullScreen);
+                this, &Control3DView::onShowFullScreen, Qt::UniqueConnection);
 
         connect(m_pUi->m_checkBox_rotate, &QCheckBox::clicked,
-                this, &Control3DView::onRotationClicked);
+                this, &Control3DView::onRotationClicked, Qt::UniqueConnection);
 
         connect(m_pUi->m_checkBox_coordAxis, &QCheckBox::clicked,
-                this, &Control3DView::onCoordAxisClicked);
+                this, &Control3DView::onCoordAxisClicked, Qt::UniqueConnection);
 
         connect(m_pUi->m_pushButton_takeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &Control3DView::takeScreenshotChanged);
+                this, &Control3DView::takeScreenshotChanged, Qt::UniqueConnection);
 
         connect(m_pUi->m_radioButton_single, &QRadioButton::pressed,
-                this, &Control3DView::toggleSingleView);
+                this, &Control3DView::toggleSingleView, Qt::UniqueConnection);
 
         connect(m_pUi->m_radioButton_multi, &QRadioButton::pressed,
-                this, &Control3DView::toggleMutiview);
+                this, &Control3DView::toggleMutiview, Qt::UniqueConnection);
     } else {
         m_pUi->m_groupBox_viewOptions->hide();
     }
@@ -126,9 +126,9 @@ void Control3DView::setFlags(const QStringList& slFlags)
         m_pUi->m_groupBox_lightOptions->show();
 
         connect(m_pUi->m_pushButton_lightColorPicker, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-                this, &Control3DView::onLightColorPicker);
+                this, &Control3DView::onLightColorPicker, Qt::UniqueConnection);
         connect(m_pUi->m_doubleSpinBox_colorIntensity, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this, &Control3DView::onLightIntensityChanged);
+                this, &Control3DView::onLightIntensityChanged, Qt::UniqueConnection);
     } else {
         m_pUi->m_groupBox_lightOptions->hide();
     }
