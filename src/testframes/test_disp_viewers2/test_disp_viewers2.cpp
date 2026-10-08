@@ -3313,8 +3313,8 @@ void TestDispViewers2::bidsView_treeMovesAndSelection()
     QAction* moveData = actionNamed(menu, QStringLiteral("ses-preop"));
     QVERIFY(moveData != nullptr);
     QVERIFY(actionNamed(menu, QStringLiteral("Remove Data")) != nullptr);
-    menu->close();
     moveData->trigger();
+    menu->close();
     QStandardItem* ses2Item = model.item(1)->child(0);
     QCOMPARE(ses2Item->child(0)->text(), QStringLiteral("func"));
     QCOMPARE(ses2Item->child(0)->child(0)->text(), QStringLiteral("raw.fif"));
@@ -3327,8 +3327,8 @@ void TestDispViewers2::bidsView_treeMovesAndSelection()
     menu = openMenuAt(model.item(0)->child(0)->index());
     QAction* moveSession = actionNamed(menu, QStringLiteral("sub-Secondsubject"));
     QVERIFY(moveSession != nullptr);
-    menu->close();
     moveSession->trigger();
+    menu->close();
     QCOMPARE(model.item(0)->rowCount(), 0);
     QCOMPARE(model.item(1)->rowCount(), 2);
     QStandardItem* movedAnat = model.item(1)->child(1)->child(0)->child(0);
@@ -3343,6 +3343,9 @@ void TestDispViewers2::bidsView_treeMovesAndSelection()
     emit tree->customContextMenuRequested(QPoint(5, tree->viewport()->height() - 5));
     QVERIFY(actionNamed(view.findChildren<QMenu*>().last(), QStringLiteral("Add Subject")) != nullptr);
     view.findChildren<QMenu*>().last()->close();
+    // Closed context menus do not stay alive
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    QCOMPARE(view.findChildren<QMenu*>().size(), 0);
 
     // Delete on a non-subject item asks the model owner to remove it
     QSignalSpy removeSpy(&view, &BidsView::removeItem);

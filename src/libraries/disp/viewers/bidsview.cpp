@@ -108,6 +108,7 @@ void BidsView::customMenuRequested(QPoint pos)
         switch (pItem->data(BIDS_ITEM_TYPE).value<int>()) {
             case BIDS_SUBJECT: {
                 QMenu* menu = new QMenu(this);
+                menu->setAttribute(Qt::WA_DeleteOnClose);
 
                 QAction* pAddSessionAction = new QAction("Add Session", this);
                 connect(pAddSessionAction, &QAction::triggered, [=, this]() {
@@ -129,6 +130,7 @@ void BidsView::customMenuRequested(QPoint pos)
             }
             case BIDS_SESSION: {
                 QMenu* menu = new QMenu(this);
+                menu->setAttribute(Qt::WA_DeleteOnClose);
 
                 pRemoveAction = new QAction("Remove Session", this);
 
@@ -158,6 +160,7 @@ void BidsView::customMenuRequested(QPoint pos)
             case BIDS_ANATOMICALDATA:
             case BIDS_FUNCTIONALDATA: {
                 QMenu* menu = new QMenu(this);
+                menu->setAttribute(Qt::WA_DeleteOnClose);
 
                 pRemoveAction = new QAction("Remove Data", this);
 
@@ -190,6 +193,7 @@ void BidsView::customMenuRequested(QPoint pos)
             default: {
                 qDebug() << "DataManagerControlView::customMenuRequested - default";
                 QMenu* menu = new QMenu(this);
+                menu->setAttribute(Qt::WA_DeleteOnClose);
 
                 pRemoveAction = new QAction("Remove", this);
                 menu->addAction(pRemoveAction);
@@ -212,6 +216,7 @@ void BidsView::customMenuRequested(QPoint pos)
         });
     } else {
         QMenu* menu = new QMenu(this);
+        menu->setAttribute(Qt::WA_DeleteOnClose);
 
         QAction* pAddSubjectAction = new QAction("Add Subject", this);
         connect(pAddSubjectAction, &QAction::triggered, [=, this]() {
