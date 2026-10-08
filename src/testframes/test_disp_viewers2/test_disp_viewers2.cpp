@@ -28,6 +28,7 @@
 #include <disp/viewers/projectsettingsview.h>
 #include <disp/viewers/filterdesignview.h>
 #include <disp/viewers/triggerdetectionview.h>
+#include <disp/viewers/averagingsettingsview.h>
 #include <disp/viewers/bidsview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/channeldataview.h>
@@ -80,6 +81,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGridLayout>
+#include <QScopeGuard>
+#include <QGroupBox>
+#include <QSettings>
 #include <QPainter>
 #include <QCheckBox>
 #include <QComboBox>
@@ -293,6 +297,13 @@ private slots:
      * offline detect button, also after a re-init.
      */
     void triggerDetectionView_settingsAndSignals();
+
+    //=========================================================================================================
+    /**
+     * Verifies AveragingSettingsView defaults, stim channel selection, epoch window and baseline controls, saved
+     * settings and the detected-epoch table.
+     */
+    void averagingSettingsView_controlsAndSettings();
 
     //=========================================================================================================
     /**
@@ -949,6 +960,133 @@ void TestDispViewers2::coregSettingsView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::averagingSettingsView_controlsAndSettings()
+{
+    // Stored settings
+    const QString sPath = QStringLiteral("test_disp_viewers2_averaging_%1").arg(QCoreApplication::applicationPid());
+    {
+        QSettings settings("MNECPP");
+        settings.setValue(sPath + QStringLiteral("/AveragingSettingsView/preStimSeconds"), 200);
+        settings.setValue(sPath + QStringLiteral("/AveragingSettingsView/postStimSeconds"), 500);
+        settings.setValue(sPath + QStringLiteral("/AveragingSettingsView/baselineFromSeconds"), -150);
+        settings.setValue(sPath + QStringLiteral("/AveragingSettingsView/baselineToSeconds"), -50);
+        settings.setValue(sPath + QStringLiteral("/AveragingSettingsView/numAverages"), 25);
+        settings.setValue(sPath + QStringLiteral("/AveragingSettingsView/currentStimChannel"), QStringLiteral("STI101"));
+        settings.setValue(sPath + QStringLiteral("/AveragingSettingsView/doBaselineCorrection"), true);
+    }
+    const auto removeSettings = qScopeGuard([&sPath]() { QSettings("MNECPP").remove(sPath); });
+
+    const QMap<QString, int> stimChannels = {{QStringLiteral("STI014"), 306}, {QStringLiteral("STI101"), 312}};
+    AveragingSettingsView view(sPath, stimChannels);
+    view.show();
+    auto* pChannels = view.findChild<QComboBox*>(QStringLiteral("m_pComboBoxChSelection"));
+    auto* pPre = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxPreStimMSeconds"));
+    auto* pPost = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxPostStimMSeconds"));
+    auto* pFrom = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxBaselineFromMSeconds"));
+    auto* pTo = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxBaselineToMSeconds"));
+    auto* pNum = view.findChild<QSpinBox*>(QStringLiteral("m_pSpinBoxNumAverages"));
+    QVERIFY(pChannels);
+    QVERIFY(pPre);
+    QVERIFY(pPost);
+    QVERIFY(pFrom);
+    QVERIFY(pTo);
+    QVERIFY(pNum);
+
+    QCOMPARE(view.getNumAverages(), 25);
+    QCOMPARE(pNum->value(), 25);
+    QCOMPARE(view.getPreStimMSeconds(), 200);
+    QCOMPARE(view.getPostStimMSeconds(), 500);
+    QCOMPARE(view.getBaselineFromSeconds(), -150);
+    QVERIFY(view.getDoBaselineCorrection());
+
+    // Stim channel: the stored one is selected and its channel index is reported
+    QCOMPARE(pChannels->currentText(), QStringLiteral("STI101"));
+    QSignalSpy stimSpy(&view, &AveragingSettingsView::changeStimChannel);
+    pChannels->setCurrentText(QStringLiteral("STI014"));
+    QCOMPARE(stimSpy.count(), 1);
+    QCOMPARE(stimSpy.last().at(0).toString(), QStringLiteral("STI014"));
+
+    // New stim channels replace the list
+    view.setStimChannels({{QStringLiteral("STI014"), 6}, {QStringLiteral("STI201"), 7}});
+    QCOMPARE(pChannels->count(), 2);
+
+    // Epoch window and baseline: finished edits emit and constrain the baseline range
+    QSignalSpy preSpy(&view, &AveragingSettingsView::changePreStim);
+    QSignalSpy postSpy(&view, &AveragingSettingsView::changePostStim);
+    QSignalSpy fromSpy(&view, &AveragingSettingsView::changeBaselineFrom);
+    QSignalSpy toSpy(&view, &AveragingSettingsView::changeBaselineTo);
+    QSignalSpy numSpy(&view, &AveragingSettingsView::changeNumAverages);
+    pPre->setValue(300);
+    emit pPre->editingFinished();
+    QCOMPARE(preSpy.last().at(0).toInt(), 300);
+    QCOMPARE(pFrom->minimum(), -300);
+    QCOMPARE(pTo->minimum(), -300);
+    pPost->setValue(600);
+    emit pPost->editingFinished();
+    QCOMPARE(postSpy.last().at(0).toInt(), 600);
+    QCOMPARE(pFrom->maximum(), 600);
+    pFrom->setValue(-250);
+    emit pFrom->editingFinished();
+    QCOMPARE(fromSpy.last().at(0).toInt(), -250);
+    QCOMPARE(pTo->minimum(), -250);
+    pTo->setValue(-20);
+    emit pTo->editingFinished();
+    QCOMPARE(toSpy.last().at(0).toInt(), -20);
+    QCOMPARE(pFrom->maximum(), -20);
+    pNum->setValue(40);
+    emit pNum->editingFinished();
+    QCOMPARE(numSpy.last().at(0).toInt(), 40);
+    QCOMPARE(view.getNumAverages(), 40);
+
+    QSignalSpy baselineSpy(&view, &AveragingSettingsView::changeBaselineActive);
+    auto* pBaseline = view.findChild<QCheckBox*>(QStringLiteral("m_pcheckBoxBaselineCorrection"));
+    pBaseline->click();
+    QCOMPARE(baselineSpy.count(), 1);
+    QCOMPARE(baselineSpy.last().at(0).toBool(), pBaseline->isChecked());
+    QSignalSpy resetSpy(&view, &AveragingSettingsView::resetAverage);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_reset")), Qt::LeftButton);
+    QCOMPARE(resetSpy.count(), 1);
+
+    // Detected epochs: one row per type, at most ten
+    auto* pTrials = view.findChild<QGroupBox*>(QStringLiteral("m_groupBox_detectedTrials"));
+    QVERIFY(pTrials);
+    FiffEvokedSet evokedSet;
+    for (int i = 0; i < 12; ++i) {
+        FiffEvoked evoked;
+        evoked.comment = QString::number(i + 1);
+        evoked.nave = 3 * i;
+        evokedSet.evoked.append(evoked);
+    }
+    view.setDetectedEpochs(evokedSet);
+    QVERIFY(!pTrials->isHidden());
+    auto* pGrid = qobject_cast<QGridLayout*>(pTrials->layout());
+    QVERIFY(pGrid);
+    QCOMPARE(pGrid->count(), 2 * 11);
+    QCOMPARE(qobject_cast<QLabel*>(pGrid->itemAtPosition(3, 1)->widget())->text(), QStringLiteral("6"));
+    view.setDetectedEpochs(evokedSet);
+    QCOMPARE(pGrid->count(), 2 * 11);
+    view.setDetectedEpochs(FiffEvokedSet());
+    QVERIFY(pTrials->isHidden());
+
+    // Offline mode offers the compute controls
+    QSignalSpy computeSpy(&view, &AveragingSettingsView::calculateAverage);
+    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
+    auto* pCompute = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_compute"));
+    QVERIFY(!pCompute->isHidden());
+    QVERIFY(pChannels->isHidden());
+    QTest::mouseClick(pCompute, Qt::LeftButton);
+    QCOMPARE(computeSpy.count(), 1);
+    auto* pAuto = view.findChild<QCheckBox*>(QStringLiteral("checkBox_autoCompute"));
+    QSignalSpy autoSpy(&view, &AveragingSettingsView::setAutoCompute);
+    pAuto->click();
+    QCOMPARE(autoSpy.count(), 1);
+    QCOMPARE(view.getAutoComputeStatus(), pAuto->isChecked());
+    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
+    QVERIFY(pCompute->isHidden());
 }
 
 //=============================================================================================================
