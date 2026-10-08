@@ -85,6 +85,7 @@
 #include <QScopeGuard>
 #include <QGroupBox>
 #include <QSettings>
+#include <QPaintEngine>
 #include <QPainter>
 #include <QCheckBox>
 #include <QComboBox>
@@ -127,6 +128,92 @@ using Eigen::MatrixXd;
 
 namespace
 {
+
+/** Paint engine that records the drawn text, independent of the platform's glyph rasterisation. */
+class TextRecordingEngine : public QPaintEngine
+{
+public:
+    QStringList texts;
+
+    bool begin(QPaintDevice*) override
+    {
+        return true;
+    }
+    bool end() override
+    {
+        return true;
+    }
+    void updateState(const QPaintEngineState&) override
+    {
+    }
+    void drawPixmap(const QRectF&, const QPixmap&, const QRectF&) override
+    {
+    }
+    void drawPath(const QPainterPath&) override
+    {
+    }
+    void drawPolygon(const QPointF*, int, PolygonDrawMode) override
+    {
+    }
+    void drawLines(const QLineF*, int) override
+    {
+    }
+    void drawRects(const QRectF*, int) override
+    {
+    }
+    void drawTextItem(const QPointF&, const QTextItem& textItem) override
+    {
+        texts.append(textItem.text());
+    }
+    Type type() const override
+    {
+        return QPaintEngine::User;
+    }
+};
+
+/** Paint device backed by TextRecordingEngine. */
+class TextRecordingDevice : public QPaintDevice
+{
+public:
+    explicit TextRecordingDevice(const QSize& size)
+    : m_size(size)
+    {
+    }
+    QPaintEngine* paintEngine() const override
+    {
+        return &m_engine;
+    }
+    QStringList texts() const
+    {
+        return m_engine.texts;
+    }
+
+protected:
+    int metric(PaintDeviceMetric metric) const override
+    {
+        switch (metric) {
+            case PdmWidth:
+                return m_size.width();
+            case PdmHeight:
+                return m_size.height();
+            case PdmDpiX:
+            case PdmDpiY:
+            case PdmPhysicalDpiX:
+            case PdmPhysicalDpiY:
+                return 96;
+            case PdmDevicePixelRatio:
+                return 1;
+            case PdmDevicePixelRatioScaled:
+                return static_cast<int>(devicePixelRatioFScale());
+            default:
+                return QPaintDevice::metric(metric);
+        }
+    }
+
+private:
+    QSize m_size;
+    mutable TextRecordingEngine m_engine;
+};
 
 /** Runs fn on the next application-modal widget as soon as it is shown. */
 void answerNextModal(const std::function<void(QWidget*)>& fn)
@@ -3067,29 +3154,15 @@ void TestDispViewers2::frequencySpectrumDelegate_paintsSpectrumAndReadout()
     }
     QVERIFY2(iMarker > 30, qPrintable(QString::number(iMarker)));
     QVERIFY(hasDarkPixelNear(image, cell.left() + 88, cell.top() + 42));
-    // At exactly 100 Hz the read-out names that bin: of the texts for bins 19..21 drawn over the plain
-    // plot, the 100 Hz one is the closest match (glyph rasterisation differs slightly between platforms)
-    const QRect textArea(cell.left() + 88, cell.top() + 25, 70, 20);
-    delegate.rcvMouseLoc(0, -1, -1, cell);
-    const QImage plain = render();
-    auto distanceTo = [&](int bin) {
-        QImage expected = plain;
-        {
-            QPainter painter(&expected);
-            painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-            painter.drawText(cell.left() + 88, cell.top() + 42,
-                             QStringLiteral("%1 [DB], %2 [Hz]").arg(spectrum(0, bin)).arg(bin * 5.0));
-        }
-        qint64 distance = 0;
-        for (int y = textArea.top(); y <= textArea.bottom(); ++y) {
-            for (int x = textArea.left(); x <= textArea.right(); ++x) {
-                distance += std::abs(qGray(image.pixel(x, y)) - qGray(expected.pixel(x, y)));
-            }
-        }
-        return distance;
-    };
-    const qint64 distance100Hz = distanceTo(20);
-    QVERIFY2(distance100Hz < distanceTo(19) && distance100Hz < distanceTo(21), qPrintable(QString::number(distance100Hz)));
+    // At exactly 100 Hz the read-out names that bin
+    TextRecordingDevice recorder(image.size());
+    {
+        QPainter painter(&recorder);
+        QStyleOptionViewItem option;
+        option.rect = cell;
+        delegate.paint(&painter, option, model.index(0, 1));
+    }
+    QVERIFY2(recorder.texts().contains(QStringLiteral("10 [DB], 100 [Hz]")), qPrintable(recorder.texts().join(u'|')));
 
     // Other rows show no read-out; the name column is rotated text
     QStyleOptionViewItem option;
