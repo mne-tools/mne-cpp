@@ -490,9 +490,37 @@ void TestDispPlots::testSplineSetData()
 void TestDispPlots::testSplineThreshold()
 {
     Spline spline;
-    QVector3D thresholds(1.0, 2.0, 3.0);
-    spline.setThreshold(thresholds);
-    QVERIFY(true);
+    spline.resize(320, 250);
+    // No data yet: thresholds are ignored
+    spline.setThreshold(QVector3D(1.0f, 2.0f, 3.0f));
+    QCOMPARE(spline.getThreshold(), QVector3D());
+
+    // Class limits 0..4 with frequencies per class
+    VectorXd limits(5);
+    limits << 0.0, 1.0, 2.0, 3.0, 4.0;
+    VectorXi freq(4);
+    freq << 10, 25, 15, 30;
+    spline.setData(limits, freq);
+
+    // In-range thresholds are sorted into left <= middle <= right
+    spline.setThreshold(QVector3D(3.0f, 1.0f, 2.0f));
+    QCOMPARE(spline.getThreshold(), QVector3D(1.0f, 2.0f, 3.0f));
+
+    // Out of range: fall back to thresholds inside the axis range [min, max]
+    spline.setThreshold(QVector3D(-5.0f, 2.0f, 3.0f));
+    QVector3D fallback = spline.getThreshold();
+    QVERIFY(fallback.x() >= 0.0f && fallback.x() < fallback.y() && fallback.y() < fallback.z() && fallback.z() <= 4.0f);
+
+    // Clicking sets a threshold at the clicked data value: left button sets the left one
+    spline.setData(limits, freq);
+    QSignalSpy borderSpy(&spline, &Spline::borderChanged);
+    const double plotWidth = spline.width() - 60 - 20;
+    const QPointF at1(60 + plotWidth / 4.0, 100);
+    QMouseEvent press(QEvent::MouseButtonPress, at1, spline.mapToGlobal(at1), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(&spline, &press);
+    QCOMPARE(borderSpy.size(), 1);
+    QVERIFY(std::fabs(borderSpy.at(0).at(0).toDouble() - 1.0) < 1e-6);
+    QVERIFY(!spline.grab().isNull());
 }
 
 //=============================================================================================================
