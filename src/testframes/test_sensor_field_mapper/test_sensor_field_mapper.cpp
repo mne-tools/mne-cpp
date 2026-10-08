@@ -55,7 +55,7 @@ private slots:
     void contourStep_data();
     void contourStep();
     void sphereFit();
-    void eegFieldMatchesPython();
+    void fieldMapsMatchPython();
 };
 
 void TestSensorFieldMapper::defaultsAndBaseline()
@@ -189,7 +189,7 @@ void TestSensorFieldMapper::sphereFit()
     QVERIFY(std::abs(radius - 0.091177324f) < 1.0e-6f);
 }
 
-void TestSensorFieldMapper::eegFieldMatchesPython()
+void TestSensorFieldMapper::fieldMapsMatchPython()
 {
     QFile file(QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"));
     const FiffEvoked evoked(file, 0);
@@ -240,6 +240,29 @@ void TestSensorFieldMapper::eegFieldMatchesPython()
     view.visibility.eegFieldMap = false;
     mapper.apply(surfaces, view, {});
     QVERIFY(!surfaces.value(QStringLiteral("sens_contour_eeg_neg"))->isVisible());
+
+    // MEG onto six helmet points in head coordinates with outward normals, against
+    // _make_surface_mapping(info, surf, "meg", origin="auto") at the same time
+    MatrixX3f helmetRr(6, 3);
+    helmetRr << 0.10f, 0.0f, 0.06f, -0.10f, 0.0f, 0.06f, 0.0f, 0.11f, 0.05f, 0.0f, -0.10f, 0.06f, 0.0f, 0.0f, 0.14f, 0.06f,
+        0.06f, 0.11f;
+    const MatrixX3f helmetNn = helmetRr.rowwise().normalized();
+    auto helmet = std::make_shared<BrainSurface>();
+    helmet->createFromData(helmetRr, helmetNn, tris, Qt::gray);
+    surfaces.insert(QStringLiteral("sens_surface_meg"), helmet);
+    QVERIFY(mapper.buildMapping(surfaces, FiffCoordTrans(), false));
+    QCOMPARE(mapper.megSurfaceKey(), QStringLiteral("sens_surface_meg"));
+    QCOMPARE(mapper.megPick().size(), 305);
+    VectorXf megMeas(mapper.megPick().size());
+    for (int i = 0; i < megMeas.size(); ++i) {
+        megMeas(i) = static_cast<float>(evoked.data(mapper.megPick()(i), t));
+    }
+    const VectorXf megMapped = *mapper.megMapping() * megMeas;
+    VectorXf megExpected(6);
+    megExpected << 1.1461128036e-13f, -7.0567743396e-13f, 1.1252682584e-12f, -5.5736826601e-14f, 2.7243013520e-13f,
+        2.0390137358e-13f;
+    QVERIFY2((megMapped - megExpected).cwiseAbs().maxCoeff() < 1e-3f * megExpected.cwiseAbs().maxCoeff(),
+             qPrintable(QStringLiteral("max diff %1").arg((megMapped - megExpected).cwiseAbs().maxCoeff())));
 }
 
 QTEST_GUILESS_MAIN(TestSensorFieldMapper)
