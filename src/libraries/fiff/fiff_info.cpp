@@ -186,7 +186,7 @@ bool FiffInfo::make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf
 
     qint32 k;
     if (exclude_comp_chs) {
-        VectorXi pick = MatrixXi::Zero(1, this->nchan);
+        VectorXi pick = VectorXi::Zero(this->nchan);
         qint32 npick = 0;
         for (k = 0; k < this->nchan; ++k) {
             if (this->chs[k].kind != FIFFV_REF_MEG_CH) {
