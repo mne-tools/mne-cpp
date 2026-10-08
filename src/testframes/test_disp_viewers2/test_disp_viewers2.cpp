@@ -27,6 +27,7 @@
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/projectsettingsview.h>
 #include <disp/viewers/filterdesignview.h>
+#include <disp/viewers/triggerdetectionview.h>
 #include <disp/viewers/bidsview.h>
 #include <disp/viewers/channelselectionview.h>
 #include <disp/viewers/channeldataview.h>
@@ -284,6 +285,13 @@ private slots:
      * Verifies ArtifactSettingsView rows per channel type, threshold composition, activation and rebuilds.
      */
     void artifactSettingsView_thresholds();
+
+    //=========================================================================================================
+    /**
+     * Verifies TriggerDetectionView channel list, threshold composition, detected types, colors, reset and the
+     * offline detect button, also after a re-init.
+     */
+    void triggerDetectionView_settingsAndSignals();
 
     //=========================================================================================================
     /**
@@ -940,6 +948,72 @@ void TestDispViewers2::coregSettingsView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::triggerDetectionView_settingsAndSignals()
+{
+    auto info = createBrowserTestInfo();
+    info->chs[2].kind = FIFFV_STIM_CH;
+    info->chs[2].ch_name = QStringLiteral("STI101");
+
+    TriggerDetectionView view(QString{});
+    view.show();
+    auto* pChannels = view.findChild<QComboBox*>(QStringLiteral("m_comboBox_triggerChannels"));
+    auto* pTypes = view.findChild<QComboBox*>(QStringLiteral("m_comboBox_triggerColorType"));
+    auto* pActive = view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_activateTriggerDetection"));
+    auto* pFirst = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_detectionThresholdFirst"));
+    auto* pSecond = view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_detectionThresholdSecond"));
+    auto* pCount = view.findChild<QLabel*>(QStringLiteral("m_label_numberDetectedTriggers"));
+    auto* pDetect = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_DetectTriggers"));
+    QVERIFY(pChannels);
+    QVERIFY(pTypes);
+    QVERIFY(pActive);
+    QVERIFY(pFirst);
+    QVERIFY(pSecond);
+    QVERIFY(pCount);
+    QVERIFY(pDetect);
+
+    view.init(info);
+    QCOMPARE(pChannels->count(), 2);
+    QCOMPARE(pChannels->itemText(0), QStringLiteral("STI101"));
+    QCOMPARE(view.getSelectedStimChannel(), QStringLiteral("STI101"));
+
+    QSignalSpy infoSpy(&view, &TriggerDetectionView::triggerInfoChanged);
+    pFirst->setValue(2.5);
+    QCOMPARE(infoSpy.count(), 1);
+    pSecond->setValue(-3);
+    QCOMPARE(infoSpy.count(), 2);
+    QVERIFY(qAbs(infoSpy.last().at(3).toDouble() - 2.5e-3) < 1e-15);
+    pActive->setChecked(true);
+    QCOMPARE(infoSpy.last().at(1).toBool(), true);
+    pChannels->setCurrentIndex(1);
+    QCOMPARE(infoSpy.last().at(2).toString(), QStringLiteral("STI014"));
+    QCOMPARE(infoSpy.count(), 4);
+
+    // Detected triggers fill the count and the type list once per value
+    view.setNumberDetectedTriggersAndTypes(3, {{3, {{10, 1.0}, {20, 4.0}, {30, 1.0}}}});
+    QCOMPARE(pCount->text(), QStringLiteral("3"));
+    QCOMPARE(pTypes->count(), 2);
+
+    QSignalSpy resetSpy(&view, &TriggerDetectionView::resetTriggerCounter);
+    QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_resetNumberTriggers")), Qt::LeftButton);
+    QCOMPARE(resetSpy.count(), 1);
+    QCOMPARE(pCount->text(), QStringLiteral("0"));
+    QCOMPARE(pTypes->count(), 0);
+
+    // Offline mode swaps the live controls for the detect button
+    view.setProcessingMode(AbstractView::ProcessingMode::Offline);
+    QVERIFY(!pDetect->isHidden());
+    QVERIFY(pActive->isHidden());
+    QSignalSpy detectSpy(&view, &TriggerDetectionView::detectTriggers);
+    QTest::mouseClick(pDetect, Qt::LeftButton);
+    QCOMPARE(detectSpy.count(), 1);
+    QCOMPARE(detectSpy.last().at(0).toString(), QStringLiteral("STI014"));
+    QVERIFY(qAbs(detectSpy.last().at(1).toDouble() - 2.5e-3) < 1e-15);
+    view.setProcessingMode(AbstractView::ProcessingMode::RealTime);
+    QVERIFY(pDetect->isHidden());
 }
 
 //=============================================================================================================
