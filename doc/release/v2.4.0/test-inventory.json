@@ -832,6 +832,7 @@
         "RayHit",
         "RayPicker",
         "RtSensorStreamManager",
+        "SliceObject",
         "SourceEstimateManager",
         "SourceEstimateOverlay",
         "SourceSpaceTreeItem",

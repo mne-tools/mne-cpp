@@ -43,6 +43,7 @@
 #include <disp3D/renderable/dipoleobject.h>
 #include <disp3D/renderable/networkobject.h>
 #include <disp3D/renderable/sourceestimateoverlay.h>
+#include <disp3D/renderable/sliceobject.h>
 #include <disp/plots/helpers/colormap.h>
 #include <inv/inv_source_estimate.h>
 #include <disp3D/core/viewstate.h>
@@ -277,6 +278,12 @@ private slots:
      * Verifies SourceEstimateOverlay thresholds, time access and per-vertex colours on a surface.
      */
     void sourceEstimateOverlay_colorsSurface();
+
+    //=========================================================================================================
+    /**
+     * Verifies SliceObject corner placement for each orientation and its quad buffers.
+     */
+    void sliceObject_cornersAndQuad();
 };
 
 //=============================================================================================================
@@ -1441,6 +1448,75 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     overlay.applyToSurface(&other, 0);
     QCOMPARE(other.vertexDataRef()[0].color, before);
     overlay.applyToSurface(nullptr, 0);
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::sliceObject_cornersAndQuad()
+{
+    // 2 mm voxels, origin at (-10, -20, -30) mm
+    Eigen::Matrix4d voxelToWorld = Eigen::Matrix4d::Identity();
+    voxelToWorld.topLeftCorner<3, 3>() *= 2.0;
+    voxelToWorld.topRightCorner<3, 1>() << -10.0, -20.0, -30.0;
+    const QImage image(4, 3, QImage::Format_Grayscale8);
+
+    // Quad vertex i: position (x, y, z) at floats 5i..5i+2, UV at 5i+3, 5i+4; corners 00, 10, 01, 11
+    const auto corners = [](const SliceObject& slice) {
+        QVector<float> vertices;
+        slice.generateQuadVertices(vertices);
+        QVector<QVector3D> points;
+        for (int i = 0; i < 4; ++i) {
+            points.append(QVector3D(vertices[5 * i], vertices[5 * i + 1], vertices[5 * i + 2]));
+        }
+        return points;
+    };
+
+    SliceObject slice;
+    // Axial slice 5: columns along x, rows along y, at z = -30 + 2 * 5
+    slice.setSlice(image, SliceOrientation::Axial, 5, voxelToWorld);
+    QCOMPARE(slice.orientation(), SliceOrientation::Axial);
+    QCOMPARE(slice.sliceIndex(), 5);
+    QCOMPARE(slice.image().size(), QSize(4, 3));
+    QVector<QVector3D> points = corners(slice);
+    QCOMPARE(points[0], QVector3D(-10.0f, -20.0f, -20.0f));
+    QCOMPARE(points[1], QVector3D(-2.0f, -20.0f, -20.0f));
+    QCOMPARE(points[2], QVector3D(-10.0f, -14.0f, -20.0f));
+    QCOMPARE(points[3], QVector3D(-2.0f, -14.0f, -20.0f));
+    // The unit quad maps onto the same corners
+    QCOMPARE(slice.sliceToWorld().map(QVector3D(1.0f, 1.0f, 0.0f)), points[3]);
+
+    // Coronal: columns along x, rows along z; sagittal: columns along y, rows along z
+    slice.setSlice(image, SliceOrientation::Coronal, 1, voxelToWorld);
+    points = corners(slice);
+    QCOMPARE(points[0], QVector3D(-10.0f, -18.0f, -30.0f));
+    QCOMPARE(points[3], QVector3D(-2.0f, -18.0f, -24.0f));
+    slice.setSlice(image, SliceOrientation::Sagittal, 2, voxelToWorld);
+    points = corners(slice);
+    QCOMPARE(points[0], QVector3D(-6.0f, -20.0f, -30.0f));
+    QCOMPARE(points[3], QVector3D(-6.0f, -12.0f, -24.0f));
+
+    // An explicit image-to-world transform places the image plane directly
+    slice.setSliceToWorld(image, SliceOrientation::Axial, 0, voxelToWorld);
+    points = corners(slice);
+    QCOMPARE(points[3], QVector3D(-2.0f, -14.0f, -30.0f));
+
+    QVector<float> vertices;
+    slice.generateQuadVertices(vertices);
+    QCOMPARE(vertices.size(), 20);
+    QCOMPARE(vertices[3 * 5 + 3], 1.0f);
+    QCOMPARE(vertices[3 * 5 + 4], 1.0f);
+    QVector<unsigned int> indices;
+    SliceObject::generateQuadIndices(indices);
+    QCOMPARE(indices.size(), 6);
+    for (unsigned int index : std::as_const(indices)) {
+        QVERIFY(index < 4);
+    }
+
+    slice.setWindowLevel(0.4f, 0.3f);
+    QCOMPARE(slice.windowCenter(), 0.4f);
+    QCOMPARE(slice.windowWidth(), 0.3f);
+    slice.setOpacity(0.25f);
+    QCOMPARE(slice.opacity(), 0.25f);
 }
 
 //=============================================================================================================
