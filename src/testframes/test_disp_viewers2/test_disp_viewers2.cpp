@@ -3085,6 +3085,50 @@ void TestDispViewers2::channelRhiView_overlayValues()
     sendMouse(QEvent::MouseMove, Qt::RightButton, QPoint(160, 30));
     QVERIFY(paintOverlay().texts.contains(QStringLiteral("30 ms")));
     sendMouse(QEvent::MouseButtonRelease, Qt::RightButton, QPoint(160, 30));
+    rhiView->setAnnotationSelectionEnabled(false);
+
+    // Wheel: vertical scrolls 15 % of the view in time, a horizontal swipe 10 %, both scaled by the scroll speed
+    rhiView->setWheelScrollsChannels(false);
+    rhiView->setLastFileSample(10000);
+    const auto wheel = [rhiView](const QPoint& delta) {
+        QWheelEvent event(QPointF(50, 40), QPointF(50, 40), QPoint(), delta, Qt::NoButton, Qt::NoModifier,
+                          Qt::NoScrollPhase, false);
+        QApplication::sendEvent(rhiView, &event);
+    };
+    const float viewSamples = 400.f * 0.5f;
+    rhiView->setScrollSample(1000.f);
+    wheel(QPoint(0, -120));
+    QTRY_VERIFY(std::fabs(rhiView->scrollSample() - (1000.f + 0.15f * viewSamples)) < 0.01f);
+    wheel(QPoint(0, 120));
+    QTRY_VERIFY(std::fabs(rhiView->scrollSample() - 1000.f) < 0.01f);
+    rhiView->setScrollSpeedFactor(2.f);
+    wheel(QPoint(-120, 0));
+    QTRY_VERIFY(std::fabs(rhiView->scrollSample() - (1000.f + 2.f * 0.1f * viewSamples)) < 0.01f);
+    wheel(QPoint(120, 0));
+    QTRY_VERIFY(std::fabs(rhiView->scrollSample() - 1000.f) < 0.01f);
+    rhiView->setScrollSpeedFactor(1.f);
+
+    // Frozen: wheel and drag do not scroll, a click still reports its sample
+    rhiView->setFrozen(true);
+    wheel(QPoint(0, -120));
+    wheel(QPoint(-120, 0));
+    QTest::qWait(150);
+    QCOMPARE(rhiView->scrollSample(), 1000.f);
+    QSignalSpy clickSpy(rhiView, &ChannelRhiView::sampleClicked);
+    sendMouse(QEvent::MouseButtonPress, Qt::LeftButton, QPoint(40, 50));
+    QCOMPARE(clickSpy.size(), 1);
+    QCOMPARE(clickSpy.at(0).at(0).toInt(), 1020);
+    sendMouse(QEvent::MouseButtonRelease, Qt::LeftButton, QPoint(40, 50));
+    rhiView->setFrozen(false);
+
+    // Double-click marks the channel under the cursor bad and back
+    QVERIFY(!model.channelInfo(0).bad);
+    QMouseEvent doubleClick(QEvent::MouseButtonDblClick, QPointF(40, 50), rhiView->mapToGlobal(QPointF(40, 50)),
+                            Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(rhiView, &doubleClick);
+    QVERIFY(model.channelInfo(0).bad);
+    QApplication::sendEvent(rhiView, &doubleClick);
+    QVERIFY(!model.channelInfo(0).bad);
 }
 
 //=============================================================================================================
