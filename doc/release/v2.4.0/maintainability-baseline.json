@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 395570,
+  "scanned_lines": 395627,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -55,11 +55,11 @@
       }
     },
     "c_style_cast": {
-      "total": 429,
+      "total": 424,
       "files": 73,
       "by_scope": {
         "applications": 61,
-        "libraries": 275,
+        "libraries": 270,
         "tools": 93
       },
       "suppressed": [],
@@ -68,10 +68,10 @@
         "src/libraries/disp/plots/helpers/colormap.cpp": 42,
         "src/libraries/disp3D/renderable/networkobject.cpp": 23,
         "src/libraries/fiff/fiff_tag.cpp": 20,
-        "src/libraries/disp/viewers/helpers/frequencyspectrumdelegate.cpp": 18,
         "src/tools/inverse/mne_compute_raw_inverse/main.cpp": 18,
         "src/tools/inverse/mne_compute_mne/main.cpp": 17,
         "src/applications/mne_browse/Utils/newparksmcclellan.cpp": 16,
+        "src/libraries/disp/viewers/helpers/frequencyspectrumdelegate.cpp": 16,
         "src/libraries/dsp/parksmcclellan.cpp": 16,
         "src/libraries/disp/viewers/butterflyview.cpp": 10,
         "src/libraries/fiff/fiff_tag.h": 9,
@@ -112,8 +112,8 @@
         "src/libraries/disp/viewers/filterdesignview.cpp": 6,
         "src/libraries/disp/viewers/helpers/evokedsetmodel.cpp": 1,
         "src/libraries/disp/viewers/helpers/filterplotscene.cpp": 8,
-        "src/libraries/disp/viewers/helpers/frequencyspectrumdelegate.cpp": 18,
-        "src/libraries/disp/viewers/helpers/rtfiffrawviewdelegate.cpp": 5,
+        "src/libraries/disp/viewers/helpers/frequencyspectrumdelegate.cpp": 16,
+        "src/libraries/disp/viewers/helpers/rtfiffrawviewdelegate.cpp": 2,
         "src/libraries/disp/viewers/helpers/rtfiffrawviewmodel.cpp": 1,
         "src/libraries/disp/viewers/spectrumsettingsview.cpp": 4,
         "src/libraries/disp3D/helpers/geometryinfo.cpp": 1,
@@ -548,11 +548,11 @@
       }
     },
     "qt_new_unparented": {
-      "total": 820,
+      "total": 819,
       "files": 80,
       "by_scope": {
         "applications": 713,
-        "libraries": 105,
+        "libraries": 104,
         "tools": 2
       },
       "suppressed": [],
@@ -646,7 +646,7 @@
         "src/libraries/disp/viewers/modalityselectionview.cpp": 2,
         "src/libraries/disp/viewers/projectorsview.cpp": 4,
         "src/libraries/disp/viewers/quickcontrolview.cpp": 7,
-        "src/libraries/disp/viewers/rtfiffrawview.cpp": 3,
+        "src/libraries/disp/viewers/rtfiffrawview.cpp": 2,
         "src/libraries/disp/viewers/spectrumsettingsview.cpp": 5,
         "src/libraries/disp/viewers/spectrumview.cpp": 1,
         "src/libraries/disp3D/model/braintreemodel.cpp": 4,

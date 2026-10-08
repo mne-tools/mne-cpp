@@ -1021,7 +1021,11 @@
         "ubuntu-24.04": "run",
         "windows-2025-vs2026": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "RtFiffRawView",
+        "RtFiffRawViewDelegate",
+        "RtFiffRawViewModel"
+      ]
     },
     {
       "name": "test_disp_viewers3",

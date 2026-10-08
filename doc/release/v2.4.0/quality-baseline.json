@@ -52,7 +52,7 @@
       "example_eligible": 367,
       "eligible_backed_percent": 100.0,
       "snippets": 388,
-      "registered_test_percent": 26.86
+      "registered_test_percent": 27.45
     },
     "G4_screenshots": {
       "referenced_images": 19,
@@ -65,12 +65,12 @@
       "compiler_warnings": 0,
       "null_macro": 43,
       "typedef_struct": 12,
-      "c_style_cast": 429,
+      "c_style_cast": 424,
       "raw_new": 169,
       "raw_delete": 275,
       "console_io": 358,
       "numeric_define": 834,
-      "qt_new_unparented": 820,
+      "qt_new_unparented": 819,
       "oversized_unit": 8
     },
     "G6_parity": {
