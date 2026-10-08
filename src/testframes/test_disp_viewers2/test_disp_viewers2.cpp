@@ -129,11 +129,12 @@ using Eigen::MatrixXd;
 namespace
 {
 
-/** Paint engine that records the drawn text, independent of the platform's glyph rasterisation. */
+/** Paint engine that records the drawn text and lines, independent of the platform's glyph rasterisation. */
 class TextRecordingEngine : public QPaintEngine
 {
 public:
     QStringList texts;
+    QList<QLineF> lines;
 
     bool begin(QPaintDevice*) override
     {
@@ -155,8 +156,17 @@ public:
     void drawPolygon(const QPointF*, int, PolygonDrawMode) override
     {
     }
-    void drawLines(const QLineF*, int) override
+    void drawLines(const QLineF* lineArray, int lineCount) override
     {
+        for (int i = 0; i < lineCount; ++i) {
+            lines.append(state->transform().map(lineArray[i]));
+        }
+    }
+    void drawLines(const QLine* lineArray, int lineCount) override
+    {
+        for (int i = 0; i < lineCount; ++i) {
+            lines.append(state->transform().map(QLineF(lineArray[i])));
+        }
     }
     void drawRects(const QRectF*, int) override
     {
@@ -186,6 +196,10 @@ public:
     QStringList texts() const
     {
         return m_engine.texts;
+    }
+    QList<QLineF> lines() const
+    {
+        return m_engine.lines;
     }
 
 protected:
@@ -517,6 +531,12 @@ private slots:
      * Verifies that ChannelRhiView::renderToImage() lays out rows and scales traces like the GPU path.
      */
     void channelRhiView_renderToImage();
+
+    //=========================================================================================================
+    /**
+     * Verifies the values shown by the ChannelRhiView scalebar, crosshair and ruler overlays.
+     */
+    void channelRhiView_overlayValues();
     void channelRhiView_rendersAndDrawsOverlays();
     void channelDataModel_bufferDetrendAndDecimation();
 
@@ -2618,6 +2638,69 @@ void TestDispViewers2::channelRhiView_renderToImage()
     }
 
     QVERIFY(view.renderToImage(QSize(0, 10)).isNull());
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::channelRhiView_overlayValues()
+{
+    ChannelDataView view(QStringLiteral("test_disp_viewers2_rhi_overlay"));
+    view.init(createBrowserTestInfo());
+    view.setFileBounds(100, 299);
+    view.setData(createBrowserTestData(), 100);
+    auto* rhiView = view.findChild<ChannelRhiView*>();
+    QVERIFY(rhiView != nullptr);
+    rhiView->resize(400, 400);
+    rhiView->setSfreq(1000.f);
+    rhiView->setFirstFileSample(100);
+    rhiView->setSamplesPerPixel(0.5f);
+    rhiView->setScrollSample(100.f);
+    rhiView->setVisibleChannelCount(4);
+    rhiView->setCrosshairEnabled(false);
+    const QList<QWidget*> children = rhiView->findChildren<QWidget*>(Qt::FindDirectChildrenOnly);
+    QCOMPARE(children.size(), 1);
+    QWidget* overlay = children.first();
+    overlay->resize(rhiView->size());
+
+    struct Recording
+    {
+        QStringList texts;
+        QList<QLineF> lines;
+    };
+    const auto paintOverlay = [overlay]() {
+        TextRecordingDevice recorder(overlay->size());
+        {
+            QPainter painter(&recorder);
+            overlay->render(&painter);
+        }
+        return Recording{recorder.texts(), recorder.lines()};
+    };
+    const auto textStartingWith = [](const QStringList& texts, const QString& prefix) {
+        for (const QString& text : texts) {
+            if (text.startsWith(prefix)) {
+                return text;
+            }
+        }
+        return QString();
+    };
+
+    // Scalebar: the bar length (vertical line between the two ticks) shows the labelled amplitude at the
+    // trace scale, where amplitudeMax spans 45 % of a 100 px row
+    rhiView->setScalebarsVisible(true);
+    Recording rec = paintOverlay();
+    const float magScale = view.model()->channelInfo(0).amplitudeMax;
+    const QString magLabel = textStartingWith(rec.texts, QStringLiteral("MEG mag: "));
+    QVERIFY2(!magLabel.isEmpty(), qPrintable(rec.texts.join(u'|')));
+    float barPx = 0.f;
+    for (const QLineF& line : rec.lines) {
+        if (qFuzzyIsNull(line.dx()) && line.dy() != 0.f) {
+            barPx = qMax(barPx, static_cast<float>(qAbs(line.dy())));
+        }
+    }
+    QVERIFY(barPx > 0.f);
+    const float expectedPicoTesla = magScale * barPx / 45.f * 1e12f;
+    QCOMPARE(magLabel, QStringLiteral("MEG mag: %1 pT").arg(QString::number(expectedPicoTesla, 'f', 1)));
+    rhiView->setScalebarsVisible(false);
 }
 
 //=============================================================================================================

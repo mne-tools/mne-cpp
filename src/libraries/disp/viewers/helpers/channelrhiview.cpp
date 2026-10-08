@@ -2024,14 +2024,16 @@ void ChannelRhiView::drawScalebars(QPainter& p)
 
     // Draw scalebars in the bottom-right corner
     const int margin = 12;
-    const int barHeight = qBound(20, static_cast<int>(laneH * 0.35f), 60);
+    // amplitudeMax spans 45 % of a row (channeldata.vert); label the amplitude the drawn bar length stands for
+    const float scalePx = laneH * 0.45f;
+    const int barHeight = qBound(20, qRound(scalePx), 60);
     int x = width() - margin;
     int y = height() - margin;
 
     for (auto it = typeScales.constEnd(); it != typeScales.constBegin();) {
         --it;
         QString unit = unitForType(it.key());
-        float ampValue = it.value();
+        float ampValue = it.value() * static_cast<float>(barHeight) / scalePx;
         QString label = it.key() + QStringLiteral(": ") + formatAmplitude(ampValue, unit);
 
         int textW = fm.horizontalAdvance(label);

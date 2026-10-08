@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 395469,
+  "scanned_lines": 395471,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -671,14 +671,14 @@
         "src/applications/mne_inspect/app/mainwindow.cpp": 3574,
         "src/libraries/fiff/fiff_stream.cpp": 3413,
         "src/libraries/fwd/fwd_bem_model.cpp": 3368,
-        "src/libraries/disp/viewers/helpers/channelrhiview.cpp": 2659,
+        "src/libraries/disp/viewers/helpers/channelrhiview.cpp": 2661,
         "src/libraries/mne/mne_source_space.cpp": 2424
       },
       "all_files": {
         "src/applications/mne_analyze_studio/workbench/mainwindow.cpp": 9128,
         "src/applications/mne_browse/Windows/mainwindow.cpp": 4574,
         "src/applications/mne_inspect/app/mainwindow.cpp": 3574,
-        "src/libraries/disp/viewers/helpers/channelrhiview.cpp": 2659,
+        "src/libraries/disp/viewers/helpers/channelrhiview.cpp": 2661,
         "src/libraries/disp3D/view/brainview.cpp": 3902,
         "src/libraries/fiff/fiff_stream.cpp": 3413,
         "src/libraries/fwd/fwd_bem_model.cpp": 3368,
