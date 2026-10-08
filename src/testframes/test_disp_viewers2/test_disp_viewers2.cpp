@@ -3067,17 +3067,29 @@ void TestDispViewers2::frequencySpectrumDelegate_paintsSpectrumAndReadout()
     }
     QVERIFY2(iMarker > 30, qPrintable(QString::number(iMarker)));
     QVERIFY(hasDarkPixelNear(image, cell.left() + 88, cell.top() + 42));
-    // At exactly 100 Hz the read-out names that bin: same pixels as the expected text drawn over the plain plot
-    QImage expected = image;
-    {
-        delegate.rcvMouseLoc(0, -1, -1, cell);
-        expected = render();
-        QPainter painter(&expected);
-        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-        painter.drawText(cell.left() + 88, cell.top() + 42, QStringLiteral("10 [DB], 100 [Hz]"));
-    }
+    // At exactly 100 Hz the read-out names that bin: of the texts for bins 19..21 drawn over the plain
+    // plot, the 100 Hz one is the closest match (glyph rasterisation differs slightly between platforms)
     const QRect textArea(cell.left() + 88, cell.top() + 25, 70, 20);
-    QCOMPARE(image.copy(textArea), expected.copy(textArea));
+    delegate.rcvMouseLoc(0, -1, -1, cell);
+    const QImage plain = render();
+    auto distanceTo = [&](int bin) {
+        QImage expected = plain;
+        {
+            QPainter painter(&expected);
+            painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+            painter.drawText(cell.left() + 88, cell.top() + 42,
+                             QStringLiteral("%1 [DB], %2 [Hz]").arg(spectrum(0, bin)).arg(bin * 5.0));
+        }
+        qint64 distance = 0;
+        for (int y = textArea.top(); y <= textArea.bottom(); ++y) {
+            for (int x = textArea.left(); x <= textArea.right(); ++x) {
+                distance += std::abs(qGray(image.pixel(x, y)) - qGray(expected.pixel(x, y)));
+            }
+        }
+        return distance;
+    };
+    const qint64 distance100Hz = distanceTo(20);
+    QVERIFY2(distance100Hz < distanceTo(19) && distance100Hz < distanceTo(21), qPrintable(QString::number(distance100Hz)));
 
     // Other rows show no read-out; the name column is rotated text
     QStyleOptionViewItem option;
