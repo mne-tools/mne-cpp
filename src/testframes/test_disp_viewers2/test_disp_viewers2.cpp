@@ -2233,8 +2233,12 @@ void TestDispViewers2::evokedSetModel_projectionRolesAndAverageMaps()
     const FiffEvoked vis = set->evoked.takeLast();
     model.setEvokedSet(set);
     QCOMPARE(model.getNumAverages(), 1);
-    QCOMPARE(model.data(0, 1).value<QList<AvrTypeRowVector>>().size(), 2);
-    QCOMPARE(model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<AvrTypeRowVectorPair>>().size(), 2);
+    const auto frozenRows = model.data(0, 1).value<QList<AvrTypeRowVector>>();
+    QCOMPARE(frozenRows.size(), 2);
+    QCOMPARE(frozenRows.at(1).first, QStringLiteral("vis"));
+    const auto frozenMatrices = model.data(0, 2, EvokedSetModelRoles::GetAverageData).value<QList<AvrTypeRowVectorPair>>();
+    QCOMPARE(frozenMatrices.size(), 2);
+    QCOMPARE(frozenMatrices.at(1).first, QStringLiteral("vis"));
     QCOMPARE(colorSpy.size(), 2);
     QVERIFY(!model.getAverageColor()->contains(QStringLiteral("vis")));
     model.toggleFreeze();

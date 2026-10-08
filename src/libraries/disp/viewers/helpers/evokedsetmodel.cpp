@@ -121,7 +121,7 @@ QVariant EvokedSetModel::data(const QModelIndex& index, int role) const
                     if (m_bIsFreezed) {
                         // data freeze
                         for (int i = 0; i < m_matDataFreeze.size(); ++i) {
-                            pairItem.first = m_lAvrTypes.at(i);
+                            pairItem.first = m_lAvrTypesFreeze.at(i);
                             pairItem.second = m_matDataFreeze.at(i).row(row);
                             lRowDataPerTrigType.append(pairItem);
                         }
@@ -163,7 +163,7 @@ QVariant EvokedSetModel::data(const QModelIndex& index, int role) const
                     if (m_bIsFreezed) {
                         // data freeze
                         for (int i = 0; i < m_matDataFreeze.size(); ++i) {
-                            averagedData.first = m_lAvrTypes.at(i);
+                            averagedData.first = m_lAvrTypesFreeze.at(i);
                             averagedData.second.first = m_matDataFreeze.at(i).data();
                             averagedData.second.second = m_matDataFreeze.at(i).cols();
 
@@ -758,6 +758,7 @@ void EvokedSetModel::toggleFreeze()
 
     if (m_bIsFreezed) {
         m_matDataFreeze = m_matData;
+        m_lAvrTypesFreeze = m_lAvrTypes;
     }
 
     //Update data content

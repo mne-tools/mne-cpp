@@ -391,6 +391,7 @@ private:
     QList<Eigen::MatrixXd> m_matData;       /**< List that holds the data*/
     QList<Eigen::MatrixXd> m_matDataFreeze; /**< List that holds the data when freezed*/
     QStringList m_lAvrTypes;                /**< The average types. */
+    QStringList m_lAvrTypesFreeze;          /**< The average types of m_matDataFreeze. */
 
     Eigen::MatrixXd m_matProj;                           /**< SSP projector. */
     Eigen::MatrixXd m_matComp;                           /**< Compensator. */
