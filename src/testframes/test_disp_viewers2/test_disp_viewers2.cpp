@@ -1473,6 +1473,83 @@ void TestDispViewers2::fwdSettingsView_lifecycle()
     view.loadSettings();
     view.clearView();
 
+    // Status feedback for each computation state
+    auto* feedback = view.findChild<QLabel*>(QStringLiteral("m_label_recomputationFeedback"));
+    QVERIFY(feedback);
+    const QStringList states = {QStringLiteral("Initializing"), QStringLiteral("Computing"),
+                                QStringLiteral("Recomputing"), QStringLiteral("Clustering"),
+                                QStringLiteral("Not Computed"), QStringLiteral("Not Clustered"),
+                                QStringLiteral("Finished")};
+    for (int status = 0; status < states.size(); ++status) {
+        view.setRecomputationStatus(status);
+        QCOMPARE(feedback->text(), states.at(status));
+    }
+
+    // Solution information
+    const auto text = [&view](const char* name) {
+        return view.findChild<QLineEdit*>(QLatin1String(name))->text();
+    };
+    for (const auto& [frame, frameName] : {std::pair{FIFFV_COORD_HEAD, "Head Space"},
+                                           std::pair{FIFFV_COORD_MRI, "MRI Space"},
+                                           std::pair{FIFFV_COORD_DEVICE, "Unknown"}}) {
+        view.setSolutionInformation(frame == FIFFV_COORD_MRI ? 1 : 0, frame, 7498, 306, 2);
+        QCOMPARE(text("m_lineEdit_sCoordFrame"), QLatin1String(frameName));
+    }
+    QCOMPARE(text("m_lineEdit_sSourceOri"), QStringLiteral("fixed"));
+    QCOMPARE(text("m_lineEdit_iNDipole"), QStringLiteral("7498"));
+    QCOMPARE(text("m_lineEdit_iNChan"), QStringLiteral("306"));
+    QCOMPARE(text("m_lineEdit_iNSourceSpace"), QStringLiteral("2"));
+    view.setClusteredInformation(200);
+    QCOMPARE(text("m_lineEdit_iNDipoleClustered"), QStringLiteral("200"));
+
+    // Recomputation and cluster number
+    QSignalSpy recompSpy(&view, &FwdSettingsView::recompStatusChanged);
+    view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_bDoRecomputation"))->click();
+    QVERIFY(view.getRecomputationStatusChanged());
+    QCOMPARE(recompSpy.takeFirst().at(0).toBool(), true);
+    QSignalSpy clusterNumberSpy(&view, &FwdSettingsView::clusterNumberChanged);
+    view.findChild<QSpinBox*>(QStringLiteral("m_spinBox_iNDipoleClustered"))->setValue(150);
+    QCOMPARE(view.getClusterNumber(), 150);
+    QCOMPARE(clusterNumberSpy.takeFirst().at(0).toInt(), 150);
+
+    // Atlas directory: a directory without the a2009s annotations is not loaded
+    auto* atlasStat = view.findChild<QLabel*>(QStringLiteral("m_qLabel_atlasStat"));
+    QTemporaryDir atlasDir;
+    QVERIFY(atlasDir.isValid());
+    QSignalSpy atlasSpy(&view, &FwdSettingsView::atlasDirChanged);
+    chooseFileInNextDialog(atlasDir.path());
+    QMetaObject::invokeMethod(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_AtlasDirDialog")), "released");
+    QCOMPARE(atlasStat->text(), QStringLiteral("not loaded"));
+    QVERIFY(atlasSpy.isEmpty());
+
+    // Clustering needs an annotation set: without one the box is unchecked again after a warning
+    QSignalSpy clusteringSpy(&view, &FwdSettingsView::clusteringStatusChanged);
+    auto* clustering = view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_bDoClustering"));
+    clustering->setChecked(false);
+    clickNextMessageBoxButton(QStringLiteral("OK"));
+    clustering->click();
+    QVERIFY(!view.getClusteringStatusChanged());
+    QVERIFY(clusteringSpy.isEmpty());
+
+    // With both hemispheres' a2009s annotations the atlas loads and clustering is allowed
+    const QString label = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/subjects/sample/label/");
+    for (const QString& hemi : {QStringLiteral("lh"), QStringLiteral("rh")}) {
+        QVERIFY(QFile::copy(label + hemi + QStringLiteral(".aparc.annot"),
+                            atlasDir.filePath(hemi + QStringLiteral(".aparc.a2009s.annot"))));
+    }
+    chooseFileInNextDialog(atlasDir.path());
+    QMetaObject::invokeMethod(view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_AtlasDirDialog")), "released");
+    QCOMPARE(atlasStat->text(), QStringLiteral("loaded"));
+    QCOMPARE(atlasSpy.size(), 1);
+    QCOMPARE(atlasSpy.at(0).at(0).toString(), atlasDir.path());
+    clustering->click();
+    QVERIFY(view.getClusteringStatusChanged());
+    QCOMPARE(clusteringSpy.takeFirst().at(0).toBool(), true);
+
+    QSignalSpy computeSpy(&view, &FwdSettingsView::doForwardComputation);
+    view.findChild<QPushButton*>(QStringLiteral("m_qPushButton_ComputeForward"))->click();
+    QCOMPARE(computeSpy.size(), 1);
+
     QApplication::processEvents();
 }
 
