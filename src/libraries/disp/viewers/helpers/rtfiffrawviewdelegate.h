@@ -255,6 +255,17 @@ private:
 
     //=========================================================================================================
     /**
+     * Paints the crosshair: a vertical line at the mouse position and, on the hovered row, a dot on the trace.
+     *
+     * @param[in] painter    The painter.
+     * @param[in] index      Model index of the row being painted.
+     * @param[in] option     Describes the cell being painted.
+     * @param[in] data       Data of the row.
+     */
+    void paintCrosshair(QPainter* painter, const QModelIndex& index, const QStyleOptionViewItem& option, const DISPLIB::RowVectorPair& data) const;
+
+    //=========================================================================================================
+    /**
      * Allows to access the parent Object (FiffRawView) sampling frequency member and returns the sampling period.
      *
      */
@@ -270,6 +281,7 @@ private:
     int m_iUpperItemIndex; /**< The current upper item index visible in the QTableView. */
 
     QPen m_penMarker;            /**< Pen for drawing the data marker. */
+    QPen m_penCrosshair;         /**< Pen for drawing the mouse crosshair. */
     QPen m_penGrid;              /**< Pen for drawing the data grid. */
     QPen m_penTimeSpacers;       /**< Pen for drawing the time spacer. */
     QPen m_penFreeze;            /**< Pen for drawing the data when freeze is on. */

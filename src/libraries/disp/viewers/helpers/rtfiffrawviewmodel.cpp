@@ -1309,6 +1309,33 @@ void RtFiffRawViewModel::addEvent(int iSample)
 
 //=============================================================================================================
 
+int RtFiffRawViewModel::getSampleAtColumn(int iColumn) const
+{
+    if (iColumn < 0 || iColumn >= m_iMaxSamples) {
+        return -1;
+    }
+
+    // Left of the write position is the current sweep, from it on the previous one
+    const int iWritePosition = m_bIsFreezed ? m_iCurrentSampleFreeze : m_iCurrentSample;
+    const int iSample = getFirstSampleOffset() + iColumn - (iColumn < iWritePosition ? 0 : m_iMaxSamples);
+
+    return iSample >= 0 ? iSample : -1;
+}
+
+//=============================================================================================================
+
+double RtFiffRawViewModel::getValueAtColumn(int iRow, int iColumn) const
+{
+    const RowVectorPair rowData = data(index(iRow, 1)).value<RowVectorPair>();
+    if (!rowData.first || iColumn < 0 || iColumn >= rowData.second) {
+        return 0.0;
+    }
+
+    return rowData.first[iColumn];
+}
+
+//=============================================================================================================
+
 std::vector<int> RtFiffRawViewModel::getEventsToDisplay(int iBegin, int iEnd) const
 {
     if (m_fnGetEventSamples) {

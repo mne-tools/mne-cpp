@@ -607,6 +607,41 @@ Get offset of first drawn sample in the window.
 
 ---
 
+### getSampleAtColumn(iColumn)
+
+Maps a displayed buffer column to the sample it shows.
+
+**Parameters:**
+
+- **iColumn** : *int*
+  Buffer column, 0 .. `getMaxSamples()` - 1.
+
+**Returns:**
+
+- *int* — The sample index since the start of the stream, or -1 if the column holds no data yet.
+
+---
+
+### getValueAtColumn(iRow, iColumn)
+
+Returns the displayed value of a row at a buffer column, i.e.
+
+after projectors, compensators and filters.
+
+**Parameters:**
+
+- **iRow** : *int*
+  Row of the model.
+
+- **iColumn** : *int*
+  Buffer column, 0 .. `getMaxSamples()` - 1.
+
+**Returns:**
+
+- *double* — The value in SI units, 0 for an invalid row or column.
+
+---
+
 ### getMaxValueFromRawViewModel(row)
 
 Get maximum range of respective channel type.

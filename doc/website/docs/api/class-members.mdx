@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6244 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6249 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -1120,6 +1120,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **CrossCorrelation** `[fn]` in [CrossCorrelation](/docs/api/connectivity/cross-correlation) — Constructs a [`CrossCorrelation`](/docs/api/connectivity/cross-correlation) object.
 - **crosshairEnabled** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **crosshairEnabled** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
+- **crosshairMoved** `[signal]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Emitted while the crosshair is enabled and the mouse is over data.
 - **crosshairToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **csdByFreq** `[var]` in [CsdResult](/docs/api/utils/csd-result) — One n_ch × n_ch CSD matrix per selected frequency bin.
 - **csdFromTaperedSpectra** `[fn]` in [Spectral](/docs/api/utils/spectral) — Calculates the cross-spectral density of the tapered spectra of seed and target.
@@ -2230,6 +2231,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **getRawCommand** `[fn]` in [CommandParser](/docs/api/com/command-parser) — Returns the stored [`RawCommand`](/docs/api/com/raw-command).
 - **getRecomputationStatusChanged** `[fn]` in [FwdSettingsView](/docs/api/disp/fwd-settings-view) — Get status of recomputation check box.
 - **getRGBAs** `[fn]` in [FsColortable](/docs/api/fs/fs-colortable) — RGBAs encoded in the colortable.
+- **getSampleAtColumn** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Maps a displayed buffer column to the sample it shows.
 - **getSampleCount** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Return total number of samples across the recording.
 - **getSampleCount** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return total number of samples across the recording.
 - **getSampleCount** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Return total number of samples across the recording.
@@ -2286,6 +2288,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **getUpperFreq** `[fn]` in [ConnectivitySettingsView](/docs/api/disp/connectivity-settings-view) — Get the current upper frequency range.
 - **getUpperFrqBound** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns the upper frequency boundary.
 - **getUsedFreqBins** `[fn]` in [Network](/docs/api/connectivity/network) — Get the currently set number of frequency bins.
+- **getValueAtColumn** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Returns the displayed value of a row at a buffer column, i.e.
 - **getValuesAtTime** `[fn]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Pick signal values at a specified time point using linear interpolation.
 - **getValuesFromChannelData** `[fn]` in [MNEMeasDataSet](/docs/api/mne/mne-meas-data-set) — Pick signal values at a specified time point using linear interpolation (channel-major layout).
 - **getVert** `[fn]` in [NetworkNode](/docs/api/connectivity/network-node) — Returns the vertex (position) of the node.
@@ -2669,6 +2672,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **isClustered** `[fn]` in [MNEHemisphere](/docs/api/mne/mne-hemisphere) — is hemisphere clustered?
 - **isComputed** `[fn]` in [SourceMorph](/docs/api/inv/source-morph) — Check if the morph has been computed.
 - **isConnected** `[fn]` in [PolhemusConnection](/docs/api/utils/polhemus-connection)
+- **isCrosshairEnabled** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view)
 - **isDepthEnabled** `[fn]` in [VideoOverlay](/docs/api/disp3-d/video-overlay)
 - **isDipole** `[var]` in [RayHit](/docs/api/disp3-d/ray-hit) — True if a dipole was hit.
 - **isEmpty** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
@@ -4727,6 +4731,7 @@ Index of 6244 public class members (functions, variables, typedefs, enums) acros
 - **setContactValues** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Apply per-contact scalar overlay values and map them to a color gradient.
 - **setCrosshairEnabled** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Enable or disable the crosshair cursor with coordinate readout.
 - **setCrosshairEnabled** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Enable or disable the crosshair cursor overlay.
+- **setCrosshairEnabled** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Shows a crosshair at the mouse position and reports the value under it via `crosshairMoved()`.
 - **setCurrentLayoutFile** `[fn]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — Sets the current layout file.
 - **setCurrentlyMappedFiffChannels** `[fn]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — Sets the currently mapped fiff channels.
 - **setCurrentSamples** `[fn]` in [CovarianceSettingsView](/docs/api/disp/covariance-settings-view) — Set current samples to gather until a new covariance is calculated.

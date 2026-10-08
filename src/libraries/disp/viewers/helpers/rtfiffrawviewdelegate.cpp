@@ -51,7 +51,7 @@ RtFiffRawViewDelegate::RtFiffRawViewDelegate(RtFiffRawView* parent)
 , m_pParent(parent)
 , m_dMaxValue(0.0)
 , m_dScaleY(0.0)
-, m_iActiveRow(0)
+, m_iActiveRow(-1)
 , m_iUpperItemIndex(0)
 {
 }
@@ -83,6 +83,8 @@ void RtFiffRawViewDelegate::initPainterPaths(const QAbstractTableModel* model)
 
     m_penNormalBad = QPen(Qt::darkBlue, 0.1, Qt::SolidLine);
     m_penNormalSelectedBad = QPen(Qt::red, 1, Qt::SolidLine);
+
+    m_penCrosshair = QPen(QColor(255, 140, 0), 1, Qt::SolidLine);
 }
 
 //=============================================================================================================
@@ -244,6 +246,8 @@ void RtFiffRawViewDelegate::paint(QPainter* painter,
                 painter->setPen(QPen(Qt::green, 1, Qt::SolidLine));
                 painter->drawPath(path);
                 painter->restore();
+
+                paintCrosshair(painter, index, option, data);
             }
             break;
         }
@@ -279,6 +283,34 @@ void RtFiffRawViewDelegate::markerMoved(QPoint position,
 {
     m_markerPosition = position;
     m_iActiveRow = activeRow;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewDelegate::paintCrosshair(QPainter* painter,
+                                           const QModelIndex& index,
+                                           const QStyleOptionViewItem& option,
+                                           const RowVectorPair& data) const
+{
+    if (m_iActiveRow < 0 || m_markerPosition.x() < option.rect.left() || m_markerPosition.x() > option.rect.right()) {
+        return;
+    }
+
+    painter->save();
+    painter->setPen(m_penCrosshair);
+    painter->drawLine(QPointF(m_markerPosition.x(), option.rect.top()), QPointF(m_markerPosition.x(), option.rect.bottom()));
+
+    const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
+    const double dDx = static_cast<double>(option.rect.width()) / static_cast<double>(t_pModel->getMaxSamples());
+    const int iColumn = static_cast<int>((m_markerPosition.x() - option.rect.x()) / dDx);
+    if (index.row() == m_iActiveRow && iColumn >= 0 && iColumn < data.second) {
+        const double dScaleY = option.rect.height() / (2 * t_pModel->getMaxValueFromRawViewModel(index.row()));
+        const QPointF point(option.rect.x() + (iColumn + 1) * dDx, option.rect.center().y() + 0.5 - data.first[iColumn] * dScaleY);
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(m_penCrosshair.color());
+        painter->drawEllipse(point, 3.0, 3.0);
+    }
+    painter->restore();
 }
 
 //=============================================================================================================

@@ -64,25 +64,11 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 , m_bHideBadChannels(false)
 , m_iDistanceTimeSpacer(1)
 , m_iClickPosX(0)
+, m_bCrosshairEnabled(false)
 {
     m_sSettingsPath = sSettingsPath;
     m_pTableView = new QTableView;
-
-    auto* rhiViewport = new QRhiWidget;
-#if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
-    rhiViewport->setApi(QRhiWidget::Api::OpenGL);
-#elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
-    rhiViewport->setApi(QRhiWidget::Api::Metal);
-#elif defined(Q_OS_WIN)
-    rhiViewport->setApi(QRhiWidget::Api::Direct3D11);
-#else
-    rhiViewport->setApi(QRhiWidget::Api::OpenGL);
-#endif
-    m_pTableView->setViewport(rhiViewport);
-
-    // Install event filter for tracking mouse movements
-    m_pTableView->viewport()->installEventFilter(this);
-    m_pTableView->setMouseTracking(true);
+    updateViewport();
 
     // Set layout
     QVBoxLayout* neLayout = new QVBoxLayout(this);
@@ -116,6 +102,10 @@ void RtFiffRawView::updateViewport()
         rhiViewport->setApi(QRhiWidget::Api::OpenGL);
 #endif
         m_pTableView->setViewport(rhiViewport);
+
+        // Mouse moves drive the crosshair
+        rhiViewport->installEventFilter(this);
+        rhiViewport->setMouseTracking(true);
     }
 }
 
@@ -228,13 +218,64 @@ MatrixXd RtFiffRawView::getLastBlock()
 
 bool RtFiffRawView::eventFilter(QObject* object, QEvent* event)
 {
-    //    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseMove) {
-    //        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-    //        emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
-    //        return true;
-    //    }
+    if (m_bCrosshairEnabled && m_pModel && object == m_pTableView->viewport()) {
+        if (event->type() == QEvent::MouseMove) {
+            updateCrosshair(static_cast<QMouseEvent*>(event)->position().toPoint());
+        } else if (event->type() == QEvent::Leave) {
+            emit markerMoved(QPoint(), -1);
+            m_pTableView->viewport()->update();
+        }
+    }
 
     return QWidget::eventFilter(object, event);
+}
+
+//=============================================================================================================
+
+void RtFiffRawView::setCrosshairEnabled(bool bEnabled)
+{
+    m_bCrosshairEnabled = bEnabled;
+
+    if (!bEnabled) {
+        emit markerMoved(QPoint(), -1);
+        m_pTableView->viewport()->update();
+    }
+}
+
+//=============================================================================================================
+
+bool RtFiffRawView::isCrosshairEnabled() const
+{
+    return m_bCrosshairEnabled;
+}
+
+//=============================================================================================================
+
+int RtFiffRawView::columnAt(int iX) const
+{
+    const double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
+
+    return static_cast<int>((iX - m_pTableView->columnViewportPosition(1)) / dDx);
+}
+
+//=============================================================================================================
+
+void RtFiffRawView::updateCrosshair(const QPoint& position)
+{
+    const int iRow = m_pTableView->rowAt(position.y());
+    emit markerMoved(position, iRow);
+    m_pTableView->viewport()->update();
+
+    const int iColumn = columnAt(position.x());
+    const int iSample = m_pModel->getSampleAtColumn(iColumn);
+    if (iRow < 0 || iSample < 0) {
+        return;
+    }
+
+    emit crosshairMoved(m_pModel->data(m_pModel->index(iRow, 0)).toString(),
+                        iSample / static_cast<double>(m_fSamplingRate),
+                        m_pModel->getValueAtColumn(iRow, iColumn),
+                        m_pModel->getUnit(iRow));
 }
 
 //=============================================================================================================
@@ -761,25 +802,10 @@ void RtFiffRawView::clearView()
 void RtFiffRawView::onAddEvent(bool bChecked)
 {
     Q_UNUSED(bChecked)
-    double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
-    double dSample = static_cast<double>(m_iClickPosX) / dDx;
 
-    int iFirstSampleOffset = m_pModel->getFirstSampleOffset();
-
-    // Dont allow adding events to blank space in the beginning
-    if (dSample > m_pModel->getCurrentSampleIndex() && iFirstSampleOffset == 0) {
-        return;
+    // No events on the blank space before the first sweep has filled the window
+    const int iSample = m_pModel->getSampleAtColumn(columnAt(m_iClickPosX));
+    if (iSample >= 0) {
+        emit addSampleAsEvent(iSample);
     }
-
-    //Add offset
-    int iAbsoluteSample = static_cast<int>(dSample) + iFirstSampleOffset;
-
-    //Account for whether adding before or after draw point
-    if (dSample > m_pModel->getCurrentSampleIndex()) {
-        iAbsoluteSample -= m_pModel->getMaxSamples();
-    }
-
-    qDebug() << "EVENT SAMPLE:" << iAbsoluteSample;
-
-    emit addSampleAsEvent(iAbsoluteSample);
 }

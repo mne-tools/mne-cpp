@@ -399,6 +399,20 @@ public:
      */
     float getSamplingFreq() const;
 
+    //=========================================================================================================
+    /**
+     * Shows a crosshair at the mouse position and reports the value under it via crosshairMoved().
+     *
+     * @param[in] bEnabled  Whether the crosshair is shown.
+     */
+    void setCrosshairEnabled(bool bEnabled);
+
+    //=========================================================================================================
+    /**
+     * @return Whether the crosshair is shown.
+     */
+    bool isCrosshairEnabled() const;
+
 protected:
     //=========================================================================================================
     /**
@@ -471,6 +485,24 @@ protected:
      */
     void onAddEvent(bool bChecked);
 
+    //=========================================================================================================
+    /**
+     * Maps a viewport x position to the buffer column it shows.
+     *
+     * @param[in] iX    The x position in viewport coordinates.
+     *
+     * @return  The buffer column.
+     */
+    int columnAt(int iX) const;
+
+    //=========================================================================================================
+    /**
+     * Moves the crosshair to a viewport position and reports the value under it.
+     *
+     * @param[in] position  The mouse position in viewport coordinates.
+     */
+    void updateCrosshair(const QPoint& position);
+
     QPointer<QTableView> m_pTableView;                    /**< The QTableView being part of the model/view framework of Qt. */
     QPointer<DISPLIB::RtFiffRawViewDelegate> m_pDelegate; /**< The channel data delegate. */
     QPointer<DISPLIB::RtFiffRawViewModel> m_pModel;       /**< The channel data model. */
@@ -488,6 +520,7 @@ protected:
     QColor m_backgroundColor;                      /**< Current background color. */
     int m_iDistanceTimeSpacer;                     /**< Current distance between time spacer. */
     int m_iClickPosX;
+    bool m_bCrosshairEnabled; /**< Whether the crosshair follows the mouse. */
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
@@ -517,6 +550,17 @@ signals:
 
     //=========================================================================================================
     void addSampleAsEvent(int iSample);
+
+    //=========================================================================================================
+    /**
+     * Emitted while the crosshair is enabled and the mouse is over data.
+     *
+     * @param[in] sChannelName  The channel under the mouse.
+     * @param[in] dTime         Time since the start of the stream in seconds.
+     * @param[in] dValue        Displayed value (after projectors, compensators and filters) in SI units.
+     * @param[in] iUnit         FIFF unit of the value (e.g. FIFF_UNIT_T, FIFF_UNIT_T_M, FIFF_UNIT_V).
+     */
+    void crosshairMoved(const QString& sChannelName, double dTime, double dValue, int iUnit);
 };
 } // NAMESPACE
 

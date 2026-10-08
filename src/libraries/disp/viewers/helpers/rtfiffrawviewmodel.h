@@ -514,6 +514,27 @@ public:
 
     //=========================================================================================================
     /**
+     * Maps a displayed buffer column to the sample it shows.
+     *
+     * @param[in] iColumn   Buffer column, 0 .. getMaxSamples() - 1.
+     *
+     * @return  The sample index since the start of the stream, or -1 if the column holds no data yet.
+     */
+    int getSampleAtColumn(int iColumn) const;
+
+    //=========================================================================================================
+    /**
+     * Returns the displayed value of a row at a buffer column, i.e. after projectors, compensators and filters.
+     *
+     * @param[in] iRow      Row of the model.
+     * @param[in] iColumn   Buffer column, 0 .. getMaxSamples() - 1.
+     *
+     * @return  The value in SI units, 0 for an invalid row or column.
+     */
+    double getValueAtColumn(int iRow, int iColumn) const;
+
+    //=========================================================================================================
+    /**
      * Get maximum range of respective channel type. range value in FiffChInfo does not seem to contain a reasonable value
      *
      * @param[in] row Row of the model.

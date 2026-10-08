@@ -2823,6 +2823,55 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
     QCOMPARE(view.findChildren<QMenu*>().size(), 0);
 
+    // Crosshair: reports channel, time, displayed value and unit at the mouse, also in the previous sweep
+    QSignalSpy crosshairSpy(&view, &RtFiffRawView::crosshairMoved);
+    auto hover = [table](const QPoint& pos) {
+        QMouseEvent move(QEvent::MouseMove, QPointF(pos), table->viewport()->mapToGlobal(QPointF(pos)), Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+        QApplication::sendEvent(table->viewport(), &move);
+    };
+    const int yRow0 = table->visualRect(model->index(0, 1)).center().y();
+    hover(QPoint(xNew, yRow0));
+    QCOMPARE(crosshairSpy.size(), 0);
+    QVERIFY(!view.isCrosshairEnabled());
+    view.setCrosshairEnabled(true);
+    QVERIFY(view.isCrosshairEnabled());
+    for (const int x : {xNew, xOld}) {
+        hover(QPoint(x, yRow0));
+        const int iSample = (x == xNew ? 1000 : 0) + static_cast<int>(x / dx);
+        QVERIFY(!crosshairSpy.isEmpty());
+        QCOMPARE(crosshairSpy.last().at(0).toString(), QStringLiteral("MEG0111"));
+        QCOMPARE(crosshairSpy.last().at(1).toDouble(), iSample / 1000.0);
+        QVERIFY(std::abs(crosshairSpy.last().at(2).toDouble() - std::sin(0.02 * iSample)) < 1e-12);
+        QCOMPARE(crosshairSpy.last().at(3).toInt(), FIFF_UNIT_T);
+    }
+    const int iBefore = crosshairSpy.size();
+    hover(QPoint(xNew, table->visualRect(model->index(2, 1)).center().y()));
+    QCOMPARE(crosshairSpy.size(), iBefore + 1);
+    QCOMPARE(crosshairSpy.last().at(0).toString(), QStringLiteral("MEG0113"));
+    QCOMPARE(crosshairSpy.last().at(2).toDouble(), 0.5);
+
+    // The crosshair is drawn: a vertical line in its own color at the mouse position
+    hover(QPoint(xNew, yRow0));
+    QImage withCrosshair = view.grab().toImage();
+    const QPoint viewportOrigin = table->viewport()->mapTo(&view, QPoint(0, 0));
+    auto crosshairPixels = [&viewportOrigin, &table](const QImage& image, int x) {
+        int iCount = 0;
+        for (int y = 0; y < table->viewport()->height(); ++y) {
+            const QColor c = image.pixelColor(viewportOrigin + QPoint(x, y));
+            // Orange, also at the half intensity of an antialiased line between pixels
+            if (c.red() > 220 && c.green() < c.red() - 30 && c.blue() < c.green() - 30) {
+                ++iCount;
+            }
+        }
+        return iCount;
+    };
+    QVERIFY2(crosshairPixels(withCrosshair, xNew) > table->viewport()->height() / 2, qPrintable(QString::number(crosshairPixels(withCrosshair, xNew))));
+    view.setCrosshairEnabled(false);
+    QCOMPARE(crosshairPixels(view.grab().toImage(), xNew), 0);
+    const int iReports = crosshairSpy.size();
+    hover(QPoint(xOld, yRow0));
+    QCOMPARE(crosshairSpy.size(), iReports);
+
     const QString shot = QDir::temp().filePath(QStringLiteral("test_disp_viewers2_rawview.png"));
     view.takeScreenshot(shot);
     QVERIFY(QFile::exists(shot));
