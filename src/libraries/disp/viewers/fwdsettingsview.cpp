@@ -80,8 +80,8 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
 
     FsAnnotationSet::SPtr t_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(t_sAtlasDir + "/lh.aparc.a2009s.annot", t_sAtlasDir + "/rh.aparc.a2009s.annot"));
 
+    // No atlasDirChanged() here: nothing can be connected to it during construction
     if (!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2) {
-        emit atlasDirChanged(t_sAtlasDir, t_pAnnotationSet);
         m_pUi->m_qLabel_atlasStat->setText("loaded");
         m_bAnnotaionsLoaded = true;
     } else {
