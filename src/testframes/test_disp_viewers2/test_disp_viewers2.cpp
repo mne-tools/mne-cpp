@@ -1343,6 +1343,16 @@ void TestDispViewers2::triggerDetectionView_settingsAndSignals()
     QVERIFY(pColor->palette().color(QPalette::Button) != QColor(10, 200, 30));
     pTypes->setCurrentIndex(1);
     QCOMPARE(pColor->palette().color(QPalette::Button), QColor(10, 200, 30));
+    // Cancelling the colour dialog keeps the colour
+    const qsizetype infoCount = infoSpy.size();
+    answerNextModal([](QWidget* pModal) {
+        auto* pDialog = qobject_cast<QColorDialog*>(pModal);
+        QVERIFY(pDialog);
+        static_cast<QDialog*>(pDialog)->reject();
+    });
+    QTest::mouseClick(pColor, Qt::LeftButton);
+    QCOMPARE(pColor->palette().color(QPalette::Button), QColor(10, 200, 30));
+    QCOMPARE(infoSpy.size(), infoCount);
 
     QSignalSpy resetSpy(&view, &TriggerDetectionView::resetTriggerCounter);
     QTest::mouseClick(view.findChild<QPushButton*>(QStringLiteral("m_pushButton_resetNumberTriggers")), Qt::LeftButton);

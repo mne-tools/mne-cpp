@@ -252,6 +252,10 @@ void TriggerDetectionView::onRealTimeTriggerColorChanged(bool state)
     Q_UNUSED(state);
 
     QColor color = QColorDialog::getColor(m_qMapTriggerColor[m_pUi->m_comboBox_triggerColorType->currentText().toDouble()], this, "Set trigger color");
+    // Cancelled: getColor() returns an invalid colour
+    if (!color.isValid()) {
+        return;
+    }
 
     //Change color of pushbutton
     QPalette palette = m_pUi->m_pushButton_triggerColor->palette();
