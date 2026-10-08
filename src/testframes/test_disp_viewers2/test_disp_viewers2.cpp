@@ -106,7 +106,10 @@
 #include <QTimer>
 
 #include <functional>
+#include <QPointer>
 #include <QTreeView>
+#include <QStyledItemDelegate>
+#include <QStandardItemModel>
 #include <QStandardItem>
 #include <QKeyEvent>
 
@@ -444,6 +447,12 @@ private slots:
      * do not crash.
      */
     void control3dView_lifecycle();
+
+    //=========================================================================================================
+    /**
+     * Verifies Control3DView tool flags, view and light signals, color pickers and the data tree context menu.
+     */
+    void control3dView_flagsSignalsAndTree();
 
     //=========================================================================================================
     /**
@@ -2815,6 +2824,120 @@ void TestDispViewers2::dipoleFitView_lifecycle()
     view.clearView();
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::control3dView_flagsSignalsAndTree()
+{
+    Control3DView view(QString{}, nullptr, {QStringLiteral("Data")});
+    view.show();
+    auto* pTree = view.findChild<QTreeView*>(QStringLiteral("m_treeView_loadedData"));
+    auto* pViewBox = view.findChild<QWidget*>(QStringLiteral("m_groupBox_viewOptions"));
+    auto* pLightBox = view.findChild<QWidget*>(QStringLiteral("m_groupBox_lightOptions"));
+    QVERIFY(pTree);
+    QVERIFY(pViewBox);
+    QVERIFY(pLightBox);
+    QVERIFY(!pTree->isHidden());
+    QVERIFY(pViewBox->isHidden());
+    QVERIFY(pLightBox->isHidden());
+
+    view.setFlags({QStringLiteral("View"), QStringLiteral("Light")});
+    QVERIFY(pTree->isHidden());
+    QVERIFY(!pViewBox->isHidden());
+    QVERIFY(!pLightBox->isHidden());
+
+    QSignalSpy fullSpy(&view, &Control3DView::showFullScreen);
+    QSignalSpy rotSpy(&view, &Control3DView::rotationChanged);
+    QSignalSpy axisSpy(&view, &Control3DView::showCoordAxis);
+    QSignalSpy shotSpy(&view, &Control3DView::takeScreenshotChanged);
+    QSignalSpy singleSpy(&view, &Control3DView::toggleSingleView);
+    QSignalSpy multiSpy(&view, &Control3DView::toggleMutiview);
+    QSignalSpy intensitySpy(&view, &Control3DView::lightIntensityChanged);
+    view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_showFullScreen"))->click();
+    view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_rotate"))->click();
+    view.findChild<QCheckBox*>(QStringLiteral("m_checkBox_coordAxis"))->click();
+    view.findChild<QPushButton*>(QStringLiteral("m_pushButton_takeScreenshot"))->click();
+    QTest::mousePress(view.findChild<QRadioButton*>(QStringLiteral("m_radioButton_multi")), Qt::LeftButton);
+    QTest::mousePress(view.findChild<QRadioButton*>(QStringLiteral("m_radioButton_single")), Qt::LeftButton);
+    auto* pIntensity = view.findChild<QDoubleSpinBox*>(QStringLiteral("m_doubleSpinBox_colorIntensity"));
+    pIntensity->setValue(pIntensity->value() + pIntensity->singleStep());
+    QCOMPARE(fullSpy.count(), 1);
+    QCOMPARE(rotSpy.count(), 1);
+    QCOMPARE(axisSpy.count(), 1);
+    QCOMPARE(shotSpy.count(), 1);
+    QCOMPARE(multiSpy.count(), 1);
+    QCOMPARE(singleSpy.count(), 1);
+    QCOMPARE(intensitySpy.count(), 1);
+    QCOMPARE(intensitySpy.last().at(0).toDouble(), pIntensity->value());
+
+    // Color pickers stream the color while choosing and keep the accepted one
+    auto pickColor = [](const QColor& color, bool bAccept) {
+        answerNextModal([color, bAccept](QWidget* pModal) {
+            auto* pDialog = qobject_cast<QColorDialog*>(pModal);
+            QVERIFY(pDialog);
+            pDialog->setCurrentColor(color);
+            if (bAccept) {
+                static_cast<QDialog*>(pDialog)->accept();
+            } else {
+                static_cast<QDialog*>(pDialog)->reject();
+            }
+        });
+    };
+    QSignalSpy sceneSpy(&view, &Control3DView::sceneColorChanged);
+    QSignalSpy lightSpy(&view, &Control3DView::lightColorChanged);
+    auto* pScene = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_sceneColorPicker"));
+    auto* pLight = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_lightColorPicker"));
+    pickColor(QColor(20, 40, 60), true);
+    pScene->click();
+    QCOMPARE(sceneSpy.last().at(0).value<QColor>(), QColor(20, 40, 60));
+    QVERIFY(pScene->styleSheet().contains(QStringLiteral("rgb(20, 40, 60)")));
+    pickColor(QColor(200, 100, 50), true);
+    pLight->click();
+    QCOMPARE(lightSpy.last().at(0).value<QColor>(), QColor(200, 100, 50));
+    QVERIFY(pLight->styleSheet().contains(QStringLiteral("rgb(200, 100, 50)")));
+
+
+    // Data tree: header toggle and confirmed removal through the context menu
+    view.setFlags({QStringLiteral("Data")});
+    QStandardItemModel model(0, 2);
+    model.appendRow({new QStandardItem(QStringLiteral("lh.pial")), new QStandardItem(QStringLiteral("left"))});
+    model.appendRow({new QStandardItem(QStringLiteral("rh.pial")), new QStandardItem(QStringLiteral("right"))});
+    view.setModel(&model);
+    QStyledItemDelegate delegate;
+    view.setDelegate(&delegate);
+    QCOMPARE(pTree->itemDelegate(), &delegate);
+    QVERIFY(!pTree->isHeaderHidden());
+    QCoreApplication::processEvents();
+    auto contextAction = [&view, pTree](const QString& sText) {
+        emit pTree->customContextMenuRequested(pTree->visualRect(pTree->model()->index(1, 0)).center());
+        QPointer<QMenu> pMenu = view.findChildren<QMenu*>().last();
+        for (QAction* pAction : pMenu->actions()) {
+            if (pAction->text() == sText) {
+                pAction->trigger();
+                break;
+            }
+        }
+        if (pMenu) {
+            pMenu->close();
+        }
+    };
+    contextAction(QStringLiteral("Toggle header"));
+    QVERIFY(pTree->isHeaderHidden());
+    contextAction(QStringLiteral("Toggle header"));
+    QVERIFY(!pTree->isHeaderHidden());
+    clickNextMessageBoxButton(QStringLiteral("No"));
+    contextAction(QStringLiteral("Remove"));
+    QCOMPARE(model.rowCount(), 2);
+    clickNextMessageBoxButton(QStringLiteral("Yes"));
+    contextAction(QStringLiteral("Remove"));
+    QCOMPARE(model.rowCount(), 1);
+    QCOMPARE(model.item(0)->text(), QStringLiteral("lh.pial"));
+
+    view.onTreeViewDescriptionHide();
+    QVERIFY(pTree->isColumnHidden(1));
+    view.onTreeViewDescriptionHide();
+    QVERIFY(!pTree->isColumnHidden(1));
 }
 
 //=============================================================================================================
