@@ -494,8 +494,11 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     QCOMPARE(eegCount, 1);
     QCOMPARE(eegKey, QStringLiteral("bem_head"));
     QVERIFY(mapping && mapping->rows() == scalp.rows() && mapping->cols() == pick.size());
+    // The file's own bad channels (EEG 053) are left out, as in SensorFieldMapper and MNE-Python
+    QVERIFY(!evoked.info.bads.isEmpty());
     for (int k : pick) {
         QCOMPARE(evoked.info.chs[k].kind, FIFFV_EEG_CH);
+        QVERIFY(!evoked.info.bads.contains(evoked.info.chs[k].ch_name));
     }
 
     // Channels passed as bad are left out
