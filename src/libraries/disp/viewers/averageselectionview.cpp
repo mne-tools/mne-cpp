@@ -243,6 +243,10 @@ void AverageSelectionView::onAverageSelectionColorChanged()
         QString sObjectName = button->objectName();
 
         QColor color = QColorDialog::getColor(m_qMapAverageColor->value(sObjectName), this, "Set average color");
+        // Cancelled: getColor() returns an invalid colour
+        if (!color.isValid()) {
+            return;
+        }
 
         if (button) {
             QPalette palette(QPalette::Button, color);

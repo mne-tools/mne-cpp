@@ -1720,7 +1720,7 @@ void TestDispViewers2::averageSelectionView_lifecycle()
     QCOMPARE(activationSpy.size(), 1);
     QVERIFY(activation->value(QStringLiteral("vis")));
 
-    // Picking a colour stores it
+    // Picking a colour stores it; cancelling the dialog keeps the old one
     QSignalSpy colorSpy(view.get(), &AverageSelectionView::newAverageColorMap);
     auto* visButton = view->findChild<QPushButton*>(QStringLiteral("vis"));
     answerNextModal([](QWidget* pModal) {
@@ -1728,6 +1728,14 @@ void TestDispViewers2::averageSelectionView_lifecycle()
         QVERIFY(pDialog);
         pDialog->setCurrentColor(QColor(10, 200, 30));
         static_cast<QDialog*>(pDialog)->accept();
+    });
+    visButton->click();
+    QCOMPARE(colors->value(QStringLiteral("vis")), QColor(10, 200, 30));
+    QCOMPARE(colorSpy.size(), 1);
+    answerNextModal([](QWidget* pModal) {
+        auto* pDialog = qobject_cast<QColorDialog*>(pModal);
+        QVERIFY(pDialog);
+        static_cast<QDialog*>(pDialog)->reject();
     });
     visButton->click();
     QCOMPARE(colors->value(QStringLiteral("vis")), QColor(10, 200, 30));
