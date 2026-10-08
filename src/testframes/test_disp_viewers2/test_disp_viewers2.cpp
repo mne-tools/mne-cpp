@@ -443,6 +443,12 @@ private slots:
 
     //=========================================================================================================
     /**
+     * Verifies DipoleFitView parameter signals, the requested parameter set, model lists and the fit name.
+     */
+    void dipoleFitView_paramsModelsAndFit();
+
+    //=========================================================================================================
+    /**
      * Verifies that Control3DView constructs headlessly and basic setters
      * do not crash.
      */
@@ -2799,6 +2805,107 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     view.takeScreenshot(shot);
     QVERIFY(QFile::exists(shot));
     QFile::remove(shot);
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::dipoleFitView_paramsModelsAndFit()
+{
+    DipoleFitView view;
+    auto spin = [&view](const char* name) {
+        return view.findChild<QSpinBox*>(QLatin1String(name));
+    };
+    auto dspin = [&view](const char* name) {
+        return view.findChild<QDoubleSpinBox*>(QLatin1String(name));
+    };
+
+    // Each control reports its whole parameter group
+    QSignalSpy timeSpy(&view, &DipoleFitView::timeChanged);
+    QSignalSpy baselineSpy(&view, &DipoleFitView::baselineChanged);
+    QSignalSpy modalitySpy(&view, &DipoleFitView::modalityChanged);
+    QSignalSpy fittingSpy(&view, &DipoleFitView::fittingChanged);
+    QSignalSpy noiseSpy(&view, &DipoleFitView::noiseChanged);
+    QSignalSpy regSpy(&view, &DipoleFitView::regChanged);
+    QSignalSpy sphereSpy(&view, &DipoleFitView::sphereChanged);
+    spin("spinBox_tmin")->setValue(10);
+    spin("spinBox_tmax")->setValue(120);
+    spin("spinBox_tstep")->setValue(5);
+    spin("spinBox_tint")->setValue(2);
+    QCOMPARE(timeSpy.count(), 4);
+    QCOMPARE(timeSpy.last(), (QList<QVariant>{10, 120, 5, 2}));
+
+    spin("spinBox_bmin")->setValue(-100);
+    spin("spinBox_bmax")->setValue(-20);
+    QCOMPARE(baselineSpy.last(), (QList<QVariant>{-100, -20}));
+    spin("spinBox_bmax")->setValue(-100);
+    QCOMPARE(baselineSpy.last(), (QList<QVariant>{1000000, 1000000}));
+    spin("spinBox_bmax")->setValue(-20);
+
+    view.findChild<QCheckBox*>(QStringLiteral("checkBox_EEG"))->setChecked(false);
+    view.findChild<QCheckBox*>(QStringLiteral("checkBox_MEG"))->setChecked(true);
+    QCOMPARE(modalitySpy.last(), (QList<QVariant>{false, true}));
+
+    dspin("doubleSpinBox_dist")->setValue(7.0);
+    dspin("doubleSpinBox_grid")->setValue(9.0);
+    QCOMPARE(fittingSpy.last(), (QList<QVariant>{7.0, 9.0}));
+    dspin("doubleSpinBox_gradnoise")->setValue(4.0);
+    dspin("doubleSpinBox_magnoise")->setValue(30.0);
+    dspin("doubleSpinBox_eegnoise")->setValue(0.4);
+    QCOMPARE(noiseSpy.last(), (QList<QVariant>{4.0, 30.0, 0.4}));
+    dspin("doubleSpinBox_gradreg")->setValue(0.2);
+    dspin("doubleSpinBox_magreg")->setValue(0.3);
+    dspin("doubleSpinBox_eegreg")->setValue(0.4);
+    QCOMPARE(regSpy.last(), (QList<QVariant>{0.2, 0.3, 0.4}));
+    dspin("doubleSpinBox_orgx")->setValue(1.0);
+    dspin("doubleSpinBox_orgy")->setValue(2.0);
+    dspin("doubleSpinBox_orgz")->setValue(40.0);
+    dspin("doubleSpinBox_rad")->setValue(80.0);
+    QCOMPARE(sphereSpy.last(), (QList<QVariant>{1.0, 2.0, 40.0, 80.0}));
+
+    // Requesting the parameters repeats exactly what the controls reported
+    const QList<QSignalSpy*> spies = {&timeSpy, &baselineSpy, &modalitySpy, &fittingSpy, &noiseSpy, &regSpy, &sphereSpy};
+    QList<QList<QVariant>> lastReported;
+    for (QSignalSpy* pSpy : spies) {
+        lastReported << pSpy->last();
+        pSpy->clear();
+    }
+    view.requestParams();
+    for (int i = 0; i < spies.size(); ++i) {
+        QCOMPARE(spies.at(i)->count(), 1);
+        if (spies.at(i) != &baselineSpy) {
+            QCOMPARE(spies.at(i)->last(), lastReported.at(i));
+        }
+    }
+
+    // Model lists; the measurement selection derives the fit name
+    QSignalSpy measSpy(&view, &DipoleFitView::selectedMeas);
+    QSignalSpy bemSpy(&view, &DipoleFitView::selectedBem);
+    QSignalSpy fitSpy(&view, &DipoleFitView::performDipoleFit);
+    auto* pMeas = view.findChild<QComboBox*>(QStringLiteral("comboBox_meas"));
+    auto* pBem = view.findChild<QComboBox*>(QStringLiteral("comboBox_bem"));
+    auto* pName = view.findChild<QLineEdit*>(QStringLiteral("lineEdit_name"));
+    view.addMeas(QStringLiteral("sample_audvis-ave.fif"));
+    view.addBem(QStringLiteral("sample-5120-bem-sol.fif"));
+    view.addMri(QStringLiteral("all-trans.fif"));
+    view.addNoise(QStringLiteral("sample_audvis-cov.fif"));
+    pMeas->setCurrentIndex(1);
+    QCOMPARE(measSpy.last().at(0).toString(), QStringLiteral("sample_audvis-ave.fif"));
+    QVERIFY(pName->text().startsWith(QStringLiteral("Dipole Fit - sample_audvis - ")));
+    pBem->setCurrentIndex(1);
+    QCOMPARE(bemSpy.last().at(0).toString(), QStringLiteral("sample-5120-bem-sol.fif"));
+    view.findChild<QPushButton*>(QStringLiteral("pushButton_fit"))->click();
+    QCOMPARE(fitSpy.last().at(0).toString(), pName->text());
+
+    view.removeModel(QStringLiteral("sample-5120-bem-sol.fif"), 2);
+    QCOMPARE(pBem->findText(QStringLiteral("sample-5120-bem-sol.fif")), -1);
+    view.removeModel(QStringLiteral("all-trans.fif"), 3);
+    view.removeModel(QStringLiteral("sample_audvis-cov.fif"), 4);
+    view.removeModel(QStringLiteral("sample_audvis-ave.fif"), 1);
+    QCOMPARE(pMeas->count(), 1);
+    view.removeModel(QStringLiteral("x"), 9);
+    view.clearView();
+    QCOMPARE(pMeas->count(), 0);
+    QVERIFY(pName->text().isEmpty());
 }
 
 //=============================================================================================================
