@@ -2945,6 +2945,9 @@ void TestDispViewers2::control3dView_flagsSignalsAndTree()
     contextAction(QStringLiteral("Remove"));
     QCOMPARE(model.rowCount(), 1);
     QCOMPARE(model.item(0)->text(), QStringLiteral("lh.pial"));
+    // A closed context menu does not stay alive
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    QCOMPARE(view.findChildren<QMenu*>().size(), 0);
 
     view.onTreeViewDescriptionHide();
     QVERIFY(pTree->isColumnHidden(1));

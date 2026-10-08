@@ -267,6 +267,7 @@ void Control3DView::onCustomContextMenuRequested(QPoint pos)
 {
     //create custom context menu and actions
     QMenu* menu = new QMenu(this);
+    menu->setAttribute(Qt::WA_DeleteOnClose);
 
     // Hide header
     QAction* pHideHeader = menu->addAction(tr("Toggle header"));
