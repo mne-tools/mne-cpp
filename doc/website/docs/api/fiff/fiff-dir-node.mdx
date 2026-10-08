@@ -257,6 +257,23 @@ Get textual explanation of a tag.
 
 ---
 
+### get_unit_name(unit)
+
+Get the SI symbol of a FIFF unit, e.g.
+
+"T" for FIFF_UNIT_T, "T/m" for FIFF_UNIT_T_M.
+
+**Parameters:**
+
+- **unit** : *int*
+  FIFF unit (FIFF_UNIT_*).
+
+**Returns:**
+
+- *const char ** — The symbol, or "NA" for FIFF_UNIT_NONE and unknown units (as in MNE-Python).
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)

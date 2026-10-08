@@ -562,6 +562,10 @@ void TestFiffStreamPython::printsDirectoryTree()
     QVERIFY(g_messages.contains(QStringLiteral("203 = %1").arg(QString::fromLatin1(FiffDirNode::get_tag_explanation(FIFF_CH_INFO)))));
     QVERIFY(g_messages.contains(QStringLiteral(" [36]\n")));
     QCOMPARE(QString::fromLatin1(FiffDirNode::get_tag_explanation(-5)), QStringLiteral("unknown"));
+    QCOMPARE(QString::fromLatin1(FiffDirNode::get_unit_name(FIFF_UNIT_T)), QStringLiteral("T"));
+    QCOMPARE(QString::fromLatin1(FiffDirNode::get_unit_name(FIFF_UNIT_T_M)), QStringLiteral("T/m"));
+    QCOMPARE(QString::fromLatin1(FiffDirNode::get_unit_name(FIFF_UNIT_V)), QStringLiteral("V"));
+    QCOMPARE(QString::fromLatin1(FiffDirNode::get_unit_name(FIFF_UNIT_NONE)), QStringLiteral("NA"));
     g_messages.clear();
     qInstallMessageHandler(collectMessages);
     FiffDirNode::explain(-5);

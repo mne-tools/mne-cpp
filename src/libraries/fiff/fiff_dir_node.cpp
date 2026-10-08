@@ -291,6 +291,17 @@ const char* FiffDirNode::get_tag_explanation(int kind)
 
 //=============================================================================================================
 
+const char* FiffDirNode::get_unit_name(int unit)
+{
+    for (int k = 0; _fiff_unit_explanations[k].kind >= 0; k++) {
+        if (_fiff_unit_explanations[k].kind == unit)
+            return _fiff_unit_explanations[k].text;
+    }
+    return "NA";
+}
+
+//=============================================================================================================
+
 fiff_int_t FiffDirNode::nent() const
 {
     return dir.size();

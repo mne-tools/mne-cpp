@@ -227,6 +227,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Get the SI symbol of a FIFF unit, e.g. "T" for FIFF_UNIT_T, "T/m" for FIFF_UNIT_T_M.
+     *
+     * @param[in] unit   FIFF unit (FIFF_UNIT_*).
+     *
+     * @return The symbol, or "NA" for FIFF_UNIT_NONE and unknown units (as in MNE-Python).
+     */
+    static const char* get_unit_name(int unit);
+
+    //=========================================================================================================
+    /**
      * Returns the number of entries in this node
      *
      * @return Number of entries in this node.

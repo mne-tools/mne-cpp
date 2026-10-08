@@ -258,10 +258,7 @@ static FiffExplainEntry _fiff_block_explanations[] = {
 
 //=============================================================================================================
 
-// Reference tables kept alongside the tag and block explanations for
-// completeness. Nothing consumes them yet, so they are marked maybe_unused to
-// stay in the header without tripping -Wunused-variable in every translation
-// unit that includes it.
+// Unit tables; marked maybe_unused because not every translation unit that includes this header reads them.
 [[maybe_unused]] static FiffExplainEntry _fiff_unit_explanations[] = {
     /*
    * SI base units
