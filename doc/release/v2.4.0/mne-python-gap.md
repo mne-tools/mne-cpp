@@ -8,11 +8,11 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **183**
-- Partial: **85**
-- Missing: **167**
+- Implemented: **185**
+- Partial: **84**
+- Missing: **166**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **51.8%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **52.2%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -21,7 +21,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Domain | Implemented | Partial | Missing | N/A | Total |
 |---|---:|---:|---:|---:|---:|
 | I/O & Readers | 18 | 2 | 39 | 0 | 59 |
-| Core Data Containers | 38 | 14 | 6 | 3 | 61 |
+| Core Data Containers | 40 | 13 | 5 | 3 | 61 |
 | Preprocessing & Artifacts | 10 | 8 | 24 | 1 | 43 |
 | Channels & Montages | 10 | 9 | 22 | 1 | 42 |
 | Epochs & Evoked | 12 | 2 | 2 | 0 | 16 |
@@ -88,7 +88,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
-| `mne.channel_indices_by_type` | partial | FiffInfoBase::pick_types, channel_type | per-type picks only; no type→indices dict |
 | `mne.compute_proj_raw` | partial | FIFFLIB::FiffProj::compute_from_raw | event-locked epochs only; no continuous segmenting |
 | `mne.compute_rank` | partial | MATHLIB::Linalg::rank | matrix rank; no per-type/info/SSP handling |
 | `mne.get_volume_labels_from_aseg` | partial | FSLIB::FsAtlasLookup::load | loads aseg; no listing of present labels |
@@ -104,7 +103,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.write_label` | partial | writeLabel | tool-private writer; FsLabel has no write |
 | `mne.BiHemiLabel` | missing | — | FsLabel is deliberately single-hemisphere (src/libraries/fs/fs_label.h:170) |
 | `mne.compute_proj_evoked` | missing | — | mne_cov2proj works on covariance, not evoked |
-| `mne.pick_channels_regexp` | missing | — | no regex channel picking |
 | `mne.random_parcellation` | missing | — | random parcellation not ported |
 | `mne.read_lta` | missing | — | FreeSurfer LTA transform reader not ported |
 | `mne.write_labels_to_annot` | missing | — | no .annot writer |
@@ -357,5 +355,5 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 ## Already implemented (do not re-implement)
 
-183 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
+185 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
 

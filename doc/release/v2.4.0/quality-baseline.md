@@ -18,9 +18,9 @@ Coverage from `733eaa5de` (https://github.com/mne-tools/mne-cpp/actions/runs/379
 | G4 | Documentation images generated in CI | 19 referenced, 0 without producer, placeholders in 0 workflows | met |
 | G4 | Visual regression compares to goldens | 19 golden comparisons | met |
 | G5 | Zero compiler warnings | enforced by -Werror on every matrix entry | met |
-| G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 419, raw_new 169, raw_delete 275, console_io 356, numeric_define 834, qt_new_unparented 819, oversized_unit 8 | baseline recorded |
+| G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 419, raw_new 169, raw_delete 275, console_io 356, numeric_define 852, qt_new_unparented 819, oversized_unit 8 | baseline recorded |
 | G6 | Pinned reference environment | MNE-Python 1.11.0; unpinned in CI: none | met |
-| G6 | Parity claims cross-validated | cross-validated-static 86, cross-validated-live 2, tested 235, unverified 6 | **open** |
+| G6 | Parity claims cross-validated | cross-validated-static 89, cross-validated-live 2, tested 233, unverified 6 | **open** |
 
 Detailed reports: [test inventory](test-inventory.md), [coverage](coverage-baseline.md), [API evidence](api-evidence-baseline.md), [visual](visual-baseline.md), [maintainability](maintainability-baseline.md), [parity evidence](parity-baseline.md), [MNE-Python gap](mne-python-gap.md).
 

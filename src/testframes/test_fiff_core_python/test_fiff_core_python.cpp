@@ -232,6 +232,7 @@ private slots:
     void transSet_headToMniMatchesPython();
     void events_matchPython();
     void eventUtilities_matchPython();
+    void channelTypes_matchPython();
 
     void sparse_createAndConvert();
 };
@@ -1096,6 +1097,46 @@ void TestFiffCorePython::eventUtilities_matchPython()
     QCOMPARE(fixed.events.topRows(2), rows({{0, 0, 1}, {991, 0, 1}}));
     QCOMPARE(fixed.events.bottomRows(1), rows({{4955, 0, 1}}));
     QVERIFY(FiffEvents::make_fixed_length(*m_raw, 1, 0.0, -1.0, 1.0, true, 1.0).is_empty());
+}
+
+//=============================================================================================================
+
+void TestFiffCorePython::channelTypes_matchPython()
+{
+    // data/channel-types-raw.fif: one channel of every type mne.create_info knows; reference values produced by
+    // mne.channel_type (make_channel_types_fixture.py)
+    const QStringList expected{"grad", "mag", "ref_meg", "eeg", "seeg", "dbs", "ecog", "eog", "emg", "ecg", "resp", "bio",
+                               "misc", "stim", "exci", "syst", "ias", "gof", "dipole", "chpi", "fnirs_cw_amplitude",
+                               "fnirs_fd_ac_amplitude", "fnirs_fd_phase", "fnirs_td_gated_amplitude", "fnirs_td_moments_intensity",
+                               "fnirs_td_moments_mean", "fnirs_td_moments_variance", "fnirs_od", "hbo", "hbr", "csd", "temperature",
+                               "gsr", "eyegaze", "pupil"};
+    QFile file(QStringLiteral(FIFF_CORE_DATA_DIR "/channel-types-raw.fif"));
+    const FiffRawData raw(file);
+    QCOMPARE(raw.info.chs.size(), expected.size());
+    for (int k = 0; k < expected.size(); ++k) {
+        QCOMPARE(raw.info.channel_type(k), expected[k]);
+    }
+    FiffInfo info = raw.info;
+    QCOMPARE(info.get_channel_types(), expected);
+    // The intracranial kinds MNE-CPP writes are the FIFF ones mne-python reads
+    QCOMPARE(raw.info.chs[4].kind, FIFFV_SEEG_CH);
+    QCOMPARE(raw.info.chs[5].kind, FIFFV_DBS_CH);
+    QCOMPARE(raw.info.chs[6].kind, FIFFV_ECOG_CH);
+
+    // mne.channel_indices_by_type: every type with its channel indices, empty types included
+    const QMap<QString, QList<int>> byType = raw.info.channel_indices_by_type();
+    QCOMPARE(byType.value(QStringLiteral("seeg")), QList<int>{4});
+    QCOMPARE(byType.value(QStringLiteral("hbr")), QList<int>{29});
+    QVERIFY(byType.contains(QStringLiteral("mag")));
+    const QMap<QString, QList<int>> megOnly = raw.info.channel_indices_by_type({0, 1, 2});
+    QCOMPARE(megOnly.value(QStringLiteral("grad")), QList<int>{0});
+    QCOMPARE(megOnly.value(QStringLiteral("ref_meg")), QList<int>{2});
+    QVERIFY(megOnly.value(QStringLiteral("eeg")).isEmpty());
+
+    // mne.pick_channels_regexp matches from the start of the name
+    QCOMPARE(FiffInfoBase::pick_channels_regexp(raw.info.ch_names, QStringLiteral("CH1[0-2]")), RowVectorXi::LinSpaced(3, 10, 12));
+    QCOMPARE(FiffInfoBase::pick_channels_regexp(raw.info.ch_names, QStringLiteral("H0")).size(), Index(0));
+    QCOMPARE(FiffInfoBase::pick_channels_regexp(m_raw->info.ch_names, QStringLiteral("MEG ?01[1-2]")), RowVectorXi::LinSpaced(6, 0, 5));
 }
 
 //=============================================================================================================

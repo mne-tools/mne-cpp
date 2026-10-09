@@ -9,9 +9,9 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 183,
-      "partial": 85,
-      "missing": 167,
+      "implemented": 185,
+      "partial": 84,
+      "missing": 166,
       "not-applicable": 8
     },
     "by_domain": {
@@ -22,9 +22,9 @@
         "not-applicable": 0
       },
       "core": {
-        "implemented": 38,
-        "partial": 14,
-        "missing": 6,
+        "implemented": 40,
+        "partial": 13,
+        "missing": 5,
         "not-applicable": 3
       },
       "preprocessing": {
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 51.8
+    "parity_percent": 52.2
   },
   "apis": [
     {
@@ -871,13 +871,24 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.channel_indices_by_type",
+      "name": "channel_indices_by_type",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "implemented",
+      "mne_cpp": "FiffInfoBase::channel_indices_by_type",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.channel_type",
       "name": "channel_type",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB::FiffInfoBase::channel_type",
+      "mne_cpp": "FiffInfoBase::channel_type",
       "note": "",
       "evidence": "parity-record"
     },
@@ -999,6 +1010,17 @@
       "domain": "core",
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::pick_channels",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.pick_channels_regexp",
+      "name": "pick_channels_regexp",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "implemented",
+      "mne_cpp": "FiffInfoBase::pick_channels_regexp",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1190,17 +1212,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.channel_indices_by_type",
-      "name": "channel_indices_by_type",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "partial",
-      "mne_cpp": "FiffInfoBase::pick_types, channel_type",
-      "note": "per-type picks only; no type→indices dict",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.compute_proj_raw",
       "name": "compute_proj_raw",
       "submodule": "(top-level)",
@@ -1363,17 +1374,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "mne_cov2proj works on covariance, not evoked",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.pick_channels_regexp",
-      "name": "pick_channels_regexp",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "no regex channel picking",
       "evidence": "parity-record"
     },
     {

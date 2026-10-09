@@ -25,6 +25,8 @@
 #include <iostream>
 
 #include <QFile>
+#include <QHash>
+#include <QRegularExpression>
 #include <QTextStream>
 #include <QDebug>
 
@@ -69,31 +71,81 @@ FiffInfoBase::~FiffInfoBase()
 
 //=============================================================================================================
 
+namespace
+{
+
+/** mne-python's channel type name for @p ch, or an empty string for a kind outside the standard. */
+QString channelTypeName(const FiffChInfo& ch)
+{
+    // mne-python's _first_rule (by kind) refined by _second_rules (MEG by unit, EEG/fNIRS/eye tracking by coil type)
+    static const QHash<int, QString> byKind{
+        {FIFFV_REF_MEG_CH, "ref_meg"}, {FIFFV_STIM_CH, "stim"}, {FIFFV_EOG_CH, "eog"}, {FIFFV_EMG_CH, "emg"}, {FIFFV_ECG_CH, "ecg"}, {FIFFV_RESP_CH, "resp"}, {FIFFV_MISC_CH, "misc"}, {FIFFV_EXCI_CH, "exci"}, {FIFFV_IAS_CH, "ias"}, {FIFFV_SYST_CH, "syst"}, {FIFFV_SEEG_CH, "seeg"}, {FIFFV_DBS_CH, "dbs"}, {FIFFV_BIO_CH, "bio"}, {FIFFV_DIPOLE_WAVE_CH, "dipole"}, {FIFFV_GOODNESS_FIT_CH, "gof"}, {FIFFV_ECOG_CH, "ecog"}, {FIFFV_TEMPERATURE_CH, "temperature"}, {FIFFV_GALVANIC_CH, "gsr"}};
+    static const QHash<int, QString> eegByCoil{
+        {FIFFV_COIL_EEG, "eeg"}, {FIFFV_COIL_EEG_BIPOLAR, "eeg"}, {FIFFV_COIL_NONE, "eeg"}, {FIFFV_COIL_EEG_CSD, "csd"}};
+    static const QHash<int, QString> fnirsByCoil{
+        {FIFFV_COIL_FNIRS_HBO, "hbo"}, {FIFFV_COIL_FNIRS_HBR, "hbr"}, {FIFFV_COIL_FNIRS_CW_AMPLITUDE, "fnirs_cw_amplitude"}, {FIFFV_COIL_FNIRS_FD_AC_AMPLITUDE, "fnirs_fd_ac_amplitude"}, {FIFFV_COIL_FNIRS_FD_PHASE, "fnirs_fd_phase"}, {FIFFV_COIL_FNIRS_OD, "fnirs_od"}, {FIFFV_COIL_FNIRS_TD_GATED_AMPLITUDE, "fnirs_td_gated_amplitude"}, {FIFFV_COIL_FNIRS_TD_MOMENTS_INTENSITY, "fnirs_td_moments_intensity"}, {FIFFV_COIL_FNIRS_TD_MOMENTS_MEAN, "fnirs_td_moments_mean"}, {FIFFV_COIL_FNIRS_TD_MOMENTS_VARIANCE, "fnirs_td_moments_variance"}};
+    static const QHash<int, QString> eyetrackByCoil{{FIFFV_COIL_EYETRACK_POS, "eyegaze"}, {FIFFV_COIL_EYETRACK_PUPIL, "pupil"}};
+
+    const auto refine = [](const QHash<int, QString>& rule, int key) {
+        return rule.value(key);
+    };
+    if (ch.kind == FIFFV_MEG_CH)
+        return refine({{FIFF_UNIT_T_M, "grad"}, {FIFF_UNIT_T, "mag"}}, ch.unit);
+    if (ch.kind == FIFFV_EEG_CH)
+        return refine(eegByCoil, ch.chpos.coil_type);
+    if (ch.kind == FIFFV_FNIRS_CH)
+        return refine(fnirsByCoil, ch.chpos.coil_type);
+    if (ch.kind == FIFFV_EYETRACK_CH)
+        return refine(eyetrackByCoil, ch.chpos.coil_type);
+    if (FIFFM_QUAT_CH(ch.kind))
+        return "chpi"; // channels relative to head position monitoring
+    return refine(byKind, ch.kind);
+}
+
+} // namespace
+
+//=============================================================================================================
+
 QString FiffInfoBase::channel_type(qint32 idx) const
 {
-    qint32 kind = this->chs[idx].kind;
-    if (kind == FIFFV_MEG_CH) {
-        if (this->chs[idx].unit == FIFF_UNIT_T_M)
-            return "grad";
-        else if (this->chs[idx].unit == FIFF_UNIT_T)
-            return "mag";
-    } else if (kind == FIFFV_REF_MEG_CH)
-        return "ref_meg";
-    else if (kind == FIFFV_EEG_CH)
-        return "eeg";
-    else if (kind == FIFFV_STIM_CH)
-        return "stim";
-    else if (kind == FIFFV_EOG_CH)
-        return "eog";
-    else if (kind == FIFFV_EMG_CH)
-        return "emg";
-    else if (kind == FIFFV_ECG_CH)
-        return "ecg";
-    else if (kind == FIFFV_MISC_CH)
-        return "misc";
-    else if (kind == FIFFV_QUAT_0 || kind == FIFFV_QUAT_1 || kind == FIFFV_QUAT_2 || kind == FIFFV_QUAT_3 || kind == FIFFV_QUAT_4 || kind == FIFFV_QUAT_5 || kind == FIFFV_QUAT_6 || kind == FIFFV_HPI_G || kind == FIFFV_HPI_ERR || kind == FIFFV_HPI_MOV)
-        return "chpi"; // channels relative to head position monitoring
-    throw std::invalid_argument("Unknown channel type");
+    const QString type = channelTypeName(this->chs[idx]);
+    if (type.isEmpty())
+        throw std::invalid_argument("Unknown channel type for channel " + this->chs[idx].ch_name.toStdString());
+    return type;
+}
+
+//=============================================================================================================
+
+QMap<QString, QList<int>> FiffInfoBase::channel_indices_by_type(const QList<int>& picks) const
+{
+    QMap<QString, QList<int>> byType;
+    for (const char* type : {"grad", "mag", "ref_meg", "eeg", "csd", "seeg", "dbs", "ecog", "eog", "emg", "ecg", "resp", "bio",
+                             "misc", "stim", "exci", "syst", "ias", "gof", "dipole", "chpi", "temperature", "gsr", "hbo", "hbr",
+                             "fnirs_cw_amplitude", "fnirs_fd_ac_amplitude", "fnirs_fd_phase", "fnirs_od",
+                             "fnirs_td_gated_amplitude", "fnirs_td_moments_intensity", "fnirs_td_moments_mean",
+                             "fnirs_td_moments_variance", "eyegaze", "pupil"}) {
+        byType.insert(QString::fromLatin1(type), {});
+    }
+    const qsizetype count = picks.isEmpty() ? chs.size() : picks.size();
+    for (qsizetype k = 0; k < count; ++k) {
+        const int idx = picks.isEmpty() ? static_cast<int>(k) : picks[k];
+        byType[channel_type(idx)].append(idx);
+    }
+    return byType;
+}
+
+//=============================================================================================================
+
+RowVectorXi FiffInfoBase::pick_channels_regexp(const QStringList& ch_names, const QString& regexp)
+{
+    const QRegularExpression re(QRegularExpression::anchoredPattern(regexp + QStringLiteral(".*")),
+                                QRegularExpression::DotMatchesEverythingOption);
+    QList<int> sel;
+    for (int k = 0; k < ch_names.size(); ++k) {
+        if (re.match(ch_names[k]).hasMatch())
+            sel.append(k);
+    }
+    return Eigen::Map<const RowVectorXi>(sel.constData(), sel.size());
 }
 
 //=============================================================================================================
@@ -249,71 +301,11 @@ void FiffInfoBase::mne_read_meg_comp_eeg_ch_info(QList<FiffChInfo>& megp,
 QStringList FiffInfoBase::get_channel_types()
 {
     QStringList lChannelTypes;
-
-    for (int i = 0; i < chs.size(); ++i) {
-        switch (chs.at(i).kind) {
-            case FIFFV_MEG_CH: {
-                if (chs.at(i).unit == FIFF_UNIT_T_M) { //Gradiometers
-                    if (!lChannelTypes.contains("grad")) {
-                        lChannelTypes << "grad";
-                    }
-                } else if (chs.at(i).unit == FIFF_UNIT_T) { //Magnetometers
-                    if (!lChannelTypes.contains("mag")) {
-                        lChannelTypes << "mag";
-                    }
-                }
-                break;
-            }
-
-            case FIFFV_REF_MEG_CH: {
-                if (!lChannelTypes.contains("ref_meg")) {
-                    lChannelTypes << "ref_meg";
-                }
-                break;
-            }
-
-            case FIFFV_EEG_CH: { //EEG Channels
-                if (!lChannelTypes.contains("eeg")) {
-                    lChannelTypes << "eeg";
-                }
-                break;
-            }
-
-            case FIFFV_ECG_CH: { //ECG Channels
-                if (!lChannelTypes.contains("ecg")) {
-                    lChannelTypes << "ecg";
-                }
-                break;
-            }
-            case FIFFV_EMG_CH: { //EMG Channels
-                if (!lChannelTypes.contains("emg")) {
-                    lChannelTypes << "emg";
-                }
-                break;
-            }
-            case FIFFV_EOG_CH: { //EOG Channels
-                if (!lChannelTypes.contains("eog")) {
-                    lChannelTypes << "eog";
-                }
-                break;
-            }
-
-            case FIFFV_STIM_CH: { //STIM Channels
-                if (!lChannelTypes.contains("stim")) {
-                    lChannelTypes << "stim";
-                }
-                break;
-            }
-
-            case FIFFV_MISC_CH: { //MISC Channels
-                if (!lChannelTypes.contains("misc")) {
-                    lChannelTypes << "misc";
-                }
-                break;
-            }
-        }
+    for (const FiffChInfo& ch : chs) {
+        const QString type = channelTypeName(ch);
+        if (!type.isEmpty() && !lChannelTypes.contains(type))
+            lChannelTypes << type;
     }
-
     return lChannelTypes;
 }
 

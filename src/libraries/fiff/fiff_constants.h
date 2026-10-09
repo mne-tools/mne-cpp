@@ -271,21 +271,39 @@ namespace FIFFLIB
 #define FIFFV_EMG_CH 302
 #define FIFFV_ECG_CH 402
 #define FIFFV_MISC_CH 502
-#define FIFFV_RESP_CH 602 /**< Respiration monitoring*/
+#define FIFFV_RESP_CH 602         /**< Respiration monitoring*/
+#define FIFFV_BIO_CH 102          /**< Biological signal (e.g. GSR recorded as bio). */
+#define FIFFV_SYST_CH 900         /**< System status channel. */
+#define FIFFV_IAS_CH 910          /**< Internal active shielding data (Triux). */
+#define FIFFV_EXCI_CH 920         /**< Flux excitation channel. */
+#define FIFFV_FNIRS_CH 1100       /**< Functional near-infrared spectroscopy. */
+#define FIFFV_TEMPERATURE_CH 1200 /**< Temperature. */
+#define FIFFV_GALVANIC_CH 1300    /**< Galvanic skin response. */
+#define FIFFV_EYETRACK_CH 1400    /**< Eye tracking. */
 
 /*
- * Intracranial EEG channel types
+ * Intracranial EEG channel types (FIFF standard, as written by mne-python); their coil type is FIFFV_COIL_EEG
  */
-#define FIFFV_ECOG_CH 2001 /**< Electrocorticography (subdural grids/strips). */
-#define FIFFV_SEEG_CH 2002 /**< Stereoelectroencephalography (depth electrodes). */
-#define FIFFV_DBS_CH 2003  /**< Deep brain stimulation electrodes. */
+#define FIFFV_ECOG_CH 902 /**< Electrocorticography (subdural grids/strips). */
+#define FIFFV_SEEG_CH 802 /**< Stereoelectroencephalography (depth electrodes). */
+#define FIFFV_DBS_CH 803  /**< Deep brain stimulation electrodes. */
 
 /*
- * Coil types for intracranial EEG
+ * Coil types that distinguish EEG, fNIRS and eye-tracking channel types
  */
-#define FIFFV_COIL_EEG_ECOG 140 /**< ECoG electrode position in r0. */
-#define FIFFV_COIL_EEG_SEEG 150 /**< sEEG electrode position in r0. */
-#define FIFFV_COIL_EEG_DBS 160  /**< DBS electrode position in r0. */
+#define FIFFV_COIL_EEG_CSD 6                      /**< Current source density (surface Laplacian). */
+#define FIFFV_COIL_FNIRS_HBO 300                  /**< Oxyhaemoglobin. */
+#define FIFFV_COIL_FNIRS_HBR 301                  /**< Deoxyhaemoglobin. */
+#define FIFFV_COIL_FNIRS_CW_AMPLITUDE 302         /**< Continuous-wave amplitude. */
+#define FIFFV_COIL_FNIRS_OD 303                   /**< Optical density. */
+#define FIFFV_COIL_FNIRS_FD_AC_AMPLITUDE 304      /**< Frequency-domain AC amplitude. */
+#define FIFFV_COIL_FNIRS_FD_PHASE 305             /**< Frequency-domain phase. */
+#define FIFFV_COIL_FNIRS_TD_GATED_AMPLITUDE 306   /**< Time-domain gated amplitude. */
+#define FIFFV_COIL_FNIRS_TD_MOMENTS_INTENSITY 307 /**< Time-domain moments: intensity. */
+#define FIFFV_COIL_FNIRS_TD_MOMENTS_MEAN 308      /**< Time-domain moments: mean. */
+#define FIFFV_COIL_FNIRS_TD_MOMENTS_VARIANCE 309  /**< Time-domain moments: variance. */
+#define FIFFV_COIL_EYETRACK_POS 400               /**< Eye-tracking gaze position. */
+#define FIFFV_COIL_EYETRACK_PUPIL 401             /**< Eye-tracking pupil size. */
 
 /*
  * More of those defined in MNE

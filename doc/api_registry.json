@@ -11654,17 +11654,17 @@
       },
       {
         "python": "mne.channel_indices_by_type",
-        "status": "partial",
-        "mne_cpp": "FiffInfoBase::pick_types, channel_type",
-        "note": "per-type picks only; no type→indices dict",
-        "test": "test_fiff_info"
+        "status": "implemented",
+        "mne_cpp": "FiffInfoBase::channel_indices_by_type",
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.channel_type",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB::FiffInfoBase::channel_type",
+        "mne_cpp": "FiffInfoBase::channel_type",
         "note": "",
-        "test": "test_fiff_info"
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.channels.DigMontage",
@@ -12943,9 +12943,10 @@
       },
       {
         "python": "mne.pick_channels_regexp",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "no regex channel picking"
+        "status": "implemented",
+        "mne_cpp": "FiffInfoBase::pick_channels_regexp",
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.pick_events",

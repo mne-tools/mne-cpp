@@ -69,7 +69,7 @@
       "raw_new": 169,
       "raw_delete": 275,
       "console_io": 356,
-      "numeric_define": 834,
+      "numeric_define": 852,
       "qt_new_unparented": 819,
       "oversized_unit": 8
     },
@@ -78,16 +78,16 @@
       "unpinned_ci_packages": [],
       "inventoried_apis": 443,
       "by_status": {
-        "implemented": 183,
-        "partial": 85,
-        "missing": 167,
+        "implemented": 185,
+        "partial": 84,
+        "missing": 166,
         "not-applicable": 8
       },
-      "claims": 329,
+      "claims": 330,
       "claims_by_evidence": {
-        "cross-validated-static": 86,
+        "cross-validated-static": 89,
         "cross-validated-live": 2,
-        "tested": 235,
+        "tested": 233,
         "unverified": 6
       }
     }

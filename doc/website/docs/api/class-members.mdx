@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6260 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6262 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -454,6 +454,7 @@ Index of 6260 public class members (functions, variables, typedefs, enums) acros
 - **changeSelectedBem** `[signal]` in [CoregSettingsView](/docs/api/disp/coreg-settings-view) — Emit this signal whenever the selected Bem changed.
 - **changeStimChannel** `[signal]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
 - **channel** `[var]` in [BrainVisionMarker](/docs/api/bids/brain-vision-marker) — Channel number (0 = all channels).
+- **channel_indices_by_type** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Channel indices of each channel type, like mne.channel_indices_by_type.
 - **channel_type** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Get channel type.
 - **channelBadToggled** `[signal]` in [ChannelLabelPanel](/docs/api/disp/channel-label-panel)
 - **channelCount** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model)
@@ -3885,6 +3886,7 @@ Index of 6260 public class members (functions, variables, typedefs, enums) acros
 - **pick_channels** `[fn]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Reduces the data to the selected rows.
 - **pick_channels** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Reduces alld epochs to the selected rows.
 - **pick_channels** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — mne.fiff.pick_channels_forward
+- **pick_channels_regexp** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Indices of the channel names that match a regular expression from their start, like mne.pick_channels_regexp.
 - **pick_chs_omit** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Pick designated channels from this covariance matrix, optionally omitting MEG-EEG cross-correlations.
 - **pick_data** `[fn]` in [MNERawData](/docs/api/mne/mne-raw-data) — Extract raw data samples for selected channels (including derived channels) with compensation applied, zero-padding or edge-extending as needed at boundaries.
 - **pick_data_filt** `[fn]` in [MNERawData](/docs/api/mne/mne-raw-data) — Pick filtered data for a channel selection by loading filter buffers, applying the frequency-domain filter per channel (skipping stimulus channels), and accumulating overlapping results.

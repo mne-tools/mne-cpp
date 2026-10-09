@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1502,
-  "scanned_lines": 394598,
+  "scanned_lines": 394630,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -486,17 +486,17 @@
       }
     },
     "numeric_define": {
-      "total": 834,
+      "total": 852,
       "files": 31,
       "by_scope": {
         "applications": 69,
-        "libraries": 730,
+        "libraries": 748,
         "tools": 35
       },
       "suppressed": [],
       "top": {
         "src/libraries/fiff/fiff_file.h": 401,
-        "src/libraries/fiff/fiff_constants.h": 265,
+        "src/libraries/fiff/fiff_constants.h": 283,
         "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/rawsettings.h": 35,
         "src/applications/mne_scan/plugins/tmsi/tmsidriver.h": 24,
         "src/libraries/disp/viewers/helpers/bidsviewmodel.h": 13,
@@ -521,7 +521,7 @@
         "src/applications/mne_scan/plugins/writetofile/writetofile.h": 1,
         "src/libraries/disp/viewers/coregsettingsview.cpp": 1,
         "src/libraries/disp/viewers/helpers/bidsviewmodel.h": 13,
-        "src/libraries/fiff/fiff_constants.h": 265,
+        "src/libraries/fiff/fiff_constants.h": 283,
         "src/libraries/fiff/fiff_file.h": 401,
         "src/libraries/fiff/fiff_tag.h": 5,
         "src/libraries/inv/dipole_fit/inv_dipole_fit_data.cpp": 4,

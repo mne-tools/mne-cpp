@@ -96,7 +96,22 @@ Get channel type.
 
 **Returns:**
 
-- *QString* — Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg').
+- *QString* — Type of channel as in mne.channel_type ('grad', 'mag', 'eeg', 'seeg', 'ecog', 'hbo', 'eyegaze', ...).
+
+---
+
+### channel_indices_by_type(picks)
+
+Channel indices of each channel type, like mne.channel_indices_by_type.
+
+**Parameters:**
+
+- **picks** : *const QList&lt; int &gt; &*
+  Channels to classify (empty: all).
+
+**Returns:**
+
+- *QMap&lt; QString, QList&lt; int &gt; &gt;* — Every channel type mapped to the indices of its channels (empty lists for absent types).
 
 ---
 
@@ -225,11 +240,29 @@ Parses the channel info information and returns a string list of channel types.
 
 **Returns:**
 
-- *QStringList* — The channel types present in this fiff info (grad,mag,eeg,ecg,emg,misc,stim).
+- *QStringList* — The distinct channel types in channel order, as `channel_type()` names them (unknown kinds skipped).
 
 ---
 
 ## Static Methods
+
+### pick_channels_regexp(ch_names, regexp)
+
+Indices of the channel names that match a regular expression from their start, like mne.pick_channels_regexp.
+
+**Parameters:**
+
+- **ch_names** : *const QStringList &*
+  The channel names.
+
+- **regexp** : *const QString &*
+  The regular expression (Perl syntax).
+
+**Returns:**
+
+- *Eigen::RowVectorXi* — The selector (row vector).
+
+---
 
 ### pick_channels(ch_names, include, exclude)
 

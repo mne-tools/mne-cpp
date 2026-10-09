@@ -49,6 +49,7 @@
 //=============================================================================================================
 
 #include <QList>
+#include <QMap>
 #include <QStringList>
 #include <QSharedPointer>
 #include <memory>
@@ -125,9 +126,30 @@ public:
      *
      * @param[in] idx    Index of channel.
      *
-     * @return Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg').
+     * @return Type of channel as in mne.channel_type ('grad', 'mag', 'eeg', 'seeg', 'ecog', 'hbo', 'eyegaze', ...).
      */
     QString channel_type(qint32 idx) const;
+
+    //=========================================================================================================
+    /**
+     * Channel indices of each channel type, like mne.channel_indices_by_type.
+     *
+     * @param[in] picks  Channels to classify (empty: all).
+     *
+     * @return Every channel type mapped to the indices of its channels (empty lists for absent types).
+     */
+    QMap<QString, QList<int>> channel_indices_by_type(const QList<int>& picks = {}) const;
+
+    //=========================================================================================================
+    /**
+     * Indices of the channel names that match a regular expression from their start, like mne.pick_channels_regexp.
+     *
+     * @param[in] ch_names  The channel names.
+     * @param[in] regexp    The regular expression (Perl syntax).
+     *
+     * @return The selector (row vector).
+     */
+    static Eigen::RowVectorXi pick_channels_regexp(const QStringList& ch_names, const QString& regexp);
 
     //=========================================================================================================
     /**
@@ -243,7 +265,7 @@ public:
     /**
      * Parses the channel info information and returns a string list of channel types.
      *
-     * @return The channel types present in this fiff info (grad,mag,eeg,ecg,emg,misc,stim).
+     * @return The distinct channel types in channel order, as channel_type() names them (unknown kinds skipped).
      */
     QStringList get_channel_types();
 

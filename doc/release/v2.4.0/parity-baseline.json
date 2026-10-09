@@ -20,11 +20,11 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 329,
+    "claims": 330,
     "by_evidence": {
-      "cross-validated-static": 86,
+      "cross-validated-static": 89,
       "cross-validated-live": 2,
-      "tested": 235,
+      "tested": 233,
       "unverified": 6
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 77,
+        "cross-validated-static": 80,
         "cross-validated-live": 1,
-        "tested": 156,
+        "tested": 154,
         "unverified": 6
       }
     },
@@ -93,7 +93,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **51.8%",
+      "text": "parity: **52.2%",
       "status": "generated-with-denominator"
     }
   ],
@@ -980,19 +980,19 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FiffInfoBase::pick_types, channel_type",
+      "mne_cpp": "FiffInfoBase::channel_indices_by_type",
       "python": "mne.channel_indices_by_type",
-      "claimed": "partial",
-      "test": "test_fiff_info",
-      "evidence": "tested"
+      "claimed": "implemented",
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffInfoBase::channel_type",
+      "mne_cpp": "FiffInfoBase::channel_type",
       "python": "mne.channel_type",
       "claimed": "implemented",
-      "test": "test_fiff_info",
-      "evidence": "tested"
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1865,6 +1865,14 @@
       "claimed": "implemented",
       "test": "test_mne_forward_solution",
       "evidence": "tested"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "FiffInfoBase::pick_channels_regexp",
+      "python": "mne.pick_channels_regexp",
+      "claimed": "implemented",
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
