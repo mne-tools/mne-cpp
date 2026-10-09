@@ -524,9 +524,14 @@ void TestFiffFsLibrary::fiff_coordTransReadWrite()
     FiffCoordTrans trans = FiffCoordTrans::readMriTransform(transPath());
     QVERIFY(trans.from != 0 || trans.to != 0);
 
+    // Without frames the first transform is read, as mne.read_trans does (device -> head in all-trans.fif)
     FiffCoordTrans trans2;
     QFile transFile(transPath());
-    FiffCoordTrans::read(transFile, trans2);
+    QVERIFY(FiffCoordTrans::read(transFile, trans2));
+    QCOMPARE(trans2.from, FIFFV_COORD_DEVICE);
+    QCOMPARE(trans2.to, FIFFV_COORD_HEAD);
+    QVERIFY(std::fabs(trans2.trans(0, 3) + 6.129309069e-03f) < 1e-8f);
+    QVERIFY(std::fabs(trans2.trans(2, 3) - 6.474152207e-02f) < 1e-8f);
 
     FiffCoordTrans inv = trans.inverted();
     QCOMPARE(inv.from, trans.to);

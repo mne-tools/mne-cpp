@@ -265,9 +265,6 @@ int main(int argc, char* argv[])
     QFile t_fileDig(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffDigPointSet t_Dig(t_fileDig);
 
-    QFile coordTransfile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/all-trans.fif");
-    FiffCoordTrans coordTrans(coordTransfile);
-
     pModel->addDigitizerData(t_Dig.getList());
 
     // Load sensor field data from evoked file for MEG/EEG field mapping

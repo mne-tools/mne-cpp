@@ -138,9 +138,8 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
     //
     //   Get the MRI <-> head coordinate transformation
     //
-    for (qint32 k = 0; k < pStream->dir().size(); ++k) {
-        if (pStream->dir()[k]->kind == FIFF_COORD_TRANS) {
-            pStream->read_tag(t_pTag, pStream->dir()[k]->pos);
+    for (qint32 k = 0; k < pStream->dir().size() && !success; ++k) {
+        if (pStream->dir()[k]->kind == FIFF_COORD_TRANS && pStream->read_tag(t_pTag, pStream->dir()[k]->pos)) {
             p_Trans = t_pTag->toCoordTrans();
             success = true;
         }

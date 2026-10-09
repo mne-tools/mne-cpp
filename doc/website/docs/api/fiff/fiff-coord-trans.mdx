@@ -24,8 +24,7 @@ Labelled 4x4 FIFF affine: source frame, destination frame, rotation, translation
 Each transform carries its source (`from`) and destination (`to`) `FIFFV_COORD_*` frame identifiers so the inverse and any chained composition can be type-checked at runtime. The inverse is stored alongside the forward transform because both directions are routinely needed (device→head for head-position tracking, head→MRI for source space registration, etc.).
 
 ```cpp title="src/examples/ex_fiff_api/main.cpp"
-QFile transFile(dir + "/all-trans.fif");
-FiffCoordTrans headToMri(transFile);            // FIFFV_COORD_HEAD (4) -> FIFFV_COORD_MRI (5)
+const FiffCoordTrans headToMri = FiffCoordTrans::readTransform(dir + "/all-trans.fif", FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
 const FiffCoordTrans devHead = info.dev_head_t; // device -> head, from the measurement info
 FiffCoordTrans back = devHead.inverted();
 float r[3] = {0.0f, 0.0f, 0.0f};
@@ -263,7 +262,9 @@ Calculate translation between two rotation matrices in meter.
 
 ### read(p_IODevice, p_Trans)
 
-Reads a coordinate transform from a fif file.
+Reads the first coordinate transform from a fif file (as mne.read_trans).
+
+Use `readTransform()` to select a transform by its coordinate frames.
 
 **Parameters:**
 

@@ -264,7 +264,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads a coordinate transform from a fif file
+     * Reads the first coordinate transform from a fif file (as mne.read_trans). Use readTransform()
+     * to select a transform by its coordinate frames.
      *
      * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket.
      * @param[out] p_Trans      A coordinate transform from a fif file.
