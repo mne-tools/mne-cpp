@@ -276,6 +276,40 @@ void TestMneRawDataPython::projectsSegment()
     QVERIFY2(closeTo(all.values.cast<double>().cwiseAbs().sum(), 4.027555929286992e-06, 1e-4),
              qPrintable(QStringLiteral("all projected %1").arg(all.values.cast<double>().cwiseAbs().sum(), 0, 'g', 12)));
     m_raw->proj.reset();
+
+    // Bad channels are left out of the vectors before orthogonalisation (mne make_projector(projs, ch_names, bads)):
+    // the average EEG reference then spans 59 channels, and with every EEG channel bad it disappears
+    const auto projector = [&](const QStringList& bads, int& nvec) {
+        std::unique_ptr<MNEProjOp> op;
+        MNEProjOp::makeProjection({m_rawPath}, m_raw->info->chInfo, m_raw->info->nchan, op);
+        op->assign_channels(m_raw->ch_names, m_raw->info->nchan);
+        op->make_proj_bad(bads);
+        nvec = op->nvec;
+        const Eigen::MatrixXd u = op->proj_data.cast<double>();
+        return Eigen::MatrixXd(Eigen::MatrixXd::Identity(u.cols(), u.cols()) - u.transpose() * u);
+    };
+    const int eeg1 = m_raw->ch_names.indexOf(QStringLiteral("EEG001"));
+    const int meg2443 = m_raw->ch_names.indexOf(QStringLiteral("MEG2443"));
+    QVERIFY(eeg1 >= 0 && meg2443 >= 0);
+    int nvec = 0;
+    Eigen::MatrixXd p = projector({}, nvec);
+    QCOMPARE(nvec, 4);
+    QVERIFY(std::fabs(p(eeg1, eeg1) - 0.9833333333333333) < 1e-6);
+    p = projector({QStringLiteral("MEG2443"), QStringLiteral("EEG053")}, nvec);
+    QCOMPARE(nvec, 4);
+    QVERIFY(std::fabs(p.trace() - 372.0) < 1e-4);
+    QVERIFY2(std::fabs(p(eeg1, eeg1) - 0.9830508474576272) < 1e-6, qPrintable(QString::number(p(eeg1, eeg1), 'g', 10)));
+    QVERIFY(std::fabs(p(meg2443, meg2443) - 1.0) < 1e-6);
+    QStringList allEeg;
+    for (const QString& name : m_raw->ch_names) {
+        if (name.startsWith(QLatin1String("EEG"))) {
+            allEeg << name;
+        }
+    }
+    p = projector(allEeg, nvec);
+    QCOMPARE(nvec, 3);
+    QVERIFY(std::fabs(p.trace() - 373.0) < 1e-4);
+    QVERIFY(std::fabs(p(eeg1, eeg1) - 1.0) < 1e-6);
 }
 
 //=============================================================================================================
