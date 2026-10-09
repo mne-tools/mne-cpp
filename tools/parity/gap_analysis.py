@@ -268,10 +268,18 @@ def build_python_inventory(pinned: str) -> List[Dict[str, Any]]:
                 continue
             if name in SKIP_SYMBOLS:
                 continue
+            # A symbol that cannot be imported must fail the run: skipping it
+            # would make the inventory depend on which optional packages
+            # happen to be installed.
             try:
                 obj = getattr(module, name)
-            except Exception:
-                continue
+            except ImportError as error:
+                sys.stderr.write(
+                    f"ERROR: cannot import {prefix}.{name} ({error}). Install "
+                    "the optional dependencies of the pinned MNE-Python "
+                    "(e.g. scikit-learn) before generating the inventory.\n"
+                )
+                raise SystemExit(2) from error
             if isinstance(obj, types.ModuleType):
                 continue
             if not (inspect.isclass(obj) or inspect.isfunction(obj) or inspect.isbuiltin(obj)):

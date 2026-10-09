@@ -167,7 +167,9 @@ jobs:
 
     # Gate G6: the rendered gap analysis must reflect the parity records it is generated from.
     - name: Check gap analysis is current
-      run: python3 tools/parity/gap_analysis.py --check
+      run: |
+        python3 -m pip install --quiet mne==1.11.0 numpy==2.2.6 scipy==1.15.3 scikit-learn==1.7.2
+        python3 tools/parity/gap_analysis.py --check
 
     # Gate G5: layering violations and dependency cycles are cheap to prevent
     # and expensive to unpick once they have been built on.
