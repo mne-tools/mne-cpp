@@ -442,8 +442,9 @@ QJsonObject buildIeegSidecarJson(const BidsRawData& data,
     else
         json[QStringLiteral("RecordingType")] = QStringLiteral("continuous");
 
+    // mne-bids writes raw.times[-1]
     if (info.sfreq > 0.0f && data.raw.last_samp >= data.raw.first_samp) {
-        double dur = static_cast<double>(data.raw.last_samp - data.raw.first_samp + 1) / static_cast<double>(info.sfreq);
+        double dur = static_cast<double>(data.raw.last_samp - data.raw.first_samp) / static_cast<double>(info.sfreq);
         json[QStringLiteral("RecordingDuration")] = dur;
     }
 

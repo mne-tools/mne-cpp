@@ -30,6 +30,8 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QTemporaryDir>
 
 #include <algorithm>
@@ -578,6 +580,10 @@ void TestBids::testWriteRoundTrip()
     BIDSPath edfDst(tmpDir.path(), "02", "01", "rest", "eeg", "eeg", ".edf");
     QVERIFY(edf.write(edfDst, edfSrc.filePath(), opts) == edfDst);
     QCOMPARE(QFileInfo(edfDst.filePath()).size(), QFileInfo(edfSrc.filePath()).size());
+    QFile sidecar(edfDst.sidecarJsonPath().filePath());
+    QVERIFY(sidecar.open(QIODevice::ReadOnly));
+    // mne-bids writes raw.times[-1]: 1227 / 128 Hz
+    QCOMPARE(QJsonDocument::fromJson(sidecar.readAll()).object().value(QStringLiteral("RecordingDuration")).toDouble(), 9.5859375);
     BidsRawData edfBack = BidsRawData::read(edfDst);
     QVERIFY(edfBack.isValid());
     QCOMPARE(edfBack.raw.info.nchan, 25);
