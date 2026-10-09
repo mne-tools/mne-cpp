@@ -37,8 +37,6 @@
 #include <inv/dipole_fit/inv_dipole_fit.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
 
-#include <fiff/fiff_coord_trans.h>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -441,41 +439,6 @@ INVLIB::InvEcdSet InvDipoleFit::dipoleFitCalculation()
     INVLIB::InvEcdSet ecdSet = dipFit.calculateFit();
 
     qInfo() << "Done!";
-    INVLIB::InvEcdSet ecdSetTrans = ecdSet;
-
-    QFile file(m_DipoleSettings.mriname);
-
-    if (file.exists()) {
-        FIFFLIB::FiffCoordTrans coordTrans(file);
-
-        for (int i = 0; i < ecdSet.size(); ++i) {
-            MatrixX3f dipoles(1, 3);
-            //transform location
-            dipoles(0, 0) = ecdSet[i].rd(0);
-            dipoles(0, 1) = ecdSet[i].rd(1);
-            dipoles(0, 2) = ecdSet[i].rd(2);
-
-            dipoles = coordTrans.apply_trans(dipoles);
-
-            ecdSetTrans[i].rd(0) = dipoles(0, 0);
-            ecdSetTrans[i].rd(1) = dipoles(0, 1);
-            ecdSetTrans[i].rd(2) = dipoles(0, 2);
-
-            //transform orientation
-            dipoles(0, 0) = ecdSet[i].Q(0);
-            dipoles(0, 1) = ecdSet[i].Q(1);
-            dipoles(0, 2) = ecdSet[i].Q(2);
-
-            dipoles = coordTrans.apply_trans(dipoles, false);
-
-            ecdSetTrans[i].Q(0) = dipoles(0, 0);
-            ecdSetTrans[i].Q(1) = dipoles(0, 1);
-            ecdSetTrans[i].Q(2) = dipoles(0, 2);
-        }
-    } else {
-        qWarning("[InvDipoleFit::onPerformDipoleFit] Cannot open FiffCoordTrans file");
-    }
-
     return ecdSet;
 }
 
