@@ -246,14 +246,14 @@ inline QStringList bidsEntityOrder()
     return {QStringLiteral("sub"),
             QStringLiteral("ses"),
             QStringLiteral("task"),
+            QStringLiteral("tracksys"),
             QStringLiteral("acq"),
             QStringLiteral("run"),
             QStringLiteral("proc"),
             QStringLiteral("space"),
-            QStringLiteral("rec"),
+            QStringLiteral("recording"),
             QStringLiteral("split"),
-            QStringLiteral("desc"),
-            QStringLiteral("tracking_system")};
+            QStringLiteral("desc")};
 }
 
 } // namespace BIDSLIB

@@ -774,6 +774,10 @@ void TestBids::testPathSettersGetters()
     QCOMPARE(path.datatype(), QStringLiteral("meg"));
     QCOMPARE(path.suffix(), QStringLiteral("meg"));
     QCOMPARE(path.extension(), QStringLiteral(".fif"));
+
+    // mne_bids.BIDSPath(...).basename with the same entities (space CTF, check=False)
+    path.setSpace("CTF");
+    QCOMPARE(path.basename(), QStringLiteral("sub-02_ses-03_task-motor_acq-acq01_run-01_proc-sss_space-CTF_recording-ecog_split-01_desc-filtered_meg.fif"));
 }
 
 //=============================================================================================================

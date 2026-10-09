@@ -230,7 +230,7 @@ QString BIDSPath::basename() const
     if (!m_sSpace.isEmpty())
         parts << QStringLiteral("space-") + m_sSpace;
     if (!m_sRecording.isEmpty())
-        parts << QStringLiteral("rec-") + m_sRecording;
+        parts << QStringLiteral("recording-") + m_sRecording;
     if (!m_sSplit.isEmpty())
         parts << QStringLiteral("split-") + m_sSplit;
     if (!m_sDescription.isEmpty())
@@ -409,7 +409,7 @@ QList<BIDSPath> BIDSPath::match() const
                 p.setProcessing(val);
             else if (key == QStringLiteral("space"))
                 p.setSpace(val);
-            else if (key == QStringLiteral("rec"))
+            else if (key == QStringLiteral("recording"))
                 p.setRecording(val);
             else if (key == QStringLiteral("split"))
                 p.setSplit(val);

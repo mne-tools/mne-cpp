@@ -259,7 +259,7 @@ public:
      * Constructs the BIDS-compliant filename (without directory).
      *
      * Format: `sub-<label>[_ses-<label>][_task-<label>][_acq-<label>][_run-<index>]`
-     *         `[_proc-<label>][_space-<label>][_rec-<label>][_split-<index>]`
+     *         `[_proc-<label>][_space-<label>][_recording-<label>][_split-<index>]`
      *         `[_desc-<label>]_<suffix><extension>`
      *
      * @return The BIDS filename.
