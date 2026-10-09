@@ -119,6 +119,10 @@
 
 #include <Eigen/Core>
 
+#include <rhi/qrhi.h>
+
+#include <memory>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -131,6 +135,14 @@ using Eigen::MatrixXd;
 
 namespace
 {
+
+/** Exposes the frame recording of ChannelRhiView so a test can render it into an offscreen QRhi. */
+class FrameChannelRhiView : public ChannelRhiView
+{
+public:
+    using ChannelRhiView::releaseResources;
+    using ChannelRhiView::renderFrame;
+};
 
 /** Paint engine that records the drawn text and lines, independent of the platform's glyph rasterisation. */
 class TextRecordingEngine : public QPaintEngine
@@ -534,6 +546,12 @@ private slots:
      * Verifies that ChannelRhiView::renderToImage() lays out rows and scales traces like the GPU path.
      */
     void channelRhiView_renderToImage();
+
+    //=========================================================================================================
+    /**
+     * Verifies that the GPU frame of ChannelRhiView draws the rows of renderToImage() in every display mode.
+     */
+    void channelRhiView_gpuFrame();
 
     //=========================================================================================================
     /**
@@ -2822,6 +2840,142 @@ void TestDispViewers2::channelRhiView_renderToImage()
     QCOMPARE(image.pixelColor(350, 10), QColor(235, 235, 235));
 
     QVERIFY(view.renderToImage(QSize(0, 10)).isNull());
+}
+
+//=============================================================================================================
+
+void TestDispViewers2::channelRhiView_gpuFrame()
+{
+    // The platform's own backend renders real pixels; without one (e.g. Linux CI) the Null backend runs the code path
+    std::unique_ptr<QRhi> rhi;
+#if defined(Q_OS_MACOS)
+    QRhiMetalInitParams metalParams;
+    rhi.reset(QRhi::create(QRhi::Metal, &metalParams));
+#elif defined(Q_OS_WIN)
+    QRhiD3D11InitParams d3dParams;
+    rhi.reset(QRhi::create(QRhi::D3D11, &d3dParams, QRhi::PreferSoftwareRenderer));
+#endif
+    const bool realPixels = rhi != nullptr;
+    if (!rhi) {
+        QRhiNullInitParams nullParams;
+        rhi.reset(QRhi::create(QRhi::Null, &nullParams));
+    }
+    QVERIFY(rhi);
+
+    ChannelDataModel model;
+    model.init(createBrowserTestInfo());
+    const float amplitudeMax = model.channelInfo(0).amplitudeMax;
+    Eigen::MatrixXd data = Eigen::MatrixXd::Zero(4, 2000);
+    data.row(0).setConstant(0.5 * amplitudeMax);
+    data.row(1).setConstant(0.5 * amplitudeMax);
+    data.row(2).setConstant(-3.0 * amplitudeMax);
+    model.setData(data, 100);
+
+    FrameChannelRhiView view;
+    view.setModel(&model);
+    view.setFirstFileSample(100);
+    view.setLastFileSample(2099);
+    view.setSamplesPerPixel(0.5f);
+    view.setScrollSample(100.f);
+    view.setGridVisible(false);
+    view.setBackgroundColor(Qt::white);
+    view.setVisibleChannelCount(4);
+    view.setEvents({ChannelRhiView::EventMarker{150, 1, Qt::red, QStringLiteral("event")}});
+    view.setAnnotations({ChannelRhiView::AnnotationSpan{160, 170, Qt::blue, QStringLiteral("blink")}});
+    view.setEpochMarkers({180});
+    QTest::failOnWarning(QRegularExpression(QStringLiteral("ChannelRhiView")));
+
+    std::unique_ptr<QRhiTexture> color;
+    std::unique_ptr<QRhiTextureRenderTarget> target;
+    std::unique_ptr<QRhiRenderPassDescriptor> pass;
+    const auto frame = [&](const QSize& size) {
+        view.resize(size);
+        if (!color || color->pixelSize() != size) {
+            view.releaseResources();
+            target.reset();
+            pass.reset();
+            color.reset(rhi->newTexture(QRhiTexture::RGBA8, size, 1, QRhiTexture::RenderTarget | QRhiTexture::UsedAsTransferSource));
+            color->create();
+            target.reset(rhi->newTextureRenderTarget({QRhiColorAttachment(color.get())}));
+            pass.reset(target->newCompatibleRenderPassDescriptor());
+            target->setRenderPassDescriptor(pass.get());
+            target->create();
+        }
+        QRhiCommandBuffer* cb = nullptr;
+        if (rhi->beginOffscreenFrame(&cb) != QRhi::FrameOpSuccess) {
+            return QImage();
+        }
+        view.renderFrame(rhi.get(), target.get(), cb);
+        QRhiReadbackResult result;
+        QRhiResourceUpdateBatch* readback = rhi->nextResourceUpdateBatch();
+        readback->readBackTexture({color.get()}, &result);
+        cb->resourceUpdate(readback);
+        rhi->endOffscreenFrame();
+        QImage image(reinterpret_cast<const uchar*>(result.data.constData()), result.pixelSize.width(),
+                     result.pixelSize.height(), QImage::Format_RGBA8888);
+        image = image.convertToFormat(QImage::Format_RGB32);
+        return rhi->isYUpInFramebuffer() ? image.flipped() : image;
+    };
+    // Rows of the drawn (non-white) pixels in one column
+    const auto traceRows = [](const QImage& image, int x) {
+        QList<int> rows;
+        for (int y = 0; y < image.height(); ++y) {
+            if (image.pixelColor(x, y) != QColor(Qt::white)) {
+                rows.append(y);
+            }
+        }
+        return rows;
+    };
+    const auto near = [](const QList<int>& rows, int y) {
+        return std::any_of(rows.cbegin(), rows.cend(), [y](int row) { return qAbs(row - y) <= 1; });
+    };
+    // Every trace pixel of the CPU image has a GPU pixel next to it and vice versa, in a column without markers
+    const auto matchesImage = [&](const QSize& size, const char* mode) {
+        const QImage gpu = frame(size);
+        if (gpu.size() != size) {
+            return false;
+        }
+        if (!realPixels) {
+            return true;
+        }
+        const QList<int> gpuRows = traceRows(gpu, size.width() / 8);
+        const QList<int> cpuRows = traceRows(view.renderToImage(size), size.width() / 8);
+        for (int y : cpuRows) {
+            if (!near(gpuRows, y)) {
+                qWarning() << mode << "CPU row" << y << "missing on the GPU" << gpuRows;
+                return false;
+            }
+        }
+        for (int y : gpuRows) {
+            if (!near(cpuRows, y)) {
+                qWarning() << mode << "GPU row" << y << "missing in the image" << cpuRows;
+                return false;
+            }
+        }
+        return !cpuRows.isEmpty();
+    };
+
+    QVERIFY(matchesImage(QSize(400, 200), "rows"));
+    // The event, annotation and epoch lines are composited on top
+    if (realPixels) {
+        const QImage gpu = frame(QSize(400, 200));
+        QVERIFY(traceRows(gpu, 100).size() > 150);
+        QVERIFY(traceRows(gpu, 130).size() > 150);
+        QVERIFY2(traceRows(gpu, 160).size() > 100, "dashed epoch marker");
+        QVERIFY(traceRows(gpu, 50).size() < 10);
+    }
+    view.setScrollSample(1500.f);
+    QVERIFY(matchesImage(QSize(400, 200), "scrolled"));
+    QVERIFY(matchesImage(QSize(300, 120), "resized"));
+    view.setHideBadChannels(true);
+    view.setButterflyMode(true);
+    QVERIFY(matchesImage(QSize(400, 200), "butterfly"));
+    view.setButterflyMode(false);
+    view.setZScoreMode(true);
+    QVERIFY(matchesImage(QSize(400, 200), "z-score"));
+    view.setModel(nullptr);
+    QCOMPARE(frame(QSize(400, 200)).size(), QSize(400, 200));
+    view.releaseResources();
 }
 
 //=============================================================================================================

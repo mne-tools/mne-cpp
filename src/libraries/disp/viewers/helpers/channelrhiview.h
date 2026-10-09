@@ -526,6 +526,16 @@ protected:
     void releaseResources() override;
     void paintEvent(QPaintEvent* event) override;
 
+    //=========================================================================================================
+    /**
+     * Records one frame into @p target; render() calls it with the widget's own QRhi and render target.
+     *
+     * @param[in] rhi     The QRhi that owns @p target and the view's GPU resources.
+     * @param[in] target  Render target sized like the widget times its device pixel ratio.
+     * @param[in] cb      Command buffer of the current frame.
+     */
+    void renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCommandBuffer* cb);
+
     // Overlay access — called by CrosshairOverlay::paintEvent
     friend class ::CrosshairOverlay;
     void drawCrosshair(QPainter& p);
@@ -561,13 +571,13 @@ private:
         int vboFirstSample = 0; // absolute first sample in VBO
     };
 
-    void ensurePipeline();
-    void rebuildVBOs(QRhiResourceUpdateBatch* batch);
+    void ensurePipeline(QRhi* rhi, QRhiRenderTarget* target);
+    void rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch);
     void updateUBO(QRhiResourceUpdateBatch* batch);
     bool isVboDirty() const;
 
     // ── Overlay blit (annotations/events baked into texture, bands in shader) ──
-    void ensureOverlayPipeline();
+    void ensureOverlayPipeline(QRhi* rhi, QRhiRenderTarget* target);
     void rebuildOverlayImage(int logicalWidth, int logicalHeight, qreal devicePixelRatio);
 
     std::unique_ptr<QRhiBuffer> m_overlayVbo; // Static quad

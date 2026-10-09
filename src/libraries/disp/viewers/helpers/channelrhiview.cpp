@@ -773,13 +773,9 @@ void ChannelRhiView::releaseResources()
 
 //=============================================================================================================
 
-void ChannelRhiView::ensurePipeline()
+void ChannelRhiView::ensurePipeline(QRhi* rhi, QRhiRenderTarget* target)
 {
     if (!m_pipelineDirty)
-        return;
-
-    QRhi* rhi = this->rhi();
-    if (!rhi)
         return;
 
     m_uboStride = static_cast<int>(
@@ -845,7 +841,7 @@ void ChannelRhiView::ensurePipeline()
 
     m_pipeline->setVertexInputLayout(il);
     m_pipeline->setShaderResourceBindings(m_srb.get());
-    m_pipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
+    m_pipeline->setRenderPassDescriptor(target->renderPassDescriptor());
     m_pipeline->setTopology(QRhiGraphicsPipeline::LineStrip);
     m_pipeline->setDepthTest(false);
     m_pipeline->setDepthWrite(false);
@@ -881,13 +877,9 @@ bool ChannelRhiView::isVboDirty() const
 
 //=============================================================================================================
 
-void ChannelRhiView::rebuildVBOs(QRhiResourceUpdateBatch* batch)
+void ChannelRhiView::rebuildVBOs(QRhi* rhi, QRhiResourceUpdateBatch* batch)
 {
     if (!m_model)
-        return;
-
-    QRhi* rhi = this->rhi();
-    if (!rhi)
         return;
 
     int nCh = totalLogicalChannels();
@@ -1227,11 +1219,8 @@ void ChannelRhiView::rebuildOverlayImage(int logicalWidth, int logicalHeight, qr
 
 //=============================================================================================================
 
-void ChannelRhiView::ensureOverlayPipeline()
+void ChannelRhiView::ensureOverlayPipeline(QRhi* rhi, QRhiRenderTarget* target)
 {
-    QRhi* rhi = this->rhi();
-    if (!rhi || !renderTarget())
-        return;
     if (m_overlayPipeline)
         return;
 
@@ -1343,7 +1332,7 @@ void ChannelRhiView::ensureOverlayPipeline()
                                QRhiVertexInputAttribute(0, 1, QRhiVertexInputAttribute::Float2, 2 * sizeof(float))});
     m_overlayPipeline->setVertexInputLayout(inputLayout);
     m_overlayPipeline->setShaderResourceBindings(m_overlaySrb.get());
-    m_overlayPipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
+    m_overlayPipeline->setRenderPassDescriptor(target->renderPassDescriptor());
 
     if (!m_overlayPipeline->create()) {
         qWarning() << "ChannelRhiView: overlay pipeline create failed";
@@ -1361,41 +1350,48 @@ void ChannelRhiView::ensureOverlayPipeline()
 
 void ChannelRhiView::render(QRhiCommandBuffer* cb)
 {
+    renderFrame(rhi(), renderTarget(), cb);
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::renderFrame(QRhi* rhi, QRhiRenderTarget* target, QRhiCommandBuffer* cb)
+{
     if (!m_model || totalLogicalChannels() == 0) {
         // Clear to background colour only
-        QRhiResourceUpdateBatch* u = rhi()->nextResourceUpdateBatch();
+        QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
         QColor bg = m_bgColor;
-        cb->beginPass(renderTarget(), bg, {1.f, 0}, u);
+        cb->beginPass(target, bg, {1.f, 0}, u);
         cb->endPass();
         return;
     }
 
     // ── Ensure GPU resources ─────────────────────────────────────────────
-    ensurePipeline();
+    ensurePipeline(rhi, target);
     if (!m_pipeline) {
         // Pipeline not ready: show RED background so the failure is visible
-        QRhiResourceUpdateBatch* u = rhi()->nextResourceUpdateBatch();
-        cb->beginPass(renderTarget(), QColor(220, 0, 0), {1.f, 0}, u);
+        QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
+        cb->beginPass(target, QColor(220, 0, 0), {1.f, 0}, u);
         cb->endPass();
         return;
     }
 
-    QSize ps = renderTarget()->pixelSize();
+    QSize ps = target->pixelSize();
     const int pw = ps.width();
     const int ph = ps.height();
     const int logicalW = width();
     const int logicalH = height();
     const qreal overlayDpr = (logicalW > 0) ? (static_cast<qreal>(pw) / static_cast<qreal>(logicalW)) : 1.0;
 
-    QRhiResourceUpdateBatch* batch = rhi()->nextResourceUpdateBatch();
+    QRhiResourceUpdateBatch* batch = rhi->nextResourceUpdateBatch();
 
     if (isVboDirty())
-        rebuildVBOs(batch);
+        rebuildVBOs(rhi, batch);
 
     updateUBO(batch);
 
     // ── Overlay image (annotations + events; bands computed in shader) ──
-    ensureOverlayPipeline();
+    ensureOverlayPipeline(rhi, target);
     bool overlayReady = false;
     if (m_overlayPipeline && m_overlayVbo && m_overlayUbo && pw > 0 && ph > 0 && logicalW > 0 && logicalH > 0) {
         // Upload the static quad VBO if it was just created
@@ -1444,7 +1440,7 @@ void ChannelRhiView::render(QRhiCommandBuffer* cb)
 
             // (Re)create texture at the correct pixel size
             if (requiredTexSize != m_overlayTexSize) {
-                m_overlayTex.reset(rhi()->newTexture(QRhiTexture::RGBA8, requiredTexSize));
+                m_overlayTex.reset(rhi->newTexture(QRhiTexture::RGBA8, requiredTexSize));
                 m_overlayTex->create();
                 // Re-create SRB because it references the texture
                 m_overlaySrb->setBindings({QRhiShaderResourceBinding::sampledTexture(
@@ -1489,7 +1485,7 @@ void ChannelRhiView::render(QRhiCommandBuffer* cb)
 
     // ── Render pass ──────────────────────────────────────────────────────
     QColor bg = m_bgColor;
-    cb->beginPass(renderTarget(), bg, {1.f, 0}, batch);
+    cb->beginPass(target, bg, {1.f, 0}, batch);
 
     cb->setViewport(QRhiViewport(0.f, 0.f, static_cast<float>(pw),
                                  static_cast<float>(ph)));
