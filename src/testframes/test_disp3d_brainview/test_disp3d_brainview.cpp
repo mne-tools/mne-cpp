@@ -610,6 +610,61 @@ void TestDisp3dBrainView::sourceEstimateManager_basics()
     QVERIFY(!manager.isLoaded());
     QCOMPARE(manager.numTimePoints(), 0);
     QCOMPARE(manager.currentTimePoint(), 0);
+    QCOMPARE(manager.closestIndex(0.0f), -1);
+
+    // No brain surface: loading is refused
+    QMap<QString, std::shared_ptr<BrainSurface>> surfaces;
+    QVERIFY(!manager.load(QStringLiteral("a-lh.stc"), QString(), surfaces, QStringLiteral("pial")));
+
+    // Left STC: 2 sources on a 4-vertex "lh_pial" surface, 3 time points from -10 ms in 5 ms steps
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString lhPath = dir.filePath(QStringLiteral("test-lh.stc"));
+    Eigen::MatrixXd data(2, 3);
+    data << 1.0, 2.0, 3.0, 4.0, 5.0, 6.0;
+    Eigen::VectorXi vertices(2);
+    vertices << 0, 3;
+    {
+        QFile out(lhPath);
+        QVERIFY(INVLIB::InvSourceEstimate(data, vertices, -0.01f, 0.005f).write(out));
+    }
+    Eigen::MatrixX3f rr(4, 3);
+    rr << 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.01f, 0.01f, 0.0f;
+    Eigen::MatrixX3i tris(2, 3);
+    tris << 0, 1, 2, 1, 3, 2;
+    auto lh = std::make_shared<BrainSurface>();
+    lh->createFromData(rr, tris, Qt::gray);
+    lh->setHemi(0);
+    surfaces.insert(QStringLiteral("lh_pial"), lh);
+
+    QSignalSpy loadedSpy(&manager, &SourceEstimateManager::loaded);
+    QSignalSpy thresholdSpy(&manager, &SourceEstimateManager::thresholdsUpdated);
+    QVERIFY(manager.load(lhPath, QString(), surfaces, QStringLiteral("pial")));
+    QVERIFY(manager.isLoading());
+    QVERIFY(!manager.load(lhPath, QString(), surfaces, QStringLiteral("pial")));
+    QTRY_COMPARE(loadedSpy.size(), 1);
+    QVERIFY(!manager.isLoading());
+    QVERIFY(manager.isLoaded());
+    QCOMPARE(loadedSpy.at(0).at(0).toInt(), 3);
+    QCOMPARE(thresholdSpy.size(), 1);
+    QCOMPARE(thresholdSpy.at(0).at(2).toFloat(), 6.0f);
+    QCOMPARE(manager.numTimePoints(), 3);
+    QCOMPARE(manager.tmin(), -0.01f);
+    QCOMPARE(manager.tstep(), 0.005f);
+    QCOMPARE(manager.closestIndex(-0.0004f), 2);
+    QCOMPARE(manager.closestIndex(-0.0071f), 1);
+    QCOMPARE(manager.closestIndex(1.0f), 2);
+
+    // Stepping to a time point colours the active surface type and reports the time
+    QSignalSpy timeSpy(&manager, &SourceEstimateManager::timePointChanged);
+    const uint32_t before = lh->vertexDataRef()[3].color;
+    SubView view;
+    view.surfaceType = QStringLiteral("pial");
+    manager.setTimePoint(5, surfaces, view, {});
+    QCOMPARE(manager.currentTimePoint(), 2);
+    QCOMPARE(timeSpy.size(), 1);
+    QVERIFY(std::fabs(timeSpy.at(0).at(1).toFloat() - 0.0f) < 1e-6f);
+    QVERIFY(lh->vertexDataRef()[3].color != before);
 
     QApplication::processEvents();
 }
