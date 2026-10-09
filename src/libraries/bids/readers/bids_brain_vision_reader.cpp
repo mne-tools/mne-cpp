@@ -548,7 +548,7 @@ FiffRawData BrainVisionReader::toFiffRawData() const
     FiffRawData raw;
     raw.info = getInfo();
     raw.first_samp = 0;
-    raw.last_samp = m_lSampleCount;
+    raw.last_samp = static_cast<int>(m_lSampleCount) - 1;
 
     RowVectorXd cals(raw.info.nchan);
     for (int i = 0; i < raw.info.chs.size(); ++i) {

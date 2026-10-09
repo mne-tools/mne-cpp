@@ -460,6 +460,8 @@ void TestBids::testReadEdf()
 
     // Samples in volts, as mne.io.read_raw_edf(...).get_data()
     QCOMPARE(data.reader->getSampleCount(), 1228L);
+    QCOMPARE(data.raw.first_samp, 0);
+    QCOMPARE(data.raw.last_samp, 1227); // mne raw.last_samp is inclusive
     const Eigen::MatrixXd samples = data.reader->readRawSegment(0, 1228).cast<double>();
     QCOMPARE(samples.rows(), Eigen::Index(25));
     QVERIFY(std::abs(samples(0, 0) - 0.175940656291) < 1e-7);
@@ -648,6 +650,7 @@ void TestBids::testBrainVisionReaderMatchesPython()
         QVERIFY(reader.open(dir.filePath(base + ".vhdr")));
         QCOMPARE(reader.getFrequency(), 500.0f);
         QCOMPARE(reader.getSampleCount(), 4L);
+        QCOMPARE(reader.toFiffRawData().last_samp, 3);
         const FIFFLIB::FiffInfo info = reader.getInfo();
         QCOMPARE(info.ch_names.last(), QStringLiteral("A,B"));
         for (int k = 0; k < 6; ++k) {
