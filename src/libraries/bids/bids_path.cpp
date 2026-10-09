@@ -17,6 +17,8 @@
 #include "bids_path.h"
 #include "bids_const.h"
 
+#include <algorithm>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -355,46 +357,38 @@ bool BIDSPath::mkdirs() const
 
 QList<BIDSPath> BIDSPath::match() const
 {
+    // Like mne_bids.BIDSPath.match: every set entity must equal the file's, unset ones match anything
     QList<BIDSPath> results;
-
-    QDir dir(directory());
-    if (!dir.exists())
+    if (m_sRoot.isEmpty() || !QDir(m_sRoot).exists())
         return results;
 
-    // Build a glob pattern from the set entities
-    QString pattern = QStringLiteral("sub-") + (m_sSubject.isEmpty() ? QStringLiteral("*") : m_sSubject);
+    QDirIterator it(m_sRoot, QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        const QFileInfo file(it.next());
+        const QString name = file.fileName();
+        const int dot = name.indexOf(QLatin1Char('.'));
+        if (dot <= 0)
+            continue;
 
-    if (!m_sSession.isEmpty())
-        pattern += QStringLiteral("_ses-") + m_sSession;
-    else
-        pattern += QStringLiteral("*");
-
-    pattern += QStringLiteral("*"); // match remaining entities
-
-    if (!m_sSuffix.isEmpty())
-        pattern += QStringLiteral("_") + m_sSuffix;
-
-    if (!m_sExtension.isEmpty())
-        pattern += m_sExtension;
-    else
-        pattern += QStringLiteral(".*");
-
-    QStringList entries = dir.entryList({pattern}, QDir::Files);
-
-    // Parse matching filenames back into BIDSPath objects
-    static const QRegularExpression entityRx(QStringLiteral("(\\w+)-(\\w+)"));
-    for (const QString& entry : entries) {
         BIDSPath p;
         p.setRoot(m_sRoot);
-        p.setDatatype(m_sDatatype);
+        p.setExtension(name.mid(dot));
+        const QString dirName = file.dir().dirName();
+        if (!dirName.startsWith(QStringLiteral("sub-")) && !dirName.startsWith(QStringLiteral("ses-")))
+            p.setDatatype(dirName);
 
-        // Extract entities from filename
-        auto it = entityRx.globalMatch(entry);
-        while (it.hasNext()) {
-            auto match = it.next();
-            const QString key = match.captured(1);
-            const QString val = match.captured(2);
-
+        bool valid = true;
+        const QStringList parts = name.left(dot).split(QLatin1Char('_'));
+        for (int i = 0; i < parts.size() && valid; ++i) {
+            const int dash = parts[i].indexOf(QLatin1Char('-'));
+            if (dash < 0) {
+                // Only the last part may be the suffix
+                valid = (i == parts.size() - 1);
+                p.setSuffix(parts[i]);
+                continue;
+            }
+            const QString key = parts[i].left(dash);
+            const QString val = parts[i].mid(dash + 1);
             if (key == QStringLiteral("sub"))
                 p.setSubject(val);
             else if (key == QStringLiteral("ses"))
@@ -416,22 +410,16 @@ QList<BIDSPath> BIDSPath::match() const
             else if (key == QStringLiteral("desc"))
                 p.setDescription(val);
         }
+        if (!valid || p.subject().isEmpty())
+            continue;
 
-        // Extract suffix and extension
-        // The suffix is the last _<word> before the extension
-        int dotIdx = entry.lastIndexOf(QLatin1Char('.'));
-        if (dotIdx > 0) {
-            p.setExtension(entry.mid(dotIdx));
-            QString nameWithoutExt = entry.left(dotIdx);
-            int lastUnder = nameWithoutExt.lastIndexOf(QLatin1Char('_'));
-            if (lastUnder >= 0) {
-                p.setSuffix(nameWithoutExt.mid(lastUnder + 1));
-            }
-        }
-
-        results.append(p);
+        const QList<std::pair<QString, QString>> wanted{
+            {m_sSubject, p.subject()}, {m_sSession, p.session()}, {m_sTask, p.task()}, {m_sAcquisition, p.acquisition()}, {m_sRun, p.run()}, {m_sProcessing, p.processing()}, {m_sSpace, p.space()}, {m_sRecording, p.recording()}, {m_sSplit, p.split()}, {m_sDescription, p.description()}, {m_sDatatype, p.datatype()}, {m_sSuffix, p.suffix()}, {m_sExtension, p.extension()}};
+        if (std::all_of(wanted.cbegin(), wanted.cend(), [](const auto& w) { return w.first.isEmpty() || w.first == w.second; }))
+            results.append(p);
     }
 
+    std::sort(results.begin(), results.end(), [](const BIDSPath& a, const BIDSPath& b) { return a.filePath() < b.filePath(); });
     return results;
 }
 

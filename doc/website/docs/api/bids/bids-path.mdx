@@ -515,13 +515,11 @@ Creates the directory structure for this path (mkdir -p).
 
 ### match()
 
-Searches the BIDS root for all files matching the current entities.
-
-Wildcards are used for unset entities.
+Searches the BIDS root (all subject, session and datatype folders) for files whose entities, datatype, suffix and extension equal the ones set here; unset ones match anything, as in mne_bids.BIDSPath.match.
 
 **Returns:**
 
-- *QList&lt; [BIDSPath](/docs/api/bids/bids-path) &gt;* — List of matching [`BIDSPath`](/docs/api/bids/bids-path) objects.
+- *QList&lt; [BIDSPath](/docs/api/bids/bids-path) &gt;* — Matching paths, sorted by file path.
 
 ---
 

@@ -778,6 +778,31 @@ void TestBids::testPathSettersGetters()
     // mne_bids.BIDSPath(...).basename with the same entities (space CTF, check=False)
     path.setSpace("CTF");
     QCOMPARE(path.basename(), QStringLiteral("sub-02_ses-03_task-motor_acq-acq01_run-01_proc-sss_space-CTF_recording-ecog_split-01_desc-filtered_meg.fif"));
+
+    // match(): every set entity filters, unset ones match anything, files are found below the root
+    QTemporaryDir dir;
+    for (const QString& file : {QStringLiteral("sub-01/ses-01/ieeg/sub-01_ses-01_task-rest_run-01_ieeg.vhdr"),
+                                QStringLiteral("sub-01/ses-01/ieeg/sub-01_ses-01_task-motor_ieeg.vhdr"),
+                                QStringLiteral("sub-01/ses-01/ieeg/sub-01_ses-01_task-rest_run-01_ieeg.eeg"),
+                                QStringLiteral("sub-02/ses-01/ieeg/sub-02_ses-01_task-rest_ieeg.vhdr")}) {
+        QVERIFY(QDir(dir.path()).mkpath(QFileInfo(file).path()));
+        QFile f(dir.filePath(file));
+        QVERIFY(f.open(QIODevice::WriteOnly));
+    }
+    const auto describe = [](const QList<BIDSPath>& paths) {
+        QStringList out;
+        for (const BIDSPath& p : paths) {
+            out << QStringList{p.subject(), p.session(), p.task(), p.run(), p.datatype(), p.suffix(), p.extension()}.join(u'|');
+        }
+        return out;
+    };
+    // Expected: mne_bids.BIDSPath(root=..., **entities).match()
+    QCOMPARE(describe(BIDSPath(dir.path(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr").match()),
+             QStringList{"01|01|rest|01|ieeg|ieeg|.vhdr"});
+    QCOMPARE(describe(BIDSPath(dir.path(), "01", "01", QString(), "ieeg", "ieeg", ".vhdr").match()),
+             (QStringList{"01|01|motor||ieeg|ieeg|.vhdr", "01|01|rest|01|ieeg|ieeg|.vhdr"}));
+    QCOMPARE(describe(BIDSPath(dir.path(), QString(), QString(), "rest", "ieeg", "ieeg", ".vhdr").match()),
+             (QStringList{"01|01|rest|01|ieeg|ieeg|.vhdr", "02|01|rest||ieeg|ieeg|.vhdr"}));
 }
 
 //=============================================================================================================

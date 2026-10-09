@@ -340,10 +340,10 @@ public:
     bool mkdirs() const;
 
     /**
-     * Searches the BIDS root for all files matching the current entities.
-     * Wildcards are used for unset entities.
+     * Searches the BIDS root (all subject, session and datatype folders) for files whose entities, datatype,
+     * suffix and extension equal the ones set here; unset ones match anything, as in mne_bids.BIDSPath.match.
      *
-     * @return List of matching BIDSPath objects.
+     * @return Matching paths, sorted by file path.
      */
     QList<BIDSPath> match() const;
 

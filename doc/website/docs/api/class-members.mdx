@@ -3074,7 +3074,7 @@ Index of 6251 public class members (functions, variables, typedefs, enums) acros
 - **marker_values** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Per-vertex marker values (shown in shades of marker color).
 - **markerMoved** `[signal]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — position is emitted whenever user moves the mouse inside of the table view viewport
 - **markerMoved** `[fn]` in [RtFiffRawViewDelegate](/docs/api/disp/rt-fiff-raw-view-delegate) — markerMoved is called whenever user moves the mouse inside of the table view viewport
-- **match** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Searches the BIDS root for all files matching the current entities.
+- **match** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Searches the BIDS root (all subject, session and datatype folders) for files whose entities, datatype, suffix and extension equal the ones set here; unset ones match anything, as in mne_bids.BIDSPath.match.
 - **match** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Keeps the derivations whose inputs are all among `chNames` and merges them into one derivation whose columns are exactly `chNames` (MNE-C `mne_match_merge_deriv`).
 - **matched** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Set by the last `MNELayout::matchPorts` call.
 - **matches** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns which port shows which channel after `matchPorts(const QStringList&)`.
