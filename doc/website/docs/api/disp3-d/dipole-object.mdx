@@ -87,7 +87,21 @@ const int pickedDipole = dipoleGlyphs.intersect(QVector3D(0.03f, 0.0f, 0.2f), QV
 
 ---
 
-### debugFirstDipolePosition()
+### boundingBox(min, max)
+
+Axis-aligned bounds of the (transformed) dipole positions.
+
+**Parameters:**
+
+- **min** : *QVector3D &*
+  Minimum corner.
+
+- **max** : *QVector3D &*
+  Maximum corner.
+
+**Returns:**
+
+- *bool* — False if no dipoles are loaded.
 
 ---
 

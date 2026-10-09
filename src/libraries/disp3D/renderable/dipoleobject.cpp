@@ -176,13 +176,18 @@ void DipoleObject::applyTransform(const QMatrix4x4& trans)
     m_instancesDirty = true;
 }
 
-QVector3D DipoleObject::debugFirstDipolePosition() const
+bool DipoleObject::boundingBox(QVector3D& min, QVector3D& max) const
 {
     if (m_instanceCount == 0)
-        return QVector3D();
+        return false;
     const InstanceData* data = reinterpret_cast<const InstanceData*>(m_instanceData.constData());
-    // Column 3 is translation (12, 13, 14)
-    return QVector3D(data[0].model[12], data[0].model[13], data[0].model[14]);
+    for (int i = 0; i < m_instanceCount; ++i) {
+        // Column-major model matrix: the translation is elements 12..14
+        const QVector3D pos(data[i].model[12], data[i].model[13], data[i].model[14]);
+        min = i == 0 ? pos : QVector3D(std::min(min.x(), pos.x()), std::min(min.y(), pos.y()), std::min(min.z(), pos.z()));
+        max = i == 0 ? pos : QVector3D(std::max(max.x(), pos.x()), std::max(max.y(), pos.y()), std::max(max.z(), pos.z()));
+    }
+    return true;
 }
 
 void DipoleObject::createGeometry()

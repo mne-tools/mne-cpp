@@ -90,7 +90,15 @@ public:
         m_visible = visible;
     }
 
-    QVector3D debugFirstDipolePosition() const; // For debugging
+    //=========================================================================================================
+    /**
+     * Axis-aligned bounds of the (transformed) dipole positions.
+     *
+     * @param[out] min   Minimum corner.
+     * @param[out] max   Maximum corner.
+     * @return False if no dipoles are loaded.
+     */
+    bool boundingBox(QVector3D& min, QVector3D& max) const;
 
     void setSelected(int index, bool selected);
 

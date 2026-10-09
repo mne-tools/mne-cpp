@@ -576,13 +576,12 @@ void BrainView::updateSceneBounds()
         }
     }
 
-    // Iterate over all dipoles
-    for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-        if (it.value()->isVisible()) {
-            // Dipoles don't have a bounding box method in DipoleObject yet,
-            // but we can approximate or skip for now.
-            // Ideally DipoleObject should expose bounds.
-            // For now, let's assume surfaces dictate the scene size usually.
+    for (auto it = m_itemDipoleMap.cbegin(); it != m_itemDipoleMap.cend(); ++it) {
+        QVector3D dMin, dMax;
+        if (it.value()->isVisible() && it.value()->boundingBox(dMin, dMax)) {
+            min = QVector3D(std::min(min.x(), dMin.x()), std::min(min.y(), dMin.y()), std::min(min.z(), dMin.z()));
+            max = QVector3D(std::max(max.x(), dMax.x()), std::max(max.y(), dMax.y()), std::max(max.z(), dMax.z()));
+            hasContent = true;
         }
     }
 

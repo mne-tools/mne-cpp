@@ -307,7 +307,7 @@ private slots:
     //=========================================================================================================
     /**
      * Verifies DipoleObject with a loaded ECD set: load(), applyTransform(),
-     * debugFirstDipolePosition(), and intersect().
+     * boundingBox(), and intersect().
      */
     void dipoleObject_extended();
 
@@ -417,6 +417,25 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     QVERIFY(!view.loadDipoles(dipPath));
     QVERIFY(!view.loadSourceSpace(fwdPath));
     QVERIFY(view.loadNetwork(network, QStringLiteral("Coherence")));
+
+    // Dipoles alone frame the camera: the view centre looks at an off-axis dipole
+    {
+        INVLIB::InvEcd offAxis = ecd;
+        offAxis.rd = Eigen::Vector3f(0.08f, 0.06f, 0.05f);
+        INVLIB::InvEcdSet offAxisSet;
+        offAxisSet << offAxis;
+        const QString offAxisPath = dir.filePath(QStringLiteral("off-axis.dip"));
+        QVERIFY(offAxisSet.save_dipoles_dip(offAxisPath));
+        BrainTreeModel dipModel;
+        BrainView dipView;
+        dipView.setModel(&dipModel);
+        dipView.showSingleView();
+        dipView.setDipoleVisible(true);
+        QVERIFY(dipView.loadDipoles(offAxisPath));
+        QSignalSpy dipHovered(&dipView, &BrainView::hoveredRegionChanged);
+        dipView.castRay(dipView.rect().center());
+        QVERIFY(!dipHovered.isEmpty() && !dipHovered.last().at(0).toString().isEmpty());
+    }
 
     BrainTreeModel model;
     BrainView modelView;
@@ -1914,9 +1933,8 @@ void TestDisp3dBrainView::dipoleObject_basics()
     obj.setSelected(-1, true);
     obj.setSelected(0, false);
 
-    // debugFirstDipolePosition on empty — returns QVector3D()
-    QVector3D pos = obj.debugFirstDipolePosition();
-    QCOMPARE(pos, QVector3D(0, 0, 0));
+    QVector3D bMin, bMax;
+    QVERIFY(!obj.boundingBox(bMin, bMax));
 
     QApplication::processEvents();
 }
@@ -2209,24 +2227,30 @@ void TestDisp3dBrainView::dipoleObject_extended()
     obj.load(ecdSet);
     QVERIFY(obj.instanceCount() > 0);
 
-    // debugFirstDipolePosition — returns position of first instance
-    QVector3D pos = obj.debugFirstDipolePosition();
-    // Coordinates are ~10–40 mm → converted to meters (0.001 scale)
-    QVERIFY(std::abs(pos.x()) < 1.0f);
+    // The bounds span the dipole positions
+    QVector3D pos, bMax;
+    QVERIFY(obj.boundingBox(pos, bMax));
+    QVERIFY((pos - QVector3D(-0.01f, 0.01f, 0.03f)).length() < 1e-7f);
+    QVERIFY((bMax - QVector3D(0.01f, 0.02f, 0.04f)).length() < 1e-7f);
 
     // applyTransform places the loaded dipoles; it replaces the previous transform instead of stacking on it,
     // so a transform can be re-applied whenever it changes
+    const auto minCorner = [&obj] {
+        QVector3D lo, hi;
+        obj.boundingBox(lo, hi);
+        return lo;
+    };
     QMatrix4x4 identity;
     obj.applyTransform(identity);
-    QCOMPARE(obj.debugFirstDipolePosition(), pos);
+    QCOMPARE(minCorner(), pos);
 
     QMatrix4x4 translate;
     translate.translate(0.01f, 0.0f, 0.0f);
     obj.applyTransform(translate);
     obj.applyTransform(translate);
-    QVERIFY((obj.debugFirstDipolePosition() - (pos + QVector3D(0.01f, 0.0f, 0.0f))).length() < 1e-7f);
+    QVERIFY((minCorner() - (pos + QVector3D(0.01f, 0.0f, 0.0f))).length() < 1e-7f);
     obj.applyTransform(identity);
-    QVERIFY((obj.debugFirstDipolePosition() - pos).length() < 1e-7f);
+    QVERIFY((minCorner() - pos).length() < 1e-7f);
 
     // intersect — ray casting against cone geometry
     float dist = 0.0f;
