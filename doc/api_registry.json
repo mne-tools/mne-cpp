@@ -11447,15 +11447,16 @@
       },
       {
         "python": "mne.BaseEpochs",
-        "status": "implemented",
-        "mne_cpp": "MNEEpochDataList",
-        "note": "base epochs container"
+        "status": "partial",
+        "mne_cpp": "MNELIB::MNEEpochDataList",
+        "note": "no crop/resample/save/metadata",
+        "test": "test_mne_library"
       },
       {
         "python": "mne.BiHemiLabel",
-        "status": "implemented",
-        "mne_cpp": "Label (FSLIB)",
-        "note": "bi-hemisphere label"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FsLabel is deliberately single-hemisphere (src/libraries/fs/fs_label.h:170)"
       },
       {
         "python": "mne.Dipole",
@@ -11466,15 +11467,16 @@
       },
       {
         "python": "mne.DipoleFixed",
-        "status": "partial",
-        "mne_cpp": "ECD (partial)",
-        "note": "fixed-dipole time course limited"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": ""
       },
       {
         "python": "mne.EpochsArray",
-        "status": "implemented",
-        "mne_cpp": "MNEEpochDataList (constructed directly)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MNELIB::MNEEpochData, FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
+        "note": "no info/events-bearing array constructor",
+        "test": "test_epochs"
       },
       {
         "python": "mne.EvokedArray",
@@ -11511,8 +11513,9 @@
       {
         "python": "mne.VolSourceEstimate",
         "status": "partial",
-        "mne_cpp": "MNESourceEstimate (partial)",
-        "note": "volume STC limited"
+        "mne_cpp": "INVLIB::InvVolumeSourceEstimate",
+        "note": "no NIfTI export",
+        "test": "test_source_estimate_types"
       },
       {
         "python": "mne.VolVectorSourceEstimate",
@@ -11523,8 +11526,9 @@
       {
         "python": "mne.add_reference_channels",
         "status": "implemented",
-        "mne_cpp": "RTPROCESSINGLIB rereference",
-        "note": ""
+        "mne_cpp": "UTILSLIB::addReferenceChannels",
+        "note": "",
+        "test": "test_dsp_eeg_reference"
       },
       {
         "python": "mne.add_source_space_distances",
@@ -11557,31 +11561,36 @@
         "python": "mne.average_forward_solutions",
         "status": "implemented",
         "mne_cpp": "mne_average_forward_solutions (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_tool_data_pipeline"
       },
       {
         "python": "mne.beamformer.Beamformer",
-        "status": "implemented",
-        "mne_cpp": "Lcmv/Dics (container)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "INVLIB::InvBeamformer",
+        "note": "no save/read",
+        "test": "test_inv_beamformer"
       },
       {
         "python": "mne.beamformer.apply_dics",
         "status": "implemented",
-        "mne_cpp": "Dics",
-        "note": ""
+        "mne_cpp": "InvDICS::applyDICS",
+        "note": "",
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.apply_dics_csd",
         "status": "implemented",
-        "mne_cpp": "Dics (CSD)",
-        "note": ""
+        "mne_cpp": "InvDICS::applyDICSCsd",
+        "note": "",
+        "test": "test_inv_beamformer"
       },
       {
         "python": "mne.beamformer.apply_dics_epochs",
-        "status": "partial",
-        "mne_cpp": "Dics (partial)",
-        "note": "epochs DICS"
+        "status": "implemented",
+        "mne_cpp": "InvDICS::applyDICSEpochs",
+        "note": "epochs DICS",
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.apply_dics_tfr_epochs",
@@ -11606,14 +11615,16 @@
       {
         "python": "mne.beamformer.apply_lcmv_epochs",
         "status": "implemented",
-        "mne_cpp": "Lcmv (epochs)",
-        "note": ""
+        "mne_cpp": "InvLCMV::applyLCMVEpochs",
+        "note": "",
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.apply_lcmv_raw",
         "status": "implemented",
-        "mne_cpp": "Lcmv (raw)",
-        "note": ""
+        "mne_cpp": "InvLCMV::applyLCMVRaw",
+        "note": "",
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.make_dics",
@@ -11637,45 +11648,51 @@
       },
       {
         "python": "mne.beamformer.read_beamformer",
-        "status": "partial",
-        "mne_cpp": "Lcmv/Dics (partial)",
-        "note": "beamformer I/O limited"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "InvBeamformer has no I/O"
       },
       {
         "python": "mne.channel_indices_by_type",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB channel picking",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "FiffInfoBase::pick_types, channel_type",
+        "note": "per-type picks only; no type→indices dict",
+        "test": "test_fiff_info"
       },
       {
         "python": "mne.channel_type",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB channel-type query",
-        "note": ""
+        "mne_cpp": "FIFFLIB::FiffInfoBase::channel_type",
+        "note": "",
+        "test": "test_fiff_info"
       },
       {
         "python": "mne.channels.DigMontage",
         "status": "partial",
-        "mne_cpp": "FIFFLIB dig (partial)",
-        "note": "montage container limited"
+        "mne_cpp": "FIFFLIB::FiffDigPointSet",
+        "note": "no channel-name→position montage API",
+        "test": "test_fiff_dig_point_python"
       },
       {
         "python": "mne.channels.Layout",
         "status": "implemented",
-        "mne_cpp": "DISPLIB Layout",
-        "note": ""
+        "mne_cpp": "MNELIB::MNELayout",
+        "note": "",
+        "test": "test_mne_library"
       },
       {
         "python": "mne.channels.combine_channels",
-        "status": "implemented",
-        "mne_cpp": "MNEDeriv combinations",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::ChannelDerivation::apply",
+        "note": "weighted sums only; no median/std",
+        "test": "test_dsp_channel_derivation"
       },
       {
         "python": "mne.channels.compute_dev_head_t",
-        "status": "implemented",
-        "mne_cpp": "mne_coreg ICP",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MNELIB::fitMatchedPoints",
+        "note": "rigid point fit; no montage-HPI extraction",
+        "test": "test_coregistration"
       },
       {
         "python": "mne.channels.compute_native_head_t",
@@ -11685,8 +11702,8 @@
       },
       {
         "python": "mne.channels.equalize_channels",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB channel alignment",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -11698,21 +11715,23 @@
       },
       {
         "python": "mne.channels.find_layout",
-        "status": "implemented",
-        "mne_cpp": "DISPLIB layout",
-        "note": ""
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no automatic layout selection"
       },
       {
         "python": "mne.channels.fix_mag_coil_types",
         "status": "implemented",
-        "mne_cpp": "mne_fix_mag_coil_types (CLI)",
-        "note": ""
+        "mne_cpp": "processFile (CLI)",
+        "note": "",
+        "test": "test_tool_data_pipeline"
       },
       {
         "python": "mne.channels.generate_2d_layout",
-        "status": "implemented",
-        "mne_cpp": "DISPLIB layout generation",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::LayoutMaker::makeLayout",
+        "note": "projects 3-D points; no direct 2-D input",
+        "test": "test_utils_layout_selection"
       },
       {
         "python": "mne.channels.get_builtin_ch_adjacencies",
@@ -11735,19 +11754,21 @@
       {
         "python": "mne.channels.make_dig_montage",
         "status": "partial",
-        "mne_cpp": "FIFFLIB dig (partial)",
-        "note": "montage builder limited"
+        "mne_cpp": "FiffDigPointSet(QList<FiffDigPoint>)",
+        "note": "no name→position mapping",
+        "test": "test_fiff_dig_point_python"
       },
       {
         "python": "mne.channels.make_eeg_layout",
         "status": "implemented",
-        "mne_cpp": "mne_make_eeg_layout (CLI)",
-        "note": ""
+        "mne_cpp": "LayoutMaker::makeLayout (CLI)",
+        "note": "",
+        "test": "test_tool_surface_math"
       },
       {
         "python": "mne.channels.make_grid_layout",
-        "status": "implemented",
-        "mne_cpp": "DISPLIB grid layout",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -11766,8 +11787,9 @@
       {
         "python": "mne.channels.read_custom_montage",
         "status": "partial",
-        "mne_cpp": "FIFFLIB dig (partial)",
-        "note": "custom montage limited"
+        "mne_cpp": "UTILSLIB::LayoutLoader::readAsaElcFile",
+        "note": ".elc only; no .sfp/.loc/.bvef",
+        "test": "test_utils_layout_selection"
       },
       {
         "python": "mne.channels.read_dig_captrak",
@@ -11803,8 +11825,9 @@
       {
         "python": "mne.channels.read_dig_hpts",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB HPTS dig I/O",
-        "note": ""
+        "mne_cpp": "readHpts (CLI)",
+        "note": "",
+        "test": "test_tool_conversion_functions"
       },
       {
         "python": "mne.channels.read_dig_localite",
@@ -11814,9 +11837,9 @@
       },
       {
         "python": "mne.channels.read_dig_polhemus_isotrak",
-        "status": "implemented",
-        "mne_cpp": "mne_coreg Polhemus driver",
-        "note": ""
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no .hsp/.elp isotrak reader (the Tufts .elp reader is a different format)"
       },
       {
         "python": "mne.channels.read_layout",
@@ -11827,21 +11850,23 @@
       },
       {
         "python": "mne.channels.read_polhemus_fastscan",
-        "status": "implemented",
-        "mne_cpp": "mne_coreg Polhemus driver",
-        "note": ""
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "FastrakParser parses the live serial stream, not files"
       },
       {
         "python": "mne.channels.read_vectorview_selection",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB selection I/O",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::SelectionIO::readMNESelFile",
+        "note": "reads .sel; no name filter or space fixing",
+        "test": "test_utils_layout_selection"
       },
       {
         "python": "mne.channels.rename_channels",
         "status": "implemented",
         "mne_cpp": "mne_rename_channels (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_tool_preproc_helpers"
       },
       {
         "python": "mne.channels.transform_to_head",
@@ -11852,8 +11877,8 @@
       },
       {
         "python": "mne.channels.unify_bad_channels",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB bad-channel utils",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -11879,21 +11904,23 @@
       },
       {
         "python": "mne.compute_proj_evoked",
-        "status": "implemented",
-        "mne_cpp": "DSPLIB SSP",
-        "note": ""
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "mne_cov2proj works on covariance, not evoked"
       },
       {
         "python": "mne.compute_proj_raw",
-        "status": "implemented",
-        "mne_cpp": "DSPLIB SSP",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "FIFFLIB::FiffProj::compute_from_raw",
+        "note": "event-locked epochs only; no continuous segmenting",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.compute_rank",
-        "status": "implemented",
-        "mne_cpp": "MATHLIB rank estimation",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MATHLIB::Linalg::rank",
+        "note": "matrix rank; no per-type/info/SSP handling",
+        "test": "test_utils_mnemath"
       },
       {
         "python": "mne.compute_raw_covariance",
@@ -11905,14 +11932,16 @@
       {
         "python": "mne.compute_source_morph",
         "status": "partial",
-        "mne_cpp": "MNEMorphMap (partial)",
-        "note": "surface morph; no unified vol morph"
+        "mne_cpp": "INVLIB::SourceMorph::compute, MNEMorphMap::compute",
+        "note": "nearest-neighbour surface only; no smoothing/volume",
+        "test": "test_source_morph"
       },
       {
         "python": "mne.concatenate_epochs",
         "status": "implemented",
-        "mne_cpp": "MNEEpochDataList",
-        "note": ""
+        "mne_cpp": "FIFFLIB::FiffEpochs::concatenateEpochs",
+        "note": "",
+        "test": "test_epochs"
       },
       {
         "python": "mne.concatenate_events",
@@ -11964,9 +11993,10 @@
       },
       {
         "python": "mne.decimate_surface",
-        "status": "implemented",
-        "mne_cpp": "MNESurface decimation",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MNEBemSurface::makeScalpSurfaces",
+        "note": "MNEBemSurface input only; vertex (not triangle) target",
+        "test": "test_tool_data_pipeline"
       },
       {
         "python": "mne.decoding.BaseEstimator",
@@ -11977,8 +12007,9 @@
       {
         "python": "mne.decoding.CSP",
         "status": "implemented",
-        "mne_cpp": "MlCsp (skigen)",
-        "note": ""
+        "mne_cpp": "DecodingCsp",
+        "note": "",
+        "test": "test_decoding_csp"
       },
       {
         "python": "mne.decoding.EMS",
@@ -11989,8 +12020,9 @@
       {
         "python": "mne.decoding.FilterEstimator",
         "status": "partial",
-        "mne_cpp": "DSPLIB filters (partial)",
-        "note": "no sklearn wrapper"
+        "mne_cpp": "FirFilter::filterData",
+        "note": "filters exist; no transformer wrapper",
+        "test": "test_dsp_annotate_artifact"
       },
       {
         "python": "mne.decoding.GeneralizingEstimator",
@@ -12000,9 +12032,9 @@
       },
       {
         "python": "mne.decoding.LinearModel",
-        "status": "partial",
-        "mne_cpp": "MlLinearModel (partial)",
-        "note": "predict-only container"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no coef→patterns (Haufe) wrapper"
       },
       {
         "python": "mne.decoding.PSDEstimator",
@@ -12020,20 +12052,22 @@
       {
         "python": "mne.decoding.SPoC",
         "status": "implemented",
-        "mne_cpp": "MlSpoc (skigen)",
-        "note": ""
+        "mne_cpp": "DecodingSpoc",
+        "note": "",
+        "test": "test_decoding_spoc"
       },
       {
         "python": "mne.decoding.SSD",
         "status": "implemented",
-        "mne_cpp": "MlSsd (skigen)",
-        "note": ""
+        "mne_cpp": "DecodingSsd",
+        "note": "",
+        "test": "test_decoding_ssd"
       },
       {
         "python": "mne.decoding.Scaler",
-        "status": "implemented",
-        "mne_cpp": "MlScaler (skigen)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "StandardScaler",
+        "note": "generic external scaler; no per-channel-type scalings"
       },
       {
         "python": "mne.decoding.SlidingEstimator",
@@ -12043,15 +12077,17 @@
       },
       {
         "python": "mne.decoding.SpatialFilter",
-        "status": "implemented",
-        "mne_cpp": "MlCsp/MlSpoc/MlSsd base",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "DecodingCsp::filters/patterns",
+        "note": "no shared base class; each decoder has its own filters/patterns",
+        "test": "test_decoding_csp"
       },
       {
         "python": "mne.decoding.TemporalFilter",
         "status": "partial",
-        "mne_cpp": "DSPLIB filters (partial)",
-        "note": "no sklearn wrapper"
+        "mne_cpp": "FirFilter::filterData",
+        "note": "no transformer wrapper",
+        "test": "test_dsp_annotate_artifact"
       },
       {
         "python": "mne.decoding.TimeDelayingRidge",
@@ -12062,8 +12098,9 @@
       {
         "python": "mne.decoding.TimeFrequency",
         "status": "partial",
-        "mne_cpp": "DSPLIB TFR (partial)",
-        "note": "no sklearn wrapper"
+        "mne_cpp": "MorletTfr::computeMultiChannel",
+        "note": "no transformer; power only",
+        "test": "test_dsp_morlet_tfr"
       },
       {
         "python": "mne.decoding.TransformerMixin",
@@ -12086,8 +12123,9 @@
       {
         "python": "mne.decoding.XdawnTransformer",
         "status": "implemented",
-        "mne_cpp": "xDAWN (DSPLIB)",
-        "note": ""
+        "mne_cpp": "UTILSLIB::Xdawn::fit/apply",
+        "note": "",
+        "test": "test_dsp_xdawn"
       },
       {
         "python": "mne.decoding.compute_ems",
@@ -12121,8 +12159,8 @@
       },
       {
         "python": "mne.equalize_channels",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB channel alignment",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -12134,15 +12172,15 @@
       },
       {
         "python": "mne.export.export_epochs",
-        "status": "partial",
-        "mne_cpp": "EDF/BrainVision export (partial)",
-        "note": "epochs export limited"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "only mne_epochs2mat (.mat output)"
       },
       {
         "python": "mne.export.export_evokeds",
-        "status": "partial",
-        "mne_cpp": "EDF/BrainVision export (partial)",
-        "note": "evoked export limited"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": ""
       },
       {
         "python": "mne.export.export_evokeds_mff",
@@ -12152,9 +12190,9 @@
       },
       {
         "python": "mne.export.export_raw",
-        "status": "partial",
-        "mne_cpp": "EDF/BrainVision export (partial)",
-        "note": "not all formats"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no EDF/BrainVision/EEGLAB writer"
       },
       {
         "python": "mne.find_events",
@@ -12165,8 +12203,8 @@
       },
       {
         "python": "mne.find_layout",
-        "status": "implemented",
-        "mne_cpp": "DISPLIB layout",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -12194,7 +12232,8 @@
         "python": "mne.forward.average_forward_solutions",
         "status": "implemented",
         "mne_cpp": "mne_average_forward_solutions (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_tool_data_pipeline"
       },
       {
         "python": "mne.forward.compute_depth_prior",
@@ -12259,9 +12298,10 @@
       },
       {
         "python": "mne.forward.use_coil_def",
-        "status": "implemented",
-        "mne_cpp": "FWDLIB coil definitions",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "FwdCoilSet::read_coil_defs",
+        "note": "custom coil file readable; ComputeFwd path hard-coded",
+        "test": "test_fwd_bem_field_computation"
       },
       {
         "python": "mne.forward.write_forward_solution",
@@ -12272,9 +12312,10 @@
       },
       {
         "python": "mne.get_head_surf",
-        "status": "implemented",
-        "mne_cpp": "FSLIB head surface",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MNEBem(QIODevice&)",
+        "note": "readable via MNEBem; no subject/path lookup",
+        "test": "test_mne_library"
       },
       {
         "python": "mne.get_meg_helmet_surf",
@@ -12286,20 +12327,22 @@
       {
         "python": "mne.get_volume_labels_from_aseg",
         "status": "partial",
-        "mne_cpp": "MRILIB aseg (partial)",
-        "note": ""
+        "mne_cpp": "FSLIB::FsAtlasLookup::load",
+        "note": "loads aseg; no listing of present labels",
+        "test": "test_fs_atlas_lookup"
       },
       {
         "python": "mne.get_volume_labels_from_src",
-        "status": "partial",
-        "mne_cpp": "MRILIB aseg (partial)",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
         "python": "mne.grade_to_tris",
-        "status": "implemented",
-        "mne_cpp": "MNESurface triangulation",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "generateIcoVertices",
+        "note": "ico vertices only (file-private); no triangles returned",
+        "test": "test_mne_source_space_ops_python"
       },
       {
         "python": "mne.grade_to_vertices",
@@ -12318,8 +12361,9 @@
       {
         "python": "mne.grow_labels",
         "status": "partial",
-        "mne_cpp": "FSLIB (partial)",
-        "note": "label grow present, split limited"
+        "mne_cpp": "FsLabelUtils::growLabel",
+        "note": "edge-hop count; no mm extent or multiple seeds",
+        "test": "test_label_utils"
       },
       {
         "python": "mne.head_to_mni",
@@ -12337,21 +12381,23 @@
       },
       {
         "python": "mne.inverse_sparse.gamma_map",
-        "status": "implemented",
-        "mne_cpp": "GammaMap",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "InvGammaMap::compute",
+        "note": "solver only; no evoked/forward/whitening wrapper",
+        "test": "test_inv_sparse"
       },
       {
         "python": "mne.inverse_sparse.make_stc_from_dipoles",
-        "status": "implemented",
-        "mne_cpp": "MixedNorm/GammaMap output",
-        "note": ""
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no dipole-list→STC conversion"
       },
       {
         "python": "mne.inverse_sparse.mixed_norm",
-        "status": "implemented",
-        "mne_cpp": "MixedNorm (MxNE)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "InvMxne::compute",
+        "note": "IRLS solver only; no whitening/depth/debias",
+        "test": "test_inv_sparse"
       },
       {
         "python": "mne.inverse_sparse.tf_mixed_norm",
@@ -12376,8 +12422,9 @@
       {
         "python": "mne.io.anonymize_info",
         "status": "implemented",
-        "mne_cpp": "mne_anonymize (CLI)",
-        "note": ""
+        "mne_cpp": "FiffAnonymizer (CLI)",
+        "note": "",
+        "test": "test_mne_anonymize"
       },
       {
         "python": "mne.io.concatenate_raws",
@@ -12388,14 +12435,14 @@
       },
       {
         "python": "mne.io.get_channel_type_constants",
-        "status": "implemented",
-        "mne_cpp": "FIFF constants",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "FIFFV_MEG_CH",
+        "note": "macros only; no name→constants map"
       },
       {
         "python": "mne.io.match_channel_orders",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB channel alignment",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -12437,8 +12484,9 @@
       {
         "python": "mne.io.read_fiducials",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB fiducial I/O",
-        "note": ""
+        "mne_cpp": "FiffDigPointSet(QIODevice&), FiffDigitizerData",
+        "note": "",
+        "test": "test_mne_library"
       },
       {
         "python": "mne.io.read_info",
@@ -12449,9 +12497,10 @@
       },
       {
         "python": "mne.io.read_raw",
-        "status": "implemented",
-        "mne_cpp": "BIDS reader dispatch / CLI converters",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "BidsRawData::createReader",
+        "note": "dispatch for BrainVision/EDF/BDF only",
+        "test": "test_bids"
       },
       {
         "python": "mne.io.read_raw_ant",
@@ -12501,7 +12550,8 @@
         "python": "mne.io.read_raw_ctf",
         "status": "implemented",
         "mne_cpp": "mne_ctf2fiff (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_tool_conversion_extended"
       },
       {
         "python": "mne.io.read_raw_curry",
@@ -12575,7 +12625,8 @@
         "python": "mne.io.read_raw_kit",
         "status": "implemented",
         "mne_cpp": "mne_kit2fiff (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_tool_conversion_extended"
       },
       {
         "python": "mne.io.read_raw_nedf",
@@ -12629,13 +12680,15 @@
         "python": "mne.io.show_fiff",
         "status": "implemented",
         "mne_cpp": "mne_show_fiff (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_tool_show_fiff"
       },
       {
         "python": "mne.io.write_fiducials",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB fiducial I/O",
-        "note": ""
+        "mne_cpp": "FiffDigPointSet::write",
+        "note": "",
+        "test": "test_fiff_fs_library"
       },
       {
         "python": "mne.io.write_info",
@@ -12646,15 +12699,17 @@
       },
       {
         "python": "mne.label_sign_flip",
-        "status": "implemented",
-        "mne_cpp": "FSLIB label sign flip",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "InvLabelTimeCourse::computeSignFlip",
+        "note": "signs from data SVD, not source normals",
+        "test": "test_label_time_course"
       },
       {
         "python": "mne.labels_to_stc",
         "status": "partial",
-        "mne_cpp": "FSLIB (partial)",
-        "note": "label->stc limited"
+        "mne_cpp": "FsLabelUtils::labelsToStc",
+        "note": "binary mask only; no per-label values",
+        "test": "test_label_utils"
       },
       {
         "python": "mne.make_ad_hoc_cov",
@@ -12666,8 +12721,9 @@
       {
         "python": "mne.make_bem_model",
         "status": "implemented",
-        "mne_cpp": "mne_prepare_bem_model (CLI)",
-        "note": ""
+        "mne_cpp": "mne_surf2bem (CLI)",
+        "note": "",
+        "test": "test_mne_surf2bem"
       },
       {
         "python": "mne.make_bem_solution",
@@ -12718,8 +12774,8 @@
       },
       {
         "python": "mne.match_channel_orders",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB channel alignment",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -12745,7 +12801,7 @@
       {
         "python": "mne.minimum_norm.apply_inverse_epochs",
         "status": "implemented",
-        "mne_cpp": "MinimumNorm (epochs)",
+        "mne_cpp": "INVLIB::applyInverseEpochs",
         "note": ""
       },
       {
@@ -12771,8 +12827,9 @@
       {
         "python": "mne.minimum_norm.compute_source_psd",
         "status": "partial",
-        "mne_cpp": "Welch PSD + inverse (manual)",
-        "note": "no single convenience API"
+        "mne_cpp": "INVLIB::computeSourcePsd",
+        "note": "takes an STC; no raw→inverse→PSD pipeline",
+        "test": "test_inv_convenience"
       },
       {
         "python": "mne.minimum_norm.compute_source_psd_epochs",
@@ -12848,12 +12905,13 @@
         "python": "mne.morph_labels",
         "status": "implemented",
         "mne_cpp": "mne_morph_labels (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_tool_surface_math"
       },
       {
         "python": "mne.morph_source_spaces",
-        "status": "partial",
-        "mne_cpp": "MNEMorphMap (partial)",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -12865,8 +12923,9 @@
       {
         "python": "mne.pick_channels",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB channel picking",
-        "note": ""
+        "mne_cpp": "FiffInfoBase::pick_channels",
+        "note": "",
+        "test": "test_fiff_info"
       },
       {
         "python": "mne.pick_channels_cov",
@@ -12884,9 +12943,9 @@
       },
       {
         "python": "mne.pick_channels_regexp",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB channel picking",
-        "note": ""
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no regex channel picking"
       },
       {
         "python": "mne.pick_events",
@@ -12904,9 +12963,10 @@
       },
       {
         "python": "mne.pick_types",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB channel picking",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "FiffInfoBase::pick_types",
+        "note": "only meg/eeg/stim flags; no eog/ecg/seeg…",
+        "test": "test_fiff_info"
       },
       {
         "python": "mne.pick_types_forward",
@@ -12923,9 +12983,10 @@
       },
       {
         "python": "mne.preprocessing.ICA",
-        "status": "implemented",
-        "mne_cpp": "FastICA / Infomax (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax",
+        "note": "stateless functions; no info-aware object or save",
+        "test": "test_dsp_ica"
       },
       {
         "python": "mne.preprocessing.annotate_amplitude",
@@ -12990,15 +13051,17 @@
       },
       {
         "python": "mne.preprocessing.compute_proj_ecg",
-        "status": "implemented",
-        "mne_cpp": "DSPLIB ECG SSP",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "ArtifactDetect::detectEcg, FiffProj::compute_from_raw",
+        "note": "detection plus SSP exist; no combined helper",
+        "test": "test_dsp_artifact_detect"
       },
       {
         "python": "mne.preprocessing.compute_proj_eog",
-        "status": "implemented",
-        "mne_cpp": "DSPLIB EOG SSP",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "ArtifactDetect::detectEog, compute_from_raw",
+        "note": "detection plus SSP exist; no combined helper",
+        "test": "test_dsp_artifact_detect"
       },
       {
         "python": "mne.preprocessing.compute_proj_hfc",
@@ -13020,20 +13083,22 @@
       },
       {
         "python": "mne.preprocessing.create_ecg_epochs",
-        "status": "implemented",
-        "mne_cpp": "DSPLIB ECG epochs",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "detectEcg, EpochExtractor::extract",
+        "note": "no combined detect+epoch helper",
+        "test": "test_dsp_artifact_detect"
       },
       {
         "python": "mne.preprocessing.create_eog_epochs",
-        "status": "implemented",
-        "mne_cpp": "DSPLIB EOG epochs",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "detectEog, EpochExtractor::extract",
+        "note": "no combined detect+epoch helper",
+        "test": "test_dsp_artifact_detect"
       },
       {
         "python": "mne.preprocessing.equalize_bads",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB bad-channel utils",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -13052,14 +13117,16 @@
       {
         "python": "mne.preprocessing.find_ecg_events",
         "status": "implemented",
-        "mne_cpp": "DSPLIB ECG detection",
-        "note": ""
+        "mne_cpp": "ArtifactDetect::detectEcg",
+        "note": "",
+        "test": "test_dsp_artifact_detect"
       },
       {
         "python": "mne.preprocessing.find_eog_events",
         "status": "implemented",
-        "mne_cpp": "DSPLIB EOG detection",
-        "note": ""
+        "mne_cpp": "ArtifactDetect::detectEog",
+        "note": "",
+        "test": "test_dsp_artifact_detect"
       },
       {
         "python": "mne.preprocessing.get_score_funcs",
@@ -13069,15 +13136,17 @@
       },
       {
         "python": "mne.preprocessing.ica_find_ecg_events",
-        "status": "implemented",
-        "mne_cpp": "DSPLIB ECG detection",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "detectEcg",
+        "note": "needs a FiffInfo ECG channel; no ICA-source input",
+        "test": "test_dsp_artifact_detect"
       },
       {
         "python": "mne.preprocessing.ica_find_eog_events",
-        "status": "implemented",
-        "mne_cpp": "DSPLIB EOG detection",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "detectEog",
+        "note": "needs a FiffInfo EOG channel; no ICA-source input",
+        "test": "test_dsp_artifact_detect"
       },
       {
         "python": "mne.preprocessing.infomax",
@@ -13183,9 +13252,10 @@
       },
       {
         "python": "mne.read_dipole",
-        "status": "implemented",
-        "mne_cpp": "ECD / mne_dipole_fit (CLI)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "InvEcdSet::read_dipoles_dip",
+        "note": ".dip only; .bdip is write-only",
+        "test": "test_inv_dipole_rap_mne"
       },
       {
         "python": "mne.read_epochs",
@@ -13215,8 +13285,9 @@
       {
         "python": "mne.read_events",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB event I/O",
-        "note": ""
+        "mne_cpp": "FiffEvents::read, read_from_fif, read_from_ascii",
+        "note": "",
+        "test": "test_fiff_data_types"
       },
       {
         "python": "mne.read_evoked_besa",
@@ -13252,9 +13323,10 @@
       },
       {
         "python": "mne.read_freesurfer_lut",
-        "status": "implemented",
-        "mne_cpp": "FSLIB LUT reader",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "FsAtlasLookup::initLookupTable",
+        "note": "hard-coded subset; no LUT file parser",
+        "test": "test_fs_atlas_lookup"
       },
       {
         "python": "mne.read_label",
@@ -13298,15 +13370,16 @@
       },
       {
         "python": "mne.read_source_estimate",
-        "status": "implemented",
-        "mne_cpp": "MNESourceEstimate::read",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "InvSourceEstimate::read, read_w",
+        "note": ".stc/.w only; no .h5",
+        "test": "test_source_estimate_io"
       },
       {
         "python": "mne.read_source_morph",
-        "status": "partial",
-        "mne_cpp": "MNEMorphMap (partial)",
-        "note": "surface morph only"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libraries/mne/mne_morph_map.h:120)"
       },
       {
         "python": "mne.read_source_spaces",
@@ -13317,9 +13390,10 @@
       },
       {
         "python": "mne.read_talxfm",
-        "status": "partial",
-        "mne_cpp": "FSLIB (partial)",
-        "note": "Talairach xfm limited"
+        "status": "implemented",
+        "mne_cpp": "FiffCoordTransSet::readMniTransform",
+        "note": "Talairach xfm limited",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.read_trans",
@@ -13331,20 +13405,23 @@
       {
         "python": "mne.read_tri",
         "status": "implemented",
-        "mne_cpp": "mne_convert_surface (CLI)",
-        "note": ""
+        "mne_cpp": "readTriFile (CLI)",
+        "note": "",
+        "test": "test_tool_conversion_functions"
       },
       {
         "python": "mne.read_vectorview_selection",
-        "status": "implemented",
-        "mne_cpp": "FIFFLIB selection I/O",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "SelectionIO::readMNESelFile",
+        "note": "reads .sel; no name filter or space fixing",
+        "test": "test_utils_layout_selection"
       },
       {
         "python": "mne.rename_channels",
         "status": "implemented",
         "mne_cpp": "mne_rename_channels (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_tool_preproc_helpers"
       },
       {
         "python": "mne.scale_bem",
@@ -13372,27 +13449,31 @@
       },
       {
         "python": "mne.sensitivity_map",
-        "status": "implemented",
+        "status": "partial",
         "mne_cpp": "mne_sensitivity_map (CLI)",
-        "note": ""
+        "note": "only norm/svd modes",
+        "test": "test_tool_data_pipeline"
       },
       {
         "python": "mne.set_bipolar_reference",
         "status": "implemented",
-        "mne_cpp": "MNEDeriv / mne_make_derivations (CLI)",
-        "note": ""
+        "mne_cpp": "UTILSLIB::setBipolarReference",
+        "note": "",
+        "test": "test_dsp_eeg_reference"
       },
       {
         "python": "mne.set_eeg_reference",
         "status": "implemented",
-        "mne_cpp": "RTPROCESSINGLIB rereference",
-        "note": ""
+        "mne_cpp": "UTILSLIB::setEegReference",
+        "note": "",
+        "test": "test_dsp_eeg_reference"
       },
       {
         "python": "mne.setup_source_space",
         "status": "implemented",
         "mne_cpp": "mne_make_source_space (CLI)",
-        "note": "surface source space"
+        "note": "surface source space",
+        "test": "test_tool_forward_generation"
       },
       {
         "python": "mne.setup_volume_source_space",
@@ -13475,9 +13556,9 @@
       },
       {
         "python": "mne.source_space.get_decimated_surfaces",
-        "status": "implemented",
-        "mne_cpp": "MNESurface decimation",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MNESurfaceOrVolume::use_itris",
+        "note": "use_itris stored; no extraction helper"
       },
       {
         "python": "mne.source_space.read_source_spaces",
@@ -13490,7 +13571,8 @@
         "python": "mne.source_space.setup_source_space",
         "status": "implemented",
         "mne_cpp": "mne_make_source_space (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_tool_forward_generation"
       },
       {
         "python": "mne.source_space.setup_volume_source_space",
@@ -13681,33 +13763,38 @@
       },
       {
         "python": "mne.stc_to_label",
-        "status": "partial",
-        "mne_cpp": "FSLIB (partial)",
-        "note": "stc->label limited"
+        "status": "implemented",
+        "mne_cpp": "FsLabelUtils::stcToLabel",
+        "note": "stc->label limited",
+        "test": "test_label_utils"
       },
       {
         "python": "mne.time_frequency.AverageTFR",
-        "status": "implemented",
-        "mne_cpp": "TFR containers (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MorletTfrResult, MultitaperTfrResult",
+        "note": "result struct only; no info/average/IO",
+        "test": "test_dsp_morlet_tfr"
       },
       {
         "python": "mne.time_frequency.AverageTFRArray",
-        "status": "implemented",
-        "mne_cpp": "TFR containers (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MorletTfrResult",
+        "note": "result struct only",
+        "test": "test_dsp_morlet_tfr"
       },
       {
         "python": "mne.time_frequency.BaseTFR",
-        "status": "implemented",
-        "mne_cpp": "TFR containers (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MultitaperTfrResult",
+        "note": "no common TFR base class",
+        "test": "test_dsp_multitaper"
       },
       {
         "python": "mne.time_frequency.CrossSpectralDensity",
-        "status": "implemented",
-        "mne_cpp": "CrossSpectralDensity",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::CsdResult",
+        "note": "no channel names/pick/IO",
+        "test": "test_dsp_csd"
       },
       {
         "python": "mne.time_frequency.EpochsSpectrum",
@@ -13725,27 +13812,29 @@
       },
       {
         "python": "mne.time_frequency.EpochsTFR",
-        "status": "implemented",
-        "mne_cpp": "TFR containers (DSPLIB)",
-        "note": ""
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no per-epoch TFR container"
       },
       {
         "python": "mne.time_frequency.EpochsTFRArray",
-        "status": "implemented",
-        "mne_cpp": "TFR containers (DSPLIB)",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
         "python": "mne.time_frequency.RawTFR",
-        "status": "implemented",
-        "mne_cpp": "TFR containers (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MorletTfr::computeMultiChannel",
+        "note": "result struct only",
+        "test": "test_dsp_morlet_tfr"
       },
       {
         "python": "mne.time_frequency.RawTFRArray",
-        "status": "implemented",
-        "mne_cpp": "TFR containers (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MorletTfrResult",
+        "note": "result struct only",
+        "test": "test_dsp_morlet_tfr"
       },
       {
         "python": "mne.time_frequency.Spectrum",
@@ -13770,57 +13859,64 @@
       },
       {
         "python": "mne.time_frequency.combine_tfr",
-        "status": "partial",
-        "mne_cpp": "TFR (partial)",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
         "python": "mne.time_frequency.csd_array_fourier",
-        "status": "implemented",
-        "mne_cpp": "CrossSpectralDensity",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "Csd::computeFourier",
+        "note": "2-D input; no averaging over epochs",
+        "test": "test_dsp_csd"
       },
       {
         "python": "mne.time_frequency.csd_array_morlet",
-        "status": "implemented",
-        "mne_cpp": "CrossSpectralDensity",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "Csd::computeMorlet",
+        "note": "2-D input; no averaging over epochs",
+        "test": "test_dsp_csd"
       },
       {
         "python": "mne.time_frequency.csd_array_multitaper",
-        "status": "implemented",
-        "mne_cpp": "CrossSpectralDensity",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "Csd::computeMultitaper",
+        "note": "2-D input; no averaging over epochs",
+        "test": "test_dsp_csd"
       },
       {
         "python": "mne.time_frequency.csd_fourier",
-        "status": "implemented",
-        "mne_cpp": "CrossSpectralDensity",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "Csd::computeFourier",
+        "note": "matrix input; no Epochs object",
+        "test": "test_dsp_csd"
       },
       {
         "python": "mne.time_frequency.csd_morlet",
-        "status": "implemented",
-        "mne_cpp": "CrossSpectralDensity",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "Csd::computeMorlet",
+        "note": "matrix input; no Epochs object",
+        "test": "test_dsp_csd"
       },
       {
         "python": "mne.time_frequency.csd_multitaper",
-        "status": "implemented",
-        "mne_cpp": "CrossSpectralDensity",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "Csd::computeMultitaper",
+        "note": "matrix input; no Epochs object",
+        "test": "test_dsp_csd"
       },
       {
         "python": "mne.time_frequency.csd_tfr",
-        "status": "partial",
-        "mne_cpp": "CrossSpectralDensity (partial)",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
         "python": "mne.time_frequency.dpss_windows",
         "status": "implemented",
-        "mne_cpp": "DPSS tapers (DSPLIB)",
-        "note": ""
+        "mne_cpp": "UTILSLIB::Dpss::compute",
+        "note": "",
+        "test": "test_dsp_multitaper"
       },
       {
         "python": "mne.time_frequency.fit_iir_model_raw",
@@ -13842,14 +13938,14 @@
       },
       {
         "python": "mne.time_frequency.morlet",
-        "status": "implemented",
-        "mne_cpp": "Morlet wavelets (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MorletTfr::buildWavelet",
+        "note": "wavelet builder is private"
       },
       {
         "python": "mne.time_frequency.pick_channels_csd",
-        "status": "implemented",
-        "mne_cpp": "CrossSpectralDensity picking",
+        "status": "missing",
+        "mne_cpp": "",
         "note": ""
       },
       {
@@ -13868,9 +13964,9 @@
       },
       {
         "python": "mne.time_frequency.read_csd",
-        "status": "partial",
-        "mne_cpp": "CrossSpectralDensity (partial)",
-        "note": "CSD I/O limited"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": ""
       },
       {
         "python": "mne.time_frequency.read_spectrum",
@@ -13881,27 +13977,30 @@
       },
       {
         "python": "mne.time_frequency.read_tfrs",
-        "status": "partial",
-        "mne_cpp": "TFR (partial)",
-        "note": "TFR I/O limited"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": ""
       },
       {
         "python": "mne.time_frequency.stft",
-        "status": "implemented",
-        "mne_cpp": "Spectrogram STFT (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "Spectrogram::makeSpectrogram",
+        "note": "Gaussian-window magnitude only; no complex output/istft",
+        "test": "test_dsp_spectrogram"
       },
       {
         "python": "mne.time_frequency.stftfreq",
         "status": "implemented",
-        "mne_cpp": "Spectrogram STFT (DSPLIB)",
-        "note": ""
+        "mne_cpp": "MATHLIB::Spectral::calculateFFTFreqs",
+        "note": "",
+        "test": "test_utils_spectral"
       },
       {
         "python": "mne.time_frequency.tfr_array_morlet",
-        "status": "implemented",
-        "mne_cpp": "Morlet TFR (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MorletTfr::computeMultiChannel",
+        "note": "power only; single epoch; no complex/ITC",
+        "test": "test_dsp_morlet_tfr"
       },
       {
         "python": "mne.time_frequency.tfr_array_multitaper",
@@ -13917,9 +14016,10 @@
       },
       {
         "python": "mne.time_frequency.tfr_morlet",
-        "status": "implemented",
-        "mne_cpp": "Morlet TFR (DSPLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "MorletTfr::compute",
+        "note": "no Epochs input, averaging or ITC",
+        "test": "test_dsp_morlet_tfr"
       },
       {
         "python": "mne.time_frequency.tfr_multitaper",
@@ -13935,27 +14035,30 @@
       },
       {
         "python": "mne.time_frequency.write_tfrs",
-        "status": "partial",
-        "mne_cpp": "TFR (partial)",
-        "note": "TFR I/O limited"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": ""
       },
       {
         "python": "mne.transform_surface_to",
         "status": "implemented",
-        "mne_cpp": "FSLIB surface transform",
-        "note": ""
+        "mne_cpp": "MNELIB::MNEBem::transform",
+        "note": "",
+        "test": "test_mne_data_types"
       },
       {
         "python": "mne.use_coil_def",
-        "status": "implemented",
-        "mne_cpp": "FWDLIB coil definitions",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "FwdCoilSet::read_coil_defs",
+        "note": "reader exists; ComputeFwd path hard-coded",
+        "test": "test_fwd_bem_field_computation"
       },
       {
         "python": "mne.vertex_to_mni",
         "status": "partial",
-        "mne_cpp": "FSLIB (partial)",
-        "note": "MNI mapping limited"
+        "mne_cpp": "FiffCoordTransSet::headToMni",
+        "note": "head points only; no vertex/surface-RAS input",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.what",
@@ -13965,21 +14068,24 @@
       },
       {
         "python": "mne.whiten_evoked",
-        "status": "implemented",
-        "mne_cpp": "INVERSELIB whitening",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "INVLIB::computeWhitener",
+        "note": "builds whitener; not applied to evoked",
+        "test": "test_inv_convenience"
       },
       {
         "python": "mne.write_bem_solution",
         "status": "implemented",
-        "mne_cpp": "FWDLIB BEM I/O",
-        "note": ""
+        "mne_cpp": "FwdBemModel::fwd_bem_save_model",
+        "note": "",
+        "test": "test_fwd_bem_driver_python"
       },
       {
         "python": "mne.write_bem_surfaces",
         "status": "implemented",
-        "mne_cpp": "FWDLIB BEM I/O",
-        "note": ""
+        "mne_cpp": "MNELIB::MNEBem::write",
+        "note": "",
+        "test": "test_mne_data_types"
       },
       {
         "python": "mne.write_cov",
@@ -13991,8 +14097,9 @@
       {
         "python": "mne.write_events",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB event I/O",
-        "note": ""
+        "mne_cpp": "FiffEvents::write_to_fif, write_to_ascii",
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.write_evokeds",
@@ -14011,20 +14118,22 @@
       {
         "python": "mne.write_head_bem",
         "status": "implemented",
-        "mne_cpp": "FWDLIB BEM I/O",
-        "note": ""
+        "mne_cpp": "MNEBem::write, --id 4",
+        "note": "",
+        "test": "test_mne_surf2bem"
       },
       {
         "python": "mne.write_label",
-        "status": "implemented",
-        "mne_cpp": "Label::write (FSLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "writeLabel",
+        "note": "tool-private writer; FsLabel has no write",
+        "test": "test_tool_data_pipeline"
       },
       {
         "python": "mne.write_labels_to_annot",
-        "status": "implemented",
-        "mne_cpp": "FSLIB annotation writer",
-        "note": ""
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no .annot writer"
       },
       {
         "python": "mne.write_proj",
@@ -14042,9 +14151,10 @@
       },
       {
         "python": "mne.write_surface",
-        "status": "implemented",
-        "mne_cpp": "Surface::write (FSLIB)",
-        "note": ""
+        "status": "partial",
+        "mne_cpp": "mne_flash_bem, mne_setup_forward_model (tool-private FreeSurfer writers)",
+        "note": "tool-private FreeSurfer writers; no FsSurface write",
+        "test": "test_mne_flash_bem"
       },
       {
         "python": "mne.write_trans",

@@ -9,28 +9,28 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 251,
-      "partial": 47,
-      "missing": 137,
+      "implemented": 183,
+      "partial": 85,
+      "missing": 167,
       "not-applicable": 8
     },
     "by_domain": {
       "io": {
-        "implemented": 22,
-        "partial": 3,
-        "missing": 34,
+        "implemented": 18,
+        "partial": 2,
+        "missing": 39,
         "not-applicable": 0
       },
       "core": {
-        "implemented": 48,
-        "partial": 8,
-        "missing": 2,
+        "implemented": 38,
+        "partial": 14,
+        "missing": 6,
         "not-applicable": 3
       },
       "preprocessing": {
-        "implemented": 18,
-        "partial": 1,
-        "missing": 23,
+        "implemented": 10,
+        "partial": 8,
+        "missing": 24,
         "not-applicable": 1
       },
       "filter": {
@@ -40,45 +40,45 @@
         "not-applicable": 0
       },
       "channels": {
-        "implemented": 23,
-        "partial": 4,
-        "missing": 14,
+        "implemented": 10,
+        "partial": 9,
+        "missing": 22,
         "not-applicable": 1
       },
       "epochs": {
-        "implemented": 13,
-        "partial": 0,
-        "missing": 3,
+        "implemented": 12,
+        "partial": 2,
+        "missing": 2,
         "not-applicable": 0
       },
       "cov": {
-        "implemented": 7,
-        "partial": 0,
+        "implemented": 6,
+        "partial": 1,
         "missing": 0,
         "not-applicable": 0
       },
       "forward": {
         "implemented": 27,
-        "partial": 3,
-        "missing": 5,
+        "partial": 5,
+        "missing": 3,
         "not-applicable": 0
       },
       "inverse": {
-        "implemented": 35,
-        "partial": 9,
-        "missing": 16,
+        "implemented": 29,
+        "partial": 12,
+        "missing": 19,
         "not-applicable": 0
       },
       "source_space": {
-        "implemented": 19,
-        "partial": 4,
-        "missing": 4,
+        "implemented": 15,
+        "partial": 5,
+        "missing": 7,
         "not-applicable": 0
       },
       "time_frequency": {
-        "implemented": 25,
-        "partial": 9,
-        "missing": 7,
+        "implemented": 6,
+        "partial": 20,
+        "missing": 15,
         "not-applicable": 0
       },
       "connectivity": {
@@ -88,9 +88,9 @@
         "not-applicable": 0
       },
       "decoding": {
-        "implemented": 6,
-        "partial": 5,
-        "missing": 11,
+        "implemented": 4,
+        "partial": 6,
+        "missing": 12,
         "not-applicable": 2
       },
       "stats": {
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 63.1
+    "parity_percent": 51.8
   },
   "apis": [
     {
@@ -173,7 +173,7 @@
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "mne_anonymize (CLI)",
+      "mne_cpp": "FiffAnonymizer (CLI)",
       "note": "",
       "evidence": "parity-record"
     },
@@ -189,35 +189,13 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.io.get_channel_type_constants",
-      "name": "get_channel_type_constants",
-      "submodule": "io",
-      "kind": "function",
-      "domain": "io",
-      "status": "implemented",
-      "mne_cpp": "FIFF constants",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.io.match_channel_orders",
-      "name": "match_channel_orders",
-      "submodule": "io",
-      "kind": "function",
-      "domain": "io",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB channel alignment",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.io.read_fiducials",
       "name": "read_fiducials",
       "submodule": "io",
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB fiducial I/O",
+      "mne_cpp": "FiffDigPointSet(QIODevice&), FiffDigitizerData",
       "note": "",
       "evidence": "parity-record"
     },
@@ -233,25 +211,14 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.io.read_raw",
-      "name": "read_raw",
-      "submodule": "io",
-      "kind": "function",
-      "domain": "io",
-      "status": "implemented",
-      "mne_cpp": "BIDS reader dispatch / CLI converters",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.io.read_raw_bdf",
       "name": "read_raw_bdf",
       "submodule": "io",
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "mne_edf2fiff (CLI) / BIDS reader",
-      "note": "BDF is EDF-family",
+      "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
+      "note": "24-bit BDF samples",
       "evidence": "parity-record"
     },
     {
@@ -261,7 +228,7 @@
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "mne_brain_vision2fiff (CLI)",
+      "mne_cpp": "BIDSLIB::BrainVisionReader / mne_brain_vision2fiff (CLI)",
       "note": "",
       "evidence": "parity-record"
     },
@@ -283,7 +250,7 @@
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "mne_edf2fiff (CLI) / BIDS reader",
+      "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
       "note": "",
       "evidence": "parity-record"
     },
@@ -338,7 +305,7 @@
       "kind": "function",
       "domain": "io",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB fiducial I/O",
+      "mne_cpp": "FiffDigPointSet::write",
       "note": "",
       "evidence": "parity-record"
     },
@@ -354,14 +321,25 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.match_channel_orders",
-      "name": "match_channel_orders",
-      "submodule": "(top-level)",
+      "python": "mne.io.get_channel_type_constants",
+      "name": "get_channel_type_constants",
+      "submodule": "io",
       "kind": "function",
       "domain": "io",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB channel alignment",
-      "note": "",
+      "status": "partial",
+      "mne_cpp": "FIFFV_MEG_CH",
+      "note": "macros only; no name→constants map",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.io.read_raw",
+      "name": "read_raw",
+      "submodule": "io",
+      "kind": "function",
+      "domain": "io",
+      "status": "partial",
+      "mne_cpp": "BidsRawData::createReader",
+      "note": "dispatch for BrainVision/EDF/BDF only",
       "evidence": "parity-record"
     },
     {
@@ -370,9 +348,9 @@
       "submodule": "export",
       "kind": "function",
       "domain": "io",
-      "status": "partial",
-      "mne_cpp": "EDF/BrainVision export (partial)",
-      "note": "epochs export limited",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "only mne_epochs2mat (.mat output)",
       "evidence": "parity-record"
     },
     {
@@ -381,20 +359,9 @@
       "submodule": "export",
       "kind": "function",
       "domain": "io",
-      "status": "partial",
-      "mne_cpp": "EDF/BrainVision export (partial)",
-      "note": "evoked export limited",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.export.export_raw",
-      "name": "export_raw",
-      "submodule": "export",
-      "kind": "function",
-      "domain": "io",
-      "status": "partial",
-      "mne_cpp": "EDF/BrainVision export (partial)",
-      "note": "not all formats",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
       "evidence": "parity-record"
     },
     {
@@ -406,6 +373,28 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EGI-MFF evoked export not ported",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.export.export_raw",
+      "name": "export_raw",
+      "submodule": "export",
+      "kind": "function",
+      "domain": "io",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no EDF/BrainVision/EEGLAB writer",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.io.match_channel_orders",
+      "name": "match_channel_orders",
+      "submodule": "io",
+      "kind": "function",
+      "domain": "io",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
       "evidence": "parity-record"
     },
     {
@@ -706,6 +695,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.match_channel_orders",
+      "name": "match_channel_orders",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "io",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.read_epochs_eeglab",
       "name": "read_epochs_eeglab",
       "submodule": "(top-level)",
@@ -783,17 +783,6 @@
       "evidence": "registry-class"
     },
     {
-      "python": "mne.BiHemiLabel",
-      "name": "BiHemiLabel",
-      "submodule": "(top-level)",
-      "kind": "class",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "Label (FSLIB)",
-      "note": "bi-hemisphere label",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.Evoked",
       "name": "Evoked",
       "submodule": "(top-level)",
@@ -866,7 +855,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "RTPROCESSINGLIB rereference",
+      "mne_cpp": "UTILSLIB::addReferenceChannels",
       "note": "",
       "evidence": "parity-record"
     },
@@ -882,24 +871,13 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.channel_indices_by_type",
-      "name": "channel_indices_by_type",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB channel picking",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.channel_type",
       "name": "channel_type",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB channel-type query",
+      "mne_cpp": "FIFFLIB::FiffInfoBase::channel_type",
       "note": "",
       "evidence": "parity-record"
     },
@@ -922,39 +900,6 @@
       "domain": "core",
       "status": "implemented",
       "mne_cpp": "DSPLIB SSP",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.compute_proj_evoked",
-      "name": "compute_proj_evoked",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "DSPLIB SSP",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.compute_proj_raw",
-      "name": "compute_proj_raw",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "DSPLIB SSP",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.compute_rank",
-      "name": "compute_rank",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "MATHLIB rank estimation",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1014,17 +959,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.label_sign_flip",
-      "name": "label_sign_flip",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "FSLIB label sign flip",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.morph_labels",
       "name": "morph_labels",
       "submodule": "(top-level)",
@@ -1042,7 +976,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB channel picking",
+      "mne_cpp": "FiffInfoBase::pick_channels",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1069,17 +1003,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.pick_channels_regexp",
-      "name": "pick_channels_regexp",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB channel picking",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.pick_info",
       "name": "pick_info",
       "submodule": "(top-level)",
@@ -1087,17 +1010,6 @@
       "domain": "core",
       "status": "implemented",
       "mne_cpp": "FiffInfo::pick_info",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.pick_types",
-      "name": "pick_types",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB channel picking",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1131,17 +1043,6 @@
       "domain": "core",
       "status": "implemented",
       "mne_cpp": "FiffEvoked::read",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.read_freesurfer_lut",
-      "name": "read_freesurfer_lut",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "FSLIB LUT reader",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1190,6 +1091,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.read_talxfm",
+      "name": "read_talxfm",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "implemented",
+      "mne_cpp": "FiffCoordTransSet::readMniTransform",
+      "note": "Talairach xfm limited",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.read_trans",
       "name": "read_trans",
       "submodule": "(top-level)",
@@ -1201,24 +1113,13 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.sensitivity_map",
-      "name": "sensitivity_map",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "mne_sensitivity_map (CLI)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.set_bipolar_reference",
       "name": "set_bipolar_reference",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "MNEDeriv / mne_make_derivations (CLI)",
+      "mne_cpp": "UTILSLIB::setBipolarReference",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1229,8 +1130,19 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "RTPROCESSINGLIB rereference",
+      "mne_cpp": "UTILSLIB::setEegReference",
       "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.stc_to_label",
+      "name": "stc_to_label",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "implemented",
+      "mne_cpp": "FsLabelUtils::stcToLabel",
+      "note": "stc->label limited",
       "evidence": "parity-record"
     },
     {
@@ -1240,7 +1152,7 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "FSLIB surface transform",
+      "mne_cpp": "MNELIB::MNEBem::transform",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1252,28 +1164,6 @@
       "domain": "core",
       "status": "implemented",
       "mne_cpp": "FiffEvoked::write",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.write_label",
-      "name": "write_label",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "Label::write (FSLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.write_labels_to_annot",
-      "name": "write_labels_to_annot",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "FSLIB annotation writer",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1300,14 +1190,47 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.channel_indices_by_type",
+      "name": "channel_indices_by_type",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "partial",
+      "mne_cpp": "FiffInfoBase::pick_types, channel_type",
+      "note": "per-type picks only; no type→indices dict",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.compute_proj_raw",
+      "name": "compute_proj_raw",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "partial",
+      "mne_cpp": "FIFFLIB::FiffProj::compute_from_raw",
+      "note": "event-locked epochs only; no continuous segmenting",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.compute_rank",
+      "name": "compute_rank",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "partial",
+      "mne_cpp": "MATHLIB::Linalg::rank",
+      "note": "matrix rank; no per-type/info/SSP handling",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.get_volume_labels_from_aseg",
       "name": "get_volume_labels_from_aseg",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "MRILIB aseg (partial)",
-      "note": "",
+      "mne_cpp": "FSLIB::FsAtlasLookup::load",
+      "note": "loads aseg; no listing of present labels",
       "evidence": "parity-record"
     },
     {
@@ -1317,8 +1240,8 @@
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "FSLIB (partial)",
-      "note": "label grow present, split limited",
+      "mne_cpp": "FsLabelUtils::growLabel",
+      "note": "edge-hop count; no mm extent or multiple seeds",
       "evidence": "parity-record"
     },
     {
@@ -1333,25 +1256,58 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.label_sign_flip",
+      "name": "label_sign_flip",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "partial",
+      "mne_cpp": "InvLabelTimeCourse::computeSignFlip",
+      "note": "signs from data SVD, not source normals",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.labels_to_stc",
       "name": "labels_to_stc",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "FSLIB (partial)",
-      "note": "label->stc limited",
+      "mne_cpp": "FsLabelUtils::labelsToStc",
+      "note": "binary mask only; no per-label values",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.read_talxfm",
-      "name": "read_talxfm",
+      "python": "mne.pick_types",
+      "name": "pick_types",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "FSLIB (partial)",
-      "note": "Talairach xfm limited",
+      "mne_cpp": "FiffInfoBase::pick_types",
+      "note": "only meg/eeg/stim flags; no eog/ecg/seeg…",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.read_freesurfer_lut",
+      "name": "read_freesurfer_lut",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "partial",
+      "mne_cpp": "FsAtlasLookup::initLookupTable",
+      "note": "hard-coded subset; no LUT file parser",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.sensitivity_map",
+      "name": "sensitivity_map",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "partial",
+      "mne_cpp": "mne_sensitivity_map (CLI)",
+      "note": "only norm/svd modes",
       "evidence": "parity-record"
     },
     {
@@ -1366,25 +1322,58 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.stc_to_label",
-      "name": "stc_to_label",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "partial",
-      "mne_cpp": "FSLIB (partial)",
-      "note": "stc->label limited",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.vertex_to_mni",
       "name": "vertex_to_mni",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "FSLIB (partial)",
-      "note": "MNI mapping limited",
+      "mne_cpp": "FiffCoordTransSet::headToMni",
+      "note": "head points only; no vertex/surface-RAS input",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.write_label",
+      "name": "write_label",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "partial",
+      "mne_cpp": "writeLabel",
+      "note": "tool-private writer; FsLabel has no write",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.BiHemiLabel",
+      "name": "BiHemiLabel",
+      "submodule": "(top-level)",
+      "kind": "class",
+      "domain": "core",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "FsLabel is deliberately single-hemisphere (src/libraries/fs/fs_label.h:170)",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.compute_proj_evoked",
+      "name": "compute_proj_evoked",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "mne_cov2proj works on covariance, not evoked",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.pick_channels_regexp",
+      "name": "pick_channels_regexp",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no regex channel picking",
       "evidence": "parity-record"
     },
     {
@@ -1407,6 +1396,17 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FreeSurfer LTA transform reader not ported",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.write_labels_to_annot",
+      "name": "write_labels_to_annot",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no .annot writer",
       "evidence": "parity-record"
     },
     {
@@ -1443,17 +1443,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.preprocessing.ICA",
-      "name": "ICA",
-      "submodule": "preprocessing",
-      "kind": "class",
-      "domain": "preprocessing",
-      "status": "implemented",
-      "mne_cpp": "FastICA / Infomax (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.preprocessing.Xdawn",
       "name": "Xdawn",
       "submodule": "preprocessing",
@@ -1487,61 +1476,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.preprocessing.compute_proj_ecg",
-      "name": "compute_proj_ecg",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "implemented",
-      "mne_cpp": "DSPLIB ECG SSP",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.compute_proj_eog",
-      "name": "compute_proj_eog",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "implemented",
-      "mne_cpp": "DSPLIB EOG SSP",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.create_ecg_epochs",
-      "name": "create_ecg_epochs",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "implemented",
-      "mne_cpp": "DSPLIB ECG epochs",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.create_eog_epochs",
-      "name": "create_eog_epochs",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "implemented",
-      "mne_cpp": "DSPLIB EOG epochs",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.equalize_bads",
-      "name": "equalize_bads",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB bad-channel utils",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.preprocessing.find_bad_channels_lof",
       "name": "find_bad_channels_lof",
       "submodule": "preprocessing",
@@ -1559,7 +1493,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "DSPLIB ECG detection",
+      "mne_cpp": "ArtifactDetect::detectEcg",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1570,7 +1504,7 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "DSPLIB EOG detection",
+      "mne_cpp": "ArtifactDetect::detectEog",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1584,28 +1518,6 @@
       "mne_cpp": "StimArtifact",
       "note": "",
       "evidence": "registry-class"
-    },
-    {
-      "python": "mne.preprocessing.ica_find_ecg_events",
-      "name": "ica_find_ecg_events",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "implemented",
-      "mne_cpp": "DSPLIB ECG detection",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.ica_find_eog_events",
-      "name": "ica_find_eog_events",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "implemented",
-      "mne_cpp": "DSPLIB EOG detection",
-      "note": "",
-      "evidence": "parity-record"
     },
     {
       "python": "mne.preprocessing.infomax",
@@ -1639,6 +1551,83 @@
       "mne_cpp": "FineCalibration",
       "note": "",
       "evidence": "registry-class"
+    },
+    {
+      "python": "mne.preprocessing.ICA",
+      "name": "ICA",
+      "submodule": "preprocessing",
+      "kind": "class",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax",
+      "note": "stateless functions; no info-aware object or save",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.preprocessing.compute_proj_ecg",
+      "name": "compute_proj_ecg",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "ArtifactDetect::detectEcg, FiffProj::compute_from_raw",
+      "note": "detection plus SSP exist; no combined helper",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.preprocessing.compute_proj_eog",
+      "name": "compute_proj_eog",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "ArtifactDetect::detectEog, compute_from_raw",
+      "note": "detection plus SSP exist; no combined helper",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.preprocessing.create_ecg_epochs",
+      "name": "create_ecg_epochs",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "detectEcg, EpochExtractor::extract",
+      "note": "no combined detect+epoch helper",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.preprocessing.create_eog_epochs",
+      "name": "create_eog_epochs",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "detectEog, EpochExtractor::extract",
+      "note": "no combined detect+epoch helper",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.preprocessing.ica_find_ecg_events",
+      "name": "ica_find_ecg_events",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "detectEcg",
+      "note": "needs a FiffInfo ECG channel; no ICA-source input",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.preprocessing.ica_find_eog_events",
+      "name": "ica_find_eog_events",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "detectEog",
+      "note": "needs a FiffInfo EOG channel; no ICA-source input",
+      "evidence": "parity-record"
     },
     {
       "python": "mne.preprocessing.maxwell_filter",
@@ -1795,6 +1784,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.preprocessing.equalize_bads",
+      "name": "equalize_bads",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.preprocessing.find_bad_channels_maxwell",
       "name": "find_bad_channels_maxwell",
       "submodule": "preprocessing",
@@ -1922,40 +1922,7 @@
       "kind": "class",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "DISPLIB Layout",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.combine_channels",
-      "name": "combine_channels",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "MNEDeriv combinations",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.compute_dev_head_t",
-      "name": "compute_dev_head_t",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "mne_coreg ICP",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.equalize_channels",
-      "name": "equalize_channels",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB channel alignment",
+      "mne_cpp": "MNELIB::MNELayout",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1971,35 +1938,13 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.channels.find_layout",
-      "name": "find_layout",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "DISPLIB layout",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.channels.fix_mag_coil_types",
       "name": "fix_mag_coil_types",
       "submodule": "channels",
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "mne_fix_mag_coil_types (CLI)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.generate_2d_layout",
-      "name": "generate_2d_layout",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "DISPLIB layout generation",
+      "mne_cpp": "processFile (CLI)",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2010,18 +1955,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "mne_make_eeg_layout (CLI)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.make_grid_layout",
-      "name": "make_grid_layout",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "DISPLIB grid layout",
+      "mne_cpp": "LayoutMaker::makeLayout (CLI)",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2043,18 +1977,7 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB HPTS dig I/O",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.read_dig_polhemus_isotrak",
-      "name": "read_dig_polhemus_isotrak",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "mne_coreg Polhemus driver",
+      "mne_cpp": "readHpts (CLI)",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2066,28 +1989,6 @@
       "domain": "channels",
       "status": "implemented",
       "mne_cpp": "DISPLIB layout I/O",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.read_polhemus_fastscan",
-      "name": "read_polhemus_fastscan",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "mne_coreg Polhemus driver",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.read_vectorview_selection",
-      "name": "read_vectorview_selection",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB selection I/O",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2114,50 +2015,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.channels.unify_bad_channels",
-      "name": "unify_bad_channels",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB bad-channel utils",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.equalize_channels",
-      "name": "equalize_channels",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB channel alignment",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.find_layout",
-      "name": "find_layout",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "DISPLIB layout",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.read_vectorview_selection",
-      "name": "read_vectorview_selection",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "channels",
-      "status": "implemented",
-      "mne_cpp": "FIFFLIB selection I/O",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.rename_channels",
       "name": "rename_channels",
       "submodule": "(top-level)",
@@ -2175,8 +2032,41 @@
       "kind": "class",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "FIFFLIB dig (partial)",
-      "note": "montage container limited",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet",
+      "note": "no channel-name→position montage API",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.combine_channels",
+      "name": "combine_channels",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::ChannelDerivation::apply",
+      "note": "weighted sums only; no median/std",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.compute_dev_head_t",
+      "name": "compute_dev_head_t",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "partial",
+      "mne_cpp": "MNELIB::fitMatchedPoints",
+      "note": "rigid point fit; no montage-HPI extraction",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.generate_2d_layout",
+      "name": "generate_2d_layout",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::LayoutMaker::makeLayout",
+      "note": "projects 3-D points; no direct 2-D input",
       "evidence": "parity-record"
     },
     {
@@ -2186,8 +2076,8 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "FIFFLIB dig (partial)",
-      "note": "montage builder limited",
+      "mne_cpp": "FiffDigPointSet(QList<FiffDigPoint>)",
+      "note": "no name→position mapping",
       "evidence": "parity-record"
     },
     {
@@ -2208,8 +2098,30 @@
       "kind": "function",
       "domain": "channels",
       "status": "partial",
-      "mne_cpp": "FIFFLIB dig (partial)",
-      "note": "custom montage limited",
+      "mne_cpp": "UTILSLIB::LayoutLoader::readAsaElcFile",
+      "note": ".elc only; no .sfp/.loc/.bvef",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.read_vectorview_selection",
+      "name": "read_vectorview_selection",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::SelectionIO::readMNESelFile",
+      "note": "reads .sel; no name filter or space fixing",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.read_vectorview_selection",
+      "name": "read_vectorview_selection",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "channels",
+      "status": "partial",
+      "mne_cpp": "SelectionIO::readMNESelFile",
+      "note": "reads .sel; no name filter or space fixing",
       "evidence": "parity-record"
     },
     {
@@ -2221,6 +2133,28 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "native->head transform not ported",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.equalize_channels",
+      "name": "equalize_channels",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.find_layout",
+      "name": "find_layout",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no automatic layout selection",
       "evidence": "parity-record"
     },
     {
@@ -2254,6 +2188,17 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "10-20 channel selection groups not ported",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.make_grid_layout",
+      "name": "make_grid_layout",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
       "evidence": "parity-record"
     },
     {
@@ -2323,6 +2268,61 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.channels.read_dig_polhemus_isotrak",
+      "name": "read_dig_polhemus_isotrak",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no .hsp/.elp isotrak reader (the Tufts .elp reader is a different format)",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.read_polhemus_fastscan",
+      "name": "read_polhemus_fastscan",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "FastrakParser parses the live serial stream, not files",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.unify_bad_channels",
+      "name": "unify_bad_channels",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.equalize_channels",
+      "name": "equalize_channels",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "channels",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.find_layout",
+      "name": "find_layout",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "channels",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.scale_bem",
       "name": "scale_bem",
       "submodule": "(top-level)",
@@ -2378,17 +2378,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.BaseEpochs",
-      "name": "BaseEpochs",
-      "submodule": "(top-level)",
-      "kind": "class",
-      "domain": "epochs",
-      "status": "implemented",
-      "mne_cpp": "MNEEpochDataList",
-      "note": "base epochs container",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.Epochs",
       "name": "Epochs",
       "submodule": "(top-level)",
@@ -2400,24 +2389,13 @@
       "evidence": "registry-class"
     },
     {
-      "python": "mne.EpochsArray",
-      "name": "EpochsArray",
-      "submodule": "(top-level)",
-      "kind": "class",
-      "domain": "epochs",
-      "status": "implemented",
-      "mne_cpp": "MNEEpochDataList (constructed directly)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.concatenate_epochs",
       "name": "concatenate_epochs",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "MNEEpochDataList",
+      "mne_cpp": "FIFFLIB::FiffEpochs::concatenateEpochs",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2428,7 +2406,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB event utils",
+      "mne_cpp": "FiffEvents::concatenate",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2439,7 +2417,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB event utils",
+      "mne_cpp": "FiffEvents::count",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2461,7 +2439,18 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "RTPROCESSINGLIB event detection",
+      "mne_cpp": "FiffEvents::find_stim_steps",
+      "note": "takes the stimulus channel data instead of a Raw object",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.make_fixed_length_events",
+      "name": "make_fixed_length_events",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "epochs",
+      "status": "implemented",
+      "mne_cpp": "FiffEvents::make_fixed_length",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2472,7 +2461,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB event utils",
+      "mne_cpp": "FiffEvents::merge",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2483,7 +2472,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB event utils",
+      "mne_cpp": "FiffEvents::pick",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2505,7 +2494,7 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB event I/O",
+      "mne_cpp": "FiffEvents::read, read_from_fif, read_from_ascii",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2516,8 +2505,30 @@
       "kind": "function",
       "domain": "epochs",
       "status": "implemented",
-      "mne_cpp": "FIFFLIB event I/O",
+      "mne_cpp": "FiffEvents::write_to_fif, write_to_ascii",
       "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.BaseEpochs",
+      "name": "BaseEpochs",
+      "submodule": "(top-level)",
+      "kind": "class",
+      "domain": "epochs",
+      "status": "partial",
+      "mne_cpp": "MNELIB::MNEEpochDataList",
+      "note": "no crop/resample/save/metadata",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.EpochsArray",
+      "name": "EpochsArray",
+      "submodule": "(top-level)",
+      "kind": "class",
+      "domain": "epochs",
+      "status": "partial",
+      "mne_cpp": "MNELIB::MNEEpochData, FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
+      "note": "no info/events-bearing array constructor",
       "evidence": "parity-record"
     },
     {
@@ -2540,17 +2551,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "fixed-length epochs helper",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.make_fixed_length_events",
-      "name": "make_fixed_length_events",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "epochs",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "fixed-length events helper",
       "evidence": "parity-record"
     },
     {
@@ -2609,17 +2609,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.whiten_evoked",
-      "name": "whiten_evoked",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "cov",
-      "status": "implemented",
-      "mne_cpp": "INVERSELIB whitening",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.write_cov",
       "name": "write_cov",
       "submodule": "(top-level)",
@@ -2628,6 +2617,17 @@
       "status": "implemented",
       "mne_cpp": "FiffCov::write",
       "note": "FIFF covariance I/O",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.whiten_evoked",
+      "name": "whiten_evoked",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "cov",
+      "status": "partial",
+      "mne_cpp": "INVLIB::computeWhitener",
+      "note": "builds whitener; not applied to evoked",
       "evidence": "parity-record"
     },
     {
@@ -2730,6 +2730,28 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.forward.compute_depth_prior",
+      "name": "compute_depth_prior",
+      "submodule": "forward",
+      "kind": "function",
+      "domain": "forward",
+      "status": "implemented",
+      "mne_cpp": "MNEForwardSolution::compute_depth_prior",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.forward.compute_orient_prior",
+      "name": "compute_orient_prior",
+      "submodule": "forward",
+      "kind": "function",
+      "domain": "forward",
+      "status": "implemented",
+      "mne_cpp": "MNEForwardSolution::compute_orient_prior",
+      "note": "a Cartesian forward with loose < 1 falls back to loose 1 and a fixed-orientation forward ignores loose (mne-python raises)",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.forward.convert_forward_solution",
       "name": "convert_forward_solution",
       "submodule": "forward",
@@ -2774,17 +2796,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.forward.use_coil_def",
-      "name": "use_coil_def",
-      "submodule": "forward",
-      "kind": "function",
-      "domain": "forward",
-      "status": "implemented",
-      "mne_cpp": "FWDLIB coil definitions",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.forward.write_forward_solution",
       "name": "write_forward_solution",
       "submodule": "forward",
@@ -2802,7 +2813,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "mne_prepare_bem_model (CLI)",
+      "mne_cpp": "mne_surf2bem (CLI)",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2873,24 +2884,13 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.use_coil_def",
-      "name": "use_coil_def",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "forward",
-      "status": "implemented",
-      "mne_cpp": "FWDLIB coil definitions",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.write_bem_solution",
       "name": "write_bem_solution",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "FWDLIB BEM I/O",
+      "mne_cpp": "FwdBemModel::fwd_bem_save_model",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2901,7 +2901,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "FWDLIB BEM I/O",
+      "mne_cpp": "MNELIB::MNEBem::write",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2923,7 +2923,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "FWDLIB BEM I/O",
+      "mne_cpp": "MNEBem::write, --id 4",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2950,6 +2950,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.forward.use_coil_def",
+      "name": "use_coil_def",
+      "submodule": "forward",
+      "kind": "function",
+      "domain": "forward",
+      "status": "partial",
+      "mne_cpp": "FwdCoilSet::read_coil_defs",
+      "note": "custom coil file readable; ComputeFwd path hard-coded",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.make_forward_dipole",
       "name": "make_forward_dipole",
       "submodule": "(top-level)",
@@ -2961,25 +2972,14 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.forward.compute_depth_prior",
-      "name": "compute_depth_prior",
-      "submodule": "forward",
+      "python": "mne.use_coil_def",
+      "name": "use_coil_def",
+      "submodule": "(top-level)",
       "kind": "function",
       "domain": "forward",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "depth weighting not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.forward.compute_orient_prior",
-      "name": "compute_orient_prior",
-      "submodule": "forward",
-      "kind": "function",
-      "domain": "forward",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "orientation prior not ported",
+      "status": "partial",
+      "mne_cpp": "FwdCoilSet::read_coil_defs",
+      "note": "reader exists; ComputeFwd path hard-coded",
       "evidence": "parity-record"
     },
     {
@@ -3049,24 +3049,13 @@
       "evidence": "registry-class"
     },
     {
-      "python": "mne.beamformer.Beamformer",
-      "name": "Beamformer",
-      "submodule": "beamformer",
-      "kind": "class",
-      "domain": "inverse",
-      "status": "implemented",
-      "mne_cpp": "Lcmv/Dics (container)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.beamformer.apply_dics",
       "name": "apply_dics",
       "submodule": "beamformer",
       "kind": "function",
       "domain": "inverse",
       "status": "implemented",
-      "mne_cpp": "Dics",
+      "mne_cpp": "InvDICS::applyDICS",
       "note": "",
       "evidence": "parity-record"
     },
@@ -3077,8 +3066,19 @@
       "kind": "function",
       "domain": "inverse",
       "status": "implemented",
-      "mne_cpp": "Dics (CSD)",
+      "mne_cpp": "InvDICS::applyDICSCsd",
       "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.beamformer.apply_dics_epochs",
+      "name": "apply_dics_epochs",
+      "submodule": "beamformer",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "implemented",
+      "mne_cpp": "InvDICS::applyDICSEpochs",
+      "note": "epochs DICS",
       "evidence": "parity-record"
     },
     {
@@ -3099,7 +3099,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "implemented",
-      "mne_cpp": "Lcmv (epochs)",
+      "mne_cpp": "InvLCMV::applyLCMVEpochs",
       "note": "",
       "evidence": "parity-record"
     },
@@ -3110,7 +3110,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "implemented",
-      "mne_cpp": "Lcmv (raw)",
+      "mne_cpp": "InvLCMV::applyLCMVRaw",
       "note": "",
       "evidence": "parity-record"
     },
@@ -3181,50 +3181,6 @@
       "evidence": "registry-class"
     },
     {
-      "python": "mne.grade_to_tris",
-      "name": "grade_to_tris",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "implemented",
-      "mne_cpp": "MNESurface triangulation",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.inverse_sparse.gamma_map",
-      "name": "gamma_map",
-      "submodule": "inverse_sparse",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "implemented",
-      "mne_cpp": "GammaMap",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.inverse_sparse.make_stc_from_dipoles",
-      "name": "make_stc_from_dipoles",
-      "submodule": "inverse_sparse",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "implemented",
-      "mne_cpp": "MixedNorm/GammaMap output",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.inverse_sparse.mixed_norm",
-      "name": "mixed_norm",
-      "submodule": "inverse_sparse",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "implemented",
-      "mne_cpp": "MixedNorm (MxNE)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.minimum_norm.InverseOperator",
       "name": "InverseOperator",
       "submodule": "minimum_norm",
@@ -3253,7 +3209,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "implemented",
-      "mne_cpp": "MinimumNorm (epochs)",
+      "mne_cpp": "INVLIB::applyInverseEpochs",
       "note": "",
       "evidence": "parity-record"
     },
@@ -3335,28 +3291,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.read_dipole",
-      "name": "read_dipole",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "implemented",
-      "mne_cpp": "ECD / mne_dipole_fit (CLI)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.read_source_estimate",
-      "name": "read_source_estimate",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "implemented",
-      "mne_cpp": "MNESourceEstimate::read",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.spatial_src_adjacency",
       "name": "spatial_src_adjacency",
       "submodule": "(top-level)",
@@ -3401,36 +3335,25 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.DipoleFixed",
-      "name": "DipoleFixed",
-      "submodule": "(top-level)",
-      "kind": "class",
-      "domain": "inverse",
-      "status": "partial",
-      "mne_cpp": "ECD (partial)",
-      "note": "fixed-dipole time course limited",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.VolSourceEstimate",
       "name": "VolSourceEstimate",
       "submodule": "(top-level)",
       "kind": "class",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "MNESourceEstimate (partial)",
-      "note": "volume STC limited",
+      "mne_cpp": "INVLIB::InvVolumeSourceEstimate",
+      "note": "no NIfTI export",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.beamformer.apply_dics_epochs",
-      "name": "apply_dics_epochs",
+      "python": "mne.beamformer.Beamformer",
+      "name": "Beamformer",
       "submodule": "beamformer",
-      "kind": "function",
+      "kind": "class",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "Dics (partial)",
-      "note": "epochs DICS",
+      "mne_cpp": "INVLIB::InvBeamformer",
+      "note": "no save/read",
       "evidence": "parity-record"
     },
     {
@@ -3445,14 +3368,36 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.beamformer.read_beamformer",
-      "name": "read_beamformer",
-      "submodule": "beamformer",
+      "python": "mne.grade_to_tris",
+      "name": "grade_to_tris",
+      "submodule": "(top-level)",
       "kind": "function",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "Lcmv/Dics (partial)",
-      "note": "beamformer I/O limited",
+      "mne_cpp": "generateIcoVertices",
+      "note": "ico vertices only (file-private); no triangles returned",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.inverse_sparse.gamma_map",
+      "name": "gamma_map",
+      "submodule": "inverse_sparse",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "partial",
+      "mne_cpp": "InvGammaMap::compute",
+      "note": "solver only; no evoked/forward/whitening wrapper",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.inverse_sparse.mixed_norm",
+      "name": "mixed_norm",
+      "submodule": "inverse_sparse",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "partial",
+      "mne_cpp": "InvMxne::compute",
+      "note": "IRLS solver only; no whitening/depth/debias",
       "evidence": "parity-record"
     },
     {
@@ -3462,8 +3407,30 @@
       "kind": "function",
       "domain": "inverse",
       "status": "partial",
-      "mne_cpp": "Welch PSD + inverse (manual)",
-      "note": "no single convenience API",
+      "mne_cpp": "INVLIB::computeSourcePsd",
+      "note": "takes an STC; no raw→inverse→PSD pipeline",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.read_dipole",
+      "name": "read_dipole",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "partial",
+      "mne_cpp": "InvEcdSet::read_dipoles_dip",
+      "note": ".dip only; .bdip is write-only",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.read_source_estimate",
+      "name": "read_source_estimate",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "partial",
+      "mne_cpp": "InvSourceEstimate::read, read_w",
+      "note": ".stc/.w only; no .h5",
       "evidence": "parity-record"
     },
     {
@@ -3497,6 +3464,17 @@
       "status": "partial",
       "mne_cpp": "StatsAdjacency (partial)",
       "note": "distance adjacency limited",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.DipoleFixed",
+      "name": "DipoleFixed",
+      "submodule": "(top-level)",
+      "kind": "class",
+      "domain": "inverse",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
       "evidence": "parity-record"
     },
     {
@@ -3555,6 +3533,28 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.beamformer.read_beamformer",
+      "name": "read_beamformer",
+      "submodule": "beamformer",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "InvBeamformer has no I/O",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.inverse_sparse.make_stc_from_dipoles",
+      "name": "make_stc_from_dipoles",
+      "submodule": "inverse_sparse",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no dipole-list→STC conversion",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.inverse_sparse.tf_mixed_norm",
       "name": "tf_mixed_norm",
       "submodule": "inverse_sparse",
@@ -3605,7 +3605,7 @@
       "kind": "function",
       "domain": "inverse",
       "status": "missing",
-      "mne_cpp": "",
+      "mne_cpp": "MNEMneData",
       "note": "SNR estimation not ported",
       "evidence": "parity-record"
     },
@@ -3698,28 +3698,6 @@
       "evidence": "registry-class"
     },
     {
-      "python": "mne.decimate_surface",
-      "name": "decimate_surface",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "source_space",
-      "status": "implemented",
-      "mne_cpp": "MNESurface decimation",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.get_head_surf",
-      "name": "get_head_surf",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "source_space",
-      "status": "implemented",
-      "mne_cpp": "FSLIB head surface",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.get_meg_helmet_surf",
       "name": "get_meg_helmet_surf",
       "submodule": "(top-level)",
@@ -3770,7 +3748,7 @@
       "kind": "function",
       "domain": "source_space",
       "status": "implemented",
-      "mne_cpp": "mne_convert_surface (CLI)",
+      "mne_cpp": "readTriFile (CLI)",
       "note": "",
       "evidence": "parity-record"
     },
@@ -3806,17 +3784,6 @@
       "mne_cpp": "MNESourceSpace",
       "note": "",
       "evidence": "registry-class"
-    },
-    {
-      "python": "mne.source_space.get_decimated_surfaces",
-      "name": "get_decimated_surfaces",
-      "submodule": "source_space",
-      "kind": "function",
-      "domain": "source_space",
-      "status": "implemented",
-      "mne_cpp": "MNESurface decimation",
-      "note": "",
-      "evidence": "parity-record"
     },
     {
       "python": "mne.source_space.read_source_spaces",
@@ -3874,58 +3841,58 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.write_surface",
-      "name": "write_surface",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "source_space",
-      "status": "implemented",
-      "mne_cpp": "Surface::write (FSLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.compute_source_morph",
       "name": "compute_source_morph",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "source_space",
       "status": "partial",
-      "mne_cpp": "MNEMorphMap (partial)",
-      "note": "surface morph; no unified vol morph",
+      "mne_cpp": "INVLIB::SourceMorph::compute, MNEMorphMap::compute",
+      "note": "nearest-neighbour surface only; no smoothing/volume",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.get_volume_labels_from_src",
-      "name": "get_volume_labels_from_src",
+      "python": "mne.decimate_surface",
+      "name": "decimate_surface",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "source_space",
       "status": "partial",
-      "mne_cpp": "MRILIB aseg (partial)",
-      "note": "",
+      "mne_cpp": "MNEBemSurface::makeScalpSurfaces",
+      "note": "MNEBemSurface input only; vertex (not triangle) target",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.morph_source_spaces",
-      "name": "morph_source_spaces",
+      "python": "mne.get_head_surf",
+      "name": "get_head_surf",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "source_space",
       "status": "partial",
-      "mne_cpp": "MNEMorphMap (partial)",
-      "note": "",
+      "mne_cpp": "MNEBem(QIODevice&)",
+      "note": "readable via MNEBem; no subject/path lookup",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.read_source_morph",
-      "name": "read_source_morph",
+      "python": "mne.source_space.get_decimated_surfaces",
+      "name": "get_decimated_surfaces",
+      "submodule": "source_space",
+      "kind": "function",
+      "domain": "source_space",
+      "status": "partial",
+      "mne_cpp": "MNESurfaceOrVolume::use_itris",
+      "note": "use_itris stored; no extraction helper",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.write_surface",
+      "name": "write_surface",
       "submodule": "(top-level)",
       "kind": "function",
       "domain": "source_space",
       "status": "partial",
-      "mne_cpp": "MNEMorphMap (partial)",
-      "note": "surface morph only",
+      "mne_cpp": "mne_flash_bem, mne_setup_forward_model (tool-private FreeSurfer writers)",
+      "note": "tool-private FreeSurfer writers; no FsSurface write",
       "evidence": "parity-record"
     },
     {
@@ -3951,6 +3918,39 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.get_volume_labels_from_src",
+      "name": "get_volume_labels_from_src",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "source_space",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.morph_source_spaces",
+      "name": "morph_source_spaces",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "source_space",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.read_source_morph",
+      "name": "read_source_morph",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "source_space",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libraries/mne/mne_morph_map.h:120)",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.source_space.add_source_space_distances",
       "name": "add_source_space_distances",
       "submodule": "source_space",
@@ -3970,94 +3970,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "src-sensor distance not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.AverageTFR",
-      "name": "AverageTFR",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "TFR containers (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.AverageTFRArray",
-      "name": "AverageTFRArray",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "TFR containers (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.BaseTFR",
-      "name": "BaseTFR",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "TFR containers (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.CrossSpectralDensity",
-      "name": "CrossSpectralDensity",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "CrossSpectralDensity",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.EpochsTFR",
-      "name": "EpochsTFR",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "TFR containers (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.EpochsTFRArray",
-      "name": "EpochsTFRArray",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "TFR containers (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.RawTFR",
-      "name": "RawTFR",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "TFR containers (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.RawTFRArray",
-      "name": "RawTFRArray",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "TFR containers (DSPLIB)",
-      "note": "",
       "evidence": "parity-record"
     },
     {
@@ -4083,101 +3995,13 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.csd_array_fourier",
-      "name": "csd_array_fourier",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "CrossSpectralDensity",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.csd_array_morlet",
-      "name": "csd_array_morlet",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "CrossSpectralDensity",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.csd_array_multitaper",
-      "name": "csd_array_multitaper",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "CrossSpectralDensity",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.csd_fourier",
-      "name": "csd_fourier",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "CrossSpectralDensity",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.csd_morlet",
-      "name": "csd_morlet",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "CrossSpectralDensity",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.csd_multitaper",
-      "name": "csd_multitaper",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "CrossSpectralDensity",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.time_frequency.dpss_windows",
       "name": "dpss_windows",
       "submodule": "time_frequency",
       "kind": "function",
       "domain": "time_frequency",
       "status": "implemented",
-      "mne_cpp": "DPSS tapers (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.morlet",
-      "name": "morlet",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "Morlet wavelets (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.pick_channels_csd",
-      "name": "pick_channels_csd",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "CrossSpectralDensity picking",
+      "mne_cpp": "UTILSLIB::Dpss::compute",
       "note": "",
       "evidence": "parity-record"
     },
@@ -4204,47 +4028,58 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.stft",
-      "name": "stft",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "Spectrogram STFT (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.time_frequency.stftfreq",
       "name": "stftfreq",
       "submodule": "time_frequency",
       "kind": "function",
       "domain": "time_frequency",
       "status": "implemented",
-      "mne_cpp": "Spectrogram STFT (DSPLIB)",
+      "mne_cpp": "MATHLIB::Spectral::calculateFFTFreqs",
       "note": "",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.tfr_array_morlet",
-      "name": "tfr_array_morlet",
+      "python": "mne.time_frequency.AverageTFR",
+      "name": "AverageTFR",
       "submodule": "time_frequency",
-      "kind": "function",
+      "kind": "class",
       "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "Morlet TFR (DSPLIB)",
-      "note": "",
+      "status": "partial",
+      "mne_cpp": "MorletTfrResult, MultitaperTfrResult",
+      "note": "result struct only; no info/average/IO",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.tfr_morlet",
-      "name": "tfr_morlet",
+      "python": "mne.time_frequency.AverageTFRArray",
+      "name": "AverageTFRArray",
       "submodule": "time_frequency",
-      "kind": "function",
+      "kind": "class",
       "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "Morlet TFR (DSPLIB)",
-      "note": "",
+      "status": "partial",
+      "mne_cpp": "MorletTfrResult",
+      "note": "result struct only",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.BaseTFR",
+      "name": "BaseTFR",
+      "submodule": "time_frequency",
+      "kind": "class",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "MultitaperTfrResult",
+      "note": "no common TFR base class",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.CrossSpectralDensity",
+      "name": "CrossSpectralDensity",
+      "submodule": "time_frequency",
+      "kind": "class",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::CsdResult",
+      "note": "no channel names/pick/IO",
       "evidence": "parity-record"
     },
     {
@@ -4270,6 +4105,28 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.time_frequency.RawTFR",
+      "name": "RawTFR",
+      "submodule": "time_frequency",
+      "kind": "class",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "MorletTfr::computeMultiChannel",
+      "note": "result struct only",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.RawTFRArray",
+      "name": "RawTFRArray",
+      "submodule": "time_frequency",
+      "kind": "class",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "MorletTfrResult",
+      "note": "result struct only",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.time_frequency.combine_spectrum",
       "name": "combine_spectrum",
       "submodule": "time_frequency",
@@ -4281,36 +4138,80 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.combine_tfr",
-      "name": "combine_tfr",
+      "python": "mne.time_frequency.csd_array_fourier",
+      "name": "csd_array_fourier",
       "submodule": "time_frequency",
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "TFR (partial)",
-      "note": "",
+      "mne_cpp": "Csd::computeFourier",
+      "note": "2-D input; no averaging over epochs",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.csd_tfr",
-      "name": "csd_tfr",
+      "python": "mne.time_frequency.csd_array_morlet",
+      "name": "csd_array_morlet",
       "submodule": "time_frequency",
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "CrossSpectralDensity (partial)",
-      "note": "",
+      "mne_cpp": "Csd::computeMorlet",
+      "note": "2-D input; no averaging over epochs",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.read_csd",
-      "name": "read_csd",
+      "python": "mne.time_frequency.csd_array_multitaper",
+      "name": "csd_array_multitaper",
       "submodule": "time_frequency",
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "CrossSpectralDensity (partial)",
-      "note": "CSD I/O limited",
+      "mne_cpp": "Csd::computeMultitaper",
+      "note": "2-D input; no averaging over epochs",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.csd_fourier",
+      "name": "csd_fourier",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "Csd::computeFourier",
+      "note": "matrix input; no Epochs object",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.csd_morlet",
+      "name": "csd_morlet",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "Csd::computeMorlet",
+      "note": "matrix input; no Epochs object",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.csd_multitaper",
+      "name": "csd_multitaper",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "Csd::computeMultitaper",
+      "note": "matrix input; no Epochs object",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.morlet",
+      "name": "morlet",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "MorletTfr::buildWavelet",
+      "note": "wavelet builder is private",
       "evidence": "parity-record"
     },
     {
@@ -4325,25 +4226,80 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.read_tfrs",
-      "name": "read_tfrs",
+      "python": "mne.time_frequency.stft",
+      "name": "stft",
       "submodule": "time_frequency",
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "TFR (partial)",
-      "note": "TFR I/O limited",
+      "mne_cpp": "Spectrogram::makeSpectrogram",
+      "note": "Gaussian-window magnitude only; no complex output/istft",
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.write_tfrs",
-      "name": "write_tfrs",
+      "python": "mne.time_frequency.tfr_array_morlet",
+      "name": "tfr_array_morlet",
       "submodule": "time_frequency",
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "TFR (partial)",
-      "note": "TFR I/O limited",
+      "mne_cpp": "MorletTfr::computeMultiChannel",
+      "note": "power only; single epoch; no complex/ITC",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.tfr_morlet",
+      "name": "tfr_morlet",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "MorletTfr::compute",
+      "note": "no Epochs input, averaging or ITC",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.EpochsTFR",
+      "name": "EpochsTFR",
+      "submodule": "time_frequency",
+      "kind": "class",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no per-epoch TFR container",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.EpochsTFRArray",
+      "name": "EpochsTFRArray",
+      "submodule": "time_frequency",
+      "kind": "class",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.combine_tfr",
+      "name": "combine_tfr",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.csd_tfr",
+      "name": "csd_tfr",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
       "evidence": "parity-record"
     },
     {
@@ -4377,6 +4333,39 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "inverse STFT not ported",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.pick_channels_csd",
+      "name": "pick_channels_csd",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.read_csd",
+      "name": "read_csd",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.read_tfrs",
+      "name": "read_tfrs",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
       "evidence": "parity-record"
     },
     {
@@ -4424,13 +4413,24 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.time_frequency.write_tfrs",
+      "name": "write_tfrs",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.decoding.CSP",
       "name": "CSP",
       "submodule": "decoding",
       "kind": "class",
       "domain": "decoding",
       "status": "implemented",
-      "mne_cpp": "MlCsp (skigen)",
+      "mne_cpp": "DecodingCsp",
       "note": "",
       "evidence": "parity-record"
     },
@@ -4441,7 +4441,7 @@
       "kind": "class",
       "domain": "decoding",
       "status": "implemented",
-      "mne_cpp": "MlSpoc (skigen)",
+      "mne_cpp": "DecodingSpoc",
       "note": "",
       "evidence": "parity-record"
     },
@@ -4452,29 +4452,7 @@
       "kind": "class",
       "domain": "decoding",
       "status": "implemented",
-      "mne_cpp": "MlSsd (skigen)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.decoding.Scaler",
-      "name": "Scaler",
-      "submodule": "decoding",
-      "kind": "class",
-      "domain": "decoding",
-      "status": "implemented",
-      "mne_cpp": "MlScaler (skigen)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.decoding.SpatialFilter",
-      "name": "SpatialFilter",
-      "submodule": "decoding",
-      "kind": "class",
-      "domain": "decoding",
-      "status": "implemented",
-      "mne_cpp": "MlCsp/MlSpoc/MlSsd base",
+      "mne_cpp": "DecodingSsd",
       "note": "",
       "evidence": "parity-record"
     },
@@ -4485,7 +4463,7 @@
       "kind": "class",
       "domain": "decoding",
       "status": "implemented",
-      "mne_cpp": "xDAWN (DSPLIB)",
+      "mne_cpp": "UTILSLIB::Xdawn::fit/apply",
       "note": "",
       "evidence": "parity-record"
     },
@@ -4496,19 +4474,8 @@
       "kind": "class",
       "domain": "decoding",
       "status": "partial",
-      "mne_cpp": "DSPLIB filters (partial)",
-      "note": "no sklearn wrapper",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.decoding.LinearModel",
-      "name": "LinearModel",
-      "submodule": "decoding",
-      "kind": "class",
-      "domain": "decoding",
-      "status": "partial",
-      "mne_cpp": "MlLinearModel (partial)",
-      "note": "predict-only container",
+      "mne_cpp": "FirFilter::filterData",
+      "note": "filters exist; no transformer wrapper",
       "evidence": "parity-record"
     },
     {
@@ -4523,14 +4490,36 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.decoding.Scaler",
+      "name": "Scaler",
+      "submodule": "decoding",
+      "kind": "class",
+      "domain": "decoding",
+      "status": "partial",
+      "mne_cpp": "StandardScaler",
+      "note": "generic external scaler; no per-channel-type scalings",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.decoding.SpatialFilter",
+      "name": "SpatialFilter",
+      "submodule": "decoding",
+      "kind": "class",
+      "domain": "decoding",
+      "status": "partial",
+      "mne_cpp": "DecodingCsp::filters/patterns",
+      "note": "no shared base class; each decoder has its own filters/patterns",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.decoding.TemporalFilter",
       "name": "TemporalFilter",
       "submodule": "decoding",
       "kind": "class",
       "domain": "decoding",
       "status": "partial",
-      "mne_cpp": "DSPLIB filters (partial)",
-      "note": "no sklearn wrapper",
+      "mne_cpp": "FirFilter::filterData",
+      "note": "no transformer wrapper",
       "evidence": "parity-record"
     },
     {
@@ -4540,8 +4529,8 @@
       "kind": "class",
       "domain": "decoding",
       "status": "partial",
-      "mne_cpp": "DSPLIB TFR (partial)",
-      "note": "no sklearn wrapper",
+      "mne_cpp": "MorletTfr::computeMultiChannel",
+      "note": "no transformer; power only",
       "evidence": "parity-record"
     },
     {
@@ -4564,6 +4553,17 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "temporal generalization wrapper",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.decoding.LinearModel",
+      "name": "LinearModel",
+      "submodule": "decoding",
+      "kind": "class",
+      "domain": "decoding",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no coef→patterns (Haufe) wrapper",
       "evidence": "parity-record"
     },
     {

@@ -12,9 +12,9 @@ MNE-C SVN) to identify features and algorithms not yet ported.
 > parity figure. The domain narratives further below are hand-maintained
 > context and must not contradict the generated data.
 
-- Generated reference: **MNE-Python 1.11.0** (pinned 1.11.x), on **2026-07-11**.
-- Inventoried public APIs: **443** — implemented **251**, partial **47**, missing **137**, not-applicable **8**.
-- Machine-rendered parity: **63.1%** of 435 in-scope APIs (implemented + ½·partial; not-applicable excluded).
+- Generated reference: **MNE-Python 1.11.0** (pinned 1.11.x).
+- Inventoried public APIs: **443** — implemented **183**, partial **85**, missing **167**, not-applicable **8**.
+- Machine-rendered parity: **51.8%** of 435 in-scope APIs (implemented + ½·partial; not-applicable excluded).
 
 ---
 
