@@ -78,6 +78,7 @@
 
 #include <QtTest>
 #include <QApplication>
+#include <QSettings>
 #include <QVector3D>
 #include <QQuaternion>
 
@@ -334,6 +335,15 @@ private slots:
 
 void TestDisp3dBrainView::initTestCase()
 {
+    // BrainView persists its layout in QSettings: without an organisation the Windows registry backend stores nothing
+    QCoreApplication::setOrganizationName(QStringLiteral("MNE-CPP-Tests"));
+    QCoreApplication::setApplicationName(QStringLiteral("test_disp3d_brainview"));
+    QSettings settings;
+    settings.clear();
+    settings.setValue(QStringLiteral("probe"), 1);
+    settings.sync();
+    QCOMPARE(settings.status(), QSettings::NoError);
+    settings.remove(QStringLiteral("probe"));
     QApplication::processEvents();
 }
 
@@ -341,6 +351,7 @@ void TestDisp3dBrainView::initTestCase()
 
 void TestDisp3dBrainView::cleanupTestCase()
 {
+    QSettings().clear();
 }
 
 //=============================================================================================================
