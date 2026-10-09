@@ -1135,6 +1135,42 @@ int FwdBemModel::fwd_bem_load_recompute_solution(const QString& name, int bemMet
 
 //=============================================================================================================
 
+int FwdBemModel::fwd_bem_save_model(const QString& name) const
+{
+    if (nsurf == 0) {
+        qWarning("[FwdBemModel::fwd_bem_save_model] No model to save");
+        return FAIL;
+    }
+    if (solution.size() > 0 && bem_method != FWD_BEM_CONSTANT_COLL && bem_method != FWD_BEM_LINEAR_COLL) {
+        qWarning("[FwdBemModel::fwd_bem_save_model] Unknown BEM method : %d", bem_method);
+        return FAIL;
+    }
+    QFile file(name);
+    FiffStream::SPtr stream = FiffStream::start_file(file);
+    if (!stream) {
+        return FAIL;
+    }
+    stream->start_block(FIFFB_BEM);
+    int coordFrame = surfs[0]->coord_frame;
+    stream->write_int(FIFF_BEM_COORD_FRAME, &coordFrame);
+    for (int k = 0; k < nsurf; ++k) {
+        surfs[k]->sigma = sigma[k];
+        stream->start_block(FIFFB_BEM_SURF);
+        surfs[k]->writeToStream(stream.data());
+        stream->end_block(FIFFB_BEM_SURF);
+    }
+    if (solution.size() > 0) {
+        int approx = (bem_method == FWD_BEM_CONSTANT_COLL) ? FIFFV_BEM_APPROX_CONST : FIFFV_BEM_APPROX_LINEAR;
+        stream->write_int(FIFF_BEM_APPROX, &approx);
+        stream->write_float_matrix(FIFF_BEM_POT_SOLUTION, solution);
+    }
+    stream->end_block(FIFFB_BEM);
+    stream->end_file();
+    return OK;
+}
+
+//=============================================================================================================
+
 float FwdBemModel::fwd_bem_inf_field(const Eigen::Vector3f& rd, const Eigen::Vector3f& Q, const Eigen::Vector3f& rp, const Eigen::Vector3f& dir)
 /*
      * Infinite-medium magnetic field

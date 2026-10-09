@@ -452,6 +452,18 @@ public:
                                         int bemMethod,
                                         int force_recompute);
 
+    //=========================================================================================================
+    /**
+     * @brief Save the surfaces, conductivities and potential solution (MNE-C fwd_bem_save_model).
+     *
+     * The file holds a FIFFB_BEM block that fwd_bem_load_surfaces / fwd_bem_load_recompute_solution and
+     * mne.read_bem_solution read back.
+     *
+     * @param[in] name   Output file.
+     * @return OK on success, FAIL if there is no model or the file cannot be written.
+     */
+    int fwd_bem_save_model(const QString& name) const;
+
     //============================= fwd_bem_pot.c =============================
 
     //=========================================================================================================

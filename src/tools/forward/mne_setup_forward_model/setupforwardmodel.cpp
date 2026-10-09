@@ -687,90 +687,11 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
 
     qInfo("Solution computed.");
 
-    //
-    // Save the BEM solution:
-    //   - Write FIFF file with BEM surfaces + solution matrix
-    //   - Format matches what fwd_bem_load_solution expects:
-    //     FIFFB_BEM block containing:
-    //       - FIFF_BEM_APPROX (int: FIFFV_BEM_APPROX_LINEAR)
-    //       - FIFF_BEM_POT_SOLUTION (float matrix: nsol x nsol)
-    //       - FIFFB_BEM_SURF blocks for each surface
-    //
     qInfo("Saving...");
-
-    {
-        QFile file(solFile);
-        FiffStream::SPtr stream = FiffStream::start_file(file);
-
-        stream->start_block(FIFFB_BEM);
-
-        // Write BEM approximation method
-        int approxMethod = FIFFV_BEM_APPROX_LINEAR;
-        stream->write_int(FIFF_BEM_APPROX, &approxMethod);
-
-        // Write BEM surfaces
-        for (int k = 0; k < bemModel->nsurf; ++k) {
-            stream->start_block(FIFFB_BEM_SURF);
-
-            MNESurface* s = bemModel->surfs[k].get();
-
-            // FsSurface ID
-            int surfId = s->id;
-            stream->write_int(FIFF_BEM_SURF_ID, &surfId);
-
-            // Conductivity
-            float sigma = bemModel->sigma[k];
-            stream->write_float(FIFF_BEM_SIGMA, &sigma);
-
-            // Coordinate frame
-            int coordFrame = s->coord_frame;
-            stream->write_int(FIFF_MNE_COORD_FRAME, &coordFrame);
-
-            // Number of vertices and triangles
-            stream->write_int(FIFF_BEM_SURF_NNODE, &s->np);
-            stream->write_int(FIFF_BEM_SURF_NTRI, &s->ntri);
-
-            // Vertex coordinates
-            MatrixXf rr(s->np, 3);
-            for (int v = 0; v < s->np; ++v) {
-                rr(v, 0) = s->rr(v, 0);
-                rr(v, 1) = s->rr(v, 1);
-                rr(v, 2) = s->rr(v, 2);
-            }
-            stream->write_float_matrix(FIFF_BEM_SURF_NODES, rr);
-
-            // Triangle indices (convert to 1-based for FIFF)
-            if (s->ntri > 0) {
-                MatrixXi tris(s->ntri, 3);
-                for (int t = 0; t < s->ntri; ++t) {
-                    tris(t, 0) = s->tris[t].vert[0] + 1;
-                    tris(t, 1) = s->tris[t].vert[1] + 1;
-                    tris(t, 2) = s->tris[t].vert[2] + 1;
-                }
-                stream->write_int_matrix(FIFF_BEM_SURF_TRIANGLES, tris);
-            }
-
-            // Vertex normals
-            MatrixXf nn(s->np, 3);
-            for (int v = 0; v < s->np; ++v) {
-                nn(v, 0) = s->nn(v, 0);
-                nn(v, 1) = s->nn(v, 1);
-                nn(v, 2) = s->nn(v, 2);
-            }
-            stream->write_float_matrix(FIFF_BEM_SURF_NORMALS, nn);
-
-            stream->end_block(FIFFB_BEM_SURF);
-        }
-
-        // Write the solution matrix
-        if (bemModel->solution.size() > 0 && bemModel->nsol > 0) {
-            stream->write_float_matrix(FIFF_BEM_POT_SOLUTION, bemModel->solution);
-        }
-
-        stream->end_block(FIFFB_BEM);
-        stream->end_file();
+    if (bemModel->fwd_bem_save_model(solFile) != 0) {
+        qCritical() << "Could not write" << solFile;
+        return false;
     }
-
     qInfo("Saved the result to %s", qPrintable(solFile));
 
 

@@ -21,6 +21,8 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_stream.h>
+#include <fiff/fiff_dir_node.h>
+#include <fiff/fiff_tag.h>
 #include <mne/mne_bem.h>
 
 //=============================================================================================================
@@ -2044,8 +2046,25 @@ private slots:
         QString outPath = m_tempDir.path() + "/prepared_bem.fif";
         QString output = runTool("mne_prepare_bem_model", {"--bem", bemFile, "--sol", outPath}, 300000);
         QVERIFY(QFile::exists(outPath));
-        QFileInfo fi(outPath);
-        QVERIFY(fi.size() > 100);
+
+        // Like an MNE-C -sol.fif: the surfaces and the linear potential solution (one row per vertex)
+        QFile surfFile(outPath);
+        MNELIB::MNEBem bem(surfFile);
+        QCOMPARE(bem.size(), 1);
+        QFile solFile(outPath);
+        FIFFLIB::FiffStream stream(&solFile);
+        QVERIFY(stream.open());
+        const QList<FIFFLIB::FiffDirNode::SPtr> bemNodes = stream.dirtree()->dir_tree_find(FIFFB_BEM);
+        QCOMPARE(bemNodes.size(), 1);
+        FIFFLIB::FiffTag::UPtr tag;
+        QVERIFY(bemNodes[0]->find_tag(&stream, FIFF_BEM_APPROX, tag));
+        QCOMPARE(*tag->toInt(), FIFFV_BEM_APPROX_LINEAR);
+        QVERIFY(bemNodes[0]->find_tag(&stream, FIFF_BEM_POT_SOLUTION, tag));
+        qint32 ndim;
+        QVector<qint32> dims;
+        tag->getMatrixDimensions(ndim, dims);
+        QCOMPARE(dims[0], bem[0].np);
+        QCOMPARE(dims[1], bem[0].np);
     }
 
     //=========================================================================================================

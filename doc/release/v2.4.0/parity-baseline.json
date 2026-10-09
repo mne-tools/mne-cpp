@@ -56,6 +56,7 @@
         "test_fiff_stream_python",
         "test_filtering",
         "test_fs_io",
+        "test_fwd_bem_driver_python",
         "test_fwd_python",
         "test_inv_beamformer_python",
         "test_inv_dipole_fit_python",

@@ -170,6 +170,23 @@ Attempts to read the pre-computed solution; if it is missing or force_recompute 
 
 ---
 
+### fwd_bem_save_model(name)
+
+Save the surfaces, conductivities and potential solution (MNE-C fwd_bem_save_model).
+
+The file holds a FIFFB_BEM block that fwd_bem_load_surfaces / fwd_bem_load_recompute_solution and mne.read_bem_solution read back.
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Output file.
+
+**Returns:**
+
+- *int* — OK on success, FAIL if there is no model or the file cannot be written.
+
+---
+
 ### fwd_bem_specify_els(els)
 
 Precompute the electrode-specific BEM solution.

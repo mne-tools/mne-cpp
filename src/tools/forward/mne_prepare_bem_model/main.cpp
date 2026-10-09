@@ -132,21 +132,10 @@ int main(int argc, char* argv[])
     // Save the solution
     qInfo("Writing solution to: %s", qPrintable(solFile));
 
-    QFile file(solFile);
-    FiffStream::SPtr stream = FiffStream::start_file(file);
-    if (!stream) {
-        qCritical("Cannot open output file: %s", qPrintable(solFile));
+    if (bemModel->fwd_bem_save_model(solFile) != 0) {
+        qCritical("Cannot write output file: %s", qPrintable(solFile));
         return 1;
     }
-
-    stream->start_block(FIFFB_BEM);
-    stream->write_int(FIFF_BEM_APPROX, &bemModel->bem_method);
-
-    // Write solution as a float matrix
-    stream->write_float_matrix(FIFF_MNE_FORWARD_SOLUTION, bemModel->solution);
-
-    stream->end_block(FIFFB_BEM);
-    stream->end_file();
 
     qInfo("BEM solution saved.");
     return 0;

@@ -27,6 +27,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_named_matrix.h>
 #include <mne/mne_source_space.h>
+#include <mne/mne_surface.h>
 
 #include <memory>
 #include <vector>
@@ -38,6 +39,7 @@
 #include <QtTest>
 #include <QCoreApplication>
 #include <QFile>
+#include <QTemporaryDir>
 #include <QTextStream>
 
 //=============================================================================================================
@@ -112,6 +114,7 @@ private slots:
     void gain();
     void gradient_data();
     void gradient();
+    void saveModel();
 };
 
 //=============================================================================================================
@@ -272,6 +275,48 @@ void TestFwdBemDriverPython::gradient()
 
 //=============================================================================================================
 // MAIN
+//=============================================================================================================
+
+void TestFwdBemDriverPython::saveModel()
+{
+    // The model read from mne.write_bem_solution's file is saved and read back unchanged
+    QTemporaryDir dir;
+    const QString linear = dir.filePath(QStringLiteral("linear-bem-sol.fif"));
+    QCOMPARE(m_model->fwd_bem_save_model(linear), 0);
+    auto back = FwdBemModel::fwd_bem_load_three_layer_surfaces(linear);
+    QVERIFY(back != nullptr);
+    QCOMPARE(back->sigma, m_model->sigma);
+    for (int k = 0; k < m_model->nsurf; ++k) {
+        QCOMPARE(back->surfs[k]->id, m_model->surfs[k]->id);
+        QCOMPARE(back->surfs[k]->rr, m_model->surfs[k]->rr);
+        QCOMPARE(back->surfs[k]->itris, m_model->surfs[k]->itris);
+    }
+    QCOMPARE(back->fwd_bem_load_recompute_solution(linear, FWD_BEM_LINEAR_COLL, 0), 0);
+    QCOMPARE(back->sol_name, linear);
+    QCOMPARE(back->solution, m_model->solution);
+
+    // A constant collocation solution comes back as one; asking for the linear one recomputes it
+    QCOMPARE(back->fwd_bem_compute_solution(FWD_BEM_CONSTANT_COLL), 0);
+    const MatrixXf constantSolution = back->solution;
+    const QString constant = dir.filePath(QStringLiteral("constant-bem-sol.fif"));
+    QCOMPARE(back->fwd_bem_save_model(constant), 0);
+    auto reread = FwdBemModel::fwd_bem_load_three_layer_surfaces(constant);
+    QVERIFY(reread != nullptr);
+    QCOMPARE(reread->fwd_bem_load_recompute_solution(constant, FWD_BEM_UNKNOWN, 0), 0);
+    QCOMPARE(reread->bem_method, static_cast<int>(FWD_BEM_CONSTANT_COLL));
+    QCOMPARE(reread->sol_name, constant);
+    QCOMPARE(reread->solution, constantSolution);
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Approximation method in file"));
+    QCOMPARE(reread->fwd_bem_load_recompute_solution(constant, FWD_BEM_LINEAR_COLL, 0), 0);
+    QVERIFY(reread->sol_name.isEmpty());
+    // The recomputed linear solution matches mne.make_bem_solution's
+    const float relDiff = (reread->solution - m_model->solution).norm() / m_model->solution.norm();
+    QVERIFY2(relDiff < 1e-5f, qPrintable(QString::number(relDiff)));
+
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No model to save"));
+    QCOMPARE(FwdBemModel().fwd_bem_save_model(dir.filePath(QStringLiteral("empty.fif"))), -1);
+}
+
 //=============================================================================================================
 
 QTEST_GUILESS_MAIN(TestFwdBemDriverPython)

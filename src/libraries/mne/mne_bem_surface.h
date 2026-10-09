@@ -147,14 +147,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Writes the bem surface to a FIFF stream
-     *
-     * @param[in] p_pStream  The stream to write to.
-     */
-    void writeToStream(FIFFLIB::FiffStream* p_pStream);
-
-    //=========================================================================================================
-    /**
      * Map bem id integers to human-readable names
      *
      * @param[in] id  The bem id integer.

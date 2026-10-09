@@ -60,6 +60,17 @@ Destroys the [`MNE`](/docs/api/mne/mne-class) [FsSurface](/docs/api/fs/fs-surfac
 
 ---
 
+### writeToStream(p_pStream)
+
+Writes the surface tags of a FIFFB_BEM_SURF block (MNE-C mne_write_bem_surfaces_block): conductivity if set, id, coordinate frame, vertices, triangles and normals.
+
+**Parameters:**
+
+- **p_pStream** : *[FiffStream](/docs/api/fiff/fiff-stream) **
+  The stream to write to; the caller opens and closes the block.
+
+---
+
 ### sum_solids(from)
 
 Sum the solid angles of all triangles as seen from a given point.
