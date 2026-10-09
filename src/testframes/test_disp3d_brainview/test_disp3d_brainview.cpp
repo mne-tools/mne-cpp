@@ -866,6 +866,18 @@ void TestDisp3dBrainView::sourceEstimateManager_basics()
     QVERIFY(std::fabs(timeSpy.at(0).at(1).toFloat() - 0.0f) < 1e-6f);
     QVERIFY(lh->vertexDataRef()[3].color != before);
 
+    // A finished load leaves the manager safe to reload, cancel and destroy (the worker used to be
+    // freed behind its back; this faults under DYLD_INSERT_LIBRARIES=libgmalloc / glibc heap checks)
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    QVERIFY(manager.load(lhPath, QString(), surfaces, QStringLiteral("pial")));
+    QTRY_COMPARE(loadedSpy.size(), 2);
+    QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+    manager.cancelLoading();
+    QVERIFY(!manager.isLoading());
+    QVERIFY(manager.load(lhPath, QString(), surfaces, QStringLiteral("pial")));
+    manager.cancelLoading();
+    QVERIFY(!manager.isLoading());
+
     QApplication::processEvents();
 }
 

@@ -55,6 +55,11 @@ void SourceEstimateManager::cancelLoading()
         m_loadingThread->quit();
         m_loadingThread->wait();
     }
+    // The worker is deleted here, once its thread has stopped, never by the thread itself:
+    // onStcLoadingFinished still reads it after the thread may have finished
+    delete m_stcWorker;
+    m_stcWorker = nullptr;
+    m_isLoading = false;
 }
 
 //=============================================================================================================
@@ -102,13 +107,10 @@ bool SourceEstimateManager::load(const QString& lhPath, const QString& rhPath,
         return false;
     }
 
-    // Clean up any previous loading thread
-    if (m_loadingThread) {
-        m_loadingThread->quit();
-        m_loadingThread->wait();
-        delete m_loadingThread;
-        m_loadingThread = nullptr;
-    }
+    // Clean up any previous loading thread and worker
+    cancelLoading();
+    delete m_loadingThread;
+    m_loadingThread = nullptr;
 
     // Create overlay for results
     m_overlay = std::make_unique<SourceEstimateOverlay>();
@@ -122,7 +124,6 @@ bool SourceEstimateManager::load(const QString& lhPath, const QString& rhPath,
     connect(m_stcWorker, &StcLoadingWorker::progress, this, &SourceEstimateManager::loadingProgress);
     connect(m_stcWorker, &StcLoadingWorker::finished, this, &SourceEstimateManager::onStcLoadingFinished);
     connect(m_stcWorker, &StcLoadingWorker::finished, m_loadingThread, &QThread::quit);
-    connect(m_loadingThread, &QThread::finished, m_stcWorker, &QObject::deleteLater);
 
     m_isLoading = true;
     m_loadingThread->start();
