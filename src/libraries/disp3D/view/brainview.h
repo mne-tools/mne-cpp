@@ -1231,6 +1231,7 @@ private:
     const ViewVisibilityProfile& visibilityProfileForTarget(int target) const;
 
     void refreshSensorTransforms();
+    QMatrix4x4 itemTransform(const QStandardItem* item) const;
     void removeSurfacesByPrefix(const QStringList& prefixes);
 
 protected:

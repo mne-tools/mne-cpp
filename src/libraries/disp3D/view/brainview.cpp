@@ -386,15 +386,6 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
             brainSurf->setVisible(sensItem->isVisible());
             m_itemSurfaceMap[item] = brainSurf;
 
-            // Apply Head-to-MRI transformation if available
-            // Note: meg positions in info might already be head-space, but check if we need this global trans
-            if (!m_headToMriTrans.isEmpty()) {
-                QMatrix4x4 m;
-                if (m_applySensorTrans) {
-                    m = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans);
-                }
-                brainSurf->applyTransform(m);
-            }
 
             // Legacy map support
             const QString keyPrefix = SURFACEKEYS::sensorParentToKeyPrefix(parentText);
@@ -409,9 +400,7 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
             auto dipObject = std::make_shared<DipoleObject>();
             dipObject->load(dipItem->ecdSet());
             dipObject->setVisible(dipItem->isVisible());
-            if (m_applySensorTrans && !m_headToMriTrans.isEmpty()) {
-                dipObject->applyTransform(SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans));
-            }
+            dipObject->applyTransform(itemTransform(item));
 
             m_itemDipoleMap[item] = dipObject;
         }
@@ -443,15 +432,6 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
                                                                itemColor(*digItem));
             brainSurf->setVisible(digItem->isVisible());
 
-            // Apply Head-to-MRI transformation if available
-            if (!m_headToMriTrans.isEmpty()) {
-                QMatrix4x4 m;
-                if (m_applySensorTrans) {
-                    m = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans);
-                }
-                brainSurf->applyTransform(m);
-            }
-
             m_itemSurfaceMap[item] = brainSurf;
 
             // Category name for surface-map key.  A monotonic counter
@@ -482,6 +462,8 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
             m_surfaces[key] = brainSurf;
         }
 
+        if (m_itemSurfaceMap.contains(item))
+            m_itemSurfaceMap[item]->applyTransform(itemTransform(item));
 
         // Check children recursively
         if (m_model->hasChildren(index)) {
@@ -497,7 +479,7 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
 
 void BrainView::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
-    // Update visuals based on roles
+    bool transformChanged = false;
     for (int i = topLeft.row(); i <= bottomRight.row(); ++i) {
         QModelIndex index = m_model->index(i, 0, topLeft.parent());
         QStandardItem* item = m_model->itemFromIndex(index);
@@ -514,6 +496,10 @@ void BrainView::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bot
                 if ((roles.contains(AbstractTreeItem::ColorRole) || roles.contains(AbstractTreeItem::AlphaRole)) && absItem->color().isValid()) {
                     surf->setColor(itemColor(*absItem));
                 }
+                if (roles.contains(AbstractTreeItem::TransformRole)) {
+                    surf->applyTransform(itemTransform(item));
+                    transformChanged = true;
+                }
                 if (roles.contains(SurfaceTreeItem::AnnotationDataRole)) {
                     SurfaceTreeItem* sItem = static_cast<SurfaceTreeItem*>(absItem);
                     if (!sItem->annotationData().isEmpty()) {
@@ -523,10 +509,17 @@ void BrainView::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bot
             }
         }
 
-        if (m_itemDipoleMap.contains(item) && roles.contains(AbstractTreeItem::VisibleRole)) {
-            if (auto* absItem = dynamic_cast<AbstractTreeItem*>(item))
+        if (m_itemDipoleMap.contains(item)) {
+            auto* absItem = dynamic_cast<AbstractTreeItem*>(item);
+            if (absItem && roles.contains(AbstractTreeItem::VisibleRole))
                 m_itemDipoleMap[item]->setVisible(absItem->isVisible());
+            if (roles.contains(AbstractTreeItem::TransformRole))
+                m_itemDipoleMap[item]->applyTransform(itemTransform(item));
         }
+    }
+    if (transformChanged) {
+        updateInflatedSurfaceTransforms();
+        m_vertexCountDirty = true;
     }
     updateSceneBounds();
     m_sceneDirty = true;
@@ -766,9 +759,8 @@ void BrainView::updateInflatedSurfaceTransforms()
     auto lhSurf = m_surfaces[lhKey];
     auto rhSurf = m_surfaces[rhKey];
 
-    QMatrix4x4 identity;
-    lhSurf->applyTransform(identity);
-    rhSurf->applyTransform(identity);
+    lhSurf->applyTransform(itemTransform(m_itemSurfaceMap.key(lhSurf)));
+    rhSurf->applyTransform(itemTransform(m_itemSurfaceMap.key(rhSurf)));
 
     if (!needsInflated) {
         return;
@@ -2961,6 +2953,22 @@ bool BrainView::loadTransformation(const QString& transPath)
 
 //==============================================================================
 
+QMatrix4x4 BrainView::itemTransform(const QStandardItem* item) const
+{
+    const auto* absItem = dynamic_cast<const AbstractTreeItem*>(item);
+    if (!absItem)
+        return {};
+    QMatrix4x4 trans = absItem->transform();
+    // Sensors, digitizer points and dipoles are in head coordinates
+    const int type = absItem->type();
+    const bool inHead = type == AbstractTreeItem::itemTypeId(AbstractTreeItem::SensorItem) || type == AbstractTreeItem::itemTypeId(AbstractTreeItem::DigitizerItem) || type == AbstractTreeItem::itemTypeId(AbstractTreeItem::DipoleItem);
+    if (inHead && m_applySensorTrans && !m_headToMriTrans.isEmpty())
+        trans = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans) * trans;
+    return trans;
+}
+
+//==============================================================================
+
 void BrainView::refreshSensorTransforms()
 {
     QMatrix4x4 qmat;
@@ -2970,12 +2978,12 @@ void BrainView::refreshSensorTransforms()
 
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if ((it.key().startsWith("sens_") || it.key().startsWith("dig_")) && it.value()) {
-            it.value()->applyTransform(qmat);
+            const QStandardItem* item = m_itemSurfaceMap.key(it.value());
+            it.value()->applyTransform(item ? itemTransform(item) : qmat);
         }
     }
-    // Dipoles are in head coordinates, like sensors and digitizer points
-    for (const auto& dipoles : std::as_const(m_itemDipoleMap)) {
-        dipoles->applyTransform(qmat);
+    for (auto it = m_itemDipoleMap.cbegin(); it != m_itemDipoleMap.cend(); ++it) {
+        it.value()->applyTransform(itemTransform(it.key()));
     }
 
     if (m_fieldMapper.isLoaded()) {

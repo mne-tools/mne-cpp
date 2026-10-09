@@ -459,6 +459,19 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     QVERIFY(!dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
     static_cast<AbstractTreeItem*>(*dipoleRow)->setVisible(true);
     QVERIFY(dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
+    // The item transform moves the dipoles in head coordinates, before head -> MRI:
+    // MNE-Python apply_trans puts head (0, 0, 150) mm at MRI (7.3, -76.1, 94.2) mm
+    QMatrix4x4 shift;
+    shift.translate(0.0f, 0.0f, 0.1f);
+    static_cast<AbstractTreeItem*>(*dipoleRow)->setTransform(shift);
+    QVERIFY(!dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
+    QVERIFY(dipoleHitAt(QVector3D(0.0f, 0.0f, 0.15f)));
+    QVERIFY(modelView.loadTransformation(dataDir + QStringLiteral("MEG/sample/all-trans.fif")));
+    QVERIFY(!dipoleHitAt(QVector3D(0.00381462f, -0.01784828f, 0.0130306f)));
+    QVERIFY(dipoleHitAt(QVector3D(0.00730404f, -0.07614912f, 0.09420224f)));
+    QVERIFY(!dipoleHitAt(QVector3D(0.00381462f, -0.01784828f, 0.0130306f)));
+    static_cast<AbstractTreeItem*>(*dipoleRow)->setTransform(QMatrix4x4());
+    QVERIFY(dipoleHitAt(QVector3D(0.00381462f, -0.01784828f, 0.0130306f)));
     modelView.clearCameraFocusOverride();
     QVERIFY(modelView.loadTransformation(dataDir + QStringLiteral("MEG/sample/all-trans.fif")));
 
@@ -2549,6 +2562,17 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     dragAndRelease(false);
     QVERIFY(clicked.isEmpty());
     lhItem->setVisible(true);
+    dragAndRelease(false);
+    QCOMPARE(clicked.size(), 1);
+
+    // Moving the surface through its tree transform moves it away from the ray, and back
+    QMatrix4x4 away;
+    away.translate(0.5f, 0.0f, 0.0f);
+    lhItem->setTransform(away);
+    clicked.clear();
+    dragAndRelease(false);
+    QVERIFY(clicked.isEmpty());
+    lhItem->setTransform(QMatrix4x4());
     dragAndRelease(false);
     QCOMPARE(clicked.size(), 1);
 
