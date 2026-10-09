@@ -10,15 +10,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Concurrent Network)
+set(QT_REQUIRED_COMPONENTS Core)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
     main.cpp
-    edf_info.cpp
-    edf_raw_data.cpp
-    edf_ch_info.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -30,10 +27,10 @@ endif()
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
-set(MNE_LIBS_REQUIRED 
+set(MNE_LIBS_REQUIRED
+  mne_bids
   mne_fiff
   mne_utils
-    mne_math
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

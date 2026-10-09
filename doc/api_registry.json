@@ -12474,8 +12474,9 @@
       {
         "python": "mne.io.read_raw_brainvision",
         "status": "implemented",
-        "mne_cpp": "mne_brain_vision2fiff (CLI)",
-        "note": ""
+        "mne_cpp": "BIDSLIB::BrainVisionReader / mne_brain_vision2fiff (CLI)",
+        "note": "",
+        "test": "test_bids"
       },
       {
         "python": "mne.io.read_raw_bti",
@@ -12504,8 +12505,9 @@
       {
         "python": "mne.io.read_raw_edf",
         "status": "implemented",
-        "mne_cpp": "mne_edf2fiff (CLI) / BIDS reader",
-        "note": ""
+        "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
+        "note": "",
+        "test": "test_bids"
       },
       {
         "python": "mne.io.read_raw_eeglab",

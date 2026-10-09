@@ -8,68 +8,51 @@
  *           Simon Heinke <simon.heinke@tu-ilmenau.de>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @date     April, 2019
-* @version  1.0
-* @brief    Converting EDF data into Fiff data.T
+ * @brief    Converts EDF/EDF+ and BDF recordings to FIFF via BIDSLIB::EDFReader.
  */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 #include <algorithm>
-#include <vector>
 
-#include <fiff/fiff_ch_info.h>
-#include <fiff/fiff_info.h>
-#include <fiff/fiff_raw_data.h>
+#include <bids/readers/bids_edf_reader.h>
+
 #include <fiff/fiff_file.h>
+#include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_stream.h>
 
 #include <utils/generics/mne_logger.h>
 
-#include "edf_info.h"
-#include "edf_raw_data.h"
-
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
-#include <QFile>
 #include <QCommandLineParser>
+#include <QCoreApplication>
 #include <QDebug>
+#include <QFile>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EDF2FIFF;
+using namespace BIDSLIB;
 using namespace FIFFLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 
-//*************************************************************************************************************
 //=============================================================================================================
 // STATIC DEFINITIONS
 //=============================================================================================================
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
-//*************************************************************************************************************
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
+
 int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
@@ -77,85 +60,57 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("mne_edf2fiff");
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
-    // command line parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("EDF to Fiff conversion. Variable channel frequencies are supported. Interrupted recordings are not supported.");
+    parser.setApplicationDescription("EDF/EDF+/BDF to FIFF conversion. Samples are stored in SI units like mne.io.read_raw_edf; "
+                                     "channels sampled below the highest rate are skipped.");
     parser.addHelpOption();
+    parser.addVersionOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file. Needs to be specified.", "in", "");
-    QCommandLineOption outputOption("fileOut", "The output file. If not specified, this will be the same filename as the input file.", "out", "");
-    QCommandLineOption scaleOption("scaleFactor", "The raw value scaling factor. Must be a float number. If not specified, this will be 1e6.", "in", "1e6");
-
+    QCommandLineOption inputOption("fileIn", "The input EDF or BDF file. Needs to be specified.", "in");
+    QCommandLineOption outputOption("fileOut", "The output file. If not specified, the input file name with a .fif extension.", "out");
     parser.addOption(inputOption);
     parser.addOption(outputOption);
-    parser.addOption(scaleOption);
-
     parser.process(a);
 
-    QString sInputFile = parser.value(inputOption);
+    const QString sInputFile = parser.value(inputOption);
     QString sOutputFile = parser.value(outputOption);
-    QString sScaleFactor = parser.value(scaleOption);
-
-    // check for correct usage:
     if (sInputFile.isEmpty()) {
-        parser.showHelp(0);
-    }
-    if (!sInputFile.toUpper().endsWith(".EDF")) {
-        qDebug() << "Not an EDF file: " << sInputFile;
-        return 0;
+        parser.showHelp(1);
     }
 
-    if (sScaleFactor.toFloat() == 0.0f) {
-        qDebug() << "Not a float number: " << sScaleFactor;
-        return 0;
+    EDFReader reader;
+    if (!reader.supportsExtension(sInputFile.mid(sInputFile.lastIndexOf('.')))) {
+        qCritical() << "Not an EDF or BDF file:" << sInputFile;
+        return 1;
     }
-
-    // if the user did not specify an output file, simply use the same location as the input file:
+    if (!reader.open(sInputFile) || reader.getSampleCount() <= 0) {
+        qCritical() << "Could not read" << sInputFile;
+        return 1;
+    }
     if (sOutputFile.isEmpty()) {
-        qDebug() << "No output file specified, using same filename for output FIFF file";
-        sOutputFile = sInputFile.left(sInputFile.size() - 3); // cut the 'edf'
-        sOutputFile = sOutputFile.append("fif");              // append 'fif'
+        sOutputFile = sInputFile.left(sInputFile.lastIndexOf('.')) + ".fif";
     }
 
-    // init data loading and writing
-    QFile t_fileIn(sInputFile);
-    QFile t_fileOut(sOutputFile);
-
-    // initialize raw data
-    EDFRawData edfRaw(&t_fileIn, sScaleFactor.toFloat());
-    // print basic info
-    EDFInfo edfInfo = edfRaw.getInfo();
-    // qDebug().noquote() << edfInfo.getAsString();
-
-    // convert to fiff
-    FiffRawData fiffRaw = edfRaw.toFiffRawData();
-
-    // set up the reading parameters
-    float fTimesliceSeconds = 10.0f; //read and write in 10 sec chunks
-    int iTimesliceSamples = static_cast<int>(ceil(fTimesliceSeconds * fiffRaw.info.sfreq));
-
+    const FiffRawData fiffRaw = reader.toFiffRawData();
+    QFile fileOut(sOutputFile);
     RowVectorXd cals;
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, fiffRaw.info, cals);
-
-    // copied from read/write example
-    fiff_int_t first = 0; // EDF files start at index 0
+    FiffStream::SPtr outfid = FiffStream::start_writing_raw(fileOut, fiffRaw.info, cals);
+    if (!outfid) {
+        qCritical() << "Could not write" << sOutputFile;
+        return 1;
+    }
+    fiff_int_t first = 0;
     outfid->write_int(FIFF_FIRST_SAMPLE, &first);
 
-    // read chunks, remember how many samples were already read
-    int iSamplesRead = 0;
-
-    while (iSamplesRead < edfInfo.getSampleCount()) {
-        int iNextChunkSize = std::min(iTimesliceSamples, edfInfo.getSampleCount() - iSamplesRead);
-        // EDF sample indexing starts at 0, simply use samplesRead as argument to read_raw_segment
-        MatrixXd data = edfRaw.read_raw_segment(iSamplesRead, iSamplesRead + iNextChunkSize).cast<double>();
-
-        iSamplesRead += iNextChunkSize;
-
-        outfid->write_raw_buffer(data, cals);
+    // 10 s buffers
+    const int iBufferSamples = static_cast<int>(std::ceil(10.0f * fiffRaw.info.sfreq));
+    const int iSampleCount = static_cast<int>(reader.getSampleCount());
+    for (int iStart = 0; iStart < iSampleCount; iStart += iBufferSamples) {
+        const int iEnd = std::min(iStart + iBufferSamples, iSampleCount);
+        outfid->write_raw_buffer(reader.readRawSegment(iStart, iEnd).cast<double>(), cals);
     }
-
     outfid->finish_writing_raw();
-    qDebug() << "Writing finished !";
 
+    qInfo() << "Wrote" << sOutputFile;
     return 0;
 }

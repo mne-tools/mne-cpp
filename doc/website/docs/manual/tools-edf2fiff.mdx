@@ -8,12 +8,13 @@ sidebar_position: 9
 
 ## Overview
 
-`mne_edf2fiff` converts EDF (European Data Format) files to FIFF format. It supports variable channel frequencies.
+`mne_edf2fiff` converts EDF (European Data Format) and EDF+ files to FIFF. It reads the file with
+`BIDSLIB::EDFReader`, so the samples match `mne.io.read_raw_edf`.
 
 ## Usage
 
 ```bash
-mne_edf2fiff [options]
+mne_edf2fiff --fileIn <file> [--fileOut <file>]
 ```
 
 ## Options
@@ -22,32 +23,21 @@ mne_edf2fiff [options]
 |---|---|
 | `--fileIn <file>` | Input EDF file **(required)** |
 | `--fileOut <file>` | Output FIFF file (default: same name with `.fif` extension) |
-| `--scaleFactor <value>` | Raw value scaling factor (default: 1e6) |
 
 ## Description
 
-The European Data Format (EDF) is a widely used standard for storing multi-channel electrophysiological signals. This tool converts EDF files to the FIFF format used by the MNE software suite.
-
-### Supported Features
-
-- Variable sampling frequencies across channels
-- Standard EDF header information is preserved in the FIFF output
+Each channel is scaled from its physical dimension (µV, mV, V) to SI units, so voltages are stored in volts.
+Channels named `Status` or `Trigger` become stim channels and are written unscaled. Other channel types are
+taken from the label (EEG, ECoG, sEEG, MEG, ECG, EOG, EMG); unrecognised labels are EEG, as in MNE-Python.
 
 ### Limitations
 
-- Interrupted recordings are **not** supported
+- Only the channels sampled at the highest rate are converted; channels sampled more slowly are skipped
+- Interrupted (EDF+D) recordings are **not** supported
 - EDF+ annotations are not converted
 
 ## Example
 
-Convert an EDF file to FIFF:
-
 ```bash
-mne_edf2fiff --fileIn recording.edf --fileOut recording.fif
-```
-
-With a custom scaling factor:
-
-```bash
-mne_edf2fiff --fileIn recording.edf --scaleFactor 1e3
+mne_edf2fiff --fileIn recording.edf --fileOut recording_raw.fif
 ```

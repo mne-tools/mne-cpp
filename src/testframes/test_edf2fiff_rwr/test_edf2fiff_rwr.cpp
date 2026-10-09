@@ -9,206 +9,158 @@
  *           Simon Heinke <simon.heinke@tu-ilmenau.de>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @date     August, 2019
-* @version  1.0
-* @brief    Converts the EDF file into a Fiff file and tests whether the raw values are identical.
+ * @brief    Runs mne_edf2fiff and compares the FIFF it writes with mne.io.read_raw_edf and BIDSLIB::EDFReader.
  */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <algorithm>
+#include <bids/readers/bids_edf_reader.h>
 
-#include <fiff/fiff.h>
-#include "../../tools/conversion/mne_edf2fiff/edf_raw_data.h"
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_raw_data.h>
 
 #include <utils/generics/mne_logger.h>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtTest>
 #include <QProcess>
+#include <QTemporaryDir>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace BIDSLIB;
 using namespace FIFFLIB;
-using namespace EDF2FIFF;
 using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TestEDF2FIFFRWR
-*
-* @brief The TestEDF2FIFFRWR class performs an EDF-to-Fiff conversion and compares the converted data with
-*        the original data from the EDF file.
-*
-*/
+ * @brief Converts test_reduced.edf with mne_edf2fiff and checks the FIFF against MNE-Python and EDFReader.
+ */
 class TestEDF2FIFFRWR : public QObject
 {
     Q_OBJECT
 
-public:
-    TestEDF2FIFFRWR();
-
 private slots:
     void initTestCase();
-    void testEDF2FiffConversion();
-    void testEDFReadAndFiffWrite();
-    void testFiffReadingAndValueEquality();
-    void cleanupTestCase();
+    void convertMatchesPython();
+    void refusesBadInput();
 
 private:
-    const float m_fTimesliceSeconds = 10.0f; //read and write in 10 sec chunks
-    const float m_fEpsilon = 0.000000001f;
+    int run(const QStringList& arguments);
 
-    // files:
-    QFile* m_pFileIn;
-    QFile* m_pFileOut; // temporary outfile, to be deleted during cleanup
-
-    // EDF / Fiff containers:
-    EDFRawData* m_pEDFRaw;
-    FiffRawData* m_pFiffRaw;
-
-    // raw data:
-    QVector<MatrixXd> m_vRawChunksFromOriginalEDF;
-    QVector<MatrixXd> m_vRawChunksFromWrittenFIFF;
+    QString m_sTool;
+    QString m_sEdf;
+    QTemporaryDir m_tempDir;
 };
 
-//*************************************************************************************************************
-
-TestEDF2FIFFRWR::TestEDF2FIFFRWR()
-{
-}
-
-//*************************************************************************************************************
+//=============================================================================================================
 
 void TestEDF2FIFFRWR::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
-
-    m_pFileIn = new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/EEG/test_reduced.edf");
-    m_pFileOut = new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/EEG/test_reduced_temporary.fif");
-
-    // initialize EDF raw data
-    m_pEDFRaw = new EDFRawData(m_pFileIn);
-
-    QVERIFY(m_pEDFRaw->getInfo().getAllChannelInfos().size() != 0);
-}
-
-//*************************************************************************************************************
-
-void TestEDF2FIFFRWR::testEDF2FiffConversion()
-{
-    // convert to fiff
-    m_pFiffRaw = new FiffRawData(m_pEDFRaw->toFiffRawData());
-
-    QVERIFY(m_pEDFRaw->getInfo().getMeasurementChannelInfos().size() == m_pFiffRaw->info.nchan);
-    QVERIFY(std::abs(m_pEDFRaw->getInfo().getFrequency() - m_pFiffRaw->info.sfreq) <= m_fEpsilon); // float-comparisons via '==' are unsafe
-    QVERIFY(m_pEDFRaw->getInfo().getSampleCount() == m_pFiffRaw->last_samp - m_pFiffRaw->first_samp);
-}
-
-//*************************************************************************************************************
-
-void TestEDF2FIFFRWR::testEDFReadAndFiffWrite()
-{
-    // set up the reading parameters
-    int iTimesliceSamples = static_cast<int>(ceil(m_fTimesliceSeconds * m_pFiffRaw->info.sfreq));
-
-    RowVectorXd cals;
-    FiffStream::SPtr outfid = FiffStream::start_writing_raw(*m_pFileOut, m_pFiffRaw->info, cals);
-
-    // write start of Fiff file
-    fiff_int_t first = 0; // EDF files start at index 0
-    outfid->write_int(FIFF_FIRST_SAMPLE, &first);
-
-    // read chunks, remember how many samples were already read
-    int iSamplesRead = 0;
-    while (iSamplesRead < m_pEDFRaw->getInfo().getSampleCount()) {
-        int iNextChunkSize = std::min(iTimesliceSamples, m_pEDFRaw->getInfo().getSampleCount() - iSamplesRead);
-        // EDF sample indexing starts at 0, simply use samplesRead as argument to read_raw_segment
-        MatrixXd data = m_pEDFRaw->read_raw_segment(iSamplesRead, iSamplesRead + iNextChunkSize).cast<double>();
-        iSamplesRead += iNextChunkSize;
-        outfid->write_raw_buffer(data, cals);
-        // copy into vector for later comparison with written Fiff file
-        m_vRawChunksFromOriginalEDF.append(data);
-    }
-
-    outfid->finish_writing_raw();
-
-    QVERIFY(iSamplesRead == m_pEDFRaw->getInfo().getSampleCount());
-}
-
-//*************************************************************************************************************
-
-void TestEDF2FIFFRWR::testFiffReadingAndValueEquality()
-{
-    // close outfile in case it is still open
-    m_pFileOut->close();
-    // open again
-    FiffRawData writtenFiff(*m_pFileOut);
-
-    // set up the reading parameters
-    int iTimesliceSamples = static_cast<int>(ceil(m_fTimesliceSeconds * writtenFiff.info.sfreq));
-    // read chunks, remember which is the current sample
-    int iCurrentSample = writtenFiff.first_samp;
-    while (iCurrentSample < writtenFiff.last_samp) {
-        // timeslice_samples - 1 because FiffRawData.read_raw_segment has inclusive index arguments
-        int iNextChunkSize = std::min(iTimesliceSamples - 1, writtenFiff.last_samp - iCurrentSample);
-        MatrixXd data, times;
-        writtenFiff.read_raw_segment(data, times, iCurrentSample, iCurrentSample + iNextChunkSize);
-        iCurrentSample += iNextChunkSize + 1; // + 1 because chunkSize of inclusive index arguments (see above)
-        // copy into vector for later comparison with original EDF file
-        m_vRawChunksFromWrittenFIFF.append(data);
-    }
-
-    // compare chunk vectors
-    QVERIFY(m_vRawChunksFromOriginalEDF.size() == m_vRawChunksFromWrittenFIFF.size());
-    for (int i = 0; i < m_vRawChunksFromOriginalEDF.size(); ++i) {
-        const MatrixXd originalEDFChunk = m_vRawChunksFromOriginalEDF[i];
-        const MatrixXd writtenFiffChunk = m_vRawChunksFromWrittenFIFF[i];
-
-        if (originalEDFChunk.cols() != writtenFiffChunk.cols() || originalEDFChunk.rows() != writtenFiffChunk.rows()) {
-            QFAIL("Found a chunk with mismatching dimensions ...");
-        }
-        // compare every single raw value
-        for (int r = 0; r < originalEDFChunk.rows(); ++r) {
-            for (int c = 0; c < originalEDFChunk.cols(); ++c) {
-                if (std::abs(originalEDFChunk(r, c) - writtenFiffChunk(r, c)) > static_cast<double>(m_fEpsilon)) { // double-comparisons via '==' are unsafe
-                    QFAIL("Found some non-identical raw values ...");
-                }
-            }
+    const QString appDir = QCoreApplication::applicationDirPath();
+    m_sEdf = appDir + "/../resources/data/mne-cpp-test-data/EEG/test_reduced.edf";
+    QVERIFY(QFileInfo::exists(m_sEdf));
+    QVERIFY(m_tempDir.isValid());
+#ifdef Q_OS_WIN
+    const QString exe = QStringLiteral("mne_edf2fiff.exe");
+#else
+    const QString exe = QStringLiteral("mne_edf2fiff");
+#endif
+    for (const QString& dir : {appDir, appDir + "/../bin", appDir + "/../apps"}) {
+        const QFileInfo fi(dir + "/" + exe);
+        if (fi.exists() && fi.isExecutable()) {
+            m_sTool = fi.canonicalFilePath();
+            break;
         }
     }
+    QVERIFY2(!m_sTool.isEmpty(), "mne_edf2fiff executable not found");
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 
-void TestEDF2FIFFRWR::cleanupTestCase()
+int TestEDF2FIFFRWR::run(const QStringList& arguments)
 {
-    // destroy containers
-    delete m_pFiffRaw;
-    delete m_pEDFRaw;
-
-    // close files
-    m_pFileOut->close();
-    m_pFileIn->close();
-
-    // remove temporary outfile
-    m_pFileOut->remove();
-
-    // destroy filehandles
-    delete m_pFileOut;
-    delete m_pFileIn;
+    QProcess proc;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    // The Windows loader needs the Qt and mne-cpp DLL directories on PATH
+    env.insert("PATH", QFileInfo(m_sTool).absolutePath() + ";" + QDir::cleanPath(QCoreApplication::applicationDirPath() + "/../../../src/external/qt/dynamic/bin") + ";" + env.value("PATH"));
+    proc.setProcessEnvironment(env);
+    proc.setProcessChannelMode(QProcess::ForwardedChannels);
+    proc.start(m_sTool, arguments);
+    if (!proc.waitForFinished(60000) || proc.exitStatus() != QProcess::NormalExit) {
+        return -1;
+    }
+    return proc.exitCode();
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
+
+void TestEDF2FIFFRWR::convertMatchesPython()
+{
+    const QString fif = m_tempDir.filePath(QStringLiteral("test_reduced_raw.fif"));
+    QCOMPARE(run({"--fileIn", m_sEdf, "--fileOut", fif}), 0);
+
+    QFile file(fif);
+    FiffRawData raw(file);
+    QCOMPARE(raw.info.sfreq, 512.0f);
+    QCOMPARE(raw.first_samp, 0);
+    QCOMPARE(raw.last_samp, 3071);
+    QCOMPARE(raw.info.nchan, 126); // the 512 Hz channels of mne's 139
+    MatrixXd data, times;
+    QVERIFY(raw.read_raw_segment(data, times, raw.first_samp, raw.last_samp));
+
+    // mne.io.read_raw_edf(test_reduced.edf).get_data(): samples 0, 1000, 3071 and sum |x|
+    const QList<std::tuple<QString, int, std::array<double, 4>>> expected{
+        {QStringLiteral("A10"), FIFFV_EEG_CH, {-1.2e-05, 2.6e-05, -3.6e-05, 0.047375}},
+        {QStringLiteral("H16"), FIFFV_EEG_CH, {-5e-06, 2.2e-05, -2.3e-05, 0.039064}},
+        {QStringLiteral("Ergo-Left"), FIFFV_EEG_CH, {1.6e-05, 1.7e-05, 1.7e-05, 0.052226}},
+        {QStringLiteral("Status"), FIFFV_STIM_CH, {4352.0, 0.0, 0.0, 57624.0}},
+    };
+    for (const auto& [name, kind, values] : expected) {
+        const int k = raw.info.ch_names.indexOf(name);
+        QVERIFY2(k >= 0, qPrintable(name));
+        QCOMPARE(raw.info.chs[k].kind, kind);
+        const double tol = 1e-6 * std::abs(values[3]);
+        QVERIFY2(std::abs(data(k, 0) - values[0]) < tol, qPrintable(name));
+        QVERIFY2(std::abs(data(k, 1000) - values[1]) < tol, qPrintable(name));
+        QVERIFY2(std::abs(data(k, 3071) - values[2]) < tol, qPrintable(name));
+        QVERIFY2(std::abs(data.row(k).cwiseAbs().sum() - values[3]) < 1e-5 * values[3], qPrintable(name));
+    }
+
+    // Every channel equals what EDFReader reads (float samples, float FIFF buffers)
+    EDFReader reader;
+    QVERIFY(reader.open(m_sEdf));
+    QVERIFY(data.isApprox(reader.readRawSegment(0, 3072).cast<double>()));
+
+    // Without --fileOut the output goes next to the input
+    const QString copy = m_tempDir.filePath(QStringLiteral("copy.EDF"));
+    QVERIFY(QFile::copy(m_sEdf, copy));
+    QCOMPARE(run({"--fileIn", copy}), 0);
+    QVERIFY(QFileInfo::exists(m_tempDir.filePath(QStringLiteral("copy.fif"))));
+}
+
+//=============================================================================================================
+
+void TestEDF2FIFFRWR::refusesBadInput()
+{
+    QCOMPARE(run({}), 1);
+    QCOMPARE(run({"--fileIn", m_tempDir.filePath(QStringLiteral("missing.edf"))}), 1);
+    const QString text = m_tempDir.filePath(QStringLiteral("notes.txt"));
+    QFile notes(text);
+    QVERIFY(notes.open(QIODevice::WriteOnly));
+    notes.close();
+    QCOMPARE(run({"--fileIn", text}), 1);
+    QCOMPARE(run({"--fileIn", m_sEdf, "--fileOut", m_tempDir.filePath(QStringLiteral("no/such/dir/out.fif"))}), 1);
+}
+
 //=============================================================================================================
 // MAIN
 //=============================================================================================================

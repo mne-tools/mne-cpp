@@ -2587,23 +2587,6 @@ private slots:
     }
 
     //=========================================================================================================
-    // mne_edf2fiff — with custom scale factor
-    //=========================================================================================================
-
-    void testEdf2FiffScaleFactor()
-    {
-        if (!toolExists("mne_edf2fiff"))
-            QSKIP("mne_edf2fiff not found");
-        QString edfFile = m_sResourcePath + "EEG/test_reduced.edf";
-        if (!QFile::exists(edfFile))
-            QSKIP("EDF test data not available");
-
-        QString outPath = m_tempDir.path() + "/test_edf_scaled.fif";
-        QString output = runTool("mne_edf2fiff", {"--fileIn", edfFile, "--fileOut", outPath, "--scaleFactor", "1e3"}, 120000);
-        QVERIFY(QFile::exists(outPath));
-    }
-
-    //=========================================================================================================
     // mne_annot2labels — right hemisphere
     //=========================================================================================================
 

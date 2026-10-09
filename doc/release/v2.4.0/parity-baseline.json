@@ -24,8 +24,8 @@
     "by_evidence": {
       "cross-validated-static": 56,
       "cross-validated-live": 2,
-      "tested": 138,
-      "unverified": 163
+      "tested": 140,
+      "unverified": 161
     },
     "by_source": {
       "classes": {
@@ -37,14 +37,15 @@
       "parity": {
         "cross-validated-static": 49,
         "cross-validated-live": 1,
-        "tested": 57,
-        "unverified": 163
+        "tested": 59,
+        "unverified": 161
       }
     },
     "tests_by_relation": {
       "cross-validated-static": [
         "test_anshared_models",
         "test_dsp_annotate_artifact",
+        "test_edf2fiff_rwr",
         "test_fiff_core_python",
         "test_fiff_cov_python",
         "test_fiff_dig_point_python",
@@ -1744,11 +1745,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "mne_brain_vision2fiff (CLI)",
+      "mne_cpp": "BIDSLIB::BrainVisionReader / mne_brain_vision2fiff (CLI)",
       "python": "mne.io.read_raw_brainvision",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_bids",
+      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -1760,11 +1761,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "mne_edf2fiff (CLI) / BIDS reader",
+      "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
       "python": "mne.io.read_raw_edf",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_bids",
+      "evidence": "tested"
     },
     {
       "source": "parity",

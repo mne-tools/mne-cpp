@@ -70,22 +70,14 @@ Optional files include a head shape data file (`.hsp`) and raw data in text form
 
 The digital trigger channel (STI 014) can be synthesized from analog trigger channels using `--stim`, with an adjustable threshold (`--stimthresh`, default 1.0).
 
-### EDF, EDF+, and BDF Formats
+### EDF and EDF+ Formats
 
-Use [`mne_edf2fiff`](tools-edf2fiff) to convert European Data Format (EDF/EDF+, 16-bit) and BioSemi BDF (24-bit) files. Key considerations:
+Use [`mne_edf2fiff`](tools-edf2fiff) to convert European Data Format (EDF/EDF+, 16-bit) files. Samples are
+scaled to SI units per channel and match `mne.io.read_raw_edf`.
 
-- **Electrode locations** must be provided separately via `--hpts` or `--elp` files (fiducial locations are mandatory)
-- **EDF+ annotation channels** can be converted to trigger channel (STI 014) using `--annotmap`
-- **BDF trigger data**: use `--digtrigmask 0xff` to select the significant bytes
-
-Post-conversion steps:
-1. Set correct channel types (EOG, EMG) with `mne_rename_channels`
-2. Create topographical layout with `mne_make_eeg_layout`
-3. For BDF files, specify trigger channel name "Status" via `--digtrig`
-
-:::warning
-BDF 3-byte samples are converted to 4-byte integers. The maximum convertible BDF file size is approximately 1.5 GB. Channel-dependent sampling rates are not supported.
-:::
+- Only channels at the highest sampling rate are converted
+- `Status`/`Trigger` channels become stim channels; electrode locations are not part of EDF and must be added separately
+- EDF+ annotations are not converted
 
 ### BrainVision EEG Data
 
