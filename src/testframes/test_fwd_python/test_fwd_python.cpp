@@ -457,10 +457,12 @@ void TestFwdPython::labelForward_variants_data()
     QTest::addColumn<bool>("meg");
     QTest::addColumn<bool>("eeg");
     QTest::addColumn<bool>("grad");
+    QTest::addColumn<bool>("fixedOri");
 
-    QTest::newRow("MRI frame") << true << false << true << true << false;
-    QTest::newRow("ASCII trans, MEG only, measurement file") << false << true << true << false << true;
-    QTest::newRow("EEG only") << false << false << false << true << true;
+    QTest::newRow("MRI frame") << true << false << true << true << false << false;
+    QTest::newRow("ASCII trans, MEG only, measurement file") << false << true << true << false << true << false;
+    QTest::newRow("EEG only") << false << false << false << true << true << false;
+    QTest::newRow("fixed orientation with gradients") << false << false << true << true << true << true;
 }
 
 void TestFwdPython::labelForward_variants()
@@ -470,8 +472,9 @@ void TestFwdPython::labelForward_variants()
     QFETCH(bool, meg);
     QFETCH(bool, eeg);
     QFETCH(bool, grad);
+    QFETCH(bool, fixedOri);
 
-    auto s = settings(false, grad);
+    auto s = settings(fixedOri, grad);
     s->include_meg = meg;
     s->include_eeg = eeg;
     if (mriFrame) {
@@ -512,15 +515,34 @@ void TestFwdPython::labelForward_variants()
     QCOMPARE(fwd->sol->row_names, m_ref.sol->row_names.mid(first, nChan));
     auto check = [&]() {
         for (int i = 0; i < 70; ++i) {
-            const MatrixXd ref = m_ref.sol->data.block(first, 3 * m_v1Sel(i), nChan, 3) * R;
-            const MatrixXd got = fwd->sol->data.middleCols(3 * i, 3);
+            MatrixXd ref = m_ref.sol->data.block(first, 3 * m_v1Sel(i), nChan, 3) * R;
+            if (fixedOri) {
+                ref = ref * m_ref.src[0].nn.row(m_ref.src[0].vertno(m_v1Sel(i))).cast<double>().transpose();
+            }
+            const MatrixXd got = fwd->sol->data.middleCols(ref.cols() * i, ref.cols());
             QVERIFY2((got - ref).norm() <= 1e-4 * ref.norm(), qPrintable(QString("source %1 differs by %2").arg(i).arg((got - ref).norm() / ref.norm())));
         }
     };
     check();
     if (grad) {
         QCOMPARE(static_cast<int>(fwd->sol_grad->data.rows()), nChan);
-        QCOMPARE(static_cast<int>(fwd->sol_grad->data.cols()), 9 * 70);
+        QCOMPARE(static_cast<int>(fwd->sol_grad->data.cols()), (fixedOri ? 3 : 9) * 70);
+    }
+    if (fixedOri) {
+        // Position derivatives of the normal dipole: dG_d n from the free solution (mne-python kron(fix_rot, eye(3)))
+        auto free = settings(false, true);
+        free->solname = m_dir.filePath("free-for-fixed-fwd.fif");
+        auto freeFwd = std::make_shared<ComputeFwd>(free)->calculateFwd();
+        QVERIFY(freeFwd != nullptr);
+        const MatrixXd& dG = freeFwd->sol_grad->data;
+        for (int i = 0; i < 70; ++i) {
+            const Vector3d n = fwd->source_nn.row(i).cast<double>().transpose();
+            for (int d = 0; d < 3; ++d) {
+                const VectorXd want = dG.col(9 * i + d) * n(0) + dG.col(9 * i + 3 + d) * n(1) + dG.col(9 * i + 6 + d) * n(2);
+                QVERIFY2((fwd->sol_grad->data.col(3 * i + d) - want).norm() <= 1e-5 * want.norm(),
+                         qPrintable(QString("source %1 derivative %2").arg(i).arg(d)));
+            }
+        }
     }
 
     // Recomputing at the same head position must leave the MEG rows unchanged.
