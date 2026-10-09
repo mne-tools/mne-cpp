@@ -180,6 +180,22 @@ Smoothly animate the scroll position.
 
 ---
 
+### scrollBy(deltaSamples, durationMs)
+
+Smoothly scroll by a number of samples.
+
+While a scroll animation runs, the step continues from its target, so repeated wheel ticks or key presses add up.
+
+**Parameters:**
+
+- **deltaSamples** : *float*
+  Samples to scroll (negative = earlier).
+
+- **durationMs** : *int*
+  Animation duration in milliseconds (0 = instant).
+
+---
+
 ### zoomTo(targetSpp, durationMs)
 
 Smoothly animate the zoom level.

@@ -2967,6 +2967,10 @@ void TestDispViewers2::channelDataView_keyboardShortcuts()
     QVERIFY(scrollsTo(Qt::Key_Left, 100.f));
     QVERIFY(scrollsTo(Qt::Key_PageDown, 100.f + 0.9f * visible));
     QVERIFY(scrollsTo(Qt::Key_PageUp, 100.f));
+    // A key pressed while the previous scroll is still animating continues from its target
+    pressKey(Qt::Key_Right);
+    QVERIFY(scrollsTo(Qt::Key_Right, 100.f + 0.2f * visible));
+    QVERIFY(scrollsTo(Qt::Key_Home, 100.f));
 
     // + / = zoom in to 75 %, - zooms out by 1.33
     const auto zoomsTo = [&pressKey, rhiView](Qt::Key key, float expected) {
@@ -3096,17 +3100,28 @@ void TestDispViewers2::channelRhiView_overlayValues()
         QApplication::sendEvent(rhiView, &event);
     };
     const float viewSamples = 400.f * 0.5f;
+    // Scrolls land exactly on their target, not just within a fuzzy distance of it
+    const auto settlesAt = [rhiView](float target) {
+        return QTest::qWaitFor([&] { return rhiView->scrollSample() == target; }, 2000);
+    };
     rhiView->setScrollSample(1000.f);
     wheel(QPoint(0, -120));
-    QTRY_VERIFY(std::fabs(rhiView->scrollSample() - (1000.f + 0.15f * viewSamples)) < 0.01f);
+    QVERIFY(settlesAt(1000.f + 0.15f * viewSamples));
     wheel(QPoint(0, 120));
-    QTRY_VERIFY(std::fabs(rhiView->scrollSample() - 1000.f) < 0.01f);
+    QVERIFY(settlesAt(1000.f));
     rhiView->setScrollSpeedFactor(2.f);
     wheel(QPoint(-120, 0));
-    QTRY_VERIFY(std::fabs(rhiView->scrollSample() - (1000.f + 2.f * 0.1f * viewSamples)) < 0.01f);
+    QVERIFY(settlesAt(1000.f + 2.f * 0.1f * viewSamples));
     wheel(QPoint(120, 0));
-    QTRY_VERIFY(std::fabs(rhiView->scrollSample() - 1000.f) < 0.01f);
+    QVERIFY(settlesAt(1000.f));
     rhiView->setScrollSpeedFactor(1.f);
+    // Ticks arriving while the previous scroll is still animating add up
+    wheel(QPoint(0, -120));
+    wheel(QPoint(0, -120));
+    QVERIFY(settlesAt(1000.f + 2.f * 0.15f * viewSamples));
+    wheel(QPoint(0, 120));
+    wheel(QPoint(0, 120));
+    QVERIFY(settlesAt(1000.f));
 
     // Frozen: wheel and drag do not scroll, a click still reports its sample
     rhiView->setFrozen(true);
@@ -3119,6 +3134,13 @@ void TestDispViewers2::channelRhiView_overlayValues()
     QCOMPARE(clickSpy.size(), 1);
     QCOMPARE(clickSpy.at(0).at(0).toInt(), 1020);
     sendMouse(QEvent::MouseButtonRelease, Qt::LeftButton, QPoint(40, 50));
+    rhiView->setFrozen(false);
+    // Freezing stops a scroll that is still animating
+    wheel(QPoint(0, -120));
+    rhiView->setFrozen(true);
+    const float frozenAt = rhiView->scrollSample();
+    QTest::qWait(150);
+    QCOMPARE(rhiView->scrollSample(), frozenAt);
     rhiView->setFrozen(false);
 
     // An hour into a 1 kHz recording a 5-sample step still scrolls (no relative fuzzy comparison)

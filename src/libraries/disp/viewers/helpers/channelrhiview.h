@@ -209,6 +209,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Smoothly scroll by a number of samples. While a scroll animation runs, the step continues from its
+     * target, so repeated wheel ticks or key presses add up.
+     *
+     * @param[in] deltaSamples  Samples to scroll (negative = earlier).
+     * @param[in] durationMs    Animation duration in milliseconds (0 = instant).
+     */
+    void scrollBy(float deltaSamples, int durationMs = 200);
+
+    //=========================================================================================================
+    /**
      * Smoothly animate the zoom level.
      *
      * @param[in] targetSpp   Target samples-per-pixel.
@@ -540,6 +550,9 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent* event) override;
 
 private:
+    float clampScrollSample(float sample) const;
+    void stopScrollAnimations();
+
     // ── GPU resource management ────────────────────────────────────────
     struct ChannelGpuData
     {
@@ -623,6 +636,8 @@ private:
     QVector<VelocitySample> m_velocityHistory;
     QElapsedTimer m_dragTimer;
     QPropertyAnimation* m_pInertialAnim = nullptr;
+    QPointer<QPropertyAnimation> m_pScrollAnim;
+    float m_scrollTarget = 0.f;
 
     // ── Channel index filter ──────────────────────────────────────────
     // When non-empty, only these model channel indices are rendered/scrolled.

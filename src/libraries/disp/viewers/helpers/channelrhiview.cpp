@@ -206,7 +206,7 @@ void ChannelRhiView::setModel(ChannelDataModel* model)
 
 //=============================================================================================================
 
-void ChannelRhiView::setScrollSample(float sample)
+float ChannelRhiView::clampScrollSample(float sample) const
 {
     // Never scroll before the first available sample
     if (m_model && m_model->totalSamples() > 0)
@@ -220,6 +220,14 @@ void ChannelRhiView::setScrollSample(float sample)
         maxScroll = qMax(maxScroll, static_cast<float>(m_firstFileSample));
         sample = qMin(sample, maxScroll);
     }
+    return sample;
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::setScrollSample(float sample)
+{
+    sample = clampScrollSample(sample);
 
     // Exact: a relative fuzzy compare ignores steps below 1e-5 of the position (10 samples at 10^6)
     if (m_scrollSample == sample)
@@ -266,16 +274,39 @@ void ChannelRhiView::setSamplesPerPixel(float spp)
 
 void ChannelRhiView::scrollTo(float targetSample, int durationMs)
 {
+    // A running animation would keep writing scrollSample and fight the new one
+    stopScrollAnimations();
     if (durationMs <= 0) {
         setScrollSample(targetSample);
         return;
     }
-    auto* anim = new QPropertyAnimation(this, "scrollSample", this);
-    anim->setDuration(durationMs);
-    anim->setEasingCurve(QEasingCurve::OutCubic);
-    anim->setStartValue(m_scrollSample);
-    anim->setEndValue(targetSample);
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
+    m_scrollTarget = clampScrollSample(targetSample);
+    m_pScrollAnim = new QPropertyAnimation(this, "scrollSample", this);
+    m_pScrollAnim->setDuration(durationMs);
+    m_pScrollAnim->setEasingCurve(QEasingCurve::OutCubic);
+    m_pScrollAnim->setStartValue(m_scrollSample);
+    m_pScrollAnim->setEndValue(m_scrollTarget);
+    m_pScrollAnim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::stopScrollAnimations()
+{
+    if (m_pScrollAnim) {
+        m_pScrollAnim->stop();
+    }
+    if (m_pInertialAnim) {
+        m_pInertialAnim->stop();
+        m_pInertialAnim = nullptr;
+    }
+}
+
+//=============================================================================================================
+
+void ChannelRhiView::scrollBy(float deltaSamples, int durationMs)
+{
+    scrollTo((m_pScrollAnim ? m_scrollTarget : m_scrollSample) + deltaSamples, durationMs);
 }
 
 //=============================================================================================================
@@ -358,9 +389,8 @@ void ChannelRhiView::setVisibleChannelCount(int count)
 void ChannelRhiView::setFrozen(bool frozen)
 {
     m_frozen = frozen;
-    if (m_frozen && m_pInertialAnim) {
-        m_pInertialAnim->stop();
-        m_pInertialAnim = nullptr;
+    if (m_frozen) {
+        stopScrollAnimations();
     }
 }
 
@@ -2283,7 +2313,7 @@ void ChannelRhiView::wheelEvent(QWheelEvent* event)
         // Predominantly horizontal gesture (trackpad swipe left/right) → scroll time
         if (!m_frozen) {
             float step = width() * m_samplesPerPixel * 0.1f * m_scrollSpeedFactor * (delta.x() > 0 ? -1.f : 1.f);
-            scrollTo(m_scrollSample + step, 100);
+            scrollBy(step, 100);
         }
 
     } else if (m_wheelScrollsChannels) {
@@ -2295,7 +2325,7 @@ void ChannelRhiView::wheelEvent(QWheelEvent* event)
         // Vertical wheel → scroll time
         if (!m_frozen) {
             float step = width() * m_samplesPerPixel * 0.15f * m_scrollSpeedFactor * (delta.y() > 0 ? -1.f : 1.f);
-            scrollTo(m_scrollSample + step, 100);
+            scrollBy(step, 100);
         }
     }
 
@@ -2310,10 +2340,7 @@ void ChannelRhiView::mousePressEvent(QMouseEvent* event)
     //            → ruler measurement         (when annotation mode is OFF)
     if (event->button() == Qt::RightButton) {
         // Stop any running inertial scroll
-        if (m_pInertialAnim) {
-            m_pInertialAnim->stop();
-            m_pInertialAnim = nullptr;
-        }
+        stopScrollAnimations();
 
         if (m_annotationSelectionEnabled) {
             // Annotation mode: right-drag creates a new annotation range
@@ -2345,10 +2372,7 @@ void ChannelRhiView::mousePressEvent(QMouseEvent* event)
     }
     if (event->button() == Qt::LeftButton) {
         // Stop any running inertial scroll
-        if (m_pInertialAnim) {
-            m_pInertialAnim->stop();
-            m_pInertialAnim = nullptr;
-        }
+        stopScrollAnimations();
 
         // Check if clicking on an annotation boundary for drag-resize
         if (m_annotationSelectionEnabled && !m_annotations.isEmpty()) {

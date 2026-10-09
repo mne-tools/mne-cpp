@@ -980,16 +980,16 @@ void ChannelDataView::keyPressEvent(QKeyEvent* event)
 
     switch (event->key()) {
         case Qt::Key_Left:
-            m_pRhiView->scrollTo(m_pRhiView->scrollSample() - step, 150);
+            m_pRhiView->scrollBy(-step, 150);
             break;
         case Qt::Key_Right:
-            m_pRhiView->scrollTo(m_pRhiView->scrollSample() + step, 150);
+            m_pRhiView->scrollBy(step, 150);
             break;
         case Qt::Key_PageUp:
-            m_pRhiView->scrollTo(m_pRhiView->scrollSample() - page, 200);
+            m_pRhiView->scrollBy(-page, 200);
             break;
         case Qt::Key_PageDown:
-            m_pRhiView->scrollTo(m_pRhiView->scrollSample() + page, 200);
+            m_pRhiView->scrollBy(page, 200);
             break;
         case Qt::Key_Home:
             m_pRhiView->scrollTo(static_cast<float>(m_pModel->firstSample()), 300);
