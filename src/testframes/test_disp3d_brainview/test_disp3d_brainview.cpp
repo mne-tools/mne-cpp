@@ -1654,6 +1654,29 @@ void TestDisp3dBrainView::brainView_streamingApi()
     view.setViewCount(3);
     QCOMPARE(view.viewCount(), 3);
 
+    // With a scalp in the model the sample EEG field maps onto it and streams live
+    {
+        BrainTreeModel model;
+        BrainView fieldView;
+        fieldView.setModel(&model);
+        MNELIB::MNEBemSurface scalp;
+        scalp.id = FIFFV_BEM_SURF_ID_HEAD;
+        scalp.rr.resize(6, 3);
+        scalp.rr << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f, 0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.05f, 0.05f, 0.1f;
+        scalp.itris.resize(4, 3);
+        scalp.itris << 0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4;
+        model.addBemSurface(QStringLiteral("sample"), QStringLiteral("head"), scalp);
+        QSignalSpy loaded(&fieldView, &BrainView::sensorFieldLoaded);
+        QVERIFY(fieldView.loadSensorField(QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"), 0));
+        QCOMPARE(loaded.size(), 1);
+        QVERIFY(fieldView.sensorFieldTimeRange(tmin, tmax));
+        QVERIFY(tmin < 0.0f && tmax > 0.0f);
+        fieldView.startRealtimeSensorStreaming(QStringLiteral("EEG"));
+        QVERIFY(fieldView.isRealtimeSensorStreaming());
+        fieldView.stopRealtimeSensorStreaming();
+        QVERIFY(!fieldView.isRealtimeSensorStreaming());
+    }
+
     QApplication::processEvents();
 }
 
