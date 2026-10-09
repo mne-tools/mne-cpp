@@ -367,6 +367,9 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
             auto dipObject = std::make_shared<DipoleObject>();
             dipObject->load(dipItem->ecdSet());
             dipObject->setVisible(dipItem->isVisible());
+            if (m_applySensorTrans && !m_headToMriTrans.isEmpty()) {
+                dipObject->applyTransform(SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans));
+            }
 
             m_itemDipoleMap[item] = dipObject;
         }
@@ -2907,6 +2910,10 @@ void BrainView::refreshSensorTransforms()
         if ((it.key().startsWith("sens_") || it.key().startsWith("dig_")) && it.value()) {
             it.value()->applyTransform(qmat);
         }
+    }
+    // Dipoles are in head coordinates, like sensors and digitizer points
+    for (const auto& dipoles : std::as_const(m_itemDipoleMap)) {
+        dipoles->applyTransform(qmat);
     }
 
     if (m_fieldMapper.isLoaded()) {

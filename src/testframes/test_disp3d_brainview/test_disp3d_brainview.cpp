@@ -404,6 +404,24 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     QVERIFY(std::fabs(fiducials[FIFFV_POINT_LPA].x() + 0.07137661f) < 1e-6f);
     QVERIFY(!modelView.loadTransformation(dir.filePath(QStringLiteral("missing-trans.fif"))));
     QVERIFY(modelView.loadTransformation(dataDir + QStringLiteral("MEG/sample/all-trans.fif")));
+    // The dipole (head coordinates) follows the transform like the sensors: a ray through the view centre
+    // picks it only where MNE-Python's apply_trans puts head (0, 0, 50) mm, 41 mm from the untransformed spot
+    modelView.showSingleView();
+    modelView.setDipoleVisible(true);
+    QSignalSpy hovered(&modelView, &BrainView::hoveredRegionChanged);
+    const auto dipoleHitAt = [&](const QVector3D& centre) {
+        modelView.setCameraFocusOverride(centre, 0.05f);
+        hovered.clear();
+        modelView.castRay(modelView.rect().center());
+        return !hovered.isEmpty() && !hovered.last().at(0).toString().isEmpty();
+    };
+    QVERIFY(dipoleHitAt(QVector3D(0.00381462f, -0.01784828f, 0.0130306f)));
+    QVERIFY(!dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
+    modelView.clearTransformation();
+    QVERIFY(dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
+    modelView.clearCameraFocusOverride();
+    QVERIFY(modelView.loadTransformation(dataDir + QStringLiteral("MEG/sample/all-trans.fif")));
+
     fiducials = modelView.cardinalFiducialsInMri();
     const QMap<int, QVector3D> expected{{FIFFV_POINT_LPA, QVector3D(-0.06925742f, 0.01058946f, -0.02500086f)},
                                         {FIFFV_POINT_NASION, QVector3D(0.00337909f, 0.09465942f, 0.03225918f)},
