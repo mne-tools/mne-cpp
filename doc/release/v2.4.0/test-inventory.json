@@ -906,6 +906,7 @@
       },
       "registry_classes": [
         "BemTreeItem",
+        "BrainRenderer",
         "BrainTreeModel",
         "BrainView",
         "CameraController",

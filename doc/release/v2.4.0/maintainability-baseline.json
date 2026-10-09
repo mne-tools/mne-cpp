@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 395422,
+  "scanned_lines": 395429,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -55,11 +55,11 @@
       }
     },
     "c_style_cast": {
-      "total": 424,
-      "files": 73,
+      "total": 423,
+      "files": 72,
       "by_scope": {
         "applications": 61,
-        "libraries": 270,
+        "libraries": 269,
         "tools": 93
       },
       "suppressed": [],
@@ -118,7 +118,6 @@
         "src/libraries/disp/viewers/spectrumsettingsview.cpp": 4,
         "src/libraries/disp3D/helpers/geometryinfo.cpp": 1,
         "src/libraries/disp3D/renderable/networkobject.cpp": 23,
-        "src/libraries/disp3D/view/brainrenderer.cpp": 1,
         "src/libraries/dsp/parksmcclellan.cpp": 16,
         "src/libraries/dsp/rt/rt_cov.cpp": 1,
         "src/libraries/dsp/rt/rt_filter.cpp": 1,

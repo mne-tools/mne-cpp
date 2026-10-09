@@ -19,6 +19,8 @@
 //=============================================================================================================
 
 #include <disp3D/view/brainview.h>
+#include <disp3D/view/brainrenderer.h>
+#include <rhi/qrhi.h>
 #include <disp3D/renderable/polylineobject.h>
 #include <disp3D/view/multiviewlayout.h>
 #include <disp3D/model/braintreemodel.h>
@@ -221,6 +223,13 @@ private slots:
      * Verifies VideoOverlay ignores null frames and counts video and depth frames separately.
      */
     void videoOverlay_basics();
+
+    //=========================================================================================================
+    /**
+     * Drives BrainRenderer through whole frames on the Null QRhi backend: render targets, every
+     * renderable, the uniform slot budget and recovery after it overflows.
+     */
+    void brainRenderer_nullRhi();
 
     //=========================================================================================================
     /**
@@ -1246,6 +1255,149 @@ void TestDisp3dBrainView::videoOverlay_basics()
     QCOMPARE(overlay.depthFrame().size(), QSize(4, 2));
     QCOMPARE(overlay.depthFrameGeneration(), quint64(1));
     QCOMPARE(overlay.frameGeneration(), quint64(2));
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::brainRenderer_nullRhi()
+{
+    QRhiNullInitParams params;
+    std::unique_ptr<QRhi> rhi(QRhi::create(QRhi::Null, &params));
+    QVERIFY(rhi);
+    std::unique_ptr<QRhiTexture> color(rhi->newTexture(QRhiTexture::RGBA8, QSize(64, 48), 1, QRhiTexture::RenderTarget));
+    QVERIFY(color->create());
+
+    BrainRenderer renderer;
+    renderer.ensureRenderTargets(rhi.get(), color.get(), QSize(64, 48));
+    QVERIFY(renderer.rtClear() && renderer.rtPreserve());
+    QCOMPARE(renderer.rtClear()->pixelSize(), QSize(64, 48));
+    QRhiRenderTarget* const firstClear = renderer.rtClear();
+    renderer.ensureRenderTargets(rhi.get(), color.get(), QSize(64, 48));
+    QCOMPARE(renderer.rtClear(), firstClear);
+    renderer.initialize(rhi.get(), renderer.rtClear()->renderPassDescriptor(), 1);
+
+    // Scene: a tetrahedron, a dipole, a two-node network, a polyline, an MRI slice and a video overlay
+    Eigen::MatrixX3f rr(4, 3);
+    rr << 0.0f, 0.0f, 0.0f, 0.05f, 0.0f, 0.0f, 0.0f, 0.05f, 0.0f, 0.0f, 0.0f, 0.05f;
+    Eigen::MatrixX3i tris(4, 3);
+    tris << 0, 2, 1, 0, 1, 3, 0, 3, 2, 1, 2, 3;
+    BrainSurface surface;
+    surface.createFromData(rr, tris, Qt::gray);
+    INVLIB::InvEcd ecd;
+    ecd.rd = Eigen::Vector3f(0.0f, 0.0f, 0.05f);
+    ecd.Q = Eigen::Vector3f(1e-8f, 0.0f, 0.0f);
+    INVLIB::InvEcdSet ecds;
+    ecds << ecd;
+    DipoleObject dipoles;
+    dipoles.load(ecds);
+    CONNECTIVITYLIB::Network network(QStringLiteral("Coherence"));
+    QList<CONNECTIVITYLIB::NetworkNode::SPtr> nodes;
+    for (int i = 0; i < 2; ++i) {
+        nodes.append(CONNECTIVITYLIB::NetworkNode::SPtr::create(static_cast<qint16>(i), Eigen::RowVectorXf::Constant(3, 0.02f * static_cast<float>(i))));
+        network.append(nodes.last());
+    }
+    auto edge = CONNECTIVITYLIB::NetworkEdge::SPtr::create(0, 1, Eigen::MatrixXd::Constant(1, 1, 0.5));
+    network.append(edge);
+    nodes[0]->append(edge);
+    nodes[1]->append(edge);
+    NetworkObject networkObject;
+    networkObject.load(network, QStringLiteral("Jet"));
+    networkObject.setThreshold(0.0);
+    PolylineObject path;
+    path.setPoints({Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.01f, 0.0f, 0.0f), Eigen::Vector3f(0.01f, 0.01f, 0.0f)});
+    QImage mri(4, 3, QImage::Format_Grayscale8);
+    mri.fill(128);
+    SliceObject slice;
+    slice.setSlice(mri, SliceOrientation::Axial, 1, Eigen::Matrix4d::Identity());
+    VideoOverlay video;
+    video.setEnabled(true);
+    QImage frame(8, 4, QImage::Format_RGB32);
+    frame.fill(Qt::green);
+    video.setFrame(frame);
+    video.setDepthEnabled(true);
+    QImage depth(8, 4, QImage::Format_Grayscale8);
+    depth.fill(64);
+    video.setDepthFrame(depth);
+
+    BrainRenderer::SceneData scene;
+    scene.mvp.ortho(-0.1f, 0.1f, -0.1f, 0.1f, -1.0f, 1.0f);
+    scene.cameraPos = QVector3D(0.0f, 0.0f, 1.0f);
+    scene.lightDir = QVector3D(0.0f, 0.0f, -1.0f);
+    scene.lightingEnabled = true;
+    scene.viewportW = 64;
+    scene.viewportH = 48;
+    scene.scissorW = 64;
+    scene.scissorH = 48;
+
+    // The uniform buffer holds one slot per draw (8192); a whole frame must stay usable when it overflows
+    QTest::failOnWarning(QRegularExpression(QStringLiteral("exhausted|uniform buffer")));
+    for (int frameIndex = 0; frameIndex < 2; ++frameIndex) {
+        QRhiCommandBuffer* cb = nullptr;
+        QCOMPARE(rhi->beginOffscreenFrame(&cb), QRhi::FrameOpSuccess);
+        QRhiResourceUpdateBatch* upload = rhi->nextResourceUpdateBatch();
+        QVERIFY(upload);
+        surface.updateBuffers(rhi.get(), upload);
+        renderer.prepareVideoOverlay(rhi.get(), upload, &video);
+        renderer.prepareSlice(rhi.get(), upload, &slice, 0);
+        renderer.prepareSlice(rhi.get(), upload, nullptr, 1);
+        renderer.prepareMergedSurfaces(rhi.get(), upload, {&surface}, QStringLiteral("default"));
+        QVERIFY(renderer.hasMergedContent(QStringLiteral("default")));
+        cb->resourceUpdate(upload);
+
+        renderer.beginFrame(cb);
+        for (const auto mode : {BrainRenderer::Standard, BrainRenderer::Holographic, BrainRenderer::Anatomical, BrainRenderer::XRay, BrainRenderer::ShowNormals}) {
+            renderer.renderSurface(cb, rhi.get(), scene, &surface, mode);
+        }
+        renderer.drawMergedSurfaces(cb, rhi.get(), scene, BrainRenderer::Standard, QStringLiteral("default"));
+        renderer.renderDipoles(cb, rhi.get(), scene, &dipoles);
+        renderer.renderNetwork(cb, rhi.get(), scene, &networkObject);
+        renderer.renderPolyline(cb, rhi.get(), scene, &path);
+        renderer.renderVideoOverlay(cb, rhi.get(), scene, &video);
+        renderer.renderVideoOverlayOnSurface(cb, rhi.get(), scene, &video, &surface);
+        renderer.endPass(cb);
+        renderer.beginPreservingPass(cb);
+
+        // Slots continue after the draws above and are aligned; every slot of the buffer is usable
+        QRhiResourceUpdateBatch* slotBatch = rhi->nextResourceUpdateBatch();
+        const int sliceOffset = renderer.prepareSliceDraw(slotBatch, scene, 0);
+        QCOMPARE(sliceOffset, 0);
+        QCOMPARE(renderer.prepareSliceDraw(slotBatch, scene, 1), -1);
+        int used = 10; // 5 surface modes, merged group, dipoles, network nodes + edges, polyline
+        int last = -1;
+        // One warning per frame, however many draws are skipped
+        QTest::ignoreMessage(QtWarningMsg, "BrainRenderer: uniform buffer full at prepareSurfaceDraw; further draws this frame are skipped");
+        for (int offset = renderer.prepareSurfaceDraw(slotBatch, scene, &surface); offset >= 0; offset = renderer.prepareSurfaceDraw(slotBatch, scene, &surface)) {
+            QCOMPARE(offset % rhi->ubufAlignment(), 0);
+            QVERIFY(offset > last);
+            last = offset;
+            ++used;
+        }
+        QCOMPARE(used, 8192);
+        cb->resourceUpdate(slotBatch);
+        renderer.issueSliceDraw(cb, 0, sliceOffset);
+        renderer.issueSurfaceDraw(cb, &surface, BrainRenderer::Standard, last);
+        // Overflowing draws are skipped without exhausting QRhi's pool of 64 update batches
+        for (int i = 0; i < 100; ++i) {
+            renderer.renderSurface(cb, rhi.get(), scene, &surface, BrainRenderer::Standard);
+            renderer.renderDipoles(cb, rhi.get(), scene, &dipoles);
+            renderer.renderPolyline(cb, rhi.get(), scene, &path);
+            renderer.renderVideoOverlay(cb, rhi.get(), scene, &video);
+            renderer.renderVideoOverlayOnSurface(cb, rhi.get(), scene, &video, &surface);
+        }
+        renderer.endPass(cb);
+        QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
+    }
+
+    // A new colour texture rebuilds the targets; an invalidated merged group is rebuilt from the new surface list
+    std::unique_ptr<QRhiTexture> smaller(rhi->newTexture(QRhiTexture::RGBA8, QSize(32, 24), 1, QRhiTexture::RenderTarget));
+    QVERIFY(smaller->create());
+    renderer.ensureRenderTargets(rhi.get(), smaller.get(), QSize(32, 24));
+    QCOMPARE(renderer.rtClear()->pixelSize(), QSize(32, 24));
+    renderer.invalidateMergedGroup(QStringLiteral("default"));
+    QRhiResourceUpdateBatch* rebuild = rhi->nextResourceUpdateBatch();
+    renderer.prepareMergedSurfaces(rhi.get(), rebuild, {}, QStringLiteral("default"));
+    rebuild->release();
+    QVERIFY(!renderer.hasMergedContent(QStringLiteral("default")));
 }
 
 //=============================================================================================================

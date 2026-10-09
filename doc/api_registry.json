@@ -10692,7 +10692,7 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
+      "test": "test_disp3d_brainview",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,

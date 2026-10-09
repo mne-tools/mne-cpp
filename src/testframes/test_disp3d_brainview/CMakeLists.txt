@@ -12,6 +12,9 @@ set(CMAKE_AUTORCC ON)
 set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+# QRhi (BrainRenderer on the Null backend) lives in GuiPrivate, like in disp3D itself
+set(QT_NO_PRIVATE_MODULE_WARNING ON)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS GuiPrivate)
 
 set(SOURCES test_disp3d_brainview.cpp)
 
@@ -33,6 +36,7 @@ set(MNE_LIBS_REQUIRED
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
+    Qt${QT_VERSION_MAJOR}::GuiPrivate
     Eigen3::Eigen
 )
 
