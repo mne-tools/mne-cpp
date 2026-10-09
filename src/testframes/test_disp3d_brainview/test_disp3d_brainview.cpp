@@ -356,6 +356,45 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     // setMegHelmetOverride must not crash
     view.setMegHelmetOverride("");
 
+    // Loaders register their data in the tree model: without a model they refuse instead of crashing,
+    // a network still renders without its tree row
+    const QString dataDir = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/");
+    QTemporaryDir dir;
+    INVLIB::InvEcd ecd;
+    ecd.valid = true;
+    ecd.time = 0.1f;
+    ecd.rd = Eigen::Vector3f(0.0f, 0.0f, 0.05f);
+    ecd.Q = Eigen::Vector3f(1e-8f, 0.0f, 0.0f);
+    ecd.good = 0.9f;
+    INVLIB::InvEcdSet dipoles;
+    dipoles << ecd;
+    const QString dipPath = dir.filePath(QStringLiteral("one.dip"));
+    QVERIFY(dipoles.save_dipoles_dip(dipPath));
+    CONNECTIVITYLIB::Network network(QStringLiteral("Coherence"));
+    QList<CONNECTIVITYLIB::NetworkNode::SPtr> nodes;
+    for (int i = 0; i < 2; ++i) {
+        nodes.append(CONNECTIVITYLIB::NetworkNode::SPtr::create(static_cast<qint16>(i), Eigen::RowVectorXf::Constant(3, 0.01f * static_cast<float>(i))));
+        network.append(nodes.last());
+    }
+    auto edge = CONNECTIVITYLIB::NetworkEdge::SPtr::create(0, 1, Eigen::MatrixXd::Constant(1, 1, 0.5));
+    network.append(edge);
+    nodes[0]->append(edge);
+    nodes[1]->append(edge);
+    const QString avePath = dataDir + QStringLiteral("MEG/sample/sample_audvis-ave.fif");
+    const QString fwdPath = dataDir + QStringLiteral("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QVERIFY(!view.loadSensors(avePath));
+    QVERIFY(!view.loadDipoles(dipPath));
+    QVERIFY(!view.loadSourceSpace(fwdPath));
+    QVERIFY(view.loadNetwork(network, QStringLiteral("Coherence")));
+
+    BrainTreeModel model;
+    BrainView modelView;
+    modelView.setModel(&model);
+    QVERIFY(modelView.loadDipoles(dipPath));
+    QVERIFY(modelView.loadSensors(avePath));
+    QVERIFY(modelView.loadNetwork(network, QStringLiteral("Coherence")));
+    QVERIFY(model.rowCount() >= 3);
+
     QApplication::processEvents();
 }
 

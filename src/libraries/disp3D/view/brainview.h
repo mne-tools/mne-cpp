@@ -551,7 +551,7 @@ public slots:
      * Load sensors (MEG/EEG/Digitizers) from a FIF file.
      *
      * @param[in] fifPath    Path to the FIF file.
-     * @return True if successful.
+     * @return True if successful; false without a tree model (see setModel()).
      */
     bool loadSensors(const QString& fifPath);
 
@@ -580,7 +580,7 @@ public slots:
      * Load dipoles from a .dip or .bdip file.
      *
      * @param[in] dipPath    Path to the dipole file.
-     * @return True if successful.
+     * @return True if successful; false without a tree model (see setModel()).
      */
     bool loadDipoles(const QString& dipPath);
 
@@ -589,7 +589,7 @@ public slots:
      * Load source space from a FIF file (forward solution or source space file).
      *
      * @param[in] fwdPath    Path to the FIF file containing source space data.
-     * @return True if successful.
+     * @return True if successful; false without a tree model (see setModel()).
      */
     bool loadSourceSpace(const QString& fwdPath);
 

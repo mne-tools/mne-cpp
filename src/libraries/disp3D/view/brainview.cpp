@@ -2690,6 +2690,9 @@ void BrainView::onSensorStreamColorsAvailable(const QString& surfaceKey,
 
 bool BrainView::loadSensors(const QString& fifPath)
 {
+    if (!m_model)
+        return false;
+
     auto r = DataLoader::loadSensors(fifPath, m_megHelmetOverridePath);
     if (!r.hasInfo && !r.hasDigitizer)
         return false;
@@ -2787,6 +2790,9 @@ bool BrainView::loadMegHelmetSurface(const QString& helmetFilePath)
 
 bool BrainView::loadDipoles(const QString& dipPath)
 {
+    if (!m_model)
+        return false;
+
     auto ecdSet = DataLoader::loadDipoles(dipPath);
     if (ecdSet.size() == 0)
         return false;
@@ -2806,7 +2812,8 @@ bool BrainView::loadNetwork(const CONNECTIVITYLIB::Network& network, const QStri
     m_network->setVisible(true);
 
     // Also register in the tree model
-    m_model->addNetwork(network, name);
+    if (m_model)
+        m_model->addNetwork(network, name);
 
     m_sceneDirty = true;
     update();
@@ -2853,6 +2860,9 @@ void BrainView::setNetworkColormap(const QString& name)
 
 bool BrainView::loadSourceSpace(const QString& fwdPath)
 {
+    if (!m_model)
+        return false;
+
     auto srcSpace = DataLoader::loadSourceSpace(fwdPath);
     if (srcSpace.isEmpty())
         return false;
