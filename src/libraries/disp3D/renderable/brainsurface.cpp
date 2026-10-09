@@ -510,7 +510,11 @@ void BrainSurface::transform(const QMatrix4x4& m)
 
 void BrainSurface::applyTransform(const QMatrix4x4& m)
 {
-    m_vertexData = m_originalVertexData;
+    // Only the geometry is reset; colours and overlays set since loading stay
+    for (int i = 0; i < qMin(m_vertexData.size(), m_originalVertexData.size()); ++i) {
+        m_vertexData[i].pos = m_originalVertexData[i].pos;
+        m_vertexData[i].norm = m_originalVertexData[i].norm;
+    }
     if (!m.isIdentity()) {
         transform(m);
     } else {
