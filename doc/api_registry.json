@@ -4170,7 +4170,7 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
+      "test": "test_sensor_streaming",
       "example": null,
       "status": "documented",
       "skigen_candidate": false,

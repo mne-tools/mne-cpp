@@ -114,9 +114,10 @@ public:
      * Set the dense mapping matrix (sensor → surface vertices).
      * Size: (nVertices × nChannels).
      *
+     * @param[in] surfaceKey Key of the surface the matrix maps onto; colours are emitted for it.
      * @param[in] mat        Dense mapping matrix.
      */
-    void setMappingMatrix(std::shared_ptr<Eigen::MatrixXf> mat);
+    void setMappingMatrix(const QString& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat);
 
     //=========================================================================================================
     /**

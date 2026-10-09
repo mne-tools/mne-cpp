@@ -85,13 +85,16 @@ The vector should contain one value per picked sensor channel (matching the mapp
 
 ---
 
-### setMappingMatrix(mat)
+### setMappingMatrix(surfaceKey, mat)
 
 Set the dense mapping matrix (sensor → surface vertices).
 
 Size: (nVertices × nChannels).
 
 **Parameters:**
+
+- **surfaceKey** : *const QString &*
+  Key of the surface the matrix maps onto; colours are emitted for it.
 
 - **mat** : *std::shared_ptr&lt; Eigen::MatrixXf &gt;*
   Dense mapping matrix.

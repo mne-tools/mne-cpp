@@ -97,7 +97,7 @@ bool RtSensorStreamManager::startStreaming(const QString& modality,
     }
 
     // Propagate mapping matrix
-    m_controller->setMappingMatrix(mappingMat);
+    m_controller->setMappingMatrix(surfaceKey, mappingMat);
 
     // Propagate current visualization parameters
     m_controller->setColormapType(fieldMapper.colormap());

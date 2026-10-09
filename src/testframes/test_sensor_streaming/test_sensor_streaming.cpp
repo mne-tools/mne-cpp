@@ -165,7 +165,7 @@ void TestSensorStreaming::testWorkerStreamDataWithMapping()
     const int nVertices = 20;
 
     auto mapping = createTestMapping(nVertices, nSensors);
-    worker.setMappingMatrix(mapping);
+    worker.setMappingMatrix(QStringLiteral("head"), mapping);
 
     Eigen::VectorXf data(nSensors);
     data << 1.0f, 0.5f, -0.5f, -1.0f, 0.0f;
@@ -177,6 +177,7 @@ void TestSensorStreaming::testWorkerStreamDataWithMapping()
     QCOMPARE(spy.count(), 1);
 
     QList<QVariant> args = spy.takeFirst();
+    QCOMPARE(args.at(0).toString(), QStringLiteral("head"));
     QVector<uint32_t> colors = args.at(1).value<QVector<uint32_t>>();
     QCOMPARE(colors.size(), nVertices);
 
@@ -196,7 +197,7 @@ void TestSensorStreaming::testWorkerAveraging()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    worker.setMappingMatrix(mapping);
+    worker.setMappingMatrix(QStringLiteral("head"), mapping);
     worker.setNumberAverages(3);
 
     // Add 3 samples
@@ -238,7 +239,7 @@ void TestSensorStreaming::testWorkerLooping()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    worker.setMappingMatrix(mapping);
+    worker.setMappingMatrix(QStringLiteral("head"), mapping);
     worker.setLoopState(true);
 
     Eigen::VectorXf data(nSensors);
@@ -287,7 +288,7 @@ void TestSensorStreaming::testWorkerMappingMatrixDimensionMismatch()
     const int nVertices = 10;
 
     auto mapping = createTestMapping(nVertices, nSensors);
-    worker.setMappingMatrix(mapping);
+    worker.setMappingMatrix(QStringLiteral("head"), mapping);
 
     // Feed data with wrong number of sensors
     Eigen::VectorXf wrongData(nSensors + 3);
@@ -317,7 +318,7 @@ void TestSensorStreaming::testWorkerColorOutput()
     (*mapping)(2, 1) = 1.0f;
     (*mapping)(3, 1) = 1.0f;
 
-    worker.setMappingMatrix(mapping);
+    worker.setMappingMatrix(QStringLiteral("head"), mapping);
 
     // Feed equal and opposite sensor values
     Eigen::VectorXf data(nSensors);
@@ -353,7 +354,7 @@ void TestSensorStreaming::testWorkerSymmetricNormalization()
     (*mapping)(1, 0) = 0.0f;  // Will get 0.0
     (*mapping)(2, 0) = -1.0f; // Will get -1.0 * data
 
-    worker.setMappingMatrix(mapping);
+    worker.setMappingMatrix(QStringLiteral("head"), mapping);
 
     Eigen::VectorXf data(nSensors);
     data << 2.0f;
@@ -388,7 +389,7 @@ void TestSensorStreaming::testWorkerColormapChange()
     (*mapping)(1, 0) = 0.0f;
     (*mapping)(2, 0) = -1.0f;
 
-    worker.setMappingMatrix(mapping);
+    worker.setMappingMatrix(QStringLiteral("head"), mapping);
 
     Eigen::VectorXf data(nSensors);
     data << 1.0f;
@@ -479,7 +480,7 @@ void TestSensorStreaming::testControllerSignalForwarding()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    controller.setMappingMatrix(mapping);
+    controller.setMappingMatrix(QStringLiteral("head"), mapping);
     controller.setColormapType("Hot");
     controller.setLoopState(true);
 
@@ -531,7 +532,7 @@ void TestSensorStreaming::testEndToEndStreaming()
     const int nVertices = 12;
 
     auto mapping = createTestMapping(nVertices, nSensors);
-    controller.setMappingMatrix(mapping);
+    controller.setMappingMatrix(QStringLiteral("head"), mapping);
     controller.setColormapType("MNE");
     controller.setLoopState(false);
     controller.setNumberAverages(1);
@@ -575,7 +576,7 @@ void TestSensorStreaming::testMultipleStreamCycles()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    controller.setMappingMatrix(mapping);
+    controller.setMappingMatrix(QStringLiteral("head"), mapping);
     controller.setLoopState(true);
     controller.setTimeInterval(10);
 
@@ -608,7 +609,7 @@ void TestSensorStreaming::testEmptyQueueBehavior()
     const int nVertices = 6;
 
     auto mapping = createUniformMapping(nVertices, nSensors);
-    controller.setMappingMatrix(mapping);
+    controller.setMappingMatrix(QStringLiteral("head"), mapping);
     controller.setLoopState(false); // No looping
 
     // Don't add any data

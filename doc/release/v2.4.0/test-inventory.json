@@ -6504,7 +6504,8 @@
         "windows-2025-vs2026": "run"
       },
       "registry_classes": [
-        "RtSensorDataController"
+        "RtSensorDataController",
+        "RtSensorDataWorker"
       ]
     },
     {

@@ -108,10 +108,10 @@ void RtSensorDataController::addData(const Eigen::VectorXf& data)
 
 //=============================================================================================================
 
-void RtSensorDataController::setMappingMatrix(std::shared_ptr<Eigen::MatrixXf> mat)
+void RtSensorDataController::setMappingMatrix(const QString& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat)
 {
     if (m_pWorker) {
-        m_pWorker->setMappingMatrix(mat);
+        m_pWorker->setMappingMatrix(surfaceKey, mat);
     }
 }
 
@@ -293,7 +293,7 @@ void RtSensorDataController::onNewMegMapping(const QString& surfaceKey,
 {
     // Auto-forward the new matrix to the data worker
     if (m_pWorker && mappingMat) {
-        m_pWorker->setMappingMatrix(mappingMat);
+        m_pWorker->setMappingMatrix(surfaceKey, mappingMat);
     }
 
     // Re-emit for external listeners (e.g. BrainView)
@@ -311,7 +311,7 @@ void RtSensorDataController::onNewEegMapping(const QString& surfaceKey,
 {
     // Auto-forward the new matrix to the data worker
     if (m_pWorker && mappingMat) {
-        m_pWorker->setMappingMatrix(mappingMat);
+        m_pWorker->setMappingMatrix(surfaceKey, mappingMat);
     }
 
     // Re-emit for external listeners (e.g. BrainView)

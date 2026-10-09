@@ -678,6 +678,42 @@ void TestDisp3dBrainView::rtSensorStreamManager_basics()
     // stopStreaming is safe to call even with no active stream
     manager.stopStreaming();
 
+    // Without evoked data or a mapping nothing can be streamed
+    SensorFieldMapper mapper;
+    QMap<QString, std::shared_ptr<BrainSurface>> surfaces;
+    QVERIFY(!manager.startStreaming(QStringLiteral("EEG"), mapper, surfaces));
+    QVERIFY(!manager.isStreaming());
+
+    // EEG of the sample data mapped onto a small scalp surface
+    QFile file(QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"));
+    mapper.setEvoked(FIFFLIB::FiffEvoked(file, 0));
+    Eigen::MatrixX3f rr(6, 3);
+    rr << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f, 0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.05f, 0.05f, 0.1f;
+    Eigen::MatrixX3i tris(4, 3);
+    tris << 0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4;
+    auto head = std::make_shared<BrainSurface>();
+    head->createFromData(rr, tris, Qt::gray);
+    surfaces.insert(QStringLiteral("bem_head"), head);
+    QVERIFY(mapper.buildMapping(surfaces, FIFFLIB::FiffCoordTrans(), false));
+    QVERIFY(!manager.startStreaming(QStringLiteral("ECoG"), mapper, surfaces));
+
+    // Streaming sends colours for every vertex of the mapped surface, addressed by its key
+    QString key;
+    QVector<uint32_t> colors;
+    connect(&manager, &RtSensorStreamManager::colorsAvailable,
+            [&](const QString& surfaceKey, const QVector<uint32_t>& vertexColors) {
+                key = surfaceKey;
+                colors = vertexColors;
+            });
+    manager.setInterval(10);
+    QVERIFY(manager.startStreaming(QStringLiteral("EEG"), mapper, surfaces));
+    QVERIFY(manager.isStreaming());
+    QVERIFY(!manager.startStreaming(QStringLiteral("EEG"), mapper, surfaces));
+    QTRY_COMPARE(colors.size(), 6);
+    QCOMPARE(key, QStringLiteral("bem_head"));
+    manager.stopStreaming();
+    QVERIFY(!manager.isStreaming());
+
     QApplication::processEvents();
 }
 
@@ -1554,7 +1590,7 @@ void TestDisp3dBrainView::rtDataWorkers_basics()
 
         // setMappingMatrix with null
         std::shared_ptr<Eigen::MatrixXf> nullMap;
-        worker.setMappingMatrix(nullMap);
+        worker.setMappingMatrix(QString(), nullMap);
     }
 
     QApplication::processEvents();

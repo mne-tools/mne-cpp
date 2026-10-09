@@ -64,13 +64,16 @@ Clear all queued data and reset averaging state.
 
 ---
 
-### setMappingMatrix(mat)
+### setMappingMatrix(surfaceKey, mat)
 
 Set the dense mapping matrix (sensor → surface vertices).
 
 This matrix is typically produced by `FieldMap::computeMegMapping()` or computeEegMapping(). Size: (nVertices × nChannels).
 
 **Parameters:**
+
+- **surfaceKey** : *const QString &*
+  Key of the surface the matrix maps onto; colours are emitted for it.
 
 - **mat** : *std::shared_ptr&lt; Eigen::MatrixXf &gt;*
   Dense mapping matrix.

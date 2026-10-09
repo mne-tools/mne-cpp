@@ -68,9 +68,10 @@ void RtSensorDataWorker::clear()
 
 //=============================================================================================================
 
-void RtSensorDataWorker::setMappingMatrix(std::shared_ptr<Eigen::MatrixXf> mat)
+void RtSensorDataWorker::setMappingMatrix(const QString& surfaceKey, std::shared_ptr<Eigen::MatrixXf> mat)
 {
     QMutexLocker locker(&m_mutex);
+    m_sSurfaceKey = surfaceKey;
     m_mappingMat = mat;
 }
 
