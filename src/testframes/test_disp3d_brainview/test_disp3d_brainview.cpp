@@ -226,6 +226,12 @@ private slots:
 
     //=========================================================================================================
     /**
+     * Verifies live ray, live/static markers, probe and video overlay setters on BrainView.
+     */
+    void brainView_liveOverlays();
+
+    //=========================================================================================================
+    /**
      * Drives BrainRenderer through whole frames on the Null QRhi backend: render targets, every
      * renderable, the uniform slot budget and recovery after it overflows.
      */
@@ -1236,6 +1242,62 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
     QVERIFY(item.categoryItem(999) == nullptr);
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::brainView_liveOverlays()
+{
+    // Live ray, probe and markers are pickable scene surfaces; each clear call removes exactly its own kind
+    BrainView view;
+    const auto hitAtZ = [&](float z) {
+        QVector3D hit;
+        return view.intersectWorldRay(QVector3D(-1.0f, 0.0f, z), QVector3D(1.0f, 0.0f, 0.0f), hit) && std::fabs(hit.z() - z) < 1e-3f;
+    };
+    QVERIFY(!hitAtZ(0.15f));
+    view.setLiveRay(QVector3D(0.0f, 0.0f, 0.1f), QVector3D(0.0f, 0.0f, 0.2f), Qt::yellow, 0.002f);
+    QVERIFY(hitAtZ(0.15f));
+    view.setLiveRay(QVector3D(0.0f, 0.0f, 0.3f), QVector3D(0.0f, 0.0f, 0.4f), Qt::yellow, 0.002f);
+    QVERIFY(!hitAtZ(0.15f));
+    QVERIFY(hitAtZ(0.35f));
+    view.clearLiveRay();
+    QVERIFY(!hitAtZ(0.35f));
+
+    LiveMarker marker;
+    marker.position = QVector3D(0.0f, 0.0f, 0.5f);
+    marker.color = Qt::red;
+    marker.radius = 0.01f;
+    view.setLiveMarkers({marker});
+    marker.position = QVector3D(0.0f, 0.0f, 0.6f);
+    view.setStaticMarkers({marker});
+    QVERIFY(hitAtZ(0.5f) && hitAtZ(0.6f));
+    view.clearLiveMarkers();
+    QVERIFY(!hitAtZ(0.5f) && hitAtZ(0.6f));
+    view.clearStaticMarkers();
+    QVERIFY(!hitAtZ(0.6f));
+
+    view.setProbeVisualization(QVector3D(0.0f, 0.0f, 0.7f), QVector3D(0.0f, 0.0f, 1.0f), 0.05f, Qt::blue, Qt::cyan, QQuaternion());
+    QVERIFY(hitAtZ(0.68f)); // the shaft runs back from the tip against the direction
+    view.clearProbeVisualization();
+    QVERIFY(!hitAtZ(0.68f));
+
+    // Video overlay settings only take effect when enabled and are clamped to sane ranges
+    QVERIFY(!view.isVideoOverlayEnabled());
+    view.setVideoOverlayEnabled(true);
+    QVERIFY(view.isVideoOverlayEnabled());
+    view.setVideoOverlaySize(-1.0f);
+    view.setVideoOverlayOpacity(2.0f);
+    view.setVideoDepthScale(-0.5f);
+    view.setVideoDepthSteps(1000);
+    view.setVideoDepthEnabled(true);
+    view.setVideoOverlayFocusPosition(QVector3D(0.0f, 0.0f, 0.1f));
+    view.setVideoOverlayUpHint(QVector3D(0.0f, 1.0f, 0.0f));
+    QImage frame(8, 4, QImage::Format_RGB32);
+    frame.fill(Qt::green);
+    view.pushVideoOverlayFrame(frame);
+    view.pushVideoDepthFrame(QImage(8, 4, QImage::Format_Grayscale8));
+    view.setVideoOverlayEnabled(false);
+    QVERIFY(!view.isVideoOverlayEnabled());
 }
 
 //=============================================================================================================
