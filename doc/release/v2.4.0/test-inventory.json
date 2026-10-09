@@ -264,7 +264,8 @@
       },
       "registry_classes": [
         "BIDSPath",
-        "BidsRawData"
+        "BidsRawData",
+        "BrainVisionReader"
       ]
     },
     {

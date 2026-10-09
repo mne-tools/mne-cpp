@@ -22,6 +22,7 @@
 #include <bids/bids_dataset_description.h>
 #include <bids/bids_raw_data.h>
 #include <bids/bids_global.h>
+#include <bids/readers/bids_brain_vision_reader.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -94,6 +95,9 @@ private slots:
 
     // BidsRawData::write round-trip
     void testWriteRoundTrip();
+
+    // BrainVisionReader against mne.io.read_raw_brainvision
+    void testBrainVisionReaderMatchesPython();
 
     // BIDSPath setter/getter coverage
     void testPathSettersGetters();
@@ -534,6 +538,104 @@ void TestBids::testWriteRoundTrip()
     QCOMPARE(edfBack.events[1].trialType, QStringLiteral("visual"));
     QCOMPARE(edfBack.events[2].trialType, QStringLiteral("response"));
     QVERIFY(edfBack.raw.info.bads.contains(QStringLiteral("EEG O1")));
+}
+
+//=============================================================================================================
+
+void TestBids::testBrainVisionReaderMatchesPython()
+{
+    // Six channels, four samples; raw values -7 .. 16 channel by channel. Units cover voltage (EEG), a unit
+    // MNE-Python scales by 1 (ARU), micro-Siemens and a channel with neither resolution nor unit.
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QStringList channels{QStringLiteral("Fp1,,0.1,\u00B5V"), QStringLiteral("Cz,,0.5,mV"), QStringLiteral("Resp,,2,ARU"),
+                               QStringLiteral("GSR,,0.25,\u00B5S"), QStringLiteral("Bare,,,"), QStringLiteral("A\\1B,,1,\u00B5V")};
+    const auto write = [&](const QString& base, const QString& format, const QString& orientation) {
+        QFile vhdr(dir.filePath(base + ".vhdr"));
+        QVERIFY(vhdr.open(QIODevice::WriteOnly | QIODevice::Text));
+        QTextStream out(&vhdr);
+        out << "Brain Vision Data Exchange Header File Version 1.0\n[Common Infos]\nCodepage=UTF-8\n"
+            << "DataFile=" << base << ".eeg\nMarkerFile=" << base << ".vmrk\nDataFormat=BINARY\n"
+            << "DataOrientation=" << orientation << "\nNumberOfChannels=6\nSamplingInterval=2000\n"
+            << "[Binary Infos]\nBinaryFormat=" << format << "\n[Channel Infos]\n";
+        for (int k = 0; k < channels.size(); ++k) {
+            out << "Ch" << (k + 1) << "=" << channels[k] << "\n";
+        }
+        vhdr.close();
+        QByteArray data;
+        QDataStream bin(&data, QIODevice::WriteOnly);
+        bin.setByteOrder(QDataStream::LittleEndian);
+        bin.setFloatingPointPrecision(QDataStream::SinglePrecision);
+        for (int outer = 0; outer < (orientation == "VECTORIZED" ? 6 : 4); ++outer) {
+            for (int inner = 0; inner < (orientation == "VECTORIZED" ? 4 : 6); ++inner) {
+                const int value = (orientation == "VECTORIZED" ? outer * 4 + inner : inner * 4 + outer) - 7;
+                if (format == "INT_16") {
+                    bin << qint16(value);
+                } else {
+                    bin << float(value * 1.5f);
+                }
+            }
+        }
+        QFile eeg(dir.filePath(base + ".eeg"));
+        QVERIFY(eeg.open(QIODevice::WriteOnly));
+        eeg.write(data);
+        eeg.close();
+        QFile vmrk(dir.filePath(base + ".vmrk"));
+        QVERIFY(vmrk.open(QIODevice::WriteOnly | QIODevice::Text));
+        vmrk.write("Brain Vision Data Exchange Marker File, Version 1.0\n[Marker Infos]\n"
+                   "Mk1=New Segment,,1,1,0,20260101120000000000\nMk2=Stimulus,S\\1 7,3,2,0\n");
+        vmrk.close();
+    };
+    write(QStringLiteral("mux16"), QStringLiteral("INT_16"), QStringLiteral("MULTIPLEXED"));
+    write(QStringLiteral("vec32"), QStringLiteral("IEEE_FLOAT_32"), QStringLiteral("VECTORIZED"));
+
+    // mne.io.read_raw_brainvision(...).get_data() for mux16; vec32 is the same times 1.5
+    Eigen::MatrixXd expected(6, 4);
+    expected << -7e-7, -6e-7, -5e-7, -4e-7,
+        -1.5e-3, -1e-3, -5e-4, 0.0,
+        2.0, 4.0, 6.0, 8.0,
+        1.25e-6, 1.5e-6, 1.75e-6, 2e-6,
+        9e-6, 1e-5, 1.1e-5, 1.2e-5,
+        1.3e-5, 1.4e-5, 1.5e-5, 1.6e-5;
+    const QList<int> kinds{FIFFV_EEG_CH, FIFFV_EEG_CH, FIFFV_MISC_CH, FIFFV_MISC_CH, FIFFV_EEG_CH, FIFFV_EEG_CH};
+    for (const auto& [base, factor] : {std::pair<QString, double>{QStringLiteral("mux16"), 1.0}, {QStringLiteral("vec32"), 1.5}}) {
+        BrainVisionReader reader;
+        QVERIFY(reader.open(dir.filePath(base + ".vhdr")));
+        QCOMPARE(reader.getFrequency(), 500.0f);
+        QCOMPARE(reader.getSampleCount(), 4L);
+        const FIFFLIB::FiffInfo info = reader.getInfo();
+        QCOMPARE(info.ch_names.last(), QStringLiteral("A,B"));
+        for (int k = 0; k < 6; ++k) {
+            QVERIFY2(info.chs[k].kind == kinds[k], qPrintable(info.ch_names[k]));
+        }
+        const Eigen::MatrixXd data = reader.readRawSegment(0, 4).cast<double>();
+        QVERIFY2((data - factor * expected).cwiseAbs().maxCoeff() <= 1e-6 * (factor * expected).cwiseAbs().maxCoeff(),
+                 qPrintable(base));
+        for (int k = 0; k < 6; ++k) {
+            QVERIFY2((data.row(k) - factor * expected.row(k)).cwiseAbs().maxCoeff() <= 1e-6 * (factor * expected.row(k)).cwiseAbs().maxCoeff(),
+                     qPrintable(base + " " + info.ch_names[k]));
+        }
+        // Markers: 1-based positions in the file, \1 decodes to a comma
+        const QVector<BrainVisionMarker> markers = reader.getMarkers();
+        QCOMPARE(markers.size(), 2);
+        QCOMPARE(markers[1].description, QStringLiteral("S, 7"));
+        QCOMPARE(markers[1].position, 2L);
+        QCOMPARE(markers[1].duration, 2L);
+        QCOMPARE(markers[0].date, QDateTime(QDate(2026, 1, 1), QTime(12, 0)));
+    }
+
+    // ASCII data is refused rather than misread as INT_16 binary
+    QFile mux(dir.filePath(QStringLiteral("mux16.vhdr")));
+    QVERIFY(mux.open(QIODevice::ReadOnly | QIODevice::Text));
+    QString header = QString::fromUtf8(mux.readAll());
+    mux.close();
+    QFile ascii(dir.filePath(QStringLiteral("ascii.vhdr")));
+    QVERIFY(ascii.open(QIODevice::WriteOnly | QIODevice::Text));
+    ascii.write(header.replace(QStringLiteral("DataFormat=BINARY"), QStringLiteral("DataFormat=ASCII")).toUtf8());
+    ascii.close();
+    BrainVisionReader asciiReader;
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Only BINARY data is supported"));
+    QVERIFY(!asciiReader.open(ascii.fileName()));
 }
 
 //=============================================================================================================

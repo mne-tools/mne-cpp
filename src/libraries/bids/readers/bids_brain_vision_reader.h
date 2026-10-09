@@ -160,8 +160,11 @@ public:
      */
     QVector<BrainVisionChannelInfo> getChannelInfos() const;
 
-    // Unit to scaling factor (relative to V)
+    // Unit to scaling factor into SI (V for voltages, S for siemens); unknown units scale by 1, like mne
     static float unitScale(const QString& sUnit);
+
+    // Whether the unit is a voltage (V, mV, µV, uV, nV); other channels are typed misc, like mne
+    static bool isVoltageUnit(const QString& sUnit);
 
 private:
     bool parseHeader(const QString& sVhdrPath);

@@ -62,23 +62,18 @@ FiffChInfo BrainVisionChannelInfo::toFiffChInfo() const
     else if (nameUpper == "STI 014" || nameUpper.contains("STIM"))
         info.kind = FIFFV_STIM_CH;
     else {
-        // Check if unit suggests a voltage measurement (EEG)
-        float scale = BrainVisionReader::unitScale(unit);
-        if (scale > 0.0f)
-            info.kind = FIFFV_EEG_CH;
-        else
-            info.kind = FIFFV_MISC_CH;
+        // Like mne read_raw_brainvision: voltage channels are EEG, anything else (ARU, µS, °C, ...) is misc
+        info.kind = BrainVisionReader::isVoltageUnit(unit) ? FIFFV_EEG_CH : FIFFV_MISC_CH;
     }
 
     // Map unit
-    QString unitUpper = unit.toUpper();
-    if (unitUpper.contains("V") || unitUpper.isEmpty()) {
+    if (BrainVisionReader::isVoltageUnit(unit)) {
         info.unit = FIFF_UNIT_V;
-        if (unitUpper.startsWith("N"))
+        if (unit == QLatin1String("nV"))
             info.unit_mul = FIFF_UNITM_N;
-        else if (unitUpper.startsWith(QStringLiteral("\u00B5")) || unitUpper.startsWith("U"))
+        else if (unit == QStringLiteral("\u00B5V") || unit == QLatin1String("uV"))
             info.unit_mul = FIFF_UNITM_MU;
-        else if (unitUpper.startsWith("M"))
+        else if (unit == QLatin1String("mV"))
             info.unit_mul = FIFF_UNITM_M;
         else
             info.unit_mul = FIFF_UNITM_NONE;
@@ -216,6 +211,11 @@ bool BrainVisionReader::parseHeader(const QString& sVhdrPath)
     QString markerFileName = commonInfos.value("MarkerFile");
     if (!markerFileName.isEmpty()) {
         m_sMarkerPath = QDir(sDir).absoluteFilePath(markerFileName);
+    }
+
+    if (commonInfos.value("DataFormat", "BINARY").toUpper() != QLatin1String("BINARY")) {
+        qWarning() << "[BrainVisionReader::parseHeader] Only BINARY data is supported, not" << commonInfos.value("DataFormat");
+        return false;
     }
 
     // Data orientation (default: MULTIPLEXED)
@@ -382,24 +382,21 @@ void BrainVisionReader::computeSampleCount()
 
 float BrainVisionReader::unitScale(const QString& sUnit)
 {
-    QString u = sUnit.toLower();
-    if (u == "v")
-        return 1.0f;
-    if (u == "\u00B5v" || u == "uv" || u == "µv")
+    // mne.io.brainvision _unit_dict; units it does not know are taken as-is (factor 1)
+    if (sUnit == QStringLiteral("\u00B5V") || sUnit == QLatin1String("uV") || sUnit == QStringLiteral("\u00B5S") || sUnit == QLatin1String("uS"))
         return 1.0e-6f;
-    if (u == "mv")
+    if (sUnit == QLatin1String("mV"))
         return 1.0e-3f;
-    if (u == "nv")
+    if (sUnit == QLatin1String("nV"))
         return 1.0e-9f;
-    if (u == "c" || u == "\u00B0c")
-        return 1.0f; // temperature
-    if (u == "\u00B5s" || u == "us")
-        return 1.0e-6f;
-    if (u == "s")
-        return 1.0f;
-    if (u == "n/a")
-        return 1.0f;
-    return 0.0f; // unknown unit
+    return 1.0f;
+}
+
+//=============================================================================================================
+
+bool BrainVisionReader::isVoltageUnit(const QString& sUnit)
+{
+    return sUnit == QLatin1String("V") || sUnit == QLatin1String("mV") || sUnit == QStringLiteral("\u00B5V") || sUnit == QLatin1String("uV") || sUnit == QLatin1String("nV");
 }
 
 //=============================================================================================================

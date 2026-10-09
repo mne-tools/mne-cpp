@@ -2529,7 +2529,7 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
+      "test": "test_bids",
       "example": "ex_bids",
       "example_snippet": [
         "ex_bids/main.cpp#brain_vision_reader_usage"
