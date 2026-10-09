@@ -190,7 +190,7 @@ echo Developer configure complete.
 echo   Build directory: %BUILD_DIR%
 echo   Qt source: %QT_SOURCE% ^(%QT_DIR%^)
 echo   NO_OPENGL: %NO_OPENGL_VALUE%
-echo   Next step: cmake --build "%BUILD_DIR%" --parallel
+echo   Next step: cmake --build "%BUILD_DIR%" --config %BUILD_TYPE% --parallel
 exit /b 0
 
 :usage_ok

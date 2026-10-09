@@ -1,0 +1,86 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+# ---------------------------------------------------------------------------
+# Blank-machine onboarding (v2.4.0 T10.8b): a fresh clone on a clean runner
+# follows exactly the setup commands the build guide documents
+# (tools/onboarding/setup_commands.json), builds and runs an example. No
+# caches, no token for the dependency downloads, no MNE-CPP tooling beyond
+# what the guide asks a contributor to install.
+# ---------------------------------------------------------------------------
+name: Onboarding
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly, to catch dependency and runner-image drift without a code change
+    - cron: '17 3 * * 0'
+  push:
+    branches: [staging, main]
+    paths:
+      - 'init.sh'
+      - 'init.bat'
+      - 'src/external/init.sh'
+      - 'src/external/init.bat'
+      - 'src/external/external_deps.env'
+      - 'scripts/ci/download_toolchain.*'
+      - 'doc/website/docs/development/buildguide-cmake.mdx'
+      - 'tools/onboarding/**'
+      - '.github/workflows/onboarding.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: onboarding-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  Onboarding:
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 240
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            os: linux
+          - runner: macos-26
+            os: macos
+          - runner: windows-2025-vs2026
+            os: windows
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+      with:
+        persist-credentials: false
+
+    # Runner hygiene, not a contributor step: these third-party apt sources on
+    # the hosted image intermittently break `apt-get update`.
+    - name: Drop the runner's extra apt sources (Linux)
+      if: matrix.os == 'linux'
+      run: sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
+
+    # Only drives and times the documented steps; none of them needs Python
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+
+    - name: Run the documented setup
+      run: python tools/onboarding/run_setup_commands.py --os ${{ matrix.os }} --report onboarding-${{ matrix.os }}.json
+
+    - name: Upload onboarding report
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: onboarding-${{ matrix.os }}
+        path: onboarding-${{ matrix.os }}.json
+        if-no-files-found: ignore
+        retention-days: 90

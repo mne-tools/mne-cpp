@@ -11,7 +11,15 @@ MNE-CPP uses **CMake** as its build system and requires **C++20** and **Qt 6**. 
 
 ### Recommended Bootstrap
 
-The quickest way to get a reproducible developer setup is to use the repository init scripts:
+The quickest way to get a reproducible developer setup is to use the repository init scripts. On Linux, first install the compiler, CMake, Git and the OpenGL and XKB development headers the Qt bundle links against:
+
+{/* onboarding: linux */}
+```bash
+sudo apt-get update
+sudo apt-get install -y build-essential cmake git libgl1-mesa-dev libxkbcommon-dev
+```
+
+Then, on Linux and macOS:
 
 {/* onboarding: unix */}
 ```bash
@@ -24,7 +32,24 @@ On Windows use:
 {/* onboarding: windows */}
 ```bat
 .\init.bat
-cmake --build build\developer-dynamic --parallel
+cmake --build build\developer-dynamic --config Release --parallel
+```
+
+Visual Studio generators build the Debug configuration unless `--config` names another one; the downloaded Qt bundle is a Release build.
+
+Check the result by running an example. On Linux and macOS:
+
+{/* onboarding: unix */}
+```bash
+./out/Release/examples/ex_math
+```
+
+On Windows, the Qt libraries must be on the `PATH`:
+
+{/* onboarding: windows */}
+```bat
+set PATH=%CD%\src\external\qt\dynamic\bin;%PATH%
+out\Release\bin\ex_math.exe
 ```
 
 These scripts download the MNE-CPP-maintained prerelease dependency bundles into `src/external/`:

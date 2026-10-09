@@ -82,5 +82,33 @@ class ExtractSetupCommandsTest(unittest.TestCase):
                 extractor.REPO_ROOT = original
 
 
+_run_spec = importlib.util.spec_from_file_location("run_setup_commands",
+                                                   _REPO_ROOT / "tools" / "onboarding" / "run_setup_commands.py")
+assert _run_spec is not None and _run_spec.loader is not None
+runner = importlib.util.module_from_spec(_run_spec)
+sys.modules["run_setup_commands"] = runner
+_run_spec.loader.exec_module(runner)
+
+
+class RunSetupCommandsTest(unittest.TestCase):
+    def test_linux_follows_its_prerequisites_then_the_unix_path(self) -> None:
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            self.assertEqual(runner.main(["--os", "linux", "--dry-run"]), 0)
+        documented = extractor.extract_docs(_REPO_ROOT)
+        self.assertEqual(output.getvalue().splitlines(), documented["linux"] + documented["unix"])
+
+    @unittest.skipIf(sys.platform == "win32", "runs a bash session")
+    def test_one_session_stops_at_the_first_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):
+            result = runner.run("macos", ["export ONBOARDING_PROBE=1", "test \"$ONBOARDING_PROBE\" = 1", "false",
+                                          "echo never"], Path(tmp))
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["failed_step"], "false")
+        self.assertEqual([s["ok"] for s in result["steps"]], [True, True, False, False])
+        self.assertIsNone(result["steps"][3]["seconds"])
+        self.assertIn("| `false` |", runner.summary_markdown(result))
+
+
 if __name__ == "__main__":
     unittest.main()

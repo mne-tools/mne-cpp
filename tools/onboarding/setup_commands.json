@@ -1,10 +1,17 @@
 {
+  "linux": [
+    "sudo apt-get update",
+    "sudo apt-get install -y build-essential cmake git libgl1-mesa-dev libxkbcommon-dev"
+  ],
   "unix": [
     "./init.sh",
-    "cmake --build build/developer-dynamic --parallel"
+    "cmake --build build/developer-dynamic --parallel",
+    "./out/Release/examples/ex_math"
   ],
   "windows": [
     ".\\init.bat",
-    "cmake --build build\\developer-dynamic --parallel"
+    "cmake --build build\\developer-dynamic --config Release --parallel",
+    "set PATH=%CD%\\src\\external\\qt\\dynamic\\bin;%PATH%",
+    "out\\Release\\bin\\ex_math.exe"
   ]
 }
