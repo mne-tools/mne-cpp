@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
     int iMaxIter = parser.value(iterOption).toInt();
 
     // read Trans
-    FiffCoordTrans transHeadMriRef(t_fileTrans);
+    const FiffCoordTrans transHeadMriRef = FiffCoordTrans::readTransform(t_fileTrans.fileName(), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
 
     // read Bem
     MNEBem bemHead(t_fileBem);
