@@ -502,6 +502,38 @@ void TestBids::testWriteRoundTrip()
                                   [&](const BidsElectrode& e) { return e.name == before.name; });
         QVERIFY2(after != readBack.electrodes.cend() && std::abs(after->z.toDouble() - before.z.toDouble()) < 1e-6, qPrintable(before.name));
     }
+
+    // Without overwrite, existing sidecars are left alone and the write is refused
+    BidsRawData::WriteOptions keep;
+    keep.copyData = false;
+    QVERIFY(original.write(dstPath, QString(), keep) == BIDSPath());
+
+    // Incomplete paths and an empty recording are refused before anything is written
+    QTemporaryDir refusedDir;
+    BidsRawData empty;
+    QVERIFY(empty.write(BIDSPath(refusedDir.path(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
+    QVERIFY(original.write(BIDSPath(QString(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
+    QVERIFY(original.write(BIDSPath(refusedDir.path(), QString(), "01", "rest", "ieeg", "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
+    QVERIFY(original.write(BIDSPath(refusedDir.path(), "01", "01", QString(), "ieeg", "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
+    QVERIFY(original.write(BIDSPath(refusedDir.path(), "01", "01", "rest", QString(), "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
+    QVERIFY(QDir(refusedDir.path()).isEmpty());
+
+    // EDF: copied as a single file; events without a trial type get theirs from the event id map
+    BIDSPath edfSrc(bidsRoot(), "02", "01", "rest", "eeg", "eeg", ".edf");
+    BidsRawData edf = BidsRawData::read(edfSrc);
+    QVERIFY(edf.isValid());
+    edf.events[1].trialType.clear();
+    edf.eventIdMap.insert(QStringLiteral("visual"), edf.events[1].value);
+    BIDSPath edfDst(tmpDir.path(), "02", "01", "rest", "eeg", "eeg", ".edf");
+    QVERIFY(edf.write(edfDst, edfSrc.filePath(), opts) == edfDst);
+    QCOMPARE(QFileInfo(edfDst.filePath()).size(), QFileInfo(edfSrc.filePath()).size());
+    BidsRawData edfBack = BidsRawData::read(edfDst);
+    QVERIFY(edfBack.isValid());
+    QCOMPARE(edfBack.raw.info.nchan, 25);
+    QCOMPARE(edfBack.events.size(), 3);
+    QCOMPARE(edfBack.events[1].trialType, QStringLiteral("visual"));
+    QCOMPARE(edfBack.events[2].trialType, QStringLiteral("response"));
+    QVERIFY(edfBack.raw.info.bads.contains(QStringLiteral("EEG O1")));
 }
 
 //=============================================================================================================
