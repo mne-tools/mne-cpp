@@ -372,7 +372,7 @@ void TestInvLcmvPython::rejectsInvalidInput()
     QTest::ignoreMessage(QtWarningMsg, "InvLCMV::makeLCMV - Forward solution has no gain matrix!");
     QVERIFY(!InvLCMV::makeLCMV(m_info, MNEForwardSolution(), m_dataCov, 0.05, m_noiseCov).isValid());
     FiffCov smallCov = m_dataCov;
-    smallCov.data = smallCov.data.topLeftCorner(10, 10);
+    smallCov.data = smallCov.data.topLeftCorner(10, 10).eval(); // resizing frees the block being read
     QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Data covariance dimension \\(10 x 10\\)"));
     QVERIFY(!InvLCMV::makeLCMV(m_info, m_fwd, smallCov, 0.05, m_noiseCov).isValid());
 
