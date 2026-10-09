@@ -1130,17 +1130,16 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
 
 //=============================================================================================================
 
-void MNEInverseOperator::write(QIODevice& p_IODevice)
+bool MNEInverseOperator::write(QIODevice& p_IODevice)
 {
-    //
-    //   Open the file, create directory
-    //
-
-    // Create the file and save the essentials
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
+    if (!t_pStream) {
+        return false;
+    }
     qInfo("Write inverse operator decomposition in %s...", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
     t_pStream->end_file();
+    return true;
 }
 
 //=============================================================================================================

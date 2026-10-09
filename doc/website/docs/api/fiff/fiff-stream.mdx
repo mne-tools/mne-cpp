@@ -1110,7 +1110,7 @@ function [fid,cals] = fiff_start_writing_raw(name,info,sel)
 
 **Returns:**
 
-- *FiffStream::SPtr* — the started fiff file.
+- *FiffStream::SPtr* — the started fiff file, or null if the device cannot be opened for writing.
 
 ---
 

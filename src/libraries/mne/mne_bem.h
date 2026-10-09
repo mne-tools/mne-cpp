@@ -153,8 +153,10 @@ public:
      * Write the Bem to a FIF file
      *
      * @param[in] p_IODevice   IO device to write the bem to.
+     *
+     * @return false if the device cannot be opened for writing.
      */
-    void write(QIODevice& p_IODevice);
+    bool write(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**

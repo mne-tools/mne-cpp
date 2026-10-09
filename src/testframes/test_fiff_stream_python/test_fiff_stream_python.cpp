@@ -35,6 +35,7 @@
 #include <fiff/fiff_named_matrix.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_dig_point_set.h>
 
 #include <cmath>
 #include <cstring>
@@ -99,6 +100,7 @@ private slots:
     void readsMeasInfo();
     void readsTagTypes();
     void printsDirectoryTree();
+    void refusesUnwritablePath();
 
 private:
     FiffDirNode::SPtr findBlock(int kind) const;
@@ -578,6 +580,30 @@ void TestFiffStreamPython::printsDirectoryTree()
 
 //=============================================================================================================
 // MAIN
+//=============================================================================================================
+
+void TestFiffStreamPython::refusesUnwritablePath()
+{
+    QTemporaryDir dir;
+    const QString path = dir.filePath(QStringLiteral("no/such/dir/out.fif"));
+    FiffInfo info;
+    FiffChInfo ch;
+    ch.ch_name = QStringLiteral("EEG001");
+    ch.kind = FIFFV_EEG_CH;
+    info.chs << ch;
+    info.ch_names << ch.ch_name;
+    info.nchan = 1;
+    info.sfreq = 100.0f;
+    QFile raw(path);
+    RowVectorXd cals;
+    QVERIFY(!FiffStream::start_writing_raw(raw, info, cals));
+    QFile trans(path);
+    QVERIFY(!FiffCoordTrans().write(trans));
+    QFile dig(path);
+    QVERIFY(!FiffDigPointSet().write(dig));
+    QVERIFY(!QFileInfo::exists(path));
+}
+
 //=============================================================================================================
 
 QTEST_GUILESS_MAIN(TestFiffStreamPython)

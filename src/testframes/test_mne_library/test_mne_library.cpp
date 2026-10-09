@@ -147,6 +147,7 @@ private slots:
 
     // ── MNEBem ──
     void bem_constructAndOperators();
+    void writersRefuseUnwritablePath();
     void bem_readFromFile();
     void bem_transformOps();
 
@@ -558,6 +559,21 @@ void TestMneLibrary::sourceEstimate_writeReadFile()
 
 //=============================================================================================================
 // MNEBem
+//=============================================================================================================
+
+void TestMneLibrary::writersRefuseUnwritablePath()
+{
+    QTemporaryDir dir;
+    const QString path = dir.filePath(QStringLiteral("no/such/dir/out.fif"));
+    QFile bem(path);
+    QVERIFY(!MNEBem().write(bem));
+    QFile inv(path);
+    QVERIFY(!MNEInverseOperator().write(inv));
+    QFile fwd(path);
+    QVERIFY(!MNEForwardSolution().write(fwd));
+    QVERIFY(!QFileInfo::exists(path));
+}
+
 //=============================================================================================================
 
 void TestMneLibrary::bem_constructAndOperators()

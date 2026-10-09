@@ -173,8 +173,10 @@ public:
      * Writes the FiffDigPointSet to a FIFF file.
      *
      * @param[in] p_IODevice   IO device to write the digitizer point set to.
+     *
+     * @return false if the device cannot be opened for writing.
      */
-    void write(QIODevice& p_IODevice);
+    bool write(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**

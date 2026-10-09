@@ -253,6 +253,9 @@ bool MNEForwardSolution::write(QIODevice& p_IODevice) const
     //   Open the file, create the directory
     //
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
+    if (!t_pStream) {
+        return false;
+    }
     t_pStream->start_block(FIFFB_MNE);
 
     //

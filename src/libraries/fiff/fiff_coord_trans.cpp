@@ -150,14 +150,18 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 
 //=============================================================================================================
 
-void FiffCoordTrans::write(QIODevice& qIODevice)
+bool FiffCoordTrans::write(QIODevice& qIODevice)
 {
     // Create the file and save the essentials
     FiffStream::SPtr pStream = FiffStream::start_file(qIODevice);
+    if (!pStream) {
+        return false;
+    }
     qInfo("Write coordinate transform in %s...\n", pStream->streamName().toUtf8().constData());
     this->writeToStream(pStream.data());
     pStream->end_file();
     qIODevice.close();
+    return true;
 }
 
 //=============================================================================================================

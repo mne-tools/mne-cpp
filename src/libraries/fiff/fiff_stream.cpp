@@ -2049,8 +2049,11 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice& p_IODevice,
     //  Create the file and save the essentials
     //
     FiffStream::SPtr t_pStream = start_file(p_IODevice); //1, 2, 3
-    t_pStream->start_block(FIFFB_MEAS);                  //4
-    t_pStream->write_id(FIFF_BLOCK_ID);                  //5
+    if (!t_pStream) {
+        return t_pStream;
+    }
+    t_pStream->start_block(FIFFB_MEAS); //4
+    t_pStream->write_id(FIFF_BLOCK_ID); //5
     if (info.meas_id.version != -1) {
         t_pStream->write_id(FIFF_PARENT_BLOCK_ID, info.meas_id); //6
     }

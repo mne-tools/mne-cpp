@@ -175,17 +175,16 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr& p_pStream, FiffDigPointSe
 
 //=============================================================================================================
 
-void FiffDigPointSet::write(QIODevice& p_IODevice)
+bool FiffDigPointSet::write(QIODevice& p_IODevice)
 {
-    //
-    //   Open the file, create directory
-    //
-
-    // Create the file and save the essentials
     FiffStream::SPtr t_pStream = FiffStream::start_file(p_IODevice);
+    if (!t_pStream) {
+        return false;
+    }
     qInfo("Write Digitizer Points in %s...\n", t_pStream->streamName().toUtf8().constData());
     this->writeToStream(t_pStream.data());
     t_pStream->end_file();
+    return true;
 }
 
 //=============================================================================================================

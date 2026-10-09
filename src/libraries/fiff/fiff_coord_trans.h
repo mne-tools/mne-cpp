@@ -448,8 +448,10 @@ public:
      * @brief Writes the transformation to file.
      *
      * @param[in] p_IODevice   IO device to write the transformation to.
+     *
+     * @return false if the device cannot be opened for writing.
      */
-    void write(QIODevice& p_IODevice);
+    bool write(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
