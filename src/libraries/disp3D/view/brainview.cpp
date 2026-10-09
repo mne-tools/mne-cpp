@@ -510,6 +510,11 @@ void BrainView::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bot
                 }
             }
         }
+
+        if (m_itemDipoleMap.contains(item) && roles.contains(AbstractTreeItem::VisibleRole)) {
+            if (auto* absItem = dynamic_cast<AbstractTreeItem*>(item))
+                m_itemDipoleMap[item]->setVisible(absItem->isVisible());
+        }
     }
     updateSceneBounds();
     m_sceneDirty = true;

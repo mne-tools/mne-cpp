@@ -448,6 +448,17 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     QVERIFY(!dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
     modelView.clearTransformation();
     QVERIFY(dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
+    // Unchecking the dipole set in the tree hides it
+    const QList<QStandardItem*> dipoleRows = model.findItems(QStringLiteral("*"), Qt::MatchWildcard | Qt::MatchRecursive);
+    auto dipoleRow = std::find_if(dipoleRows.cbegin(), dipoleRows.cend(), [](QStandardItem* row) {
+        return row->type() == AbstractTreeItem::itemTypeId(AbstractTreeItem::DipoleItem);
+    });
+    QVERIFY(dipoleRow != dipoleRows.cend());
+    QVERIFY(!dipoleHitAt(QVector3D(0.00381462f, -0.01784828f, 0.0130306f)));
+    static_cast<AbstractTreeItem*>(*dipoleRow)->setVisible(false);
+    QVERIFY(!dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
+    static_cast<AbstractTreeItem*>(*dipoleRow)->setVisible(true);
+    QVERIFY(dipoleHitAt(QVector3D(0.0f, 0.0f, 0.05f)));
     modelView.clearCameraFocusOverride();
     QVERIFY(modelView.loadTransformation(dataDir + QStringLiteral("MEG/sample/all-trans.fif")));
 
