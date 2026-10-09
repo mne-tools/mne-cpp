@@ -20,12 +20,12 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 361,
+    "claims": 362,
     "by_evidence": {
-      "cross-validated-static": 66,
+      "cross-validated-static": 72,
       "cross-validated-live": 2,
       "tested": 139,
-      "unverified": 154
+      "unverified": 149
     },
     "by_source": {
       "classes": {
@@ -35,10 +35,10 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 57,
+        "cross-validated-static": 63,
         "cross-validated-live": 1,
         "tested": 60,
-        "unverified": 154
+        "unverified": 149
       }
     },
     "tests_by_relation": {
@@ -1276,11 +1276,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB event utils",
+      "mne_cpp": "FiffEvents::concatenate",
       "python": "mne.concatenate_events",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1308,11 +1308,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB event utils",
+      "mne_cpp": "FiffEvents::count",
       "python": "mne.count_events",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1476,11 +1476,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "RTPROCESSINGLIB event detection",
+      "mne_cpp": "FiffEvents::find_stim_steps",
       "python": "mne.find_stim_steps",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1876,6 +1876,14 @@
     },
     {
       "source": "parity",
+      "mne_cpp": "FiffEvents::make_fixed_length",
+      "python": "mne.make_fixed_length_events",
+      "claimed": "implemented",
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
       "mne_cpp": "ComputeFwd (partial)",
       "python": "mne.make_forward_dipole",
       "claimed": "partial",
@@ -1908,11 +1916,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB event utils",
+      "mne_cpp": "FiffEvents::merge",
       "python": "mne.merge_events",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2036,11 +2044,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB event utils",
+      "mne_cpp": "FiffEvents::pick",
       "python": "mne.pick_events",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

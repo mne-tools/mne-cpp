@@ -39,6 +39,11 @@
 
 #include <Eigen/Core>
 
+#include <QList>
+#include <QMap>
+
+#include <optional>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -196,6 +201,92 @@ public:
     static bool matchEvent(const AverageCategory& cat,
                            const Eigen::MatrixXi& events,
                            int eventIdx);
+
+    //=========================================================================================================
+    /**
+     * Select events by code, like mne.pick_events.
+     *
+     * @param[in] include  Codes to keep; if empty, all codes except @p exclude are kept.
+     * @param[in] exclude  Codes to drop when @p include is empty.
+     * @param[in] step     Also match the code before the step (column 1).
+     *
+     * @return The selected events in their original order.
+     */
+    FiffEvents pick(const QList<int>& include, const QList<int>& exclude = {}, bool step = false) const;
+
+    //=========================================================================================================
+    /**
+     * Replace codes in both code columns by a new one, like mne.merge_events.
+     *
+     * @param[in] ids            Codes to replace.
+     * @param[in] newId          The new code.
+     * @param[in] replaceEvents  If false, the original events are kept as well, sorted by row.
+     *
+     * @return The merged events.
+     */
+    FiffEvents merge(const QList<int>& ids, int newId, bool replaceEvents = true) const;
+
+    //=========================================================================================================
+    /**
+     * Count the events per code (column 2), like mne.count_events.
+     *
+     * @param[in] ids  Codes to report (0 if absent); if empty, every code that occurs.
+     *
+     * @return Code to count.
+     */
+    QMap<int, int> count(const QList<int>& ids = {}) const;
+
+    //=========================================================================================================
+    /**
+     * Concatenate the events of consecutive recordings, like mne.concatenate_events.
+     *
+     * @param[in] events      Events of each recording.
+     * @param[in] firstSamps  First sample of each recording.
+     * @param[in] lastSamps   Last sample of each recording.
+     *
+     * @return Events on the sample axis of the concatenated recording (empty if the list lengths differ).
+     */
+    static FiffEvents concatenate(const QList<FiffEvents>& events, const QList<int>& firstSamps, const QList<int>& lastSamps);
+
+    //=========================================================================================================
+    /**
+     * Find the samples where all stimulus channels change at once, like mne.find_stim_steps.
+     *
+     * @param[in] stimData   Stimulus channel data (channels x samples); steps carry the values of the first row.
+     * @param[in] firstSamp  Sample number of the first column.
+     * @param[in] padStart   If set, a step from this value at sample 0 is added when the data start elsewhere.
+     * @param[in] padStop    If set, a step to this value after the last sample is added.
+     * @param[in] merge      Merge steps at most |merge| samples apart (> 0: into the later, < 0: into the earlier).
+     *
+     * @return Steps as [sample, value before, value after].
+     */
+    static FiffEvents find_stim_steps(const Eigen::MatrixXi& stimData,
+                                      int firstSamp,
+                                      std::optional<int> padStart = std::nullopt,
+                                      std::optional<int> padStop = std::nullopt,
+                                      int merge = 0);
+
+    //=========================================================================================================
+    /**
+     * Events at regular intervals, like mne.make_fixed_length_events.
+     *
+     * @param[in] raw        The recording.
+     * @param[in] id         Event code.
+     * @param[in] start      First event time in s.
+     * @param[in] stop       Time in s after which no event may start (negative: end of the recording).
+     * @param[in] duration   Duration of each segment in s.
+     * @param[in] firstSamp  Whether times count from the recording's first sample (true) or from 0.
+     * @param[in] overlap    Overlap of consecutive segments in s, 0 <= overlap < duration.
+     *
+     * @return The events (empty if none fit or the overlap is invalid).
+     */
+    static FiffEvents make_fixed_length(const FiffRawData& raw,
+                                        int id = 1,
+                                        double start = 0.0,
+                                        double stop = -1.0,
+                                        double duration = 1.0,
+                                        bool firstSamp = true,
+                                        double overlap = 0.0);
 
     Eigen::MatrixXi events; /**< Event matrix (nEvents x 3): [sample, before, after]. */
 };

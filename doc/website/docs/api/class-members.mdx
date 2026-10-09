@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6254 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6260 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -813,6 +813,7 @@ Index of 6254 public class members (functions, variables, typedefs, enums) acros
 - **computeVector** `[fn]` in [WelchPsd](/docs/api/dsp/welch-psd) — Compute Welch PSD for a single channel row vector.
 - **computeVox2Ras** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data) — Builds the voxel-to-surface-RAS (MRI) 4×4 transform matrix.
 - **computeVox2RasTkr** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data) — Builds the voxel-to-surface-RAS (tkRAS / tkregister) 4×4 transform.
+- **concatenate** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Concatenate the events of consecutive recordings, like mne.concatenate_events.
 - **concatenateEpochs** `[fn]` in [FiffEpochs](/docs/api/fiff/fiff-epochs) — Concatenate multiple epoch sets into a single list.
 - **condition** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Condition the covariance matrix by eigendecomposition with per-channel-type scaling, zeroing sub-threshold eigenvalues, and reconstructing.
 - **confidence** `[var]` in [IcaLabelResult](/docs/api/decoding/ica-label-result) — Confidence score in [0, 1].
@@ -1084,6 +1085,7 @@ Index of 6254 public class members (functions, variables, typedefs, enums) acros
 - **cosmag** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **cosmag** `[fn]` in [InvSensorSet](/docs/api/inv/inv-sensor-set)
 - **count** `[fn]` in [Command](/docs/api/com/command) — Returns the number of parameters.
+- **count** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Count the events per code (column 2), like mne.count_events.
 - **count** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Returns the number of derived channels over all derivations (MNE-C `mne_count_deriv`).
 - **count** `[fn]` in [RawCommand](/docs/api/com/raw-command) — Returns the number of parameters.
 - **countOf** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points)
@@ -1745,6 +1747,7 @@ Index of 6254 public class members (functions, variables, typedefs, enums) acros
 - **find_source_space_hemi** `[fn]` in [MNE](/docs/api/mne/mne-class) — mne_find_source_space_hemi
 - **find_source_space_hemi** `[fn]` in [MNESourceSpace](/docs/api/mne/mne-source-space) — Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for this source space, based on the average x-coordinate of all vertices.
 - **find_source_space_hemi** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces)
+- **find_stim_steps** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Find the samples where all stimulus channels change at once, like mne.find_stim_steps.
 - **find_tag** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Definition of the find_tag function in various files e.g.
 - **find_tag** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Definition of the find_tag function in various files e.g.
 - **findArtifactComponents** `[fn]` in [MlIcaLabel](/docs/api/decoding/ml-ica-label) — Extract indices of artifact components (EOG, ECG, muscle).
@@ -3039,6 +3042,7 @@ Index of 6254 public class members (functions, variables, typedefs, enums) acros
 - **make_comp** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Build the current compensation operator for the given channel set by locating the matching compensation matrix and constructing pre/post-selection sparse matrices.
 - **make_compensator** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — mne_make_compensator
 - **make_compensator** `[fn]` in [MNE](/docs/api/mne/mne-class) — mne_make_compensator
+- **make_fixed_length** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Events at regular intervals, like mne.make_fixed_length_events.
 - **make_guesses** `[fn]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Generate a set of dipole guess locations inside a boundary surface.
 - **make_inverse_operator** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Assemble an inverse operator from a forward solution and noise covariance.
 - **make_proj** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Compile the projection operator via SVD (no bad channels).
@@ -3174,6 +3178,7 @@ Index of 6254 public class members (functions, variables, typedefs, enums) acros
 - **megPick** `[fn]` in [SensorFieldMapper](/docs/api/disp3-d/sensor-field-mapper)
 - **megSurfaceKey** `[fn]` in [SensorFieldMapper](/docs/api/disp3-d/sensor-field-mapper)
 - **memb_vert** `[var]` in [MNEPatchInfo](/docs/api/mne/mne-patch-info) — Vertex indices that constitute the patch.
+- **merge** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Replace codes in both code columns by a new one, like mne.merge_events.
 - **MeshFactory** `[fn]` in [MeshFactory](/docs/api/disp3-d/mesh-factory)
 - **message** `[var]` in [MnaVerificationResult](/docs/api/mna/mna-verification-result) — Formatted message: "PASS: ..." or "FAIL [error]: ...".
 - **metaChanged** `[signal]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Emitted when channel metadata (scale, colour, bad-flag) changes.
@@ -3865,6 +3870,7 @@ Index of 6254 public class members (functions, variables, typedefs, enums) acros
 - **physicalDimension** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - **physicalMax** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - **physicalMin** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
+- **pick** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Select events by code, like mne.pick_events.
 - **pick** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — Matrix to pick data from the full data set which may contain channels we are not interested in (currently unused).
 - **pick** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — Corresponding channels in raw data (&lt; 0 indicates missing).
 - **pick** `[fn]` in [MNENamedMatrix](/docs/api/mne/mne-named-matrix) — Create a sub-matrix by picking named rows and columns.

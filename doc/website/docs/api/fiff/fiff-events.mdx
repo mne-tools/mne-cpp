@@ -106,6 +106,63 @@ Returns true if no events are stored.
 
 ---
 
+### pick(include, exclude, step)
+
+Select events by code, like mne.pick_events.
+
+**Parameters:**
+
+- **include** : *const QList&lt; int &gt; &*
+  Codes to keep; if empty, all codes except `exclude` are kept.
+
+- **exclude** : *const QList&lt; int &gt; &*
+  Codes to drop when `include` is empty.
+
+- **step** : *bool*
+  Also match the code before the step (column 1).
+
+**Returns:**
+
+- *[FiffEvents](/docs/api/fiff/fiff-events)* — The selected events in their original order.
+
+---
+
+### merge(ids, newId, replaceEvents)
+
+Replace codes in both code columns by a new one, like mne.merge_events.
+
+**Parameters:**
+
+- **ids** : *const QList&lt; int &gt; &*
+  Codes to replace.
+
+- **newId** : *int*
+  The new code.
+
+- **replaceEvents** : *bool*
+  If false, the original events are kept as well, sorted by row.
+
+**Returns:**
+
+- *[FiffEvents](/docs/api/fiff/fiff-events)* — The merged events.
+
+---
+
+### count(ids)
+
+Count the events per code (column 2), like mne.count_events.
+
+**Parameters:**
+
+- **ids** : *const QList&lt; int &gt; &*
+  Codes to report (0 if absent); if empty, every code that occurs.
+
+**Returns:**
+
+- *QMap&lt; int, int &gt;* — Code to count.
+
+---
+
 ## Static Methods
 
 ### read(t_sEventName, t_fileRawName, p_Events)
@@ -214,6 +271,87 @@ Check whether an event matches a category definition.
 **Returns:**
 
 - *bool* — true if the event matches.
+
+---
+
+### concatenate(events, firstSamps, lastSamps)
+
+Concatenate the events of consecutive recordings, like mne.concatenate_events.
+
+**Parameters:**
+
+- **events** : *const QList&lt; [FiffEvents](/docs/api/fiff/fiff-events) &gt; &*
+  Events of each recording.
+
+- **firstSamps** : *const QList&lt; int &gt; &*
+  First sample of each recording.
+
+- **lastSamps** : *const QList&lt; int &gt; &*
+  Last sample of each recording.
+
+**Returns:**
+
+- *[FiffEvents](/docs/api/fiff/fiff-events)* — Events on the sample axis of the concatenated recording (empty if the list lengths differ).
+
+---
+
+### find_stim_steps(stimData, firstSamp, padStart, padStop, merge)
+
+Find the samples where all stimulus channels change at once, like mne.find_stim_steps.
+
+**Parameters:**
+
+- **stimData** : *const Eigen::MatrixXi &*
+  Stimulus channel data (channels x samples); steps carry the values of the first row.
+
+- **firstSamp** : *int*
+  Sample number of the first column.
+
+- **padStart** : *std::optional&lt; int &gt;*
+  If set, a step from this value at sample 0 is added when the data start elsewhere.
+
+- **padStop** : *std::optional&lt; int &gt;*
+  If set, a step to this value after the last sample is added.
+
+- **merge** : *int*
+  Merge steps at most |merge| samples apart (&gt; 0: into the later, &lt; 0: into the earlier).
+
+**Returns:**
+
+- *[FiffEvents](/docs/api/fiff/fiff-events)* — Steps as [sample, value before, value after].
+
+---
+
+### make_fixed_length(raw, id, start, stop, duration, firstSamp, overlap)
+
+Events at regular intervals, like mne.make_fixed_length_events.
+
+**Parameters:**
+
+- **raw** : *const [FiffRawData](/docs/api/fiff/fiff-raw-data) &*
+  The recording.
+
+- **id** : *int*
+  Event code.
+
+- **start** : *double*
+  First event time in s.
+
+- **stop** : *double*
+  Time in s after which no event may start (negative: end of the recording).
+
+- **duration** : *double*
+  Duration of each segment in s.
+
+- **firstSamp** : *bool*
+  Whether times count from the recording's first sample (true) or from 0.
+
+- **overlap** : *double*
+  Overlap of consecutive segments in s, 0 &lt;= overlap &lt; duration.
+
+**Returns:**
+
+- *[FiffEvents](/docs/api/fiff/fiff-events)* — The events (empty if none fit or the overlap is invalid).
 
 ---
 

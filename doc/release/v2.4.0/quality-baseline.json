@@ -83,12 +83,12 @@
         "missing": 137,
         "not-applicable": 8
       },
-      "claims": 361,
+      "claims": 362,
       "claims_by_evidence": {
-        "cross-validated-static": 66,
+        "cross-validated-static": 72,
         "cross-validated-live": 2,
         "tested": 139,
-        "unverified": 154
+        "unverified": 149
       }
     }
   }

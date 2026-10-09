@@ -36,6 +36,11 @@
 #include <QRegularExpression>
 #include <QTextStream>
 
+#include <algorithm>
+#include <cmath>
+#include <numeric>
+#include <vector>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -401,4 +406,185 @@ bool FiffEvents::matchEvent(const AverageCategory& cat,
     }
 
     return match;
+}
+
+//=============================================================================================================
+
+namespace
+{
+
+/** The rows of @p events whose flag is set, in order. */
+MatrixXi selectRows(const MatrixXi& events, const std::vector<bool>& keep)
+{
+    MatrixXi out(std::count(keep.cbegin(), keep.cend(), true), events.cols());
+    Index r = 0;
+    for (Index i = 0; i < events.rows(); ++i) {
+        if (keep[i])
+            out.row(r++) = events.row(i);
+    }
+    return out;
+}
+
+} // namespace
+
+//=============================================================================================================
+
+FiffEvents FiffEvents::pick(const QList<int>& include, const QList<int>& exclude, bool step) const
+{
+    std::vector<bool> keep(events.rows());
+    for (Index i = 0; i < events.rows(); ++i) {
+        const bool matches = !include.isEmpty()
+            ? include.contains(events(i, 2)) || (step && include.contains(events(i, 1)))
+            : !(exclude.contains(events(i, 2)) || (step && exclude.contains(events(i, 1))));
+        keep[i] = matches;
+    }
+    FiffEvents out;
+    out.events = selectRows(events, keep);
+    return out;
+}
+
+//=============================================================================================================
+
+FiffEvents FiffEvents::merge(const QList<int>& ids, int newId, bool replaceEvents) const
+{
+    FiffEvents out;
+    out.events = events;
+    std::vector<bool> touched(events.rows(), false);
+    for (Index i = 0; i < events.rows(); ++i) {
+        for (int col = 1; col <= 2; ++col) {
+            if (ids.contains(events(i, col))) {
+                out.events(i, col) = newId;
+                touched[i] = true;
+            }
+        }
+    }
+    if (!replaceEvents) {
+        const MatrixXi originals = selectRows(events, touched);
+        MatrixXi all(out.events.rows() + originals.rows(), 3);
+        all << out.events, originals;
+        std::vector<Index> order(all.rows());
+        std::iota(order.begin(), order.end(), 0);
+        std::stable_sort(order.begin(), order.end(), [&all](Index a, Index b) {
+            return std::lexicographical_compare(all.row(a).begin(), all.row(a).end(), all.row(b).begin(), all.row(b).end());
+        });
+        out.events.resize(all.rows(), 3);
+        for (Index i = 0; i < all.rows(); ++i)
+            out.events.row(i) = all.row(order[i]);
+    }
+    return out;
+}
+
+//=============================================================================================================
+
+QMap<int, int> FiffEvents::count(const QList<int>& ids) const
+{
+    QMap<int, int> counts;
+    for (const int id : ids)
+        counts.insert(id, 0);
+    for (Index i = 0; i < events.rows(); ++i) {
+        if (ids.isEmpty() || ids.contains(events(i, 2)))
+            ++counts[events(i, 2)];
+    }
+    return counts;
+}
+
+//=============================================================================================================
+
+FiffEvents FiffEvents::concatenate(const QList<FiffEvents>& events, const QList<int>& firstSamps, const QList<int>& lastSamps)
+{
+    FiffEvents out;
+    if (events.isEmpty() || events.size() != firstSamps.size() || events.size() != lastSamps.size())
+        return out;
+    Index rows = 0;
+    for (const FiffEvents& e : events)
+        rows += e.events.rows();
+    out.events.resize(rows, 3);
+    Index r = 0;
+    int offset = 0;
+    for (qsizetype k = 0; k < events.size(); ++k) {
+        MatrixXi shifted = events[k].events;
+        if (k > 0)
+            shifted.col(0).array() += offset + firstSamps[0] - firstSamps[k];
+        out.events.middleRows(r, shifted.rows()) = shifted;
+        r += shifted.rows();
+        offset += lastSamps[k] - firstSamps[k] + 1;
+    }
+    return out;
+}
+
+//=============================================================================================================
+
+FiffEvents FiffEvents::find_stim_steps(const MatrixXi& stimData, int firstSamp, std::optional<int> padStart, std::optional<int> padStop, int merge)
+{
+    std::vector<RowVector3i> steps;
+    for (Index t = 0; t + 1 < stimData.cols(); ++t) {
+        if ((stimData.col(t + 1).array() != stimData.col(t).array()).all())
+            steps.emplace_back(static_cast<int>(t + 1) + firstSamp, stimData(0, t), stimData(0, t + 1));
+    }
+    FiffEvents out;
+    if (steps.empty())
+        return out;
+    if (padStart && steps.front()(1) != *padStart)
+        steps.insert(steps.begin(), RowVector3i(0, *padStart, steps.front()(1)));
+    if (padStop && steps.back()(2) != *padStop)
+        steps.emplace_back(static_cast<int>(stimData.cols()) + firstSamp, steps.back()(2), *padStop);
+    if (merge != 0) {
+        const size_t n = steps.size();
+        std::vector<bool> close(n > 0 ? n - 1 : 0);
+        for (size_t i = 0; i + 1 < n; ++i)
+            close[i] = steps[i + 1](0) - steps[i](0) <= std::abs(merge);
+        if (std::find(close.cbegin(), close.cend(), true) != close.cend()) {
+            // Merged steps take the outer values; the step that is merged away is dropped
+            std::vector<bool> keep(n, true);
+            const std::vector<RowVector3i> original = steps;
+            for (size_t i = 0; i + 1 < n; ++i) {
+                if (!close[i])
+                    continue;
+                if (merge > 0) {
+                    steps[i + 1](1) = original[i](1);
+                    keep[i] = false;
+                } else {
+                    steps[i](2) = original[i + 1](2);
+                    keep[i + 1] = false;
+                }
+            }
+            std::vector<RowVector3i> kept;
+            for (size_t i = 0; i < n; ++i) {
+                if (keep[i] && steps[i](1) != steps[i](2))
+                    kept.push_back(steps[i]);
+            }
+            steps.swap(kept);
+        }
+    }
+    out.events.resize(static_cast<Index>(steps.size()), 3);
+    for (size_t i = 0; i < steps.size(); ++i)
+        out.events.row(static_cast<Index>(i)) = steps[i];
+    return out;
+}
+
+//=============================================================================================================
+
+FiffEvents FiffEvents::make_fixed_length(const FiffRawData& raw, int id, double start, double stop, double duration, bool firstSamp, double overlap)
+{
+    FiffEvents out;
+    const double sfreq = raw.info.sfreq;
+    if (overlap < 0.0 || overlap >= duration || sfreq <= 0.0)
+        return out;
+    double first = std::nearbyint(start * sfreq);
+    double last = stop >= 0.0 ? std::nearbyint(stop * sfreq) : raw.last_samp + 1.0;
+    if (firstSamp) {
+        first += raw.first_samp;
+        last = std::min(last + (stop >= 0.0 ? raw.first_samp : 0), raw.last_samp + 1.0);
+    } else {
+        last = std::min(last - (stop >= 0.0 ? 0 : raw.first_samp), static_cast<double>(raw.last_samp - raw.first_samp + 1));
+    }
+    last -= std::nearbyint(sfreq * duration);
+    const double stepSamples = sfreq * (duration - overlap);
+    const auto count = static_cast<Index>(std::max(0.0, std::ceil((last + 1.0 - first) / stepSamples)));
+    out.events = MatrixXi::Zero(count, 3);
+    for (Index i = 0; i < count; ++i) {
+        out.events(i, 0) = static_cast<int>(first + static_cast<double>(i) * stepSamples);
+        out.events(i, 2) = id;
+    }
+    return out;
 }

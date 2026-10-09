@@ -11917,8 +11917,9 @@
       {
         "python": "mne.concatenate_events",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB event utils",
-        "note": ""
+        "mne_cpp": "FiffEvents::concatenate",
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.concatenate_raws",
@@ -11944,8 +11945,9 @@
       {
         "python": "mne.count_events",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB event utils",
-        "note": ""
+        "mne_cpp": "FiffEvents::count",
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.create_default_subject",
@@ -12170,8 +12172,9 @@
       {
         "python": "mne.find_stim_steps",
         "status": "implemented",
-        "mne_cpp": "RTPROCESSINGLIB event detection",
-        "note": ""
+        "mne_cpp": "FiffEvents::find_stim_steps",
+        "note": "takes the stimulus channel data instead of a Raw object",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.forward.apply_forward",
@@ -12687,9 +12690,10 @@
       },
       {
         "python": "mne.make_fixed_length_events",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "fixed-length events helper"
+        "status": "implemented",
+        "mne_cpp": "FiffEvents::make_fixed_length",
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.make_forward_dipole",
@@ -12721,8 +12725,9 @@
       {
         "python": "mne.merge_events",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB event utils",
-        "note": ""
+        "mne_cpp": "FiffEvents::merge",
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.minimum_norm.apply_inverse",
@@ -12886,8 +12891,9 @@
       {
         "python": "mne.pick_events",
         "status": "implemented",
-        "mne_cpp": "FIFFLIB event utils",
-        "note": ""
+        "mne_cpp": "FiffEvents::pick",
+        "note": "",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.pick_info",

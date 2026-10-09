@@ -53,7 +53,9 @@
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_events.h>
 
+#include <array>
 #include <cmath>
+#include <initializer_list>
 #include <memory>
 
 //=============================================================================================================
@@ -229,6 +231,7 @@ private slots:
     void applyTrans_withoutMove();
     void transSet_headToMniMatchesPython();
     void events_matchPython();
+    void eventUtilities_matchPython();
 
     void sparse_createAndConvert();
 };
@@ -1028,6 +1031,71 @@ void TestFiffCorePython::events_matchPython()
     QFile eveFile(evePath);
     const FiffEvents ascii(eveFile);
     QVERIFY(ascii.events == onsets);
+}
+
+//=============================================================================================================
+
+void TestFiffCorePython::eventUtilities_matchPython()
+{
+    // Reference values produced by mne.pick_events, merge_events, count_events, concatenate_events,
+    // event._find_stim_steps and make_fixed_length_events (mne-python 1.11)
+    const auto rows = [](std::initializer_list<std::array<int, 3>> list) {
+        MatrixXi m(static_cast<Index>(list.size()), 3);
+        Index r = 0;
+        for (const auto& row : list) {
+            m.row(r++) << row[0], row[1], row[2];
+        }
+        return m;
+    };
+    FiffEvents ev;
+    ev.events = rows({{10, 0, 1}, {20, 1, 0}, {35, 0, 2}, {40, 2, 3}, {52, 3, 0}, {60, 0, 1}, {75, 0, 4}, {80, 4, 0}});
+
+    QCOMPARE(ev.pick({1, 3}).events, rows({{10, 0, 1}, {40, 2, 3}, {60, 0, 1}}));
+    QCOMPARE(ev.pick({1, 3}, {}, true).events, rows({{10, 0, 1}, {20, 1, 0}, {40, 2, 3}, {52, 3, 0}, {60, 0, 1}}));
+    QCOMPARE(ev.pick({}, {0}).events, rows({{10, 0, 1}, {35, 0, 2}, {40, 2, 3}, {60, 0, 1}, {75, 0, 4}}));
+    QCOMPARE(ev.pick({}, {0, 1}, true).events, rows({{40, 2, 3}}));
+
+    QCOMPARE(ev.merge({1, 2}, 9).events, rows({{10, 0, 9}, {20, 9, 0}, {35, 0, 9}, {40, 9, 3}, {52, 3, 0}, {60, 0, 9}, {75, 0, 4}, {80, 4, 0}}));
+    QCOMPARE(ev.merge({1, 2}, 9, false).events,
+             rows({{10, 0, 1}, {10, 0, 9}, {20, 1, 0}, {20, 9, 0}, {35, 0, 2}, {35, 0, 9}, {40, 2, 3}, {40, 9, 3}, {52, 3, 0}, {60, 0, 1}, {60, 0, 9}, {75, 0, 4}, {80, 4, 0}}));
+
+    QCOMPARE(ev.count(), (QMap<int, int>{{0, 3}, {1, 2}, {2, 1}, {3, 1}, {4, 1}}));
+    QCOMPARE(ev.count({1, 5}), (QMap<int, int>{{1, 2}, {5, 0}}));
+
+    FiffEvents second;
+    second.events = rows({{105, 0, 7}, {130, 7, 0}});
+    QCOMPARE(FiffEvents::concatenate({ev, second}, {5, 100}, {99, 199}).events,
+             rows({{10, 0, 1}, {20, 1, 0}, {35, 0, 2}, {40, 2, 3}, {52, 3, 0}, {60, 0, 1}, {75, 0, 4}, {80, 4, 0}, {105, 0, 7}, {130, 7, 0}}));
+    QVERIFY(FiffEvents::concatenate({ev, second}, {5}, {99, 199}).is_empty());
+
+    MatrixXi stim(1, 16);
+    stim << 0, 0, 1, 1, 1, 3, 3, 0, 0, 2, 2, 2, 0, 0, 0, 5;
+    const MatrixXi plain = rows({{102, 0, 1}, {105, 1, 3}, {107, 3, 0}, {109, 0, 2}, {112, 2, 0}, {115, 0, 5}});
+    QCOMPARE(FiffEvents::find_stim_steps(stim, 100).events, plain);
+    QCOMPARE(FiffEvents::find_stim_steps(stim, 100, 4, 6).events,
+             rows({{0, 4, 0}, {102, 0, 1}, {105, 1, 3}, {107, 3, 0}, {109, 0, 2}, {112, 2, 0}, {115, 0, 5}, {116, 5, 6}}));
+    QCOMPARE(FiffEvents::find_stim_steps(stim, 100, std::nullopt, std::nullopt, 1).events, plain);
+    QCOMPARE(FiffEvents::find_stim_steps(stim, 100, std::nullopt, std::nullopt, 2).events, rows({{102, 0, 1}, {109, 3, 2}, {112, 2, 0}, {115, 0, 5}}));
+    QCOMPARE(FiffEvents::find_stim_steps(stim, 100, std::nullopt, std::nullopt, -2).events, rows({{102, 0, 1}, {105, 1, 0}, {112, 2, 0}, {115, 0, 5}}));
+    QCOMPARE(FiffEvents::find_stim_steps(stim, 100, std::nullopt, std::nullopt, -3).events, rows({{102, 0, 3}}));
+    QCOMPARE(FiffEvents::find_stim_steps(stim, 100, std::nullopt, std::nullopt, 3).events, rows({{115, 2, 5}}));
+    MatrixXi twoChannels(2, 6);
+    twoChannels << 0, 0, 1, 1, 2, 2, 0, 5, 5, 6, 7, 7;
+    QCOMPARE(FiffEvents::find_stim_steps(twoChannels, 0).events, rows({{4, 1, 2}}));
+
+    FiffEvents fixed = FiffEvents::make_fixed_length(*m_raw);
+    QCOMPARE(fixed.num_events(), 20);
+    QCOMPARE(fixed.events.topRows(2), rows({{12900, 0, 1}, {13200, 0, 1}}));
+    QCOMPARE(fixed.events.bottomRows(1), rows({{18605, 0, 1}}));
+    fixed = FiffEvents::make_fixed_length(*m_raw, 7, 1.5, 10.25, 2.0, true, 0.5);
+    QCOMPARE(fixed.num_events(), 5);
+    QCOMPARE(fixed.events.topRows(2), rows({{13350, 0, 7}, {13800, 0, 7}}));
+    QCOMPARE(fixed.events.bottomRows(1), rows({{15151, 0, 7}}));
+    fixed = FiffEvents::make_fixed_length(*m_raw, 1, 0.0, -1.0, 3.3, false);
+    QCOMPARE(fixed.num_events(), 6);
+    QCOMPARE(fixed.events.topRows(2), rows({{0, 0, 1}, {991, 0, 1}}));
+    QCOMPARE(fixed.events.bottomRows(1), rows({{4955, 0, 1}}));
+    QVERIFY(FiffEvents::make_fixed_length(*m_raw, 1, 0.0, -1.0, 1.0, true, 1.0).is_empty());
 }
 
 //=============================================================================================================
