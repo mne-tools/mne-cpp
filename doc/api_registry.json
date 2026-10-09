@@ -4264,7 +4264,7 @@
       "mne_c_tool": null,
       "mne_python": null,
       "sklearn": null,
-      "test": null,
+      "test": "test_disp3d_brainview",
       "example": "ex_disp3d_scene",
       "example_snippet": [
         "ex_disp3d_scene/main.cpp#video_overlay_usage"

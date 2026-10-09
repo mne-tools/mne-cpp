@@ -46,6 +46,7 @@
 #include <disp3D/renderable/networkobject.h>
 #include <disp3D/renderable/sourceestimateoverlay.h>
 #include <disp3D/renderable/sliceobject.h>
+#include <disp3D/renderable/videooverlay.h>
 #include <disp3D/scene/sensorfieldmapper.h>
 #include <fiff/fiff_evoked.h>
 #include <fwd/fwd_coil_set.h>
@@ -212,6 +213,12 @@ private slots:
      * pick with empty surface/dipole maps, and displayLabel on a RayHit.
      */
     void rayPicker_basics();
+
+    //=========================================================================================================
+    /**
+     * Verifies VideoOverlay ignores null frames and counts video and depth frames separately.
+     */
+    void videoOverlay_basics();
 
     //=========================================================================================================
     /**
@@ -1108,6 +1115,37 @@ void TestDisp3dBrainView::digitizerSetTreeItem_basics()
     QVERIFY(item.categoryItem(999) == nullptr);
 
     QApplication::processEvents();
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::videoOverlay_basics()
+{
+    VideoOverlay overlay;
+    QVERIFY(!overlay.isEnabled());
+    QVERIFY(!overlay.hasFrame());
+    QVERIFY(!overlay.hasDepthFrame());
+
+    // Null frames are ignored; each real frame bumps only its own generation so the renderer re-uploads it
+    overlay.setFrame(QImage());
+    overlay.setDepthFrame(QImage());
+    QCOMPARE(overlay.frameGeneration(), quint64(0));
+    QCOMPARE(overlay.depthFrameGeneration(), quint64(0));
+    QImage video(4, 2, QImage::Format_RGBA8888);
+    video.fill(Qt::red);
+    overlay.setFrame(video);
+    overlay.setFrame(video);
+    QVERIFY(overlay.hasFrame());
+    QCOMPARE(overlay.frame().pixelColor(3, 1), QColor(Qt::red));
+    QCOMPARE(overlay.frameGeneration(), quint64(2));
+    QCOMPARE(overlay.depthFrameGeneration(), quint64(0));
+    QImage depth(4, 2, QImage::Format_Grayscale8);
+    depth.fill(128);
+    overlay.setDepthFrame(depth);
+    QVERIFY(overlay.hasDepthFrame());
+    QCOMPARE(overlay.depthFrame().size(), QSize(4, 2));
+    QCOMPARE(overlay.depthFrameGeneration(), quint64(1));
+    QCOMPARE(overlay.frameGeneration(), quint64(2));
 }
 
 //=============================================================================================================

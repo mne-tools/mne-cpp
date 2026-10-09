@@ -839,7 +839,8 @@
         "SourceEstimateOverlay",
         "SourceSpaceTreeItem",
         "StcLoadingWorker",
-        "SurfaceTreeItem"
+        "SurfaceTreeItem",
+        "VideoOverlay"
       ]
     },
     {
