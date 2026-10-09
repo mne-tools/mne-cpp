@@ -2812,6 +2812,15 @@ void TestDispViewers2::channelRhiView_renderToImage()
         QVERIFY(!isClipRed(color));
     }
 
+    // Per-second bands belong to the grid and darken odd seconds by 8 %, like the overlay shader
+    rhiView->setZScoreMode(false);
+    rhiView->setSfreq(100.f);
+    QCOMPARE(view.renderToImage(QSize(400, 200)).pixelColor(350, 10), QColor(Qt::white));
+    rhiView->setGridVisible(true);
+    image = view.renderToImage(QSize(400, 200));
+    QCOMPARE(image.pixelColor(150, 10), QColor(Qt::white));
+    QCOMPARE(image.pixelColor(350, 10), QColor(235, 235, 235));
+
     QVERIFY(view.renderToImage(QSize(0, 10)).isNull());
 }
 

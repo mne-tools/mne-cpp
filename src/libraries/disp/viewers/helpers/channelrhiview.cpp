@@ -1620,7 +1620,7 @@ QImage ChannelRhiView::renderToImage(const QSize& size) const
 
     // ── Alternating per-second background bands ─────────────────────
     // Draw subtle alternating grey/white bands every second, like MNE-Python browser.
-    if (sfreq > 0.f) {
+    if (gridVisible && sfreq > 0.f) {
         float samplesPerSec = sfreq;
         float firstBound = std::floor(
                                (scrollSample - static_cast<float>(firstFileSample)) / samplesPerSec) *
@@ -1632,11 +1632,10 @@ QImage ChannelRhiView::renderToImage(const QSize& size) const
             (firstBound - static_cast<float>(firstFileSample)) / samplesPerSec);
         bool oddBand = (bandIndex & 1) != 0;
 
-        // Compute a slightly darker shade for odd bands relative to bgColor
-        QColor altColor(
-            qBound(0, bgColor.red() - 10, 255),
-            qBound(0, bgColor.green() - 10, 255),
-            qBound(0, bgColor.blue() - 10, 255));
+        // Odd seconds are darkened by 8 %, as in overlay.frag
+        const QColor altColor(qRound(bgColor.red() * 0.92),
+                              qRound(bgColor.green() * 0.92),
+                              qRound(bgColor.blue() * 0.92));
 
         for (float s = firstBound; s < lastSample; s += samplesPerSec, oddBand = !oddBand) {
             if (!oddBand)
