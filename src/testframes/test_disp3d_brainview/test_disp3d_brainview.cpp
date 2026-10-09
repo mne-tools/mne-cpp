@@ -553,8 +553,18 @@ void TestDisp3dBrainView::brainView_appearanceSetters()
     view.setLightingEnabled(true);
     view.setLightingEnabled(false);
 
-    // Snapshot (no rendering context — just exercises the non-render code path)
-    // view.saveSnapshot(); // would need render context
+    // Without a rendered frame (no QRhi offscreen) a screenshot is refused and nothing is written
+    QTemporaryDir shots;
+    const QString shot = shots.filePath(QStringLiteral("sub/view.png"));
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No rendered frame"));
+    QVERIFY(!view.takeScreenshot(shot));
+    QVERIFY(QDir(shots.path()).isEmpty());
+    const QString cwd = QDir::currentPath();
+    QDir::setCurrent(shots.path());
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No rendered frame"));
+    QVERIFY(!view.saveSnapshot());
+    QVERIFY(QDir(shots.path()).isEmpty());
+    QDir::setCurrent(cwd);
 
     QApplication::processEvents();
 }

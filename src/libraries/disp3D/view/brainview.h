@@ -345,9 +345,20 @@ public slots:
 
     //=========================================================================================================
     /**
-     * Save a snapshot of the current view to a file.
+     * Save the current view as ./Screenshots/&lt;date&gt;-&lt;time&gt;-3DView.png, like the other MNE-CPP views.
+     *
+     * @return false if there is no rendered frame or the file cannot be written.
      */
-    void saveSnapshot();
+    bool saveSnapshot();
+
+    //=========================================================================================================
+    /**
+     * Save the current rendered frame to an image file; missing parent directories are created.
+     *
+     * @param[in] fileName   Output file; the format follows the suffix (e.g. .png, .jpg).
+     * @return false if there is no rendered frame or the file cannot be written.
+     */
+    bool takeScreenshot(const QString& fileName);
 
     //=========================================================================================================
     /**
@@ -1301,7 +1312,6 @@ private:
     bool m_sceneDirty = true;                /**< Set when scene needs redraw; cleared after render. */
     qint64 m_cachedVertexCount = 0;          /**< Cached visible vertex count (invalidated on surface changes). */
     bool m_vertexCountDirty = true;          /**< Recount vertices on next FPS update when true. */
-    int m_snapshotCounter = 0;               /**< Sequential counter for snapshot filenames. */
     bool m_infoPanelVisible = true;          /**< Whether the info overlay panel is shown. */
 
     // ── Scene objects ──────────────────────────────────────────────────

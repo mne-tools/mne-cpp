@@ -52,6 +52,9 @@
 #include <QStandardItem>
 #include <QCoreApplication>
 #include <QElapsedTimer>
+#include <QDateTime>
+#include <QDir>
+#include <QFileInfo>
 #include <algorithm>
 #include <cmath>
 
@@ -976,11 +979,26 @@ void BrainView::clearHeadMovementPath()
 
 //=============================================================================================================
 
-void BrainView::saveSnapshot()
+bool BrainView::saveSnapshot()
 {
-    QImage img = grabFramebuffer();
-    QString fileName = QString("snapshot_refactor_%1.png").arg(m_snapshotCounter++, 4, 10, QChar('0'));
-    img.save(fileName);
+    const QDateTime now = QDateTime::currentDateTime();
+    return takeScreenshot(QStringLiteral("./Screenshots/%1-%2-3DView.png").arg(now.toString(QStringLiteral("yyyy_MM_dd")), now.toString(QStringLiteral("hh_mm_ss"))));
+}
+
+//=============================================================================================================
+
+bool BrainView::takeScreenshot(const QString& fileName)
+{
+    const QImage frame = grabFramebuffer();
+    if (frame.isNull()) {
+        qWarning() << "[BrainView::takeScreenshot] No rendered frame - nothing written to" << fileName;
+        return false;
+    }
+    if (!QDir().mkpath(QFileInfo(fileName).absolutePath()) || !frame.save(fileName)) {
+        qWarning() << "[BrainView::takeScreenshot] Cannot write" << fileName;
+        return false;
+    }
+    return true;
 }
 
 //=============================================================================================================
