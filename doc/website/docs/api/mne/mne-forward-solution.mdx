@@ -410,7 +410,7 @@ ToDo move this to [FiffCov](/docs/api/fiff/fiff-cov)
   (optional; default = 10.0).
 
 - **patch_areas** : *const Eigen::MatrixXd &*
-  (optional).
+  (optional) Cortical patch area of each source position (m²); the source gain is divided by it, as in mne.forward.compute_depth_prior.
 
 - **limit_depth_chs** : *bool*
   If True, use only grad channels in depth weighting (equivalent to [`MNE`](/docs/api/mne/mne-class) C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional).

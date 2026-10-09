@@ -808,6 +808,9 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd& Gain, const Fiff
     // Compute the gain matrix
     if (is_fixed_ori) {
         d = G.array().square().colwise().sum().transpose();
+        // A spherical lead field can vanish at the centre
+        const double minNonZero = (d.array() != 0.0).select(d.array(), std::numeric_limits<double>::infinity()).minCoeff();
+        d = (d.array() == 0.0).select(minNonZero, d.array());
     } else {
         qint32 n_pos = G.cols() / 3;
         d = VectorXd::Zero(n_pos);
@@ -819,9 +822,9 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd& Gain, const Fiff
         }
     }
 
-    // ToDo Currently the fwd solns never have "patch_areas" defined
-    if (patch_areas.cols() > 0) {
-        qWarning("\tToDo!!!!! >>> Patch areas taken into account in the depth weighting");
+    if (patch_areas.size() > 0) {
+        d.array() /= patch_areas.reshaped().array().square();
+        qInfo("\tPatch areas taken into account in the depth weighting");
     }
 
     qint32 n_limit;

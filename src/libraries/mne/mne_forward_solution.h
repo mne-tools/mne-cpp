@@ -274,7 +274,8 @@ public:
      * @param[in] is_fixed_ori       Fixed orientation?.
      * @param[in] exp                float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed. (optional; default = 0.8).
      * @param[in] limit              (optional; default = 10.0).
-     * @param[in] patch_areas        (optional).
+     * @param[in] patch_areas        (optional) Cortical patch area of each source position (m²); the source
+     *                               gain is divided by it, as in mne.forward.compute_depth_prior.
      * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional).
      *
      * @return the depth prior.

@@ -27,6 +27,8 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
 
 //=============================================================================================================
 
@@ -163,18 +165,72 @@ private slots:
 
     // ── compute_depth_prior ─────────────────────────────────────────────────
 
+    void testComputeDepthPrior_data()
+    {
+        QTest::addColumn<bool>("fixed");
+        QTest::addColumn<bool>("limitDepthChs");
+        QTest::addColumn<bool>("patches");
+        QTest::addColumn<bool>("zeroSource");
+        QTest::addColumn<double>("sum");
+        QTest::addColumn<double>("first");
+        QTest::addColumn<double>("at300");
+        // mne.forward.compute_depth_prior(exp=0.8, limit=10) on the reference forward (float64), fixed via
+        // convert_forward_solution(surf_ori=True, force_fixed=True); patch areas 1e-4 (1 + 0.5 sin(i)),
+        // "zero": the first source's gain columns set to 0
+        QTest::newRow("free all nopatch") << false << false << false << false << 1184.0195577632926 << 0.07107741995621498 << 0.05195537546353134;
+        QTest::newRow("free all nopatch zero") << false << false << false << true << 1186.806325503424 << 1.0 << 0.05195537546353134;
+        QTest::newRow("free all patch") << false << false << true << false << 3301.162314698329 << 0.18673095543082796 << 0.08555748929128305;
+        QTest::newRow("free all patch zero") << false << false << true << true << 3303.602121832036 << 1.0 << 0.08555748929128305;
+        QTest::newRow("free limited nopatch") << false << true << false << false << 4943.62086633969 << 0.03942008089353401 << 0.05692038612759248;
+        QTest::newRow("free limited nopatch zero") << false << true << false << true << 4946.5026060970085 << 1.0 << 0.05692038612759248;
+        QTest::newRow("free limited patch") << false << true << true << false << 9792.431995152121 << 0.10245099653188249 << 0.092727679766952;
+        QTest::newRow("free limited patch zero") << false << true << true << true << 9795.124642162526 << 1.0 << 0.092727679766952;
+        QTest::newRow("fixed all nopatch") << true << false << false << false << 569.6915446311631 << 0.2221870817099831 << 0.04754109384838697;
+        QTest::newRow("fixed all nopatch zero") << true << false << false << true << 569.9928884859207 << 0.5235309364677159 << 0.04754109384838697;
+        QTest::newRow("fixed all patch") << true << false << true << false << 1514.81271061057 << 0.5578230861724156 << 0.039388414116389533;
+        QTest::newRow("fixed all patch zero") << true << false << true << true << 1515.2548875243979 << 1.0 << 0.03938841411638953;
+        QTest::newRow("fixed limited nopatch") << true << true << false << false << 2425.6244900339702 << 0.05772284507793688 << 0.053175981276141246;
+        QTest::newRow("fixed limited nopatch zero") << true << true << false << true << 2426.5667671888923 << 1.0 << 0.053175981276141246;
+        QTest::newRow("fixed limited patch") << true << true << true << false << 3754.105468584854 << 0.13276900194030072 << 0.04036324933994017;
+        QTest::newRow("fixed limited patch zero") << true << true << true << true << 3754.9726995829133 << 1.0 << 0.04036324933994017;
+    }
+
     void testComputeDepthPrior()
     {
         if (!m_bFwdLoaded)
             QSKIP("Forward solution not loaded");
+        QFETCH(bool, fixed);
+        QFETCH(bool, limitDepthChs);
+        QFETCH(bool, patches);
+        QFETCH(bool, zeroSource);
+        QFETCH(double, sum);
+        QFETCH(double, first);
+        QFETCH(double, at300);
 
-        // Use the forward solution's gain matrix and info from raw file
-        QFile rawFileForDepth(m_sRawFile);
-        FiffRawData rawForDepth(rawFileForDepth);
-        bool isFixed = (m_fwd.source_ori == FIFFV_MNE_FIXED_ORI);
-        FiffCov depthPrior = MNEForwardSolution::compute_depth_prior(
-            m_fwd.sol->data, rawForDepth.info, isFixed, 0.8, 10.0);
-        QVERIFY(depthPrior.dim > 0);
+        QFile file(m_sFwdFile);
+        const MNEForwardSolution fwd = fixed ? MNEForwardSolution(file, true) : m_fwd;
+        MatrixXd gain = fwd.sol->data;
+        if (zeroSource) {
+            gain.leftCols(fixed ? 1 : 3).setZero();
+        }
+        MatrixXd patchAreas;
+        if (patches) {
+            patchAreas = 1e-4 * (1.0 + 0.5 * VectorXd::LinSpaced(fwd.nsource, 0, fwd.nsource - 1).array().sin()).matrix();
+        }
+        // The measurement info restricted to the forward's channels, in its order
+        QFile rawFile(m_sRawFile);
+        const FiffRawData raw(rawFile);
+        Eigen::RowVectorXi sel(fwd.info.ch_names.size());
+        for (int i = 0; i < sel.size(); ++i) {
+            sel(i) = static_cast<int>(raw.info.ch_names.indexOf(fwd.info.ch_names[i]));
+            QVERIFY(sel(i) >= 0);
+        }
+        const FiffInfo info = raw.info.pick_info(sel);
+        const FiffCov prior = MNEForwardSolution::compute_depth_prior(gain, info, fixed, 0.8, 10.0, patchAreas, limitDepthChs);
+        QCOMPARE(static_cast<int>(prior.data.rows()), static_cast<int>(gain.cols()));
+        QVERIFY2(std::abs(prior.data.sum() - sum) < 1e-5 * sum, qPrintable(QString::number(prior.data.sum(), 'g', 17)));
+        QVERIFY2(std::abs(prior.data(0, 0) - first) < 1e-5 * first, qPrintable(QString::number(prior.data(0, 0), 'g', 17)));
+        QVERIFY2(std::abs(prior.data(300, 0) - at300) < 1e-5 * at300, qPrintable(QString::number(prior.data(300, 0), 'g', 17)));
     }
 
     // ── prepare_forward ─────────────────────────────────────────────────────
