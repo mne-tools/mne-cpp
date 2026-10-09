@@ -437,12 +437,11 @@ void WriteToFile::toggleRecordingFile()
 }
 
 //=============================================================================================================
-#include <iostream>
 void WriteToFile::splitRecordingFile()
 {
     //qDebug() << "Split recording file";
     ++m_iSplitCount;
-    QString nextFileName = m_sRecordFileName.remove("_raw.fif");
+    QString nextFileName = QString(m_sRecordFileName).remove("_raw.fif");
     nextFileName += QString("-%1_raw.fif").arg(m_iSplitCount);
 
     //Write the link to the next file
