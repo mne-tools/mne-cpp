@@ -93,9 +93,9 @@ enum class KMeansStart
 /** @brief Action to take when a K-Means cluster becomes empty. */
 enum class KMeansEmptyAction
 {
-    Error,    /**< Treat as an error (default). */
-    Drop,     /**< Drop the empty cluster. */
-    Singleton /**< Replace with the farthest point from its centroid. */
+    Error,    /**< Fail the replicate; calculate() fails if every replicate does. */
+    Drop,     /**< Drop the empty cluster: its centroid and distances become NaN. */
+    Singleton /**< Move the point farthest from its centroid into it (default, as in MATLAB). */
 };
 
 //=============================================================================================================
@@ -121,14 +121,14 @@ public:
      * @param[in] distance   (optional) K-Means distance measure: "sqeuclidean" (default), "cityblock" , "cosine", "correlation", "hamming".
      * @param[in] start      (optional) Cluster initialization: "sample" (default), "uniform", "cluster".
      * @param[in] replicates (optional) Number of K-Means replicates, which are generated. Best is returned.
-     * @param[in] emptyact   (optional) What happens if a cluster goes empty: "error" (default), "drop", "singleton".
+     * @param[in] emptyact   (optional) What happens if a cluster goes empty: "error", "drop", "singleton" (default).
      * @param[in] online     (optional) If centroids should be updated during iterations: true (default), false.
      * @param[in] maxit      (optional) Maximal number of iterations per replicate; 100 by default.
      */
     explicit KMeans(QString distance = QString("sqeuclidean"),
                     QString start = QString("sample"),
                     qint32 replicates = 1,
-                    QString emptyact = QString("error"),
+                    QString emptyact = QString("singleton"),
                     bool online = true,
                     qint32 maxit = 100);
 
@@ -146,7 +146,7 @@ public:
     explicit KMeans(KMeansDistance distance,
                     KMeansStart start = KMeansStart::Sample,
                     qint32 replicates = 1,
-                    KMeansEmptyAction emptyact = KMeansEmptyAction::Error,
+                    KMeansEmptyAction emptyact = KMeansEmptyAction::Singleton,
                     bool online = true,
                     qint32 maxit = 100);
 
@@ -170,7 +170,57 @@ public:
                    Eigen::VectorXd& sumD,
                    Eigen::MatrixXd& D);
 
+    //=========================================================================================================
+    /**
+     * Clusters input data X from given initial centroids (MATLAB's numeric @c Start), running one replicate.
+     *
+     * @param[in] X          Input data (rows = points; cols = p dimensional space).
+     * @param[in] start      Initial centroids k x p; k is the number of clusters.
+     * @param[out] idx       The cluster indices to which cluster the input points belong to.
+     * @param[out] C         Cluster centroids k x p.
+     * @param[out] sumD      Summation of the distances to the centroid within one cluster.
+     * @param[out] D         Cluster distances to the centroid.
+     *
+     * @return true if clustering succeeded, false otherwise.
+     */
+    bool calculate(const Eigen::MatrixXd& X,
+                   const Eigen::MatrixXd& start,
+                   Eigen::VectorXi& idx,
+                   Eigen::MatrixXd& C,
+                   Eigen::VectorXd& sumD,
+                   Eigen::MatrixXd& D);
+
 private:
+    //=========================================================================================================
+    /**
+     * Normalizes rows the way the distance needs: unit length for cosine, centred unit length for correlation.
+     *
+     * @param[in] X  Rows to normalize.
+     *
+     * @return The normalized rows (X itself for the other distances).
+     */
+    Eigen::MatrixXd normalizedRows(const Eigen::MatrixXd& X) const;
+
+    //=========================================================================================================
+    /**
+     * Runs the batch and online phases of one replicate from the centroids in C.
+     *
+     * @param[in] X          Normalized input data.
+     * @param[in, out] C     Initial centroids in, final centroids out (empty clusters NaN).
+     * @param[out] idx       Cluster index of each point.
+     * @param[out] sumD      Within-cluster sums of distances.
+     * @param[out] D         Point-to-centroid distances (empty clusters NaN).
+     * @param[in] rep        Replicate number for messages.
+     *
+     * @return false if a cluster became empty and the empty action is Error.
+     */
+    bool runReplicate(const Eigen::MatrixXd& X,
+                      Eigen::MatrixXd& C,
+                      Eigen::VectorXi& idx,
+                      Eigen::VectorXd& sumD,
+                      Eigen::MatrixXd& D,
+                      qint32 rep);
+
     //=========================================================================================================
     /**
      * Calculate point-to-cluster-centroid distances.
@@ -187,15 +237,17 @@ private:
     /**
      * Batch-update step: reassign all points to nearest centroid and recompute centroids.
      *
-     * @param[in] X          Input data.
-     * @param[in, out] C     Cluster centroids.
-     * @param[in, out] idx   Cluster indices for each point.
+     * @param[in] X           Input data.
+     * @param[in, out] C      Cluster centroids.
+     * @param[in, out] idx    Cluster indices for each point.
+     * @param[out] converged  Whether the reassignments converged.
      *
-     * @return true if converged, false otherwise.
+     * @return false if a cluster became empty and the empty action is Error.
      */
     bool batchUpdate(const Eigen::MatrixXd& X,
                      Eigen::MatrixXd& C,
-                     Eigen::VectorXi& idx);
+                     Eigen::VectorXi& idx,
+                     bool& converged);
 
     //=========================================================================================================
     /**

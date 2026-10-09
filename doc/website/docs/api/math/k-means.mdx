@@ -49,7 +49,7 @@ Constructs a [`KMeans`](/docs/api/math/k-means) algorithm object.
   (optional) Number of K-Means replicates, which are generated. Best is returned.
 
 - **emptyact** : *QString*
-  (optional) What happens if a cluster goes empty: "error" (default), "drop", "singleton".
+  (optional) What happens if a cluster goes empty: "error", "drop", "singleton" (default).
 
 - **online** : *bool*
   (optional) If centroids should be updated during iterations: true (default), false.
@@ -96,6 +96,36 @@ Clusters input data X.
 
 - **kClusters** : *qint32*
   Number of k clusters.
+
+- **idx** : *Eigen::VectorXi &*
+  The cluster indices to which cluster the input points belong to.
+
+- **C** : *Eigen::MatrixXd &*
+  Cluster centroids k x p.
+
+- **sumD** : *Eigen::VectorXd &*
+  Summation of the distances to the centroid within one cluster.
+
+- **D** : *Eigen::MatrixXd &*
+  Cluster distances to the centroid.
+
+**Returns:**
+
+- *bool* — true if clustering succeeded, false otherwise.
+
+---
+
+### calculate(X, start, idx, C, sumD, D)
+
+Clusters input data X from given initial centroids (MATLAB's numeric `Start`), running one replicate.
+
+**Parameters:**
+
+- **X** : *const Eigen::MatrixXd &*
+  Input data (rows = points; cols = p dimensional space).
+
+- **start** : *const Eigen::MatrixXd &*
+  Initial centroids k x p; k is the number of clusters.
 
 - **idx** : *Eigen::VectorXi &*
   The cluster indices to which cluster the input points belong to.
