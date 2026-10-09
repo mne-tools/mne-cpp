@@ -47,7 +47,7 @@ namespace FIFFLIB
  *
  * @return The value with its byte order reversed.
  */
-inline qint16 swap_short(qint16 source)
+[[nodiscard]] inline qint16 swap_short(qint16 source)
 {
     auto* csource = reinterpret_cast<unsigned char*>(&source);
     qint16 result;
@@ -65,7 +65,7 @@ inline qint16 swap_short(qint16 source)
  *
  * @return The value with its byte order reversed.
  */
-inline qint32 swap_int(qint32 source)
+[[nodiscard]] inline qint32 swap_int(qint32 source)
 {
     auto* csource = reinterpret_cast<unsigned char*>(&source);
     qint32 result;
@@ -103,7 +103,7 @@ inline void swap_intp(qint32* source)
  *
  * @return The value with its byte order reversed.
  */
-inline qint64 swap_long(qint64 source)
+[[nodiscard]] inline qint64 swap_long(qint64 source)
 {
     auto* csource = reinterpret_cast<unsigned char*>(&source);
     qint64 result;
@@ -151,7 +151,7 @@ inline void swap_longp(qint64* source)
  *
  * @return The value with its byte order reversed.
  */
-inline float swap_float(float source)
+[[nodiscard]] inline float swap_float(float source)
 {
     auto* csource = reinterpret_cast<unsigned char*>(&source);
     float result;

@@ -295,8 +295,6 @@ bool FsSurface::read(const QString& p_sFile, FsSurface& p_Surface, bool p_bLoadC
 
         t_DataStream >> nvert;
         t_DataStream >> nface;
-        FIFFLIB::swap_int(nvert);
-        FIFFLIB::swap_int(nface);
 
         qInfo("\t%s is a triangle file (nvert = %d ntri = %d)\n", p_sFile.toUtf8().constData(), nvert, nface);
         qInfo("\t%s", s.toUtf8().constData());
@@ -314,7 +312,6 @@ bool FsSurface::read(const QString& p_sFile, FsSurface& p_Surface, bool p_bLoadC
         for (qint32 i = 0; i < nface; ++i) {
             for (qint32 j = 0; j < 3; ++j) {
                 t_DataStream >> iVal;
-                FIFFLIB::swap_int(iVal);
                 faces(i, j) = iVal;
             }
         }
@@ -396,7 +393,6 @@ VectorXf FsSurface::read_curv(const QString& p_sFileName)
         curv.resize(vnum, 1);
         for (qint32 i = 0; i < vnum; ++i) {
             t_DataStream >> iVal;
-            FIFFLIB::swap_short(iVal);
             curv(i) = static_cast<float>(iVal) / 100;
         }
     }
