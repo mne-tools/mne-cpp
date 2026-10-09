@@ -2528,6 +2528,37 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     view.showMultiView();
     QCOMPARE(BrainView().viewMode(), BrainView::MultiView);
     view.showSingleView();
+
+    // Wheel zoom in the single view: zooming out moves the hemisphere's right edge towards the centre,
+    // and the zoom is restored like the rotation when the view is opened again
+    const auto rightEdge = [&](BrainView& target) {
+        QSignalSpy hits(&target, &BrainView::surfacePointClicked);
+        const int y = target.height() / 2;
+        for (int x = target.width() / 2; x < target.width(); x += 2) {
+            QMouseEvent press(QEvent::MouseButtonPress, QPointF(x, y), target.mapToGlobal(QPointF(x, y)), Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+            QMouseEvent release(QEvent::MouseButtonRelease, QPointF(x, y), target.mapToGlobal(QPointF(x, y)), Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+            QApplication::sendEvent(&target, &press);
+            QApplication::sendEvent(&target, &release);
+            if (hits.isEmpty()) {
+                return x;
+            }
+            hits.clear();
+        }
+        return target.width();
+    };
+    const int edgeBefore = rightEdge(view);
+    QWheelEvent zoomOut(QPointF(400, 300), view.mapToGlobal(QPointF(400, 300)), QPoint(), QPoint(0, -720), Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false);
+    QApplication::sendEvent(&view, &zoomOut);
+    const int edgeAfter = rightEdge(view);
+    QVERIFY2(edgeAfter < edgeBefore - 20, qPrintable(QStringLiteral("%1 -> %2").arg(edgeBefore).arg(edgeAfter)));
+
+    BrainView reopened;
+    reopened.setModel(&model);
+    reopened.resize(800, 600);
+    reopened.setCameraFocusOverride(QVector3D(centroid.x(), centroid.y(), centroid.z()), 0.1f);
+    QCOMPARE(rightEdge(reopened), edgeAfter);
+    view.resetSingleViewCameraState();
+    QCOMPARE(rightEdge(view), edgeBefore);
 }
 
 //=============================================================================================================

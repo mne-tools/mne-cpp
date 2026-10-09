@@ -1301,7 +1301,6 @@ private:
     bool m_cameraFocusOverride = false;           /**< When true, m_sceneCenter/m_sceneSize are user-set. */
     QVector3D m_cameraFocusCenter;                /**< Override center (valid when m_cameraFocusOverride). */
     float m_cameraFocusSize = 0.3f;               /**< Override size   (valid when m_cameraFocusOverride). */
-    float m_zoom = 0.0f;                          /**< Zoom level for single-view mode. */
     QPoint m_lastMousePos;                        /**< Previous mouse position for drag deltas. */
     QTimer* m_pAutoRotateTimer = nullptr;         /**< Drives the automated rotation animation. */
 

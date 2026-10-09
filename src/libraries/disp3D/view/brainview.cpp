@@ -1516,7 +1516,7 @@ void BrainView::setViewportCameraPreset(int index, int preset)
 void BrainView::resetSingleViewCameraState()
 {
     m_cameraRotation = QQuaternion();
-    m_zoom = 0.0f;
+    m_singleView.zoom = 0.0f;
     saveMultiViewSettings();
     m_sceneDirty = true;
     update();
@@ -1549,7 +1549,6 @@ void BrainView::resetAllSubViewState()
         m_subViews[i].enabled = wasEnabled;
     }
     m_cameraRotation = QQuaternion();
-    m_zoom = 0.0f;
     saveMultiViewSettings();
     updateOverlayLayout();
     m_sceneDirty = true;
@@ -1858,7 +1857,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
         m_camera.setSceneCenter(effectiveCenter);
         m_camera.setSceneSize(effectiveSize);
         m_camera.setRotation(m_cameraRotation);
-        m_camera.setZoom(m_zoom);
+        m_camera.setZoom(m_singleView.zoom);
         const CameraResult cam = (m_viewMode == MultiView)
             ? m_camera.computeMultiView(sv, aspectRatio)
             : m_camera.computeSingleView(aspectRatio);
@@ -2328,7 +2327,8 @@ void BrainView::wheelEvent(QWheelEvent* event)
             saveMultiViewSettings();
         }
     } else {
-        m_zoom += delta;
+        m_singleView.zoom += delta;
+        saveMultiViewSettings();
     }
     m_sceneDirty = true;
     update();
@@ -3004,7 +3004,7 @@ void BrainView::castRay(const QPoint& pos)
     m_camera.setSceneCenter(effectiveCenter2);
     m_camera.setSceneSize(effectiveSize2);
     m_camera.setRotation(m_cameraRotation);
-    m_camera.setZoom(m_zoom);
+    m_camera.setZoom(m_singleView.zoom);
     const float aspect = float(std::max(1, activePane.width())) / float(std::max(1, activePane.height()));
     const CameraResult cam = (m_viewMode == MultiView)
         ? m_camera.computeMultiView(sv, aspect)
