@@ -31,6 +31,7 @@
 #include <disp3D/model/items/dipoletreeitem.h>
 #include <disp3D/model/items/sourcespacetreeitem.h>
 #include <disp3D/workers/rtsourceinterpolationmatworker.h>
+#include <disp3D/workers/rtsourcedatacontroller.h>
 #include <disp3D/workers/rtsensorinterpolationmatworker.h>
 #include <disp3D/workers/rtsourcedataworker.h>
 #include <disp3D/workers/rtsensordataworker.h>
@@ -520,6 +521,51 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
     QVERIFY(std::fabs(line(0) - 1.0f) < 1e-6f);
     QVERIFY(std::fabs(line(2) - 3.0f) < 1e-6f);
     QVERIFY(line(1) > 1.0f && line(1) < 3.0f);
+
+    // The controller computes the matrices on its worker thread and streams one colour per vertex of each hemisphere
+    RtSourceDataController controller;
+    int nCtrlLh = 0;
+    int nCtrlRh = 0;
+    QVector<uint32_t> colorsLh;
+    QVector<uint32_t> colorsRh;
+    Eigen::VectorXd rawLh;
+    connect(&controller, &RtSourceDataController::newInterpolationMatrixLeftAvailable,
+            [&](const QSharedPointer<Eigen::SparseMatrix<float>>&) { ++nCtrlLh; });
+    connect(&controller, &RtSourceDataController::newInterpolationMatrixRightAvailable,
+            [&](const QSharedPointer<Eigen::SparseMatrix<float>>&) { ++nCtrlRh; });
+    connect(&controller, &RtSourceDataController::newSmoothedDataAvailable,
+            [&](const QVector<uint32_t>& lh, const QVector<uint32_t>& rh) {
+                colorsLh = lh;
+                colorsRh = rh;
+            });
+    connect(&controller, &RtSourceDataController::newRawDataAvailable,
+            [&](const Eigen::VectorXd& lh, const Eigen::VectorXd&) { rawLh = lh; });
+    b.vertices = Eigen::VectorXi::LinSpaced(3, 3, 5);
+    labelIds(3) = 20;
+    controller.setVisualizationType(RtSourceInterpolationMatWorker::AnnotationBased);
+    controller.setAnnotationInfoLeft(labelIds, {a, b}, sources);
+    controller.setAnnotationInfoRight(labelIds, {a, b}, sources);
+    controller.recomputeInterpolation();
+    QTRY_COMPARE(nCtrlLh, 1);
+    QTRY_COMPARE(nCtrlRh, 1);
+    controller.setThresholds(0.0, 0.5, 1.0);
+    controller.setTimeInterval(10);
+    Eigen::VectorXd data(6);
+    data << 0.0, 0.2, 1.0, 0.0, 0.2, 1.0;
+    controller.addData(data);
+    controller.setStreamingState(true);
+    QTRY_COMPARE(colorsLh.size(), 6);
+    QCOMPARE(colorsRh.size(), 6);
+    // Vertices of one label share its mean, so they share a colour; the two labels differ
+    QCOMPARE(colorsLh[1], colorsLh[0]);
+    QCOMPARE(colorsLh[5], colorsLh[3]);
+    QVERIFY(colorsLh[0] != colorsLh[3]);
+    QCOMPARE(colorsRh, colorsLh);
+    controller.setStreamSmoothedData(false);
+    controller.addData(data);
+    QTRY_COMPARE(rawLh.size(), Eigen::Index(3));
+    QCOMPARE(rawLh(2), 1.0);
+    controller.setStreamingState(false);
 
     QApplication::processEvents();
 }
