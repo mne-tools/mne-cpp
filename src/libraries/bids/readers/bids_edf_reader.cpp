@@ -23,6 +23,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QFileInfo>
 #include <QIODevice>
 
 //=============================================================================================================
@@ -136,6 +137,8 @@ bool EDFReader::open(const QString& sFilePath)
         return false;
     }
 
+    // Like mne, the extension decides between EDF (16 bit) and BDF (24 bit)
+    m_iBytesPerSample = QFileInfo(sFilePath).suffix().compare(QLatin1String("bdf"), Qt::CaseInsensitive) == 0 ? 3 : 2;
     parseHeader(&m_file);
     m_bIsOpen = true;
     return true;
@@ -219,7 +222,7 @@ void EDFReader::parseHeader(QIODevice* pDev)
     // Calculate bytes per data record
     m_iNumBytesPerDataRecord = 0;
     for (const auto& ch : m_vAllChannels) {
-        m_iNumBytesPerDataRecord += ch.samplesPerRecord * 2; // 16-bit integers
+        m_iNumBytesPerDataRecord += ch.samplesPerRecord * m_iBytesPerSample;
     }
 
     // Identify measurement channels (those with the highest sample rate)
@@ -307,11 +310,15 @@ MatrixXf EDFReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
             int nSamp = m_vAllChannels[iCh].samplesPerRecord;
             QVector<int> patch(nSamp);
             for (int s = 0; s < nSamp; ++s) {
-                int byteIdx = (iOffset + s) * 2;
-                // 16-bit little-endian signed integer
-                patch[s] = static_cast<int16_t>(
-                    (static_cast<unsigned char>(vRecords[iRec].at(byteIdx + 1)) << 8) |
-                    (static_cast<unsigned char>(vRecords[iRec].at(byteIdx))));
+                // Little-endian signed integers: 16 bit (EDF) or 24 bit (BDF)
+                const auto* bytes = reinterpret_cast<const unsigned char*>(vRecords[iRec].constData()) + (iOffset + s) * m_iBytesPerSample;
+                int value = bytes[0] | (bytes[1] << 8);
+                if (m_iBytesPerSample == 3) {
+                    value |= bytes[2] << 16;
+                    patch[s] = (value & 0x800000) ? value - 0x1000000 : value;
+                } else {
+                    patch[s] = static_cast<int16_t>(value);
+                }
             }
             iOffset += nSamp;
             vRawPatches[iCh] += patch;
@@ -332,13 +339,19 @@ MatrixXf EDFReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
 
     for (int iCh = 0; iCh < vMeasPatches.size(); ++iCh) {
         const EDFChannelInfo& ch = m_vMeasChannels[iCh];
-        float digRange = static_cast<float>(ch.digitalMax - ch.digitalMin);
-        float physRange = ch.physicalMax - ch.physicalMin;
+        const double digRange = static_cast<double>(ch.digitalMax - ch.digitalMin);
+        const double physRange = static_cast<double>(ch.physicalMax) - ch.physicalMin;
+        const bool stim = isAutoStimLabel(ch.label);
 
         for (int s = 0; s < iNumSamples; ++s) {
-            int rawIdx = s + iRelativeFirst;
-            float physVal = static_cast<float>(vMeasPatches[iCh][rawIdx] - ch.digitalMin) / digRange * physRange + ch.physicalMin;
-            result(iCh, s) = physVal * ch.toSi();
+            const int raw = vMeasPatches[iCh][s + iRelativeFirst];
+            // mne read_raw_bdf keeps the raw stim value; both readers keep its low 17 bits
+            if (stim) {
+                const double value = (m_iBytesPerSample == 3) ? raw : (raw - ch.digitalMin) / digRange * physRange + ch.physicalMin;
+                result(iCh, s) = static_cast<float>(static_cast<int>(value) & 0x1FFFF);
+            } else {
+                result(iCh, s) = static_cast<float>(((raw - ch.digitalMin) / digRange * physRange + ch.physicalMin) * ch.toSi());
+            }
         }
     }
 

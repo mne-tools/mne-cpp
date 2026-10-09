@@ -475,18 +475,21 @@ void TestBids::testReadEdf()
     const auto field = [](const QString& s, int width) {
         return s.leftJustified(width, QLatin1Char(' '), true).toLatin1();
     };
-    const QStringList labels{QStringLiteral("EEG Cz"), QStringLiteral("EEG Pz"), QStringLiteral("Temp")};
-    const QStringList dims{QStringLiteral("uV"), QStringLiteral("mV"), QStringLiteral("V")};
-    const QStringList physMin{QStringLiteral("-500.0"), QStringLiteral("-2.0"), QStringLiteral("-1.0")};
-    const QStringList physMax{QStringLiteral("500.0"), QStringLiteral("2.0"), QStringLiteral("1.0")};
-    QByteArray edfBytes = field("0", 8) + field("X X X X", 80) + field("Startdate 01-JAN-2026 X X X", 80) + field("01.01.26", 8) + field("12.00.00", 8) + field("1024", 8) + field("", 44) + field("1", 8) + field("1", 8) + field("3", 4);
-    // Per-signal fields: label, transducer, dimension, physical min/max, digital min/max, prefilter, samples/record, reserved
-    const QList<std::pair<QStringList, int>> columns{{labels, 16}, {QStringList(3), 80}, {dims, 8}, {physMin, 8}, {physMax, 8}, {QStringList(3, "-32768"), 8}, {QStringList(3, "32767"), 8}, {QStringList(3), 80}, {QStringList(3, "4"), 8}, {QStringList(3), 32}};
-    for (const auto& [column, width] : columns) {
-        for (const QString& value : column) {
-            edfBytes += field(value, width);
+    // One data record of 4 samples for 3 signals
+    const auto header = [&field](const QByteArray& version, const QString& reserved, const QStringList& labels, const QStringList& dims,
+                                 const QStringList& physMin, const QStringList& physMax, const QString& digMin, const QString& digMax) {
+        QByteArray bytes = version + field("X X X X", 80) + field("Startdate 01-JAN-2026 X X X", 80) + field("01.01.26", 8) + field("12.00.00", 8) + field("1024", 8) + field(reserved, 44) + field("1", 8) + field("1", 8) + field("3", 4);
+        // Per-signal fields: label, transducer, dimension, physical min/max, digital min/max, prefilter, samples/record, reserved
+        const QList<std::pair<QStringList, int>> columns{{labels, 16}, {QStringList(3), 80}, {dims, 8}, {physMin, 8}, {physMax, 8}, {QStringList(3, digMin), 8}, {QStringList(3, digMax), 8}, {QStringList(3), 80}, {QStringList(3, "4"), 8}, {QStringList(3), 32}};
+        for (const auto& [column, width] : columns) {
+            for (const QString& value : column) {
+                bytes += field(value, width);
+            }
         }
-    }
+        return bytes;
+    };
+    const QStringList labels{QStringLiteral("EEG Cz"), QStringLiteral("EEG Pz"), QStringLiteral("Temp")};
+    QByteArray edfBytes = header(field("0", 8), QString(), labels, {"uV", "mV", "V"}, {"-500.0", "-2.0", "-1.0"}, {"500.0", "2.0", "1.0"}, "-32768", "32767");
     QVERIFY(edfBytes.size() == 1024);
     for (const qint16 value : {-32768, -1000, 0, 32767, 100, 200, -300, 400, -16384, 0, 16384, 32767}) {
         edfBytes.append(char(value & 0xff)).append(char((value >> 8) & 0xff));
@@ -521,6 +524,29 @@ void TestBids::testReadEdf()
     const Eigen::MatrixXf reducedData = reduced.readRawSegment(0, 2);
     QCOMPARE(reducedData(status, 0), 4352.0f);
     QCOMPARE(reducedData(status, 1), 0.0f);
+
+    // BDF stores 24-bit samples; the Status channel keeps the low 17 bits of the raw value (mne read_raw_bdf)
+    QByteArray bdfBytes = header(QByteArray("\xff") + field("BIOSEMI", 7), QStringLiteral("24BIT"), {"EEG Cz", "EXG1", "Status"},
+                                 {"uV", "mV", "Boolean"}, {"-262144", "-262", "-8388608"}, {"262143", "262", "8388607"}, "-8388608", "8388607");
+    for (const qint32 value : {-8388608, -1000, 0, 8388607, 100, -200, 300, -400, 0, -65531, 65539, 8388607}) {
+        bdfBytes.append(char(value & 0xff)).append(char((value >> 8) & 0xff)).append(char((value >> 16) & 0xff));
+    }
+    QFile bdf(dir.filePath(QStringLiteral("synth.bdf")));
+    QVERIFY(bdf.open(QIODevice::WriteOnly));
+    bdf.write(bdfBytes);
+    bdf.close();
+    EDFReader bdfReader;
+    QVERIFY(bdfReader.open(bdf.fileName()));
+    QCOMPARE(bdfReader.getSampleCount(), 4L);
+    QCOMPARE(bdfReader.getInfo().chs[2].kind, FIFFV_STIM_CH);
+    const Eigen::MatrixXd bdfData = bdfReader.readRawSegment(0, 4).cast<double>();
+    Eigen::MatrixXd bdfExpected(3, 4);
+    bdfExpected << -0.262144, -3.1734317286867926e-05, -4.843750288709998e-07, 0.262143,
+        3.1388999902333236e-06, -6.2309507269447055e-06, 9.385467135018676e-06, -1.2477517871730058e-05,
+        0.0, 65541.0, 65539.0, 131071.0;
+    for (int k = 0; k < 3; ++k) {
+        QVERIFY2((bdfData.row(k) - bdfExpected.row(k)).cwiseAbs().maxCoeff() < 1e-6 * bdfExpected.row(k).cwiseAbs().maxCoeff(), qPrintable(QString::number(k)));
+    }
 }
 
 //=============================================================================================================

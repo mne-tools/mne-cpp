@@ -24,8 +24,8 @@
     "by_evidence": {
       "cross-validated-static": 56,
       "cross-validated-live": 2,
-      "tested": 140,
-      "unverified": 161
+      "tested": 141,
+      "unverified": 160
     },
     "by_source": {
       "classes": {
@@ -37,8 +37,8 @@
       "parity": {
         "cross-validated-static": 49,
         "cross-validated-live": 1,
-        "tested": 59,
-        "unverified": 161
+        "tested": 60,
+        "unverified": 160
       }
     },
     "tests_by_relation": {
@@ -1737,11 +1737,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "mne_edf2fiff (CLI) / BIDS reader",
+      "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
       "python": "mne.io.read_raw_bdf",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_bids",
+      "evidence": "tested"
     },
     {
       "source": "parity",

@@ -70,10 +70,10 @@ Optional files include a head shape data file (`.hsp`) and raw data in text form
 
 The digital trigger channel (STI 014) can be synthesized from analog trigger channels using `--stim`, with an adjustable threshold (`--stimthresh`, default 1.0).
 
-### EDF and EDF+ Formats
+### EDF, EDF+, and BDF Formats
 
-Use [`mne_edf2fiff`](tools-edf2fiff) to convert European Data Format (EDF/EDF+, 16-bit) files. Samples are
-scaled to SI units per channel and match `mne.io.read_raw_edf`.
+Use [`mne_edf2fiff`](tools-edf2fiff) to convert European Data Format (EDF/EDF+, 16-bit) and BioSemi BDF (24-bit) files. Samples are
+scaled to SI units per channel and match `mne.io.read_raw_edf` / `mne.io.read_raw_bdf`.
 
 - Only channels at the highest sampling rate are converted
 - `Status`/`Trigger` channels become stim channels; electrode locations are not part of EDF and must be added separately

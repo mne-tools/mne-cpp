@@ -17,7 +17,7 @@ class BIDSLIB::EDFReader
 
 The [`EDFReader`](/docs/api/bids/edf-reader) reads European Data Format (EDF/EDF+) files and exposes them through the [`AbstractFormatReader`](/docs/api/bids/abstract-format-reader) interface.
 
-The EDF specification stores data as 16-bit little-endian integers in fixed-duration "data records", with channels interleaved within each record.
+EDF stores data as 16-bit (BDF: 24-bit) little-endian integers in fixed-duration "data records", with channels interleaved within each record.
 
 ```cpp title="src/examples/ex_bids/main.cpp"
 std::unique_ptr<AbstractFormatReader> edf = BidsRawData::createReader(".edf"); // or construct EDFReader directly

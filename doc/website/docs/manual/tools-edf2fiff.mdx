@@ -8,8 +8,8 @@ sidebar_position: 9
 
 ## Overview
 
-`mne_edf2fiff` converts EDF (European Data Format) and EDF+ files to FIFF. It reads the file with
-`BIDSLIB::EDFReader`, so the samples match `mne.io.read_raw_edf`.
+`mne_edf2fiff` converts EDF (European Data Format), EDF+ and BioSemi BDF files to FIFF. It reads the file with
+`BIDSLIB::EDFReader`, so the samples match `mne.io.read_raw_edf` / `mne.io.read_raw_bdf`.
 
 ## Usage
 
@@ -21,13 +21,13 @@ mne_edf2fiff --fileIn <file> [--fileOut <file>]
 
 | Option | Description |
 |---|---|
-| `--fileIn <file>` | Input EDF file **(required)** |
+| `--fileIn <file>` | Input `.edf` or `.bdf` file **(required)** |
 | `--fileOut <file>` | Output FIFF file (default: same name with `.fif` extension) |
 
 ## Description
 
 Each channel is scaled from its physical dimension (µV, mV, V) to SI units, so voltages are stored in volts.
-Channels named `Status` or `Trigger` become stim channels and are written unscaled. Other channel types are
+Channels named `Status` or `Trigger` become stim channels holding the low 17 bits of their value (the raw value for BDF). Other channel types are
 taken from the label (EEG, ECoG, sEEG, MEG, ECG, EOG, EMG); unrecognised labels are EEG, as in MNE-Python.
 
 ### Limitations

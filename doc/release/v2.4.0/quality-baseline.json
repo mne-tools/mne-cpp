@@ -87,8 +87,8 @@
       "claims_by_evidence": {
         "cross-validated-static": 56,
         "cross-validated-live": 2,
-        "tested": 140,
-        "unverified": 161
+        "tested": 141,
+        "unverified": 160
       }
     }
   }

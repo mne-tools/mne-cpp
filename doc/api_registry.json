@@ -12462,8 +12462,9 @@
       {
         "python": "mne.io.read_raw_bdf",
         "status": "implemented",
-        "mne_cpp": "mne_edf2fiff (CLI) / BIDS reader",
-        "note": "BDF is EDF-family"
+        "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
+        "note": "24-bit BDF samples",
+        "test": "test_bids"
       },
       {
         "python": "mne.io.read_raw_boxy",

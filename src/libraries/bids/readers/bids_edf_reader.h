@@ -7,23 +7,24 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    @ref BIDSLIB::AbstractFormatReader implementation for European Data Format (EDF / EDF+) files.
+ * @brief    @ref BIDSLIB::AbstractFormatReader implementation for European Data Format (EDF / EDF+) and BioSemi BDF files.
  *
  * EDF stores a recording as a fixed-size ASCII header followed by a
  * stream of @c duration_seconds-long "data records"; inside each
  * record the channels appear in order, with each channel contributing
- * @c samples_per_record little-endian @c int16 samples. The header
+ * @c samples_per_record little-endian @c int16 samples (24-bit integers
+ * in a @c .bdf file). The header
  * additionally lists per-channel physical / digital min / max which
  * @ref BIDSLIB::EDFReader uses to derive the affine calibration that
  * converts the on-disk integers back into the channel's physical unit
  * (volts, microvolts, degrees Celsius, …).
  *
- * The reader is the BIDS counterpart of the legacy @c mne_edf2fiff
- * command-line tool, refactored into a reusable library class so the
- * same parser feeds both @ref BIDSLIB::BidsRawData and standalone
- * converters. Each channel is scaled from its physical dimension
+ * The same parser feeds @ref BIDSLIB::BidsRawData and the @c mne_edf2fiff
+ * converter. Each channel is scaled from its physical dimension
  * (µV, mV) into SI units, as in mne read_raw_edf, so voltages emerge
- * in volts, matching the MNE-CPP @c FIFFLIB convention.
+ * in volts, matching the MNE-CPP @c FIFFLIB convention. A "Status" or
+ * "Trigger" channel keeps the low 17 bits of its value (raw for BDF),
+ * as in mne read_raw_edf / read_raw_bdf.
  *
  * Format reference: Kemp & Olivan, "European data format 'plus'
  * (EDF+)", Clin. Neurophysiol. 114 (2003) 1755–1761; spec at
@@ -87,7 +88,7 @@ struct BIDSSHARED_EXPORT EDFChannelInfo
  * @brief The EDFReader reads European Data Format (EDF/EDF+) files and exposes them through
  *        the AbstractFormatReader interface.
  *
- *        The EDF specification stores data as 16-bit little-endian integers in fixed-duration
+ *        EDF stores data as 16-bit (BDF: 24-bit) little-endian integers in fixed-duration
  *        "data records", with channels interleaved within each record.
  *
  * @snippet ex_bids/main.cpp edf_reader_usage
@@ -176,6 +177,7 @@ private:
 
     mutable QFile m_file;
     bool m_bIsOpen{false};
+    int m_iBytesPerSample{2}; // 3 for BDF
 };
 
 } // namespace BIDSLIB
