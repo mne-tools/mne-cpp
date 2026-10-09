@@ -400,6 +400,14 @@ void TestDispViewers3::timeRulerAndOverviewBar_mapSamplesAndPaint()
     ruler.toggleTimeFormat();
     QVERIFY(!ruler.clockTimeFormat());
 
+    // An hour into the recording a 5-sample scroll still moves the event mark 10 px
+    ruler.setSamplesPerPixel(0.5f);
+    ruler.setEvents({TimeRulerEventMark{3600200, Qt::red, QStringLiteral("1")}});
+    ruler.setScrollSample(3600000.0f);
+    const QImage before = ruler.grab().toImage();
+    ruler.setScrollSample(3600005.0f);
+    QVERIFY(ruler.grab().toImage() != before);
+
     OverviewBarWidget bar(m_pHolder.data());
     QSignalSpy scrollSpy(&bar, &OverviewBarWidget::scrollRequested);
     bar.resize(400, bar.sizeHint().height());

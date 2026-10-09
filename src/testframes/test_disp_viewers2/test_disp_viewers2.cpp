@@ -3121,6 +3121,13 @@ void TestDispViewers2::channelRhiView_overlayValues()
     sendMouse(QEvent::MouseButtonRelease, Qt::LeftButton, QPoint(40, 50));
     rhiView->setFrozen(false);
 
+    // An hour into a 1 kHz recording a 5-sample step still scrolls (no relative fuzzy comparison)
+    rhiView->setLastFileSample(10000000);
+    rhiView->setScrollSample(3600000.f);
+    rhiView->setScrollSample(3600005.f);
+    QCOMPARE(qRound(rhiView->scrollSample() - 3600000.f), 5);
+    rhiView->setScrollSample(1000.f);
+
     // Double-click marks the channel under the cursor bad and back
     QVERIFY(!model.channelInfo(0).bad);
     QMouseEvent doubleClick(QEvent::MouseButtonDblClick, QPointF(40, 50), rhiView->mapToGlobal(QPointF(40, 50)),

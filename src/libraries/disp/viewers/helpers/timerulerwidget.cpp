@@ -96,7 +96,8 @@ void TimeRulerWidget::setReferenceMarkers(const QVector<TimeRulerReferenceMark>&
 
 void TimeRulerWidget::setScrollSample(float sample)
 {
-    if (qFuzzyCompare(m_scrollSample, sample))
+    // Exact: a relative fuzzy compare ignores steps below 1e-5 of the position (10 samples at 10^6)
+    if (m_scrollSample == sample)
         return;
     m_scrollSample = sample;
     update();
