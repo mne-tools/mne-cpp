@@ -1,0 +1,10 @@
+{
+  "unix": [
+    "./init.sh",
+    "cmake --build build/developer-dynamic --parallel"
+  ],
+  "windows": [
+    ".\\init.bat",
+    "cmake --build build\\developer-dynamic --parallel"
+  ]
+}

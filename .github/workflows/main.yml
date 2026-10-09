@@ -161,6 +161,14 @@ jobs:
         python3 -m unittest discover -s tools/quality/tests
         python3 tools/quality/validate_test_inventory.py
 
+    # T10.8a: onboarding CI runs the commands the build guide shows, so both must change together.
+    - name: Check documented onboarding commands
+      run: python3 tools/onboarding/extract_setup_commands.py --check
+
+    # Gate G6: the rendered gap analysis must reflect the parity records it is generated from.
+    - name: Check gap analysis is current
+      run: python3 tools/parity/gap_analysis.py --check
+
     # Gate G5: layering violations and dependency cycles are cheap to prevent
     # and expensive to unpick once they have been built on.
     - name: Audit dependency architecture
