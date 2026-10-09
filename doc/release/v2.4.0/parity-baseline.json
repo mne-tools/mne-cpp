@@ -22,10 +22,10 @@
   "summary": {
     "claims": 330,
     "by_evidence": {
-      "cross-validated-static": 89,
+      "cross-validated-static": 90,
       "cross-validated-live": 2,
       "tested": 233,
-      "unverified": 6
+      "unverified": 5
     },
     "by_source": {
       "classes": {
@@ -35,10 +35,10 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 80,
+        "cross-validated-static": 81,
         "cross-validated-live": 1,
         "tested": 154,
-        "unverified": 6
+        "unverified": 5
       }
     },
     "tests_by_relation": {
@@ -1775,8 +1775,8 @@
       "mne_cpp": "INVLIB::applyInverseEpochs",
       "python": "mne.minimum_norm.apply_inverse_epochs",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_inv_eloreta_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

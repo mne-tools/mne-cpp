@@ -12802,7 +12802,8 @@
         "python": "mne.minimum_norm.apply_inverse_epochs",
         "status": "implemented",
         "mne_cpp": "INVLIB::applyInverseEpochs",
-        "note": ""
+        "note": "",
+        "test": "test_inv_eloreta_python"
       },
       {
         "python": "mne.minimum_norm.apply_inverse_raw",

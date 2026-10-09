@@ -439,6 +439,21 @@ void TestInvEloretaPython::applyInverseRaw_matchesPython()
              qPrintable(QString("abs sum %1").arg(stc.data.cwiseAbs().sum(), 0, 'g', 17)));
     QVERIFY(std::fabs(stc.data(10, 5) - value10_5) <= 1e-5 * value10_5);
     QVERIFY(std::fabs(stc.data(60, 50) - value60_50) <= 1e-5 * value60_50);
+
+    // mne.minimum_norm.apply_inverse_epochs uses nave=1 like apply_inverse_raw, so an epoch holding these samples
+    // gets the same values; the second epoch is the same data with the opposite sign
+    MatrixXd segment, times;
+    raw.read_raw_segment(segment, times, from, from + 99, FiffInfo::pick_channels(raw.info.ch_names, m_loose.noise_cov->names));
+    const QList<InvSourceEstimate> epochs = applyInverseEpochs({segment, -segment}, m_loose, 1.0f / 9.0f, method, -0.1f, 0.002f);
+    QCOMPARE(epochs.size(), 2);
+    for (const InvSourceEstimate& epoch : epochs) {
+        QCOMPARE(epoch.tmin, -0.1f);
+        QCOMPARE(epoch.tstep, 0.002f);
+        QVERIFY(std::fabs(epoch.data.cwiseAbs().sum() - absSum) <= 1e-5 * absSum);
+    }
+    QVERIFY(std::fabs(epochs[0].data(10, 5) - value10_5) <= 1e-5 * value10_5);
+    // dSPM/MNE on a free inverse report the norm over the three orientations, so the sign does not change it
+    QVERIFY(std::fabs(epochs[1].data(60, 50) - value60_50) <= 1e-5 * value60_50);
 }
 
 //=============================================================================================================
