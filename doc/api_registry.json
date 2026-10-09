@@ -11837,9 +11837,10 @@
       },
       {
         "python": "mne.channels.read_dig_polhemus_isotrak",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "no .hsp/.elp isotrak reader (the Tufts .elp reader is a different format)"
+        "status": "partial",
+        "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
+        "note": "same points, kinds and idents; electrode names are not kept (FiffDigPointSet has no names)",
+        "test": "test_fiff_dig_point_python"
       },
       {
         "python": "mne.channels.read_layout",
@@ -11850,9 +11851,10 @@
       },
       {
         "python": "mne.channels.read_polhemus_fastscan",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "FastrakParser parses the live serial stream, not files"
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusFastscan",
+        "note": "",
+        "test": "test_fiff_dig_point_python"
       },
       {
         "python": "mne.channels.read_vectorview_selection",

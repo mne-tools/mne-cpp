@@ -9,9 +9,9 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 185,
-      "partial": 84,
-      "missing": 166,
+      "implemented": 186,
+      "partial": 85,
+      "missing": 164,
       "not-applicable": 8
     },
     "by_domain": {
@@ -40,9 +40,9 @@
         "not-applicable": 0
       },
       "channels": {
-        "implemented": 10,
-        "partial": 9,
-        "missing": 22,
+        "implemented": 11,
+        "partial": 10,
+        "missing": 20,
         "not-applicable": 1
       },
       "epochs": {
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 52.2
+    "parity_percent": 52.5
   },
   "apis": [
     {
@@ -1993,6 +1993,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.channels.read_polhemus_fastscan",
+      "name": "read_polhemus_fastscan",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "implemented",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusFastscan",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.channels.rename_channels",
       "name": "rename_channels",
       "submodule": "channels",
@@ -2100,6 +2111,17 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::LayoutLoader::readAsaElcFile",
       "note": ".elc only; no .sfp/.loc/.bvef",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.read_dig_polhemus_isotrak",
+      "name": "read_dig_polhemus_isotrak",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "partial",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
+      "note": "same points, kinds and idents; electrode names are not kept (FiffDigPointSet has no names)",
       "evidence": "parity-record"
     },
     {
@@ -2265,28 +2287,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Localite dig reader not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.read_dig_polhemus_isotrak",
-      "name": "read_dig_polhemus_isotrak",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "no .hsp/.elp isotrak reader (the Tufts .elp reader is a different format)",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.read_polhemus_fastscan",
-      "name": "read_polhemus_fastscan",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "FastrakParser parses the live serial stream, not files",
       "evidence": "parity-record"
     },
     {

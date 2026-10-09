@@ -20,9 +20,9 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 330,
+    "claims": 332,
     "by_evidence": {
-      "cross-validated-static": 90,
+      "cross-validated-static": 92,
       "cross-validated-live": 2,
       "tested": 233,
       "unverified": 5
@@ -35,7 +35,7 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 81,
+        "cross-validated-static": 83,
         "cross-validated-live": 1,
         "tested": 154,
         "unverified": 5
@@ -93,7 +93,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **52.2%",
+      "text": "parity: **52.5%",
       "status": "generated-with-denominator"
     }
   ],
@@ -1100,11 +1100,27 @@
     },
     {
       "source": "parity",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
+      "python": "mne.channels.read_dig_polhemus_isotrak",
+      "claimed": "partial",
+      "test": "test_fiff_dig_point_python",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
       "mne_cpp": "DISPLIB layout I/O",
       "python": "mne.channels.read_layout",
       "claimed": "implemented",
       "test": "test_mne_library",
       "evidence": "tested"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusFastscan",
+      "python": "mne.channels.read_polhemus_fastscan",
+      "claimed": "implemented",
+      "test": "test_fiff_dig_point_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

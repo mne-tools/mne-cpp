@@ -40,6 +40,7 @@
 #include <QSharedPointer>
 #include <QIODevice>
 #include <QList>
+#include <QStringList>
 
 #include "fiff_stream.h"
 #include "fiff_dig_point.h"
@@ -145,6 +146,47 @@ public:
      * @return true if succeeded, false otherwise.
      */
     static bool readFromStream(FiffStream::SPtr& p_Stream, FiffDigPointSet& p_Dig);
+
+    //=========================================================================================================
+    /**
+     * Reads a Polhemus Isotrak digitizer file, as mne.channels.read_dig_polhemus_isotrak does.
+     *
+     * The three fiducials become cardinal points (LPA, nasion, RPA). The remaining
+     * points become HPI coils for an .elp file and head shape points for .hsp/.eeg
+     * files, or EEG electrodes when @p chNames names them. Electrodes are numbered by
+     * the last three characters of their names when all of those are numbers, and
+     * 1..n otherwise. All points are in digitizer coordinates (FIFFV_COORD_UNKNOWN).
+     *
+     * @param[in]  path     The .elp, .hsp or .eeg file.
+     * @param[out] dig      The digitizer points.
+     * @param[in]  chNames  Electrode names, one per non-fiducial point, or empty.
+     * @param[in]  unit     Unit of the file: "m", "cm" or "mm".
+     *
+     * @return false if the file cannot be read, the extension or unit is unknown, or
+     *         the number of names does not match the number of points.
+     */
+    static bool readPolhemusIsotrak(const QString& path,
+                                    FiffDigPointSet& dig,
+                                    const QStringList& chNames = QStringList(),
+                                    const QString& unit = QStringLiteral("m"));
+
+    //=========================================================================================================
+    /**
+     * Reads the points of a Polhemus FastSCAN .txt file in metres, as
+     * mne.channels.read_polhemus_fastscan does.
+     *
+     * @param[in]  path           The .txt file.
+     * @param[out] points         The points, one per row, in digitizer coordinates.
+     * @param[in]  unit           Unit of the file: "m", "cm" or "mm".
+     * @param[in]  requireHeader  Reject files whose "%" header does not name FastSCAN.
+     *
+     * @return false if the file cannot be read, the extension, unit or header is
+     *         wrong, or a row does not hold three numbers.
+     */
+    static bool readPolhemusFastscan(const QString& path,
+                                     Eigen::MatrixX3d& points,
+                                     const QString& unit = QStringLiteral("mm"),
+                                     bool requireHeader = true);
 
     //=========================================================================================================
     /**

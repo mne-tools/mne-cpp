@@ -88,6 +88,11 @@ private slots:
     void allPoints_matchPython();
     void coordFrame_isHeadEverywhere();
     void writeRoundTrip();
+    void polhemusIsotrak_matchesPython_data();
+    void polhemusIsotrak_matchesPython();
+    void polhemusFastscan_matchesPython_data();
+    void polhemusFastscan_matchesPython();
+    void polhemusReaders_rejectBadInput();
 };
 
 //=============================================================================================================
@@ -278,6 +283,165 @@ void TestFiffDigPointPython::coordFrame_isHeadEverywhere()
                                 .arg(p.coord_frame)
                                 .arg(FIFFV_COORD_HEAD)));
     }
+}
+
+//=============================================================================================================
+
+namespace
+{
+
+// The Polhemus fixtures are mne-python's own (mne/io/kit/tests/data, BSD-3-Clause).
+QString polhemusFile(const QString& name)
+{
+    return QStringLiteral(DIG_POLHEMUS_DATA_DIR "/") + name;
+}
+
+using Point = QList<double>;
+
+void compareRows(const Point& actual, const Point& expected, const char* what)
+{
+    for (int c = 0; c < 3; ++c) {
+        QVERIFY2(std::fabs(actual[c] - expected[c]) <= 1e-6 * std::fabs(expected[c]) + 1e-12,
+                 qPrintable(QString("%1[%2] is %3, mne-python says %4").arg(what).arg(c).arg(actual[c], 0, 'g', 10).arg(expected[c], 0, 'g', 10)));
+    }
+}
+
+} // namespace
+
+//=============================================================================================================
+
+void TestFiffDigPointPython::polhemusIsotrak_matchesPython_data()
+{
+    // Reference values produced by mne.channels.read_dig_polhemus_isotrak:
+    // cardinals (LPA, nasion, RPA) first, then the points as HPI coils (.elp),
+    // head shape (.hsp) or, with channel names, EEG electrodes numbered by the
+    // last three characters of the names when all of them are numbers.
+    QTest::addColumn<QString>("file");
+    QTest::addColumn<QStringList>("chNames");
+    QTest::addColumn<QString>("unit");
+    QTest::addColumn<int>("count");
+    QTest::addColumn<QList<int>>("kindIdents");
+    QTest::addColumn<Point>("first");
+    QTest::addColumn<Point>("last");
+    QTest::addColumn<Point>("sum");
+
+    const Point lpa{-2.1075e-04, 8.0793e-02, -7.5894e-19};
+    const Point elpLast{0.10746, -0.034116, 0.031846};
+    const Point elpSum{0.4516462, 0.01879889999999999, 0.07785065};
+    QTest::newRow("elp as HPI") << "test.elp" << QStringList() << "m" << 8
+                                << QList<int>{1, 1, 1, 2, 1, 3, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5} << lpa << elpLast << elpSum;
+    QTest::newRow("elp as named EEG") << "test.elp" << QStringList{"Fp1", "Fp2", "Cz", "O1", "O2"} << "m" << 8
+                                      << QList<int>{1, 1, 1, 2, 1, 3, 3, 1, 3, 2, 3, 3, 3, 4, 3, 5} << lpa << elpLast << elpSum;
+    QTest::newRow("elp as numbered EEG in mm")
+        << "test.elp" << QStringList{"EEG 003", "EEG 007", "EEG 011", "EEG 012", "EEG 020"} << "mm" << 8
+        << QList<int>{1, 1, 1, 2, 1, 3, 3, 3, 3, 7, 3, 11, 3, 12, 3, 20}
+        << Point{-2.1075e-07, 8.0793e-05, -7.5894e-22} << Point{1.0746e-04, -3.4116e-05, 3.1846e-05}
+        << Point{4.516462e-04, 1.8798899999999994e-05, 7.785065e-05};
+    QTest::newRow("hsp as head shape") << "test.hsp" << QStringList() << "m" << 503
+                                       << QList<int>{1, 1, 1, 2, 1, 3, 4, 1, 4, 2, 4, 3, 4, 4} << lpa << Point{0.014196, -0.078057, 0.074778}
+                                       << Point{-6.573226000000002, -37.38123799999998, 37.735278999999984};
+}
+
+//=============================================================================================================
+
+void TestFiffDigPointPython::polhemusIsotrak_matchesPython()
+{
+    QFETCH(QString, file);
+    QFETCH(QStringList, chNames);
+    QFETCH(QString, unit);
+    QFETCH(int, count);
+    QFETCH(QList<int>, kindIdents);
+    QFETCH(Point, first);
+    QFETCH(Point, last);
+    QFETCH(Point, sum);
+
+    FiffDigPointSet dig;
+    QVERIFY(FiffDigPointSet::readPolhemusIsotrak(polhemusFile(file), dig, chNames, unit));
+    QCOMPARE(dig.size(), count);
+    for (int i = 0; i < kindIdents.size() / 2; ++i) {
+        QCOMPARE(dig[i].kind, kindIdents[2 * i]);
+        QCOMPARE(dig[i].ident, kindIdents[2 * i + 1]);
+    }
+    Point total{0.0, 0.0, 0.0};
+    for (int i = 0; i < dig.size(); ++i) {
+        QCOMPARE(dig[i].coord_frame, FIFFV_COORD_UNKNOWN);
+        for (int c = 0; c < 3; ++c)
+            total[c] += dig[i].r[c];
+    }
+    if (kindIdents.size() / 2 < dig.size()) // head shape points are numbered 1..n after the cardinals
+        QCOMPARE(dig[dig.size() - 1].ident, dig.size() - 3);
+    compareRows({dig[0].r[0], dig[0].r[1], dig[0].r[2]}, first, "first point");
+    const FiffDigPoint& end = dig[dig.size() - 1];
+    compareRows({end.r[0], end.r[1], end.r[2]}, last, "last point");
+    compareRows(total, sum, "sum");
+}
+
+//=============================================================================================================
+
+void TestFiffDigPointPython::polhemusFastscan_matchesPython_data()
+{
+    // Reference values produced by mne.channels.read_polhemus_fastscan (millimetres -> metres).
+    QTest::addColumn<QString>("file");
+    QTest::addColumn<int>("count");
+    QTest::addColumn<Point>("first");
+    QTest::addColumn<Point>("last");
+    QTest::addColumn<Point>("sum");
+
+    QTest::newRow("electrodes") << "test_elp.txt" << 8 << Point{0.001393, 0.0131613, -0.0046967}
+                                << Point{-0.0277519, 0.0452628, -0.0222407}
+                                << Point{-0.32169220000000004, 0.05751710000000002, 0.24655119999999997};
+    QTest::newRow("head shape") << "test_hsp.txt" << 500 << Point{-0.10693, 0.0998, 0.06881} << Point{-0.12335, 0.08139, 0.02279}
+                                << Point{-70.54912999999995, 38.24442999999999, 21.787739999999992};
+}
+
+//=============================================================================================================
+
+void TestFiffDigPointPython::polhemusFastscan_matchesPython()
+{
+    QFETCH(QString, file);
+    QFETCH(int, count);
+    QFETCH(Point, first);
+    QFETCH(Point, last);
+    QFETCH(Point, sum);
+
+    Eigen::MatrixX3d points;
+    QVERIFY(FiffDigPointSet::readPolhemusFastscan(polhemusFile(file), points));
+    QCOMPARE(points.rows(), count);
+    compareRows({points(0, 0), points(0, 1), points(0, 2)}, first, "first point");
+    compareRows({points(count - 1, 0), points(count - 1, 1), points(count - 1, 2)}, last, "last point");
+    const Eigen::RowVector3d total = points.colwise().sum();
+    compareRows({total(0), total(1), total(2)}, sum, "sum");
+
+    // In metres the same file is a thousand times larger
+    Eigen::MatrixX3d metres;
+    QVERIFY(FiffDigPointSet::readPolhemusFastscan(polhemusFile(file), metres, QStringLiteral("m")));
+    QVERIFY(metres.isApprox(1000.0 * points));
+}
+
+//=============================================================================================================
+
+void TestFiffDigPointPython::polhemusReaders_rejectBadInput()
+{
+    // Each of these raises in mne-python.
+    FiffDigPointSet dig;
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(polhemusFile("test.elp"), dig, {"Fp1"}));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(polhemusFile("test.elp"), dig, {}, "inch"));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(polhemusFile("test_elp.txt"), dig));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(polhemusFile("missing.hsp"), dig));
+
+    // A FastSCAN file whose header does not name FastSCAN is rejected unless asked not to
+    QTemporaryDir dir;
+    QFile in(polhemusFile("test_elp.txt"));
+    QVERIFY(in.open(QIODevice::ReadOnly));
+    QFile out(dir.filePath("other.txt"));
+    QVERIFY(out.open(QIODevice::WriteOnly));
+    out.write(in.readAll().replace("FastSCAN", "XxxxXXXX"));
+    out.close();
+    Eigen::MatrixX3d points;
+    QVERIFY(!FiffDigPointSet::readPolhemusFastscan(out.fileName(), points));
+    QVERIFY(FiffDigPointSet::readPolhemusFastscan(out.fileName(), points, QStringLiteral("mm"), false));
+    QCOMPARE(points.rows(), 8);
+    QVERIFY(!FiffDigPointSet::readPolhemusFastscan(polhemusFile("test.elp"), points));
 }
 
 //=============================================================================================================

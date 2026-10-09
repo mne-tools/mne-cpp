@@ -36,6 +36,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QRegularExpression>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -170,6 +171,168 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr& p_pStream, FiffDigPointSe
     if (open_here) {
         p_pStream->close();
     }
+    return true;
+}
+
+//=============================================================================================================
+
+namespace
+{
+
+// Metres per file unit, as mne's _check_unit_and_get_scaling; 0 for an unknown unit.
+double unitScale(const QString& unit)
+{
+    if (unit == QLatin1String("m"))
+        return 1.0;
+    if (unit == QLatin1String("cm"))
+        return 1e-2;
+    if (unit == QLatin1String("mm"))
+        return 1e-3;
+    qWarning() << "[FiffDigPointSet] unknown unit" << unit << "(use m, cm or mm)";
+    return 0.0;
+}
+
+// Whitespace-separated numbers; false if any token is not one.
+bool parseNumbers(QStringView text, QList<double>& values)
+{
+    static const QRegularExpression whitespace(QStringLiteral("\\s+"));
+    for (const QStringView token : text.split(whitespace, Qt::SkipEmptyParts)) {
+        bool ok = false;
+        values.append(token.toDouble(&ok));
+        if (!ok)
+            return false;
+    }
+    return true;
+}
+
+// The fiducials (nasion, LPA, RPA) followed by the points, as mne's _read_isotrak_elp_points.
+QList<Vector3d> readIsotrakElp(const QString& text)
+{
+    static const QRegularExpression coordinates(
+        QStringLiteral("(-?\\d+\\.?\\d*e?-?\\d*)\\s+(-?\\d+\\.?\\d*e?-?\\d*)\\s+(-?\\d+\\.?\\d*e?-?\\d*)\\s*$"),
+        QRegularExpression::MultilineOption);
+    QList<Vector3d> points;
+    for (QRegularExpressionMatchIterator it = coordinates.globalMatch(text); it.hasNext();) {
+        const QRegularExpressionMatch match = it.next();
+        points.append(Vector3d(match.captured(1).toDouble(), match.captured(2).toDouble(), match.captured(3).toDouble()));
+    }
+    return points;
+}
+
+// The same for an .hsp/.eeg file, as mne's _read_isotrak_hsp_points; empty on a malformed file.
+QList<Vector3d> readIsotrakHsp(const QString& text)
+{
+    const QStringList lines = text.split(QLatin1Char('\n'));
+    qsizetype line = 0;
+    while (line < lines.size() && !lines[line].toLower().contains(QLatin1String("position of fiducials")))
+        ++line;
+    QList<Vector3d> points;
+    for (int i = 1; i <= 3; ++i) {
+        QList<double> values;
+        if (line + i >= lines.size() || !parseNumbers(QString(lines[line + i]).remove(QLatin1String("%F")), values) || values.size() != 3)
+            return {};
+        points.append(Vector3d(values[0], values[1], values[2]));
+    }
+    // A comment line, then "<number of points> <number of columns>" and the points
+    const qsizetype header = line + 5;
+    if (header >= lines.size())
+        return points;
+    QList<double> shape;
+    if (!parseNumbers(lines[header], shape) || shape.size() != 2 || shape[1] != 3.0)
+        return {};
+    QList<double> values;
+    if (!parseNumbers(lines.mid(header + 1).join(QLatin1Char('\n')), values) || values.size() != 3 * shape[0])
+        return {};
+    for (qsizetype i = 0; i + 2 < values.size(); i += 3)
+        points.append(Vector3d(values[i], values[i + 1], values[i + 2]));
+    return points;
+}
+
+} // namespace
+
+//=============================================================================================================
+
+bool FiffDigPointSet::readPolhemusIsotrak(const QString& path, FiffDigPointSet& dig, const QStringList& chNames, const QString& unit)
+{
+    const QString extension = QLatin1Char('.') + QFileInfo(path).suffix();
+    const double scale = unitScale(unit);
+    QFile file(path);
+    if (scale == 0.0 || !QStringList{".hsp", ".elp", ".eeg"}.contains(extension) || !file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "[FiffDigPointSet::readPolhemusIsotrak] cannot read" << path;
+        return false;
+    }
+    const QString text = QString::fromUtf8(file.readAll());
+    const QList<Vector3d> points = extension == QLatin1String(".elp") ? readIsotrakElp(text) : readIsotrakHsp(text);
+    const qsizetype count = points.size() - 3;
+    if (count < 0 || (!chNames.isEmpty() && chNames.size() != count)) {
+        qWarning() << "[FiffDigPointSet::readPolhemusIsotrak]" << path << "holds" << qMax(count, qsizetype(0)) << "points besides the fiducials, but"
+                   << chNames.size() << "names were given";
+        return false;
+    }
+
+    // Electrodes keep the number at the end of their names when every name has one
+    QList<int> idents;
+    for (const QString& name : chNames) {
+        bool ok = false;
+        idents.append(name.right(3).trimmed().toInt(&ok));
+        if (!ok) {
+            idents.clear();
+            break;
+        }
+    }
+
+    QList<FiffDigPoint> result;
+    const auto append = [&](int kind, int ident, const Vector3d& r) {
+        FiffDigPoint point;
+        point.kind = kind;
+        point.ident = ident;
+        point.coord_frame = FIFFV_COORD_UNKNOWN;
+        for (int c = 0; c < 3; ++c)
+            point.r[c] = static_cast<float>(scale * r[c]);
+        result.append(point);
+    };
+    append(FIFFV_POINT_CARDINAL, FIFFV_POINT_LPA, points[1]);
+    append(FIFFV_POINT_CARDINAL, FIFFV_POINT_NASION, points[0]);
+    append(FIFFV_POINT_CARDINAL, FIFFV_POINT_RPA, points[2]);
+    const int kind = !chNames.isEmpty() ? FIFFV_POINT_EEG : (extension == QLatin1String(".elp") ? FIFFV_POINT_HPI : FIFFV_POINT_EXTRA);
+    for (qsizetype i = 0; i < count; ++i)
+        append(kind, idents.isEmpty() ? static_cast<int>(i) + 1 : idents[i], points[i + 3]);
+    dig = FiffDigPointSet(result);
+    return true;
+}
+
+//=============================================================================================================
+
+bool FiffDigPointSet::readPolhemusFastscan(const QString& path, MatrixX3d& points, const QString& unit, bool requireHeader)
+{
+    const double scale = unitScale(unit);
+    QFile file(path);
+    if (scale == 0.0 || QFileInfo(path).suffix() != QLatin1String("txt") || !file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "[FiffDigPointSet::readPolhemusFastscan] cannot read" << path;
+        return false;
+    }
+    const QStringList lines = QString::fromUtf8(file.readAll()).split(QLatin1Char('\n'));
+
+    QString header;
+    for (qsizetype i = 0; i < lines.size() && lines[i].startsWith(QLatin1Char('%')); ++i)
+        header += lines[i];
+    if (requireHeader && !header.contains(QLatin1String("FastSCAN"))) {
+        qWarning() << "[FiffDigPointSet::readPolhemusFastscan]" << path << "does not contain a valid Polhemus FastSCAN header";
+        return false;
+    }
+
+    QList<double> values;
+    for (const QString& line : lines) {
+        QList<double> row;
+        if (!parseNumbers(line.left(line.indexOf(QLatin1Char('%'))), row) || (!row.isEmpty() && row.size() != 3)) {
+            qWarning() << "[FiffDigPointSet::readPolhemusFastscan]" << path << "has a row that is not three numbers:" << line;
+            return false;
+        }
+        values.append(row);
+    }
+    points.resize(values.size() / 3, 3);
+    for (qsizetype i = 0; i < values.size(); ++i)
+        points(i / 3, i % 3) = scale * values[i];
     return true;
 }
 

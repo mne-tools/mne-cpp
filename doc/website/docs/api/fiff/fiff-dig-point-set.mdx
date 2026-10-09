@@ -281,6 +281,56 @@ Reads [`FiffDigPointSet`](/docs/api/fiff/fiff-dig-point-set) from a fif file.
 
 ---
 
+### readPolhemusIsotrak(path, dig, chNames, unit)
+
+Reads a Polhemus Isotrak digitizer file, as mne.channels.read_dig_polhemus_isotrak does.
+
+The three fiducials become cardinal points (LPA, nasion, RPA). The remaining points become HPI coils for an .elp file and head shape points for .hsp/.eeg files, or EEG electrodes when `chNames` names them. Electrodes are numbered by the last three characters of their names when all of those are numbers, and 1..n otherwise. All points are in digitizer coordinates (FIFFV_COORD_UNKNOWN).
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The .elp, .hsp or .eeg file.
+
+- **dig** : *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) &*
+  The digitizer points.
+
+- **chNames** : *const QStringList &*
+  Electrode names, one per non-fiducial point, or empty.
+
+- **unit** : *const QString &*
+  Unit of the file: "m", "cm" or "mm".
+
+**Returns:**
+
+- *bool* — false if the file cannot be read, the extension or unit is unknown, or the number of names does not match the number of points.
+
+---
+
+### readPolhemusFastscan(path, points, unit, requireHeader)
+
+Reads the points of a Polhemus FastSCAN .txt file in metres, as mne.channels.read_polhemus_fastscan does.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The .txt file.
+
+- **points** : *Eigen::MatrixX3d &*
+  The points, one per row, in digitizer coordinates.
+
+- **unit** : *const QString &*
+  Unit of the file: "m", "cm" or "mm".
+
+- **requireHeader** : *bool*
+  Reject files whose "%" header does not name FastSCAN.
+
+**Returns:**
+
+- *bool* — false if the file cannot be read, the extension, unit or header is wrong, or a row does not hold three numbers.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)

@@ -8,11 +8,11 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **185**
-- Partial: **84**
-- Missing: **166**
+- Implemented: **186**
+- Partial: **85**
+- Missing: **164**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **52.2%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **52.5%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -23,7 +23,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | I/O & Readers | 18 | 2 | 39 | 0 | 59 |
 | Core Data Containers | 40 | 13 | 5 | 3 | 61 |
 | Preprocessing & Artifacts | 10 | 8 | 24 | 1 | 43 |
-| Channels & Montages | 10 | 9 | 22 | 1 | 42 |
+| Channels & Montages | 11 | 10 | 20 | 1 | 42 |
 | Epochs & Evoked | 12 | 2 | 2 | 0 | 16 |
 | Covariance & Whitening | 6 | 1 | 0 | 0 | 7 |
 | Forward Modelling | 27 | 5 | 3 | 0 | 35 |
@@ -155,6 +155,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.channels.make_dig_montage` | partial | FiffDigPointSet(QList<FiffDigPoint>) | no name→position mapping |
 | `mne.channels.read_ch_adjacency` | partial | StatsAdjacency (partial) |  |
 | `mne.channels.read_custom_montage` | partial | UTILSLIB::LayoutLoader::readAsaElcFile | .elc only; no .sfp/.loc/.bvef |
+| `mne.channels.read_dig_polhemus_isotrak` | partial | FIFFLIB::FiffDigPointSet::readPolhemusIsotrak | same points, kinds and idents; electrode names are not kept (FiffDigPointSet has no names) |
 | `mne.channels.read_vectorview_selection` | partial | UTILSLIB::SelectionIO::readMNESelFile | reads .sel; no name filter or space fixing |
 | `mne.read_vectorview_selection` | partial | SelectionIO::readMNESelFile | reads .sel; no name filter or space fixing |
 | `mne.channels.compute_native_head_t` | missing | — | native->head transform not ported |
@@ -170,8 +171,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.channels.read_dig_dat` | missing | — | Neuroscan .dat dig reader not ported |
 | `mne.channels.read_dig_egi` | missing | — | EGI dig reader not ported |
 | `mne.channels.read_dig_localite` | missing | — | Localite dig reader not ported |
-| `mne.channels.read_dig_polhemus_isotrak` | missing | — | no .hsp/.elp isotrak reader (the Tufts .elp reader is a different format) |
-| `mne.channels.read_polhemus_fastscan` | missing | — | FastrakParser parses the live serial stream, not files |
 | `mne.channels.unify_bad_channels` | missing | — |  |
 | `mne.equalize_channels` | missing | — |  |
 | `mne.find_layout` | missing | — |  |
@@ -355,5 +354,5 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 ## Already implemented (do not re-implement)
 
-185 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
+186 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
 
