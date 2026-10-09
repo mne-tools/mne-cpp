@@ -216,12 +216,39 @@ BrainView::~BrainView()
 
 void BrainView::setModel(BrainTreeModel* model)
 {
+    if (model == m_model)
+        return;
+
+    if (m_model) {
+        disconnect(m_model, nullptr, this, nullptr);
+        for (auto it = m_itemSurfaceMap.cbegin(); it != m_itemSurfaceMap.cend(); ++it) {
+            for (auto sit = m_surfaces.begin(); sit != m_surfaces.end();) {
+                sit = (sit.value() == it.value()) ? m_surfaces.erase(sit) : std::next(sit);
+            }
+        }
+        m_itemSurfaceMap.clear();
+        m_itemDipoleMap.clear();
+        m_hoveredItem = nullptr;
+        m_activeSurface.reset();
+    }
+
     m_model = model;
+    if (!m_model) {
+        updateSceneBounds();
+        m_sceneDirty = true;
+        update();
+        return;
+    }
     connect(m_model, &BrainTreeModel::rowsInserted, this, &BrainView::onRowsInserted);
     connect(m_model, &BrainTreeModel::dataChanged, this, &BrainView::onDataChanged);
 
-    // Initial population if not empty?
-    // For now assuming we set model before adding data or iterate.
+    if (m_model->rowCount() > 0) {
+        onRowsInserted(QModelIndex(), 0, m_model->rowCount() - 1);
+    } else {
+        updateSceneBounds();
+        m_sceneDirty = true;
+        update();
+    }
 }
 
 //=============================================================================================================

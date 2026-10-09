@@ -134,9 +134,10 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the data model.
+     * Set the data model and show the objects it already holds. Objects of a previous model are removed
+     * from the view (the previous model is not modified).
      *
-     * @param[in] model      Pointer to BrainTreeModel.
+     * @param[in] model      Pointer to BrainTreeModel, or nullptr to detach.
      */
     void setModel(BrainTreeModel* model);
 

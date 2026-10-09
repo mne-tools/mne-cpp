@@ -63,12 +63,14 @@ Destructor.
 
 ### setModel(model)
 
-Set the data model.
+Set the data model and show the objects it already holds.
+
+Objects of a previous model are removed from the view (the previous model is not modified).
 
 **Parameters:**
 
 - **model** : *[BrainTreeModel](/docs/api/disp3-d/brain-tree-model) **
-  Pointer to [`BrainTreeModel`](/docs/api/disp3-d/brain-tree-model).
+  Pointer to [`BrainTreeModel`](/docs/api/disp3-d/brain-tree-model), or nullptr to detach.
 
 ---
 

@@ -2505,7 +2505,22 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     QCOMPARE(doubleClicked.first().first().value<QVector3D>(), clicked.last().first().value<QVector3D>());
     send(QEvent::MouseButtonDblClick, QPoint(2, 2), Qt::LeftButton);
     QCOMPARE(doubleClicked.size(), 1);
+
     view.showSingleView();
+    view.setVisualizationEditTarget(-1);
+
+    // Switching models drops the old model's objects and stops following it; switching back shows them again
+    centre = view.rect().center();
+    BrainTreeModel emptyModel;
+    view.setModel(&emptyModel);
+    lhItem->setVisible(false);
+    lhItem->setVisible(true);
+    clicked.clear();
+    dragAndRelease(false);
+    QVERIFY(clicked.isEmpty());
+    view.setModel(&model);
+    dragAndRelease(false);
+    QCOMPARE(clicked.size(), 1);
 }
 
 //=============================================================================================================
