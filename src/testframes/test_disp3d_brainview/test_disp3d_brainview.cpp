@@ -1828,6 +1828,11 @@ void TestDisp3dBrainView::brainSurface_advanced()
     surf.setSelectedRegion(-1);
     surf.setUseDefaultColor(true);
     surf.setUseDefaultColor(false);
+    QCOMPARE(surf.vertexDataRef()[1].color, packABGR(255, 255, 255, 255));
+    surf.setColor(QColor(10, 20, 30, 128));
+    QCOMPARE(surf.vertexDataRef()[1].color, packABGR(10, 20, 30, 128));
+    surf.setUseDefaultColor(true);
+    QCOMPARE(surf.vertexDataRef()[1].color, packABGR(10, 20, 30, 128));
     surf.setVisualizationMode(BrainSurface::ModeSurface);
     surf.setVisualizationMode(BrainSurface::ModeScientific);
     surf.setVisualizationMode(BrainSurface::ModeSourceEstimate);

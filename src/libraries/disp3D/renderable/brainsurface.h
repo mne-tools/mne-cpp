@@ -440,6 +440,14 @@ public:
      */
     void setUseDefaultColor(bool useDefault);
 
+    //=========================================================================================================
+    /**
+     * Set the colour of a surface without curvature (BEM, sensors, digitizers, source spaces).
+     *
+     * @param[in] color   New colour; its alpha is the opacity of the holographic shader.
+     */
+    void setColor(const QColor& color);
+
     void setSelected(bool selected);
     bool isSelected() const
     {

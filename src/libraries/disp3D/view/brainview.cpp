@@ -71,6 +71,18 @@ using namespace FIFFLIB;
 namespace DISP3DLIB
 {
 
+namespace
+{
+
+QColor itemColor(const AbstractTreeItem& item)
+{
+    QColor color = item.color();
+    color.setAlphaF(color.alphaF() * item.alpha());
+    return color;
+}
+
+} // namespace
+
 // QSettings is constructed with its default ctor below; it picks up the
 // organisation and application names that each host (mne_align,
 // mne_inspect, ex_disp_3D, ...) sets on QCoreApplication in its main(),
@@ -325,7 +337,7 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
             auto brainSurf = std::make_shared<BrainSurface>();
 
             // Load BEM geometry with color from item
-            brainSurf->fromBemSurface(bemSurfData, bemItem->color());
+            brainSurf->fromBemSurface(bemSurfData, itemColor(*bemItem));
 
             brainSurf->setVisible(bemItem->isVisible());
 
@@ -361,14 +373,14 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
 
             if (parentText.contains("MEG/Grad") && sensItem->hasOrientation()) {
                 brainSurf = MeshFactory::createBarbell(sensItem->position(), sensItem->orientation(),
-                                                       sensItem->color(), sensItem->scale());
+                                                       itemColor(*sensItem), sensItem->scale());
             } else if (parentText.contains("MEG/Mag") && sensItem->hasOrientation()) {
                 brainSurf = MeshFactory::createPlate(sensItem->position(), sensItem->orientation(),
-                                                     sensItem->color(), sensItem->scale());
+                                                     itemColor(*sensItem), sensItem->scale());
             } else {
                 // EEG and other sensors: smooth icosphere
                 brainSurf = MeshFactory::createSphere(sensItem->position(), sensItem->scale(),
-                                                      sensItem->color());
+                                                      itemColor(*sensItem));
             }
 
             brainSurf->setVisible(sensItem->isVisible());
@@ -412,7 +424,7 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
                 continue;
 
             auto brainSurf = MeshFactory::createBatchedSpheres(positions, srcItem->scale(),
-                                                               srcItem->color());
+                                                               itemColor(*srcItem));
             brainSurf->setVisible(srcItem->isVisible());
             m_itemSurfaceMap[item] = brainSurf;
 
@@ -428,7 +440,7 @@ void BrainView::onRowsInserted(const QModelIndex& parent, int first, int last)
                 continue;
 
             auto brainSurf = MeshFactory::createBatchedSpheres(positions, digItem->scale(),
-                                                               digItem->color());
+                                                               itemColor(*digItem));
             brainSurf->setVisible(digItem->isVisible());
 
             // Apply Head-to-MRI transformation if available
@@ -499,8 +511,8 @@ void BrainView::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bot
                     surf->setVisible(absItem->isVisible());
                     m_vertexCountDirty = true;
                 }
-                if (roles.contains(AbstractTreeItem::ColorRole)) {
-                    // Update color (not fully impl in BrainSurface yet for uniform override, but prepared)
+                if ((roles.contains(AbstractTreeItem::ColorRole) || roles.contains(AbstractTreeItem::AlphaRole)) && absItem->color().isValid()) {
+                    surf->setColor(itemColor(*absItem));
                 }
                 if (roles.contains(SurfaceTreeItem::AnnotationDataRole)) {
                     SurfaceTreeItem* sItem = static_cast<SurfaceTreeItem*>(absItem);

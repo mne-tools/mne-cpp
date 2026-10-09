@@ -335,6 +335,15 @@ void BrainSurface::setUseDefaultColor(bool useDefault)
     updateVertexColors();
 }
 
+//=============================================================================================================
+
+void BrainSurface::setColor(const QColor& color)
+{
+    m_defaultColor = color;
+    m_baseColor = color;
+    updateVertexColors();
+}
+
 void BrainSurface::updateVertexColors()
 {
     // ── 1. Populate the primary "color" channel.
