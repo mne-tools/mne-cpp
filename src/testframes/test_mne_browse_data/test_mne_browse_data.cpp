@@ -421,6 +421,9 @@ void TestMneBrowseData::testRawModelWriteFiff()
     QVERIFY(QFile::exists(outPath));
     QFileInfo fi(outPath);
     QVERIFY(fi.size() > 0);
+
+    QFile unwritable(m_tempDir.filePath(QStringLiteral("no/such/dir/out.fif")));
+    QVERIFY(!model.writeFiffData(&unwritable));
 }
 
 void TestMneBrowseData::testRawModelChannelInfo()

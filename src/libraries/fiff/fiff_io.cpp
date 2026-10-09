@@ -245,6 +245,9 @@ bool FiffIO::write_raw(QIODevice& pIODevice,
     SparseMatrix<double> mult;
     RowVectorXi sel;
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(pIODevice, this->m_qlistRaw[idx]->info, cals);
+    if (!outfid) {
+        return false;
+    }
 
     //Setup reading parameters
     fiff_int_t from = m_qlistRaw[idx]->first_samp;

@@ -96,6 +96,10 @@ int main(int argc, char* argv[])
 
     RowVectorXd cals;
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(t_fileOut, raw.info, cals /*, picks*/);
+    if (!outfid) {
+        printf("Cannot write %s\n", t_fileOut.fileName().toUtf8().constData());
+        return -1;
+    }
 
     // Set up the reading parameters
     fiff_int_t from = raw.first_samp;

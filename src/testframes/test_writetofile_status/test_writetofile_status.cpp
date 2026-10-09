@@ -15,8 +15,13 @@
 #include <writetofile/writetofile.h>
 #include <writetofile/FormFiles/writetofilestatuswidget.h>
 
+#include <fiff/fiff_dir_node.h>
+#include <fiff/fiff_stream.h>
+
+#include <QApplication>
 #include <QFile>
 #include <QFileInfo>
+#include <QTimer>
 #include <QObject>
 #include <QRegularExpression>
 #include <QSignalSpy>
@@ -33,6 +38,7 @@ private slots:
     void formatHelpers_produceExpectedStrings();
     void emitRecordingStatus_isRepeatableAndMonotonic();
     void statusWidget_reflectsLatestSummary();
+    void recording_refusesUnwritableFile();
 };
 
 //=============================================================================================================
@@ -154,6 +160,47 @@ void TestWriteToFileStatus::statusWidget_reflectsLatestSummary()
     QVERIFY(!widget.isActive());
     QCOMPARE(widget.currentText(), QStringLiteral("Not recording"));
 }
+
+void TestWriteToFileStatus::recording_refusesUnwritableFile()
+{
+    QTemporaryDir tmpDir;
+    WriteToFile plugin;
+    plugin.m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>::create();
+    plugin.m_pFiffInfo->sfreq = 1000.0;
+    FIFFLIB::FiffChInfo ch;
+    ch.ch_name = QStringLiteral("EEG001");
+    ch.kind = FIFFV_EEG_CH;
+    plugin.m_pFiffInfo->chs << ch;
+    plugin.m_pFiffInfo->ch_names << ch.ch_name;
+    plugin.m_pFiffInfo->nchan = 1;
+    plugin.m_pFiffInfo->dev_head_t.trans(0, 3) = 0.01f; // not identity: no "HPI fitting" question
+    plugin.m_sRecordFileName = tmpDir.filePath(QStringLiteral("no/such/dir/rec_raw.fif"));
+
+    // Starting is refused with a message box instead of writing through a null stream
+    QTimer::singleShot(0, [] {
+        if (QWidget* box = QApplication::activeModalWidget()) {
+            box->close();
+        }
+    });
+    plugin.toggleRecordingFile();
+    QVERIFY(!plugin.m_bWriteToFile);
+    QVERIFY(!plugin.m_pOutfid);
+
+    // A split whose next file cannot be created stops writing instead of crashing
+    QFile first(tmpDir.filePath(QStringLiteral("rec_raw.fif")));
+    plugin.m_pOutfid = FIFFLIB::FiffStream::start_writing_raw(first, *plugin.m_pFiffInfo, plugin.m_mCals);
+    QVERIFY(plugin.m_pOutfid);
+    plugin.m_bWriteToFile = true;
+    QTest::ignoreMessage(QtCriticalMsg, QRegularExpression("Cannot write"));
+    plugin.splitRecordingFile();
+    QVERIFY(!plugin.m_pOutfid);
+    QVERIFY(!plugin.m_bWriteToFile);
+    FIFFLIB::FiffStream finished(&first); // the first file was finished and links to the next one
+    QVERIFY(finished.open());
+    QVERIFY(finished.dirtree()->has_kind(FIFFB_REF));
+}
+
+//=============================================================================================================
 
 QTEST_MAIN(TestWriteToFileStatus)
 #include "test_writetofile_status.moc"

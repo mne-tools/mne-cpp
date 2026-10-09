@@ -173,6 +173,9 @@ void TestFiffIoEvokedInfo::fiffIO_writeRawRoundTrip()
     // Verify the output file exists and is non-empty
     QVERIFY(QFile::exists(outPath));
     QVERIFY(QFileInfo(outPath).size() > 0);
+
+    QFile unwritable(tmpDir.filePath(QStringLiteral("no/such/dir/out.fif")));
+    QVERIFY(!fioIn.write_raw(unwritable, 0));
 }
 
 void TestFiffIoEvokedInfo::fiffIO_setupRead()

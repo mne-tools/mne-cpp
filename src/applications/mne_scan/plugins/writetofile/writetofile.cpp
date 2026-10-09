@@ -347,7 +347,9 @@ void WriteToFile::toggleRecordingFile()
     //Setup writing to file
     if (m_bWriteToFile) {
         m_mutex.lock();
-        m_pOutfid->finish_writing_raw();
+        if (m_pOutfid) {
+            m_pOutfid->finish_writing_raw();
+        }
         m_mutex.unlock();
 
         m_bWriteToFile = false;
@@ -402,6 +404,11 @@ void WriteToFile::toggleRecordingFile()
         m_pOutfid = FiffStream::start_writing_raw(m_qFileOut,
                                                   *m_pFiffInfo,
                                                   m_mCals);
+        if (!m_pOutfid) {
+            m_mutex.unlock();
+            popUp(QStringLiteral("Cannot write %1.").arg(m_sRecordFileName));
+            return;
+        }
 
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
@@ -460,6 +467,12 @@ void WriteToFile::splitRecordingFile()
                                               m_mCals,
                                               sel,
                                               false);
+    if (!m_pOutfid) {
+        qCritical() << "[WriteToFile::splitRecordingFile] Cannot write" << nextFileName << "- recording stopped.";
+        m_bWriteToFile = false;
+        emit recordingActiveChanged(false);
+        return;
+    }
 
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);

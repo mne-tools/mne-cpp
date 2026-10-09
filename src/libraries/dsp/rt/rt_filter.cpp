@@ -96,6 +96,9 @@ bool RTPROCESSINGLIB::filterFile(QIODevice& pIODevice,
     SparseMatrix<double> mult;
     RowVectorXi sel;
     FiffStream::SPtr outfid = FiffStream::start_writing_raw(pIODevice, pFiffRawData->info, cals);
+    if (!outfid) {
+        return false;
+    }
 
     //Setup reading parameters
     fiff_int_t from = pFiffRawData->first_samp;

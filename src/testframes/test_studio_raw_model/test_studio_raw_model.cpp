@@ -140,6 +140,8 @@ void TestStudioRawModel::writeAndReopen()
     QFile outputFile(outputPath);
     QVERIFY(model.writeFiffData(&outputFile));
     QVERIFY(QFileInfo(outputFile).size() > 0);
+    QFile unwritable(temporaryDir.filePath(QStringLiteral("no/such/dir/out.fif")));
+    QVERIFY(!model.writeFiffData(&unwritable));
 
     QFile writtenFile(outputPath);
     RawModel writtenModel(nullptr);

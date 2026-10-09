@@ -207,6 +207,9 @@ private slots:
         outFile.close();
         QVERIFY(ok);
         QVERIFY(QFileInfo(outPath).size() > 0);
+
+        QFile unwritable(tmpDir.filePath(QStringLiteral("no/such/dir/out.fif")));
+        QVERIFY(!filterFile(unwritable, raw, fk, picks));
     }
 };
 

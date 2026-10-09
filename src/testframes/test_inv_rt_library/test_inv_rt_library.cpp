@@ -517,7 +517,7 @@ void TestInvRtLibrary::rtprocessing_filterFile()
 
     bool ok = RTPROCESSINGLIB::filterFile(tmpFile, pRaw, 2, 10.0, 5.0, 2.0,
                                           pRaw->info.sfreq, 512);
-    Q_UNUSED(ok);
+    QVERIFY(ok);
     QVERIFY(tmpFile.size() > 0);
 }
 
