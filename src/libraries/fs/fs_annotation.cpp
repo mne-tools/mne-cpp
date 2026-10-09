@@ -25,6 +25,9 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <algorithm>
+#include <numeric>
+
 #include <QFile>
 #include <QDataStream>
 #include <QFileInfo>
@@ -289,6 +292,7 @@ bool FsAnnotation::toLabels(const FsSurface& p_surf,
 
     //    std::cout << label_ids;
 
+    const qsizetype firstNew = p_qListLabels.size();
     qint32 label_id, count;
     RowVector4i label_rgba;
     VectorXi vertices;
@@ -316,7 +320,7 @@ bool FsAnnotation::toLabels(const FsSurface& p_surf,
         for (qint32 j = 0; j < count; ++j)
             pos.row(j) = vert_pos.row(vertices[j]);
 
-        values = VectorXd::Zero(count);
+        values = VectorXd::Ones(count);
         name = QString("%1-%2").arg(label_names[i]).arg(this->m_iHemi == 0 ? "lh" : "rh");
 
         // put it all together
@@ -359,6 +363,17 @@ bool FsAnnotation::toLabels(const FsSurface& p_surf,
     //# convert tuples to lists
     //labels = list(labels)
     //label_colors = list(label_colors)
+
+    // mne.read_labels_from_annot sorts the labels by name
+    QList<qsizetype> order(p_qListLabels.size() - firstNew);
+    std::iota(order.begin(), order.end(), firstNew);
+    std::sort(order.begin(), order.end(), [&p_qListLabels](qsizetype a, qsizetype b) { return p_qListLabels[a].name < p_qListLabels[b].name; });
+    const QList<FsLabel> labels = p_qListLabels.mid(firstNew);
+    const QList<RowVector4i> rgbas = p_qListLabelRGBAs.mid(firstNew);
+    for (qsizetype k = 0; k < order.size(); ++k) {
+        p_qListLabels[firstNew + k] = labels[order[k] - firstNew];
+        p_qListLabelRGBAs[firstNew + k] = rgbas[order[k] - firstNew];
+    }
 
     qInfo("[done]\n");
 

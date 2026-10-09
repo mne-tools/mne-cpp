@@ -240,7 +240,8 @@ public:
     /**
      * python labels_from_parc
      *
-     * Converts annotation to a label list and colortable
+     * Converts annotation to a label list and colortable, like mne.read_labels_from_annot: one label
+     * per region with vertices, named "<region>-lh|rh", values 1, sorted by name.
      *
      * @param[in] p_surf                 the surface to read the vertex positions from.
      * @param[out] p_qListLabels         the converted labels are appended to a given list. Stored data are not affected.
