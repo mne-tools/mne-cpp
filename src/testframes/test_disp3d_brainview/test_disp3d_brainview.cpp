@@ -486,6 +486,17 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
         QVERIFY(std::fabs(values(v + 3) - 7.0f) < 1e-6f);
     }
 
+    // Labels need not cover the surface (e.g. an unlabelled medial wall): one row per surface vertex
+    // regardless, unlabelled vertices stay at zero
+    b.vertices = Eigen::VectorXi::LinSpaced(2, 4, 5);
+    labelIds(3) = 0;
+    worker.setAnnotationInfoLeft(labelIds, {a, b}, sources);
+    worker.computeInterpolationMatrix();
+    QCOMPARE(lhMat->rows(), Eigen::Index(6));
+    const Eigen::VectorXf partial = *lhMat * Eigen::Vector3f(2.0f, 4.0f, 7.0f);
+    QCOMPARE(partial(3), 0.0f);
+    QVERIFY(std::fabs(partial(5) - 7.0f) < 1e-6f);
+
     // Interpolation mode on a line of 3 vertices with sources at both ends
     Eigen::MatrixX3f rr(3, 3);
     rr << 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.02f, 0.0f, 0.0f;
@@ -498,8 +509,9 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
     worker.setInterpolationInfoLeft(rr, neighbors, ends);
     worker.setVisualizationType(RtSourceInterpolationMatWorker::InterpolationBased);
     worker.setInterpolationFunction(QStringLiteral("linear"));
+    const int nBefore = nLh;
     worker.computeInterpolationMatrix();
-    QCOMPARE(nLh, 2);
+    QCOMPARE(nLh, nBefore + 1);
     QCOMPARE(lhMat->rows(), Eigen::Index(3));
     QCOMPARE(lhMat->cols(), Eigen::Index(2));
     // Source vertices keep their own value; the middle one lies between both

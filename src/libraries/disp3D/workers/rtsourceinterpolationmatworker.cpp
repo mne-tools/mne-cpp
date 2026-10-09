@@ -98,6 +98,7 @@ void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi
 
     QMutexLocker locker(&m_mutex);
     m_lLabelsLh = lLabels;
+    m_nAnnotationVerticesLh = static_cast<int>(vecLabelIds.rows());
     m_mapLabelIdSourcesLh.clear();
     m_vertNosLh.clear();
 
@@ -122,6 +123,7 @@ void RtSourceInterpolationMatWorker::setAnnotationInfoRight(const Eigen::VectorX
 
     QMutexLocker locker(&m_mutex);
     m_lLabelsRh = lLabels;
+    m_nAnnotationVerticesRh = static_cast<int>(vecLabelIds.rows());
     m_mapLabelIdSourcesRh.clear();
     m_vertNosRh.clear();
 
@@ -203,6 +205,7 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
     QMap<qint32, qint32> mapLabelIdSrcLh, mapLabelIdSrcRh;
     QList<int> vertNosLh, vertNosRh;
     bool annotLhInit, annotRhInit;
+    int nAnnotVertsLh, nAnnotVertsRh;
 
     {
         QMutexLocker locker(&m_mutex);
@@ -226,6 +229,8 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
         vertNosRh = m_vertNosRh;
         annotLhInit = m_bAnnotationLhInit;
         annotRhInit = m_bAnnotationRhInit;
+        nAnnotVertsLh = m_nAnnotationVerticesLh;
+        nAnnotVertsRh = m_nAnnotationVerticesRh;
     }
 
     // ── FsAnnotation-based mode ──────────────────────────────────────────
@@ -233,7 +238,7 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
         qDebug() << "RtSourceInterpolationMatWorker: Computing annotation matrices...";
 
         if (annotLhInit) {
-            auto mat = computeAnnotationOperator(labelsLh, mapLabelIdSrcLh, vertNosLh);
+            auto mat = computeAnnotationOperator(labelsLh, mapLabelIdSrcLh, vertNosLh, nAnnotVertsLh);
             if (mat && mat->rows() > 0) {
                 qDebug() << "RtSourceInterpolationMatWorker: LH annotation matrix:"
                          << mat->rows() << "x" << mat->cols();
@@ -242,7 +247,7 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
         }
 
         if (annotRhInit) {
-            auto mat = computeAnnotationOperator(labelsRh, mapLabelIdSrcRh, vertNosRh);
+            auto mat = computeAnnotationOperator(labelsRh, mapLabelIdSrcRh, vertNosRh, nAnnotVertsRh);
             if (mat && mat->rows() > 0) {
                 qDebug() << "RtSourceInterpolationMatWorker: RH annotation matrix:"
                          << mat->rows() << "x" << mat->cols();
@@ -305,20 +310,16 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
 QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeAnnotationOperator(
     const QList<FSLIB::FsLabel>& lLabels,
     const QMap<qint32, qint32>& mapLabelIdSrc,
-    const QList<int>& vertNos)
+    const QList<int>& vertNos,
+    int nVertices)
 {
-    if (lLabels.isEmpty() || vertNos.isEmpty()) {
+    if (lLabels.isEmpty() || vertNos.isEmpty() || nVertices <= 0) {
         return QSharedPointer<Eigen::SparseMatrix<float>>();
     }
 
-    // Count total vertices across all labels
-    int iNumVert = 0;
-    for (int i = 0; i < lLabels.size(); ++i) {
-        iNumVert += lLabels.at(i).vertices.rows();
-    }
-
+    // One row per surface vertex: labels need not cover the surface, and their vertex indices are surface indices
     auto mat = QSharedPointer<Eigen::SparseMatrix<float>>(
-        new Eigen::SparseMatrix<float>(iNumVert, vertNos.size()));
+        new Eigen::SparseMatrix<float>(nVertices, vertNos.size()));
 
     // For each label: assign uniform weight to all its vertices from sources in that label
     for (int i = 0; i < lLabels.size(); ++i) {
@@ -328,7 +329,7 @@ QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::compu
         for (int j = 0; j < label.vertices.rows(); ++j) {
             for (int k = 0; k < listSourcesVertNoLabel.size(); ++k) {
                 int colIdx = vertNos.indexOf(listSourcesVertNoLabel.at(k));
-                if (colIdx >= 0 && label.vertices(j) < iNumVert) {
+                if (colIdx >= 0 && label.vertices(j) >= 0 && label.vertices(j) < nVertices) {
                     mat->coeffRef(label.vertices(j), colIdx) = 1.0f / listSourcesVertNoLabel.size();
                 }
             }

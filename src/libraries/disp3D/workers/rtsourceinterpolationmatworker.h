@@ -242,12 +242,14 @@ private:
      * @param[in] lLabels       FreeSurfer labels.
      * @param[in] mapLabelIdSrc Map from source vertex number to label ID.
      * @param[in] vertNos       List of source vertex numbers.
+     * @param[in] nVertices     Number of surface vertices (rows of the result).
      * @return FsAnnotation matrix (nVertices x nSources).
      */
     static QSharedPointer<Eigen::SparseMatrix<float>> computeAnnotationOperator(
         const QList<FSLIB::FsLabel>& lLabels,
         const QMap<qint32, qint32>& mapLabelIdSrc,
-        const QList<int>& vertNos);
+        const QList<int>& vertNos,
+        int nVertices);
 
     mutable QMutex m_mutex; /**< Protects all data members. */
 
@@ -274,12 +276,14 @@ private:
     QList<FSLIB::FsLabel> m_lLabelsLh;          /**< LH FreeSurfer labels. */
     QMap<qint32, qint32> m_mapLabelIdSourcesLh; /**< LH source vertex → label ID map. */
     QList<int> m_vertNosLh;                     /**< LH source vertex numbers. */
+    int m_nAnnotationVerticesLh = 0;            /**< LH surface vertex count (size of the label-id vector). */
     bool m_bAnnotationLhInit = false;           /**< Whether LH annotation data is set. */
 
     // RH annotation data
     QList<FSLIB::FsLabel> m_lLabelsRh;          /**< RH FreeSurfer labels. */
     QMap<qint32, qint32> m_mapLabelIdSourcesRh; /**< RH source vertex → label ID map. */
     QList<int> m_vertNosRh;                     /**< RH source vertex numbers. */
+    int m_nAnnotationVerticesRh = 0;            /**< RH surface vertex count (size of the label-id vector). */
     bool m_bAnnotationRhInit = false;           /**< Whether RH annotation data is set. */
 };
 
