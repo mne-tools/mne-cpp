@@ -26,6 +26,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_stream.h>
+#include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_info.h>
@@ -602,6 +603,19 @@ void TestFiffStreamPython::refusesUnwritablePath()
     QFile dig(path);
     QVERIFY(!FiffDigPointSet().write(dig));
     QVERIFY(!QFileInfo::exists(path));
+
+    // The channel list, not the nchan field (-1 when never set), decides what is written
+    info.nchan = -1;
+    QFile written(dir.filePath(QStringLiteral("one_channel_raw.fif")));
+    FiffStream::SPtr stream = FiffStream::start_writing_raw(written, info, cals);
+    QVERIFY(stream);
+    QCOMPARE(cals.size(), Eigen::Index(1));
+    stream->write_raw_buffer(MatrixXd::Constant(1, 10, 2e-6), cals);
+    stream->finish_writing_raw();
+    QFile readBack(written.fileName());
+    FiffRawData raw1(readBack);
+    QCOMPARE(raw1.info.nchan, 1);
+    QCOMPARE(raw1.last_samp, 9);
 }
 
 //=============================================================================================================

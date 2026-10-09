@@ -2032,10 +2032,11 @@ FiffStream::SPtr FiffStream::start_writing_raw(QIODevice& p_IODevice,
     //
     fiff_int_t data_type = 4;
 
+    // The channel list is authoritative: nchan is -1 until a reader sets it
     if (sel.cols() == 0) {
-        sel.resize(1, info.nchan);
-        for (qint32 k = 0; k < info.nchan; ++k)
-            sel(0, k) = k; //+1 when MATLAB notation
+        sel.resize(1, info.chs.size());
+        for (qint32 k = 0; k < info.chs.size(); ++k)
+            sel(0, k) = k;
     }
 
     QList<FiffChInfo> chs;
