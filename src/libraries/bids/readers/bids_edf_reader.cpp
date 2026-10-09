@@ -66,21 +66,9 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
             info.kind = FIFFV_MISC_CH;
     }
 
-    QString sUnitUpper = physicalDimension.toUpper();
-    if (sUnitUpper.endsWith("V") || sUnitUpper.endsWith("VOLT")) {
-        info.unit = FIFF_UNIT_V;
-        if (sUnitUpper.startsWith("U") || sUnitUpper.startsWith("MICRO"))
-            info.unit_mul = FIFF_UNITM_MU;
-        else if (sUnitUpper.startsWith("M") || sUnitUpper.startsWith("MILLI"))
-            info.unit_mul = FIFF_UNITM_M;
-        else if (sUnitUpper.startsWith("N") || sUnitUpper.startsWith("NANO"))
-            info.unit_mul = FIFF_UNITM_N;
-        else
-            info.unit_mul = FIFF_UNITM_NONE;
-    } else {
-        info.unit = FIFF_UNIT_NONE;
-        info.unit_mul = FIFF_UNITM_NONE;
-    }
+    // Samples are converted to SI by toSi(), so voltages are stored in V
+    info.unit = (physicalDimension.endsWith(QLatin1Char('V'))) ? FIFF_UNIT_V : FIFF_UNIT_NONE;
+    info.unit_mul = FIFF_UNITM_NONE;
 
     info.cal = 1.0f;
     info.range = 1.0f;
@@ -93,8 +81,20 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
 // EDFReader
 //=============================================================================================================
 
-EDFReader::EDFReader(float fScaleFactor)
-: m_fScaleFactor(fScaleFactor)
+float EDFChannelInfo::toSi() const
+{
+    // mne read_raw_edf: µV (micro sign, Greek mu, Shift-JIS mu) and uV are 1e-6, mV 1e-3, anything else 1
+    const QString& d = physicalDimension;
+    if (d == QStringLiteral("\u03BCV") || d == QStringLiteral("\u00B5V") || d == QLatin1String("\x83\xCAV") || d == QLatin1String("uV"))
+        return 1.0e-6f;
+    if (d == QLatin1String("mV"))
+        return 1.0e-3f;
+    return 1.0f;
+}
+
+//=============================================================================================================
+
+EDFReader::EDFReader()
 {
 }
 
@@ -139,11 +139,11 @@ void EDFReader::parseHeader(QIODevice* pDev)
     m_startDateTime.setDate(QDate::fromString(QString::fromLatin1(pDev->read(STARTDATE)), "dd.MM.yy"));
     m_startDateTime = m_startDateTime.addYears(100);
     m_startDateTime.setTime(QTime::fromString(QString::fromLatin1(pDev->read(STARTTIME)), "hh.mm.ss"));
-    m_iNumBytesInHeader = QString::fromLatin1(pDev->read(NUM_BYTES_HEADER)).toInt();
+    m_iNumBytesInHeader = QString::fromLatin1(pDev->read(NUM_BYTES_HEADER)).trimmed().toInt();
     pDev->read(HEADER_RESERVED);
-    m_iNumDataRecords = QString::fromLatin1(pDev->read(NUM_DATA_RECORDS)).toInt();
-    m_fDataRecordsDuration = QString::fromLatin1(pDev->read(DURATION_DATA_RECS)).toFloat();
-    m_iNumChannels = QString::fromLatin1(pDev->read(NUM_SIGNALS)).toInt();
+    m_iNumDataRecords = QString::fromLatin1(pDev->read(NUM_DATA_RECORDS)).trimmed().toInt();
+    m_fDataRecordsDuration = QString::fromLatin1(pDev->read(DURATION_DATA_RECS)).trimmed().toFloat();
+    m_iNumChannels = QString::fromLatin1(pDev->read(NUM_SIGNALS)).trimmed().toInt();
 
     // Per-channel fields (read in EDF-specified order: all labels, then all transducers, etc.)
     QVector<QString> vLabels, vTransducers, vPhysDims, vPrefilterings;
@@ -157,17 +157,17 @@ void EDFReader::parseHeader(QIODevice* pDev)
     for (int i = 0; i < m_iNumChannels; ++i)
         vPhysDims.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_DIM)).trimmed());
     for (int i = 0; i < m_iNumChannels; ++i)
-        vPhysMins.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_MIN)).toFloat());
+        vPhysMins.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_MIN)).trimmed().toFloat());
     for (int i = 0; i < m_iNumChannels; ++i)
-        vPhysMaxs.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_MAX)).toFloat());
+        vPhysMaxs.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_MAX)).trimmed().toFloat());
     for (int i = 0; i < m_iNumChannels; ++i)
-        vDigMins.push_back(QString::fromLatin1(pDev->read(SIG_DIG_MIN)).toLong());
+        vDigMins.push_back(QString::fromLatin1(pDev->read(SIG_DIG_MIN)).trimmed().toLong());
     for (int i = 0; i < m_iNumChannels; ++i)
-        vDigMaxs.push_back(QString::fromLatin1(pDev->read(SIG_DIG_MAX)).toLong());
+        vDigMaxs.push_back(QString::fromLatin1(pDev->read(SIG_DIG_MAX)).trimmed().toLong());
     for (int i = 0; i < m_iNumChannels; ++i)
         vPrefilterings.push_back(QString::fromLatin1(pDev->read(SIG_PREFILTERING)).trimmed());
     for (int i = 0; i < m_iNumChannels; ++i)
-        vSamplesPerRecord.push_back(QString::fromLatin1(pDev->read(SIG_NUM_SAMPLES)).toLong());
+        vSamplesPerRecord.push_back(QString::fromLatin1(pDev->read(SIG_NUM_SAMPLES)).trimmed().toLong());
     for (int i = 0; i < m_iNumChannels; ++i)
         pDev->read(SIG_RESERVED);
 
@@ -321,10 +321,7 @@ MatrixXf EDFReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
         for (int s = 0; s < iNumSamples; ++s) {
             int rawIdx = s + iRelativeFirst;
             float physVal = static_cast<float>(vMeasPatches[iCh][rawIdx] - ch.digitalMin) / digRange * physRange + ch.physicalMin;
-            if (ch.isMeasurement) {
-                physVal /= m_fScaleFactor;
-            }
-            result(iCh, s) = physVal;
+            result(iCh, s) = physVal * ch.toSi();
         }
     }
 

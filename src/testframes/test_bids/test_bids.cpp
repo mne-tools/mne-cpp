@@ -23,6 +23,7 @@
 #include <bids/bids_raw_data.h>
 #include <bids/bids_global.h>
 #include <bids/readers/bids_brain_vision_reader.h>
+#include <bids/readers/bids_edf_reader.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -456,6 +457,50 @@ void TestBids::testReadEdf()
 
     // Reader should be alive
     QVERIFY(data.reader != nullptr);
+
+    // Samples in volts, as mne.io.read_raw_edf(...).get_data()
+    QCOMPARE(data.reader->getSampleCount(), 1228L);
+    const Eigen::MatrixXd samples = data.reader->readRawSegment(0, 1228).cast<double>();
+    QCOMPARE(samples.rows(), Eigen::Index(25));
+    QVERIFY(std::abs(samples(0, 0) - 0.175940656291) < 1e-7);
+    QVERIFY(std::abs(samples(5, 101) - 0.175486234485) < 1e-7);
+    QVERIFY(std::abs(samples.row(1).cwiseAbs().sum() - 267.274902297948) < 1e-3);
+
+    // Each channel is scaled from its own physical dimension (uV, mV, V), like mne read_raw_edf
+    QTemporaryDir dir;
+    const auto field = [](const QString& s, int width) {
+        return s.leftJustified(width, QLatin1Char(' '), true).toLatin1();
+    };
+    const QStringList labels{QStringLiteral("EEG Cz"), QStringLiteral("EEG Pz"), QStringLiteral("Temp")};
+    const QStringList dims{QStringLiteral("uV"), QStringLiteral("mV"), QStringLiteral("V")};
+    const QStringList physMin{QStringLiteral("-500.0"), QStringLiteral("-2.0"), QStringLiteral("-1.0")};
+    const QStringList physMax{QStringLiteral("500.0"), QStringLiteral("2.0"), QStringLiteral("1.0")};
+    QByteArray edfBytes = field("0", 8) + field("X X X X", 80) + field("Startdate 01-JAN-2026 X X X", 80) + field("01.01.26", 8) + field("12.00.00", 8) + field("1024", 8) + field("", 44) + field("1", 8) + field("1", 8) + field("3", 4);
+    // Per-signal fields: label, transducer, dimension, physical min/max, digital min/max, prefilter, samples/record, reserved
+    const QList<std::pair<QStringList, int>> columns{{labels, 16}, {QStringList(3), 80}, {dims, 8}, {physMin, 8}, {physMax, 8}, {QStringList(3, "-32768"), 8}, {QStringList(3, "32767"), 8}, {QStringList(3), 80}, {QStringList(3, "4"), 8}, {QStringList(3), 32}};
+    for (const auto& [column, width] : columns) {
+        for (const QString& value : column) {
+            edfBytes += field(value, width);
+        }
+    }
+    QVERIFY(edfBytes.size() == 1024);
+    for (const qint16 value : {-32768, -1000, 0, 32767, 100, 200, -300, 400, -16384, 0, 16384, 32767}) {
+        edfBytes.append(char(value & 0xff)).append(char((value >> 8) & 0xff));
+    }
+    QFile mixed(dir.filePath(QStringLiteral("mixed.edf")));
+    QVERIFY(mixed.open(QIODevice::WriteOnly));
+    mixed.write(edfBytes);
+    mixed.close();
+    EDFReader mixedReader;
+    QVERIFY(mixedReader.open(mixed.fileName()));
+    const Eigen::MatrixXd mixedData = mixedReader.readRawSegment(0, 4).cast<double>();
+    Eigen::MatrixXd expected(3, 4);
+    expected << -5e-4, -1.525139238575e-05, 7.629510948334e-09, 5e-4,
+        6.134126802472e-06, 1.223773556115e-05, -1.828030823224e-05, 2.444495307851e-05,
+        -4.999923704891e-01, 1.525902189670e-05, 5.000228885328e-01, 1.0;
+    for (int k = 0; k < 3; ++k) {
+        QVERIFY2((mixedData.row(k) - expected.row(k)).cwiseAbs().maxCoeff() < 1e-4 * expected.row(k).cwiseAbs().maxCoeff(), qPrintable(labels[k])); // float32 reader
+    }
 }
 
 //=============================================================================================================

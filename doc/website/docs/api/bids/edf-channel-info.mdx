@@ -29,6 +29,14 @@ const QVector<EDFChannelInfo> edfChannels = static_cast<EDFReader*>(edf.get())->
 
 ---
 
+### toSi()
+
+**Returns:**
+
+- *float* — Factor from the physical dimension to SI (µV/uV 1e-6, mV 1e-3, otherwise 1), as in mne read_raw_edf.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)

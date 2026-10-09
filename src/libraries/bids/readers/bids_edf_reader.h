@@ -21,10 +21,9 @@
  * The reader is the BIDS counterpart of the legacy @c mne_edf2fiff
  * command-line tool, refactored into a reusable library class so the
  * same parser feeds both @ref BIDSLIB::BidsRawData and standalone
- * converters. The optional @c fScaleFactor constructor argument
- * defaults to @c 1e6 so the canonical microvolt-stored EEG /
- * iEEG channels emerge in volts, matching the MNE-CPP @c FIFFLIB
- * convention.
+ * converters. Each channel is scaled from its physical dimension
+ * (µV, mV) into SI units, as in mne read_raw_edf, so voltages emerge
+ * in volts, matching the MNE-CPP @c FIFFLIB convention.
  *
  * Format reference: Kemp & Olivan, "European data format 'plus'
  * (EDF+)", Clin. Neurophysiol. 114 (2003) 1755–1761; spec at
@@ -78,6 +77,9 @@ struct BIDSSHARED_EXPORT EDFChannelInfo
     bool isMeasurement{false};
 
     FIFFLIB::FiffChInfo toFiffChInfo() const;
+
+    /** @return Factor from the physical dimension to SI (µV/uV 1e-6, mV 1e-3, otherwise 1), as in mne read_raw_edf. */
+    float toSi() const;
 };
 
 //=============================================================================================================
@@ -96,9 +98,8 @@ public:
     //=========================================================================================================
     /**
      * @brief EDFReader Default constructor.
-     * @param[in] fScaleFactor  Raw value scaling factor (default: 1e6 for uV→V conversion).
      */
-    explicit EDFReader(float fScaleFactor = 1e6);
+    EDFReader();
 
     ~EDFReader() override;
 
@@ -157,7 +158,6 @@ private:
 
     void parseHeader(QIODevice* pDev);
 
-    float m_fScaleFactor;
     QString m_sFilePath;
 
     // Header data

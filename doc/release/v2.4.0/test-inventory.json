@@ -265,7 +265,9 @@
       "registry_classes": [
         "BIDSPath",
         "BidsRawData",
-        "BrainVisionReader"
+        "BrainVisionReader",
+        "EDFChannelInfo",
+        "EDFReader"
       ]
     },
     {
