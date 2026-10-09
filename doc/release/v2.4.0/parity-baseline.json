@@ -22,23 +22,23 @@
   "summary": {
     "claims": 361,
     "by_evidence": {
-      "cross-validated-static": 58,
+      "cross-validated-static": 66,
       "cross-validated-live": 2,
-      "tested": 141,
-      "unverified": 160
+      "tested": 139,
+      "unverified": 154
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 7,
+        "cross-validated-static": 9,
         "cross-validated-live": 1,
-        "tested": 81,
+        "tested": 79,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 51,
+        "cross-validated-static": 57,
         "cross-validated-live": 1,
         "tested": 60,
-        "unverified": 160
+        "unverified": 154
       }
     },
     "tests_by_relation": {
@@ -55,6 +55,7 @@
         "test_fiff_raw_save_python",
         "test_fiff_stream_python",
         "test_filtering",
+        "test_fs_annotation_labels",
         "test_fs_io",
         "test_fwd_bem_driver_python",
         "test_fwd_python",
@@ -727,7 +728,7 @@
       "python": "mne.read_annot",
       "claimed": "implemented",
       "test": "test_fs_annotation_labels",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -735,7 +736,7 @@
       "python": "mne.read_label",
       "claimed": "implemented",
       "test": "test_fs_annotation_labels",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -862,8 +863,8 @@
       "mne_cpp": "Label (FSLIB)",
       "python": "mne.Label",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fs_annotation_labels",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1870,8 +1871,8 @@
       "mne_cpp": "mne_setup_forward_model (CLI)",
       "python": "mne.make_bem_solution",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fwd_bem_driver_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2190,8 +2191,8 @@
       "mne_cpp": "FWDLIB BEM",
       "python": "mne.read_bem_solution",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fwd_bem_driver_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2262,16 +2263,16 @@
       "mne_cpp": "Label::read (FSLIB)",
       "python": "mne.read_label",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_mne_label_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_annot2labels (CLI) / FSLIB",
       "python": "mne.read_labels_from_annot",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fs_annotation_labels",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2494,8 +2495,8 @@
       "mne_cpp": "FSLIB (partial)",
       "python": "mne.split_label",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_fs_annotation_labels",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

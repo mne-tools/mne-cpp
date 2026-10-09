@@ -269,8 +269,8 @@ private slots:
         QVERIFY(ok);
         QCOMPARE(labels.size(), rgbas.size());
 
-        // mne.read_labels_from_annot("sample", "aparc", hemi="lh", surf_name="white"): 34 labels sorted by
-        // name, values all 1, positions in metres
+        // Reference values produced by mne.read_labels_from_annot("sample", "aparc", hemi="lh", surf_name="white"):
+        // 34 labels sorted by name, values all 1, positions in metres
         QCOMPARE(labels.size(), 34);
         QCOMPARE(labels.first().name, QStringLiteral("bankssts-lh"));
         QCOMPARE(labels.first().vertices.size(), Eigen::Index(1604));

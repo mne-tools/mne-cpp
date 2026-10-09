@@ -11487,7 +11487,8 @@
         "python": "mne.Label",
         "status": "implemented",
         "mne_cpp": "Label (FSLIB)",
-        "note": "cortical ROI"
+        "note": "cortical ROI",
+        "test": "test_fs_annotation_labels"
       },
       {
         "python": "mne.MixedSourceEstimate",
@@ -12669,7 +12670,8 @@
         "python": "mne.make_bem_solution",
         "status": "implemented",
         "mne_cpp": "mne_setup_forward_model (CLI)",
-        "note": ""
+        "note": "",
+        "test": "test_fwd_bem_driver_python"
       },
       {
         "python": "mne.make_field_map",
@@ -13156,7 +13158,8 @@
         "python": "mne.read_bem_solution",
         "status": "implemented",
         "mne_cpp": "FWDLIB BEM",
-        "note": ""
+        "note": "",
+        "test": "test_fwd_bem_driver_python"
       },
       {
         "python": "mne.read_bem_surfaces",
@@ -13251,13 +13254,15 @@
         "python": "mne.read_label",
         "status": "implemented",
         "mne_cpp": "Label::read (FSLIB)",
-        "note": ""
+        "note": "",
+        "test": "test_mne_label_python"
       },
       {
         "python": "mne.read_labels_from_annot",
         "status": "implemented",
         "mne_cpp": "mne_annot2labels (CLI) / FSLIB",
-        "note": ""
+        "note": "",
+        "test": "test_fs_annotation_labels"
       },
       {
         "python": "mne.read_lta",
@@ -13548,7 +13553,8 @@
         "python": "mne.split_label",
         "status": "partial",
         "mne_cpp": "FSLIB (partial)",
-        "note": "split limited"
+        "note": "split limited",
+        "test": "test_fs_annotation_labels"
       },
       {
         "python": "mne.stats.bonferroni_correction",
