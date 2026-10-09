@@ -57,4 +57,5 @@ mne_add_test(${PROJECT_NAME}
     LABELS integration
     TIMEOUT 60
     REQUIRES_DATA
-        mne-cpp-test-data/BIDS)
+        mne-cpp-test-data/BIDS
+        mne-cpp-test-data/EEG)

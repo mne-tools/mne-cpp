@@ -505,6 +505,22 @@ void TestBids::testReadEdf()
     for (int k = 0; k < 3; ++k) {
         QVERIFY2((mixedData.row(k) - expected.row(k)).cwiseAbs().maxCoeff() < 1e-4 * expected.row(k).cwiseAbs().maxCoeff(), qPrintable(labels[k])); // float32 reader
     }
+
+    // Like mne read_raw_edf: unrecognised labels are EEG; "Status" is an unscaled stim channel
+    EDFReader reduced;
+    QVERIFY(reduced.open(dataPath() + QStringLiteral("EEG/test_reduced.edf")));
+    const FIFFLIB::FiffInfo reducedInfo = reduced.getInfo();
+    const int a4 = reducedInfo.ch_names.indexOf(QStringLiteral("A4"));
+    const int status = reducedInfo.ch_names.indexOf(QStringLiteral("Status"));
+    QVERIFY(a4 < 0 && status >= 0); // A4 is sampled below the highest rate
+    const int a10 = reducedInfo.ch_names.indexOf(QStringLiteral("A10"));
+    QCOMPARE(reducedInfo.chs[a10].kind, FIFFV_EEG_CH);
+    QCOMPARE(reducedInfo.chs[a10].unit, FIFF_UNIT_V);
+    QCOMPARE(reducedInfo.chs[status].kind, FIFFV_STIM_CH);
+    QCOMPARE(reducedInfo.chs[status].unit, FIFF_UNIT_NONE);
+    const Eigen::MatrixXf reducedData = reduced.readRawSegment(0, 2);
+    QCOMPARE(reducedData(status, 0), 4352.0f);
+    QCOMPARE(reducedData(status, 1), 0.0f);
 }
 
 //=============================================================================================================

@@ -37,6 +37,19 @@ using namespace Eigen;
 // EDFChannelInfo
 //=============================================================================================================
 
+namespace
+{
+
+// mne read_raw_edf stim_channel="auto"
+bool isAutoStimLabel(const QString& label)
+{
+    return label.compare(QLatin1String("status"), Qt::CaseInsensitive) == 0 || label.compare(QLatin1String("trigger"), Qt::CaseInsensitive) == 0;
+}
+
+} // namespace
+
+//=============================================================================================================
+
 FiffChInfo EDFChannelInfo::toFiffChInfo() const
 {
     FiffChInfo info;
@@ -47,6 +60,8 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
     QString sLabelUpper = label.toUpper();
     if (!isMeasurement) {
         info.kind = sLabelUpper.contains("STIM") ? FIFFV_STIM_CH : FIFFV_MISC_CH;
+    } else if (isAutoStimLabel(label)) {
+        info.kind = FIFFV_STIM_CH;
     } else {
         if (sLabelUpper.contains("ECOG"))
             info.kind = FIFFV_ECOG_CH;
@@ -63,11 +78,11 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
         else if (sLabelUpper.contains("EMG"))
             info.kind = FIFFV_EMG_CH;
         else
-            info.kind = FIFFV_MISC_CH;
+            info.kind = FIFFV_EEG_CH;
     }
 
     // Samples are converted to SI by toSi(), so voltages are stored in V
-    info.unit = (physicalDimension.endsWith(QLatin1Char('V'))) ? FIFF_UNIT_V : FIFF_UNIT_NONE;
+    info.unit = (info.kind != FIFFV_STIM_CH && physicalDimension.endsWith(QLatin1Char('V'))) ? FIFF_UNIT_V : FIFF_UNIT_NONE;
     info.unit_mul = FIFF_UNITM_NONE;
 
     info.cal = 1.0f;
@@ -84,6 +99,8 @@ FiffChInfo EDFChannelInfo::toFiffChInfo() const
 float EDFChannelInfo::toSi() const
 {
     // mne read_raw_edf: µV (micro sign, Greek mu, Shift-JIS mu) and uV are 1e-6, mV 1e-3, anything else 1
+    if (isAutoStimLabel(label))
+        return 1.0f;
     const QString& d = physicalDimension;
     if (d == QStringLiteral("\u03BCV") || d == QStringLiteral("\u00B5V") || d == QLatin1String("\x83\xCAV") || d == QLatin1String("uV"))
         return 1.0e-6f;

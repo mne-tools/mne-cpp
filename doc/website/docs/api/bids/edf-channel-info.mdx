@@ -33,7 +33,7 @@ const QVector<EDFChannelInfo> edfChannels = static_cast<EDFReader*>(edf.get())->
 
 **Returns:**
 
-- *float* — Factor from the physical dimension to SI (µV/uV 1e-6, mV 1e-3, otherwise 1), as in mne read_raw_edf.
+- *float* — Factor from the physical dimension to SI (µV/uV 1e-6, mV 1e-3, otherwise 1; 1 for a "Status"/"Trigger" stim channel), as in mne read_raw_edf.
 
 ---
 

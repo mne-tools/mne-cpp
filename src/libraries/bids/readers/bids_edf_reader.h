@@ -78,7 +78,7 @@ struct BIDSSHARED_EXPORT EDFChannelInfo
 
     FIFFLIB::FiffChInfo toFiffChInfo() const;
 
-    /** @return Factor from the physical dimension to SI (µV/uV 1e-6, mV 1e-3, otherwise 1), as in mne read_raw_edf. */
+    /** @return Factor from the physical dimension to SI (µV/uV 1e-6, mV 1e-3, otherwise 1; 1 for a "Status"/"Trigger" stim channel), as in mne read_raw_edf. */
     float toSi() const;
 };
 
