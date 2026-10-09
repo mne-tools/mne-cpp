@@ -20,7 +20,6 @@
 #include <cmath>
 #include <QQuaternion>
 #include <QRandomGenerator>
-#include <QDebug>
 
 namespace DISP3DLIB
 {
@@ -67,37 +66,16 @@ void DipoleObject::load(const INVLIB::InvEcdSet& ecdSet)
 
     QVector3D from(0.0f, 1.0f, 0.0f); // Cone points up Y axis
 
-    if (ecdSet.size() > 0) {
-        qDebug() << "DipoleObject: First dipole raw pos:" << ecdSet[0].rd(0) << ecdSet[0].rd(1) << ecdSet[0].rd(2);
-    }
-
-    // Heuristic: Check if coordinates are likely in mm (e.g., > 1.0 or similar)
-    // Head model is usually < 0.2m radius. If values are > 0.5, they are likely mm or cm.
-    // sample data is ~44.56 mm.
-    float unitScale = 1.0f;
-    float maxCoord = 0.0f;
     float maxMag = 0.0f;
-
     for (int i = 0; i < ecdSet.size(); ++i) {
-        maxCoord = std::max(maxCoord, std::abs(ecdSet[i].rd(0)));
-        maxCoord = std::max(maxCoord, std::abs(ecdSet[i].rd(1)));
-        maxCoord = std::max(maxCoord, std::abs(ecdSet[i].rd(2)));
-
         float mag = std::sqrt(std::pow(ecdSet[i].Q(0), 2) + std::pow(ecdSet[i].Q(1), 2) + std::pow(ecdSet[i].Q(2), 2));
         maxMag = std::max(maxMag, mag);
     }
 
-    if (maxCoord > 5.0f) {
-        unitScale = 0.001f; // Convert mm to meters
-        qDebug() << "DipoleObject: Detected large coordinates (max" << maxCoord << "), applying mm->m scale (0.001).";
-    }
-
-    qDebug() << "DipoleObject: Loading" << m_instanceCount << "dipoles with scale" << unitScale;
-
     for (int i = 0; i < ecdSet.size(); ++i) {
         const auto& dip = ecdSet[i];
 
-        QVector3D pos(dip.rd(0) * unitScale, dip.rd(1) * unitScale, dip.rd(2) * unitScale);
+        QVector3D pos(dip.rd(0), dip.rd(1), dip.rd(2));
         QVector3D Q(dip.Q(0), dip.Q(1), dip.Q(2));
         float mag = Q.length();
 
@@ -136,14 +114,6 @@ void DipoleObject::load(const INVLIB::InvEcdSet& ecdSet)
         data[i].isSelected = 0.0f;
     }
 
-    if (m_instanceCount > 0) {
-        InstanceData* firstData = reinterpret_cast<InstanceData*>(m_instanceData.data());
-        float x = firstData[0].model[12];
-        float y = firstData[0].model[13];
-        float z = firstData[0].model[14];
-        qDebug() << "DipoleObject: First dipole initial pos (Scaled):" << x << y << z;
-    }
-
     m_instancesDirty = true;
 }
 
@@ -160,17 +130,6 @@ void DipoleObject::applyTransform(const QMatrix4x4& trans)
         for (int j = 0; j < 16; ++j) {
             data[i].model[j] = newPtr[j];
         }
-    }
-
-    if (m_instanceCount > 0) {
-        // Log first instance pos
-        InstanceData* firstData = reinterpret_cast<InstanceData*>(m_instanceData.data());
-        // Matrix is column major? No, we stored it as we got it from QMatrix4x4.constData(), which is Column-Major.
-        // Translation is in the last column (indices 12, 13, 14).
-        float x = firstData[0].model[12];
-        float y = firstData[0].model[13];
-        float z = firstData[0].model[14];
-        qDebug() << "DipoleObject: First dipole transformed pos (Meters):" << x << y << z;
     }
 
     m_instancesDirty = true;
@@ -307,12 +266,10 @@ void DipoleObject::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
         if (!m_gpu->vertexBuffer) {
             m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_vertexData.size()));
             m_gpu->vertexBuffer->create();
-            qDebug() << "DipoleObject: Created vertex buffer size" << m_vertexData.size();
         }
         if (!m_gpu->indexBuffer) {
             m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_indexData.size()));
             m_gpu->indexBuffer->create();
-            qDebug() << "DipoleObject: Created index buffer size" << m_indexData.size();
         }
         u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
         u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
@@ -323,7 +280,6 @@ void DipoleObject::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
         if (!m_gpu->instanceBuffer || static_cast<qsizetype>(m_gpu->instanceBuffer->size()) < m_instanceData.size()) {
             m_gpu->instanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, m_instanceData.size()));
             m_gpu->instanceBuffer->create();
-            qDebug() << "DipoleObject: Created instance buffer size" << m_instanceData.size();
         }
         u->updateDynamicBuffer(m_gpu->instanceBuffer.get(), 0, m_instanceData.size(), m_instanceData.constData());
         m_instancesDirty = false;
