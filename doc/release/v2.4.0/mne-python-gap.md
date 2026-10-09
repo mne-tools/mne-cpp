@@ -8,11 +8,11 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **191**
-- Partial: **85**
-- Missing: **159**
+- Implemented: **198**
+- Partial: **101**
+- Missing: **136**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **53.7%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **57.1%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -22,17 +22,17 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 |---|---:|---:|---:|---:|---:|
 | I/O & Readers | 18 | 2 | 39 | 0 | 59 |
 | Core Data Containers | 40 | 13 | 5 | 3 | 61 |
-| Preprocessing & Artifacts | 10 | 8 | 24 | 1 | 43 |
+| Preprocessing & Artifacts | 13 | 12 | 17 | 1 | 43 |
 | Channels & Montages | 16 | 10 | 15 | 1 | 42 |
-| Epochs & Evoked | 12 | 2 | 2 | 0 | 16 |
+| Epochs & Evoked | 13 | 2 | 1 | 0 | 16 |
 | Covariance & Whitening | 6 | 1 | 0 | 0 | 7 |
-| Forward Modelling | 27 | 5 | 3 | 0 | 35 |
-| Inverse & Source Estimation | 29 | 12 | 19 | 0 | 60 |
+| Forward Modelling | 27 | 7 | 1 | 0 | 35 |
+| Inverse & Source Estimation | 31 | 16 | 13 | 0 | 60 |
 | Source Space & Morphing | 15 | 5 | 7 | 0 | 27 |
-| Time-Frequency | 6 | 20 | 15 | 0 | 41 |
+| Time-Frequency | 6 | 22 | 13 | 0 | 41 |
 | Decoding & Machine Learning | 4 | 6 | 12 | 2 | 24 |
-| Statistics | 8 | 1 | 8 | 0 | 17 |
-| Simulation | 0 | 0 | 10 | 0 | 10 |
+| Statistics | 9 | 2 | 6 | 0 | 17 |
+| Simulation | 0 | 3 | 7 | 0 | 10 |
 | Visualisation | 0 | 0 | 0 | 1 | 1 |
 
 ## Gaps (missing / partial), grouped by domain
@@ -111,29 +111,28 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
+| `mne.preprocessing.EOGRegression` | partial | UTILSLIB::EogRegression | matrix input; no Epochs/Evoked/picks/proj or saving |
 | `mne.preprocessing.ICA` | partial | UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax | stateless functions; no info-aware object or save |
+| `mne.preprocessing.annotate_amplitude` | partial | UTILSLIB::annotateAmplitude | matrix input |
 | `mne.preprocessing.compute_proj_ecg` | partial | ArtifactDetect::detectEcg, FiffProj::compute_from_raw | detection plus SSP exist; no combined helper |
 | `mne.preprocessing.compute_proj_eog` | partial | ArtifactDetect::detectEog, compute_from_raw | detection plus SSP exist; no combined helper |
 | `mne.preprocessing.create_ecg_epochs` | partial | detectEcg, EpochExtractor::extract | no combined detect+epoch helper |
 | `mne.preprocessing.create_eog_epochs` | partial | detectEog, EpochExtractor::extract | no combined detect+epoch helper |
+| `mne.preprocessing.find_bad_channels_maxwell` | partial | UTILSLIB::findBadChannelsMaxwell | robust z-score of the whole-recording SSS residual, not mne's chunk-wise limit/min_count; no flat channels |
 | `mne.preprocessing.ica_find_ecg_events` | partial | detectEcg | needs a FiffInfo ECG channel; no ICA-source input |
 | `mne.preprocessing.ica_find_eog_events` | partial | detectEog | needs a FiffInfo EOG channel; no ICA-source input |
 | `mne.preprocessing.maxwell_filter` | partial | SSS/tSSS (DSPLIB) | no movement compensation |
-| `mne.preprocessing.EOGRegression` | missing | — | EOG regression not ported |
-| `mne.preprocessing.annotate_amplitude` | missing | — | amplitude annotation not ported |
+| `mne.preprocessing.regress_artifact` | partial | UTILSLIB::EogRegression::fitApply | matrix input; no betas input or output |
 | `mne.preprocessing.annotate_break` | missing | — | break annotation not ported |
 | `mne.preprocessing.annotate_movement` | missing | — | movement annotation not ported |
-| `mne.preprocessing.annotate_muscle_zscore` | missing | — | muscle annotation not ported |
 | `mne.preprocessing.annotate_nan` | missing | — | NaN annotation not ported |
 | `mne.preprocessing.apply_pca_obs` | missing | — | PCA-OBS cardiac removal not ported |
 | `mne.preprocessing.compute_average_dev_head_t` | missing | — | average device->head transform not ported |
-| `mne.preprocessing.compute_current_source_density` | missing | SurfaceLaplacian | surface Laplacian/CSD not ported |
 | `mne.preprocessing.compute_fine_calibration` | missing | — | fine calibration not ported |
 | `mne.preprocessing.compute_proj_hfc` | missing | — | homogeneous field correction not ported |
 | `mne.preprocessing.corrmap` | missing | — | ICA corrmap not ported |
 | `mne.preprocessing.cortical_signal_suppression` | missing | — | CSS not ported |
 | `mne.preprocessing.equalize_bads` | missing | — |  |
-| `mne.preprocessing.find_bad_channels_maxwell` | missing | BadChannelsMaxwell | Maxwell-basis bad-ch detection |
 | `mne.preprocessing.interpolate_bridged_electrodes` | missing | — | bridged electrode repair not ported |
 | `mne.preprocessing.maxwell_filter_prepare_emptyroom` | missing | — | empty-room Maxwell prep not ported |
 | `mne.preprocessing.oversampled_temporal_projection` | missing | — | OTP not ported |
@@ -141,8 +140,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.preprocessing.read_ica` | missing | — | ICA solution I/O not ported |
 | `mne.preprocessing.read_ica_eeglab` | missing | — | EEGLAB ICA reader not ported |
 | `mne.preprocessing.realign_raw` | missing | — | raw realignment not ported |
-| `mne.preprocessing.regress_artifact` | missing | EogRegression | EOG regression not ported |
-| `mne.preprocessing.write_fine_calibration` | missing | — | fine-calibration I/O not ported |
 
 ### Channels & Montages
 
@@ -181,7 +178,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.BaseEpochs` | partial | MNELIB::MNEEpochDataList | no crop/resample/save/metadata |
 | `mne.EpochsArray` | partial | MNELIB::MNEEpochData, FIFFLIB::FiffEpochs::makeFixedLengthEpochs | no info/events-bearing array constructor |
 | `mne.AcqParserFIF` | missing | — | Elekta acquisition-parameter parser not ported |
-| `mne.make_fixed_length_epochs` | missing | — | fixed-length epochs helper |
 
 ### Covariance & Whitening
 
@@ -193,14 +189,14 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
+| `mne.forward.make_field_map` | partial | FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping | mapping matrices; no evoked/trans/subject wrapper |
 | `mne.forward.make_forward_dipole` | partial | ComputeFwd (partial) | dipole forward limited |
 | `mne.forward.restrict_forward_to_label` | partial | MNEForwardSolution (partial) | label restriction limited |
 | `mne.forward.use_coil_def` | partial | FwdCoilSet::read_coil_defs | custom coil file readable; ComputeFwd path hard-coded |
+| `mne.make_field_map` | partial | FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping | mapping matrices; no evoked/trans/subject wrapper |
 | `mne.make_forward_dipole` | partial | ComputeFwd (partial) | dipole forward limited |
 | `mne.use_coil_def` | partial | FwdCoilSet::read_coil_defs | reader exists; ComputeFwd path hard-coded |
-| `mne.forward.make_field_map` | missing | — | field map interpolation (viz overlay planned) |
 | `mne.forward.restrict_forward_to_stc` | missing | — | stc restriction not ported |
-| `mne.make_field_map` | missing | — | field map interpolation (viz overlay planned) |
 
 ### Inverse & Source Estimation
 
@@ -212,7 +208,11 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.grade_to_tris` | partial | generateIcoVertices | ico vertices only (file-private); no triangles returned |
 | `mne.inverse_sparse.gamma_map` | partial | InvGammaMap::compute | solver only; no evoked/forward/whitening wrapper |
 | `mne.inverse_sparse.mixed_norm` | partial | InvMxne::compute | IRLS solver only; no whitening/depth/debias |
+| `mne.inverse_sparse.tf_mixed_norm` | partial | INVLIB::InvTfMxne::compute | dictionary of 2*nFreqs atoms at one time point, not mne's STFT Gabor frame; no whitening/depth/loose |
 | `mne.minimum_norm.compute_source_psd` | partial | INVLIB::computeSourcePsd | takes an STC; no raw→inverse→PSD pipeline |
+| `mne.minimum_norm.get_cross_talk` | partial | INVLIB::InvResolutionMatrix::getCtf/getCtfs | raw rows only; no mode/n_comp/norm summaries or STC output |
+| `mne.minimum_norm.get_point_spread` | partial | INVLIB::InvResolutionMatrix::getPsf/getPsfs | raw columns only; no mode/n_comp/norm summaries or STC output |
+| `mne.minimum_norm.resolution_metrics` | partial | INVLIB::InvResolutionMatrix::peakLocalisationError/spatialSpread | peak_err and PSF spread only; no cog_err, maxrad_ext, sum_amp, peak_amp or CTF mode |
 | `mne.read_dipole` | partial | InvEcdSet::read_dipoles_dip | .dip only; .bdip is write-only |
 | `mne.read_source_estimate` | partial | InvSourceEstimate::read, read_w | .stc/.w only; no .h5 |
 | `mne.spatial_dist_adjacency` | partial | StatsAdjacency (partial) | distance-based adjacency limited |
@@ -223,17 +223,11 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.MixedVectorSourceEstimate` | missing | — | mixed vector STC not ported |
 | `mne.VolVectorSourceEstimate` | missing | — | volume vector STC not ported |
 | `mne.beamformer.apply_dics_tfr_epochs` | missing | — | TFR-epochs DICS not ported |
-| `mne.beamformer.make_lcmv_resolution_matrix` | missing | — | LCMV resolution matrix not ported |
 | `mne.beamformer.read_beamformer` | missing | — | InvBeamformer has no I/O |
 | `mne.inverse_sparse.make_stc_from_dipoles` | missing | — | no dipole-list→STC conversion |
-| `mne.inverse_sparse.tf_mixed_norm` | missing | InvTfMxne | TF-MxNE not yet ported |
 | `mne.minimum_norm.apply_inverse_cov` | missing | — | covariance source power convenience |
 | `mne.minimum_norm.apply_inverse_tfr_epochs` | missing | — | TFR-epochs inverse convenience not ported |
 | `mne.minimum_norm.compute_source_psd_epochs` | missing | — | epochs source PSD convenience |
-| `mne.minimum_norm.estimate_snr` | missing | MNEMneData | SNR estimation not ported |
-| `mne.minimum_norm.get_cross_talk` | missing | — | CTF resolution metric not ported |
-| `mne.minimum_norm.get_point_spread` | missing | — | PSF resolution metric not ported |
-| `mne.minimum_norm.resolution_metrics` | missing | — | resolution metrics not ported |
 | `mne.minimum_norm.source_band_induced_power` | missing | — | banded source power convenience |
 | `mne.minimum_norm.source_induced_power` | missing | — | source induced power convenience |
 | `mne.stc_near_sensors` | missing | — | sensor-space stc projection not ported |
@@ -278,7 +272,9 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.time_frequency.read_spectrum` | partial | Spectral (partial) | spectrum I/O limited |
 | `mne.time_frequency.stft` | partial | Spectrogram::makeSpectrogram | Gaussian-window magnitude only; no complex output/istft |
 | `mne.time_frequency.tfr_array_morlet` | partial | MorletTfr::computeMultiChannel | power only; single epoch; no complex/ITC |
+| `mne.time_frequency.tfr_array_multitaper` | partial | UTILSLIB::MultitaperTfr::compute | sliding-window multitaper spectrogram on FFT bins, not per-frequency multitaper wavelets |
 | `mne.time_frequency.tfr_morlet` | partial | MorletTfr::compute | no Epochs input, averaging or ITC |
+| `mne.time_frequency.tfr_multitaper` | partial | UTILSLIB::MultitaperTfr::compute | sliding-window multitaper spectrogram on FFT bins; no Epochs/Evoked input |
 | `mne.time_frequency.EpochsTFR` | missing | — | no per-epoch TFR container |
 | `mne.time_frequency.EpochsTFRArray` | missing | — |  |
 | `mne.time_frequency.combine_tfr` | missing | — |  |
@@ -289,9 +285,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.time_frequency.pick_channels_csd` | missing | — |  |
 | `mne.time_frequency.read_csd` | missing | — |  |
 | `mne.time_frequency.read_tfrs` | missing | — |  |
-| `mne.time_frequency.tfr_array_multitaper` | missing | — | multitaper TFR not ported |
 | `mne.time_frequency.tfr_array_stockwell` | missing | — | Stockwell TFR not ported |
-| `mne.time_frequency.tfr_multitaper` | missing | MultitaperTfr | multitaper TFR (PSD multitaper exists) |
 | `mne.time_frequency.tfr_stockwell` | missing | — | Stockwell TFR not ported |
 | `mne.time_frequency.write_tfrs` | missing | — |  |
 
@@ -323,11 +317,10 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
 | `mne.stats.combine_adjacency` | partial | StatsAdjacency (partial) |  |
-| `mne.stats.bonferroni_correction` | missing | — | Bonferroni correction not ported |
+| `mne.stats.fdr_correction` | partial | STSLIB::StatsMcCorrection::fdr |  |
 | `mne.stats.bootstrap_confidence_interval` | missing | — | bootstrap CI not ported |
 | `mne.stats.f_mway_rm` | missing | — | RM-ANOVA not ported |
 | `mne.stats.f_threshold_mway_rm` | missing | — | RM-ANOVA threshold not ported |
-| `mne.stats.fdr_correction` | missing | — | FDR correction not ported |
 | `mne.stats.linear_regression` | missing | — | channel-wise regression not ported |
 | `mne.stats.linear_regression_raw` | missing | — | raw linear regression (rERP) not ported |
 | `mne.stats.summarize_clusters_stc` | missing | — | cluster summary stc not ported |
@@ -336,18 +329,18 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
+| `mne.simulation.simulate_evoked` | partial | UTILSLIB::simulateEvoked | no iir_filter; STC rows must equal forward columns |
+| `mne.simulation.simulate_sparse_stc` | partial | UTILSLIB::simulateStc | caller picks vertices; fixed Gaussian envelopes |
+| `mne.simulation.simulate_stc` | partial | UTILSLIB::simulateStcFromWaveforms | vertex list + waveforms; no labels/src/value_fun |
 | `mne.simulation.SourceSimulator` | missing | — | source simulator not ported |
 | `mne.simulation.add_chpi` | missing | — | cHPI injection not ported |
 | `mne.simulation.add_ecg` | missing | — | ECG injection not ported |
 | `mne.simulation.add_eog` | missing | — | EOG injection not ported |
 | `mne.simulation.add_noise` | missing | — | noise injection not ported |
 | `mne.simulation.select_source_in_label` | missing | — | source selection in label not ported |
-| `mne.simulation.simulate_evoked` | missing | — | evoked simulation not ported |
 | `mne.simulation.simulate_raw` | missing | — | raw simulation not ported |
-| `mne.simulation.simulate_sparse_stc` | missing | — | sparse STC simulation not ported |
-| `mne.simulation.simulate_stc` | missing | — | STC simulation not ported |
 
 ## Already implemented (do not re-implement)
 
-191 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
+198 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
 

@@ -11642,9 +11642,10 @@
       },
       {
         "python": "mne.beamformer.make_lcmv_resolution_matrix",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "LCMV resolution matrix not ported"
+        "status": "implemented",
+        "mne_cpp": "INVLIB::InvLCMV::makeLCMVResolutionMatrix",
+        "note": "builds the LCMV filter from fwd/info/cov itself",
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.read_beamformer",
@@ -12272,9 +12273,10 @@
       },
       {
         "python": "mne.forward.make_field_map",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "field map interpolation (viz overlay planned)"
+        "status": "partial",
+        "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
+        "note": "mapping matrices; no evoked/trans/subject wrapper",
+        "test": "test_field_map"
       },
       {
         "python": "mne.forward.make_forward_dipole",
@@ -12408,9 +12410,10 @@
       },
       {
         "python": "mne.inverse_sparse.tf_mixed_norm",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "TF-MxNE not yet ported"
+        "status": "partial",
+        "mne_cpp": "INVLIB::InvTfMxne::compute",
+        "note": "dictionary of 2*nFreqs atoms at one time point, not mne's STFT Gabor frame; no whitening/depth/loose",
+        "test": "test_tf_mxne"
       },
       {
         "python": "mne.io.BaseRaw",
@@ -12741,15 +12744,17 @@
       },
       {
         "python": "mne.make_field_map",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "field map interpolation (viz overlay planned)"
+        "status": "partial",
+        "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
+        "note": "mapping matrices; no evoked/trans/subject wrapper",
+        "test": "test_field_map"
       },
       {
         "python": "mne.make_fixed_length_epochs",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "fixed-length epochs helper"
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
+        "note": "matrix input; no reject_by_annotation",
+        "test": "test_epochs"
       },
       {
         "python": "mne.make_fixed_length_events",
@@ -12847,21 +12852,24 @@
       },
       {
         "python": "mne.minimum_norm.estimate_snr",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "SNR estimation not ported"
+        "status": "implemented",
+        "mne_cpp": "INVLIB::estimateSnr",
+        "note": "",
+        "test": "test_inv_eloreta_python"
       },
       {
         "python": "mne.minimum_norm.get_cross_talk",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "CTF resolution metric not ported"
+        "status": "partial",
+        "mne_cpp": "INVLIB::InvResolutionMatrix::getCtf/getCtfs",
+        "note": "raw rows only; no mode/n_comp/norm summaries or STC output",
+        "test": "test_resolution_matrix"
       },
       {
         "python": "mne.minimum_norm.get_point_spread",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "PSF resolution metric not ported"
+        "status": "partial",
+        "mne_cpp": "INVLIB::InvResolutionMatrix::getPsf/getPsfs",
+        "note": "raw columns only; no mode/n_comp/norm summaries or STC output",
+        "test": "test_resolution_matrix"
       },
       {
         "python": "mne.minimum_norm.make_inverse_operator",
@@ -12886,9 +12894,10 @@
       },
       {
         "python": "mne.minimum_norm.resolution_metrics",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "resolution metrics not ported"
+        "status": "partial",
+        "mne_cpp": "INVLIB::InvResolutionMatrix::peakLocalisationError/spatialSpread",
+        "note": "peak_err and PSF spread only; no cog_err, maxrad_ext, sum_amp, peak_amp or CTF mode",
+        "test": "test_resolution_matrix"
       },
       {
         "python": "mne.minimum_norm.source_band_induced_power",
@@ -12986,9 +12995,10 @@
       },
       {
         "python": "mne.preprocessing.EOGRegression",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "EOG regression not ported"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::EogRegression",
+        "note": "matrix input; no Epochs/Evoked/picks/proj or saving",
+        "test": "test_dsp_eog_regression"
       },
       {
         "python": "mne.preprocessing.ICA",
@@ -12999,9 +13009,10 @@
       },
       {
         "python": "mne.preprocessing.annotate_amplitude",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "amplitude annotation not ported"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::annotateAmplitude",
+        "note": "matrix input",
+        "test": "test_dsp_annotate_artifact"
       },
       {
         "python": "mne.preprocessing.annotate_break",
@@ -13017,9 +13028,10 @@
       },
       {
         "python": "mne.preprocessing.annotate_muscle_zscore",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "muscle annotation not ported"
+        "status": "implemented",
+        "mne_cpp": "UTILSLIB::annotateMusclZscore",
+        "note": "automatic channel-type choice only",
+        "test": "test_dsp_annotate_artifact"
       },
       {
         "python": "mne.preprocessing.annotate_nan",
@@ -13041,9 +13053,10 @@
       },
       {
         "python": "mne.preprocessing.compute_current_source_density",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "surface Laplacian/CSD not ported"
+        "status": "implemented",
+        "mne_cpp": "UTILSLIB::SurfaceLaplacian::compute",
+        "note": "data matrix plus positions; no Info conversion",
+        "test": "test_surface_laplacian"
       },
       {
         "python": "mne.preprocessing.compute_fine_calibration",
@@ -13119,9 +13132,10 @@
       },
       {
         "python": "mne.preprocessing.find_bad_channels_maxwell",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "Maxwell-basis bad-ch detection"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::findBadChannelsMaxwell",
+        "note": "robust z-score of the whole-recording SSS residual, not mne's chunk-wise limit/min_count; no flat channels",
+        "test": "test_dsp_bad_channels_maxwell"
       },
       {
         "python": "mne.preprocessing.find_ecg_events",
@@ -13215,15 +13229,17 @@
       },
       {
         "python": "mne.preprocessing.regress_artifact",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "EOG regression not ported"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::EogRegression::fitApply",
+        "note": "matrix input; no betas input or output",
+        "test": "test_dsp_eog_regression"
       },
       {
         "python": "mne.preprocessing.write_fine_calibration",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "fine-calibration I/O not ported"
+        "status": "implemented",
+        "mne_cpp": "UTILSLIB::FineCalibration::write",
+        "note": "",
+        "test": "test_fine_calibration"
       },
       {
         "python": "mne.random_parcellation",
@@ -13529,9 +13545,10 @@
       },
       {
         "python": "mne.simulation.simulate_evoked",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "evoked simulation not ported"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::simulateEvoked",
+        "note": "no iir_filter; STC rows must equal forward columns",
+        "test": "test_dsp_simulate"
       },
       {
         "python": "mne.simulation.simulate_raw",
@@ -13541,15 +13558,17 @@
       },
       {
         "python": "mne.simulation.simulate_sparse_stc",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "sparse STC simulation not ported"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::simulateStc",
+        "note": "caller picks vertices; fixed Gaussian envelopes",
+        "test": "test_dsp_simulate"
       },
       {
         "python": "mne.simulation.simulate_stc",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "STC simulation not ported"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::simulateStcFromWaveforms",
+        "note": "vertex list + waveforms; no labels/src/value_fun",
+        "test": "test_dsp_simulate"
       },
       {
         "python": "mne.source_space.add_source_space_distances",
@@ -13655,9 +13674,10 @@
       },
       {
         "python": "mne.stats.bonferroni_correction",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "Bonferroni correction not ported"
+        "status": "implemented",
+        "mne_cpp": "STSLIB::StatsMcCorrection::bonferroni",
+        "note": "corrected p-values only, no reject mask",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.bootstrap_confidence_interval",
@@ -13693,9 +13713,10 @@
       },
       {
         "python": "mne.stats.fdr_correction",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "FDR correction not ported"
+        "status": "partial",
+        "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
+        "note": "",
+        "test": "test_sts_cluster"
       },
       {
         "python": "mne.stats.linear_regression",
@@ -14013,9 +14034,10 @@
       },
       {
         "python": "mne.time_frequency.tfr_array_multitaper",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "multitaper TFR not ported"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::MultitaperTfr::compute",
+        "note": "sliding-window multitaper spectrogram on FFT bins, not per-frequency multitaper wavelets",
+        "test": "test_dsp_multitaper"
       },
       {
         "python": "mne.time_frequency.tfr_array_stockwell",
@@ -14032,9 +14054,10 @@
       },
       {
         "python": "mne.time_frequency.tfr_multitaper",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "multitaper TFR (PSD multitaper exists)"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::MultitaperTfr::compute",
+        "note": "sliding-window multitaper spectrogram on FFT bins; no Epochs/Evoked input",
+        "test": "test_dsp_multitaper"
       },
       {
         "python": "mne.time_frequency.tfr_stockwell",

@@ -9,9 +9,9 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 191,
-      "partial": 85,
-      "missing": 159,
+      "implemented": 198,
+      "partial": 101,
+      "missing": 136,
       "not-applicable": 8
     },
     "by_domain": {
@@ -28,9 +28,9 @@
         "not-applicable": 3
       },
       "preprocessing": {
-        "implemented": 10,
-        "partial": 8,
-        "missing": 24,
+        "implemented": 13,
+        "partial": 12,
+        "missing": 17,
         "not-applicable": 1
       },
       "filter": {
@@ -46,9 +46,9 @@
         "not-applicable": 1
       },
       "epochs": {
-        "implemented": 12,
+        "implemented": 13,
         "partial": 2,
-        "missing": 2,
+        "missing": 1,
         "not-applicable": 0
       },
       "cov": {
@@ -59,14 +59,14 @@
       },
       "forward": {
         "implemented": 27,
-        "partial": 5,
-        "missing": 3,
+        "partial": 7,
+        "missing": 1,
         "not-applicable": 0
       },
       "inverse": {
-        "implemented": 29,
-        "partial": 12,
-        "missing": 19,
+        "implemented": 31,
+        "partial": 16,
+        "missing": 13,
         "not-applicable": 0
       },
       "source_space": {
@@ -77,8 +77,8 @@
       },
       "time_frequency": {
         "implemented": 6,
-        "partial": 20,
-        "missing": 15,
+        "partial": 22,
+        "missing": 13,
         "not-applicable": 0
       },
       "connectivity": {
@@ -94,15 +94,15 @@
         "not-applicable": 2
       },
       "stats": {
-        "implemented": 8,
-        "partial": 1,
-        "missing": 8,
+        "implemented": 9,
+        "partial": 2,
+        "missing": 6,
         "not-applicable": 0
       },
       "simulation": {
         "implemented": 0,
-        "partial": 0,
-        "missing": 10,
+        "partial": 3,
+        "missing": 7,
         "not-applicable": 0
       },
       "viz": {
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 53.7
+    "parity_percent": 57.1
   },
   "apis": [
     {
@@ -1454,6 +1454,17 @@
       "evidence": "registry-class"
     },
     {
+      "python": "mne.preprocessing.annotate_muscle_zscore",
+      "name": "annotate_muscle_zscore",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "implemented",
+      "mne_cpp": "UTILSLIB::annotateMusclZscore",
+      "note": "automatic channel-type choice only",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.preprocessing.compute_bridged_electrodes",
       "name": "compute_bridged_electrodes",
       "submodule": "preprocessing",
@@ -1463,6 +1474,17 @@
       "mne_cpp": "BridgedElectrodes",
       "note": "",
       "evidence": "registry-class"
+    },
+    {
+      "python": "mne.preprocessing.compute_current_source_density",
+      "name": "compute_current_source_density",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "implemented",
+      "mne_cpp": "UTILSLIB::SurfaceLaplacian::compute",
+      "note": "data matrix plus positions; no Info conversion",
+      "evidence": "parity-record"
     },
     {
       "python": "mne.preprocessing.compute_maxwell_basis",
@@ -1553,6 +1575,28 @@
       "evidence": "registry-class"
     },
     {
+      "python": "mne.preprocessing.write_fine_calibration",
+      "name": "write_fine_calibration",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "implemented",
+      "mne_cpp": "UTILSLIB::FineCalibration::write",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.preprocessing.EOGRegression",
+      "name": "EOGRegression",
+      "submodule": "preprocessing",
+      "kind": "class",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::EogRegression",
+      "note": "matrix input; no Epochs/Evoked/picks/proj or saving",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.preprocessing.ICA",
       "name": "ICA",
       "submodule": "preprocessing",
@@ -1561,6 +1605,17 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax",
       "note": "stateless functions; no info-aware object or save",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.preprocessing.annotate_amplitude",
+      "name": "annotate_amplitude",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::annotateAmplitude",
+      "note": "matrix input",
       "evidence": "parity-record"
     },
     {
@@ -1608,6 +1663,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.preprocessing.find_bad_channels_maxwell",
+      "name": "find_bad_channels_maxwell",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::findBadChannelsMaxwell",
+      "note": "robust z-score of the whole-recording SSS residual, not mne's chunk-wise limit/min_count; no flat channels",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.preprocessing.ica_find_ecg_events",
       "name": "ica_find_ecg_events",
       "submodule": "preprocessing",
@@ -1641,25 +1707,14 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.preprocessing.EOGRegression",
-      "name": "EOGRegression",
-      "submodule": "preprocessing",
-      "kind": "class",
-      "domain": "preprocessing",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "EOG regression not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.annotate_amplitude",
-      "name": "annotate_amplitude",
+      "python": "mne.preprocessing.regress_artifact",
+      "name": "regress_artifact",
       "submodule": "preprocessing",
       "kind": "function",
       "domain": "preprocessing",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "amplitude annotation not ported",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::EogRegression::fitApply",
+      "note": "matrix input; no betas input or output",
       "evidence": "parity-record"
     },
     {
@@ -1682,17 +1737,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "movement annotation not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.annotate_muscle_zscore",
-      "name": "annotate_muscle_zscore",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "muscle annotation not ported",
       "evidence": "parity-record"
     },
     {
@@ -1726,17 +1770,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "average device->head transform not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.compute_current_source_density",
-      "name": "compute_current_source_density",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "missing",
-      "mne_cpp": "SurfaceLaplacian",
-      "note": "surface Laplacian/CSD not ported",
       "evidence": "parity-record"
     },
     {
@@ -1792,17 +1825,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.find_bad_channels_maxwell",
-      "name": "find_bad_channels_maxwell",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "missing",
-      "mne_cpp": "BadChannelsMaxwell",
-      "note": "Maxwell-basis bad-ch detection",
       "evidence": "parity-record"
     },
     {
@@ -1880,28 +1902,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "raw realignment not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.regress_artifact",
-      "name": "regress_artifact",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "missing",
-      "mne_cpp": "EogRegression",
-      "note": "EOG regression not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.write_fine_calibration",
-      "name": "write_fine_calibration",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "fine-calibration I/O not ported",
       "evidence": "parity-record"
     },
     {
@@ -2444,6 +2444,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.make_fixed_length_epochs",
+      "name": "make_fixed_length_epochs",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "epochs",
+      "status": "implemented",
+      "mne_cpp": "FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
+      "note": "matrix input; no reject_by_annotation",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.make_fixed_length_events",
       "name": "make_fixed_length_events",
       "submodule": "(top-level)",
@@ -2540,17 +2551,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Elekta acquisition-parameter parser not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.make_fixed_length_epochs",
-      "name": "make_fixed_length_epochs",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "epochs",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "fixed-length epochs helper",
       "evidence": "parity-record"
     },
     {
@@ -2928,6 +2928,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.forward.make_field_map",
+      "name": "make_field_map",
+      "submodule": "forward",
+      "kind": "function",
+      "domain": "forward",
+      "status": "partial",
+      "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
+      "note": "mapping matrices; no evoked/trans/subject wrapper",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.forward.make_forward_dipole",
       "name": "make_forward_dipole",
       "submodule": "forward",
@@ -2961,6 +2972,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.make_field_map",
+      "name": "make_field_map",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "forward",
+      "status": "partial",
+      "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
+      "note": "mapping matrices; no evoked/trans/subject wrapper",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.make_forward_dipole",
       "name": "make_forward_dipole",
       "submodule": "(top-level)",
@@ -2983,17 +3005,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.forward.make_field_map",
-      "name": "make_field_map",
-      "submodule": "forward",
-      "kind": "function",
-      "domain": "forward",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "field map interpolation (viz overlay planned)",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.forward.restrict_forward_to_stc",
       "name": "restrict_forward_to_stc",
       "submodule": "forward",
@@ -3002,17 +3013,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "stc restriction not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.make_field_map",
-      "name": "make_field_map",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "forward",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "field map interpolation (viz overlay planned)",
       "evidence": "parity-record"
     },
     {
@@ -3137,6 +3137,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.beamformer.make_lcmv_resolution_matrix",
+      "name": "make_lcmv_resolution_matrix",
+      "submodule": "beamformer",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "implemented",
+      "mne_cpp": "INVLIB::InvLCMV::makeLCMVResolutionMatrix",
+      "note": "builds the LCMV filter from fwd/info/cov itself",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.beamformer.rap_music",
       "name": "rap_music",
       "submodule": "beamformer",
@@ -3232,6 +3243,17 @@
       "domain": "inverse",
       "status": "implemented",
       "mne_cpp": "MNEInverseOperator rank",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.minimum_norm.estimate_snr",
+      "name": "estimate_snr",
+      "submodule": "minimum_norm",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "implemented",
+      "mne_cpp": "INVLIB::estimateSnr",
       "note": "",
       "evidence": "parity-record"
     },
@@ -3401,6 +3423,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.inverse_sparse.tf_mixed_norm",
+      "name": "tf_mixed_norm",
+      "submodule": "inverse_sparse",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "partial",
+      "mne_cpp": "INVLIB::InvTfMxne::compute",
+      "note": "dictionary of 2*nFreqs atoms at one time point, not mne's STFT Gabor frame; no whitening/depth/loose",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.minimum_norm.compute_source_psd",
       "name": "compute_source_psd",
       "submodule": "minimum_norm",
@@ -3409,6 +3442,39 @@
       "status": "partial",
       "mne_cpp": "INVLIB::computeSourcePsd",
       "note": "takes an STC; no raw→inverse→PSD pipeline",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.minimum_norm.get_cross_talk",
+      "name": "get_cross_talk",
+      "submodule": "minimum_norm",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "partial",
+      "mne_cpp": "INVLIB::InvResolutionMatrix::getCtf/getCtfs",
+      "note": "raw rows only; no mode/n_comp/norm summaries or STC output",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.minimum_norm.get_point_spread",
+      "name": "get_point_spread",
+      "submodule": "minimum_norm",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "partial",
+      "mne_cpp": "INVLIB::InvResolutionMatrix::getPsf/getPsfs",
+      "note": "raw columns only; no mode/n_comp/norm summaries or STC output",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.minimum_norm.resolution_metrics",
+      "name": "resolution_metrics",
+      "submodule": "minimum_norm",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "partial",
+      "mne_cpp": "INVLIB::InvResolutionMatrix::peakLocalisationError/spatialSpread",
+      "note": "peak_err and PSF spread only; no cog_err, maxrad_ext, sum_amp, peak_amp or CTF mode",
       "evidence": "parity-record"
     },
     {
@@ -3522,17 +3588,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.beamformer.make_lcmv_resolution_matrix",
-      "name": "make_lcmv_resolution_matrix",
-      "submodule": "beamformer",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "LCMV resolution matrix not ported",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.beamformer.read_beamformer",
       "name": "read_beamformer",
       "submodule": "beamformer",
@@ -3552,17 +3607,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no dipole-list→STC conversion",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.inverse_sparse.tf_mixed_norm",
-      "name": "tf_mixed_norm",
-      "submodule": "inverse_sparse",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "missing",
-      "mne_cpp": "InvTfMxne",
-      "note": "TF-MxNE not yet ported",
       "evidence": "parity-record"
     },
     {
@@ -3596,50 +3640,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "epochs source PSD convenience",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.minimum_norm.estimate_snr",
-      "name": "estimate_snr",
-      "submodule": "minimum_norm",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "missing",
-      "mne_cpp": "MNEMneData",
-      "note": "SNR estimation not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.minimum_norm.get_cross_talk",
-      "name": "get_cross_talk",
-      "submodule": "minimum_norm",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "CTF resolution metric not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.minimum_norm.get_point_spread",
-      "name": "get_point_spread",
-      "submodule": "minimum_norm",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "PSF resolution metric not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.minimum_norm.resolution_metrics",
-      "name": "resolution_metrics",
-      "submodule": "minimum_norm",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "resolution metrics not ported",
       "evidence": "parity-record"
     },
     {
@@ -4248,6 +4248,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.time_frequency.tfr_array_multitaper",
+      "name": "tfr_array_multitaper",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::MultitaperTfr::compute",
+      "note": "sliding-window multitaper spectrogram on FFT bins, not per-frequency multitaper wavelets",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.time_frequency.tfr_morlet",
       "name": "tfr_morlet",
       "submodule": "time_frequency",
@@ -4256,6 +4267,17 @@
       "status": "partial",
       "mne_cpp": "MorletTfr::compute",
       "note": "no Epochs input, averaging or ITC",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.tfr_multitaper",
+      "name": "tfr_multitaper",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::MultitaperTfr::compute",
+      "note": "sliding-window multitaper spectrogram on FFT bins; no Epochs/Evoked input",
       "evidence": "parity-record"
     },
     {
@@ -4369,17 +4391,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.tfr_array_multitaper",
-      "name": "tfr_array_multitaper",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "multitaper TFR not ported",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.time_frequency.tfr_array_stockwell",
       "name": "tfr_array_stockwell",
       "submodule": "time_frequency",
@@ -4388,17 +4399,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Stockwell TFR not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.tfr_multitaper",
-      "name": "tfr_multitaper",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "missing",
-      "mne_cpp": "MultitaperTfr",
-      "note": "multitaper TFR (PSD multitaper exists)",
       "evidence": "parity-record"
     },
     {
@@ -4688,6 +4688,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.stats.bonferroni_correction",
+      "name": "bonferroni_correction",
+      "submodule": "stats",
+      "kind": "function",
+      "domain": "stats",
+      "status": "implemented",
+      "mne_cpp": "STSLIB::StatsMcCorrection::bonferroni",
+      "note": "corrected p-values only, no reject mask",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.stats.f_oneway",
       "name": "f_oneway",
       "submodule": "stats",
@@ -4787,14 +4798,14 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.stats.bonferroni_correction",
-      "name": "bonferroni_correction",
+      "python": "mne.stats.fdr_correction",
+      "name": "fdr_correction",
       "submodule": "stats",
       "kind": "function",
       "domain": "stats",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "Bonferroni correction not ported",
+      "status": "partial",
+      "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
+      "note": "",
       "evidence": "parity-record"
     },
     {
@@ -4831,17 +4842,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.stats.fdr_correction",
-      "name": "fdr_correction",
-      "submodule": "stats",
-      "kind": "function",
-      "domain": "stats",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "FDR correction not ported",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.stats.linear_regression",
       "name": "linear_regression",
       "submodule": "stats",
@@ -4872,6 +4872,39 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "cluster summary stc not ported",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.simulation.simulate_evoked",
+      "name": "simulate_evoked",
+      "submodule": "simulation",
+      "kind": "function",
+      "domain": "simulation",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::simulateEvoked",
+      "note": "no iir_filter; STC rows must equal forward columns",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.simulation.simulate_sparse_stc",
+      "name": "simulate_sparse_stc",
+      "submodule": "simulation",
+      "kind": "function",
+      "domain": "simulation",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::simulateStc",
+      "note": "caller picks vertices; fixed Gaussian envelopes",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.simulation.simulate_stc",
+      "name": "simulate_stc",
+      "submodule": "simulation",
+      "kind": "function",
+      "domain": "simulation",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::simulateStcFromWaveforms",
+      "note": "vertex list + waveforms; no labels/src/value_fun",
       "evidence": "parity-record"
     },
     {
@@ -4941,17 +4974,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.simulation.simulate_evoked",
-      "name": "simulate_evoked",
-      "submodule": "simulation",
-      "kind": "function",
-      "domain": "simulation",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "evoked simulation not ported",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.simulation.simulate_raw",
       "name": "simulate_raw",
       "submodule": "simulation",
@@ -4960,28 +4982,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "raw simulation not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.simulation.simulate_sparse_stc",
-      "name": "simulate_sparse_stc",
-      "submodule": "simulation",
-      "kind": "function",
-      "domain": "simulation",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "sparse STC simulation not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.simulation.simulate_stc",
-      "name": "simulate_stc",
-      "submodule": "simulation",
-      "kind": "function",
-      "domain": "simulation",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "STC simulation not ported",
       "evidence": "parity-record"
     },
     {
