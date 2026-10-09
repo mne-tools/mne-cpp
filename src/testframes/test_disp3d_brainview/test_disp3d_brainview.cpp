@@ -34,6 +34,7 @@
 #include <disp3D/workers/rtsensorinterpolationmatworker.h>
 #include <disp3D/workers/rtsourcedataworker.h>
 #include <disp3D/workers/rtsensordataworker.h>
+#include <disp3D/workers/rtsensordatacontroller.h>
 #include <disp3D/scene/sourceestimatemanager.h>
 #include <disp3D/scene/rtsensorstreammanager.h>
 #include <disp3D/workers/stcloadingworker.h>
@@ -580,6 +581,8 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     const auto expected = FWDLIB::FwdFieldMap::computeEegMapping(*coils, scalp, SensorFieldMapper::fitSphereOrigin(evoked.info), 0.06f, 1e-3f);
     QVERIFY((*mapping - *expected).cwiseAbs().maxCoeff() <= 1e-5f * expected->cwiseAbs().maxCoeff());
 
+    const auto nEeg = pick.size();
+
     // Channels passed as bad are left out
     const QString firstEeg = evoked.info.chs[pick.first()].ch_name;
     worker.setBadChannels({firstEeg});
@@ -589,6 +592,41 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
         QVERIFY(evoked.info.chs[k].ch_name != firstEeg);
     }
     worker.setBadChannels({});
+
+    // The controller computes the same mapping on its worker thread and streams colours onto that surface
+    RtSensorDataController controller;
+    QString controllerKey;
+    int controllerPicks = 0;
+    QString colorKey;
+    QVector<uint32_t> colors;
+    Eigen::VectorXf raw;
+    connect(&controller, &RtSensorDataController::newEegMappingAvailable,
+            [&](const QString& key, const std::shared_ptr<Eigen::MatrixXf>&, const QVector<int>& picked) {
+                controllerKey = key;
+                controllerPicks = picked.size();
+            });
+    connect(&controller, &RtSensorDataController::newSensorColorsAvailable,
+            [&](const QString& key, const QVector<uint32_t>& vertexColors) {
+                colorKey = key;
+                colors = vertexColors;
+            });
+    connect(&controller, &RtSensorDataController::newRawSensorDataAvailable,
+            [&](const Eigen::VectorXf& data) { raw = data; });
+    controller.setEvoked(evoked);
+    controller.setTransform(FIFFLIB::FiffCoordTrans(), false);
+    controller.setEegSurface(QStringLiteral("bem_head"), scalp);
+    controller.recomputeMapping();
+    QTRY_COMPARE(controllerKey, QStringLiteral("bem_head"));
+    QCOMPARE(controllerPicks, nEeg);
+    controller.setTimeInterval(10);
+    controller.addData(Eigen::VectorXf::Constant(nEeg, 1e-6f));
+    controller.setStreamingState(true);
+    QTRY_COMPARE(colors.size(), static_cast<int>(scalp.rows()));
+    QCOMPARE(colorKey, QStringLiteral("bem_head"));
+    controller.setStreamSmoothedData(false);
+    controller.addData(Eigen::VectorXf::Constant(nEeg, 1e-6f));
+    QTRY_COMPARE(raw.size(), static_cast<Eigen::Index>(nEeg));
+    controller.setStreamingState(false);
 
     QApplication::processEvents();
 }
