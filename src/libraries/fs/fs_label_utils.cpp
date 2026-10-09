@@ -21,6 +21,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QHash>
 #include <QQueue>
 
 //=============================================================================================================
@@ -129,74 +130,60 @@ QList<FsLabel> FsLabelUtils::splitLabel(const FsLabel& label,
     if (label.isEmpty())
         return components;
 
-    // If surface is empty, treat each vertex as its own component
-    if (surface.isEmpty()) {
-        for (int i = 0; i < label.vertices.size(); ++i) {
-            FsLabel comp;
-            comp.hemi = label.hemi;
-            comp.name = QString("%1_part%2").arg(label.name).arg(i);
-            comp.vertices.resize(1);
-            comp.vertices[0] = label.vertices[i];
-            comp.pos = label.pos.row(i);
-            comp.values = VectorXd::Ones(1);
-            if (i < label.values.size())
-                comp.values[0] = label.values[i];
-            components.append(comp);
-        }
-        return components;
-    }
-
-    const int nVerts = static_cast<int>(surface.rr().rows());
-    QList<QSet<int>> adj = buildAdjacency(surface.tris(), nVerts);
-
-    // Build set of label vertices for fast lookup
-    QSet<int> labelSet;
+    // Label row of each vertex: the parts keep the label's positions and values
+    QHash<int, int> rowOf;
     for (int i = 0; i < label.vertices.size(); ++i)
-        labelSet.insert(label.vertices[i]);
+        rowOf.insert(label.vertices[i], i);
 
+    // Connected components over the surface edges; without a surface every vertex stands alone
+    const int nVerts = surface.isEmpty() ? 0 : static_cast<int>(surface.rr().rows());
+    const QList<QSet<int>> adj = surface.isEmpty() ? QList<QSet<int>>() : buildAdjacency(surface.tris(), nVerts);
     QSet<int> visited;
-    int compIdx = 0;
-
+    QList<QList<int>> parts;
     for (int i = 0; i < label.vertices.size(); ++i) {
-        int seed = label.vertices[i];
+        const int seed = label.vertices[i];
         if (visited.contains(seed))
             continue;
-
-        // BFS from seed, restricted to label vertices
         QQueue<int> queue;
         queue.enqueue(seed);
         visited.insert(seed);
-        QList<int> component;
-
+        QList<int> part;
         while (!queue.isEmpty()) {
-            int v = queue.dequeue();
-            component.append(v);
-
+            const int v = queue.dequeue();
+            part.append(v);
             if (v >= 0 && v < nVerts) {
                 for (int neighbor : adj[v]) {
-                    if (labelSet.contains(neighbor) && !visited.contains(neighbor)) {
+                    if (rowOf.contains(neighbor) && !visited.contains(neighbor)) {
                         visited.insert(neighbor);
                         queue.enqueue(neighbor);
                     }
                 }
             }
         }
+        std::sort(part.begin(), part.end());
+        parts.append(part);
+    }
 
-        std::sort(component.begin(), component.end());
+    // As mne Label.split("contiguous"): largest part first, named <name>_div<i>[-lh|-rh]
+    std::stable_sort(parts.begin(), parts.end(), [](const QList<int>& a, const QList<int>& b) { return a.size() > b.size(); });
+    const bool hemiSuffix = label.name.endsWith(QStringLiteral("lh")) || label.name.endsWith(QStringLiteral("rh"));
+    const QString base = hemiSuffix ? label.name.left(label.name.size() - 3) : label.name;
+    const QString ext = hemiSuffix ? label.name.right(3) : QString();
 
+    for (int p = 0; p < parts.size(); ++p) {
+        const QList<int>& part = parts[p];
         FsLabel comp;
         comp.hemi = label.hemi;
-        comp.name = QString("%1_part%2").arg(label.name).arg(compIdx++);
-        comp.vertices.resize(component.size());
-        comp.pos.resize(component.size(), 3);
-        comp.values = VectorXd::Ones(component.size());
-
-        for (int j = 0; j < component.size(); ++j) {
-            comp.vertices[j] = component[j];
-            if (component[j] < nVerts)
-                comp.pos.row(j) = surface.rr().row(component[j]);
+        comp.name = QStringLiteral("%1_div%2%3").arg(base).arg(p + 1).arg(ext);
+        comp.vertices.resize(part.size());
+        comp.pos.resize(part.size(), 3);
+        comp.values.resize(part.size());
+        for (int j = 0; j < part.size(); ++j) {
+            const int row = rowOf.value(part[j]);
+            comp.vertices[j] = part[j];
+            comp.pos.row(j) = label.pos.row(row);
+            comp.values[j] = row < label.values.size() ? label.values[row] : 1.0;
         }
-
         components.append(comp);
     }
 

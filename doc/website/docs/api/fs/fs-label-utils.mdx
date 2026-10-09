@@ -59,7 +59,7 @@ Starting from the seed vertices in the label, expands outward by nSteps along su
 
 Split a label into connected components.
 
-Uses the surface mesh to identify connected sub-labels.
+Like mne Label.split("contiguous"): the parts keep the label's positions and values, come largest first and are named &lt;name&gt;_div&lt;i&gt;, before a trailing -lh / -rh.
 
 **Parameters:**
 
@@ -67,7 +67,7 @@ Uses the surface mesh to identify connected sub-labels.
   The label to split.
 
 - **surface** : *const [FsSurface](/docs/api/fs/fs-surface) &*
-  The surface providing vertex adjacency.
+  The surface providing vertex adjacency (empty: every vertex is its own part).
 
 **Returns:**
 

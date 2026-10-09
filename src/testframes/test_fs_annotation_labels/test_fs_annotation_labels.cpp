@@ -10,6 +10,7 @@
 #include <fs/fs_annotation.h>
 #include <fs/fs_annotationset.h>
 #include <fs/fs_label.h>
+#include <fs/fs_label_utils.h>
 #include <fs/fs_colortable.h>
 
 using namespace FSLIB;
@@ -285,6 +286,47 @@ private slots:
         QVERIFY(st->values.isOnes());
         for (int k = 1; k < labels.size(); ++k) {
             QVERIFY2(labels[k - 1].name < labels[k].name, qPrintable(labels[k].name));
+        }
+    }
+
+    //=========================================================================
+    // FsLabelUtils::splitLabel vs mne.Label.split("contiguous")
+    //=========================================================================
+    void labelUtils_splitContiguous()
+    {
+        const QString surfFile = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white";
+        FsSurface surf(surfFile);
+        QVERIFY(!surf.isEmpty());
+        // First rings around vertices 10 and 50000 plus the lone vertex 100000
+        const QList<QList<int>> parts{{48768, 48782, 48794, 49980, 50000, 50001, 50018, 51392, 51393, 51412},
+                                      {6, 7, 10, 11, 14, 15, 143, 150},
+                                      {100000}};
+        QList<int> all;
+        for (const QList<int>& part : parts) {
+            all << part;
+        }
+        std::sort(all.begin(), all.end());
+        Eigen::VectorXi vertices(all.size());
+        Eigen::VectorXd values(all.size());
+        Eigen::MatrixX3f pos(all.size(), 3);
+        for (int k = 0; k < all.size(); ++k) {
+            vertices[k] = all[k];
+            values[k] = 1.0 + 0.001 * all[k];
+            pos.row(k) = surf.rr().row(all[k]) * 2.0f; // not the surface positions: they must be kept
+        }
+        const FsLabel label(vertices, pos, values, 0, QStringLiteral("V1-lh"));
+
+        // mne: components by descending size, named <name>_div<i>-lh, vertices sorted, values and pos kept
+        const QList<FsLabel> split = FsLabelUtils::splitLabel(label, surf);
+        QCOMPARE(split.size(), 3);
+        for (int k = 0; k < 3; ++k) {
+            QCOMPARE(split[k].name, QStringLiteral("V1_div%1-lh").arg(k + 1));
+            QCOMPARE(split[k].vertices.size(), Eigen::Index(parts[k].size()));
+            for (int j = 0; j < parts[k].size(); ++j) {
+                QCOMPARE(split[k].vertices[j], parts[k][j]);
+                QCOMPARE(split[k].values[j], 1.0 + 0.001 * parts[k][j]);
+                QCOMPARE(split[k].pos.row(j), RowVector3f(surf.rr().row(parts[k][j]) * 2.0f));
+            }
         }
     }
 };

@@ -91,10 +91,11 @@ public:
     /**
      * @brief Split a label into connected components.
      *
-     * Uses the surface mesh to identify connected sub-labels.
+     * Like mne Label.split("contiguous"): the parts keep the label's positions and values, come largest
+     * first and are named &lt;name&gt;_div&lt;i&gt;, before a trailing -lh / -rh.
      *
      * @param[in] label     The label to split.
-     * @param[in] surface   The surface providing vertex adjacency.
+     * @param[in] surface   The surface providing vertex adjacency (empty: every vertex is its own part).
      *
      * @return List of sub-labels (connected components).
      */
