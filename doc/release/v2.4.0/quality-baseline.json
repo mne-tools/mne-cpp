@@ -65,7 +65,7 @@
       "compiler_warnings": 0,
       "null_macro": 43,
       "typedef_struct": 12,
-      "c_style_cast": 423,
+      "c_style_cast": 419,
       "raw_new": 169,
       "raw_delete": 275,
       "console_io": 356,

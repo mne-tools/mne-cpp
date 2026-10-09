@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 395419,
+  "scanned_lines": 395381,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -55,11 +55,11 @@
       }
     },
     "c_style_cast": {
-      "total": 423,
-      "files": 72,
+      "total": 419,
+      "files": 71,
       "by_scope": {
         "applications": 61,
-        "libraries": 269,
+        "libraries": 265,
         "tools": 93
       },
       "suppressed": [],
@@ -128,7 +128,6 @@
         "src/libraries/fiff/fiff_stream.cpp": 82,
         "src/libraries/fiff/fiff_tag.cpp": 20,
         "src/libraries/fiff/fiff_tag.h": 9,
-        "src/libraries/inv/dipole_fit/inv_ecd_set.cpp": 4,
         "src/libraries/mne/mne_forward_solution.cpp": 1,
         "src/libraries/mne/mne_inverse_operator.cpp": 1,
         "src/libraries/mne/mne_raw_data.cpp": 1,

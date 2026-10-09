@@ -20,6 +20,7 @@
 //=============================================================================================================
 
 #include "inv_ecd_set.h"
+#include <fiff/fiff_byte_swap.h>
 #include <fiff/fiff_types.h>
 
 
@@ -52,40 +53,6 @@ using namespace FIFFLIB;
 constexpr int X = 0;
 constexpr int Y = 1;
 constexpr int Z = 2;
-
-//=============================================================================================================
-// DEFINE STATIC METHODS
-//=============================================================================================================
-
-static fiff_int_t swap_int(fiff_int_t source)
-{
-    unsigned char* csource = (unsigned char*)(&source);
-    fiff_int_t result;
-    unsigned char* cresult = (unsigned char*)(&result);
-
-    cresult[0] = csource[3];
-    cresult[1] = csource[2];
-    cresult[2] = csource[1];
-    cresult[3] = csource[0];
-    return (result);
-}
-
-//=============================================================================================================
-
-static float swap_float(float source)
-{
-    unsigned char* csource = (unsigned char*)(&source);
-    float result;
-    unsigned char* cresult = (unsigned char*)(&result);
-
-    cresult[0] = csource[3];
-    cresult[1] = csource[2];
-    cresult[2] = csource[1];
-    cresult[3] = csource[0];
-    return result;
-}
-
-//=============================================================================================================
 
 namespace INVLIB
 {
@@ -206,16 +173,16 @@ bool InvEcdSet::save_dipoles_bdip(const QString& fileName)
     for (k = 0, nsave = 0; k < this->size(); k++) {
         one = m_qListDips[k];
         if (one.valid) {
-            one_out.dipole = swap_int(1);
-            one_out.begin = swap_float(one.time);
+            one_out.dipole = FIFFLIB::swap_int(1);
+            one_out.begin = FIFFLIB::swap_float(one.time);
             for (p = 0; p < 3; p++) {
-                one_out.r0[p] = swap_float(0.0);
-                one_out.rd[p] = swap_float(one.rd[p]);
-                one_out.Q[p] = swap_float(one.Q[p]);
+                one_out.r0[p] = FIFFLIB::swap_float(0.0);
+                one_out.rd[p] = FIFFLIB::swap_float(one.rd[p]);
+                one_out.Q[p] = FIFFLIB::swap_float(one.Q[p]);
             }
-            one_out.goodness = swap_float(one.good);
-            one_out.errors_computed = swap_int(0);
-            one_out.khi2 = swap_float(one.khi2);
+            one_out.goodness = FIFFLIB::swap_float(one.good);
+            one_out.errors_computed = FIFFLIB::swap_int(0);
+            one_out.khi2 = FIFFLIB::swap_float(one.khi2);
             if (out.write(reinterpret_cast<const char*>(&one_out), sizeof(bdipEcdRec)) != sizeof(bdipEcdRec)) {
                 qCritical("Failed to write a dipole");
                 out.close();
