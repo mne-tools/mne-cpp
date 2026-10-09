@@ -1879,13 +1879,19 @@ void TestDisp3dBrainView::dipoleObject_extended()
     // Coordinates are ~10–40 mm → converted to meters (0.001 scale)
     QVERIFY(std::abs(pos.x()) < 1.0f);
 
-    // applyTransform — multiplies all instance model matrices
+    // applyTransform places the loaded dipoles; it replaces the previous transform instead of stacking on it,
+    // so a transform can be re-applied whenever it changes
     QMatrix4x4 identity;
     obj.applyTransform(identity);
+    QCOMPARE(obj.debugFirstDipolePosition(), pos);
 
     QMatrix4x4 translate;
     translate.translate(0.01f, 0.0f, 0.0f);
     obj.applyTransform(translate);
+    obj.applyTransform(translate);
+    QVERIFY((obj.debugFirstDipolePosition() - (pos + QVector3D(0.01f, 0.0f, 0.0f))).length() < 1e-7f);
+    obj.applyTransform(identity);
+    QVERIFY((obj.debugFirstDipolePosition() - pos).length() < 1e-7f);
 
     // intersect — ray casting against cone geometry
     float dist = 0.0f;

@@ -32,6 +32,7 @@
 #include "../disp3D_global.h"
 
 #include <QMatrix4x4>
+#include <QVector>
 #include <QVector3D>
 #include <vector>
 #include <memory>
@@ -62,7 +63,7 @@ public:
 
     void load(const INVLIB::InvEcdSet& ecdSet);
 
-    // Apply a transformation matrix to all dipoles
+    // Place all loaded dipoles with this transform (replaces any previous one)
     void applyTransform(const QMatrix4x4& trans);
 
     void updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
@@ -138,6 +139,7 @@ private:
     QByteArray m_vertexData;
     QByteArray m_indexData;
     QByteArray m_instanceData;
+    QVector<QMatrix4x4> m_loadedModels; /**< Instance model matrices as loaded, before applyTransform(). */
 
     bool m_geometryDirty = false;
     bool m_instancesDirty = false;

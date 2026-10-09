@@ -62,6 +62,7 @@ void DipoleObject::load(const INVLIB::InvEcdSet& ecdSet)
 
     m_instanceCount = ecdSet.size();
     m_instanceData.resize(m_instanceCount * sizeof(InstanceData));
+    m_loadedModels.resize(m_instanceCount);
     InstanceData* data = reinterpret_cast<InstanceData*>(m_instanceData.data());
 
     QVector3D from(0.0f, 1.0f, 0.0f); // Cone points up Y axis
@@ -118,6 +119,7 @@ void DipoleObject::load(const INVLIB::InvEcdSet& ecdSet)
         m.translate(pos);
         m.rotate(rot);
         m.scale(scaleFactor);
+        m_loadedModels[i] = m;
 
         const float* mPtr = m.constData();
         for (int j = 0; j < 16; ++j) {
@@ -153,21 +155,7 @@ void DipoleObject::applyTransform(const QMatrix4x4& trans)
     InstanceData* data = reinterpret_cast<InstanceData*>(m_instanceData.data());
 
     for (int i = 0; i < m_instanceCount; ++i) {
-        // Reconstruct current model matrix
-        QMatrix4x4 currentModel;
-        const float* src = data[i].model;
-        float* dst = currentModel.data();
-        for (int j = 0; j < 16; ++j)
-            dst[j] = src[j];
-
-        // Apply transformation: NewModel = Trans * OldModel
-        // Wait, OldModel places the cone at Pos with Rot.
-        // We want to transform Pos and Rot.
-        // So yes, Trans * OldModel works.
-
-        QMatrix4x4 newModel = trans * currentModel;
-
-        // Store back
+        const QMatrix4x4 newModel = trans * m_loadedModels[i];
         const float* newPtr = newModel.constData();
         for (int j = 0; j < 16; ++j) {
             data[i].model[j] = newPtr[j];
