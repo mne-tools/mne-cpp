@@ -453,6 +453,61 @@ void TestDisp3dBrainView::rtSourceInterpolationMatWorker_basics()
     worker.setVisualizationType(0);
     worker.setVisualizationType(1);
 
+    QSharedPointer<Eigen::SparseMatrix<float>> lhMat;
+    int nLh = 0;
+    QObject::connect(&worker, &RtSourceInterpolationMatWorker::newInterpolationMatrixLeftAvailable,
+                     [&](QSharedPointer<Eigen::SparseMatrix<float>> mat) {
+                         lhMat = mat;
+                         ++nLh;
+                     });
+
+    // Annotation mode: 6 vertices in labels 10 (vertices 0-2) and 20 (3-5), sources at vertices 0, 1 and 4.
+    // Every vertex shows the mean of its label's sources.
+    Eigen::VectorXi labelIds(6);
+    labelIds << 10, 10, 10, 20, 20, 20;
+    FSLIB::FsLabel a;
+    a.label_id = 10;
+    a.vertices = Eigen::VectorXi::LinSpaced(3, 0, 2);
+    FSLIB::FsLabel b;
+    b.label_id = 20;
+    b.vertices = Eigen::VectorXi::LinSpaced(3, 3, 5);
+    Eigen::VectorXi sources(3);
+    sources << 0, 1, 4;
+    worker.setAnnotationInfoLeft(labelIds, {a, b}, sources);
+    worker.setVisualizationType(RtSourceInterpolationMatWorker::AnnotationBased);
+    worker.computeInterpolationMatrix();
+    QCOMPARE(nLh, 1);
+    QVERIFY(lhMat);
+    QCOMPARE(lhMat->rows(), Eigen::Index(6));
+    QCOMPARE(lhMat->cols(), Eigen::Index(3));
+    const Eigen::VectorXf values = *lhMat * Eigen::Vector3f(2.0f, 4.0f, 7.0f);
+    for (int v = 0; v < 3; ++v) {
+        QVERIFY(std::fabs(values(v) - 3.0f) < 1e-6f);
+        QVERIFY(std::fabs(values(v + 3) - 7.0f) < 1e-6f);
+    }
+
+    // Interpolation mode on a line of 3 vertices with sources at both ends
+    Eigen::MatrixX3f rr(3, 3);
+    rr << 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.02f, 0.0f, 0.0f;
+    std::vector<Eigen::VectorXi> neighbors(3);
+    neighbors[0] = (Eigen::VectorXi(1) << 1).finished();
+    neighbors[1] = (Eigen::VectorXi(2) << 0, 2).finished();
+    neighbors[2] = (Eigen::VectorXi(1) << 1).finished();
+    Eigen::VectorXi ends(2);
+    ends << 0, 2;
+    worker.setInterpolationInfoLeft(rr, neighbors, ends);
+    worker.setVisualizationType(RtSourceInterpolationMatWorker::InterpolationBased);
+    worker.setInterpolationFunction(QStringLiteral("linear"));
+    worker.computeInterpolationMatrix();
+    QCOMPARE(nLh, 2);
+    QCOMPARE(lhMat->rows(), Eigen::Index(3));
+    QCOMPARE(lhMat->cols(), Eigen::Index(2));
+    // Source vertices keep their own value; the middle one lies between both
+    const Eigen::VectorXf line = *lhMat * Eigen::Vector2f(1.0f, 3.0f);
+    QVERIFY(std::fabs(line(0) - 1.0f) < 1e-6f);
+    QVERIFY(std::fabs(line(2) - 3.0f) < 1e-6f);
+    QVERIFY(line(1) > 1.0f && line(1) < 3.0f);
+
     QApplication::processEvents();
 }
 
