@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "source": {
-    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/37957942050",
-    "commit": "733eaa5dea6ebe88934042e4d9bcca59c56a352a"
+    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/37988088184",
+    "commit": "a5b394939"
   },
   "platforms": {
     "macos-26": {
@@ -12,7 +12,7 @@
       "results": {
         "ex_bids": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "ex_connectivity_metrics": {
           "status": "run",
@@ -24,11 +24,11 @@
         },
         "ex_disp3d_scene": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.2
         },
         "ex_disp_plots": {
           "status": "run",
-          "seconds": 0.8
+          "seconds": 0.6
         },
         "ex_dsp_analysis": {
           "status": "run",
@@ -48,11 +48,11 @@
         },
         "ex_dsp_preprocessing": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "ex_dsp_rt": {
           "status": "run",
-          "seconds": 9.5
+          "seconds": 6.8
         },
         "ex_dsp_spectral": {
           "status": "run",
@@ -60,7 +60,7 @@
         },
         "ex_fiff_api": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.2
         },
         "ex_fiff_structure": {
           "status": "run",
@@ -68,23 +68,23 @@
         },
         "ex_fs": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.2
         },
         "ex_fwd_api": {
           "status": "run",
-          "seconds": 3.6
+          "seconds": 2.2
         },
         "ex_inv_api": {
           "status": "run",
-          "seconds": 3.2
+          "seconds": 2.4
         },
         "ex_inv_beamformer": {
           "status": "run",
-          "seconds": 1.4
+          "seconds": 1.0
         },
         "ex_inv_dipole_fit": {
           "status": "run",
-          "seconds": 0.5
+          "seconds": 0.4
         },
         "ex_inv_hpi": {
           "status": "run",
@@ -92,15 +92,15 @@
         },
         "ex_lsl": {
           "status": "run",
-          "seconds": 1.7
+          "seconds": 1.6
         },
         "ex_math": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "ex_ml": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.2
         },
         "ex_mna": {
           "status": "run",
@@ -108,11 +108,11 @@
         },
         "ex_mne_api": {
           "status": "run",
-          "seconds": 0.5
+          "seconds": 0.4
         },
         "ex_mri": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.1
         },
         "ex_sts_statistics": {
           "status": "run",
@@ -124,11 +124,11 @@
         },
         "test_anshared_models": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.2
         },
         "test_api_registry": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_batch_processor": {
           "status": "run",
@@ -156,7 +156,7 @@
         },
         "test_compute_raw_inverse": {
           "status": "run",
-          "seconds": 30.7
+          "seconds": 26.1
         },
         "test_conn_network": {
           "status": "run",
@@ -168,11 +168,11 @@
         },
         "test_connectivity_metrics": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.1
         },
         "test_coregistration": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.2
         },
         "test_cortical_surface_inverse": {
           "status": "run",
@@ -184,15 +184,15 @@
         },
         "test_cortical_surface_picking": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.3
         },
         "test_cortical_surface_stc": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.3
         },
         "test_crossval_covariance": {
           "status": "run",
-          "seconds": 2.1
+          "seconds": 2.6
         },
         "test_decoding_csp": {
           "status": "run",
@@ -208,7 +208,7 @@
         },
         "test_dipole_fit": {
           "status": "run",
-          "seconds": 2.1
+          "seconds": 1.7
         },
         "test_disp3d_brainsurface": {
           "status": "run",
@@ -216,11 +216,11 @@
         },
         "test_disp3d_brainview": {
           "status": "run",
-          "seconds": 2.9
+          "seconds": 4.5
         },
         "test_disp3d_headless": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.3
         },
         "test_disp3d_viewstate": {
           "status": "run",
@@ -232,23 +232,23 @@
         },
         "test_disp_plots": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.4
         },
         "test_disp_viewers": {
           "status": "run",
-          "seconds": 0.6
+          "seconds": 0.5
         },
         "test_disp_viewers2": {
           "status": "run",
-          "seconds": 5.5
+          "seconds": 6.0
         },
         "test_disp_viewers3": {
           "status": "run",
-          "seconds": 0.5
+          "seconds": 0.3
         },
         "test_doc_shots": {
           "status": "run",
-          "seconds": 15.2
+          "seconds": 15.1
         },
         "test_dsp_annotate_artifact": {
           "status": "run",
@@ -280,7 +280,7 @@
         },
         "test_dsp_csd": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.3
         },
         "test_dsp_eeg_reference": {
           "status": "run",
@@ -292,7 +292,7 @@
         },
         "test_dsp_epoch_extractor": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_dsp_filter_chpi": {
           "status": "run",
@@ -316,7 +316,7 @@
         },
         "test_dsp_infomax": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.2
         },
         "test_dsp_morlet_tfr": {
           "status": "run",
@@ -324,7 +324,7 @@
         },
         "test_dsp_multitaper": {
           "status": "run",
-          "seconds": 0.7
+          "seconds": 0.8
         },
         "test_dsp_peak_finder": {
           "status": "run",
@@ -336,7 +336,7 @@
         },
         "test_dsp_rt_cov": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_dsp_simulate": {
           "status": "run",
@@ -360,7 +360,7 @@
         },
         "test_dsp_welch_psd": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_dsp_xdawn": {
           "status": "run",
@@ -368,7 +368,7 @@
         },
         "test_edf2fiff_rwr": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.3
         },
         "test_electrode_object": {
           "status": "run",
@@ -384,11 +384,11 @@
         },
         "test_events": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_field_map": {
           "status": "run",
-          "seconds": 36.4
+          "seconds": 40.3
         },
         "test_fiff_annotation_event_utils": {
           "status": "run",
@@ -396,7 +396,7 @@
         },
         "test_fiff_annotations": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fiff_byte_swap": {
           "status": "run",
@@ -412,15 +412,15 @@
         },
         "test_fiff_core_python": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.9
         },
         "test_fiff_cov": {
           "status": "run",
-          "seconds": 0.6
+          "seconds": 0.9
         },
         "test_fiff_cov_python": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fiff_coverage": {
           "status": "run",
@@ -436,7 +436,7 @@
         },
         "test_fiff_digitizer": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fiff_evoked_python": {
           "status": "run",
@@ -448,7 +448,7 @@
         },
         "test_fiff_fs_library": {
           "status": "run",
-          "seconds": 1.0
+          "seconds": 1.1
         },
         "test_fiff_info": {
           "status": "run",
@@ -456,7 +456,7 @@
         },
         "test_fiff_io_evoked_info": {
           "status": "run",
-          "seconds": 0.5
+          "seconds": 0.6
         },
         "test_fiff_mne_types_io": {
           "status": "run",
@@ -464,7 +464,7 @@
         },
         "test_fiff_proj_python": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fiff_raw_formats_python": {
           "status": "run",
@@ -476,7 +476,7 @@
         },
         "test_fiff_raw_save_python": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fiff_rwr": {
           "status": "run",
@@ -492,7 +492,7 @@
         },
         "test_filter_data": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.3
         },
         "test_filter_kernel": {
           "status": "run",
@@ -512,11 +512,11 @@
         },
         "test_fs_annotation_labels": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.3
         },
         "test_fs_atlas_lookup": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fs_io": {
           "status": "run",
@@ -528,15 +528,15 @@
         },
         "test_fwd_bem_data": {
           "status": "run",
-          "seconds": 2.1
+          "seconds": 2.3
         },
         "test_fwd_bem_driver_python": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fwd_bem_field_computation": {
           "status": "run",
-          "seconds": 64.6
+          "seconds": 58.5
         },
         "test_fwd_bem_field_integrals": {
           "status": "run",
@@ -548,7 +548,7 @@
         },
         "test_fwd_library": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.4
         },
         "test_fwd_models": {
           "status": "run",
@@ -556,7 +556,7 @@
         },
         "test_fwd_python": {
           "status": "run",
-          "seconds": 32.9
+          "seconds": 29.9
         },
         "test_fwd_sphere_settings": {
           "status": "run",
@@ -572,15 +572,15 @@
         },
         "test_hpiFit": {
           "status": "run",
-          "seconds": 1.7
+          "seconds": 1.6
         },
         "test_hpiFit_integration": {
           "status": "run",
-          "seconds": 0.8
+          "seconds": 0.7
         },
         "test_hpiModelParameter": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_ica_label": {
           "status": "run",
@@ -592,7 +592,7 @@
         },
         "test_inv_beamformer": {
           "status": "run",
-          "seconds": 11.5
+          "seconds": 9.4
         },
         "test_inv_beamformer_python": {
           "status": "run",
@@ -612,23 +612,23 @@
         },
         "test_inv_dipole_rap_mne": {
           "status": "run",
-          "seconds": 3.8
+          "seconds": 3.2
         },
         "test_inv_eloreta_python": {
           "status": "run",
-          "seconds": 12.5
+          "seconds": 10.7
         },
         "test_inv_lcmv_python": {
           "status": "run",
-          "seconds": 49.8
+          "seconds": 62.1
         },
         "test_inv_loreta": {
           "status": "run",
-          "seconds": 60.6
+          "seconds": 60.9
         },
         "test_inv_rap_music_truth": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_inv_rt_library": {
           "status": "run",
@@ -644,15 +644,15 @@
         },
         "test_inverse_data": {
           "status": "run",
-          "seconds": 18.6
+          "seconds": 17.7
         },
         "test_inverse_rap_dipole": {
           "status": "run",
-          "seconds": 52.1
+          "seconds": 54.2
         },
         "test_label_time_course": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_label_utils": {
           "status": "run",
@@ -660,7 +660,7 @@
         },
         "test_lsl": {
           "status": "run",
-          "seconds": 17.0
+          "seconds": 16.8
         },
         "test_maxwell_movement_comp": {
           "status": "run",
@@ -680,15 +680,15 @@
         },
         "test_mna_graph_execution": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_mna_inverse_pipeline": {
           "status": "run",
-          "seconds": 8.4
+          "seconds": 8.8
         },
         "test_mna_io": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_mna_registry_loader": {
           "status": "run",
@@ -708,23 +708,23 @@
         },
         "test_mne_analyze_studio_scene_jsonrpc": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.1
         },
         "test_mne_analyze_studio_workflow_integration": {
           "status": "run",
-          "seconds": 0.9
+          "seconds": 0.7
         },
         "test_mne_anonymize": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.3
         },
         "test_mne_browse_app": {
           "status": "run",
-          "seconds": 0.7
+          "seconds": 0.6
         },
         "test_mne_browse_data": {
           "status": "run",
-          "seconds": 0.7
+          "seconds": 0.8
         },
         "test_mne_channel_selection": {
           "status": "run",
@@ -732,7 +732,7 @@
         },
         "test_mne_compute_raw_inverse": {
           "status": "run",
-          "seconds": 12.8
+          "seconds": 9.3
         },
         "test_mne_cov_matrix": {
           "status": "run",
@@ -740,23 +740,23 @@
         },
         "test_mne_cov_python": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.5
         },
         "test_mne_ctf_comp_python": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_mne_data_types": {
           "status": "run",
-          "seconds": 5.8
+          "seconds": 5.0
         },
         "test_mne_description_parser": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_mne_extended": {
           "status": "run",
-          "seconds": 0.7
+          "seconds": 0.4
         },
         "test_mne_flash_bem": {
           "status": "run",
@@ -764,39 +764,39 @@
         },
         "test_mne_forward_ops": {
           "status": "run",
-          "seconds": 2.2
+          "seconds": 1.5
         },
         "test_mne_forward_solution": {
           "status": "run",
-          "seconds": 29.4
+          "seconds": 20.0
         },
         "test_mne_hemisphere_epoch": {
           "status": "run",
-          "seconds": 11.0
+          "seconds": 9.9
         },
         "test_mne_inspect_multimodal": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_mne_inv_coverage": {
           "status": "run",
-          "seconds": 17.1
+          "seconds": 16.7
         },
         "test_mne_io_coverage": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.2
         },
         "test_mne_label_python": {
           "status": "run",
-          "seconds": 6.5
+          "seconds": 7.2
         },
         "test_mne_library": {
           "status": "run",
-          "seconds": 15.7
+          "seconds": 17.0
         },
         "test_mne_msh_display_surface_set": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_mne_project_to_surface": {
           "status": "run",
@@ -808,7 +808,7 @@
         },
         "test_mne_raw_data_python": {
           "status": "run",
-          "seconds": 0.9
+          "seconds": 1.2
         },
         "test_mne_raw_proj_comp": {
           "status": "run",
@@ -816,19 +816,19 @@
         },
         "test_mne_setup_mri": {
           "status": "run",
-          "seconds": 1.6
+          "seconds": 1.5
         },
         "test_mne_source_analysis": {
           "status": "run",
-          "seconds": 61.0
+          "seconds": 49.8
         },
         "test_mne_source_data": {
           "status": "run",
-          "seconds": 1.5
+          "seconds": 1.9
         },
         "test_mne_source_space_ops_python": {
           "status": "run",
-          "seconds": 1.5
+          "seconds": 1.4
         },
         "test_mne_source_space_python": {
           "status": "run",
@@ -836,23 +836,23 @@
         },
         "test_mne_surf2bem": {
           "status": "run",
-          "seconds": 0.9
+          "seconds": 0.8
         },
         "test_mne_testing_helper": {
           "status": "run",
-          "seconds": 3.5
+          "seconds": 2.1
         },
         "test_mne_watershed_bem": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.2
         },
         "test_mri_io": {
           "status": "run",
-          "seconds": 0.9
+          "seconds": 0.7
         },
         "test_mri_nifti_io": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_mri_slicer": {
           "status": "run",
@@ -868,7 +868,7 @@
         },
         "test_multimodal_scene": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_network_visualization": {
           "status": "run",
@@ -880,7 +880,7 @@
         },
         "test_polhemus_coregistration": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_project_resume_layout": {
           "status": "run",
@@ -888,7 +888,7 @@
         },
         "test_python_runner": {
           "status": "run",
-          "seconds": 1.1
+          "seconds": 1.0
         },
         "test_report": {
           "status": "run",
@@ -904,7 +904,7 @@
         },
         "test_rtprocessing_averaging": {
           "status": "run",
-          "seconds": 2.7
+          "seconds": 1.8
         },
         "test_rtprocessing_extended": {
           "status": "run",
@@ -924,11 +924,11 @@
         },
         "test_sensorSet": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.2
         },
         "test_sensor_field_mapper": {
           "status": "run",
-          "seconds": 1.2
+          "seconds": 1.1
         },
         "test_sensor_streaming": {
           "status": "run",
@@ -944,7 +944,7 @@
         },
         "test_source_estimate_io": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_source_estimate_types": {
           "status": "run",
@@ -956,7 +956,7 @@
         },
         "test_spectral_connectivity": {
           "status": "run",
-          "seconds": 3.7
+          "seconds": 3.8
         },
         "test_standard_montage": {
           "status": "run",
@@ -972,7 +972,7 @@
         },
         "test_studio_core": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.8
         },
         "test_studio_dummy3d_view": {
           "status": "run",
@@ -984,15 +984,15 @@
         },
         "test_studio_mna_skills": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_studio_neuro_kernel": {
           "status": "run",
-          "seconds": 1.6
+          "seconds": 1.5
         },
         "test_studio_raw_model": {
           "status": "run",
-          "seconds": 0.5
+          "seconds": 0.3
         },
         "test_studio_skill_host": {
           "status": "run",
@@ -1004,15 +1004,15 @@
         },
         "test_surface_laplacian": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_tf_mxne": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_tool_compute_pipeline": {
           "status": "run",
-          "seconds": 138.5
+          "seconds": 133.5
         },
         "test_tool_conversion_extended": {
           "status": "run",
@@ -1024,7 +1024,7 @@
         },
         "test_tool_data_pipeline": {
           "status": "run",
-          "seconds": 53.0
+          "seconds": 51.4
         },
         "test_tool_exit_codes": {
           "status": "run",
@@ -1044,11 +1044,11 @@
         },
         "test_tool_inverse_operator": {
           "status": "run",
-          "seconds": 9.9
+          "seconds": 10.0
         },
         "test_tool_list_source_space": {
           "status": "run",
-          "seconds": 0.5
+          "seconds": 0.3
         },
         "test_tool_preproc_helpers": {
           "status": "run",
@@ -1060,7 +1060,7 @@
         },
         "test_tool_show_fiff": {
           "status": "run",
-          "seconds": 0.7
+          "seconds": 0.4
         },
         "test_tool_surface_math": {
           "status": "run",
@@ -1072,11 +1072,11 @@
         },
         "test_utils_circularbuffer": {
           "status": "run",
-          "seconds": 4.1
+          "seconds": 4.2
         },
         "test_utils_ioutils": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_utils_kmeans": {
           "status": "run",
@@ -1135,11 +1135,11 @@
         },
         "ex_disp3d_scene": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.2
         },
         "ex_disp_plots": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.4
         },
         "ex_dsp_analysis": {
           "status": "run",
@@ -1163,7 +1163,7 @@
         },
         "ex_dsp_rt": {
           "status": "run",
-          "seconds": 8.9
+          "seconds": 8.2
         },
         "ex_dsp_spectral": {
           "status": "run",
@@ -1187,7 +1187,7 @@
         },
         "ex_inv_api": {
           "status": "run",
-          "seconds": 3.2
+          "seconds": 3.1
         },
         "ex_inv_beamformer": {
           "status": "run",
@@ -1267,7 +1267,7 @@
         },
         "test_compute_raw_inverse": {
           "status": "run",
-          "seconds": 11.9
+          "seconds": 13.7
         },
         "test_conn_network": {
           "status": "run",
@@ -1287,7 +1287,7 @@
         },
         "test_cortical_surface_inverse": {
           "status": "run",
-          "seconds": 12.9
+          "seconds": 11.4
         },
         "test_cortical_surface_labels": {
           "status": "run",
@@ -1303,7 +1303,7 @@
         },
         "test_crossval_covariance": {
           "status": "run",
-          "seconds": 1.9
+          "seconds": 1.8
         },
         "test_decoding_csp": {
           "status": "run",
@@ -1319,7 +1319,7 @@
         },
         "test_dipole_fit": {
           "status": "run",
-          "seconds": 4.1
+          "seconds": 4.0
         },
         "test_disp3d_brainsurface": {
           "status": "run",
@@ -1327,7 +1327,7 @@
         },
         "test_disp3d_brainview": {
           "status": "run",
-          "seconds": 2.4
+          "seconds": 7.1
         },
         "test_disp3d_headless": {
           "status": "run",
@@ -1367,11 +1367,11 @@
         },
         "test_dsp_artifact_detect": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_dsp_bad_channel_detect": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_dsp_bad_channels_lof": {
           "status": "run",
@@ -1379,7 +1379,7 @@
         },
         "test_dsp_bad_channels_maxwell": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_dsp_bridged_electrodes": {
           "status": "run",
@@ -1443,7 +1443,7 @@
         },
         "test_dsp_resample": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_dsp_rt_cov": {
           "status": "run",
@@ -1455,7 +1455,7 @@
         },
         "test_dsp_spectrogram": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_dsp_sphara": {
           "status": "run",
@@ -1463,7 +1463,7 @@
         },
         "test_dsp_sss": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.1
         },
         "test_dsp_stim_artifact": {
           "status": "run",
@@ -1475,7 +1475,7 @@
         },
         "test_dsp_xdawn": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_edf2fiff_rwr": {
           "status": "run",
@@ -1499,7 +1499,7 @@
         },
         "test_field_map": {
           "status": "run",
-          "seconds": 31.1
+          "seconds": 29.8
         },
         "test_fiff_annotation_event_utils": {
           "status": "run",
@@ -1523,7 +1523,7 @@
         },
         "test_fiff_core_python": {
           "status": "run",
-          "seconds": 1.4
+          "seconds": 1.5
         },
         "test_fiff_cov": {
           "status": "run",
@@ -1591,7 +1591,7 @@
         },
         "test_fiff_rwr": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.3
         },
         "test_fiff_stream_python": {
           "status": "run",
@@ -1603,7 +1603,7 @@
         },
         "test_filter_data": {
           "status": "run",
-          "seconds": 0.7
+          "seconds": 0.6
         },
         "test_filter_kernel": {
           "status": "run",
@@ -1623,7 +1623,7 @@
         },
         "test_fs_annotation_labels": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.3
         },
         "test_fs_atlas_lookup": {
           "status": "run",
@@ -1639,15 +1639,15 @@
         },
         "test_fwd_bem_data": {
           "status": "run",
-          "seconds": 2.5
+          "seconds": 2.4
         },
         "test_fwd_bem_driver_python": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fwd_bem_field_computation": {
           "status": "run",
-          "seconds": 163.3
+          "seconds": 143.3
         },
         "test_fwd_bem_field_integrals": {
           "status": "run",
@@ -1667,7 +1667,7 @@
         },
         "test_fwd_python": {
           "status": "run",
-          "seconds": 54.1
+          "seconds": 53.3
         },
         "test_fwd_sphere_settings": {
           "status": "run",
@@ -1683,11 +1683,11 @@
         },
         "test_hpiFit": {
           "status": "run",
-          "seconds": 6.2
+          "seconds": 5.9
         },
         "test_hpiFit_integration": {
           "status": "run",
-          "seconds": 2.7
+          "seconds": 2.6
         },
         "test_hpiModelParameter": {
           "status": "run",
@@ -1703,7 +1703,7 @@
         },
         "test_inv_beamformer": {
           "status": "run",
-          "seconds": 20.7
+          "seconds": 20.6
         },
         "test_inv_beamformer_python": {
           "status": "run",
@@ -1719,31 +1719,31 @@
         },
         "test_inv_dipole_fit_python": {
           "status": "run",
-          "seconds": 8.2
+          "seconds": 8.1
         },
         "test_inv_dipole_rap_mne": {
           "status": "run",
-          "seconds": 6.2
+          "seconds": 6.1
         },
         "test_inv_eloreta_python": {
           "status": "run",
-          "seconds": 18.2
+          "seconds": 17.8
         },
         "test_inv_lcmv_python": {
           "status": "run",
-          "seconds": 120.8
+          "seconds": 119.5
         },
         "test_inv_loreta": {
           "status": "run",
-          "seconds": 80.0
+          "seconds": 76.3
         },
         "test_inv_rap_music_truth": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_inv_rt_library": {
           "status": "run",
-          "seconds": 2.5
+          "seconds": 2.4
         },
         "test_inv_source_estimate_token": {
           "status": "run",
@@ -1755,11 +1755,11 @@
         },
         "test_inverse_data": {
           "status": "run",
-          "seconds": 24.9
+          "seconds": 23.9
         },
         "test_inverse_rap_dipole": {
           "status": "run",
-          "seconds": 63.1
+          "seconds": 57.7
         },
         "test_label_time_course": {
           "status": "run",
@@ -1795,7 +1795,7 @@
         },
         "test_mna_inverse_pipeline": {
           "status": "run",
-          "seconds": 14.0
+          "seconds": 12.2
         },
         "test_mna_io": {
           "status": "run",
@@ -1811,7 +1811,7 @@
         },
         "test_mna_skill_graph_equivalence": {
           "status": "run",
-          "seconds": 4.2
+          "seconds": 4.1
         },
         "test_mne_analyze_studio_core_capabilities": {
           "status": "run",
@@ -1827,7 +1827,7 @@
         },
         "test_mne_anonymize": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.5
         },
         "test_mne_browse_app": {
           "status": "run",
@@ -1835,7 +1835,7 @@
         },
         "test_mne_browse_data": {
           "status": "run",
-          "seconds": 1.1
+          "seconds": 1.0
         },
         "test_mne_channel_selection": {
           "status": "run",
@@ -1843,7 +1843,7 @@
         },
         "test_mne_compute_raw_inverse": {
           "status": "run",
-          "seconds": 14.8
+          "seconds": 14.4
         },
         "test_mne_cov_matrix": {
           "status": "run",
@@ -1859,7 +1859,7 @@
         },
         "test_mne_data_types": {
           "status": "run",
-          "seconds": 6.3
+          "seconds": 5.9
         },
         "test_mne_description_parser": {
           "status": "run",
@@ -1875,15 +1875,15 @@
         },
         "test_mne_forward_ops": {
           "status": "run",
-          "seconds": 2.1
+          "seconds": 2.0
         },
         "test_mne_forward_solution": {
           "status": "run",
-          "seconds": 71.9
+          "seconds": 52.7
         },
         "test_mne_hemisphere_epoch": {
           "status": "run",
-          "seconds": 12.9
+          "seconds": 11.9
         },
         "test_mne_inspect_multimodal": {
           "status": "run",
@@ -1891,7 +1891,7 @@
         },
         "test_mne_inv_coverage": {
           "status": "run",
-          "seconds": 28.5
+          "seconds": 25.3
         },
         "test_mne_io_coverage": {
           "status": "run",
@@ -1899,11 +1899,11 @@
         },
         "test_mne_label_python": {
           "status": "run",
-          "seconds": 8.4
+          "seconds": 8.2
         },
         "test_mne_library": {
           "status": "run",
-          "seconds": 19.6
+          "seconds": 18.5
         },
         "test_mne_msh_display_surface_set": {
           "status": "run",
@@ -1919,7 +1919,7 @@
         },
         "test_mne_raw_data_python": {
           "status": "run",
-          "seconds": 1.8
+          "seconds": 1.7
         },
         "test_mne_raw_proj_comp": {
           "status": "run",
@@ -1927,15 +1927,15 @@
         },
         "test_mne_setup_mri": {
           "status": "run",
-          "seconds": 1.5
+          "seconds": 1.4
         },
         "test_mne_source_analysis": {
           "status": "run",
-          "seconds": 65.0
+          "seconds": 59.6
         },
         "test_mne_source_data": {
           "status": "run",
-          "seconds": 2.2
+          "seconds": 2.1
         },
         "test_mne_source_space_ops_python": {
           "status": "run",
@@ -1951,7 +1951,7 @@
         },
         "test_mne_testing_helper": {
           "status": "run",
-          "seconds": 0.5
+          "seconds": 0.4
         },
         "test_mne_watershed_bem": {
           "status": "run",
@@ -1959,7 +1959,7 @@
         },
         "test_mri_io": {
           "status": "run",
-          "seconds": 1.0
+          "seconds": 0.9
         },
         "test_mri_nifti_io": {
           "status": "run",
@@ -2015,7 +2015,7 @@
         },
         "test_rtprocessing_averaging": {
           "status": "run",
-          "seconds": 2.8
+          "seconds": 2.7
         },
         "test_rtprocessing_extended": {
           "status": "run",
@@ -2039,7 +2039,7 @@
         },
         "test_sensor_field_mapper": {
           "status": "run",
-          "seconds": 1.7
+          "seconds": 1.6
         },
         "test_sensor_streaming": {
           "status": "run",
@@ -2123,7 +2123,7 @@
         },
         "test_tool_compute_pipeline": {
           "status": "run",
-          "seconds": 77.9
+          "seconds": 75.8
         },
         "test_tool_conversion_extended": {
           "status": "run",
@@ -2135,11 +2135,11 @@
         },
         "test_tool_data_pipeline": {
           "status": "run",
-          "seconds": 90.8
+          "seconds": 88.6
         },
         "test_tool_exit_codes": {
           "status": "run",
-          "seconds": 3.9
+          "seconds": 3.5
         },
         "test_tool_forward_generation": {
           "status": "run",
@@ -2155,7 +2155,7 @@
         },
         "test_tool_inverse_operator": {
           "status": "run",
-          "seconds": 13.6
+          "seconds": 13.1
         },
         "test_tool_list_source_space": {
           "status": "run",
@@ -2238,7 +2238,7 @@
         },
         "ex_connectivity_metrics": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.1
         },
         "ex_decoding": {
           "status": "run",
@@ -2254,7 +2254,7 @@
         },
         "ex_dsp_analysis": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "ex_dsp_artifacts": {
           "status": "run",
@@ -2274,7 +2274,7 @@
         },
         "ex_dsp_rt": {
           "status": "run",
-          "seconds": 9.4
+          "seconds": 8.5
         },
         "ex_dsp_spectral": {
           "status": "run",
@@ -2282,7 +2282,7 @@
         },
         "ex_fiff_api": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.3
         },
         "ex_fiff_structure": {
           "status": "run",
@@ -2290,19 +2290,19 @@
         },
         "ex_fs": {
           "status": "run",
-          "seconds": 0.8
+          "seconds": 0.6
         },
         "ex_fwd_api": {
           "status": "run",
-          "seconds": 3.6
+          "seconds": 3.5
         },
         "ex_inv_api": {
           "status": "run",
-          "seconds": 4.7
+          "seconds": 4.4
         },
         "ex_inv_beamformer": {
           "status": "run",
-          "seconds": 2.4
+          "seconds": 2.3
         },
         "ex_inv_dipole_fit": {
           "status": "run",
@@ -2350,11 +2350,11 @@
         },
         "test_api_registry": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_batch_processor": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.4
         },
         "test_bids": {
           "status": "run",
@@ -2378,7 +2378,7 @@
         },
         "test_compute_raw_inverse": {
           "status": "run",
-          "seconds": 40.6
+          "seconds": 27.0
         },
         "test_conn_network": {
           "status": "run",
@@ -2398,7 +2398,7 @@
         },
         "test_cortical_surface_inverse": {
           "status": "run",
-          "seconds": 13.6
+          "seconds": 12.4
         },
         "test_cortical_surface_labels": {
           "status": "run",
@@ -2414,7 +2414,7 @@
         },
         "test_crossval_covariance": {
           "status": "run",
-          "seconds": 3.4
+          "seconds": 5.2
         },
         "test_decoding_csp": {
           "status": "run",
@@ -2430,7 +2430,7 @@
         },
         "test_dipole_fit": {
           "status": "run",
-          "seconds": 4.0
+          "seconds": 3.9
         },
         "test_disp3d_brainsurface": {
           "status": "run",
@@ -2438,7 +2438,7 @@
         },
         "test_disp3d_brainview": {
           "status": "run",
-          "seconds": 0.9
+          "seconds": 7.2
         },
         "test_disp3d_headless": {
           "status": "run",
@@ -2458,11 +2458,11 @@
         },
         "test_disp_viewers": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.2
         },
         "test_disp_viewers2": {
           "status": "run",
-          "seconds": 5.1
+          "seconds": 5.2
         },
         "test_disp_viewers3": {
           "status": "run",
@@ -2506,7 +2506,7 @@
         },
         "test_dsp_eeg_reference": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_dsp_eog_regression": {
           "status": "run",
@@ -2522,11 +2522,11 @@
         },
         "test_dsp_filterio": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_dsp_firfilter": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.5
         },
         "test_dsp_ica": {
           "status": "run",
@@ -2546,7 +2546,7 @@
         },
         "test_dsp_multitaper": {
           "status": "run",
-          "seconds": 1.1
+          "seconds": 1.0
         },
         "test_dsp_peak_finder": {
           "status": "run",
@@ -2554,7 +2554,7 @@
         },
         "test_dsp_resample": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_dsp_rt_cov": {
           "status": "run",
@@ -2590,7 +2590,7 @@
         },
         "test_edf2fiff_rwr": {
           "status": "run",
-          "seconds": 0.6
+          "seconds": 0.4
         },
         "test_electrode_object": {
           "status": "run",
@@ -2598,7 +2598,7 @@
         },
         "test_electrodes_plugin": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_epochs": {
           "status": "run",
@@ -2610,7 +2610,7 @@
         },
         "test_field_map": {
           "status": "run",
-          "seconds": 44.0
+          "seconds": 42.6
         },
         "test_fiff_annotation_event_utils": {
           "status": "run",
@@ -2634,11 +2634,11 @@
         },
         "test_fiff_core_python": {
           "status": "run",
-          "seconds": 5.7
+          "seconds": 4.9
         },
         "test_fiff_cov": {
           "status": "run",
-          "seconds": 1.7
+          "seconds": 1.5
         },
         "test_fiff_cov_python": {
           "status": "run",
@@ -2670,7 +2670,7 @@
         },
         "test_fiff_fs_library": {
           "status": "run",
-          "seconds": 2.1
+          "seconds": 2.0
         },
         "test_fiff_info": {
           "status": "run",
@@ -2690,11 +2690,11 @@
         },
         "test_fiff_raw_formats_python": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.2
         },
         "test_fiff_raw_io": {
           "status": "run",
-          "seconds": 1.0
+          "seconds": 0.9
         },
         "test_fiff_raw_save_python": {
           "status": "run",
@@ -2702,7 +2702,7 @@
         },
         "test_fiff_rwr": {
           "status": "run",
-          "seconds": 0.4
+          "seconds": 0.7
         },
         "test_fiff_stream_python": {
           "status": "run",
@@ -2710,7 +2710,7 @@
         },
         "test_fiffsimulator_ssp": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.2
         },
         "test_filter_data": {
           "status": "run",
@@ -2722,7 +2722,7 @@
         },
         "test_filtering": {
           "status": "run",
-          "seconds": 0.5
+          "seconds": 0.4
         },
         "test_fine_calibration": {
           "status": "run",
@@ -2730,11 +2730,11 @@
         },
         "test_fs": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fs_annotation_labels": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.3
         },
         "test_fs_atlas_lookup": {
           "status": "run",
@@ -2750,19 +2750,19 @@
         },
         "test_fwd_bem_data": {
           "status": "run",
-          "seconds": 4.1
+          "seconds": 4.2
         },
         "test_fwd_bem_driver_python": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_fwd_bem_field_computation": {
           "status": "run",
-          "seconds": 136.1
+          "seconds": 124.5
         },
         "test_fwd_bem_field_integrals": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.3
         },
         "test_fwd_extended": {
           "status": "run",
@@ -2770,7 +2770,7 @@
         },
         "test_fwd_library": {
           "status": "run",
-          "seconds": 1.1
+          "seconds": 1.0
         },
         "test_fwd_models": {
           "status": "run",
@@ -2778,7 +2778,7 @@
         },
         "test_fwd_python": {
           "status": "run",
-          "seconds": 61.0
+          "seconds": 60.5
         },
         "test_fwd_sphere_settings": {
           "status": "run",
@@ -2798,7 +2798,7 @@
         },
         "test_hpiFit_integration": {
           "status": "run",
-          "seconds": 1.6
+          "seconds": 1.4
         },
         "test_hpiModelParameter": {
           "status": "run",
@@ -2810,11 +2810,11 @@
         },
         "test_interpolation": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.2
         },
         "test_inv_beamformer": {
           "status": "run",
-          "seconds": 15.0
+          "seconds": 15.3
         },
         "test_inv_beamformer_python": {
           "status": "run",
@@ -2830,23 +2830,23 @@
         },
         "test_inv_dipole_fit_python": {
           "status": "run",
-          "seconds": 7.3
+          "seconds": 8.0
         },
         "test_inv_dipole_rap_mne": {
           "status": "run",
-          "seconds": 6.8
+          "seconds": 6.5
         },
         "test_inv_eloreta_python": {
           "status": "run",
-          "seconds": 26.8
+          "seconds": 26.5
         },
         "test_inv_lcmv_python": {
           "status": "run",
-          "seconds": 139.5
+          "seconds": 135.0
         },
         "test_inv_loreta": {
           "status": "run",
-          "seconds": 74.5
+          "seconds": 76.8
         },
         "test_inv_rap_music_truth": {
           "status": "run",
@@ -2858,19 +2858,19 @@
         },
         "test_inv_source_estimate_token": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_inv_sparse": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_inverse_data": {
           "status": "run",
-          "seconds": 26.3
+          "seconds": 38.2
         },
         "test_inverse_rap_dipole": {
           "status": "run",
-          "seconds": 64.5
+          "seconds": 73.9
         },
         "test_label_time_course": {
           "status": "run",
@@ -2882,7 +2882,7 @@
         },
         "test_lsl": {
           "status": "run",
-          "seconds": 15.1
+          "seconds": 15.2
         },
         "test_maxwell_movement_comp": {
           "status": "run",
@@ -2894,7 +2894,7 @@
         },
         "test_ml_trainer": {
           "status": "run",
-          "seconds": 0.3
+          "seconds": 0.2
         },
         "test_mna_bids": {
           "status": "run",
@@ -2906,11 +2906,11 @@
         },
         "test_mna_inverse_pipeline": {
           "status": "run",
-          "seconds": 14.3
+          "seconds": 13.1
         },
         "test_mna_io": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_mna_registry_loader": {
           "status": "run",
@@ -2922,7 +2922,7 @@
         },
         "test_mna_skill_graph_equivalence": {
           "status": "run",
-          "seconds": 5.0
+          "seconds": 4.8
         },
         "test_mne_analyze_studio_core_capabilities": {
           "status": "run",
@@ -2934,7 +2934,7 @@
         },
         "test_mne_analyze_studio_workflow_integration": {
           "status": "run",
-          "seconds": 1.6
+          "seconds": 1.5
         },
         "test_mne_anonymize": {
           "status": "run",
@@ -2942,11 +2942,11 @@
         },
         "test_mne_browse_app": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.3
         },
         "test_mne_browse_data": {
           "status": "run",
-          "seconds": 1.5
+          "seconds": 1.6
         },
         "test_mne_channel_selection": {
           "status": "run",
@@ -2954,7 +2954,7 @@
         },
         "test_mne_compute_raw_inverse": {
           "status": "run",
-          "seconds": 17.9
+          "seconds": 16.9
         },
         "test_mne_cov_matrix": {
           "status": "run",
@@ -2966,15 +2966,15 @@
         },
         "test_mne_ctf_comp_python": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.2
         },
         "test_mne_data_types": {
           "status": "run",
-          "seconds": 9.7
+          "seconds": 9.4
         },
         "test_mne_description_parser": {
           "status": "run",
-          "seconds": 0.2
+          "seconds": 0.1
         },
         "test_mne_extended": {
           "status": "run",
@@ -2986,15 +2986,15 @@
         },
         "test_mne_forward_ops": {
           "status": "run",
-          "seconds": 2.9
+          "seconds": 2.8
         },
         "test_mne_forward_solution": {
           "status": "run",
-          "seconds": 21.2
+          "seconds": 17.6
         },
         "test_mne_hemisphere_epoch": {
           "status": "run",
-          "seconds": 14.1
+          "seconds": 13.8
         },
         "test_mne_inspect_multimodal": {
           "status": "run",
@@ -3002,7 +3002,7 @@
         },
         "test_mne_inv_coverage": {
           "status": "run",
-          "seconds": 31.1
+          "seconds": 28.0
         },
         "test_mne_io_coverage": {
           "status": "run",
@@ -3010,11 +3010,11 @@
         },
         "test_mne_label_python": {
           "status": "run",
-          "seconds": 10.8
+          "seconds": 10.3
         },
         "test_mne_library": {
           "status": "run",
-          "seconds": 25.5
+          "seconds": 25.2
         },
         "test_mne_msh_display_surface_set": {
           "status": "run",
@@ -3026,7 +3026,7 @@
         },
         "test_mne_projections": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_mne_raw_data_python": {
           "status": "run",
@@ -3042,15 +3042,15 @@
         },
         "test_mne_source_analysis": {
           "status": "run",
-          "seconds": 68.9
+          "seconds": 69.1
         },
         "test_mne_source_data": {
           "status": "run",
-          "seconds": 3.3
+          "seconds": 3.1
         },
         "test_mne_source_space_ops_python": {
           "status": "run",
-          "seconds": 4.9
+          "seconds": 5.0
         },
         "test_mne_source_space_python": {
           "status": "run",
@@ -3058,11 +3058,11 @@
         },
         "test_mne_surf2bem": {
           "status": "run",
-          "seconds": 3.0
+          "seconds": 3.2
         },
         "test_mne_testing_helper": {
           "status": "run",
-          "seconds": 10.5
+          "seconds": 8.4
         },
         "test_mne_watershed_bem": {
           "status": "skipped",
@@ -3070,7 +3070,7 @@
         },
         "test_mri_io": {
           "status": "run",
-          "seconds": 1.2
+          "seconds": 1.7
         },
         "test_mri_nifti_io": {
           "status": "run",
@@ -3082,7 +3082,7 @@
         },
         "test_mri_slices_plugin": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_mri_vol_data": {
           "status": "run",
@@ -3094,19 +3094,19 @@
         },
         "test_network_visualization": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_picard_ica": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_polhemus_coregistration": {
           "status": "run",
-          "seconds": 0.9
+          "seconds": 0.3
         },
         "test_project_resume_layout": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_python_runner": {
           "status": "run",
@@ -3126,7 +3126,7 @@
         },
         "test_rtprocessing_averaging": {
           "status": "run",
-          "seconds": 3.9
+          "seconds": 3.7
         },
         "test_rtprocessing_extended": {
           "status": "run",
@@ -3134,7 +3134,7 @@
         },
         "test_scdisp_widgets": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_scmeas_measurements": {
           "status": "run",
@@ -3146,7 +3146,7 @@
         },
         "test_sensorSet": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_sensor_field_mapper": {
           "status": "run",
@@ -3162,11 +3162,11 @@
         },
         "test_signalModel": {
           "status": "run",
-          "seconds": 0.0
+          "seconds": 0.1
         },
         "test_source_estimate_io": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_source_estimate_types": {
           "status": "run",
@@ -3174,11 +3174,11 @@
         },
         "test_source_morph": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_spectral_connectivity": {
           "status": "run",
-          "seconds": 1.6
+          "seconds": 1.5
         },
         "test_standard_montage": {
           "status": "run",
@@ -3210,15 +3210,15 @@
         },
         "test_studio_neuro_kernel": {
           "status": "run",
-          "seconds": 1.1
+          "seconds": 1.2
         },
         "test_studio_raw_model": {
           "status": "run",
-          "seconds": 0.5
+          "seconds": 0.6
         },
         "test_studio_skill_host": {
           "status": "run",
-          "seconds": 1.2
+          "seconds": 1.3
         },
         "test_surface_checks": {
           "status": "run",
@@ -3230,15 +3230,15 @@
         },
         "test_tf_mxne": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_tool_compute_pipeline": {
           "status": "run",
-          "seconds": 84.6
+          "seconds": 83.2
         },
         "test_tool_conversion_extended": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_tool_conversion_functions": {
           "status": "run",
@@ -3246,11 +3246,11 @@
         },
         "test_tool_data_pipeline": {
           "status": "run",
-          "seconds": 121.1
+          "seconds": 106.2
         },
         "test_tool_exit_codes": {
           "status": "run",
-          "seconds": 8.5
+          "seconds": 6.8
         },
         "test_tool_forward_generation": {
           "status": "run",
@@ -3266,7 +3266,7 @@
         },
         "test_tool_inverse_operator": {
           "status": "run",
-          "seconds": 15.6
+          "seconds": 15.3
         },
         "test_tool_list_source_space": {
           "status": "run",
@@ -3274,15 +3274,15 @@
         },
         "test_tool_preproc_helpers": {
           "status": "run",
-          "seconds": 0.1
+          "seconds": 0.0
         },
         "test_tool_preprocessing": {
           "status": "run",
-          "seconds": 0.8
+          "seconds": 0.9
         },
         "test_tool_show_fiff": {
           "status": "run",
-          "seconds": 1.1
+          "seconds": 0.8
         },
         "test_tool_surface_math": {
           "status": "run",
@@ -3294,7 +3294,7 @@
         },
         "test_utils_circularbuffer": {
           "status": "run",
-          "seconds": 4.1
+          "seconds": 4.0
         },
         "test_utils_ioutils": {
           "status": "run",
