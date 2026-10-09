@@ -516,6 +516,35 @@ void TestDisp3dBrainView::brainView_multiViewApi()
     int preset = view.viewportCameraPreset(0);
     Q_UNUSED(preset);
 
+    // Dragging the vertical splitter of the 2x2 layout from the centre to 500 px moves the pane boundary:
+    // x = 450 then lies in the first pane instead of the second, also in a view opened afterwards
+    view.setViewportEnabled(0, true);
+    view.resize(800, 600);
+    view.resetMultiViewLayout();
+    view.setViewCount(4);
+    const auto send = [](BrainView& target, QEvent::Type type, const QPoint& pos, Qt::MouseButtons buttons) {
+        QMouseEvent event(type, pos, target.mapToGlobal(pos), type == QEvent::MouseMove ? Qt::NoButton : Qt::LeftButton, buttons, Qt::NoModifier);
+        QApplication::sendEvent(&target, &event);
+    };
+    const auto paneAt = [&send](BrainView& target, const QPoint& pos) {
+        send(target, QEvent::MouseButtonPress, pos, Qt::LeftButton);
+        send(target, QEvent::MouseButtonRelease, pos, Qt::NoButton);
+        return target.visualizationEditTarget();
+    };
+    QCOMPARE(paneAt(view, QPoint(450, 100)), 1);
+    QSignalSpy clicked(&view, &BrainView::surfacePointClicked);
+    send(view, QEvent::MouseButtonPress, QPoint(400, 100), Qt::LeftButton);
+    send(view, QEvent::MouseMove, QPoint(500, 100), Qt::LeftButton);
+    send(view, QEvent::MouseButtonRelease, QPoint(500, 100), Qt::NoButton);
+    QVERIFY(clicked.isEmpty());
+    BrainView reopened;
+    reopened.resize(800, 600);
+    QCOMPARE(paneAt(reopened, QPoint(450, 100)), 0);
+    QCOMPARE(paneAt(view, QPoint(450, 100)), 0);
+    view.resetMultiViewLayout();
+    QCOMPARE(paneAt(view, QPoint(450, 100)), 1);
+    view.showSingleView();
+
     QApplication::processEvents();
 }
 
