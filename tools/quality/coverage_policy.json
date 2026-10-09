@@ -1,6 +1,6 @@
 {
   "$comment": "Coverage policy for release gate G2 (doc/dev-notes/v2.4.0-requirements.md). check_coverage_gate.py enforces the floor and regression tolerance on the filtered report; the floor is a ratchet just below the measured combined coverage and may only rise, towards the G2 release minimum of 60%. summarize_coverage.py applies the exclusions: each needs a reason, patterns are fnmatch globs on repository-relative paths ('*' also crosses '/'), and one that matches no tracked or reported file is an error.",
-  "line_floor_percent": 48.5,
+  "line_floor_percent": 60.0,
   "max_regression_points": 0.1,
   "exclusions": [
     {

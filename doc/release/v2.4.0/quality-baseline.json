@@ -17,9 +17,9 @@
       "without_labels": 0,
       "without_timeout": 0,
       "ci_executed": {
-        "macos-26": 248,
-        "ubuntu-24.04": 248,
-        "windows-2025-vs2026": 248
+        "macos-26": 276,
+        "ubuntu-24.04": 276,
+        "windows-2025-vs2026": 276
       },
       "ci_skipped": {
         "macos-26": 0,
@@ -31,18 +31,18 @@
       "retry_paths": 0
     },
     "G2_coverage": {
-      "commit": "5053fe099fe1c7ad72d6a16a07ec0e6fe53ee4ad",
-      "source": "https://github.com/mne-tools/mne-cpp/actions/runs/36266179374",
-      "line_combined": 48.85,
-      "line_libraries": 62.75,
-      "line_applications": 24.9,
-      "line_tools": 61.68,
+      "commit": "ac8ba5768a577aafb04865192dace14c82d75f46",
+      "source": "https://github.com/mne-tools/mne-cpp/actions/runs/37896560977",
+      "line_combined": 61.44,
+      "line_libraries": 81.74,
+      "line_applications": 31.43,
+      "line_tools": 61.42,
       "branch_reported": true,
-      "branch_libraries": 42.9,
-      "lines_to_combined_target": 13712,
+      "branch_libraries": 58.63,
+      "lines_to_combined_target": 0,
       "lines_to_scope_targets": {
-        "libraries": 10902,
-        "applications": 11230,
+        "libraries": 0,
+        "applications": 8236,
         "tools": 0
       }
     },
