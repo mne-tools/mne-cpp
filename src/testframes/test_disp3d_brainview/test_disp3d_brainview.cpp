@@ -2440,7 +2440,7 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     view.resetMultiViewLayout();
     view.setViewCount(4);
     const FSLIB::FsSurface lh(dataDir + QStringLiteral("subjects/sample/surf/lh.white"));
-    model.addSurface(QStringLiteral("sample"), QStringLiteral("lh"), QStringLiteral("white"), lh);
+    SurfaceTreeItem* lhItem = model.addSurface(QStringLiteral("sample"), QStringLiteral("lh"), QStringLiteral("white"), lh);
     // Aim the view centre at the hemisphere, not at the gap between hemispheres
     const Eigen::Vector3f centroid = lh.rr().colwise().mean();
     view.setCameraFocusOverride(QVector3D(centroid.x(), centroid.y(), centroid.z()), 0.1f);
@@ -2478,6 +2478,15 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
         dragAndRelease(true);
         QVERIFY2(clicked.isEmpty(), qPrintable(QString::number(pane)));
     }
+
+    // Unchecking the surface in the tree hides it from picking
+    lhItem->setVisible(false);
+    clicked.clear();
+    dragAndRelease(false);
+    QVERIFY(clicked.isEmpty());
+    lhItem->setVisible(true);
+    dragAndRelease(false);
+    QCOMPARE(clicked.size(), 1);
     view.showSingleView();
 }
 
