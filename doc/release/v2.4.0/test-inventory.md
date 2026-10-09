@@ -31,7 +31,7 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/37896560977 (comm
 | sample-data | 19 |
 | test-data | 104 |
 | GUI (`QTEST_MAIN`) | 33 |
-| Contains `QSKIP` | 73 |
+| Contains `QSKIP` | 74 |
 
 ## Conditional and unregistered tests
 

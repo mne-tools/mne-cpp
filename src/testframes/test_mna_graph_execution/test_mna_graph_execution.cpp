@@ -152,6 +152,8 @@ private slots:
     void testVerificationChecksAndProvenance();
     void testExecuteIncrementalCleanSkip();
     void testProgressCallback();
+    void testStreamStartStop();
+    void testScriptAndIpcNodes();
 
     void cleanupTestCase();
 
@@ -518,6 +520,98 @@ void TestMnaGraphExecution::testRegisterOpFunc()
 
 //=============================================================================================================
 // Graph Executor
+//=============================================================================================================
+
+void TestMnaGraphExecution::testStreamStartStop()
+{
+    MnaGraph graph;
+    graph.addNode(makeSourceNode("src", "test_source"));
+    graph.addNode(makeNode("dbl", "test_double"));
+    graph.connect("src", "out", "dbl", "in");
+    graph.paramTree.setParam("src/value", 5.0);
+    graph.paramTree.setParam("missing/value", 1.0);
+
+    // One live plugin per node, created in topological order and destroyed in reverse
+    QStringList created;
+    QStringList destroyed;
+    const auto factory = [&](const QString& opType) -> QObject* {
+        auto* plugin = new QObject;
+        plugin->setObjectName(opType);
+        created.append(opType);
+        connect(plugin, &QObject::destroyed, [&destroyed, opType]() { destroyed.append(opType); });
+        return plugin;
+    };
+    MnaGraphExecutor::StreamContext ctx = MnaGraphExecutor::startStream(graph, factory);
+    QVERIFY(ctx.running);
+    QCOMPARE(ctx.graph, &graph);
+    QCOMPARE(ctx.executionOrder, QStringList({"src", "dbl"}));
+    QCOMPARE(created, QStringList({"test_source", "test_double"}));
+    QCOMPARE(ctx.livePlugins.value("dbl")->objectName(), QStringLiteral("test_double"));
+    QCOMPARE(graph.node("src").attributes.value("value").toDouble(), 5.0);
+    MnaGraphExecutor::stopStream(ctx);
+    QVERIFY(!ctx.running && ctx.livePlugins.isEmpty() && !ctx.graph);
+    QCOMPARE(destroyed, QStringList({"test_double", "test_source"}));
+    MnaGraphExecutor::stopStream(ctx);
+
+    // A plugin that cannot be created aborts the start and frees those already created
+    destroyed.clear();
+    const auto partial = [&](const QString& opType) -> QObject* {
+        return opType == QLatin1String("test_double") ? nullptr : factory(opType);
+    };
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("factory returned nullptr"));
+    ctx = MnaGraphExecutor::startStream(graph, partial);
+    QVERIFY(!ctx.running && ctx.livePlugins.isEmpty());
+    QCOMPARE(destroyed, QStringList({"test_source"}));
+
+    // An invalid graph (unconnected input) does not start
+    MnaGraph invalid;
+    invalid.addNode(makeNode("dbl", "test_double"));
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("graph validation failed"));
+    QVERIFY(!MnaGraphExecutor::startStream(invalid, factory).running);
+}
+
+//=============================================================================================================
+
+void TestMnaGraphExecution::testScriptAndIpcNodes()
+{
+#ifdef Q_OS_WIN
+    QSKIP("Uses /bin/sh and /bin/echo");
+#else
+    // Script: {{placeholders}} take input values and attributes; stdout, stderr and the exit code become outputs
+    MnaGraph graph;
+    MnaNode src = makeSourceNode("src", "test_source");
+    src.attributes["value"] = 3.0;
+    graph.addNode(src);
+    MnaNode script = makeNode("script", "shell_script");
+    script.execMode = MnaNodeExecMode::Script;
+    script.script.language = QStringLiteral("shell");
+    script.script.interpreter = QStringLiteral("/bin/sh");
+    script.script.code = QStringLiteral("echo in={{in}} label={{label}}; echo oops >&2; exit 3");
+    script.attributes["label"] = QStringLiteral("alpha");
+    graph.addNode(script);
+    graph.connect("src", "out", "script", "in");
+
+    // IPC: an external command with resolved arguments, run in the given directory; cached result paths are passed on
+    MnaNode ipc = makeNode("ipc", "external");
+    ipc.execMode = MnaNodeExecMode::Ipc;
+    ipc.ipcCommand = QStringLiteral("/bin/sh");
+    ipc.ipcArgs = {QStringLiteral("-c"), QStringLiteral("echo {{in}} $(pwd)")};
+    QTemporaryDir workDir;
+    ipc.ipcWorkDir = QDir(workDir.path()).canonicalPath();
+    ipc.outputs[0].cachedResultPath = QStringLiteral("result.fif");
+    graph.addNode(ipc);
+    graph.connect("src", "out", "ipc", "in");
+
+    MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph, {});
+    QCOMPARE(ctx.results.value("script::stdout").toString(), QStringLiteral("in=3 label=alpha\n"));
+    QCOMPARE(ctx.results.value("script::stderr").toString(), QStringLiteral("oops\n"));
+    QCOMPARE(ctx.results.value("script::exit_code").toInt(), 3);
+    QCOMPARE(ctx.results.value("ipc::stdout").toString(), QStringLiteral("3 ") + ipc.ipcWorkDir + QStringLiteral("\n"));
+    QCOMPARE(ctx.results.value("ipc::exit_code").toInt(), 0);
+    QCOMPARE(ctx.results.value("ipc::out").toString(), QStringLiteral("result.fif"));
+#endif
+}
+
 //=============================================================================================================
 
 void TestMnaGraphExecution::testExecuteLinearGraph()

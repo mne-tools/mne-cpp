@@ -430,18 +430,7 @@ MnaGraphExecutor::StreamContext MnaGraphExecutor::startStream(MnaGraph& graph,
     ctx.executionOrder = graph.topologicalSort();
 
     // 3. Apply current parameter tree values to node attributes
-    for (MnaNode& n : graph.nodes()) {
-        for (const QString& path : graph.paramTree.allPaths()) {
-            int sep = path.indexOf(QLatin1Char('/'));
-            if (sep > 0) {
-                QString nodeId = path.left(sep);
-                QString attrKey = path.mid(sep + 1);
-                if (nodeId == n.id) {
-                    n.attributes.insert(attrKey, graph.paramTree.param(path));
-                }
-            }
-        }
-    }
+    applyParamTree(graph);
 
     // 4. Instantiate live plugins via factory
     for (const QString& nodeId : ctx.executionOrder) {
