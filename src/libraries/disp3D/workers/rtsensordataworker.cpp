@@ -181,12 +181,13 @@ void RtSensorDataWorker::streamData()
 
     // Compute per-vertex colors using the dense mapping matrix
     QVector<uint32_t> colors = computeSurfaceColors(vecCurrentData);
+    const QString surfaceKey = m_sSurfaceKey;
 
     // Unlock before emitting (avoid deadlock if slot is direct connection)
     locker.unlock();
 
     if (!colors.isEmpty()) {
-        emit newRtSensorColors(m_sSurfaceKey, colors);
+        emit newRtSensorColors(surfaceKey, colors);
     }
 }
 
