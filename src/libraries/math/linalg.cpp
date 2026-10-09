@@ -123,7 +123,7 @@ void Linalg::get_whitener(MatrixXd& A,
         qInfo("Not doing PCA for %s", ch_type.toUtf8().constData());
     else {
         qInfo("Doing PCA for %s.", ch_type.toUtf8().constData());
-        eigvec = eigvec.block(eigvec.rows() - rnk, 0, rnk, eigvec.cols());
+        eigvec = eigvec.bottomRows(rnk).eval(); // eval: resizing eigvec frees the rows being read
     }
 }
 
@@ -151,7 +151,7 @@ void Linalg::get_whitener(MatrixXd& A,
         qInfo("Not doing PCA for %s", ch_type.c_str());
     else {
         qInfo("Doing PCA for %s.", ch_type.c_str());
-        eigvec = eigvec.block(eigvec.rows() - rnk, 0, rnk, eigvec.cols());
+        eigvec = eigvec.bottomRows(rnk).eval(); // eval: resizing eigvec frees the rows being read
     }
 }
 

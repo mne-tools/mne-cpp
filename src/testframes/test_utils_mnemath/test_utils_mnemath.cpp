@@ -227,6 +227,22 @@ void TestMNEMath::testGetWhitener()
     // PCA should keep rank(cov) eigenvectors
     QVERIFY(eigvec.rows() <= 3);
     QVERIFY(eigvec.rows() > 0);
+
+    // Rank 2: PCA keeps the two eigenvectors of the non-zero eigenvalues (3 and 1), one per row
+    MatrixXd rank2 = MatrixXd::Zero(3, 3);
+    rank2.topLeftCorner(2, 2) << 2.0, 1.0, 1.0, 2.0;
+    for (const bool useQString : {true, false}) {
+        MatrixXd rank2Copy = rank2;
+        if (useQString) {
+            Linalg::get_whitener(rank2Copy, true, QString("test"), eig, eigvec);
+        } else {
+            Linalg::get_whitener(rank2Copy, true, std::string("test"), eig, eigvec);
+        }
+        QCOMPARE(eigvec.rows(), Eigen::Index(2));
+        QCOMPARE(eigvec.cols(), Eigen::Index(3));
+        QCOMPARE(eig(0), 0.0);
+        QVERIFY((eigvec * rank2 * eigvec.transpose() - Vector2d(1.0, 3.0).asDiagonal().toDenseMatrix()).cwiseAbs().maxCoeff() < 1e-12);
+    }
 }
 
 //=============================================================================================================
