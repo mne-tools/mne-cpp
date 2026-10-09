@@ -395,6 +395,23 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     QVERIFY(modelView.loadNetwork(network, QStringLiteral("Coherence")));
     QVERIFY(model.rowCount() >= 3);
 
+    // Cardinal fiducials come in head coordinates, in MRI ones once the head <-> MRI transform is loaded
+    // (MNE-Python: apply_trans(invert_transform(mri_head_t), dig[k]["r"]))
+    QMap<int, QVector3D> fiducials = modelView.cardinalFiducialsInMri();
+    QCOMPARE(fiducials.size(), 3);
+    QVERIFY(std::fabs(fiducials[FIFFV_POINT_LPA].x() + 0.07137661f) < 1e-6f);
+    QVERIFY(!modelView.loadTransformation(dir.filePath(QStringLiteral("missing-trans.fif"))));
+    QVERIFY(modelView.loadTransformation(dataDir + QStringLiteral("MEG/sample/all-trans.fif")));
+    fiducials = modelView.cardinalFiducialsInMri();
+    const QMap<int, QVector3D> expected{{FIFFV_POINT_LPA, QVector3D(-0.06925742f, 0.01058946f, -0.02500086f)},
+                                        {FIFFV_POINT_NASION, QVector3D(0.00337909f, 0.09465942f, 0.03225918f)},
+                                        {FIFFV_POINT_RPA, QVector3D(0.07728562f, 0.01205367f, -0.03024882f)}};
+    for (auto it = expected.cbegin(); it != expected.cend(); ++it) {
+        QVERIFY2((fiducials[it.key()] - it.value()).length() < 1e-6f, qPrintable(QString::number(it.key())));
+    }
+    modelView.clearTransformation();
+    QVERIFY(std::fabs(modelView.cardinalFiducialsInMri()[FIFFV_POINT_LPA].x() + 0.07137661f) < 1e-6f);
+
     QApplication::processEvents();
 }
 
