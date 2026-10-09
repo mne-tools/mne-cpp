@@ -1356,6 +1356,7 @@ private:
     QFrame* m_verticalSeparator = nullptr;            /**< Visual separator between left/right panes. */
     QFrame* m_horizontalSeparator = nullptr;          /**< Visual separator between top/bottom panes. */
     bool m_perspectiveRotatedSincePress = false;      /**< True if mouse drag rotated a perspective pane. */
+    bool m_draggedSincePress = false;                 /**< True if the left-button drag rotated or panned. */
 };
 
 } // namespace DISP3DLIB

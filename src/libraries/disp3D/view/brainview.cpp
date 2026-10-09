@@ -2118,6 +2118,7 @@ void BrainView::mousePressEvent(QMouseEvent* e)
 {
     if (e->button() == Qt::LeftButton) {
         m_perspectiveRotatedSincePress = false;
+        m_draggedSincePress = false;
     }
 
     if (e->button() == Qt::LeftButton && m_viewMode == MultiView) {
@@ -2180,6 +2181,7 @@ void BrainView::mouseMoveEvent(QMouseEvent* event)
                 // Planar views (Top/Front/Left): pan along the view plane
                 const QPoint diff = event->pos() - m_lastMousePos;
                 CameraController::applyMousePan(diff, m_subViews[activeVp].pan, m_sceneSize);
+                m_draggedSincePress = true;
                 m_lastMousePos = event->pos();
                 m_sceneDirty = true;
                 update();
@@ -2192,6 +2194,7 @@ void BrainView::mouseMoveEvent(QMouseEvent* event)
                 CameraController::applyMouseRotation(diff, m_subViews[activeVp].perspectiveRotation);
 
                 m_perspectiveRotatedSincePress = true;
+                m_draggedSincePress = true;
                 m_lastMousePos = event->pos();
                 m_sceneDirty = true;
                 update();
@@ -2205,6 +2208,7 @@ void BrainView::mouseMoveEvent(QMouseEvent* event)
         // Single-view rotation
         QPoint diff = event->pos() - m_lastMousePos;
         CameraController::applyMouseRotation(diff, m_cameraRotation);
+        m_draggedSincePress = true;
 
         m_lastMousePos = event->pos();
         m_sceneDirty = true;
@@ -2241,8 +2245,8 @@ void BrainView::mouseReleaseEvent(QMouseEvent* event)
         saveMultiViewSettings();
     }
 
-    // Emit surface click if a clean left-click landed on geometry
-    if (event->button() == Qt::LeftButton && !m_isDraggingSplitter && !m_perspectiveRotatedSincePress) {
+    // Emit surface click if a clean left-click (no rotate or pan drag) landed on geometry
+    if (event->button() == Qt::LeftButton && !m_draggedSincePress) {
         castRay(event->pos());
         if (m_hasIntersection) {
             emit surfacePointClicked(m_lastIntersectionPoint);

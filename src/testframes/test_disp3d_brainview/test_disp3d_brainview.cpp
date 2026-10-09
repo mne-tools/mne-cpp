@@ -294,6 +294,12 @@ private slots:
 
     //=========================================================================================================
     /**
+     * A left click reports the surface point under the cursor; releasing after a rotate or pan drag does not.
+     */
+    void brainView_clickVersusDrag();
+
+    //=========================================================================================================
+    /**
      * Verifies RtSourceDataWorker and RtSensorDataWorker setters do not crash.
      */
     void rtDataWorkers_basics();
@@ -2418,6 +2424,61 @@ void TestDisp3dBrainView::brainView_clearRemovesObjectsAndRows()
     QCOMPARE(countItems(AbstractTreeItem::SurfaceItem), 2);
     QCOMPARE(countItems(AbstractTreeItem::SensorItem), sensors);
     QCOMPARE(countItems(AbstractTreeItem::SourceSpaceItem), sourceSpaces);
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::brainView_clickVersusDrag()
+{
+    const QString dataDir = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/");
+    BrainTreeModel model;
+    BrainView view;
+    view.setModel(&model);
+    view.resize(800, 600);
+    // Start from the default panes, not the layout earlier tests persisted
+    view.resetAllSubViewState();
+    view.resetMultiViewLayout();
+    view.setViewCount(4);
+    const FSLIB::FsSurface lh(dataDir + QStringLiteral("subjects/sample/surf/lh.white"));
+    model.addSurface(QStringLiteral("sample"), QStringLiteral("lh"), QStringLiteral("white"), lh);
+    // Aim the view centre at the hemisphere, not at the gap between hemispheres
+    const Eigen::Vector3f centroid = lh.rr().colwise().mean();
+    view.setCameraFocusOverride(QVector3D(centroid.x(), centroid.y(), centroid.z()), 0.1f);
+    QSignalSpy clicked(&view, &BrainView::surfacePointClicked);
+    const auto send = [&view](QEvent::Type type, const QPoint& pos, Qt::MouseButtons buttons) {
+        QMouseEvent event(type, pos, view.mapToGlobal(pos), type == QEvent::MouseMove ? Qt::NoButton : Qt::LeftButton, buttons, Qt::NoModifier);
+        QApplication::sendEvent(&view, &event);
+    };
+    QPoint centre;
+    const auto dragAndRelease = [&](bool drag) {
+        send(QEvent::MouseButtonPress, centre, Qt::LeftButton);
+        if (drag) {
+            send(QEvent::MouseMove, centre + QPoint(40, 0), Qt::LeftButton);
+            send(QEvent::MouseMove, centre, Qt::LeftButton);
+        }
+        send(QEvent::MouseButtonRelease, centre, Qt::NoButton);
+    };
+
+    // Single view (edit target -1), then the planar top-left pane (preset Top) and the perspective
+    // top-right pane of the default 2x2 layout
+    for (const int pane : {-1, 0, 1}) {
+        if (pane < 0) {
+            view.showSingleView();
+        } else {
+            view.showMultiView();
+        }
+        view.setVisualizationEditTarget(pane);
+        view.setActiveSurface(QStringLiteral("white"));
+        view.setHemiVisible(0, true);
+        centre = (pane < 0) ? view.rect().center() : QPoint(view.width() * (1 + 2 * pane) / 4, view.height() / 4);
+        clicked.clear();
+        dragAndRelease(false);
+        QCOMPARE(clicked.size(), 1);
+        clicked.clear();
+        dragAndRelease(true);
+        QVERIFY2(clicked.isEmpty(), qPrintable(QString::number(pane)));
+    }
+    view.showSingleView();
 }
 
 //=============================================================================================================
