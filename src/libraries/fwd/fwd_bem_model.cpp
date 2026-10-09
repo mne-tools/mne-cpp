@@ -2668,13 +2668,13 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
         use_threads = false;
 
     if (use_threads) {
-        int nthread = (fixed_ori || vec_field || nproc < 6) ? nspace : 3 * nspace;
+        int nthread = (fixed_ori || vec_field) ? nspace : 3 * nspace;
         std::vector<FwdThreadArg::UPtr> args;
         int stat;
         /*
         * We need copies to allocate separate workspace for each thread
         */
-        if (fixed_ori || vec_field || nproc < 6) {
+        if (fixed_ori || vec_field) {
             for (k = 0, off = 0; k < nthread; k++) {
                 auto t_arg = FwdThreadArg::create_meg_multi_thread_duplicate(*one_arg, !sphere);
                 t_arg->s = spaces[k].get();
@@ -2865,13 +2865,13 @@ int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>
         use_threads = false;
 
     if (use_threads) {
-        int nthread = (fixed_ori || vec_pot || nproc < 6) ? nspace : 3 * nspace;
+        int nthread = (fixed_ori || vec_pot) ? nspace : 3 * nspace;
         std::vector<FwdThreadArg::UPtr> args;
         int stat;
         /*
         * We need copies to allocate separate workspace for each thread
         */
-        if (fixed_ori || vec_pot || nproc < 6) {
+        if (fixed_ori || vec_pot) {
             for (k = 0, off = 0; k < nthread; k++) {
                 auto t_arg = FwdThreadArg::create_eeg_multi_thread_duplicate(*one_arg, !sphere);
                 t_arg->s = spaces[k].get();

@@ -362,6 +362,17 @@ void TestFwdPython::labelForward_free()
         QVERIFY2(fwd->sol_grad->data.col(k).norm() > 0.0, qPrintable(QString("gradient column %1 is empty").arg(k)));
     }
 
+    // Threads split the work by source space and dipole component; without threads it is done in one pass
+    {
+        auto single = settings(false, true);
+        single->use_threads = false;
+        single->solname = m_dir.filePath("free-single-fwd.fif");
+        auto unthreaded = std::make_shared<ComputeFwd>(single)->calculateFwd();
+        QVERIFY(unthreaded != nullptr);
+        QCOMPARE(unthreaded->sol->data, fwd->sol->data);
+        QCOMPARE(unthreaded->sol_grad->data, fwd->sol_grad->data);
+    }
+
     // The file stores MEG and EEG as separate blocks; reading merges them again.
     const QString path = m_dir.filePath("grad-fwd.fif");
     {
