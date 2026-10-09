@@ -1666,8 +1666,10 @@ void TestDisp3dBrainView::brainView_streamingApi()
         scalp.itris.resize(4, 3);
         scalp.itris << 0, 2, 4, 2, 1, 4, 1, 3, 4, 3, 0, 4;
         model.addBemSurface(QStringLiteral("sample"), QStringLiteral("head"), scalp);
+        const QString avePath = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
+        QCOMPARE(BrainView::probeEvokedSets(avePath).size(), 4);
         QSignalSpy loaded(&fieldView, &BrainView::sensorFieldLoaded);
-        QVERIFY(fieldView.loadSensorField(QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"), 0));
+        QVERIFY(fieldView.loadSensorField(avePath, 0));
         QCOMPARE(loaded.size(), 1);
         QVERIFY(fieldView.sensorFieldTimeRange(tmin, tmax));
         QVERIFY(tmin < 0.0f && tmax > 0.0f);
@@ -1675,6 +1677,24 @@ void TestDisp3dBrainView::brainView_streamingApi()
         QVERIFY(fieldView.isRealtimeSensorStreaming());
         fieldView.stopRealtimeSensorStreaming();
         QVERIFY(!fieldView.isRealtimeSensorStreaming());
+
+        // The scalp's top is the centre of its bounding box at maximal z; rays hit its faces
+        QVector3D top;
+        QVERIFY(fieldView.bemTopVertexInMri(top));
+        QVERIFY((top - QVector3D(0.0f, 0.0f, 0.13f)).length() < 1e-6f);
+        QVector3D hit;
+        QVERIFY(fieldView.intersectWorldRay(QVector3D(0.01f, 0.01f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), hit));
+        QVERIFY((hit - QVector3D(0.01f, 0.01f, 0.11f)).length() < 1e-5f);
+
+        // Clearing the evoked stops streaming; clearing the BEM removes the scalp from the model and the scene
+        fieldView.startRealtimeSensorStreaming(QStringLiteral("EEG"));
+        fieldView.clearEvoked();
+        QVERIFY(!fieldView.isRealtimeSensorStreaming());
+        QVERIFY(!fieldView.sensorFieldTimeRange(tmin, tmax));
+        fieldView.clearBem();
+        QVERIFY(!fieldView.bemTopVertexInMri(top));
+        QVERIFY(!fieldView.intersectWorldRay(QVector3D(0.01f, 0.01f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), hit));
+        QVERIFY(model.findItems(QStringLiteral("head"), Qt::MatchRecursive).isEmpty());
     }
 
     QApplication::processEvents();
