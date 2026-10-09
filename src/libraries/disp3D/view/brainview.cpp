@@ -3154,130 +3154,51 @@ void BrainView::showViewportPresetMenu(int viewport, const QPoint& globalPos)
 // Data removal
 //=============================================================================================================
 
-/**
- * Helper: remove all entries from m_surfaces and m_itemSurfaceMap whose
- * surface-key starts with @p prefix, and delete the corresponding model rows.
- */
-void BrainView::removeSurfacesByPrefix(const QString& prefix)
+void BrainView::removeSurfacesByPrefix(const QStringList& prefixes)
 {
-    // Collect keys first to avoid modifying the map while iterating
-    QStringList keysToRemove;
-    for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
-        if (it.key().startsWith(prefix))
-            keysToRemove << it.key();
-    }
-    for (const QString& key : keysToRemove)
-        m_surfaces.remove(key);
-
-    // Remove corresponding itemSurfaceMap entries + model rows
-    QList<const QStandardItem*> itemsToRemove;
-    for (auto it = m_itemSurfaceMap.cbegin(); it != m_itemSurfaceMap.cend(); ++it) {
-        // If the surface is no longer in m_surfaces, it was removed
-        bool stillPresent = false;
-        for (auto sit = m_surfaces.cbegin(); sit != m_surfaces.cend(); ++sit) {
-            if (sit.value() == it.value()) {
-                stillPresent = true;
-                break;
-            }
+    // Remove the tree rows first: they are found through the surfaces being removed
+    for (auto it = m_itemSurfaceMap.begin(); it != m_itemSurfaceMap.end();) {
+        const QString key = m_surfaces.key(it.value());
+        const bool remove = std::any_of(prefixes.cbegin(), prefixes.cend(), [&key](const QString& prefix) { return key.startsWith(prefix); });
+        if (!remove) {
+            ++it;
+            continue;
         }
-        if (!stillPresent)
-            itemsToRemove << it.key();
-    }
-    for (const QStandardItem* item : itemsToRemove) {
-        m_itemSurfaceMap.remove(item);
-        // Remove from model
         if (m_model) {
-            QStandardItem* mutableItem = const_cast<QStandardItem*>(item);
-            if (mutableItem->parent())
-                mutableItem->parent()->removeRow(mutableItem->row());
+            QStandardItem* item = const_cast<QStandardItem*>(it.key());
+            if (item->parent())
+                item->parent()->removeRow(item->row());
             else
-                m_model->removeRow(mutableItem->row());
+                m_model->removeRow(item->row());
         }
+        it = m_itemSurfaceMap.erase(it);
     }
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end();) {
+        const QString& key = it.key();
+        if (std::any_of(prefixes.cbegin(), prefixes.cend(), [&key](const QString& prefix) { return key.startsWith(prefix); }))
+            it = m_surfaces.erase(it);
+        else
+            ++it;
+    }
+    updateSceneBounds();
+    m_sceneDirty = true;
+    update();
 }
 
 //=============================================================================================================
 
 void BrainView::clearSurfaces()
 {
-    // Remove brain surfaces (lh_*, rh_*)
-    QStringList keysToRemove;
-    for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
-        if (it.key().startsWith("lh_") || it.key().startsWith("rh_"))
-            keysToRemove << it.key();
-    }
-
-    // Clean up itemSurfaceMap
-    for (auto it = m_itemSurfaceMap.begin(); it != m_itemSurfaceMap.end();) {
-        bool remove = false;
-        for (const QString& key : keysToRemove) {
-            if (m_surfaces.contains(key) && m_surfaces[key] == it.value()) {
-                remove = true;
-                break;
-            }
-        }
-        if (remove) {
-            if (m_model) {
-                QStandardItem* mutableItem = const_cast<QStandardItem*>(it.key());
-                if (mutableItem->parent())
-                    mutableItem->parent()->removeRow(mutableItem->row());
-                else
-                    m_model->removeRow(mutableItem->row());
-            }
-            it = m_itemSurfaceMap.erase(it);
-        } else {
-            ++it;
-        }
-    }
-
-    for (const QString& key : keysToRemove)
-        m_surfaces.remove(key);
-
     m_activeSurface.reset();
     m_activeSurfaceType.clear();
-    updateSceneBounds();
-    m_sceneDirty = true;
-    update();
+    removeSurfacesByPrefix({QStringLiteral("lh_"), QStringLiteral("rh_")});
 }
 
 //=============================================================================================================
 
 void BrainView::clearBem()
 {
-    QStringList keysToRemove;
-    for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
-        if (it.key().startsWith("bem_"))
-            keysToRemove << it.key();
-    }
-
-    for (auto it = m_itemSurfaceMap.begin(); it != m_itemSurfaceMap.end();) {
-        bool remove = false;
-        for (const QString& key : keysToRemove) {
-            if (m_surfaces.contains(key) && m_surfaces[key] == it.value()) {
-                remove = true;
-                break;
-            }
-        }
-        if (remove) {
-            if (m_model) {
-                QStandardItem* mutableItem = const_cast<QStandardItem*>(it.key());
-                if (mutableItem->parent())
-                    mutableItem->parent()->removeRow(mutableItem->row());
-                else
-                    m_model->removeRow(mutableItem->row());
-            }
-            it = m_itemSurfaceMap.erase(it);
-        } else {
-            ++it;
-        }
-    }
-
-    for (const QString& key : keysToRemove)
-        m_surfaces.remove(key);
-
-    updateSceneBounds();
-    m_sceneDirty = true;
-    update();
+    removeSurfacesByPrefix({QStringLiteral("bem_")});
 }
 
 //=============================================================================================================
@@ -3319,40 +3240,7 @@ void BrainView::clearDipoles()
 
 void BrainView::clearSourceSpace()
 {
-    QStringList keysToRemove;
-    for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
-        if (it.key().startsWith("srcsp_"))
-            keysToRemove << it.key();
-    }
-
-    for (auto it = m_itemSurfaceMap.begin(); it != m_itemSurfaceMap.end();) {
-        bool remove = false;
-        for (const QString& key : keysToRemove) {
-            if (m_surfaces.contains(key) && m_surfaces[key] == it.value()) {
-                remove = true;
-                break;
-            }
-        }
-        if (remove) {
-            if (m_model) {
-                QStandardItem* mutableItem = const_cast<QStandardItem*>(it.key());
-                if (mutableItem->parent())
-                    mutableItem->parent()->removeRow(mutableItem->row());
-                else
-                    m_model->removeRow(mutableItem->row());
-            }
-            it = m_itemSurfaceMap.erase(it);
-        } else {
-            ++it;
-        }
-    }
-
-    for (const QString& key : keysToRemove)
-        m_surfaces.remove(key);
-
-    updateSceneBounds();
-    m_sceneDirty = true;
-    update();
+    removeSurfacesByPrefix({QStringLiteral("srcsp_")});
 }
 
 //=============================================================================================================
@@ -3636,42 +3524,9 @@ void BrainView::clearCameraFocusOverride()
 
 void BrainView::clearSensors()
 {
-    QStringList keysToRemove;
-    for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
-        if (it.key().startsWith("sens_") || it.key().startsWith("dig_"))
-            keysToRemove << it.key();
-    }
-
-    for (auto it = m_itemSurfaceMap.begin(); it != m_itemSurfaceMap.end();) {
-        bool remove = false;
-        for (const QString& key : keysToRemove) {
-            if (m_surfaces.contains(key) && m_surfaces[key] == it.value()) {
-                remove = true;
-                break;
-            }
-        }
-        if (remove) {
-            if (m_model) {
-                QStandardItem* mutableItem = const_cast<QStandardItem*>(it.key());
-                if (mutableItem->parent())
-                    mutableItem->parent()->removeRow(mutableItem->row());
-                else
-                    m_model->removeRow(mutableItem->row());
-            }
-            it = m_itemSurfaceMap.erase(it);
-        } else {
-            ++it;
-        }
-    }
-
-    for (const QString& key : keysToRemove)
-        m_surfaces.remove(key);
-
     m_devHeadTrans = QMatrix4x4();
     m_hasDevHead = false;
-    updateSceneBounds();
-    m_sceneDirty = true;
-    update();
+    removeSurfacesByPrefix({QStringLiteral("sens_"), QStringLiteral("dig_")});
 }
 
 //=============================================================================================================

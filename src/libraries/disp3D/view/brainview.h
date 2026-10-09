@@ -1219,7 +1219,7 @@ private:
     const ViewVisibilityProfile& visibilityProfileForTarget(int target) const;
 
     void refreshSensorTransforms();
-    void removeSurfacesByPrefix(const QString& prefix);
+    void removeSurfacesByPrefix(const QStringList& prefixes);
 
 protected:
     void initialize(QRhiCommandBuffer* cb) override;
