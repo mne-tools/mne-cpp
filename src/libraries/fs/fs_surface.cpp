@@ -234,22 +234,21 @@ bool FsSurface::read(const QString& p_sFile, FsSurface& p_Surface, bool p_bLoadC
         else
             qInfo("\t%s is a new quad file (nvert = %d nquad = %d)\n", p_sFile.toUtf8().constData(), nvert, nquad);
 
-        //vertices
-        verts.resize(nvert, 3);
+        // vertices, one column per vertex like the triangle branch (transposed below)
+        verts.resize(3, nvert);
         if (magic == QUAD_FILE_MAGIC_NUMBER) {
             qint16 iVal;
             for (qint32 i = 0; i < nvert; ++i) {
                 for (qint32 j = 0; j < 3; ++j) {
                     t_DataStream >> iVal;
-                    FIFFLIB::swap_short(iVal);
-                    verts(i, j) = static_cast<float>(iVal) / 100;
+                    verts(j, i) = static_cast<float>(iVal) / 100;
                 }
             }
         } else {
             t_DataStream.readRawData(reinterpret_cast<char*>(verts.data()), nvert * 3 * sizeof(float));
             for (qint32 i = 0; i < nvert; ++i)
                 for (qint32 j = 0; j < 3; ++j)
-                    FIFFLIB::swap_floatp(&verts(i, j));
+                    FIFFLIB::swap_floatp(&verts(j, i));
         }
 
         MatrixXi quads = FsSurface::fread3_many(t_DataStream, nquad * 4);

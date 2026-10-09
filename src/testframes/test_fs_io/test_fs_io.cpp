@@ -220,13 +220,76 @@ private slots:
         QVERIFY(QFile::exists(filePath));
 
         FsSurface s;
-        bool ok = FsSurface::read(filePath, s, false);
-        // May or may not succeed depending on format details,
-        // but should not crash
-        if (ok) {
-            QVERIFY(!s.isEmpty());
-            QCOMPARE(s.rr().rows(), (Eigen::Index)4);
-            QCOMPARE(s.tris().rows(), (Eigen::Index)2);
+        QVERIFY(FsSurface::read(filePath, s, false));
+        QVERIFY(!s.isEmpty());
+        QCOMPARE(s.rr().rows(), (Eigen::Index)4);
+        QCOMPARE(s.tris().rows(), (Eigen::Index)2);
+    }
+
+    void surface_readQuadFiles()
+    {
+        // Legacy quad surfaces (QUAD: int16 hundredths of mm, NEW_QUAD: float mm) and the old curvature format
+        // (int16 hundredths); expected values from nibabel read_geometry and mne.surface.read_curvature
+        QTemporaryDir tmpDir;
+        QVERIFY(tmpDir.isValid());
+        const auto put3 = [](QDataStream& out, int v) {
+            const char bytes[3] = {char((v >> 16) & 0xff), char((v >> 8) & 0xff), char(v & 0xff)};
+            out.writeRawData(bytes, 3);
+        };
+        const float mm[5][3] = {{1.5f, -2.25f, 3.0f}, {10.0f, 0.5f, -7.75f}, {0.0f, 4.0f, 2.5f}, {-3.5f, 1.0f, 0.25f}, {6.0f, -6.0f, 6.0f}};
+        for (const int magic : {16777215, 16777213}) {
+            QByteArray b;
+            QDataStream out(&b, QIODevice::WriteOnly);
+            out.setFloatingPointPrecision(QDataStream::SinglePrecision);
+            put3(out, magic);
+            put3(out, 5);
+            put3(out, 2);
+            for (const auto& v : mm) {
+                for (const float c : v) {
+                    if (magic == 16777215) {
+                        out << qint16(std::lround(c * 100.0f));
+                    } else {
+                        out << c;
+                    }
+                }
+            }
+            for (const int q : {0, 1, 2, 3, 1, 2, 3, 4}) {
+                put3(out, q);
+            }
+            QFile file(tmpDir.filePath(magic == 16777215 ? "lh.quad" : "lh.newquad"));
+            QVERIFY(file.open(QIODevice::WriteOnly));
+            file.write(b);
+            file.close();
+
+            FsSurface s;
+            QVERIFY(FsSurface::read(file.fileName(), s, false));
+            QCOMPARE(s.rr().rows(), Eigen::Index(5));
+            for (int i = 0; i < 5; ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    QVERIFY(std::fabs(s.rr()(i, j) - mm[i][j] * 0.001f) < 1e-7f);
+                }
+            }
+            Eigen::MatrixX3i expected(4, 3);
+            expected << 0, 1, 3, 2, 3, 1, 1, 2, 3, 1, 3, 4;
+            QCOMPARE(s.tris(), expected);
+        }
+
+        QByteArray curv;
+        QDataStream curvOut(&curv, QIODevice::WriteOnly);
+        put3(curvOut, 5);
+        put3(curvOut, 2);
+        for (const qint16 v : {25, -150, 300, 0, -1}) {
+            curvOut << v;
+        }
+        QFile curvFile(tmpDir.filePath("lh.curv"));
+        QVERIFY(curvFile.open(QIODevice::WriteOnly));
+        curvFile.write(curv);
+        curvFile.close();
+        const VectorXf values = FsSurface::read_curv(curvFile.fileName());
+        QCOMPARE(values.size(), Eigen::Index(5));
+        const float expectedCurv[] = {0.25f, -1.5f, 3.0f, 0.0f, -0.01f};
+        for (int i = 0; i < 5; ++i) {
+            QVERIFY(std::fabs(values(i) - expectedCurv[i]) < 1e-6f);
         }
     }
 
