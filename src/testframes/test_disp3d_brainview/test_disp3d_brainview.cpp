@@ -2521,6 +2521,13 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     view.setModel(&model);
     dragAndRelease(false);
     QCOMPARE(clicked.size(), 1);
+
+    // The single view chosen with four panes configured opens again as the single view, and multi view as multi
+    QCOMPARE(BrainView().viewMode(), BrainView::SingleView);
+    QCOMPARE(BrainView().viewCount(), 4);
+    view.showMultiView();
+    QCOMPARE(BrainView().viewMode(), BrainView::MultiView);
+    view.showSingleView();
 }
 
 //=============================================================================================================

@@ -1399,13 +1399,9 @@ void BrainView::loadMultiViewSettings()
     m_multiSplitY = settings.value("multiSplitY", 0.5f).toFloat();
 
     const int savedViewMode = settings.value("viewMode", static_cast<int>(SingleView)).toInt();
-    m_viewMode = (savedViewMode == static_cast<int>(MultiView)) ? MultiView : SingleView;
     m_viewCount = std::clamp(settings.value("viewCount", 1).toInt(), 1, static_cast<int>(m_subViews.size()));
-    // Reconcile: viewCount > 1 implies MultiView
-    if (m_viewCount > 1)
-        m_viewMode = MultiView;
-    else
-        m_viewMode = SingleView;
+    // showSingleView keeps the pane count for the next showMultiView; one pane is always the single view
+    m_viewMode = (savedViewMode == static_cast<int>(MultiView) && m_viewCount > 1) ? MultiView : SingleView;
 
     const bool hasCameraQuat = settings.contains("cameraRotW") && settings.contains("cameraRotX") && settings.contains("cameraRotY") && settings.contains("cameraRotZ");
     if (hasCameraQuat) {
