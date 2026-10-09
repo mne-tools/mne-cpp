@@ -477,7 +477,8 @@ void TestBids::testWriteRoundTrip()
     opts.datasetName = "TestRoundTrip";
 
     BIDSPath written = original.write(dstPath, srcPath.filePath(), opts);
-    QVERIFY2(!written.filePath().isEmpty(), "write() returned empty path");
+    // A failed write returns BIDSPath(), whose filePath() is "." and therefore never empty
+    QVERIFY(written == dstPath);
     QVERIFY(QFileInfo::exists(written.filePath()));
 
     // Verify sidecar files were created

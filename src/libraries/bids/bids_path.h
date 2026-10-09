@@ -387,6 +387,26 @@ private:
     static QString zeroPad(const QString& sValue);
 };
 
+//=============================================================================================================
+
+inline bool operator==(const BIDSPath& a, const BIDSPath& b)
+{
+    return a.root() == b.root() &&
+        a.subject() == b.subject() &&
+        a.session() == b.session() &&
+        a.task() == b.task() &&
+        a.acquisition() == b.acquisition() &&
+        a.run() == b.run() &&
+        a.processing() == b.processing() &&
+        a.space() == b.space() &&
+        a.recording() == b.recording() &&
+        a.split() == b.split() &&
+        a.description() == b.description() &&
+        a.datatype() == b.datatype() &&
+        a.suffix() == b.suffix() &&
+        a.extension() == b.extension();
+}
+
 } // namespace BIDSLIB
 
 #endif // BIDS_PATH_H
