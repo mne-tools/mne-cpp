@@ -243,6 +243,13 @@ jobs:
       run: |
         cp MNE-CPP-*-Darwin.dmg "${{ steps.tag.outputs.asset_prefix }}-macos-installer-arm64.dmg"
         gh release upload "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.asset_prefix }}-macos-installer-arm64.dmg" --clobber
+        python3 tools/release/artifact_evidence.py inspect "${{ steps.tag.outputs.asset_prefix }}-macos-installer-arm64.dmg" --out evidence-macos-installer.json
+
+    - name: Upload signing evidence
+      uses: actions/upload-artifact@v7
+      with:
+        name: signing-evidence-macos-installer
+        path: evidence-macos-installer.json
 
   WindowsInstaller:
     runs-on: windows-2025-vs2026
@@ -301,3 +308,10 @@ jobs:
       run: |
         cp MNE-CPP-*-win64.exe "${{ steps.tag.outputs.asset_prefix }}-windows-installer-x86_64.exe"
         gh release upload "${{ steps.tag.outputs.tag }}" "${{ steps.tag.outputs.asset_prefix }}-windows-installer-x86_64.exe" --clobber
+        python tools/release/artifact_evidence.py inspect "${{ steps.tag.outputs.asset_prefix }}-windows-installer-x86_64.exe" --out evidence-windows-installer.json
+
+    - name: Upload signing evidence
+      uses: actions/upload-artifact@v7
+      with:
+        name: signing-evidence-windows-installer
+        path: evidence-windows-installer.json

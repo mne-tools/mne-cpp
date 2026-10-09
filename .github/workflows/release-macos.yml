@@ -136,9 +136,18 @@ jobs:
         if [ -f mne-cpp-macos-dynamic-arm64.dmg ]; then
           cp mne-cpp-macos-dynamic-arm64.dmg "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg"
           gh release upload "${{ steps.release-info.outputs.tag }}" "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg" --clobber
+          python3 tools/release/artifact_evidence.py inspect "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg" --out evidence-macos-dynamic.json
         else
           echo "No .dmg artefact present; uploading tarball only."
         fi
+
+    - name: Upload signing evidence
+      if: steps.release-info.outputs.should_upload == 'true'
+      uses: actions/upload-artifact@v7
+      with:
+        name: signing-evidence-macos-dynamic
+        path: evidence-macos-dynamic.json
+        if-no-files-found: ignore
 
 
   MacOSStatic:

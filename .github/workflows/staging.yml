@@ -426,3 +426,11 @@ jobs:
 
         deploy_branch_dev_subdir gh-pages
         deploy_branch_dev_subdir main
+
+  # ── Checksums and signing evidence (after every asset upload) ─────────
+  ReleaseEvidence:
+    needs: [Installer, Doxygen, WebAssembly]
+    uses: ./.github/workflows/_reusable-release-evidence.yml
+    with:
+      tag: dev_build
+    secrets: inherit

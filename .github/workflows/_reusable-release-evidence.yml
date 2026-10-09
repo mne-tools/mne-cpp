@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+name: Release Evidence
+
+# Publish SHA256SUMS and the per-asset signing evidence of a release (v2.4.0
+# T10.7c) once every asset is uploaded. Signatures were checked by the jobs
+# that built the dmg/exe files (signing-evidence-* artifacts of this run).
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+
+jobs:
+  ReleaseEvidence:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+      with:
+        persist-credentials: false
+
+    - name: Download signing evidence
+      uses: actions/download-artifact@v8
+      with:
+        pattern: signing-evidence-*
+        path: evidence
+        merge-multiple: true
+
+    - name: Publish checksums and signing evidence
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        TAG: ${{ inputs.tag }}
+      run: |
+        shopt -s nullglob
+        mkdir assets
+        gh release download "$TAG" -D assets
+        rm -f assets/SHA256SUMS assets/release-evidence.json
+        gh release view "$TAG" --json body -q .body > release-notes.md
+        python3 tools/release/artifact_evidence.py publish --assets assets \
+          --evidence evidence/*.json --sums SHA256SUMS \
+          --report release-evidence.json --notes release-notes.md
+        gh release upload "$TAG" SHA256SUMS release-evidence.json --clobber
+        gh release edit "$TAG" --notes-file release-notes.md
+        cat release-notes.md >> "$GITHUB_STEP_SUMMARY"

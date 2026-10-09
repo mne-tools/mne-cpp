@@ -495,3 +495,12 @@ jobs:
         git add .
         git commit --amend --reset-author -m 'Update wasm builds'
         git push -f origin main
+
+  # ── Checksums and signing evidence (after every asset upload) ─────────
+  ReleaseEvidence:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [Installer, ReleaseDocs, WebAssembly]
+    uses: ./.github/workflows/_reusable-release-evidence.yml
+    with:
+      tag: ${{ github.ref_name }}
+    secrets: inherit
