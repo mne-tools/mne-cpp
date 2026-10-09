@@ -151,31 +151,6 @@ bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans)
 
 //=============================================================================================================
 
-bool FiffCoordTrans::read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans, int from, int to)
-{
-    FiffStream::SPtr pStream(new FiffStream(&p_IODevice));
-    if (!pStream->open())
-        return false;
-
-    FiffTag::UPtr t_pTag;
-    for (const auto& entry : pStream->dir()) {
-        if (entry->kind != FIFF_COORD_TRANS || !pStream->read_tag(t_pTag, entry->pos))
-            continue;
-        const FiffCoordTrans trans = t_pTag->toCoordTrans();
-        if (trans.from == from && trans.to == to) {
-            p_Trans = trans;
-            return true;
-        }
-        if (trans.from == to && trans.to == from) {
-            p_Trans = trans.inverted();
-            return true;
-        }
-    }
-    return false;
-}
-
-//=============================================================================================================
-
 void FiffCoordTrans::write(QIODevice& qIODevice)
 {
     // Create the file and save the essentials

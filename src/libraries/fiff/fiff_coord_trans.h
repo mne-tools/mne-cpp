@@ -275,20 +275,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Reads the transform between two coordinate frames from a fif file that may hold several
-     * (MNE-C mne_read_transform). A transform stored the other way round is inverted.
-     *
-     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket.
-     * @param[out] p_Trans      The transform from @p from to @p to.
-     * @param[in] from          Source coordinate frame (FIFFV_COORD_*).
-     * @param[in] to            Target coordinate frame (FIFFV_COORD_*).
-     *
-     * @return true if the file holds a transform between the two frames, false otherwise.
-     */
-    static bool read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans, int from, int to);
-
-    //=========================================================================================================
-    /**
      * Reads a specified coordinate transform from a FIFF file.
      *
      * @param[in] name   FIFF file path.

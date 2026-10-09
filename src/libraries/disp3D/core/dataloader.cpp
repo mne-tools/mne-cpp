@@ -27,7 +27,6 @@
 #include <Eigen/Dense>
 #include <fiff/fiff.h>
 #include <fiff/fiff_constants.h>
-#include <fiff/fiff_coord_trans_set.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_bem.h>
@@ -354,16 +353,9 @@ MNESourceSpaces DataLoader::loadSourceSpace(const QString& fwdPath)
 bool DataLoader::loadHeadToMriTransform(const QString& transPath,
                                         FiffCoordTrans& trans)
 {
-    // A file may hold several transforms (e.g. all-trans.fif: device -> head and MRI -> head);
-    // pick the head <-> MRI one by its frames, inverted to head -> MRI when stored the other way
-    FiffCoordTransSet transforms;
-    transforms.read(transPath);
-    if (transforms.head_surf_RAS_t.isEmpty()) {
-        qWarning() << "DataLoader: No head <-> MRI transformation in" << transPath;
-        return false;
-    }
-    trans = transforms.head_surf_RAS_t;
-    return true;
+    // A file may hold several transforms (e.g. all-trans.fif: device -> head and MRI -> head)
+    trans = FiffCoordTrans::readTransform(transPath, FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
+    return !trans.isEmpty();
 }
 
 //=============================================================================================================

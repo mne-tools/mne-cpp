@@ -124,9 +124,8 @@ int main(int argc, char* argv[])
     }
 
     // Read the transform between the requested frames (inverted if stored the other way round)
-    QFile transFile(transName);
-    FiffCoordTrans trans;
-    if (!FiffCoordTrans::read(transFile, trans, fromFrame, toFrame)) {
+    const FiffCoordTrans trans = FiffCoordTrans::readTransform(transName, fromFrame, toFrame);
+    if (trans.isEmpty()) {
         qCritical("No %s <-> %s coordinate transform in: %s", qPrintable(fromName), qPrintable(toName), qPrintable(transName));
         return 1;
     }
