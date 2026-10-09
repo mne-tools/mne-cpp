@@ -36,7 +36,11 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QHash>
 #include <QRegularExpression>
+#include <QXmlStreamReader>
+
+#include <optional>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -248,6 +252,117 @@ QList<Vector3d> readIsotrakHsp(const QString& text)
     return points;
 }
 
+// The points of an mne DigMontage in metres, before they become dig points.
+struct Montage
+{
+    std::optional<Vector3d> nasion, lpa, rpa;
+    QList<Vector3d> hpi, extra;
+    QStringList chNames;
+    QList<Vector3d> chPos;
+
+    // A repeated name keeps its first place and its last position, as mne's _check_dupes_odict.
+    void addElectrode(const QString& name, const Vector3d& r)
+    {
+        const qsizetype index = chNames.indexOf(name);
+        if (index >= 0) {
+            qWarning() << "[FiffDigPointSet] duplicate electrode" << name << "- the last position is used";
+            chPos[index] = r;
+            return;
+        }
+        chNames.append(name);
+        chPos.append(r);
+    }
+};
+
+// The dig points of mne's make_dig_montage: cardinals, HPI coils, head shape, then electrodes,
+// which keep the number at the end of their names when every name has one (1..n otherwise).
+FiffDigPointSet makeDigMontage(const Montage& montage, QStringList* chNames)
+{
+    QList<FiffDigPoint> points;
+    const auto append = [&points](int kind, int ident, const Vector3d& r) {
+        FiffDigPoint point;
+        point.kind = kind;
+        point.ident = ident;
+        point.coord_frame = FIFFV_COORD_UNKNOWN;
+        for (int c = 0; c < 3; ++c)
+            point.r[c] = static_cast<float>(r[c]);
+        points.append(point);
+    };
+    if (montage.lpa)
+        append(FIFFV_POINT_CARDINAL, FIFFV_POINT_LPA, *montage.lpa);
+    if (montage.nasion)
+        append(FIFFV_POINT_CARDINAL, FIFFV_POINT_NASION, *montage.nasion);
+    if (montage.rpa)
+        append(FIFFV_POINT_CARDINAL, FIFFV_POINT_RPA, *montage.rpa);
+    for (qsizetype i = 0; i < montage.hpi.size(); ++i)
+        append(FIFFV_POINT_HPI, static_cast<int>(i) + 1, montage.hpi[i]);
+    for (qsizetype i = 0; i < montage.extra.size(); ++i)
+        append(FIFFV_POINT_EXTRA, static_cast<int>(i) + 1, montage.extra[i]);
+
+    QList<int> idents;
+    for (const QString& name : montage.chNames) {
+        bool ok = false;
+        idents.append(name.right(3).trimmed().toInt(&ok));
+        if (!ok) {
+            idents.clear();
+            break;
+        }
+    }
+    for (qsizetype i = 0; i < montage.chPos.size(); ++i)
+        append(FIFFV_POINT_EEG, idents.isEmpty() ? static_cast<int>(i) + 1 : idents[i], montage.chPos[i]);
+    if (chNames)
+        *chNames = montage.chNames;
+    return FiffDigPointSet(points);
+}
+
+// The text of a file, or nothing with a warning.
+std::optional<QString> readText(const QString& path, const char* reader)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "[FiffDigPointSet::" << reader << "] cannot read" << path;
+        return std::nullopt;
+    }
+    return QString::fromUtf8(file.readAll());
+}
+
+// The text of each child element of every <element> in an XML file (namespaces ignored).
+QList<QHash<QString, QString>> readXmlRecords(const QString& path, const QString& element)
+{
+    QFile file(path);
+    QList<QHash<QString, QString>> records;
+    if (!file.open(QIODevice::ReadOnly))
+        return records;
+    QXmlStreamReader xml(&file);
+    while (!xml.atEnd()) {
+        if (xml.readNext() != QXmlStreamReader::StartElement || xml.name() != element)
+            continue;
+        QHash<QString, QString> record;
+        while (xml.readNextStartElement()) {
+            const QString key = xml.name().toString();
+            record.insert(key, xml.readElementText(QXmlStreamReader::SkipChildElements));
+        }
+        records.append(record);
+    }
+    if (xml.hasError()) {
+        qWarning() << "[FiffDigPointSet]" << path << xml.errorString();
+        records.clear();
+    }
+    return records;
+}
+
+// A position from the x/y/z fields of an XML record.
+bool recordPosition(const QHash<QString, QString>& record, const QStringList& keys, double scale, Vector3d& r)
+{
+    for (int c = 0; c < 3; ++c) {
+        bool ok = false;
+        r[c] = scale * record.value(keys[c]).toDouble(&ok);
+        if (!ok)
+            return false;
+    }
+    return true;
+}
+
 } // namespace
 
 //=============================================================================================================
@@ -256,48 +371,37 @@ bool FiffDigPointSet::readPolhemusIsotrak(const QString& path, FiffDigPointSet& 
 {
     const QString extension = QLatin1Char('.') + QFileInfo(path).suffix();
     const double scale = unitScale(unit);
-    QFile file(path);
-    if (scale == 0.0 || !QStringList{".hsp", ".elp", ".eeg"}.contains(extension) || !file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "[FiffDigPointSet::readPolhemusIsotrak] cannot read" << path;
+    if (scale == 0.0 || !QStringList{".hsp", ".elp", ".eeg"}.contains(extension)) {
+        qWarning() << "[FiffDigPointSet::readPolhemusIsotrak] not an Isotrak file:" << path;
         return false;
     }
-    const QString text = QString::fromUtf8(file.readAll());
-    const QList<Vector3d> points = extension == QLatin1String(".elp") ? readIsotrakElp(text) : readIsotrakHsp(text);
+    const std::optional<QString> text = readText(path, "readPolhemusIsotrak");
+    if (!text)
+        return false;
+    QList<Vector3d> points = extension == QLatin1String(".elp") ? readIsotrakElp(*text) : readIsotrakHsp(*text);
     const qsizetype count = points.size() - 3;
     if (count < 0 || (!chNames.isEmpty() && chNames.size() != count)) {
         qWarning() << "[FiffDigPointSet::readPolhemusIsotrak]" << path << "holds" << qMax(count, qsizetype(0)) << "points besides the fiducials, but"
                    << chNames.size() << "names were given";
         return false;
     }
+    for (Vector3d& point : points)
+        point *= scale;
 
-    // Electrodes keep the number at the end of their names when every name has one
-    QList<int> idents;
-    for (const QString& name : chNames) {
-        bool ok = false;
-        idents.append(name.right(3).trimmed().toInt(&ok));
-        if (!ok) {
-            idents.clear();
-            break;
-        }
+    Montage montage;
+    montage.nasion = points[0];
+    montage.lpa = points[1];
+    montage.rpa = points[2];
+    const QList<Vector3d> rest = points.mid(3);
+    if (!chNames.isEmpty()) {
+        for (qsizetype i = 0; i < count; ++i)
+            montage.addElectrode(chNames[i], rest[i]);
+    } else if (extension == QLatin1String(".elp")) {
+        montage.hpi = rest;
+    } else {
+        montage.extra = rest;
     }
-
-    QList<FiffDigPoint> result;
-    const auto append = [&](int kind, int ident, const Vector3d& r) {
-        FiffDigPoint point;
-        point.kind = kind;
-        point.ident = ident;
-        point.coord_frame = FIFFV_COORD_UNKNOWN;
-        for (int c = 0; c < 3; ++c)
-            point.r[c] = static_cast<float>(scale * r[c]);
-        result.append(point);
-    };
-    append(FIFFV_POINT_CARDINAL, FIFFV_POINT_LPA, points[1]);
-    append(FIFFV_POINT_CARDINAL, FIFFV_POINT_NASION, points[0]);
-    append(FIFFV_POINT_CARDINAL, FIFFV_POINT_RPA, points[2]);
-    const int kind = !chNames.isEmpty() ? FIFFV_POINT_EEG : (extension == QLatin1String(".elp") ? FIFFV_POINT_HPI : FIFFV_POINT_EXTRA);
-    for (qsizetype i = 0; i < count; ++i)
-        append(kind, idents.isEmpty() ? static_cast<int>(i) + 1 : idents[i], points[i + 3]);
-    dig = FiffDigPointSet(result);
+    dig = makeDigMontage(montage, nullptr);
     return true;
 }
 
@@ -306,12 +410,14 @@ bool FiffDigPointSet::readPolhemusIsotrak(const QString& path, FiffDigPointSet& 
 bool FiffDigPointSet::readPolhemusFastscan(const QString& path, MatrixX3d& points, const QString& unit, bool requireHeader)
 {
     const double scale = unitScale(unit);
-    QFile file(path);
-    if (scale == 0.0 || QFileInfo(path).suffix() != QLatin1String("txt") || !file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "[FiffDigPointSet::readPolhemusFastscan] cannot read" << path;
+    if (scale == 0.0 || QFileInfo(path).suffix() != QLatin1String("txt")) {
+        qWarning() << "[FiffDigPointSet::readPolhemusFastscan] not a FastSCAN file:" << path;
         return false;
     }
-    const QStringList lines = QString::fromUtf8(file.readAll()).split(QLatin1Char('\n'));
+    const std::optional<QString> text = readText(path, "readPolhemusFastscan");
+    if (!text)
+        return false;
+    const QStringList lines = text->split(QLatin1Char('\n'));
 
     QString header;
     for (qsizetype i = 0; i < lines.size() && lines[i].startsWith(QLatin1Char('%')); ++i)
@@ -333,6 +439,160 @@ bool FiffDigPointSet::readPolhemusFastscan(const QString& path, MatrixX3d& point
     points.resize(values.size() / 3, 3);
     for (qsizetype i = 0; i < values.size(); ++i)
         points(i / 3, i % 3) = scale * values[i];
+    return true;
+}
+
+//=============================================================================================================
+
+bool FiffDigPointSet::readCaptrak(const QString& path, FiffDigPointSet& dig, QStringList* chNames)
+{
+    Montage montage;
+    for (const QHash<QString, QString>& electrode : readXmlRecords(path, QStringLiteral("CapTrakElectrode"))) {
+        Vector3d r;
+        if (!recordPosition(electrode, {"X", "Y", "Z"}, 1e-3, r)) {
+            qWarning() << "[FiffDigPointSet::readCaptrak] electrode without a position in" << path;
+            return false;
+        }
+        const QString name = electrode.value(QStringLiteral("Name"));
+        if (name == QLatin1String("Nasion"))
+            montage.nasion = r;
+        else if (name == QLatin1String("LPA"))
+            montage.lpa = r;
+        else if (name == QLatin1String("RPA"))
+            montage.rpa = r;
+        else
+            montage.addElectrode(name, r);
+    }
+    if (!montage.nasion || !montage.lpa || !montage.rpa) {
+        qWarning() << "[FiffDigPointSet::readCaptrak]" << path << "lacks the Nasion, LPA or RPA electrode";
+        return false;
+    }
+    dig = makeDigMontage(montage, chNames);
+    return true;
+}
+
+//=============================================================================================================
+
+bool FiffDigPointSet::readEgi(const QString& path, FiffDigPointSet& dig, QStringList* chNames)
+{
+    Montage montage;
+    for (const QHash<QString, QString>& sensor : readXmlRecords(path, QStringLiteral("sensor"))) {
+        Vector3d r;
+        bool ok = false;
+        const int number = sensor.value(QStringLiteral("number")).toInt(&ok);
+        if (!ok || !recordPosition(sensor, {"x", "y", "z"}, 1e-2, r)) {
+            qWarning() << "[FiffDigPointSet::readEgi] sensor without a number or position in" << path;
+            return false;
+        }
+        const QString name = sensor.value(QStringLiteral("name"));
+        switch (sensor.value(QStringLiteral("type")).toInt()) {
+            case 0: // EEG
+                montage.addElectrode(QStringLiteral("EEG %1").arg(number, 3, 10, QLatin1Char('0')), r);
+                break;
+            case 1: // reference, numbered after the electrodes before it
+                montage.addElectrode(QStringLiteral("EEG %1").arg(montage.chNames.size() + 1, 3, 10, QLatin1Char('0')), r);
+                break;
+            case 2:
+                if (name == QLatin1String("Nasion"))
+                    montage.nasion = r;
+                else if (name == QLatin1String("Left periauricular point"))
+                    montage.lpa = r;
+                else if (name == QLatin1String("Right periauricular point"))
+                    montage.rpa = r;
+                break;
+            default:
+                qWarning() << "[FiffDigPointSet::readEgi] skipping sensor" << number << "of unknown type";
+        }
+    }
+    if (!montage.nasion || !montage.lpa || !montage.rpa) {
+        qWarning() << "[FiffDigPointSet::readEgi]" << path << "lacks the nasion or a periauricular point";
+        return false;
+    }
+    dig = makeDigMontage(montage, chNames);
+    return true;
+}
+
+//=============================================================================================================
+
+bool FiffDigPointSet::readLocalite(const QString& path,
+                                   FiffDigPointSet& dig,
+                                   QStringList* chNames,
+                                   const QString& nasion,
+                                   const QString& lpa,
+                                   const QString& rpa)
+{
+    const std::optional<QString> text = readText(path, "readLocalite");
+    if (!text)
+        return false;
+    const QStringList lines = text->split(QLatin1Char('\n'));
+    Montage montage;
+    for (qsizetype i = 1; i < lines.size(); ++i) {
+        if (lines[i].trimmed().isEmpty())
+            continue;
+        const QStringList fields = lines[i].split(QLatin1Char(','));
+        Vector3d r;
+        bool ok = fields.size() == 5;
+        for (int c = 0; ok && c < 3; ++c)
+            r[c] = fields[c + 2].toDouble(&ok) / 1000.0;
+        if (!ok) {
+            qWarning() << "[FiffDigPointSet::readLocalite]" << path << "line" << i + 1 << "is not '#,name,x,y,z':" << lines[i];
+            return false;
+        }
+        montage.addElectrode(fields[1], r);
+    }
+    // The named fiducials leave the electrodes
+    const auto takeFiducial = [&montage](const QString& name, std::optional<Vector3d>& fiducial) {
+        if (name.isEmpty())
+            return true;
+        const qsizetype index = montage.chNames.indexOf(name);
+        if (index < 0)
+            return false;
+        fiducial = montage.chPos.takeAt(index);
+        montage.chNames.removeAt(index);
+        return true;
+    };
+    if (!takeFiducial(nasion, montage.nasion) || !takeFiducial(lpa, montage.lpa) || !takeFiducial(rpa, montage.rpa)) {
+        qWarning() << "[FiffDigPointSet::readLocalite]" << path << "has no point named" << nasion << lpa << rpa;
+        return false;
+    }
+    dig = makeDigMontage(montage, chNames);
+    return true;
+}
+
+//=============================================================================================================
+
+bool FiffDigPointSet::readNeuroscanDat(const QString& path, FiffDigPointSet& dig, QStringList* chNames)
+{
+    static const QRegularExpression whitespace(QStringLiteral("\\s+"));
+    const std::optional<QString> text = readText(path, "readNeuroscanDat");
+    if (!text)
+        return false;
+    const QStringList lines = text->split(QLatin1Char('\n'));
+    Montage montage;
+    for (qsizetype i = 0; i < lines.size(); ++i) {
+        const QStringList items = lines[i].split(whitespace, Qt::SkipEmptyParts);
+        if (items.isEmpty())
+            continue;
+        Vector3d r;
+        bool ok = items.size() == 5;
+        for (int c = 0; ok && c < 3; ++c)
+            r[c] = items[c + 2].toDouble(&ok);
+        if (!ok) {
+            qWarning() << "[FiffDigPointSet::readNeuroscanDat]" << path << "line" << i << "is not 'name number x y z':" << lines[i];
+            return false;
+        }
+        // The point number marks the fiducials (78 nasion, 76 LPA, 82 RPA) and the centroid (67)
+        const QString& number = items[1];
+        if (number == QLatin1String("78"))
+            montage.nasion = r;
+        else if (number == QLatin1String("76"))
+            montage.lpa = r;
+        else if (number == QLatin1String("82"))
+            montage.rpa = r;
+        else if (number != QLatin1String("67"))
+            montage.addElectrode(items[0], r);
+    }
+    dig = makeDigMontage(montage, chNames);
     return true;
 }
 

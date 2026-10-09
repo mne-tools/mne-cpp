@@ -11793,9 +11793,10 @@
       },
       {
         "python": "mne.channels.read_dig_captrak",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "CapTrak dig reader not ported"
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB::FiffDigPointSet::readCaptrak",
+        "note": "",
+        "test": "test_fiff_dig_point_python"
       },
       {
         "python": "mne.channels.read_dig_curry",
@@ -11805,15 +11806,17 @@
       },
       {
         "python": "mne.channels.read_dig_dat",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "Neuroscan .dat dig reader not ported"
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB::FiffDigPointSet::readNeuroscanDat",
+        "note": "",
+        "test": "test_fiff_dig_point_python"
       },
       {
         "python": "mne.channels.read_dig_egi",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "EGI dig reader not ported"
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB::FiffDigPointSet::readEgi",
+        "note": "positions in metres; mne.channels.read_dig_egi keeps the file's centimetres",
+        "test": "test_fiff_dig_point_python"
       },
       {
         "python": "mne.channels.read_dig_fif",
@@ -11831,15 +11834,16 @@
       },
       {
         "python": "mne.channels.read_dig_localite",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "Localite dig reader not ported"
+        "status": "implemented",
+        "mne_cpp": "FIFFLIB::FiffDigPointSet::readLocalite",
+        "note": "",
+        "test": "test_fiff_dig_point_python"
       },
       {
         "python": "mne.channels.read_dig_polhemus_isotrak",
-        "status": "partial",
+        "status": "implemented",
         "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
-        "note": "same points, kinds and idents; electrode names are not kept (FiffDigPointSet has no names)",
+        "note": "",
         "test": "test_fiff_dig_point_python"
       },
       {

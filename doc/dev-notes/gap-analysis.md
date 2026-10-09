@@ -13,8 +13,8 @@ MNE-C SVN) to identify features and algorithms not yet ported.
 > context and must not contradict the generated data.
 
 - Generated reference: **MNE-Python 1.11.0** (pinned 1.11.x).
-- Inventoried public APIs: **443** — implemented **186**, partial **85**, missing **164**, not-applicable **8**.
-- Machine-rendered parity: **52.5%** of 435 in-scope APIs (implemented + ½·partial; not-applicable excluded).
+- Inventoried public APIs: **443** — implemented **191**, partial **84**, missing **160**, not-applicable **8**.
+- Machine-rendered parity: **53.6%** of 435 in-scope APIs (implemented + ½·partial; not-applicable excluded).
 
 ---
 

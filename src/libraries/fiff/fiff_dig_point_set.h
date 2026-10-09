@@ -190,6 +190,76 @@ public:
 
     //=========================================================================================================
     /**
+     * Reads a BrainVision CapTrak .bvct file, as mne.channels.read_dig_captrak does.
+     *
+     * The electrodes named Nasion, LPA and RPA become the cardinal points, every other
+     * electrode an EEG point; millimetres are converted to metres. The points are in
+     * digitizer coordinates (FIFFV_COORD_UNKNOWN), numbered as by
+     * readPolhemusIsotrak; a repeated name keeps its first place and its last position.
+     *
+     * @param[in]  path     The .bvct file.
+     * @param[out] dig      The digitizer points.
+     * @param[out] chNames  If not null, the electrode names in the order of the EEG points.
+     *
+     * @return false if the file cannot be parsed or lacks one of the fiducials.
+     */
+    static bool readCaptrak(const QString& path, FiffDigPointSet& dig, QStringList* chNames = nullptr);
+
+    //=========================================================================================================
+    /**
+     * Reads the coordinates.xml of an EGI MFF recording, as mne.channels.read_dig_egi does.
+     *
+     * Sensors of type 0 become EEG points named "EEG <number>", the reference (type 1)
+     * is numbered after the electrodes before it, and the nasion and periauricular
+     * points (type 2) become the cardinal points. Unlike mne.channels.read_dig_egi,
+     * which keeps the file's centimetres as if they were metres, the positions are
+     * converted to metres (as mne.io.read_raw_egi does).
+     *
+     * @param[in]  path     The coordinates.xml file.
+     * @param[out] dig      The digitizer points, in digitizer coordinates.
+     * @param[out] chNames  If not null, the electrode names in the order of the EEG points.
+     *
+     * @return false if the file cannot be parsed or lacks one of the fiducials.
+     */
+    static bool readEgi(const QString& path, FiffDigPointSet& dig, QStringList* chNames = nullptr);
+
+    //=========================================================================================================
+    /**
+     * Reads a Localite .csv file ("#,name,x,y,z" in millimetres after a header row), as
+     * mne.channels.read_dig_localite does.
+     *
+     * @param[in]  path     The .csv file.
+     * @param[out] dig      The digitizer points, in digitizer coordinates.
+     * @param[out] chNames  If not null, the electrode names in the order of the EEG points.
+     * @param[in]  nasion   Name of the point that is the nasion, or empty.
+     * @param[in]  lpa      Name of the point that is the left preauricular point, or empty.
+     * @param[in]  rpa      Name of the point that is the right preauricular point, or empty.
+     *
+     * @return false if the file cannot be read, a row is malformed or a named fiducial is missing.
+     */
+    static bool readLocalite(const QString& path,
+                             FiffDigPointSet& dig,
+                             QStringList* chNames = nullptr,
+                             const QString& nasion = QString(),
+                             const QString& lpa = QString(),
+                             const QString& rpa = QString());
+
+    //=========================================================================================================
+    /**
+     * Reads a Neuroscan .dat electrode file ("name number x y z" per line), as
+     * mne.channels.read_dig_dat does: point numbers 78, 76 and 82 are the nasion,
+     * LPA and RPA, 67 (the centroid) is skipped, and the coordinates are kept as they are.
+     *
+     * @param[in]  path     The .dat file.
+     * @param[out] dig      The digitizer points, in digitizer coordinates.
+     * @param[out] chNames  If not null, the electrode names in the order of the EEG points.
+     *
+     * @return false if the file cannot be read or a line does not hold five entries.
+     */
+    static bool readNeuroscanDat(const QString& path, FiffDigPointSet& dig, QStringList* chNames = nullptr);
+
+    //=========================================================================================================
+    /**
      * Initializes FiffDigPointSet
      */
     inline void clear();

@@ -331,6 +331,103 @@ Reads the points of a Polhemus FastSCAN .txt file in metres, as mne.channels.rea
 
 ---
 
+### readCaptrak(path, dig, chNames)
+
+Reads a BrainVision CapTrak .bvct file, as mne.channels.read_dig_captrak does.
+
+The electrodes named Nasion, LPA and RPA become the cardinal points, every other electrode an EEG point; millimetres are converted to metres. The points are in digitizer coordinates (FIFFV_COORD_UNKNOWN), numbered as by readPolhemusIsotrak; a repeated name keeps its first place and its last position.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The .bvct file.
+
+- **dig** : *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) &*
+  The digitizer points.
+
+- **chNames** : *QStringList **
+  If not null, the electrode names in the order of the EEG points.
+
+**Returns:**
+
+- *bool* — false if the file cannot be parsed or lacks one of the fiducials.
+
+---
+
+### readEgi(path, dig, chNames)
+
+Reads the coordinates.xml of an EGI MFF recording, as mne.channels.read_dig_egi does.
+
+Sensors of type 0 become EEG points named "EEG &lt;number&gt;", the reference (type 1) is numbered after the electrodes before it, and the nasion and periauricular points (type 2) become the cardinal points. Unlike mne.channels.read_dig_egi, which keeps the file's centimetres as if they were metres, the positions are converted to metres (as mne.io.read_raw_egi does).
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The coordinates.xml file.
+
+- **dig** : *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) &*
+  The digitizer points, in digitizer coordinates.
+
+- **chNames** : *QStringList **
+  If not null, the electrode names in the order of the EEG points.
+
+**Returns:**
+
+- *bool* — false if the file cannot be parsed or lacks one of the fiducials.
+
+---
+
+### readLocalite(path, dig, chNames, nasion, lpa, rpa)
+
+Reads a Localite .csv file ("#,name,x,y,z" in millimetres after a header row), as mne.channels.read_dig_localite does.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The .csv file.
+
+- **dig** : *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) &*
+  The digitizer points, in digitizer coordinates.
+
+- **chNames** : *QStringList **
+  If not null, the electrode names in the order of the EEG points.
+
+- **nasion** : *const QString &*
+  Name of the point that is the nasion, or empty.
+
+- **lpa** : *const QString &*
+  Name of the point that is the left preauricular point, or empty.
+
+- **rpa** : *const QString &*
+  Name of the point that is the right preauricular point, or empty.
+
+**Returns:**
+
+- *bool* — false if the file cannot be read, a row is malformed or a named fiducial is missing.
+
+---
+
+### readNeuroscanDat(path, dig, chNames)
+
+Reads a Neuroscan .dat electrode file ("name number x y z" per line), as mne.channels.read_dig_dat does: point numbers 78, 76 and 82 are the nasion, LPA and RPA, 67 (the centroid) is skipped, and the coordinates are kept as they are.
+
+**Parameters:**
+
+- **path** : *const QString &*
+  The .dat file.
+
+- **dig** : *[FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) &*
+  The digitizer points, in digitizer coordinates.
+
+- **chNames** : *QStringList **
+  If not null, the electrode names in the order of the EEG points.
+
+**Returns:**
+
+- *bool* — false if the file cannot be read or a line does not hold five entries.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)

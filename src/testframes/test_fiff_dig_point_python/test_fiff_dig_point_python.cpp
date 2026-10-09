@@ -93,6 +93,8 @@ private slots:
     void polhemusFastscan_matchesPython_data();
     void polhemusFastscan_matchesPython();
     void polhemusReaders_rejectBadInput();
+    void montageReaders_matchPython_data();
+    void montageReaders_matchPython();
 };
 
 //=============================================================================================================
@@ -290,10 +292,10 @@ void TestFiffDigPointPython::coordFrame_isHeadEverywhere()
 namespace
 {
 
-// The Polhemus fixtures are mne-python's own (mne/io/kit/tests/data, BSD-3-Clause).
-QString polhemusFile(const QString& name)
+// Digitizer files in data/: the Polhemus ones are mne-python's own (mne/io/kit/tests/data, BSD-3-Clause).
+QString digFile(const QString& name)
 {
-    return QStringLiteral(DIG_POLHEMUS_DATA_DIR "/") + name;
+    return QStringLiteral(DIG_DATA_DIR "/") + name;
 }
 
 using Point = QList<double>;
@@ -356,7 +358,7 @@ void TestFiffDigPointPython::polhemusIsotrak_matchesPython()
     QFETCH(Point, sum);
 
     FiffDigPointSet dig;
-    QVERIFY(FiffDigPointSet::readPolhemusIsotrak(polhemusFile(file), dig, chNames, unit));
+    QVERIFY(FiffDigPointSet::readPolhemusIsotrak(digFile(file), dig, chNames, unit));
     QCOMPARE(dig.size(), count);
     for (int i = 0; i < kindIdents.size() / 2; ++i) {
         QCOMPARE(dig[i].kind, kindIdents[2 * i]);
@@ -405,7 +407,7 @@ void TestFiffDigPointPython::polhemusFastscan_matchesPython()
     QFETCH(Point, sum);
 
     Eigen::MatrixX3d points;
-    QVERIFY(FiffDigPointSet::readPolhemusFastscan(polhemusFile(file), points));
+    QVERIFY(FiffDigPointSet::readPolhemusFastscan(digFile(file), points));
     QCOMPARE(points.rows(), count);
     compareRows({points(0, 0), points(0, 1), points(0, 2)}, first, "first point");
     compareRows({points(count - 1, 0), points(count - 1, 1), points(count - 1, 2)}, last, "last point");
@@ -414,7 +416,7 @@ void TestFiffDigPointPython::polhemusFastscan_matchesPython()
 
     // In metres the same file is a thousand times larger
     Eigen::MatrixX3d metres;
-    QVERIFY(FiffDigPointSet::readPolhemusFastscan(polhemusFile(file), metres, QStringLiteral("m")));
+    QVERIFY(FiffDigPointSet::readPolhemusFastscan(digFile(file), metres, QStringLiteral("m")));
     QVERIFY(metres.isApprox(1000.0 * points));
 }
 
@@ -424,14 +426,14 @@ void TestFiffDigPointPython::polhemusReaders_rejectBadInput()
 {
     // Each of these raises in mne-python.
     FiffDigPointSet dig;
-    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(polhemusFile("test.elp"), dig, {"Fp1"}));
-    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(polhemusFile("test.elp"), dig, {}, "inch"));
-    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(polhemusFile("test_elp.txt"), dig));
-    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(polhemusFile("missing.hsp"), dig));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(digFile("test.elp"), dig, {"Fp1"}));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(digFile("test.elp"), dig, {}, "inch"));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(digFile("test_elp.txt"), dig));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(digFile("missing.hsp"), dig));
 
     // A FastSCAN file whose header does not name FastSCAN is rejected unless asked not to
     QTemporaryDir dir;
-    QFile in(polhemusFile("test_elp.txt"));
+    QFile in(digFile("test_elp.txt"));
     QVERIFY(in.open(QIODevice::ReadOnly));
     QFile out(dir.filePath("other.txt"));
     QVERIFY(out.open(QIODevice::WriteOnly));
@@ -441,7 +443,89 @@ void TestFiffDigPointPython::polhemusReaders_rejectBadInput()
     QVERIFY(!FiffDigPointSet::readPolhemusFastscan(out.fileName(), points));
     QVERIFY(FiffDigPointSet::readPolhemusFastscan(out.fileName(), points, QStringLiteral("mm"), false));
     QCOMPARE(points.rows(), 8);
-    QVERIFY(!FiffDigPointSet::readPolhemusFastscan(polhemusFile("test.elp"), points));
+    QVERIFY(!FiffDigPointSet::readPolhemusFastscan(digFile("test.elp"), points));
+}
+
+//=============================================================================================================
+
+void TestFiffDigPointPython::montageReaders_matchPython_data()
+{
+    // Reference values produced by mne.channels.read_dig_captrak, read_dig_egi (whose
+    // centimetres are scaled to metres here, as mne.io.read_raw_egi does),
+    // read_dig_localite(nasion="Nasion", lpa="LPA", rpa="RPA") and read_dig_dat on the
+    // fixtures: the cardinals, then one EEG point per name with the ident mne gives it.
+    // captrak_coords.bvct and coordinates.xml are from the MNE testing dataset; the
+    // Localite and Neuroscan files are the ones mne-python's own tests write.
+    QTest::addColumn<QString>("file");
+    QTest::addColumn<int>("count");
+    QTest::addColumn<QStringList>("firstLastNames");
+    QTest::addColumn<QList<int>>("lastIdents");
+    QTest::addColumn<Point>("first");
+    QTest::addColumn<Point>("last");
+    QTest::addColumn<Point>("sum");
+
+    QTest::newRow("CapTrak") << "captrak_coords.bvct" << 66 << QStringList{"T7", "FT8"} << QList<int>{65, 66}
+                             << Point{-9.189697162389295e-02, 7.105427357601002e-18, 7.815970093361102e-17}
+                             << Point{0.0911920055367091, 0.0354346303180068, 0.04959908404797406}
+                             << Point{-0.12517363475026916, 0.02491909370084076, 5.843050150410273};
+    QTest::newRow("EGI") << "coordinates.xml" << 257 << QStringList{"EEG 001", "EEG 257"} << QList<int>{256, 257}
+                         << Point{-0.08592, 0.00498, -0.04128} << Point{0.0, 0.0, 0.09683}
+                         << Point{-7.4940054162198066e-16, -1.4278399999999958, 0.77265999999999957};
+    QTest::newRow("Localite") << "localite.csv" << 15 << QStringList{"ch01", "ch15"} << QList<int>{14, 15}
+                              << Point{0.07196698724, -0.02988835576, 0.1136703679}
+                              << Point{-0.05582855386, -0.03477319103, 0.0258083942}
+                              << Point{-0.071353608824, -0.950737338145, 0.492984028449};
+    // The repeated O2 keeps its first place and its last position; the centroid is dropped
+    QTest::newRow("Neuroscan") << "neuroscan.dat" << 1 << QStringList{"O2", "O2"} << QList<int>{3, 1}
+                               << Point{-1.0, 0.0, 0.0} << Point{0.0, 0.01, 0.02} << Point{0.0, 1.01, 0.02};
+}
+
+//=============================================================================================================
+
+void TestFiffDigPointPython::montageReaders_matchPython()
+{
+    QFETCH(QString, file);
+    QFETCH(int, count);
+    QFETCH(QStringList, firstLastNames);
+    QFETCH(QList<int>, lastIdents);
+    QFETCH(Point, first);
+    QFETCH(Point, last);
+    QFETCH(Point, sum);
+
+    FiffDigPointSet dig;
+    QStringList names;
+    const QString path = digFile(file);
+    bool ok = false;
+    if (file.endsWith(".bvct"))
+        ok = FiffDigPointSet::readCaptrak(path, dig, &names);
+    else if (file.endsWith(".xml"))
+        ok = FiffDigPointSet::readEgi(path, dig, &names);
+    else if (file.endsWith(".csv"))
+        ok = FiffDigPointSet::readLocalite(path, dig, &names, "Nasion", "LPA", "RPA");
+    else
+        ok = FiffDigPointSet::readNeuroscanDat(path, dig, &names);
+    QVERIFY(ok);
+
+    QCOMPARE(names.size(), count);
+    QCOMPARE(names.first(), firstLastNames.first());
+    QCOMPARE(names.last(), firstLastNames.last());
+    QCOMPARE(dig.size(), count + 3);
+    const QList<int> cardinals{FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA};
+    Point total{0.0, 0.0, 0.0};
+    for (int i = 0; i < dig.size(); ++i) {
+        QCOMPARE(dig[i].kind, i < 3 ? FIFFV_POINT_CARDINAL : FIFFV_POINT_EEG);
+        if (i < 3)
+            QCOMPARE(dig[i].ident, cardinals[i]);
+        QCOMPARE(dig[i].coord_frame, FIFFV_COORD_UNKNOWN);
+        for (int c = 0; c < 3; ++c)
+            total[c] += dig[i].r[c];
+    }
+    QCOMPARE(dig[dig.size() - 2].ident, lastIdents[0]);
+    QCOMPARE(dig[dig.size() - 1].ident, lastIdents[1]);
+    compareRows({dig[0].r[0], dig[0].r[1], dig[0].r[2]}, first, "first point");
+    const FiffDigPoint& end = dig[dig.size() - 1];
+    compareRows({end.r[0], end.r[1], end.r[2]}, last, "last point");
+    compareRows(total, sum, "sum");
 }
 
 //=============================================================================================================

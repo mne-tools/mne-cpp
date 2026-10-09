@@ -9,9 +9,9 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 186,
-      "partial": 85,
-      "missing": 164,
+      "implemented": 191,
+      "partial": 84,
+      "missing": 160,
       "not-applicable": 8
     },
     "by_domain": {
@@ -40,9 +40,9 @@
         "not-applicable": 0
       },
       "channels": {
-        "implemented": 11,
-        "partial": 10,
-        "missing": 20,
+        "implemented": 16,
+        "partial": 9,
+        "missing": 16,
         "not-applicable": 1
       },
       "epochs": {
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 52.5
+    "parity_percent": 53.6
   },
   "apis": [
     {
@@ -1960,6 +1960,39 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.channels.read_dig_captrak",
+      "name": "read_dig_captrak",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "implemented",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readCaptrak",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.read_dig_dat",
+      "name": "read_dig_dat",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "implemented",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readNeuroscanDat",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.read_dig_egi",
+      "name": "read_dig_egi",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "implemented",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readEgi",
+      "note": "positions in metres; mne.channels.read_dig_egi keeps the file's centimetres",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.channels.read_dig_fif",
       "name": "read_dig_fif",
       "submodule": "channels",
@@ -1978,6 +2011,28 @@
       "domain": "channels",
       "status": "implemented",
       "mne_cpp": "readHpts (CLI)",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.read_dig_localite",
+      "name": "read_dig_localite",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "implemented",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readLocalite",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.channels.read_dig_polhemus_isotrak",
+      "name": "read_dig_polhemus_isotrak",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "implemented",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2114,17 +2169,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.channels.read_dig_polhemus_isotrak",
-      "name": "read_dig_polhemus_isotrak",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "partial",
-      "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
-      "note": "same points, kinds and idents; electrode names are not kept (FiffDigPointSet has no names)",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.channels.read_vectorview_selection",
       "name": "read_vectorview_selection",
       "submodule": "channels",
@@ -2235,17 +2279,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.channels.read_dig_captrak",
-      "name": "read_dig_captrak",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "CapTrak dig reader not ported",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.channels.read_dig_curry",
       "name": "read_dig_curry",
       "submodule": "channels",
@@ -2254,39 +2287,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Curry dig reader not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.read_dig_dat",
-      "name": "read_dig_dat",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "Neuroscan .dat dig reader not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.read_dig_egi",
-      "name": "read_dig_egi",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "EGI dig reader not ported",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.read_dig_localite",
-      "name": "read_dig_localite",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "Localite dig reader not ported",
       "evidence": "parity-record"
     },
     {

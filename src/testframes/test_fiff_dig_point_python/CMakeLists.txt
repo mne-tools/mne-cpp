@@ -58,4 +58,4 @@ mne_add_test(${PROJECT_NAME}
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
-target_compile_definitions(${PROJECT_NAME} PRIVATE DIG_POLHEMUS_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
+target_compile_definitions(${PROJECT_NAME} PRIVATE DIG_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")

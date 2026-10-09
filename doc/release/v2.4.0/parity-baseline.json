@@ -20,9 +20,9 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 332,
+    "claims": 336,
     "by_evidence": {
-      "cross-validated-static": 92,
+      "cross-validated-static": 96,
       "cross-validated-live": 2,
       "tested": 233,
       "unverified": 5
@@ -35,7 +35,7 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 83,
+        "cross-validated-static": 87,
         "cross-validated-live": 1,
         "tested": 154,
         "unverified": 5
@@ -93,7 +93,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **52.5%",
+      "text": "parity: **53.6%",
       "status": "generated-with-denominator"
     }
   ],
@@ -1084,6 +1084,30 @@
     },
     {
       "source": "parity",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readCaptrak",
+      "python": "mne.channels.read_dig_captrak",
+      "claimed": "implemented",
+      "test": "test_fiff_dig_point_python",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readNeuroscanDat",
+      "python": "mne.channels.read_dig_dat",
+      "claimed": "implemented",
+      "test": "test_fiff_dig_point_python",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readEgi",
+      "python": "mne.channels.read_dig_egi",
+      "claimed": "implemented",
+      "test": "test_fiff_dig_point_python",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
       "mne_cpp": "FIFFLIB dig I/O",
       "python": "mne.channels.read_dig_fif",
       "claimed": "implemented",
@@ -1100,9 +1124,17 @@
     },
     {
       "source": "parity",
+      "mne_cpp": "FIFFLIB::FiffDigPointSet::readLocalite",
+      "python": "mne.channels.read_dig_localite",
+      "claimed": "implemented",
+      "test": "test_fiff_dig_point_python",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
       "python": "mne.channels.read_dig_polhemus_isotrak",
-      "claimed": "partial",
+      "claimed": "implemented",
       "test": "test_fiff_dig_point_python",
       "evidence": "cross-validated-static"
     },
