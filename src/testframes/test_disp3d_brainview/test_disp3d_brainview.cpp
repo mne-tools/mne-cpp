@@ -57,6 +57,8 @@
 
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_coord_trans_set.h>
+#include <fiff/fiff_stream.h>
 #include <inv/dipole_fit/inv_ecd_set.h>
 #include <inv/dipole_fit/inv_ecd.h>
 #include <connectivity/network/network.h>
@@ -411,6 +413,30 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     }
     modelView.clearTransformation();
     QVERIFY(std::fabs(modelView.cardinalFiducialsInMri()[FIFFV_POINT_LPA].x() + 0.07137661f) < 1e-6f);
+
+    // The head <-> MRI transform is found wherever it sits in the file; a file without one is refused
+    FIFFLIB::FiffCoordTransSet allTrans;
+    QVERIFY(allTrans.read(dataDir + QStringLiteral("MEG/sample/all-trans.fif")) > 0);
+    const FIFFLIB::FiffCoordTrans devHead(FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD, Eigen::Matrix3f::Identity(), Eigen::Vector3f(0.0f, 0.0f, 0.04f));
+    const QString reordered = dir.filePath(QStringLiteral("mri-head-first-trans.fif"));
+    const QString devOnly = dir.filePath(QStringLiteral("dev-head-trans.fif"));
+    for (const QString& path : {reordered, devOnly}) {
+        QFile out(path);
+        auto stream = FIFFLIB::FiffStream::start_file(out);
+        QVERIFY(stream);
+        if (path == reordered) {
+            stream->write_coord_trans(allTrans.head_surf_RAS_t.inverted());
+        }
+        stream->write_coord_trans(devHead);
+        stream->end_file();
+        out.close();
+    }
+    QVERIFY(modelView.loadTransformation(reordered));
+    fiducials = modelView.cardinalFiducialsInMri();
+    for (auto it = expected.cbegin(); it != expected.cend(); ++it) {
+        QVERIFY2((fiducials[it.key()] - it.value()).length() < 1e-6f, qPrintable(QString::number(it.key())));
+    }
+    QVERIFY(!modelView.loadTransformation(devOnly));
 
     QApplication::processEvents();
 }

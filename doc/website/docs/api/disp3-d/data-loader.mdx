@@ -100,7 +100,9 @@ Load source space from a forward-solution FIF file.
 
 ### loadHeadToMriTransform(transPath, trans)
 
-Load a coordinate transformation from a FIF file and normalise it to Head → MRI orientation.
+Load the Head ↔ MRI transformation from a FIF file and normalise it to Head → MRI orientation.
+
+Other transforms in the file are ignored.
 
 **Parameters:**
 
@@ -112,7 +114,7 @@ Load a coordinate transformation from a FIF file and normalise it to Head → MR
 
 **Returns:**
 
-- *bool* — true on success.
+- *bool* — true on success; false if the file holds no Head ↔ MRI transform.
 
 ---
 

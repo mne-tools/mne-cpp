@@ -136,12 +136,12 @@ public:
     static MNELIB::MNESourceSpaces loadSourceSpace(const QString& fwdPath);
 
     /**
-     * Load a coordinate transformation from a FIF file and normalise it
-     * to Head → MRI orientation.
+     * Load the Head ↔ MRI transformation from a FIF file and normalise it
+     * to Head → MRI orientation. Other transforms in the file are ignored.
      *
      * @param[in] transPath  Path to the FIF file.
      * @param[out] trans     The resulting transform (Head → MRI).
-     * @return true on success.
+     * @return true on success; false if the file holds no Head ↔ MRI transform.
      */
     static bool loadHeadToMriTransform(const QString& transPath,
                                        FIFFLIB::FiffCoordTrans& trans);

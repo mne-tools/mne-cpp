@@ -27,6 +27,7 @@
 #include <Eigen/Dense>
 #include <fiff/fiff.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_coord_trans_set.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <mne/mne_bem.h>
@@ -353,29 +354,15 @@ MNESourceSpaces DataLoader::loadSourceSpace(const QString& fwdPath)
 bool DataLoader::loadHeadToMriTransform(const QString& transPath,
                                         FiffCoordTrans& trans)
 {
-    QFile file(transPath);
-
-    FiffCoordTrans raw;
-    if (!FiffCoordTrans::read(file, raw)) {
-        qWarning() << "DataLoader: Failed to load transformation from" << transPath;
+    // A file may hold several transforms (e.g. all-trans.fif: device -> head and MRI -> head);
+    // pick the head <-> MRI one by its frames, inverted to head -> MRI when stored the other way
+    FiffCoordTransSet transforms;
+    transforms.read(transPath);
+    if (transforms.head_surf_RAS_t.isEmpty()) {
+        qWarning() << "DataLoader: No head <-> MRI transformation in" << transPath;
         return false;
     }
-    file.close();
-
-    if (raw.from == FIFFV_COORD_HEAD && raw.to == FIFFV_COORD_MRI) {
-        trans = raw;
-    } else if (raw.from == FIFFV_COORD_MRI && raw.to == FIFFV_COORD_HEAD) {
-        // Invert: MRI->Head becomes Head->MRI
-        trans.from = raw.to;
-        trans.to = raw.from;
-        trans.trans = raw.trans.inverse();
-        trans.invtrans = raw.trans;
-    } else {
-        qWarning() << "DataLoader: Loaded transformation is not Head<->MRI (from"
-                   << raw.from << "to" << raw.to << "). Using as is.";
-        trans = raw;
-    }
-
+    trans = transforms.head_surf_RAS_t;
     return true;
 }
 
