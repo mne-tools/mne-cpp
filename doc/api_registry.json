@@ -12194,15 +12194,17 @@
       },
       {
         "python": "mne.forward.compute_depth_prior",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "depth weighting not ported"
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution::compute_depth_prior",
+        "note": "",
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.forward.compute_orient_prior",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "orientation prior not ported"
+        "status": "implemented",
+        "mne_cpp": "MNEForwardSolution::compute_orient_prior",
+        "note": "a Cartesian forward with loose < 1 falls back to loose 1 and a fixed-orientation forward ignores loose (mne-python raises)",
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.forward.convert_forward_solution",

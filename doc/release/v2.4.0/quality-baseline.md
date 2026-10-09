@@ -20,7 +20,7 @@ Coverage from `733eaa5de` (https://github.com/mne-tools/mne-cpp/actions/runs/379
 | G5 | Zero compiler warnings | enforced by -Werror on every matrix entry | met |
 | G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 419, raw_new 169, raw_delete 275, console_io 356, numeric_define 834, qt_new_unparented 819, oversized_unit 8 | baseline recorded |
 | G6 | Pinned reference environment | MNE-Python 1.11.0; unpinned in CI: none | met |
-| G6 | Parity claims cross-validated | cross-validated-static 56, cross-validated-live 2, tested 141, unverified 160 | **open** |
+| G6 | Parity claims cross-validated | cross-validated-static 58, cross-validated-live 2, tested 141, unverified 160 | **open** |
 
 Detailed reports: [test inventory](test-inventory.md), [coverage](coverage-baseline.md), [API evidence](api-evidence-baseline.md), [visual](visual-baseline.md), [maintainability](maintainability-baseline.md), [parity evidence](parity-baseline.md), [MNE-Python gap](mne-python-gap.md).
 

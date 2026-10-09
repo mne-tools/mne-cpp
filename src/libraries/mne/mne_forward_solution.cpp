@@ -898,7 +898,6 @@ FiffCov MNEForwardSolution::compute_orient_prior(float loose)
     qint32 n_sources = this->sol->data.cols();
 
     if (0 <= loose && loose <= 1) {
-        qDebug() << "this->surf_ori" << this->surf_ori;
         if (loose < 1 && !this->surf_ori) {
             qWarning("\tForward operator is not oriented in surface coordinates. loose parameter should be None not %f.", loose);
             loose = 1;
@@ -1321,7 +1320,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
         nuse += t_SourceSpace[k].nuse;
 
     if (nuse != fwd.nsource) {
-        qDebug() << "Source spaces do not match the forward solution.\n";
+        qWarning("Source spaces do not match the forward solution.");
         return false;
     }
 

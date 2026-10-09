@@ -149,18 +149,28 @@ private slots:
         if (!m_bFwdLoaded)
             QSKIP("Forward solution not loaded");
 
-        FiffCov orientPrior = m_fwd.compute_orient_prior(0.2f);
-        QVERIFY(orientPrior.dim > 0);
-    }
+        // mne.forward.compute_orient_prior on convert_forward_solution(surf_ori=True): tangential components get loose
+        QFile surfFile(m_sFwdFile);
+        MNEForwardSolution surfOri(surfFile, false, true);
+        QVERIFY(surfOri.surf_ori);
+        FiffCov prior = surfOri.compute_orient_prior(0.2f);
+        QCOMPARE(prior.dim, 23784);
+        QCOMPARE(prior.kind, FIFFV_MNE_ORIENT_PRIOR_COV);
+        QVERIFY(prior.diag);
+        QVERIFY(std::abs(prior.data.sum() - 11099.2) < 1e-3);
+        for (int i = 0; i < 6; ++i) {
+            QCOMPARE(static_cast<float>(prior.data(i, 0)), i % 3 == 2 ? 1.0f : 0.2f);
+        }
+        QCOMPARE(surfOri.compute_orient_prior(1.0f).data.sum(), 23784.0);
 
-    void testComputeOrientPriorLoose()
-    {
-        if (!m_bFwdLoaded)
-            QSKIP("Forward solution not loaded");
-
-        // loose=1.0 means free orientation
-        FiffCov orientPrior = m_fwd.compute_orient_prior(1.0f);
-        QVERIFY(orientPrior.dim > 0);
+        // mne raises for a Cartesian forward with loose < 1 and for loose != 0 with fixed orientation; MNE-CPP
+        // falls back to free (loose 1) and to ones
+        QCOMPARE(m_fwd.compute_orient_prior(0.2f).data.sum(), 23784.0);
+        QFile fixedFile(m_sFwdFile);
+        MNEForwardSolution fixedOri(fixedFile, true);
+        prior = fixedOri.compute_orient_prior(0.2f);
+        QCOMPARE(prior.data.size(), Eigen::Index(7928));
+        QCOMPARE(prior.data.sum(), 7928.0);
     }
 
     // ── compute_depth_prior ─────────────────────────────────────────────────

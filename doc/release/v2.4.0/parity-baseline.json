@@ -20,9 +20,9 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 359,
+    "claims": 361,
     "by_evidence": {
-      "cross-validated-static": 56,
+      "cross-validated-static": 58,
       "cross-validated-live": 2,
       "tested": 141,
       "unverified": 160
@@ -35,7 +35,7 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 49,
+        "cross-validated-static": 51,
         "cross-validated-live": 1,
         "tested": 60,
         "unverified": 160
@@ -1504,6 +1504,22 @@
       "claimed": "implemented",
       "test": null,
       "evidence": "unverified"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "MNEForwardSolution::compute_depth_prior",
+      "python": "mne.forward.compute_depth_prior",
+      "claimed": "implemented",
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "MNEForwardSolution::compute_orient_prior",
+      "python": "mne.forward.compute_orient_prior",
+      "claimed": "implemented",
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
