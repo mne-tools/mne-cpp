@@ -279,6 +279,32 @@ Reads a coordinate transform from a fif file.
 
 ---
 
+### read(p_IODevice, p_Trans, from, to)
+
+Reads the transform between two coordinate frames from a fif file that may hold several (MNE-C mne_read_transform).
+
+A transform stored the other way round is inverted.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  A fiff IO device like a fiff QFile or QTCPSocket.
+
+- **p_Trans** : *[FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
+  The transform from `from` to `to`.
+
+- **from** : *int*
+  Source coordinate frame (FIFFV_COORD_*).
+
+- **to** : *int*
+  Target coordinate frame (FIFFV_COORD_*).
+
+**Returns:**
+
+- *bool* — true if the file holds a transform between the two frames, false otherwise.
+
+---
+
 ### readTransform(name, from, to)
 
 Reads a specified coordinate transform from a FIFF file.

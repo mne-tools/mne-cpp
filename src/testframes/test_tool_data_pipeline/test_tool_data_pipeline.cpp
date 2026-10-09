@@ -427,6 +427,24 @@ private slots:
             QVERIFY(qAbs(fields[1].toFloat() - point.y()) < 1e-6f);
             QVERIFY(qAbs(fields[2].toFloat() - point.z()) < 1e-6f);
         }
+
+        // all-trans.fif also holds device -> head; it is found by its frames
+        // (MNE-Python: apply_trans(read_trans(all-trans.fif), points))
+        const QString deviceHeadFile = m_tempDir.filePath("points-device-head.txt");
+        output = runTool("mne_transform_points", {"--trans", transFile, "--in", inputFile, "--out", deviceHeadFile, "--from", "device", "--to", "head"});
+        QVERIFY2(m_lastProcessFinished, qPrintable(output));
+        QCOMPARE(m_lastExitCode, 0);
+        QFile deviceHead(deviceHeadFile);
+        QVERIFY(deviceHead.open(QIODevice::ReadOnly | QIODevice::Text));
+        QTextStream deviceHeadStream(&deviceHead);
+        const QList<QVector3D> inHead = {
+            QVector3D(-0.00559116f, 0.00259466f, 0.06744415f),
+            QVector3D(-0.02057625f, 0.02416092f, 0.08945197f)};
+        for (const QVector3D& point : inHead) {
+            const QStringList fields = deviceHeadStream.readLine().split(' ', Qt::SkipEmptyParts);
+            QCOMPARE(fields.size(), 3);
+            QVERIFY((QVector3D(fields[0].toFloat(), fields[1].toFloat(), fields[2].toFloat()) - point).length() < 1e-6f);
+        }
     }
 
     //=========================================================================================================

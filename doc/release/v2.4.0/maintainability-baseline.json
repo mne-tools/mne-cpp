@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 395493,
+  "scanned_lines": 395510,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -406,12 +406,12 @@
       }
     },
     "console_io": {
-      "total": 358,
+      "total": 356,
       "files": 53,
       "by_scope": {
         "applications": 7,
         "libraries": 59,
-        "tools": 292
+        "tools": 290
       },
       "suppressed": [],
       "top": {
@@ -463,7 +463,7 @@
         "src/tools/forward/mne_fit_sphere_to_surf/main.cpp": 6,
         "src/tools/forward/mne_surf2bem/surf2bem.cpp": 22,
         "src/tools/forward/mne_surf2bem/surfacechecks.cpp": 8,
-        "src/tools/forward/mne_transform_points/main.cpp": 5,
+        "src/tools/forward/mne_transform_points/main.cpp": 3,
         "src/tools/info/mne_check_eeg_locations/main.cpp": 8,
         "src/tools/info/mne_list_bem/main.cpp": 8,
         "src/tools/info/mne_list_coil_def/main.cpp": 5,

@@ -123,31 +123,17 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    // Read coordinate transform
+    // Read the transform between the requested frames (inverted if stored the other way round)
     QFile transFile(transName);
     FiffCoordTrans trans;
-    if (!FiffCoordTrans::read(transFile, trans)) {
-        qCritical("Cannot read coordinate transform from: %s", qPrintable(transName));
+    if (!FiffCoordTrans::read(transFile, trans, fromFrame, toFrame)) {
+        qCritical("No %s <-> %s coordinate transform in: %s", qPrintable(fromName), qPrintable(toName), qPrintable(transName));
         return 1;
     }
 
     fprintf(stderr, "Read transform: %s -> %s\n",
             qPrintable(FiffCoordTrans::frame_name(trans.from)),
             qPrintable(FiffCoordTrans::frame_name(trans.to)));
-
-    // Determine if we need forward or inverse
-    bool useInverse = false;
-    if (trans.from == fromFrame && trans.to == toFrame) {
-        useInverse = false;
-    } else if (trans.from == toFrame && trans.to == fromFrame) {
-        useInverse = true;
-    } else {
-        qCritical("Transform (%s -> %s) does not match requested frames (%s -> %s).",
-                  qPrintable(FiffCoordTrans::frame_name(trans.from)),
-                  qPrintable(FiffCoordTrans::frame_name(trans.to)),
-                  qPrintable(fromName), qPrintable(toName));
-        return 1;
-    }
 
     // Read input points
     QFile inFile(inName);
@@ -186,15 +172,7 @@ int main(int argc, char* argv[])
     for (int i = 0; i < points.size(); ++i)
         rr.row(i) = points[i].transpose();
 
-    // Apply transform
-    MatrixX3f transformed;
-    if (useInverse) {
-        transformed = trans.apply_inverse_trans(rr);
-        fprintf(stderr, "Applied inverse transform.\n");
-    } else {
-        transformed = trans.apply_trans(rr);
-        fprintf(stderr, "Applied forward transform.\n");
-    }
+    const MatrixX3f transformed = trans.apply_trans(rr);
 
     // Write output
     QFile outFile(outName);
