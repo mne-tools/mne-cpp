@@ -67,6 +67,8 @@
 #include <connectivity/network/networknode.h>
 #include <connectivity/network/networkedge.h>
 #include <fs/fs_label.h>
+#include <fs/fs_surface.h>
+#include <mne/mne_bem.h>
 
 #include <Eigen/Core>
 
@@ -283,6 +285,12 @@ private slots:
      * closestStcIndex, and sensor field / realtime sensor streaming methods.
      */
     void brainView_streamingApi();
+
+    //=========================================================================================================
+    /**
+     * Each BrainView::clear* removes exactly its objects and tree rows; loading again works.
+     */
+    void brainView_clearRemovesObjectsAndRows();
 
     //=========================================================================================================
     /**
@@ -2347,6 +2355,69 @@ void TestDisp3dBrainView::sliceObject_cornersAndQuad()
     QCOMPARE(slice.windowWidth(), 0.3f);
     slice.setOpacity(0.25f);
     QCOMPARE(slice.opacity(), 0.25f);
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::brainView_clearRemovesObjectsAndRows()
+{
+    const QString dataDir = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/");
+    BrainTreeModel model;
+    BrainView view;
+    view.setModel(&model);
+    view.showSingleView();
+
+    const auto countItems = [&model](AbstractTreeItem::ItemType type) {
+        int count = 0;
+        QList<QStandardItem*> stack{model.invisibleRootItem()};
+        while (!stack.isEmpty()) {
+            QStandardItem* item = stack.takeLast();
+            count += item->type() == AbstractTreeItem::itemTypeId(type);
+            for (int r = 0; r < item->rowCount(); ++r) {
+                stack << item->child(r);
+            }
+        }
+        return count;
+    };
+    const auto loadAll = [&] {
+        for (const QString& hemi : {QStringLiteral("lh"), QStringLiteral("rh")}) {
+            model.addSurface(QStringLiteral("sample"), hemi, QStringLiteral("white"),
+                             FSLIB::FsSurface(dataDir + QStringLiteral("subjects/sample/surf/%1.white").arg(hemi)));
+        }
+        QFile bemFile(dataDir + QStringLiteral("subjects/sample/bem/sample-5120-bem.fif"));
+        MNELIB::MNEBem bem(bemFile);
+        QVERIFY(bem.size() > 0);
+        model.addBemSurface(QStringLiteral("sample"), QStringLiteral("inner_skull"), bem[0]);
+        QVERIFY(view.loadSensors(dataDir + QStringLiteral("MEG/sample/sample_audvis-ave.fif")));
+        QVERIFY(view.loadSourceSpace(dataDir + QStringLiteral("Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif")));
+    };
+    loadAll();
+    const int sensors = countItems(AbstractTreeItem::SensorItem);
+    const int sourceSpaces = countItems(AbstractTreeItem::SourceSpaceItem);
+    QCOMPARE(countItems(AbstractTreeItem::SurfaceItem), 2);
+    QCOMPARE(countItems(AbstractTreeItem::BemItem), 1);
+    QVERIFY(sensors > 0 && sourceSpaces > 0);
+
+    view.clearSurfaces();
+    QCOMPARE(countItems(AbstractTreeItem::SurfaceItem), 0);
+    QCOMPARE(countItems(AbstractTreeItem::BemItem), 1);
+    view.clearBem();
+    QCOMPARE(countItems(AbstractTreeItem::BemItem), 0);
+    QCOMPARE(countItems(AbstractTreeItem::SensorItem), sensors);
+    view.clearSensors();
+    QCOMPARE(countItems(AbstractTreeItem::SensorItem), 0);
+    QCOMPARE(countItems(AbstractTreeItem::SourceSpaceItem), sourceSpaces);
+    view.clearSourceSpace();
+    QCOMPARE(countItems(AbstractTreeItem::SourceSpaceItem), 0);
+
+    // Nothing is left to pick, and the same data loads again
+    QSignalSpy hovered(&view, &BrainView::hoveredRegionChanged);
+    view.castRay(view.rect().center());
+    QVERIFY(hovered.isEmpty() || hovered.last().at(0).toString().isEmpty());
+    loadAll();
+    QCOMPARE(countItems(AbstractTreeItem::SurfaceItem), 2);
+    QCOMPARE(countItems(AbstractTreeItem::SensorItem), sensors);
+    QCOMPARE(countItems(AbstractTreeItem::SourceSpaceItem), sourceSpaces);
 }
 
 //=============================================================================================================
