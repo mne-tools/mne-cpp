@@ -109,6 +109,39 @@ private slots:
         QVERIFY(StandardMontage::electrodeCount(StandardMontage::System::Standard_1010) >= 60);
     }
 
+    void testPositionsMatchPython()
+    {
+        // Reference values produced by mne.channels.make_standard_montage("standard_1005")
+        // (mne 1.11.0): 343 electrodes from Fp1 to A2, without the fiducials.
+        const QList<ElectrodePosition> montage = StandardMontage::getMontage(StandardMontage::System::Standard_1005);
+        QCOMPARE(montage.size(), 343);
+        QCOMPARE(montage.first().name, QStringLiteral("Fp1"));
+        QCOMPARE(montage.last().name, QStringLiteral("A2"));
+        Vector3d sum = Vector3d::Zero();
+        for (const ElectrodePosition& electrode : montage)
+            sum += electrode.pos;
+        QVERIFY((sum - Vector3d(0.23258589999999968, -5.762538499999998, 7.280988999999997)).norm() < 1e-12);
+
+        const QList<QPair<QString, Vector3d>> expected{{"Cz", {0.0004009, -0.009167, 0.100244}},
+                                                       {"A1", {-0.0860761, -0.0249897, -0.067986}},
+                                                       {"Fp1", {-0.0294367, 0.0839171, -0.00699}},
+                                                       {"O2", {0.0298426, -0.112156, 0.0088}}};
+        for (const auto& [name, position] : expected) {
+            Vector3d pos;
+            QVERIFY(StandardMontage::findElectrode(name, pos));
+            QVERIFY2((pos - position).norm() < 1e-12, qPrintable(name));
+        }
+        // The smaller systems are subsets of the same table
+        for (const auto system : {StandardMontage::System::Standard_1020, StandardMontage::System::Standard_1010}) {
+            for (const ElectrodePosition& electrode : StandardMontage::getMontage(system)) {
+                Vector3d pos;
+                QVERIFY(StandardMontage::findElectrode(electrode.name, pos));
+                QCOMPARE(electrode.pos, pos);
+            }
+        }
+        QCOMPARE(StandardMontage::electrodeCount(StandardMontage::System::Standard_1010), 73);
+    }
+
     void testUniqueNames()
     {
         QStringList names = StandardMontage::getElectrodeNames(StandardMontage::System::Standard_1010);

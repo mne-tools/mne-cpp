@@ -207,10 +207,10 @@ int main(int argc, char* argv[])
     //! [standard_montage_usage]
     const QList<ElectrodePosition> montage1020 = StandardMontage::getMontage(StandardMontage::System::Standard_1020);
     Vector3d cz;
-    const bool found = StandardMontage::findElectrode("Cz", cz); // positions in metres, head coordinates
+    const bool found = StandardMontage::findElectrode("Cz", cz); // mne's standard_1005 positions, metres, MNI frame
     //! [standard_montage_usage]
-    ok &= expect(montage1020.size() == StandardMontage::electrodeCount(StandardMontage::System::Standard_1020) && found && (cz - Vector3d(0.0, 0.0, 0.087)).norm() < 1e-9,
-                 QString("10-20 montage: %1 electrodes, Cz at (0, 0, 0.087) m").arg(montage1020.size()));
+    ok &= expect(montage1020.size() == StandardMontage::electrodeCount(StandardMontage::System::Standard_1020) && found && (cz - Vector3d(0.0004009, -0.009167, 0.100244)).norm() < 1e-12,
+                 QString("10-20 montage: %1 electrodes, Cz at (0.4, -9.2, 100.2) mm").arg(montage1020.size()));
 
     //! [layout_maker_usage]
     // Azimuthal equidistant projection around the fitted sphere: Cz lands near the centre, the nose points up

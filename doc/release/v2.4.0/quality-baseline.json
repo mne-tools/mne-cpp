@@ -79,15 +79,15 @@
       "inventoried_apis": 443,
       "by_status": {
         "implemented": 191,
-        "partial": 84,
-        "missing": 160,
+        "partial": 85,
+        "missing": 159,
         "not-applicable": 8
       },
-      "claims": 336,
+      "claims": 337,
       "claims_by_evidence": {
-        "cross-validated-static": 96,
+        "cross-validated-static": 98,
         "cross-validated-live": 2,
-        "tested": 233,
+        "tested": 232,
         "unverified": 5
       }
     }

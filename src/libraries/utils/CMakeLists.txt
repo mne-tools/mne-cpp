@@ -77,6 +77,13 @@ set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURC
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
+# MNE-Python's standard_1005 electrode table, behind StandardMontage
+qt_add_resources(${PROJECT_NAME} "standard_montage"
+  PREFIX "/utils/montages"
+  BASE montage/data
+  FILES montage/data/standard_1005.elc
+)
+
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..> $<INSTALL_INTERFACE:include>)
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})

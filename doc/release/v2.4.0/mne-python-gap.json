@@ -10,8 +10,8 @@
     "total": 443,
     "by_status": {
       "implemented": 191,
-      "partial": 84,
-      "missing": 160,
+      "partial": 85,
+      "missing": 159,
       "not-applicable": 8
     },
     "by_domain": {
@@ -41,8 +41,8 @@
       },
       "channels": {
         "implemented": 16,
-        "partial": 9,
-        "missing": 16,
+        "partial": 10,
+        "missing": 15,
         "not-applicable": 1
       },
       "epochs": {
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 53.6
+    "parity_percent": 53.7
   },
   "apis": [
     {
@@ -2147,6 +2147,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.channels.make_standard_montage",
+      "name": "make_standard_montage",
+      "submodule": "channels",
+      "kind": "function",
+      "domain": "channels",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::StandardMontage::getMontage",
+      "note": "standard_1005 (and its 10-20/10-10 subsets) from mne's bundled table; the other kinds (biosemi, easycap, GSN-HydroCel, ...) and fiducials are not bundled",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.channels.read_ch_adjacency",
       "name": "read_ch_adjacency",
       "submodule": "channels",
@@ -2265,17 +2276,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.channels.make_standard_montage",
-      "name": "make_standard_montage",
-      "submodule": "channels",
-      "kind": "function",
-      "domain": "channels",
-      "status": "missing",
-      "mne_cpp": "StandardMontage",
-      "note": "standard 10-20/10-10/10-05 montages",
       "evidence": "parity-record"
     },
     {

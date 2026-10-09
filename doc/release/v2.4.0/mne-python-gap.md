@@ -9,10 +9,10 @@
 
 - **Total public MNE-Python APIs inventoried:** 443
 - Implemented: **191**
-- Partial: **84**
-- Missing: **160**
+- Partial: **85**
+- Missing: **159**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **53.6%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **53.7%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -23,7 +23,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | I/O & Readers | 18 | 2 | 39 | 0 | 59 |
 | Core Data Containers | 40 | 13 | 5 | 3 | 61 |
 | Preprocessing & Artifacts | 10 | 8 | 24 | 1 | 43 |
-| Channels & Montages | 16 | 9 | 16 | 1 | 42 |
+| Channels & Montages | 16 | 10 | 15 | 1 | 42 |
 | Epochs & Evoked | 12 | 2 | 2 | 0 | 16 |
 | Covariance & Whitening | 6 | 1 | 0 | 0 | 7 |
 | Forward Modelling | 27 | 5 | 3 | 0 | 35 |
@@ -153,6 +153,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.channels.compute_dev_head_t` | partial | MNELIB::fitMatchedPoints | rigid point fit; no montage-HPI extraction |
 | `mne.channels.generate_2d_layout` | partial | UTILSLIB::LayoutMaker::makeLayout | projects 3-D points; no direct 2-D input |
 | `mne.channels.make_dig_montage` | partial | FiffDigPointSet(QList<FiffDigPoint>) | no name→position mapping |
+| `mne.channels.make_standard_montage` | partial | UTILSLIB::StandardMontage::getMontage | standard_1005 (and its 10-20/10-10 subsets) from mne's bundled table; the other kinds (biosemi, easycap, GSN-HydroCel, ...) and fiducials are not bundled |
 | `mne.channels.read_ch_adjacency` | partial | StatsAdjacency (partial) |  |
 | `mne.channels.read_custom_montage` | partial | UTILSLIB::LayoutLoader::readAsaElcFile | .elc only; no .sfp/.loc/.bvef |
 | `mne.channels.read_vectorview_selection` | partial | UTILSLIB::SelectionIO::readMNESelFile | reads .sel; no name filter or space fixing |
@@ -164,7 +165,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.channels.get_builtin_montages` | missing | — | builtin montage database not ported |
 | `mne.channels.make_1020_channel_selections` | missing | — | 10-20 channel selection groups not ported |
 | `mne.channels.make_grid_layout` | missing | — |  |
-| `mne.channels.make_standard_montage` | missing | StandardMontage | standard 10-20/10-10/10-05 montages |
 | `mne.channels.read_dig_curry` | missing | — | Curry dig reader not ported |
 | `mne.channels.unify_bad_channels` | missing | — |  |
 | `mne.equalize_channels` | missing | — |  |

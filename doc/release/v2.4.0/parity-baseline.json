@@ -20,22 +20,22 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 336,
+    "claims": 337,
     "by_evidence": {
-      "cross-validated-static": 96,
+      "cross-validated-static": 98,
       "cross-validated-live": 2,
-      "tested": 233,
+      "tested": 232,
       "unverified": 5
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 9,
+        "cross-validated-static": 10,
         "cross-validated-live": 1,
-        "tested": 79,
+        "tested": 78,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 87,
+        "cross-validated-static": 88,
         "cross-validated-live": 1,
         "tested": 154,
         "unverified": 5
@@ -72,6 +72,7 @@
         "test_mne_source_space_python",
         "test_sensor_field_mapper",
         "test_spectral_connectivity",
+        "test_standard_montage",
         "test_sts_cluster",
         "test_tool_list_source_space"
       ],
@@ -93,7 +94,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **53.6%",
+      "text": "parity: **53.7%",
       "status": "generated-with-denominator"
     }
   ],
@@ -792,7 +793,7 @@
       "python": "mne.channels.make_standard_montage",
       "claimed": "implemented",
       "test": "test_standard_montage",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1065,6 +1066,14 @@
       "claimed": "implemented",
       "test": "test_tool_surface_math",
       "evidence": "tested"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "UTILSLIB::StandardMontage::getMontage",
+      "python": "mne.channels.make_standard_montage",
+      "claimed": "partial",
+      "test": "test_standard_montage",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

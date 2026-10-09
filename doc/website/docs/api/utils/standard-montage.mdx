@@ -24,7 +24,7 @@ Standard EEG montage with named electrode positions.
 ```cpp title="src/examples/ex_utils/main.cpp"
 const QList<ElectrodePosition> montage1020 = StandardMontage::getMontage(StandardMontage::System::Standard_1020);
 Vector3d cz;
-const bool found = StandardMontage::findElectrode("Cz", cz); // positions in metres, head coordinates
+const bool found = StandardMontage::findElectrode("Cz", cz); // mne's standard_1005 positions, metres, MNI frame
 ```
 
 ---
@@ -65,7 +65,7 @@ Get electrode names for a standard montage.
 
 Look up a single electrode position by name.
 
-Searches through all built-in montages.
+Searches every position of the standard_1005 table, including the fiducials Nz, LPA and RPA.
 
 **Parameters:**
 

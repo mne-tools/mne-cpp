@@ -11773,9 +11773,10 @@
       },
       {
         "python": "mne.channels.make_standard_montage",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "standard 10-20/10-10/10-05 montages"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::StandardMontage::getMontage",
+        "note": "standard_1005 (and its 10-20/10-10 subsets) from mne's bundled table; the other kinds (biosemi, easycap, GSN-HydroCel, ...) and fiducials are not bundled",
+        "test": "test_standard_montage"
       },
       {
         "python": "mne.channels.read_ch_adjacency",
