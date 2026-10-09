@@ -2487,6 +2487,14 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     lhItem->setVisible(true);
     dragAndRelease(false);
     QCOMPARE(clicked.size(), 1);
+
+    // A double click on the surface reports its point; off the surface it falls through to the widget
+    QSignalSpy doubleClicked(&view, &BrainView::surfacePointDoubleClicked);
+    send(QEvent::MouseButtonDblClick, centre, Qt::LeftButton);
+    QCOMPARE(doubleClicked.size(), 1);
+    QCOMPARE(doubleClicked.first().first().value<QVector3D>(), clicked.last().first().value<QVector3D>());
+    send(QEvent::MouseButtonDblClick, QPoint(2, 2), Qt::LeftButton);
+    QCOMPARE(doubleClicked.size(), 1);
     view.showSingleView();
 }
 
