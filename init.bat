@@ -153,11 +153,6 @@ echo %EXTRA_CMAKE_ARGS% | findstr /I /C:"-DNO_OPENGL=ON" /C:"-DNO_OPENGL:BOOL=ON
 call :resolve_qt_dir
 if errorlevel 1 exit /b 1
 
-set "CMAKE_PREFIX_VALUE=%QT_DIR%"
-if exist "%EIGEN_DIR%\share\eigen3\cmake\Eigen3Config.cmake" (
-    set "CMAKE_PREFIX_VALUE=%QT_DIR%;%EIGEN_DIR%"
-)
-
 set "FORCE_ARG="
 if "%FORCE%"=="1" set "FORCE_ARG=--force"
 
@@ -167,6 +162,12 @@ if /I "%QT_SOURCE%"=="artifact" (
     call "%REPO_ROOT%\src\external\init.bat" --qt-version "%QT_VERSION%" --eigen-version "%EIGEN_VERSION%" --linkage "%LINKAGE%" --qt-dir "%QT_DIR%" --skip-qt --eigen-dir "%EIGEN_DIR%" --repository "%REPOSITORY%" --qt-release-tag "%QT_RELEASE_TAG%" --eigen-release-tag "%EIGEN_RELEASE_TAG%" %FORCE_ARG%
 )
 if errorlevel 1 exit /b 1
+
+rem Only now, after the download, does a fresh checkout have Eigen
+set "CMAKE_PREFIX_VALUE=%QT_DIR%"
+if exist "%EIGEN_DIR%\share\eigen3\cmake\Eigen3Config.cmake" (
+    set "CMAKE_PREFIX_VALUE=%QT_DIR%;%EIGEN_DIR%"
+)
 
 if "%DEPS_ONLY%"=="1" (
     echo.
@@ -190,7 +191,7 @@ echo Developer configure complete.
 echo   Build directory: %BUILD_DIR%
 echo   Qt source: %QT_SOURCE% ^(%QT_DIR%^)
 echo   NO_OPENGL: %NO_OPENGL_VALUE%
-echo   Next step: cmake --build "%BUILD_DIR%" --config %BUILD_TYPE% --parallel
+echo   Next step: cmake --build "%BUILD_DIR%" --config %BUILD_TYPE% --parallel 4
 exit /b 0
 
 :usage_ok

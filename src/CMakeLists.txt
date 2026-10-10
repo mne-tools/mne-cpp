@@ -305,13 +305,13 @@ endif()
 ## Eigen dependency
 
 set(MNE_CPP_EIGEN_VERSION "5.0.1" CACHE STRING "Preferred Eigen package version for MNE-CPP.")
-set(MNE_CPP_PREBUILT_EIGEN_DIR "${PROJECT_SOURCE_DIR}/external/Eigen3::Eigen"
+set(MNE_CPP_PREBUILT_EIGEN_DIR "${PROJECT_SOURCE_DIR}/external/eigen"
     CACHE PATH "Location of a prebuilt Eigen package prepared by the init scripts or CI helpers.")
 
 find_package(Eigen3 ${MNE_CPP_EIGEN_VERSION} QUIET NO_MODULE
     HINTS
         "${MNE_CPP_PREBUILT_EIGEN_DIR}"
-        "${PROJECT_SOURCE_DIR}/external/Eigen3::Eigen-${MNE_CPP_EIGEN_VERSION}-install")
+        "${PROJECT_SOURCE_DIR}/external/eigen-${MNE_CPP_EIGEN_VERSION}-install")
 
 if(TARGET Eigen3::Eigen)
     if(DEFINED Eigen3_DIR AND NOT Eigen3_DIR STREQUAL "")

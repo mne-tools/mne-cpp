@@ -24,7 +24,7 @@ Then, on Linux and macOS:
 {/* onboarding: unix */}
 ```bash
 ./init.sh
-cmake --build build/developer-dynamic --parallel
+cmake --build build/developer-dynamic --parallel 4
 ```
 
 On Windows use:
@@ -32,10 +32,10 @@ On Windows use:
 {/* onboarding: windows */}
 ```bat
 .\init.bat
-cmake --build build\developer-dynamic --config Release --parallel
+cmake --build build\developer-dynamic --config Release --parallel 4
 ```
 
-Visual Studio generators build the Debug configuration unless `--config` names another one; the downloaded Qt bundle is a Release build.
+Visual Studio generators build the Debug configuration unless `--config` names another one; the downloaded Qt bundle is a Release build. Some translation units need about 2 GB of memory to compile, so a bare `--parallel` (one job per core, or unlimited with Makefiles) can exhaust the memory of a laptop; raise the job count only as far as memory allows.
 
 Check the result by running an example. On Linux and macOS:
 

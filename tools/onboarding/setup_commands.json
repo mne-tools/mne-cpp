@@ -5,12 +5,12 @@
   ],
   "unix": [
     "./init.sh",
-    "cmake --build build/developer-dynamic --parallel",
+    "cmake --build build/developer-dynamic --parallel 4",
     "./out/Release/examples/ex_math"
   ],
   "windows": [
     ".\\init.bat",
-    "cmake --build build\\developer-dynamic --config Release --parallel",
+    "cmake --build build\\developer-dynamic --config Release --parallel 4",
     "set PATH=%CD%\\src\\external\\qt\\dynamic\\bin;%PATH%",
     "out\\Release\\bin\\ex_math.exe"
   ]

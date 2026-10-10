@@ -65,6 +65,17 @@ class ExtractSetupCommandsTest(unittest.TestCase):
     def test_committed_commands_match_the_docs(self) -> None:
         self.assertEqual(extractor.main(["--check"]), 0)
 
+    def test_documented_builds_bound_their_jobs(self) -> None:
+        # A bare --parallel ran out of memory on a 16 GB onboarding runner
+        texts = [(_REPO_ROOT / path).read_text(encoding="utf-8")
+                 for path in (*extractor.DOCS, "init.sh", "init.bat")]
+        texts += [command for commands in extractor.extract(
+            (_REPO_ROOT / extractor.DOCS[0]).read_text(encoding="utf-8"), "doc").values() for command in commands]
+        for text in texts:
+            for line in text.splitlines():
+                if "cmake --build" in line and "--parallel" in line:
+                    self.assertRegex(line, r"--parallel\s+\S", line)
+
     def test_edited_doc_command_is_drift(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             for doc in extractor.DOCS:
