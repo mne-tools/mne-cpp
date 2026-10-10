@@ -273,6 +273,18 @@ set(QT_NO_PRIVATE_MODULE_WARNING ON)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${_MNE_QT_COMPONENTS})
 unset(_MNE_QT_COMPONENTS)
 
+# CMAKE_INSTALL_RPATH_USE_LINK_PATH skips directories inside the project, such as the Qt init.sh downloads into src/external
+set(MNE_QT_RPATH "")
+if(NOT WIN32 AND NOT WASM)
+  get_filename_component(_mne_qt_lib_dir "${QT_DIR}/../.." ABSOLUTE)
+  string(FIND "${_mne_qt_lib_dir}/" "${CMAKE_SOURCE_DIR}/" _mne_qt_pos)
+  if(_mne_qt_pos EQUAL 0)
+    set(MNE_QT_RPATH "${_mne_qt_lib_dir}")
+  endif()
+  unset(_mne_qt_lib_dir)
+  unset(_mne_qt_pos)
+endif()
+
 ##==============================================================================
 ## Save git hash for project
 
