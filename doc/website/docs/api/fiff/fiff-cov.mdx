@@ -244,6 +244,29 @@ Ported from compute_cov.c (MNE-C).
 
 ---
 
+### compute_from_epochs(epochs, info, removeMean)
+
+Compute a noise covariance matrix from epochs that are already in memory, e.g.
+
+filtered ones.
+
+**Parameters:**
+
+- **epochs** : *const QList&lt; QList&lt; Eigen::MatrixXd &gt; &gt; &*
+  The epochs (channels x samples), grouped by event code.
+
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
+  Measurement info whose channels the epoch rows are.
+
+- **removeMean** : *bool*
+  Whether to remove each group's average response (mne keep_sample_mean=False).
+
+**Returns:**
+
+- *[FiffCov](/docs/api/fiff/fiff-cov)* — The computed noise covariance matrix, or empty [`FiffCov`](/docs/api/fiff/fiff-cov) on failure.
+
+---
+
 ### computeGrandAverage(covs)
 
 Compute a weighted grand-average covariance from multiple covariance matrices, weighting each by its degrees of freedom (nfree).

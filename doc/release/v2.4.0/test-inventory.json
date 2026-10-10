@@ -5069,7 +5069,7 @@
         "test-data"
       ],
       "gui": true,
-      "qskip_sites": 1,
+      "qskip_sites": 2,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {

@@ -206,6 +206,20 @@ public:
 
     //=========================================================================================================
     /**
+     * Compute a noise covariance matrix from epochs that are already in memory, e.g. filtered ones.
+     *
+     * @param[in] epochs        The epochs (channels x samples), grouped by event code.
+     * @param[in] info          Measurement info whose channels the epoch rows are.
+     * @param[in] removeMean    Whether to remove each group's average response (mne keep_sample_mean=False).
+     *
+     * @return The computed noise covariance matrix, or empty FiffCov on failure.
+     */
+    static FiffCov compute_from_epochs(const QList<QList<Eigen::MatrixXd>>& epochs,
+                                       const FiffInfo& info,
+                                       bool removeMean = true);
+
+    //=========================================================================================================
+    /**
      * Save this covariance matrix to a FIFF file.
      *
      * @param[in] fileName  Output file path.

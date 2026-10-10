@@ -200,54 +200,15 @@ FIFFLIB::FiffCov computeCovarianceFromEpochLists(const QList<MNELIB::MNEEpochDat
                                                  const FIFFLIB::FiffInfo& info,
                                                  bool removeMean)
 {
-    FIFFLIB::FiffCov covariance;
-    if (epochLists.isEmpty()) {
-        return covariance;
-    }
-
-    Eigen::MatrixXd covAccum = Eigen::MatrixXd::Zero(info.nchan, info.nchan);
-    Eigen::VectorXd meanAccum = Eigen::VectorXd::Zero(info.nchan);
-    int totalSamples = 0;
-    int acceptedEpochs = 0;
-
+    QList<QList<Eigen::MatrixXd>> epochs;
     for (const MNELIB::MNEEpochDataList& epochList : epochLists) {
+        QList<Eigen::MatrixXd>& codeEpochs = epochs.emplaceBack();
         for (const auto& epoch : epochList) {
-            if (epoch.isNull() || epoch->epoch.size() == 0) {
-                continue;
-            }
-
-            covAccum += epoch->epoch * epoch->epoch.transpose();
-            if (removeMean) {
-                meanAccum += epoch->epoch.rowwise().mean() * static_cast<double>(epoch->epoch.cols());
-            }
-
-            totalSamples += static_cast<int>(epoch->epoch.cols());
-            ++acceptedEpochs;
+            if (!epoch.isNull() && epoch->epoch.size() > 0)
+                codeEpochs.append(epoch->epoch);
         }
     }
-
-    if (totalSamples < 2) {
-        return covariance;
-    }
-
-    if (removeMean) {
-        const Eigen::VectorXd grandMean = meanAccum / static_cast<double>(totalSamples);
-        covariance.data = (covAccum / static_cast<double>(totalSamples - 1)) - (grandMean * grandMean.transpose()) * (static_cast<double>(totalSamples) / static_cast<double>(totalSamples - 1));
-    } else {
-        covariance.data = covAccum / static_cast<double>(totalSamples - 1);
-    }
-
-    covariance.kind = FIFFV_MNE_NOISE_COV;
-    covariance.dim = info.nchan;
-    covariance.names = info.ch_names;
-    covariance.nfree = totalSamples - 1;
-    covariance.bads = info.bads;
-    covariance.projs = info.projs;
-
-    qInfo() << "[MainWindow] Computed filtered covariance:" << info.nchan
-            << "channels," << acceptedEpochs << "epochs," << totalSamples << "total samples.";
-
-    return covariance;
+    return FIFFLIB::FiffCov::compute_from_epochs(epochs, info, removeMean);
 }
 
 bool writeFilteredRawFile(const QString& rawFilePath,

@@ -482,12 +482,8 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
         bmaxSamp = static_cast<int>(std::round(bmax * sfreq)) - minSamp;
     }
 
-    MatrixXd covAccum = MatrixXd::Zero(nchan, nchan);
-    // Per event code: sum of the accepted epochs and their count (the evoked response is removed per code)
-    QList<MatrixXd> epochSums(eventCodes.size(), MatrixXd::Zero(nchan, ns));
-    QList<int> epochCounts(eventCodes.size(), 0);
-    int totalSamples = 0;
-
+    // The accepted epochs, grouped by event code
+    QList<QList<MatrixXd>> epochs(eventCodes.size());
     for (int k = 0; k < events.rows(); ++k) {
         int evFrom = events(k, 1) & ~static_cast<int>(ignoreMask);
         int evTo = events(k, 2) & ~static_cast<int>(ignoreMask);
@@ -526,46 +522,60 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
             }
         }
 
-        covAccum += epochData * epochData.transpose();
-        if (removeMean) {
-            epochSums[iCode] += epochData;
+        epochs[iCode].append(epochData);
+    }
+
+    return compute_from_epochs(epochs, raw.info, removeMean);
+}
+
+//=============================================================================================================
+
+FiffCov FiffCov::compute_from_epochs(const QList<QList<MatrixXd>>& epochs,
+                                     const FiffInfo& info,
+                                     bool removeMean)
+{
+    FiffCov cov;
+    const int nchan = info.nchan;
+    MatrixXd covAccum = MatrixXd::Zero(nchan, nchan);
+    int totalSamples = 0;
+    int nEpochs = 0;
+    double norm = 0.0;
+    for (const QList<MatrixXd>& codeEpochs : epochs) {
+        if (codeEpochs.isEmpty())
+            continue;
+        MatrixXd sum = MatrixXd::Zero(nchan, codeEpochs.first().cols());
+        for (const MatrixXd& epoch : codeEpochs) {
+            covAccum += epoch * epoch.transpose();
+            sum += epoch;
+            totalSamples += static_cast<int>(epoch.cols());
         }
-        epochCounts[iCode]++;
-        totalSamples += ns;
+        nEpochs += static_cast<int>(codeEpochs.size());
+        if (removeMean) {
+            // As mne.compute_covariance(keep_sample_mean=False) and MNE-C compute_cov: subtract each code's evoked response
+            covAccum -= sum * sum.transpose() / static_cast<double>(codeEpochs.size());
+            norm += static_cast<double>(sum.cols()) * (codeEpochs.size() - 1);
+        }
     }
 
     if (totalSamples < 2) {
         qWarning() << "[FiffCov::compute_from_epochs] Not enough data.";
         return cov;
     }
-
-    if (removeMean) {
-        // As mne.compute_covariance(keep_sample_mean=False) and MNE-C compute_cov: subtract each code's evoked response
-        double norm = 0.0;
-        for (int c = 0; c < eventCodes.size(); ++c) {
-            if (epochCounts[c] > 0) {
-                covAccum -= epochSums[c] * epochSums[c].transpose() / static_cast<double>(epochCounts[c]);
-                norm += static_cast<double>(ns) * (epochCounts[c] - 1);
-            }
-        }
-        if (norm <= 0.0) {
-            qWarning() << "[FiffCov::compute_from_epochs] Removing the sample mean needs two epochs of one event code.";
-            return cov;
-        }
-        cov.data = covAccum / norm;
-    } else {
-        cov.data = covAccum / static_cast<double>(totalSamples - 1);
+    if (removeMean && norm <= 0.0) {
+        qWarning() << "[FiffCov::compute_from_epochs] Removing the sample mean needs two epochs of one event code.";
+        return cov;
     }
+    cov.data = covAccum / (removeMean ? norm : static_cast<double>(totalSamples - 1));
 
     cov.kind = FIFFV_MNE_NOISE_COV;
     cov.dim = nchan;
-    cov.names = raw.info.ch_names;
+    cov.names = info.ch_names;
     cov.nfree = totalSamples - 1;
-    cov.bads = raw.info.bads;
-    cov.projs = raw.info.projs;
+    cov.bads = info.bads;
+    cov.projs = info.projs;
 
     qInfo() << "[FiffCov::compute_from_epochs] Computed:" << nchan << "channels,"
-            << totalSamples / ns << "epochs," << totalSamples << "total samples.";
+            << nEpochs << "epochs," << totalSamples << "total samples.";
 
     return cov;
 }
