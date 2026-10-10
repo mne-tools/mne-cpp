@@ -182,8 +182,12 @@ int main(int argc, char* argv[])
     regression.fit(cleaned, info); // EOG channels are found by kind
     regression.apply(cleaned, info);
     //! [eog_regression_usage]
-    const double beforeBlink = data(0, 1125);
-    const double afterBlink = cleaned(0, 1125);
+    // Deflection around the second blink peak against the channel mean; averaging 21 samples keeps the noise small
+    const auto blinkDeflection = [](const RowVectorXd& row) {
+        return row.segment(1115, 21).mean() - row.mean();
+    };
+    const double beforeBlink = blinkDeflection(data.row(0));
+    const double afterBlink = blinkDeflection(cleaned.row(0));
     ok &= expect(std::fabs(regression.coefficients()(0, 0) - 0.4) < 0.02 && std::fabs(afterBlink) < 0.1 * std::fabs(beforeBlink),
                  QString("EOG regression: beta %1 (0.4), blink on EEG0 %2 -> %3 V").arg(regression.coefficients()(0, 0)).arg(beforeBlink).arg(afterBlink));
 
