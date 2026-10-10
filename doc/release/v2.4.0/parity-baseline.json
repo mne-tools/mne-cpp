@@ -43,6 +43,7 @@
     },
     "tests_by_relation": {
       "cross-validated-static": [
+        "test_analyze_averaging",
         "test_anshared_models",
         "test_dsp_annotate_artifact",
         "test_dsp_eog_regression",

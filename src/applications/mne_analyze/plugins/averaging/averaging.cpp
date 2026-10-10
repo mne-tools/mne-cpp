@@ -402,54 +402,42 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::Fi
                                                                      FIFFLIB::FiffInfo fiffInfo)
 {
     QMap<QString, double> mapReject;
-
-    int iType = 1; //hardwired for now, change later to type
     mapReject.insert("eog", 300e-06);
 
-    if (matEvents.size() < 6) {
-        //qWarning() << "[Averaging::averageCalacualtion] Not enough data points to calculate average.";
+    if (matEvents.rows() < 2) {
         return Q_NULLPTR;
     }
 
-    QSharedPointer<FIFFLIB::FiffEvoked> pFiffEvoked = QSharedPointer<FIFFLIB::FiffEvoked>(new FIFFLIB::FiffEvoked());
-
-    if (m_bPerformFiltering) {
-        QMutexLocker lock(&m_ParameterMutex);
-        *pFiffEvoked = RTPROCESSINGLIB::computeFilteredAverage(FiffRaw,
-                                                               matEvents,
-                                                               m_fPreStim,
-                                                               m_fPostStim,
-                                                               iType,
-                                                               m_bBaseline,
-                                                               m_fBaselineFromS,
-                                                               m_fBaselineToS,
-                                                               mapReject,
-                                                               filterKernel);
-    } else {
-        QMutexLocker lock(&m_ParameterMutex);
-        *pFiffEvoked = MNEEpochDataList::computeAverage(FiffRaw,
-                                                        matEvents,
-                                                        m_fPreStim,
-                                                        m_fPostStim,
-                                                        iType,
-                                                        m_bBaseline,
-                                                        m_fBaselineFromS,
-                                                        m_fBaselineToS,
-                                                        mapReject);
+    // One evoked response per trigger code of the selected events, like mne.Epochs per event_id
+    QList<int> eventCodes;
+    for (Eigen::Index i = 0; i < matEvents.rows(); ++i) {
+        if (matEvents(i, 2) != 0 && !eventCodes.contains(matEvents(i, 2)))
+            eventCodes.append(matEvents(i, 2));
     }
+    std::sort(eventCodes.begin(), eventCodes.end());
 
     QSharedPointer<FIFFLIB::FiffEvokedSet> pFiffEvokedSet = QSharedPointer<FIFFLIB::FiffEvokedSet>(new FIFFLIB::FiffEvokedSet());
-
-    pFiffEvokedSet->evoked.append(*(pFiffEvoked.data()));
     pFiffEvokedSet->info = fiffInfo;
 
     QMutexLocker lock(&m_ParameterMutex);
-
-    if (m_bBaseline) {
-        pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFromS;
-        pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
+    for (const int eventCode : eventCodes) {
+        FIFFLIB::FiffEvoked evoked = m_bPerformFiltering
+            ? RTPROCESSINGLIB::computeFilteredAverage(FiffRaw, matEvents, m_fPreStim, m_fPostStim, eventCode, m_bBaseline,
+                                                      m_fBaselineFromS, m_fBaselineToS, mapReject, filterKernel)
+            : MNEEpochDataList::computeAverage(FiffRaw, matEvents, m_fPreStim, m_fPostStim, eventCode, m_bBaseline,
+                                               m_fBaselineFromS, m_fBaselineToS, mapReject);
+        if (evoked.isEmpty())
+            continue;
+        evoked.comment = QString::number(eventCode);
+        if (m_bBaseline) {
+            evoked.baseline.first = m_fBaselineFromS;
+            evoked.baseline.second = m_fBaselineToS;
+        }
+        pFiffEvokedSet->evoked.append(evoked);
     }
 
+    if (pFiffEvokedSet->evoked.isEmpty())
+        return Q_NULLPTR;
     return pFiffEvokedSet;
 }
 

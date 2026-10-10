@@ -6,9 +6,9 @@
     "commit": "aaef74112dba471ff38e5c0ed429a4b6800b0c8f"
   },
   "summary": {
-    "directories": 251,
+    "directories": 252,
     "registration": {
-      "unconditional": 244,
+      "unconditional": 245,
       "conditional": 4,
       "unregistered": 3
     },
@@ -20,10 +20,10 @@
       "freesurfer": 2,
       "python": 9,
       "sample-data": 19,
-      "test-data": 105
+      "test-data": 106
     },
-    "gui": 33,
-    "with_qskip": 75,
+    "gui": 34,
+    "with_qskip": 76,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -31,7 +31,9 @@
         "executed": 276,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_analyze_averaging"
+        ],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -67,7 +69,9 @@
         "executed": 276,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_analyze_averaging"
+        ],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -103,7 +107,9 @@
         "executed": 276,
         "failures": 0,
         "skipped": 2,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_analyze_averaging"
+        ],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -138,6 +144,39 @@
     }
   },
   "tests": [
+    {
+      "name": "test_analyze_averaging",
+      "cmake": "src/testframes/test_analyze_averaging/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_analyze_averaging"
+      ],
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
+    },
     {
       "name": "test_anshared_models",
       "cmake": "src/testframes/test_anshared_models/CMakeLists.txt",

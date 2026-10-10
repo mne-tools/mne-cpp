@@ -239,14 +239,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Connected to GUI dropdown to select group based on group name input.
-     *
-     * @param[in] text  name of group selected in the GUI.
-     */
-    void onChangeGroupSelect(int iId);
-
-    //=========================================================================================================
-    /**
      *  Loads averging GUI components that are dependent on FiffRawModel to be initialized
      */
     void loadFullGui(QSharedPointer<FIFFLIB::FiffInfo> pInfo);
