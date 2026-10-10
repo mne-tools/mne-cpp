@@ -237,8 +237,10 @@ bool FiffRawViewModel::saveToFile(const QString& sPath)
 #else
     QFile device(sPath);
 #endif
-    const bool ok = m_bPerformFiltering ? RTPROCESSINGLIB::filterFile(device, m_pFiffIO->m_qlistRaw[0], m_filterKernel)
-                                        : m_pFiffIO->write_raw(device, 0);
+    // The same channels as in the view; an empty pick list would filter every channel, triggers included
+    const bool ok = m_bPerformFiltering && m_lFilterChannelList.size() > 0
+        ? RTPROCESSINGLIB::filterFile(device, m_pFiffIO->m_qlistRaw[0], m_filterKernel, m_lFilterChannelList)
+        : m_pFiffIO->write_raw(device, 0);
 #ifdef WASMBUILD
     if (ok) {
         QFileDialog::saveFileContent(device.data(), getModelName());

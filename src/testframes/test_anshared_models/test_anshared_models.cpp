@@ -42,6 +42,7 @@
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Management/communicator.h>
 
+#include <dsp/filterkernel.h>
 #include <fiff/fiff_events.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_raw_data.h>
@@ -151,6 +152,28 @@ void TestAnSharedModels::rawModel_saveToFileRoundTrips()
     QCOMPARE(saved.info.nchan, 376);
 
     QVERIFY(!FiffRawViewModel().saveToFile(dir.filePath("empty_raw.fif")));
+
+    // With the viewer's filter on, the saved file is filtered on the channels the viewer filters (EEG here) only:
+    // trigger codes and the other channels are written unchanged
+    const double sfreq = model.getSamplingFrequency();
+    model.setFilter(UTILSLIB::FilterKernel("lp", 0, 128, 20.0 / (sfreq / 2.0), 0.0, 5.0 / (sfreq / 2.0), sfreq, 0));
+    model.setFilterChannelType(QStringLiteral("EEG"));
+    model.setFilterActive(true);
+    const QString filtered = dir.filePath("filtered_raw.fif");
+    QVERIFY(model.saveToFile(filtered));
+    QFile filteredFile(filtered);
+    const FIFFLIB::FiffRawData lowpassed(filteredFile);
+    QFile originalFile(rawPath());
+    const FIFFLIB::FiffRawData original(originalFile);
+    Eigen::MatrixXd a, b, t;
+    QVERIFY(original.read_raw_segment(a, t, 14000, 14999));
+    QVERIFY(lowpassed.read_raw_segment(b, t, 14000, 14999));
+    for (const char* name : {"STI014", "MEG0113", "EOG061"}) {
+        const int k = static_cast<int>(original.info.ch_names.indexOf(name));
+        QVERIFY2(k >= 0 && (a.row(k) - b.row(k)).cwiseAbs().maxCoeff() <= 1e-6 * a.row(k).cwiseAbs().maxCoeff(), name);
+    }
+    const int eeg = static_cast<int>(original.info.ch_names.indexOf("EEG001"));
+    QVERIFY((a.row(eeg) - b.row(eeg)).cwiseAbs().maxCoeff() > 1e-3 * a.row(eeg).cwiseAbs().maxCoeff());
 }
 
 //=============================================================================================================
