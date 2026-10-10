@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38000906824 (comm
 
 ## Registration
 
-- Test directories: 253
-- Registered unconditionally: 246
+- Test directories: 254
+- Registered unconditionally: 247
 - Registered behind a CMake condition or early `return()`: 4
 - Not registered: 3
 - Registered without `LABELS`: 0
@@ -18,9 +18,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38000906824 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 276 | 0 | 0 | `test_analyze_averaging`, `test_analyze_dipolefit` |
-| ubuntu-24.04 | 276 | 0 | 0 | `test_analyze_averaging`, `test_analyze_dipolefit` |
-| windows-2025-vs2026 | 276 | 0 | 2 | `test_analyze_averaging`, `test_analyze_dipolefit` |
+| macos-26 | 276 | 0 | 0 | `test_analyze_averaging`, `test_analyze_dataloader`, `test_analyze_dipolefit` |
+| ubuntu-24.04 | 276 | 0 | 0 | `test_analyze_averaging`, `test_analyze_dataloader`, `test_analyze_dipolefit` |
+| windows-2025-vs2026 | 276 | 0 | 2 | `test_analyze_averaging`, `test_analyze_dataloader`, `test_analyze_dipolefit` |
 
 ## Run-time requirements (lexical signals)
 
@@ -29,9 +29,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38000906824 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 19 |
-| test-data | 107 |
-| GUI (`QTEST_MAIN`) | 35 |
-| Contains `QSKIP` | 77 |
+| test-data | 108 |
+| GUI (`QTEST_MAIN`) | 36 |
+| Contains `QSKIP` | 78 |
 
 ## Conditional and unregistered tests
 

@@ -5,7 +5,7 @@ Coverage from `aaef74112` (https://github.com/mne-tools/mne-cpp/actions/runs/380
 
 | Gate | Criterion | Current | Status |
 |---|---|---|---|
-| G1 | Every registered test runs in CI | 250 registered; CI ran 276 on macos-26, 276 on ubuntu-24.04, 276 on windows-2025-vs2026 (2 declared skips) | met |
+| G1 | Every registered test runs in CI | 251 registered; CI ran 276 on macos-26, 276 on ubuntu-24.04, 276 on windows-2025-vs2026 (2 declared skips) | met |
 | G1 | Tests carry labels and timeouts | 0 unlabelled, 0 untimed | met |
 | G1 | No retry-to-pass path | 0 retry lines in local scripts | met |
 | G2 | Combined line coverage >= 60.0% | 64.06% (0 lines short) | met |
