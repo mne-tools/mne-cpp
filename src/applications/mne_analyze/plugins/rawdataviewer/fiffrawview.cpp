@@ -580,7 +580,7 @@ void FiffRawView::updateTimeLabels(int iValue)
 {
     Q_UNUSED(iValue);
 
-    if (m_pModel->isEmpty()) {
+    if (!m_pModel || m_pModel->isEmpty()) {
         m_pEndTimeLabel->setText("0 | 0 sec");
         m_pInitialTimeLabel->setText("0 | 0 sec");
         return;
@@ -713,7 +713,7 @@ void FiffRawView::clearView()
 
 void FiffRawView::updateFileLabel()
 {
-    if (parentWidget()) {
+    if (m_pModel && parentWidget()) {
         QString label;
 
         float fFrequency = m_pModel->getSamplingFrequency();
@@ -736,6 +736,9 @@ void FiffRawView::updateFileLabel()
 
 void FiffRawView::updateFilterLabel()
 {
+    if (!m_pModel) {
+        return;
+    }
     QString label;
     if (m_pModel->isFilterActive()) {
         label += "   |   Filter ON";

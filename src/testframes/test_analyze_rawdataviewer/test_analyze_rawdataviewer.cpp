@@ -68,6 +68,12 @@ void TestAnalyzeRawDataViewer::jumpsToTheSelectedEvent()
     view->show();
     QVERIFY(QTest::qWaitForWindowExposed(view));
 
+    // Scrolling or removing the recording before one is shown must not touch a missing model
+    view->findChild<QTableView*>()->horizontalScrollBar()->valueChanged(5);
+    view->clearView();
+    plugin.handleEvent(QSharedPointer<Event>::create(TRIGGER_VIEWER_MOVE, nullptr, QVariant()));
+    plugin.handleEvent(QSharedPointer<Event>::create(TRIGGER_ACTIVE_CHANGED, nullptr, QVariant(2)));
+
     auto raw = data->loadModel<FiffRawViewModel>(rawPath);
     plugin.handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(raw.staticCast<AbstractModel>())));
     for (QRhiWidget* rhi : view->findChildren<QRhiWidget*>())
@@ -92,6 +98,12 @@ void TestAnalyzeRawDataViewer::jumpsToTheSelectedEvent()
     // The table lists the selected group's events only; its second row is the event at 16000
     events->clearEventSelection();
     events->appendSelected(1);
+    // "Activate events" in the events panel switches the event marks on and off
+    plugin.handleEvent(QSharedPointer<Event>::create(TRIGGER_ACTIVE_CHANGED, nullptr, QVariant(static_cast<int>(Qt::Checked))));
+    QVERIFY(raw->shouldDisplayEvent());
+    plugin.handleEvent(QSharedPointer<Event>::create(TRIGGER_ACTIVE_CHANGED, nullptr, QVariant(static_cast<int>(Qt::Unchecked))));
+    QVERIFY(!raw->shouldDisplayEvent());
+
     plugin.handleEvent(QSharedPointer<Event>::create(TRIGGER_VIEWER_MOVE, nullptr, QVariant()));
     const int expected = static_cast<int>((16000 - raw->absoluteFirstSample()) * raw->pixelDifference()) - table->width() / 2;
     QVERIFY2(std::abs(table->horizontalScrollBar()->value() - expected) <= 1,

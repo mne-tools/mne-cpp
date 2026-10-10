@@ -142,8 +142,7 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
             m_pFiffRawView->updateScrollPositionToEvent();
             break;
         case EVENT_TYPE::TRIGGER_ACTIVE_CHANGED:
-            m_pFiffRawView->getModel()->toggleDispEvent(e->getData().toInt());
-            m_pFiffRawView->updateView();
+            m_pFiffRawView->toggleDisplayEvent(e->getData().toInt());
             break;
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
             onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
