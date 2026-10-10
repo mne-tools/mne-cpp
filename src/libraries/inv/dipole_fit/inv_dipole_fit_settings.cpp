@@ -202,10 +202,6 @@ void InvDipoleFitSettings::checkIntegrity()
         qCritical("Data file name missing. Please specify one using the --meas option.");
         return;
     }
-    if (dipname.isEmpty() && bdipname.isEmpty()) {
-        qCritical("Output file name missing. Please use the --dip or --bdip options to do this.");
-        return;
-    }
     if (guessname.isEmpty()) {
         if (bemname.isEmpty() && !guess_surfname.isEmpty() && mriname.isEmpty()) {
             qCritical("Please specify the MRI/head coordinate transformation with the --mri option");

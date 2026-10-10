@@ -939,6 +939,20 @@ void TestInvDipoleFitPython::rejectsMissingInput()
     settings.checkIntegrity();
     InvDipoleFit fit(&settings);
     QCOMPARE(fit.calculateFit().size(), 0);
+
+    // A library caller needs no output file: the fit, SSP of the data included, is returned
+    InvDipoleFitSettings noOutput;
+    noOutput.measname = m_synthAve;
+    noOutput.include_meg = true;
+    noOutput.guess_mindist = 0.0f;
+    noOutput.tmin = 0.0f;
+    noOutput.checkIntegrity();
+    QCOMPARE(noOutput.projnames, QStringList{m_synthAve});
+    InvDipoleFit noOutputFit(&noOutput);
+    const InvEcdSet set = noOutputFit.calculateFit();
+    QCOMPARE(set.size(), m_fit.size());
+    for (int i = 0; i < set.size(); ++i)
+        QCOMPARE(set[i].rd, m_fit[i].rd);
 }
 
 //=============================================================================================================

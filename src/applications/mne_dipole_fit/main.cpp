@@ -96,7 +96,11 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     InvDipoleFitSettings settings(&argc, argv);
-    if (settings.measname.isEmpty() || (settings.dipname.isEmpty() && settings.bdipname.isEmpty()) || (!settings.include_meg && !settings.include_eeg)) {
+    if (settings.measname.isEmpty() || (!settings.include_meg && !settings.include_eeg)) {
+        return 1;
+    }
+    if (settings.dipname.isEmpty() && settings.bdipname.isEmpty()) {
+        qCritical("Output file name missing. Please use the --dip or --bdip options to do this.");
         return 1;
     }
     if (!QFileInfo(settings.measname).isReadable()) {

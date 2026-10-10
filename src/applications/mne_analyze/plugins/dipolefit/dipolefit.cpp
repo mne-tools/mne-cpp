@@ -56,7 +56,6 @@ using namespace ANSHAREDLIB;
 
 InvDipoleFit::InvDipoleFit()
 {
-    m_DipoleSettings.dipname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/dip-5120-bem_fit.dat";
 }
 
 //=============================================================================================================
