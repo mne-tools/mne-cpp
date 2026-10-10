@@ -184,16 +184,13 @@ FiffAnnotations UTILSLIB::annotateAmplitude(
     if (data.rows() == 0 || nTimes < 2 || (!params.peak && !params.flat))
         return annot;
 
-    // mne's "data_or_ica" picks without the bad channels
-    static const QStringList dataTypes{"mag", "grad", "eeg", "csd", "seeg", "ecog", "dbs", "hbo", "hbr",
-                                       "fnirs_cw_amplitude", "fnirs_fd_ac_amplitude", "fnirs_fd_phase", "fnirs_od"};
     const int minSamples = static_cast<int>(std::round(params.dMinDuration * sfreq));
     VectorXi anyFlat = VectorXi::Zero(nTimes - 1);
     VectorXi anyPeak = VectorXi::Zero(nTimes - 1);
 
-    for (int ch = 0; ch < static_cast<int>(data.rows()) && ch < info.chs.size(); ++ch) {
-        if (!dataTypes.contains(info.channel_type(ch)) || info.bads.contains(info.ch_names[ch]))
-            continue;
+    for (const int ch : info.pick_data_channels(info.bads)) {
+        if (ch >= data.rows())
+            break;
         const ArrayXd diff = (data.row(ch).tail(nTimes - 1) - data.row(ch).head(nTimes - 1)).array().abs().transpose();
         bool bad = false;
         for (const auto& [threshold, isPeak] : {std::pair{params.flat, false}, std::pair{params.peak, true}}) {

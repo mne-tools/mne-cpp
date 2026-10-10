@@ -115,6 +115,21 @@ Channel indices of each channel type, like mne.channel_indices_by_type.
 
 ---
 
+### pick_data_channels(exclude)
+
+The data channels (MEG including reference MEG, EEG, CSD, sEEG, ECoG, DBS, fNIRS), like mne's picks="data".
+
+**Parameters:**
+
+- **exclude** : *const QStringList &*
+  Channel names to leave out, e.g. the bads.
+
+**Returns:**
+
+- *Eigen::RowVectorXi* — The channel indices in channel order.
+
+---
+
 ### isEmpty()
 
 True if FIFF measurement file information is empty.

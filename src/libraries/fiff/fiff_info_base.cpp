@@ -136,6 +136,20 @@ QMap<QString, QList<int>> FiffInfoBase::channel_indices_by_type(const QList<int>
 
 //=============================================================================================================
 
+RowVectorXi FiffInfoBase::pick_data_channels(const QStringList& exclude) const
+{
+    static const QStringList dataTypes{"mag", "grad", "ref_meg", "eeg", "csd", "seeg", "ecog", "dbs", "hbo", "hbr"};
+    QList<int> picks;
+    for (int i = 0; i < chs.size(); ++i) {
+        const QString type = channelTypeName(chs[i]);
+        if ((dataTypes.contains(type) || type.startsWith(QLatin1String("fnirs_"))) && !exclude.contains(chs[i].ch_name))
+            picks.append(i);
+    }
+    return Map<const RowVectorXi>(picks.data(), picks.size());
+}
+
+//=============================================================================================================
+
 RowVectorXi FiffInfoBase::pick_channels_regexp(const QStringList& ch_names, const QString& regexp)
 {
     const QRegularExpression re(QRegularExpression::anchoredPattern(regexp + QStringLiteral(".*")),

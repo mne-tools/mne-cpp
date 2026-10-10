@@ -142,6 +142,16 @@ public:
 
     //=========================================================================================================
     /**
+     * The data channels (MEG including reference MEG, EEG, CSD, sEEG, ECoG, DBS, fNIRS), like mne's picks="data".
+     *
+     * @param[in] exclude  Channel names to leave out, e.g. the bads.
+     *
+     * @return The channel indices in channel order.
+     */
+    Eigen::RowVectorXi pick_data_channels(const QStringList& exclude = defaultQStringList) const;
+
+    //=========================================================================================================
+    /**
      * Indices of the channel names that match a regular expression from their start, like mne.pick_channels_regexp.
      *
      * @param[in] ch_names  The channel names.

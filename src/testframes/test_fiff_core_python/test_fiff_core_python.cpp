@@ -1133,6 +1133,17 @@ void TestFiffCorePython::channelTypes_matchPython()
     QCOMPARE(megOnly.value(QStringLiteral("ref_meg")), QList<int>{2});
     QVERIFY(megOnly.value(QStringLiteral("eeg")).isEmpty());
 
+    // mne _picks_to_idx(info, "data") (mne 1.14.dev; 1.11 cannot read the time-domain fNIRS kinds)
+    QList<int> data{0, 1, 2, 3, 4, 5, 6};
+    for (int k = 20; k <= 30; ++k)
+        data.append(k);
+    const RowVectorXi dataPicks = raw.info.pick_data_channels();
+    QCOMPARE(QList<int>(dataPicks.data(), dataPicks.data() + dataPicks.size()), data);
+    data.removeOne(0);
+    data.removeOne(3);
+    const RowVectorXi goodPicks = raw.info.pick_data_channels({"CH00", "CH03"});
+    QCOMPARE(QList<int>(goodPicks.data(), goodPicks.data() + goodPicks.size()), data);
+
     // mne.pick_channels_regexp matches from the start of the name
     QCOMPARE(FiffInfoBase::pick_channels_regexp(raw.info.ch_names, QStringLiteral("CH1[0-2]")), RowVectorXi::LinSpaced(3, 10, 12));
     QCOMPARE(FiffInfoBase::pick_channels_regexp(raw.info.ch_names, QStringLiteral("H0")).size(), Index(0));
