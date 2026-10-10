@@ -416,7 +416,17 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
           <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_orgz"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_orgz">
+            <property name="minimum">
+             <double>-200.0</double>
+            </property>
+            <property name="maximum">
+             <double>200.0</double>
+            </property>
+            <property name="value">
+             <double>40.0</double>
+            </property>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_20">
@@ -426,10 +436,30 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_orgy"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_orgy">
+            <property name="minimum">
+             <double>-200.0</double>
+            </property>
+            <property name="maximum">
+             <double>200.0</double>
+            </property>
+            <property name="value">
+             <double>0.0</double>
+            </property>
+           </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_orgx"/>
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_orgx">
+            <property name="minimum">
+             <double>-200.0</double>
+            </property>
+            <property name="maximum">
+             <double>200.0</double>
+            </property>
+            <property name="value">
+             <double>0.0</double>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_22">
@@ -454,8 +484,14 @@
           </item>
           <item row="3" column="1">
            <widget class="QDoubleSpinBox" name="doubleSpinBox_rad">
+            <property name="minimum">
+             <double>1.0</double>
+            </property>
+            <property name="maximum">
+             <double>300.0</double>
+            </property>
             <property name="value">
-             <double>0.090000000000000</double>
+             <double>90.0</double>
             </property>
            </widget>
           </item>

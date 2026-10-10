@@ -3998,6 +3998,13 @@ void TestDispViewers2::dipoleFitView_paramsModelsAndFit()
         return view.findChild<QDoubleSpinBox*>(QLatin1String(name));
     };
 
+    // The sphere starts at MNE-C's defaults: origin (0, 0, 40) mm, EEG sphere radius 90 mm
+    {
+        QSignalSpy defaults(&view, &DipoleFitView::sphereChanged);
+        view.requestParams();
+        QCOMPARE(defaults.last(), (QList<QVariant>{0.0, 0.0, 40.0, 90.0}));
+    }
+
     // Each control reports its whole parameter group
     QSignalSpy timeSpy(&view, &DipoleFitView::timeChanged);
     QSignalSpy baselineSpy(&view, &DipoleFitView::baselineChanged);
