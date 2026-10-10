@@ -418,37 +418,33 @@ void CoRegistration::onFitFiducials()
     float fWeightNAS = m_pCoregSettingsView->getWeightNAS();
     float fWeightRPA = m_pCoregSettingsView->getWeightRPA();
 
-    // Declare variables
-    FiffDigPointSet digSetFidHead = m_digSetHead.pickTypes({FIFFV_POINT_CARDINAL});
-    FiffDigPointSet digSetFidMRI = m_digFidMri.pickTypes({FIFFV_POINT_CARDINAL});
-
-    Matrix3f matHead(digSetFidHead.size(), 3);
-    Matrix3f matMri(digSetFidMRI.size(), 3);
+    // Pair the head and MRI fiducials by identity; the two files need not list them in the same order
+    Matrix3f matHead;
+    Matrix3f matMri;
     Matrix4f matTrans;
     Vector3f vecWeights; // LPA, Nasion, RPA
     float fScale = 0.0;
 
-    // get coordinates
-    for (int i = 0; i < digSetFidHead.size(); ++i) {
-        matHead(i, 0) = digSetFidHead[i].r[0];
-        matHead(i, 1) = digSetFidHead[i].r[1];
-        matHead(i, 2) = digSetFidHead[i].r[2];
-        matMri(i, 0) = digSetFidMRI[i].r[0];
-        matMri(i, 1) = digSetFidMRI[i].r[1];
-        matMri(i, 2) = digSetFidMRI[i].r[2];
-
-        // set weights
-        switch (digSetFidHead[i].ident) {
-            case FIFFV_POINT_NASION:
-                vecWeights(i) = fWeightNAS;
-                break;
-            case FIFFV_POINT_LPA:
-                vecWeights(i) = fWeightLPA;
-                break;
-            case FIFFV_POINT_RPA:
-                vecWeights(i) = fWeightRPA;
-                break;
+    const int fiducials[3] = {FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA};
+    const float weights[3] = {fWeightLPA, fWeightNAS, fWeightRPA};
+    for (int i = 0; i < 3; ++i) {
+        const FiffDigPoint* pHead = nullptr;
+        const FiffDigPoint* pMri = nullptr;
+        for (int k = 0; k < m_digSetHead.size(); ++k) {
+            if (m_digSetHead[k].kind == FIFFV_POINT_CARDINAL && m_digSetHead[k].ident == fiducials[i])
+                pHead = &m_digSetHead[k];
         }
+        for (int k = 0; k < m_digFidMri.size(); ++k) {
+            if (m_digFidMri[k].kind == FIFFV_POINT_CARDINAL && m_digFidMri[k].ident == fiducials[i])
+                pMri = &m_digFidMri[k];
+        }
+        if (!pHead || !pMri) {
+            qWarning() << "[CoRegistration::onFitFiducials] LPA, nasion and RPA are needed in both the digitizer and the MRI fiducials.";
+            return;
+        }
+        matHead.row(i) << pHead->r[0], pHead->r[1], pHead->r[2];
+        matMri.row(i) << pMri->r[0], pMri->r[1], pMri->r[2];
+        vecWeights(i) = weights[i];
     }
 
     // align fiducials

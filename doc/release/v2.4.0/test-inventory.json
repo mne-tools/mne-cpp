@@ -6,9 +6,9 @@
     "commit": "aaef74112dba471ff38e5c0ed429a4b6800b0c8f"
   },
   "summary": {
-    "directories": 254,
+    "directories": 255,
     "registration": {
-      "unconditional": 247,
+      "unconditional": 248,
       "conditional": 4,
       "unregistered": 3
     },
@@ -20,10 +20,10 @@
       "freesurfer": 2,
       "python": 9,
       "sample-data": 19,
-      "test-data": 108
+      "test-data": 109
     },
-    "gui": 36,
-    "with_qskip": 78,
+    "gui": 37,
+    "with_qskip": 79,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -33,6 +33,7 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_averaging",
+          "test_analyze_coregistration",
           "test_analyze_dataloader",
           "test_analyze_dipolefit"
         ],
@@ -73,6 +74,7 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_averaging",
+          "test_analyze_coregistration",
           "test_analyze_dataloader",
           "test_analyze_dipolefit"
         ],
@@ -113,6 +115,7 @@
         "skipped": 2,
         "registered_not_executed": [
           "test_analyze_averaging",
+          "test_analyze_coregistration",
           "test_analyze_dataloader",
           "test_analyze_dipolefit"
         ],
@@ -162,6 +165,39 @@
       },
       "add_test_names": [
         "test_analyze_averaging"
+      ],
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "ubuntu-24.04": "absent",
+        "windows-2025-vs2026": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_analyze_coregistration",
+      "cmake": "src/testframes/test_analyze_coregistration/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_analyze_coregistration"
       ],
       "labels": [
         "gui",
