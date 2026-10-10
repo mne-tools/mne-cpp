@@ -591,9 +591,6 @@ void EventModel::initFromFile(const QString& sFilePath)
         MNELIB::MNE::read_events_from_ascii(file, eventList);
     } else if (fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         QFile file(sFilePath);
-        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            return;
-        }
         MNELIB::MNE::read_events_from_fif(file, eventList);
     } else {
         return;

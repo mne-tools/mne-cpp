@@ -42,6 +42,7 @@
 #include <anShared/Management/eventmanager.h>
 #include <anShared/Management/communicator.h>
 
+#include <fiff/fiff_events.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_raw_data.h>
 
@@ -189,6 +190,20 @@ void TestAnSharedModels::eventModel_emptyStateIsSafe()
     // into empty storage.
     const QVariant out = model.data(model.index(0, 0));
     Q_UNUSED(out)
+
+    // Event lists load from both the FIFF and the text format
+    QTemporaryDir dir;
+    FIFFLIB::FiffEvents events;
+    events.events.resize(2, 3);
+    events.events << 25800, 0, 1, 26000, 0, 2;
+    QFile fif(dir.filePath("triggers-eve.fif"));
+    QVERIFY(events.write_to_fif(fif));
+    fif.close();
+    QFile text(dir.filePath("triggers.eve"));
+    QVERIFY(events.write_to_ascii(text));
+    for (const QString& path : {fif.fileName(), text.fileName()}) {
+        QVERIFY2(EventModel(path).rowCount() == 2, qPrintable(path));
+    }
 }
 
 //=============================================================================================================
