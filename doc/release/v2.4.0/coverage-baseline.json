@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": {
-    "commit": "a5b3949398e1df8643a65683f015c3c35a157b34",
-    "coverage_url": "https://github.com/mne-tools/mne-cpp/actions/runs/37988088184"
+    "commit": "aaef74112dba471ff38e5c0ed429a4b6800b0c8f",
+    "coverage_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38000906824"
   },
   "scope": [
     "src/libraries",
@@ -106,31 +106,31 @@
   ],
   "totals": {
     "files": 1230,
-    "lines_found": 124746,
-    "lines_hit": 79812,
-    "lines_missed": 44934,
-    "line_percent": 63.98,
-    "branches_found": 72599,
-    "branches_hit": 34627,
-    "branches_missed": 37972,
-    "branch_percent": 47.7
+    "lines_found": 124946,
+    "lines_hit": 80040,
+    "lines_missed": 44906,
+    "line_percent": 64.06,
+    "branches_found": 72912,
+    "branches_hit": 34855,
+    "branches_missed": 38057,
+    "branch_percent": 47.8
   },
   "codecov_model": {
-    "lines": 124746,
-    "hits": 78740,
-    "line_percent": 63.12
+    "lines": 124946,
+    "hits": 78963,
+    "line_percent": 63.2
   },
   "scopes": {
     "libraries": {
       "files": 696,
-      "lines_found": 65508,
-      "lines_hit": 56722,
-      "lines_missed": 8786,
-      "line_percent": 86.59,
-      "branches_found": 44686,
-      "branches_hit": 27778,
-      "branches_missed": 16908,
-      "branch_percent": 62.16
+      "lines_found": 65708,
+      "lines_hit": 56950,
+      "lines_missed": 8758,
+      "line_percent": 86.67,
+      "branches_found": 44999,
+      "branches_hit": 28006,
+      "branches_missed": 16993,
+      "branch_percent": 62.24
     },
     "applications": {
       "files": 409,
@@ -262,9 +262,9 @@
       "lines_missed": 244,
       "line_percent": 86.54,
       "branches_found": 1622,
-      "branches_hit": 898,
-      "branches_missed": 724,
-      "branch_percent": 55.36
+      "branches_hit": 900,
+      "branches_missed": 722,
+      "branch_percent": 55.49
     },
     "src/libraries/decoding": {
       "files": 5,
@@ -306,20 +306,20 @@
       "lines_missed": 423,
       "line_percent": 91.0,
       "branches_found": 3909,
-      "branches_hit": 2409,
-      "branches_missed": 1500,
-      "branch_percent": 61.63
+      "branches_hit": 2412,
+      "branches_missed": 1497,
+      "branch_percent": 61.7
     },
     "src/libraries/fiff": {
       "files": 59,
-      "lines_found": 6302,
-      "lines_hit": 5533,
-      "lines_missed": 769,
-      "line_percent": 87.8,
-      "branches_found": 4073,
-      "branches_hit": 2744,
-      "branches_missed": 1329,
-      "branch_percent": 67.37
+      "lines_found": 6423,
+      "lines_hit": 5674,
+      "lines_missed": 749,
+      "line_percent": 88.34,
+      "branches_found": 4234,
+      "branches_hit": 2877,
+      "branches_missed": 1357,
+      "branch_percent": 67.95
     },
     "src/libraries/fs": {
       "files": 15,
@@ -339,20 +339,20 @@
       "lines_missed": 329,
       "line_percent": 90.85,
       "branches_found": 2784,
-      "branches_hit": 1816,
-      "branches_missed": 968,
-      "branch_percent": 65.23
+      "branches_hit": 1813,
+      "branches_missed": 971,
+      "branch_percent": 65.12
     },
     "src/libraries/inv": {
       "files": 63,
       "lines_found": 5623,
-      "lines_hit": 5197,
-      "lines_missed": 426,
-      "line_percent": 92.42,
+      "lines_hit": 5206,
+      "lines_missed": 417,
+      "line_percent": 92.58,
       "branches_found": 4831,
-      "branches_hit": 3028,
-      "branches_missed": 1803,
-      "branch_percent": 62.68
+      "branches_hit": 3032,
+      "branches_missed": 1799,
+      "branch_percent": 62.76
     },
     "src/libraries/lsl": {
       "files": 7,
@@ -367,14 +367,14 @@
     },
     "src/libraries/math": {
       "files": 13,
-      "lines_found": 1112,
-      "lines_hit": 1016,
-      "lines_missed": 96,
-      "line_percent": 91.37,
-      "branches_found": 1198,
-      "branches_hit": 703,
-      "branches_missed": 495,
-      "branch_percent": 58.68
+      "lines_found": 1189,
+      "lines_hit": 1089,
+      "lines_missed": 100,
+      "line_percent": 91.59,
+      "branches_found": 1348,
+      "branches_hit": 784,
+      "branches_missed": 564,
+      "branch_percent": 58.16
     },
     "src/libraries/ml": {
       "files": 7,
@@ -400,14 +400,14 @@
     },
     "src/libraries/mne": {
       "files": 87,
-      "lines_found": 10237,
-      "lines_hit": 8895,
-      "lines_missed": 1342,
-      "line_percent": 86.89,
-      "branches_found": 7950,
-      "branches_hit": 5248,
-      "branches_missed": 2702,
-      "branch_percent": 66.01
+      "lines_found": 10239,
+      "lines_hit": 8900,
+      "lines_missed": 1339,
+      "line_percent": 86.92,
+      "branches_found": 7952,
+      "branches_hit": 5253,
+      "branches_missed": 2699,
+      "branch_percent": 66.06
     },
     "src/libraries/mri": {
       "files": 9,
@@ -427,9 +427,9 @@
       "lines_missed": 142,
       "line_percent": 83.56,
       "branches_found": 632,
-      "branches_hit": 362,
-      "branches_missed": 270,
-      "branch_percent": 57.28
+      "branches_hit": 365,
+      "branches_missed": 267,
+      "branch_percent": 57.75
     },
     "src/libraries/utils": {
       "files": 24,
@@ -5238,7 +5238,7 @@
       "lines_hit": 139,
       "lines_missed": 12,
       "branches_found": 154,
-      "branches_hit": 83
+      "branches_hit": 81
     },
     {
       "path": "src/libraries/connectivity/metrics/correlation.cpp",
@@ -5338,7 +5338,7 @@
       "lines_hit": 99,
       "lines_missed": 19,
       "branches_found": 122,
-      "branches_hit": 66
+      "branches_hit": 67
     },
     {
       "path": "src/libraries/connectivity/metrics/phaselockingvalue.cpp",
@@ -5368,7 +5368,7 @@
       "lines_hit": 106,
       "lines_missed": 19,
       "branches_found": 130,
-      "branches_hit": 69
+      "branches_hit": 71
     },
     {
       "path": "src/libraries/connectivity/network/network.cpp",
@@ -5378,7 +5378,7 @@
       "lines_hit": 196,
       "lines_missed": 12,
       "branches_found": 100,
-      "branches_hit": 85
+      "branches_hit": 86
     },
     {
       "path": "src/libraries/connectivity/network/network.h",
@@ -7798,7 +7798,7 @@
       "lines_hit": 232,
       "lines_missed": 11,
       "branches_found": 105,
-      "branches_hit": 66
+      "branches_hit": 69
     },
     {
       "path": "src/libraries/dsp/filterkernel.h",
@@ -8544,11 +8544,11 @@
       "path": "src/libraries/fiff/fiff_events.cpp",
       "scope": "libraries",
       "component": "src/libraries/fiff",
-      "lines_found": 190,
-      "lines_hit": 182,
-      "lines_missed": 8,
-      "branches_found": 150,
-      "branches_hit": 114
+      "lines_found": 312,
+      "lines_hit": 301,
+      "lines_missed": 11,
+      "branches_found": 300,
+      "branches_hit": 223
     },
     {
       "path": "src/libraries/fiff/fiff_events.h",
@@ -8674,11 +8674,11 @@
       "path": "src/libraries/fiff/fiff_info_base.cpp",
       "scope": "libraries",
       "component": "src/libraries/fiff",
-      "lines_found": 185,
-      "lines_hit": 135,
-      "lines_missed": 50,
-      "branches_found": 131,
-      "branches_hit": 86
+      "lines_found": 184,
+      "lines_hit": 157,
+      "lines_missed": 27,
+      "branches_found": 142,
+      "branches_hit": 110
     },
     {
       "path": "src/libraries/fiff/fiff_info_base.h",
@@ -9038,7 +9038,7 @@
       "lines_hit": 1651,
       "lines_missed": 178,
       "branches_found": 1332,
-      "branches_hit": 883
+      "branches_hit": 880
     },
     {
       "path": "src/libraries/fwd/fwd_bem_model.h",
@@ -9515,10 +9515,10 @@
       "scope": "libraries",
       "component": "src/libraries/inv",
       "lines_found": 173,
-      "lines_hit": 149,
-      "lines_missed": 24,
+      "lines_hit": 158,
+      "lines_missed": 15,
       "branches_found": 184,
-      "branches_hit": 111
+      "branches_hit": 115
     },
     {
       "path": "src/libraries/inv/inv_focal_dipole.h",
@@ -9924,11 +9924,11 @@
       "path": "src/libraries/math/kmeans.cpp",
       "scope": "libraries",
       "component": "src/libraries/math",
-      "lines_found": 437,
-      "lines_hit": 412,
-      "lines_missed": 25,
-      "branches_found": 590,
-      "branches_hit": 376
+      "lines_found": 514,
+      "lines_hit": 485,
+      "lines_missed": 29,
+      "branches_found": 740,
+      "branches_hit": 457
     },
     {
       "path": "src/libraries/math/kmeans.h",
@@ -10734,11 +10734,11 @@
       "path": "src/libraries/mne/mne_forward_solution.cpp",
       "scope": "libraries",
       "component": "src/libraries/mne",
-      "lines_found": 985,
-      "lines_hit": 860,
-      "lines_missed": 125,
-      "branches_found": 822,
-      "branches_hit": 500
+      "lines_found": 987,
+      "lines_hit": 865,
+      "lines_missed": 122,
+      "branches_found": 824,
+      "branches_hit": 504
     },
     {
       "path": "src/libraries/mne/mne_forward_solution.h",
@@ -11188,7 +11188,7 @@
       "lines_hit": 1206,
       "lines_missed": 198,
       "branches_found": 1003,
-      "branches_hit": 683
+      "branches_hit": 684
     },
     {
       "path": "src/libraries/mne/mne_source_spaces.cpp",
@@ -11438,7 +11438,7 @@
       "lines_hit": 362,
       "lines_missed": 56,
       "branches_found": 300,
-      "branches_hit": 209
+      "branches_hit": 212
     },
     {
       "path": "src/libraries/sts/sts_cluster.h",
