@@ -6,9 +6,9 @@
     "commit": "57ebf2c2d56eef6ae0acb60c34d8608f8ab2972a"
   },
   "summary": {
-    "directories": 259,
+    "directories": 260,
     "registration": {
-      "unconditional": 252,
+      "unconditional": 253,
       "conditional": 4,
       "unregistered": 3
     },
@@ -20,10 +20,10 @@
       "freesurfer": 2,
       "python": 9,
       "sample-data": 19,
-      "test-data": 113
+      "test-data": 114
     },
-    "gui": 41,
-    "with_qskip": 83,
+    "gui": 42,
+    "with_qskip": 84,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -33,6 +33,7 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_channelselection",
+          "test_analyze_controlmanager",
           "test_analyze_datamanager"
         ],
         "executed_not_in_inventory": [
@@ -72,6 +73,7 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_channelselection",
+          "test_analyze_controlmanager",
           "test_analyze_datamanager"
         ],
         "executed_not_in_inventory": [
@@ -111,6 +113,7 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_channelselection",
+          "test_analyze_controlmanager",
           "test_analyze_datamanager"
         ],
         "executed_not_in_inventory": [
@@ -150,6 +153,7 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_channelselection",
+          "test_analyze_controlmanager",
           "test_analyze_datamanager"
         ],
         "executed_not_in_inventory": [
@@ -189,6 +193,7 @@
         "skipped": 2,
         "registered_not_executed": [
           "test_analyze_channelselection",
+          "test_analyze_controlmanager",
           "test_analyze_datamanager"
         ],
         "executed_not_in_inventory": [
@@ -228,6 +233,7 @@
         "skipped": 2,
         "registered_not_executed": [
           "test_analyze_channelselection",
+          "test_analyze_controlmanager",
           "test_analyze_datamanager"
         ],
         "executed_not_in_inventory": [
@@ -312,6 +318,42 @@
       },
       "add_test_names": [
         "test_analyze_channelselection"
+      ],
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_analyze_controlmanager",
+      "cmake": "src/testframes/test_analyze_controlmanager/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_analyze_controlmanager"
       ],
       "labels": [
         "gui",
