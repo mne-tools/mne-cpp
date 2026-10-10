@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_tests.py",
   "ci_source": {
-    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38051494577",
-    "commit": "bb3a55f70811f45e0e9eb5a970afb26376cfb62a"
+    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38068428651",
+    "commit": "57ebf2c2d56eef6ae0acb60c34d8608f8ab2972a"
   },
   "summary": {
     "directories": 257,
@@ -28,13 +28,10 @@
     "retry_paths": [],
     "ci": {
       "macos-26": {
-        "executed": 280,
+        "executed": 282,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_analyze_events",
-          "test_analyze_rawdataviewer"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -67,13 +64,10 @@
         ]
       },
       "macos-26-qt-min": {
-        "executed": 280,
+        "executed": 282,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_analyze_events",
-          "test_analyze_rawdataviewer"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -106,13 +100,10 @@
         ]
       },
       "ubuntu-24.04": {
-        "executed": 280,
+        "executed": 282,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_analyze_events",
-          "test_analyze_rawdataviewer"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -145,13 +136,10 @@
         ]
       },
       "ubuntu-24.04-qt-min": {
-        "executed": 280,
+        "executed": 282,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_analyze_events",
-          "test_analyze_rawdataviewer"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -184,13 +172,10 @@
         ]
       },
       "windows-2025-vs2026": {
-        "executed": 280,
+        "executed": 282,
         "failures": 0,
         "skipped": 2,
-        "registered_not_executed": [
-          "test_analyze_events",
-          "test_analyze_rawdataviewer"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -223,13 +208,10 @@
         ]
       },
       "windows-2025-vs2026-qt-min": {
-        "executed": 280,
+        "executed": 282,
         "failures": 0,
         "skipped": 2,
-        "registered_not_executed": [
-          "test_analyze_events",
-          "test_analyze_rawdataviewer"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -435,12 +417,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -471,12 +453,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
