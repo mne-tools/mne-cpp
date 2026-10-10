@@ -222,7 +222,7 @@ void TestMneRawDataPython::padsOutsideData()
     MNEChSelection sel = makeSelection();
     PickBuffer before(sel.nchan, 8);
     QCOMPARE(m_raw->pick_data(&sel, m_raw->first_samp - 3, 8, before.rows.data()), 0);
-    QVERIFY(before.values.leftCols(3).isZero());
+    QVERIFY((before.values.leftCols(3).array() == 0.0f).all());
     QVERIFY(closeTo(before.values(3, 3), 4.491140926785156e-10, 1e-5));
 
     PickBuffer after(sel.nchan, 10);
