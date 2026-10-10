@@ -597,6 +597,37 @@ private slots:
         QVERIFY(Bval.norm() > 0);
     }
 
+    void testMagneticFieldsSkipEegElectrodes()
+    {
+        // A magnetic dipole has no electric potential: the magnetic dipole fit uses these functions as its EEG model.
+        // The sphere-model fields likewise apply to MEG coils only.
+        QFile rawFile(rawPath());
+        FiffRawData raw(rawFile);
+        QList<FiffChInfo> eegChs;
+        for (int i = 0; i < raw.info.nchan; ++i) {
+            if (raw.info.chs[i].kind == FIFFV_EEG_CH)
+                eegChs.append(raw.info.chs[i]);
+        }
+        auto els = FwdCoilSet::create_eeg_els(eegChs, eegChs.size());
+        QVERIFY(els && els->ncoil() > 0);
+        const int n = els->ncoil();
+        const Vector3f rd(0.0f, 0.02f, 0.06f);
+        const Vector3f Q(1e-8f, 0.0f, 1e-8f);
+        float r0[3] = {0.0f, 0.0f, 0.04f};
+
+        VectorXf B = VectorXf::Zero(n);
+        QCOMPARE(FwdBemModel::fwd_mag_dipole_field(rd, Q, *els, B, nullptr), 0);
+        QCOMPARE(B.norm(), 0.0f);
+        MatrixXf Bvec = MatrixXf::Zero(3, n);
+        QCOMPARE(FwdBemModel::fwd_mag_dipole_field_vec(rd, *els, Bvec, nullptr), 0);
+        QCOMPARE(Bvec.norm(), 0.0f);
+        QCOMPARE(FwdBemModel::fwd_sphere_field(rd, Q, *els, B, r0), 0);
+        QCOMPARE(B.norm(), 0.0f);
+        VectorXf gx = VectorXf::Zero(n), gy = VectorXf::Zero(n), gz = VectorXf::Zero(n);
+        QCOMPARE(FwdBemModel::fwd_sphere_field_grad(rd, Q, *els, B, gx, gy, gz, r0), 0);
+        QCOMPARE(B.norm() + gx.norm() + gy.norm() + gz.norm(), 0.0f);
+    }
+
     // ---- FwdBemModel: make_guesses ----
 
     void testMakeGuesses()

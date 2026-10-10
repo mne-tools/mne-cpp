@@ -3033,7 +3033,7 @@ int FwdBemModel::fwd_sphere_field(const Eigen::Vector3f& rd, const Eigen::Vector
 
         for (k = 0; k < coils.ncoil(); k++) {
             this_coil = coils.coils[k].get();
-            if (FWD_IS_MEG_COIL(this_coil->type)) {
+            if (FWD_IS_MEG_COIL(this_coil->coil_class)) {
                 np = this_coil->np;
 
                 for (j = 0, sum = 0.0; j < np; j++) {
@@ -3248,7 +3248,7 @@ int FwdBemModel::fwd_sphere_field_grad(const Eigen::Vector3f& rd, const Eigen::V
         for (k = 0; k < ncoil; k++) {
             this_coil = coils.coils[k].get();
 
-            if (FWD_IS_MEG_COIL(this_coil->type)) {
+            if (FWD_IS_MEG_COIL(this_coil->coil_class)) {
                 np = this_coil->np;
 
                 for (j = 0; j < np; j++) {
@@ -3338,7 +3338,7 @@ int FwdBemModel::fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Ve
     Bval.setZero();
     for (k = 0; k < coils.ncoil(); k++) {
         this_coil = coils.coils[k].get();
-        if (FWD_IS_MEG_COIL(this_coil->type)) {
+        if (FWD_IS_MEG_COIL(this_coil->coil_class)) {
             np = this_coil->np;
             /*
            * Go through all points
@@ -3354,7 +3354,7 @@ int FwdBemModel::fwd_mag_dipole_field(const Eigen::Vector3f& rm, const Eigen::Ve
                 }
             } /* All points done */
             Bval[k] = MAG_FACTOR * sum;
-        } else if (this_coil->type == FWD_COILC_EEG)
+        } else if (this_coil->coil_class == FWD_COILC_EEG)
             Bval[k] = 0.0;
     }
     return OK;
@@ -3375,7 +3375,7 @@ int FwdBemModel::fwd_mag_dipole_field_vec(const Eigen::Vector3f& rm, FwdCoilSet&
     Bval.setZero();
     for (k = 0; k < coils.ncoil(); k++) {
         this_coil = coils.coils[k].get();
-        if (FWD_IS_MEG_COIL(this_coil->type)) {
+        if (FWD_IS_MEG_COIL(this_coil->coil_class)) {
             np = this_coil->np;
             Eigen::Vector3f sum = Eigen::Vector3f::Zero();
             /*
@@ -3394,7 +3394,7 @@ int FwdBemModel::fwd_mag_dipole_field_vec(const Eigen::Vector3f& rm, FwdCoilSet&
             } /* All points done */
             for (p = 0; p < 3; p++)
                 Bval(p, k) = MAG_FACTOR * sum[p];
-        } else if (this_coil->type == FWD_COILC_EEG) {
+        } else if (this_coil->coil_class == FWD_COILC_EEG) {
             for (p = 0; p < 3; p++)
                 Bval(p, k) = 0.0;
         }
