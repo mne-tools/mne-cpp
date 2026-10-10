@@ -190,6 +190,7 @@ void Events::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
             if (pFiffRawModel->isRealtime()) {
                 pEventModel->setSharedMemory(true);
             }
+            pFiffRawModel->setEventModel(pEventModel);
             emit newEventModelAvailable(pEventModel);
             m_pAnalyzeData->addModel<ANSHAREDLIB::EventModel>(pEventModel,
                                                               "Events");

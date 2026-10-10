@@ -141,8 +141,13 @@ void TestAnalyzeEvents::detectsTriggersLikePython()
     for (const auto& [code, samples] : expected)
         QVERIFY2(found[code] == samples, qPrintable(QStringLiteral("code %1: %2 events").arg(code).arg(found[code].size())));
 
-    // The panel's check boxes reach the viewer and the model, once each, also after the model was set again
+    // Selecting the recording again shows its detected events, not a new empty list
+    const auto eventModelCount = data->getModelsByType(ANSHAREDLIB_EVENT_MODEL).size();
     plugin.handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(raw.staticCast<AbstractModel>())));
+    QCOMPARE(data->getModelsByType(ANSHAREDLIB_EVENT_MODEL).size(), eventModelCount);
+    QCOMPARE(qobject_cast<EventModel*>(dock->findChild<QTableView*>(QStringLiteral("m_tableView_eventTableView"))->model()), events.data());
+
+    // The panel's check boxes reach the viewer and the model, once each, also after the model was set again
     auto* activate = dock->findChild<QCheckBox*>(QStringLiteral("m_checkBox_activateEvents"));
     auto* selectedOnly = dock->findChild<QCheckBox*>(QStringLiteral("m_checkBox_showSelectedEventsOnly"));
     QVERIFY(activate && selectedOnly);
