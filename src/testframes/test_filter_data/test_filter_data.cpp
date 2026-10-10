@@ -206,7 +206,24 @@ private slots:
         bool ok = filterFile(outFile, raw, fk, picks);
         outFile.close();
         QVERIFY(ok);
-        QVERIFY(QFileInfo(outPath).size() > 0);
+
+        // Same samples, and the channels not picked are copied unchanged at their own times
+        QFile filteredFile(outPath);
+        FiffRawData filtered(filteredFile);
+        QCOMPARE(filtered.first_samp, raw->first_samp);
+        QCOMPARE(filtered.last_samp, raw->last_samp);
+        MatrixXd a, b, t;
+        QVERIFY(raw->read_raw_segment(a, t, raw->first_samp, raw->last_samp));
+        QVERIFY(filtered.read_raw_segment(b, t, raw->first_samp, raw->last_samp));
+        const int stim = static_cast<int>(raw->info.ch_names.indexOf("STI014"));
+        QVERIFY(stim >= 0);
+        QCOMPARE(b.row(stim), a.row(stim));
+        QVERIFY((b.row(3) - a.row(3)).cwiseAbs().maxCoeff() <= 1e-6 * a.row(3).cwiseAbs().maxCoeff());
+        // Block-wise overlap-add gives the picked channels the same values as filtering the whole recording at once
+        const MatrixXd whole = filterData(a.topRows(3), fk, picks, false, false);
+        QCOMPARE(whole.cols(), a.cols());
+        QVERIFY2((b.topRows(3) - whole).cwiseAbs().maxCoeff() <= 1e-4 * whole.cwiseAbs().maxCoeff(),
+                 qPrintable(QString::number((b.topRows(3) - whole).cwiseAbs().maxCoeff() / whole.cwiseAbs().maxCoeff())));
 
         QFile unwritable(tmpDir.filePath(QStringLiteral("no/such/dir/out.fif")));
         QVERIFY(!filterFile(unwritable, raw, fk, picks));

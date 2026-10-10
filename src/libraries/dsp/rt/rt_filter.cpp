@@ -155,15 +155,14 @@ bool RTPROCESSINGLIB::filterFile(QIODevice& pIODevice,
                                   filterKernel,
                                   bUseThreads);
 
-        if (first == from) {
-            outfid->write_raw_buffer(matData.block(0, iOrder / 2, matData.rows(), matData.cols() - iOrder), cals);
-        } else if (first + quantum >= to) {
+        // Output column c holds sample first + c - iOrder / 2; the last iOrder columns still get the next block's head
+        const bool lastBlock = last == to;
+        const int writeFrom = first == from ? iOrder / 2 : 0;
+        const int writeTo = lastBlock ? matData.cols() - iOrder / 2 : matData.cols() - iOrder;
+        if (first != from) {
             matData.block(0, 0, matData.rows(), iOrder) += matDataOverlap;
-            outfid->write_raw_buffer(matData.block(0, 0, matData.rows(), matData.cols() - iOrder), cals);
-        } else {
-            matData.block(0, 0, matData.rows(), iOrder) += matDataOverlap;
-            outfid->write_raw_buffer(matData.block(0, 0, matData.rows(), matData.cols() - iOrder), cals);
         }
+        outfid->write_raw_buffer(matData.block(0, writeFrom, matData.rows(), writeTo - writeFrom), cals);
 
         matDataOverlap = matData.block(0, matData.cols() - iOrder, matData.rows(), iOrder);
     }
