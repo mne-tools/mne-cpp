@@ -250,23 +250,23 @@ public:
         switch (temp->getType()) {
             case ANSHAREDLIB_AVERAGING_MODEL: {
                 pItem->setData(data);
-                m_pData->addToData(pItem,
-                                   m_SelectedFunctionalData,
-                                   BIDS_AVERAGE);
+                m_pData->addData(m_SelectedFunctionalData,
+                                 pItem,
+                                 BIDS_AVERAGE);
                 break;
             }
             case ANSHAREDLIB_EVENT_MODEL: {
                 pItem->setData(data);
-                m_pData->addToData(pItem,
-                                   m_SelectedFunctionalData,
-                                   BIDS_EVENT);
+                m_pData->addData(m_SelectedFunctionalData,
+                                 pItem,
+                                 BIDS_EVENT);
                 break;
             }
             case ANSHAREDLIB_DIPOLEFIT_MODEL: {
                 pItem->setData(data);
-                m_pData->addToData(pItem,
-                                   m_SelectedFunctionalData,
-                                   BIDS_DIPOLE);
+                m_pData->addData(m_SelectedFunctionalData,
+                                 pItem,
+                                 BIDS_DIPOLE);
                 break;
             }
             case ANSHAREDLIB_FIFFRAW_MODEL: {

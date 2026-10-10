@@ -69,7 +69,8 @@ void BidsViewModel::addData(QModelIndex selectedItem,
             break;
         }
         case BIDS_EVENT:
-        case BIDS_AVERAGE: {
+        case BIDS_AVERAGE:
+        case BIDS_DIPOLE: {
             if (!selectedItem.isValid()) {
                 QStandardItem* pItem = new QStandardItem("Unknown");
                 pItem->setEditable(false);

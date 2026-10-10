@@ -206,6 +206,11 @@ void TestAnSharedModels::analyzeData_startsEmpty()
     // both, and either returning garbage would be acted on as a real model.
     QVERIFY(data.getModelByPath("/no/such/file.fif").isNull());
     QVERIFY(data.getModelByName("no such model").isNull());
+
+    // An average or event list computed while no recording is selected used to dereference a null item
+    data.addModel(QSharedPointer<AveragingDataModel>::create(), "Average");
+    data.addModel(QSharedPointer<EventModel>::create(), "Events");
+    QCOMPARE(data.getAllModels().size(), 2);
 }
 
 //=============================================================================================================
