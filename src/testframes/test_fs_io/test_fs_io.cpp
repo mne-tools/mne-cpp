@@ -21,6 +21,9 @@
 #include <fs/fs_annotationset.h>
 #include <fs/fs_label.h>
 #include <fs/fs_colortable.h>
+#include <mne/mne_source_space.h>
+
+#include <memory>
 
 using namespace FSLIB;
 using namespace Eigen;
@@ -272,6 +275,12 @@ private slots:
             Eigen::MatrixX3i expected(4, 3);
             expected << 0, 1, 3, 2, 3, 1, 1, 2, 3, 1, 3, 4;
             QCOMPARE(s.tris(), expected);
+
+            // MNE-C's surface reader, used by the source-space and display code, reads the same geometry
+            const std::unique_ptr<MNELIB::MNESourceSpace> mneSurf = MNELIB::MNESourceSpace::load_surface(file.fileName(), QString());
+            QVERIFY(mneSurf);
+            QVERIFY(mneSurf->rr.isApprox(s.rr(), 1e-6f));
+            QCOMPARE(Eigen::MatrixX3i(mneSurf->itris), expected);
         }
 
         QByteArray curv;
@@ -291,6 +300,9 @@ private slots:
         for (int i = 0; i < 5; ++i) {
             QVERIFY(std::fabs(values(i) - expectedCurv[i]) < 1e-6f);
         }
+        const std::unique_ptr<MNELIB::MNESourceSpace> withCurv = MNELIB::MNESourceSpace::load_surface(tmpDir.filePath("lh.newquad"), curvFile.fileName());
+        QVERIFY(withCurv);
+        QVERIFY(withCurv->curv.isApprox(values, 1e-6f));
     }
 
     //=========================================================================
