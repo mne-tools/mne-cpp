@@ -336,6 +336,15 @@ private slots:
     //=========================================================================
     void epochData_fromEvoked()
     {
+        // mne.Epochs(tmin=-0.1, tmax=0.3, baseline=(-0.1, 0)) at 300 Hz averages samples -30..0 (31 samples),
+        // the stimulus sample included; a ramp's baseline mean is then 15
+        MNEEpochData ramp;
+        ramp.epoch = RowVectorXd::LinSpaced(121, 0.0, 120.0);
+        ramp.tmin = -0.1f;
+        ramp.tmax = 0.3f;
+        ramp.applyBaselineCorrection(QPair<float, float>(-0.1f, 0.0f));
+        QCOMPARE(ramp.epoch(0, 0), -15.0);
+
         QString avePath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
         if (!QFile::exists(avePath)) {
             QSKIP("Sample evoked file not found");

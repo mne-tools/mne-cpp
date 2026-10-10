@@ -21,6 +21,8 @@
 
 #include "mne_epoch_data.h"
 
+#include <cmath>
+
 #include <math/numerics.h>
 
 //=============================================================================================================
@@ -68,8 +70,13 @@ MNEEpochData::~MNEEpochData()
 
 void MNEEpochData::applyBaselineCorrection(const QPair<float, float>& baseline)
 {
-    // Run baseline correction
-    RowVectorXf times = RowVectorXf::LinSpaced(this->epoch.cols(), this->tmin, this->tmax);
+    // Times on whole sample offsets: an interpolated float grid puts the stimulus sample just after 0
+    const Eigen::Index n = this->epoch.cols();
+    const double step = n > 1 ? (static_cast<double>(this->tmax) - this->tmin) / static_cast<double>(n - 1) : 1.0;
+    const double first = std::round(this->tmin / step);
+    RowVectorXf times(n);
+    for (Eigen::Index i = 0; i < n; ++i)
+        times(i) = static_cast<float>((first + static_cast<double>(i)) * step);
     this->epoch = Numerics::rescale(this->epoch, times, baseline, QString("mean"));
 }
 
