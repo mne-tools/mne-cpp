@@ -9,8 +9,8 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 198,
-      "partial": 101,
+      "implemented": 199,
+      "partial": 100,
       "missing": 136,
       "not-applicable": 8
     },
@@ -28,8 +28,8 @@
         "not-applicable": 3
       },
       "preprocessing": {
-        "implemented": 13,
-        "partial": 12,
+        "implemented": 14,
+        "partial": 11,
         "missing": 17,
         "not-applicable": 1
       },
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 57.1
+    "parity_percent": 57.2
   },
   "apis": [
     {
@@ -1454,6 +1454,17 @@
       "evidence": "registry-class"
     },
     {
+      "python": "mne.preprocessing.annotate_amplitude",
+      "name": "annotate_amplitude",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "implemented",
+      "mne_cpp": "UTILSLIB::annotateAmplitude",
+      "note": "scalar thresholds for all data channels; BAD_ACQ_SKIP spans not skipped; a channel bad for both reasons listed once",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.preprocessing.annotate_muscle_zscore",
       "name": "annotate_muscle_zscore",
       "submodule": "preprocessing",
@@ -1605,17 +1616,6 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax",
       "note": "stateless functions; no info-aware object or save",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.annotate_amplitude",
-      "name": "annotate_amplitude",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "partial",
-      "mne_cpp": "UTILSLIB::annotateAmplitude",
-      "note": "matrix input",
       "evidence": "parity-record"
     },
     {

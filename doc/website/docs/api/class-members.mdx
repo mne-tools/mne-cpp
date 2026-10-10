@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6268 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6266 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -261,7 +261,6 @@ Index of 6268 public class members (functions, variables, typedefs, enums) acros
 - **bad** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Boolean array marking bad channels (0 = good, 1 = bad).
 - **badChannels** `[var]` in [BadChannelsMaxwellResult](/docs/api/dsp/bad-channels-maxwell-result) — Names of detected bad channels.
 - **badChannelsHidden** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
-- **badDescription** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Description string for annotations.
 - **badIndices** `[var]` in [BadChannelsMaxwellResult](/docs/api/dsp/bad-channels-maxwell-result) — Indices in the MEG channel list.
 - **badlist** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — List of bad channel names.
 - **badlist** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Bad channel names.
@@ -1193,6 +1192,7 @@ Index of 6268 public class members (functions, variables, typedefs, enums) acros
 - **datatype** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — BIDS datatype string.
 - **dataUpdate** `[fn]` in [ButterflyView](/docs/api/disp/butterfly-view) — Perform a data update.
 - **date** `[var]` in [BrainVisionMarker](/docs/api/bids/brain-vision-marker) — Optional date/time (for New Segment markers).
+- **dBadPercent** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — A channel above or below a threshold for at least this percentage of the recording is returned as bad.
 - **dBaseMax** `[var]` in [EpochExtractorParams](/docs/api/utils/epoch-extractor-params) — Baseline end in seconds (relative to event).
 - **dBaseMin** `[var]` in [EpochExtractorParams](/docs/api/utils/epoch-extractor-params) — Baseline start in seconds (relative to event).
 - **dCorrThresh** `[var]` in [BadChannelDetectParams](/docs/api/utils/bad-channel-detect-params) — Mean absolute neighbour correlation below this -&gt; isolated.
@@ -1274,7 +1274,6 @@ Index of 6268 public class members (functions, variables, typedefs, enums) acros
 - **dFilterHigh** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Low-pass cutoff (Hz).
 - **dFilterLow** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Lower edge of the muscle band (Hz).
 - **dFilterLow** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Bandpass lower cutoff (Hz).
-- **dFlatMin** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Flatness threshold — annotate if peak-to-peak in a window &lt; this.
 - **dFlatThreshold** `[var]` in [BadChannelDetectParams](/docs/api/utils/bad-channel-detect-params) — Peak-to-peak below this -&gt; flat (SI units; ~0.1 fT for MEG).
 - **dFMax** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Maximum frequency (Hz) for Gabor atoms.
 - **dFMin** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Minimum frequency (Hz) for Gabor atoms.
@@ -1347,7 +1346,7 @@ Index of 6268 public class members (functions, variables, typedefs, enums) acros
 - **distance** `[var]` in [RayHit](/docs/api/disp3-d/ray-hit) — Distance along ray to hit point.
 - **distanceTimeSpacerChanged** `[signal]` in [FiffRawViewSettings](/docs/api/disp/fiff-raw-view-settings) — Emit this signal whenever the user changed the time spacer distance.
 - **distanceTimeSpacerChanged** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — distanceTimeSpacerChanged changes the distance of the time spacers
-- **dMinDuration** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Minimum duration of annotation (seconds).
+- **dMinDuration** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Runs of supra- or sub-threshold differences shorter than this (seconds) are ignored.
 - **dMinGapSec** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Minimum gap between successive events in seconds.
 - **dMinHeight** `[var]` in [PeakFinderParams](/docs/api/dsp/peak-finder-params) — Minimum peak height.
 - **dMinLengthGood** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Good stretches shorter than this (seconds) between annotations become bad.
@@ -1373,8 +1372,6 @@ Index of 6268 public class members (functions, variables, typedefs, enums) acros
 - **doWork** `[fn]` in [RtHpiWorker](/docs/api/dsp/rt-hpi-worker) — Perform one single HPI fit.
 - **doWork** `[fn]` in [RtInvOpWorker](/docs/api/dsp/rt-inv-op-worker) — Perform actual inverse operator creation.
 - **doWork** `[fn]` in [RtNoiseWorker](/docs/api/dsp/rt-noise-worker) — Process one data block, accumulate, and emit the spectrum when enough blocks are collected.
-- **dPeakMax** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Max amplitude — annotate if any sample exceeds this.
-- **dPeakMin** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Min amplitude — annotate if any sample goes below this.
 - **dpfiterror** `[var]` in [CoilParam](/docs/api/inv/coil-param)
 - **dpfitnumitr** `[var]` in [CoilParam](/docs/api/inv/coil-param)
 - **dProminence** `[var]` in [PeakFinderParams](/docs/api/dsp/peak-finder-params) — Minimum peak prominence.
@@ -1406,7 +1403,6 @@ Index of 6268 public class members (functions, variables, typedefs, enums) acros
 - **duration** `[var]` in [FiffAnnotation](/docs/api/fiff/fiff-annotation) — Duration in seconds (0 for point events).
 - **duration** `[var]` in [SimulateStcParams](/docs/api/dsp/simulate-stc-params) — Duration (seconds).
 - **dVarZThresh** `[var]` in [BadChannelDetectParams](/docs/api/utils/bad-channel-detect-params) — Z-score of std-dev above this -&gt; noisy.
-- **dWindowSec** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Sliding window duration in seconds for flatness check.
 - **dZThreshold** `[var]` in [BadChannelsMaxwellParams](/docs/api/dsp/bad-channels-maxwell-params) — Z-score threshold for flagging bad channels.
 
 ## E {#e}
@@ -1812,6 +1808,7 @@ Index of 6268 public class members (functions, variables, typedefs, enums) acros
 - **fixSkew** `[var]` in [AverageDescription](/docs/api/fiff/average-description) — Fix skew on trigger lines.
 - **fixSkew** `[var]` in [CovDescription](/docs/api/mne/cov-description) — Fix skew on trigger lines.
 - **flags** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model)
+- **flat** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Annotate where consecutive samples differ by at most this much (mne's flat); unset = off.
 - **flat** `[var]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Non-zero if the patch has been flattened.
 - **flipAngle** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Flip angle (radians).
 - **fmax** `[var]` in [InvConnectivity](/docs/api/inv/inv-connectivity) — Upper frequency bound (Hz); 0 if broadband / time-domain.
@@ -3840,6 +3837,7 @@ Index of 6268 public class members (functions, variables, typedefs, enums) acros
 - **payload** `[var]` in [SceneLayer](/docs/api/disp3-d/scene-layer) — Renderable-specific data ([`ElectrodeObject`](/docs/api/disp3-d/electrode-object), [`SliceObject`](/docs/api/disp3-d/slice-object), [`BrainSurface`](/docs/api/disp3-d/brain-surface), …).
 - **pca** `[fn]` in [StsCovEstimators](/docs/api/sts/sts-cov-estimators) — PCA-based rank-reduced covariance estimator.
 - **pDescriptions** `[fn]` in [Command](/docs/api/com/command) — Get parameter descriptions.
+- **peak** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Annotate where consecutive samples differ by at least this much (mne's peak); unset = off.
 - **peakLocalisationError** `[fn]` in [InvResolutionMatrix](/docs/api/inv/inv-resolution-matrix) — Compute peak localisation error for each source.
 - **peakLocalizationError** `[fn]` in [StatsSourceMetrics](/docs/api/sts/stats-source-metrics) — Peak localization error (Euclidean distance between true and estimated peak).
 - **peakMemoryBytes** `[var]` in [MnaProvenance](/docs/api/mna/mna-provenance) — Peak RSS (if measurable), 0 otherwise.

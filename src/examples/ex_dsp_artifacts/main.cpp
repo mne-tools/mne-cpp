@@ -211,13 +211,17 @@ int main(int argc, char* argv[])
     }
     ok &= expect(stimErr < 1e-12, QString("stimulus artefact replaced by linear interpolation (max deviation %1 V)").arg(stimErr));
 
+    // Besides the flat EEG2, EEG3 loses contact from 1.0 to 1.2 s
+    MatrixXd loose = data;
+    loose.row(3).segment(250, 50).setConstant(loose(3, 250));
     //! [annotate_amplitude_usage]
     AnnotateAmplitudeParams amplitude;
-    amplitude.dPeakMax = 200e-6;
-    const FiffInfo eogInfo = info.pick_info(RowVectorXi::Constant(1, kEog));
-    const FiffAnnotations exceeded = annotateAmplitude(data.row(kEog), eogInfo, kSFreq, amplitude);
+    amplitude.flat = 1e-12; // consecutive samples within 1 pV of each other
+    QStringList flatChannels;
+    const FiffAnnotations flatSpans = annotateAmplitude(loose, info, kSFreq, amplitude, &flatChannels);
     //! [annotate_amplitude_usage]
-    ok &= expect(exceeded.size() == 3, QString("annotateAmplitude marks %1 EOG excursions above 200 uV (3)").arg(exceeded.size()));
+    ok &= expect(flatSpans.size() == 1 && flatSpans[0].description == "BAD_flat" && std::abs(flatSpans[0].onset - 1.0) < 1e-12 && flatChannels == QStringList({"EEG2"}),
+                 QString("annotateAmplitude: %1 flat span(s), bad %2").arg(flatSpans.size()).arg(flatChannels.join(", ")));
 
     // 4 s of 8 EEG channels at 1 kHz: alpha, a few tones and a 125 Hz EMG burst from 1.5 to 2.5 s
     const double emgSFreq = 1000.0;

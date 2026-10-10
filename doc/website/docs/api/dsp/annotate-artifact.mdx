@@ -23,15 +23,15 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-The detectors in this header scan continuous MEG / EEG data and emit [`FiffAnnotation`](/docs/api/fiff/fiff-annotation) intervals marking time segments that should be excluded from downstream averaging, [ICA](/docs/api/dsp/ica) fitting or PSD estimation. `annotateMusclZscore` band-pass filters the signal in the 110–140 Hz range (typical EMG band), z-scores the Hilbert envelope of every channel, combines and smooths the scores and marks samples above a threshold as BAD_muscle. `annotateAmplitude` flags two boundary conditions instead: per-channel peak-to-peak amplitude exceeding an upper limit ("high-amplitude" artefact) and amplitude falling below a lower limit for longer than a minimum duration ("flat" / dead channel).
+The detectors in this header scan continuous MEG / EEG data and emit [`FiffAnnotation`](/docs/api/fiff/fiff-annotation) intervals marking time segments that should be excluded from downstream averaging, [ICA](/docs/api/dsp/ica) fitting or PSD estimation. `annotateMusclZscore` band-pass filters the signal in the 110–140 Hz range (typical EMG band), z-scores the Hilbert envelope of every channel, combines and smooths the scores and marks samples above a threshold as BAD_muscle. `annotateAmplitude` marks spans where consecutive samples jump by more than a "peak" threshold or change by less than a "flat" one, and returns channels for which that holds too often as bad.
 
-Both routines mirror the semantics of their MNE-Python counterparts `mne.preprocessing.annotate_muscle_zscore` and `mne.preprocessing.annotate_amplitude`; annotateMusclZscore reproduces mne's onsets and durations sample for sample.
+Both routines reproduce their MNE-Python counterparts `mne.preprocessing.annotate_muscle_zscore` and `mne.preprocessing.annotate_amplitude` onset for onset.
 
 ```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
 AnnotateAmplitudeParams amplitude;
-amplitude.dPeakMax = 200e-6;
-const FiffInfo eogInfo = info.pick_info(RowVectorXi::Constant(1, kEog));
-const FiffAnnotations exceeded = annotateAmplitude(data.row(kEog), eogInfo, kSFreq, amplitude);
+amplitude.flat = 1e-12; // consecutive samples within 1 pV of each other
+QStringList flatChannels;
+const FiffAnnotations flatSpans = annotateAmplitude(loose, info, kSFreq, amplitude, &flatChannels);
 ```
 
 ```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
@@ -92,19 +92,15 @@ Mark samples above the threshold; good stretches shorter than dMinLengthGood bec
 
 ---
 
-### annotateAmplitude(data, info, sfreq, params)
+### annotateAmplitude(data, info, sfreq, params, bads)
 
 ```cpp
-[FiffAnnotations](/docs/api/fiff/fiff-annotations) annotateAmplitude(const Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) & params);
+[FiffAnnotations](/docs/api/fiff/fiff-annotations) annotateAmplitude(const Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, double sfreq, const [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) & params, QStringList * bads);
 ```
 
-Annotate segments where amplitude exceeds thresholds or is too flat.
+Annotate spans where consecutive samples jump or stay flat, as mne.preprocessing.annotate_amplitude.
 
-Scans each channel independently:
-If any sample exceeds dPeakMax or falls below dPeakMin, that time point is annotated.
-
-
-If peak-to-peak amplitude in a sliding window &lt; dFlatMin, the window is annotated as "BAD_flat".
+For every data channel that is not bad, the absolute differences between consecutive samples are compared with params.peak (at least) and params.flat (at most); runs shorter than params.dMinDuration are ignored. A channel whose runs cover at least params.dBadPercent of the recording is returned in `bads`; the runs of the other channels are merged into "BAD_flat" and "BAD_peak" annotations. Unlike mne, a channel that is bad for both reasons is listed once, and BAD_ACQ_SKIP spans are not skipped (the data matrix carries no annotations).
 
 **Parameters:**
 
@@ -112,17 +108,20 @@ If peak-to-peak amplitude in a sliding window &lt; dFlatMin, the window is annot
   Raw data matrix (n_channels × n_times).
 
 - **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  Measurement info (for channel names).
+  Measurement info (channel types, names and bads).
 
 - **sfreq** : *double*
   Sampling frequency in Hz.
 
 - **params** : *const [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) &*
-  Detection parameters.
+  Thresholds; at least one of peak and flat must be set.
+
+- **bads** : *QStringList **
+  If not null, receives the channels annotated for too long, in channel order.
 
 **Returns:**
 
-- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — FiffAnnotations with bad entries.
+- *[FiffAnnotations](/docs/api/fiff/fiff-annotations)* — "BAD_flat" and "BAD_peak" annotations.
 
 ---
 

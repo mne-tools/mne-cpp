@@ -13009,9 +13009,9 @@
       },
       {
         "python": "mne.preprocessing.annotate_amplitude",
-        "status": "partial",
+        "status": "implemented",
         "mne_cpp": "UTILSLIB::annotateAmplitude",
-        "note": "matrix input",
+        "note": "scalar thresholds for all data channels; BAD_ACQ_SKIP spans not skipped; a channel bad for both reasons listed once",
         "test": "test_dsp_annotate_artifact"
       },
       {

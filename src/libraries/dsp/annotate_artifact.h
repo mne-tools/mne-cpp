@@ -15,15 +15,14 @@
  * estimation. @c annotateMusclZscore band-pass filters the signal in
  * the 110–140 Hz range (typical EMG band), z-scores the Hilbert envelope
  * of every channel, combines and smooths the scores and marks samples
- * above a threshold as BAD_muscle. @ref UTILSLIB::annotateAmplitude "annotateAmplitude" flags two boundary
- * conditions instead: per-channel peak-to-peak amplitude exceeding an
- * upper limit ("high-amplitude" artefact) and amplitude falling below a
- * lower limit for longer than a minimum duration ("flat" / dead channel).
+ * above a threshold as BAD_muscle. @ref UTILSLIB::annotateAmplitude "annotateAmplitude" marks
+ * spans where consecutive samples jump by more than a "peak" threshold or
+ * change by less than a "flat" one, and returns channels for which that
+ * holds too often as bad.
  *
- * Both routines mirror the semantics of their MNE-Python counterparts
+ * Both routines reproduce their MNE-Python counterparts
  * @c mne.preprocessing.annotate_muscle_zscore and
- * @c mne.preprocessing.annotate_amplitude; annotateMusclZscore reproduces
- * mne's onsets and durations sample for sample.
+ * @c mne.preprocessing.annotate_amplitude onset for onset.
  *
  * @snippet ex_dsp_artifacts/main.cpp annotate_amplitude_usage
  *
@@ -51,12 +50,14 @@
 //=============================================================================================================
 
 #include <QString>
+#include <QStringList>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <limits>
+#include <optional>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -96,12 +97,10 @@ struct DSPSHARED_EXPORT AnnotateMusclParams
  */
 struct DSPSHARED_EXPORT AnnotateAmplitudeParams
 {
-    double dPeakMin = -std::numeric_limits<double>::infinity(); /**< Min amplitude — annotate if any sample goes below this. */
-    double dPeakMax = std::numeric_limits<double>::infinity();  /**< Max amplitude — annotate if any sample exceeds this. */
-    double dFlatMin = 0.0;                                      /**< Flatness threshold — annotate if peak-to-peak in a window < this. */
-    double dWindowSec = 0.5;                                    /**< Sliding window duration in seconds for flatness check. */
-    double dMinDuration = 0.0;                                  /**< Minimum duration of annotation (seconds). */
-    QString badDescription = "BAD_amplitude";                   /**< Description string for annotations. */
+    std::optional<double> peak;  /**< Annotate where consecutive samples differ by at least this much (mne's peak); unset = off. */
+    std::optional<double> flat;  /**< Annotate where consecutive samples differ by at most this much (mne's flat); unset = off. */
+    double dBadPercent = 5.0;    /**< A channel above or below a threshold for at least this percentage of the recording is returned as bad. */
+    double dMinDuration = 0.005; /**< Runs of supra- or sub-threshold differences shorter than this (seconds) are ignored. */
 };
 
 //=============================================================================================================
@@ -132,23 +131,28 @@ DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateMusclZscore(
 
 //=============================================================================================================
 /**
- * @brief Annotate segments where amplitude exceeds thresholds or is too flat.
+ * @brief Annotate spans where consecutive samples jump or stay flat, as mne.preprocessing.annotate_amplitude.
  *
- * Scans each channel independently:
- * - If any sample exceeds dPeakMax or falls below dPeakMin, that time point is annotated.
- * - If peak-to-peak amplitude in a sliding window < dFlatMin, the window is annotated as "BAD_flat".
+ * For every data channel that is not bad, the absolute differences between consecutive samples
+ * are compared with params.peak (at least) and params.flat (at most); runs shorter than
+ * params.dMinDuration are ignored. A channel whose runs cover at least params.dBadPercent of the
+ * recording is returned in @p bads; the runs of the other channels are merged into "BAD_flat"
+ * and "BAD_peak" annotations. Unlike mne, a channel that is bad for both reasons is listed once,
+ * and BAD_ACQ_SKIP spans are not skipped (the data matrix carries no annotations).
  *
- * @param[in] data    Raw data matrix (n_channels × n_times).
- * @param[in] info    Measurement info (for channel names).
- * @param[in] sfreq   Sampling frequency in Hz.
- * @param[in] params  Detection parameters.
- * @return FiffAnnotations with bad entries.
+ * @param[in]  data    Raw data matrix (n_channels × n_times).
+ * @param[in]  info    Measurement info (channel types, names and bads).
+ * @param[in]  sfreq   Sampling frequency in Hz.
+ * @param[in]  params  Thresholds; at least one of peak and flat must be set.
+ * @param[out] bads    If not null, receives the channels annotated for too long, in channel order.
+ * @return "BAD_flat" and "BAD_peak" annotations.
  */
 DSPSHARED_EXPORT FIFFLIB::FiffAnnotations annotateAmplitude(
     const Eigen::MatrixXd& data,
     const FIFFLIB::FiffInfo& info,
     double sfreq,
-    const AnnotateAmplitudeParams& params = AnnotateAmplitudeParams());
+    const AnnotateAmplitudeParams& params,
+    QStringList* bads = nullptr);
 
 } // namespace UTILSLIB
 #endif // ANNOTATE_ARTIFACT_DSP_H

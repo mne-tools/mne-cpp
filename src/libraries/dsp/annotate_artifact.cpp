@@ -174,73 +174,55 @@ FiffAnnotations UTILSLIB::annotateAmplitude(
     const MatrixXd& data,
     const FiffInfo& info,
     double sfreq,
-    const AnnotateAmplitudeParams& params)
+    const AnnotateAmplitudeParams& params,
+    QStringList* bads)
 {
     FiffAnnotations annot;
-    const Eigen::Index nCh = data.rows();
+    if (bads)
+        bads->clear();
     const Eigen::Index nTimes = data.cols();
-
-    if (nCh == 0 || nTimes == 0)
+    if (data.rows() == 0 || nTimes < 2 || (!params.peak && !params.flat))
         return annot;
 
-    const bool checkPeakMax = std::isfinite(params.dPeakMax);
-    const bool checkPeakMin = std::isfinite(params.dPeakMin);
-    const bool checkFlat = params.dFlatMin > 0.0;
+    // mne's "data_or_ica" picks without the bad channels
+    static const QStringList dataTypes{"mag", "grad", "eeg", "csd", "seeg", "ecog", "dbs", "hbo", "hbr",
+                                       "fnirs_cw_amplitude", "fnirs_fd_ac_amplitude", "fnirs_fd_phase", "fnirs_od"};
     const int minSamples = static_cast<int>(std::round(params.dMinDuration * sfreq));
+    VectorXi anyFlat = VectorXi::Zero(nTimes - 1);
+    VectorXi anyPeak = VectorXi::Zero(nTimes - 1);
 
-    //--- Peak amplitude check per channel ---
-    if (checkPeakMax || checkPeakMin) {
-        for (Eigen::Index ch = 0; ch < nCh; ++ch) {
-            const QString chName = (ch < info.ch_names.size()) ? info.ch_names[static_cast<int>(ch)] : QString("CH%1").arg(ch);
-
-            VectorXi mask(nTimes);
-            for (Eigen::Index s = 0; s < nTimes; ++s) {
-                const double val = data(ch, s);
-                mask(static_cast<int>(s)) = ((checkPeakMax && val > params.dPeakMax) ||
-                                             (checkPeakMin && val < params.dPeakMin))
-                    ? 1
-                    : 0;
-            }
-
-            auto segs = findContiguousSegments(mask);
+    for (int ch = 0; ch < static_cast<int>(data.rows()) && ch < info.chs.size(); ++ch) {
+        if (!dataTypes.contains(info.channel_type(ch)) || info.bads.contains(info.ch_names[ch]))
+            continue;
+        const ArrayXd diff = (data.row(ch).tail(nTimes - 1) - data.row(ch).head(nTimes - 1)).array().abs().transpose();
+        bool bad = false;
+        for (const auto& [threshold, isPeak] : {std::pair{params.flat, false}, std::pair{params.peak, true}}) {
+            if (!threshold)
+                continue;
+            const VectorXi mask = isPeak ? (diff >= *threshold).cast<int>().matrix().eval() : (diff <= *threshold).cast<int>().matrix().eval();
+            // Runs shorter than the minimum duration do not count
+            QVector<QPair<int, int>> segs = findContiguousSegments(mask);
             removeShortSegments(segs, minSamples);
-
-            for (const auto& seg : segs) {
-                const double onset = static_cast<double>(seg.first) / sfreq;
-                const double duration = static_cast<double>(seg.second - seg.first + 1) / sfreq;
-                annot.append(onset, duration, params.badDescription, QStringList{chName});
+            int count = 0;
+            for (const auto& seg : segs)
+                count += seg.second - seg.first + 1;
+            // A run of n differences spans n + 1 samples
+            const double percent = (count > 0 ? count + 1 : 0) * 100.0 / static_cast<double>(nTimes);
+            if (percent >= params.dBadPercent) {
+                bad = true;
+            } else if (percent > 0.0) {
+                VectorXi& any = isPeak ? anyPeak : anyFlat;
+                for (const auto& seg : segs)
+                    any.segment(seg.first, seg.second - seg.first + 1).setOnes();
             }
         }
+        if (bad && bads)
+            bads->append(info.ch_names[ch]);
     }
 
-    //--- Flatness check per channel ---
-    if (checkFlat) {
-        const int winSamples = std::max(1, static_cast<int>(std::round(params.dWindowSec * sfreq)));
-
-        for (Eigen::Index ch = 0; ch < nCh; ++ch) {
-            const QString chName = (ch < info.ch_names.size()) ? info.ch_names[static_cast<int>(ch)] : QString("CH%1").arg(ch);
-
-            VectorXi mask = VectorXi::Zero(static_cast<int>(nTimes));
-
-            for (Eigen::Index s = 0; s <= nTimes - winSamples; ++s) {
-                const auto seg = data.block(ch, s, 1, winSamples);
-                const double p2p = seg.maxCoeff() - seg.minCoeff();
-                if (p2p < params.dFlatMin) {
-                    for (int j = static_cast<int>(s); j < static_cast<int>(s) + winSamples; ++j)
-                        mask(j) = 1;
-                }
-            }
-
-            auto segs = findContiguousSegments(mask);
-            removeShortSegments(segs, minSamples);
-
-            for (const auto& seg : segs) {
-                const double onset = static_cast<double>(seg.first) / sfreq;
-                const double duration = static_cast<double>(seg.second - seg.first + 1) / sfreq;
-                annot.append(onset, duration, QStringLiteral("BAD_flat"), QStringList{chName});
-            }
-        }
+    for (const auto& [any, description] : {std::pair{&anyFlat, "BAD_flat"}, std::pair{&anyPeak, "BAD_peak"}}) {
+        for (const auto& seg : findContiguousSegments(*any))
+            annot.append(seg.first / sfreq, (seg.second - seg.first + 1) / sfreq, QString::fromLatin1(description));
     }
-
     return annot;
 }

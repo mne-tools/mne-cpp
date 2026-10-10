@@ -34,4 +34,4 @@ gap_analysis.py inventories 14 public MNE-Python namespaces; mne.viz, mne.report
 
 | Location | Claim | Status |
 |---|---|---|
-| `doc/dev-notes/gap-analysis.md:17` | parity: **57.1% | generated-with-denominator |
+| `doc/dev-notes/gap-analysis.md:17` | parity: **57.2% | generated-with-denominator |

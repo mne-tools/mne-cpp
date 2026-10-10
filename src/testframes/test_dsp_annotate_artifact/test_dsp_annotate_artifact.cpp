@@ -144,12 +144,9 @@ private slots:
     void testMusclZscoreMatchesPython();
     void testMusclZscoreCleanData();
     void testFirFilterMatchesPython();
-    void testAmplitudeExceedMax();
-    void testAmplitudeBelowMin();
-    void testAmplitudeFlat();
+    void testAmplitudeMatchesPython();
     void testAmplitudeNoArtifact();
     void testEmptyData();
-    void testAnnotationTiming();
 };
 
 //=============================================================================================================
@@ -238,85 +235,73 @@ void TestDspAnnotateArtifact::testFirFilterMatchesPython()
 // Amplitude tests
 //=============================================================================================================
 
-void TestDspAnnotateArtifact::testAmplitudeExceedMax()
+void TestDspAnnotateArtifact::testAmplitudeMatchesPython()
 {
+    // Reference values produced by mne.preprocessing.annotate_amplitude(raw, peak=5e-4, flat=1e-9)
+    // (mne 1.11.0) on this RawArray: EEG1 has a 60-sample flat run and a 10-sample jumping run,
+    // EEG2 runs too short for the 5 ms minimum, EEG3 is constant and EEG4 jumps for 10 % of the
+    // recording (both bad: at least 5 %), STI is not a data channel and EEG6 is already bad.
+    //   BAD_flat onset 0.5   duration 0.059
+    //   BAD_peak onset 1.199 duration 0.011
+    //   bads ['EEG3', 'EEG4']
     const double sfreq = 1000.0;
-    const int nCh = 3;
-    const int nSamples = 1000;
-    FiffInfo info = makeMegInfo(nCh, sfreq);
-    MatrixXd data = MatrixXd::Constant(nCh, nSamples, 1.0);
+    const int n = 2000;
+    MatrixXd data(6, n);
+    for (int k = 0; k < 6; ++k)
+        for (int i = 0; i < n; ++i)
+            data(k, i) = 2e-5 * std::sin(2.0 * M_PI * (5 + k) * i / sfreq + k);
+    const auto alternate = [&data](int row, int from, int to) {
+        for (int i = from; i < to; ++i)
+            data(row, i) += (i % 2) ? 1e-3 : -1e-3;
+    };
+    data.row(0).segment(500, 60).setConstant(data(0, 500));
+    alternate(0, 1200, 1210);
+    data.row(1).segment(300, 3).setConstant(data(1, 300));
+    alternate(1, 1700, 1703);
+    data.row(2).setConstant(1e-6);
+    alternate(3, 800, 1000);
+    for (int i = 0; i < n; ++i)
+        data(4, i) = ((i / 100) % 2) ? 5.0 : 0.0;
+    data.row(5).setZero();
 
-    // Inject spike at sample 400 on channel 0
-    data(0, 400) = 100.0;
+    FiffInfo info;
+    for (int k = 0; k < 6; ++k) {
+        FiffChInfo ch;
+        ch.kind = k == 4 ? FIFFV_STIM_CH : FIFFV_EEG_CH;
+        ch.ch_name = k == 4 ? QStringLiteral("STI") : QString("EEG%1").arg(k + 1);
+        info.chs.append(ch);
+        info.ch_names.append(ch.ch_name);
+    }
+    info.nchan = 6;
+    info.bads = QStringList{"EEG6"};
 
     AnnotateAmplitudeParams params;
-    params.dPeakMax = 50.0;
+    params.peak = 5e-4;
+    params.flat = 1e-9;
+    QStringList bads;
+    const FiffAnnotations annot = annotateAmplitude(data, info, sfreq, params, &bads);
+    QCOMPARE(bads, QStringList({"EEG3", "EEG4"}));
+    QCOMPARE(annot.size(), 2);
+    QCOMPARE(annot[0].description, QStringLiteral("BAD_flat"));
+    QCOMPARE(annot[0].onset, 0.5);
+    QVERIFY(std::abs(annot[0].duration - 0.059) < 1e-12);
+    QCOMPARE(annot[1].description, QStringLiteral("BAD_peak"));
+    QVERIFY(std::abs(annot[1].onset - 1.199) < 1e-12);
+    QVERIFY(std::abs(annot[1].duration - 0.011) < 1e-12);
 
-    FiffAnnotations annot = annotateAmplitude(data, info, sfreq, params);
+    // EEG4's 201 jumps span 202 samples, exactly 10.1 %: with bad_percent=10.1 mne still calls it bad
+    params.dBadPercent = 10.1;
+    QCOMPARE(annotateAmplitude(data, info, sfreq, params, &bads).size(), 2);
+    QCOMPARE(bads, QStringList({"EEG3", "EEG4"}));
 
-    QVERIFY2(annot.size() > 0, "Should detect spike exceeding max");
-    bool foundSpike = false;
-    for (int i = 0; i < annot.size(); ++i) {
-        const double sampleOnset = annot[i].onset * sfreq;
-        if (std::abs(sampleOnset - 400.0) < 1.5) {
-            foundSpike = true;
-            QCOMPARE(annot[i].description, QStringLiteral("BAD_amplitude"));
-            QVERIFY(!annot[i].channelNames.isEmpty());
-            QCOMPARE(annot[i].channelNames.first(), QStringLiteral("MEG001"));
-        }
-    }
-    QVERIFY2(foundSpike, "Annotation should be at the spike position");
-}
-
-//=============================================================================================================
-
-void TestDspAnnotateArtifact::testAmplitudeBelowMin()
-{
-    const double sfreq = 1000.0;
-    const int nCh = 3;
-    const int nSamples = 1000;
-    FiffInfo info = makeMegInfo(nCh, sfreq);
-    MatrixXd data = MatrixXd::Constant(nCh, nSamples, 1.0);
-
-    // Inject negative spike at sample 300 on channel 1
-    data(1, 300) = -200.0;
-
-    AnnotateAmplitudeParams params;
-    params.dPeakMin = -100.0;
-
-    FiffAnnotations annot = annotateAmplitude(data, info, sfreq, params);
-
-    QVERIFY2(annot.size() > 0, "Should detect sample below min");
-    bool foundSpike = false;
-    for (int i = 0; i < annot.size(); ++i) {
-        if (!annot[i].channelNames.isEmpty() && annot[i].channelNames.first() == "MEG002") {
-            foundSpike = true;
-            QCOMPARE(annot[i].description, QStringLiteral("BAD_amplitude"));
-        }
-    }
-    QVERIFY2(foundSpike, "Annotation should be on channel MEG002");
-}
-
-//=============================================================================================================
-
-void TestDspAnnotateArtifact::testAmplitudeFlat()
-{
-    const double sfreq = 1000.0;
-    const int nCh = 1;
-    const int nSamples = 1000;
-    FiffInfo info = makeMegInfo(nCh, sfreq);
-    MatrixXd data = MatrixXd::Zero(nCh, nSamples); // completely flat
-
-    AnnotateAmplitudeParams params;
-    params.dFlatMin = 1e-6; // anything below this p2p is flat
-    params.dWindowSec = 0.1;
-
-    FiffAnnotations annot = annotateAmplitude(data, info, sfreq, params);
-
-    QVERIFY2(annot.size() > 0, "Should detect flat segment");
-    for (int i = 0; i < annot.size(); ++i) {
-        QCOMPARE(annot[i].description, QStringLiteral("BAD_flat"));
-    }
+    // With bad_percent=20 mne annotates EEG4's run instead: BAD_peak onset 0.799 duration 0.201
+    params.dBadPercent = 20.0;
+    const FiffAnnotations relaxed = annotateAmplitude(data, info, sfreq, params, &bads);
+    QCOMPARE(bads, QStringList({"EEG3"}));
+    QCOMPARE(relaxed.size(), 3);
+    QCOMPARE(relaxed[1].description, QStringLiteral("BAD_peak"));
+    QVERIFY(std::abs(relaxed[1].onset - 0.799) < 1e-12);
+    QVERIFY(std::abs(relaxed[1].duration - 0.201) < 1e-12);
 }
 
 //=============================================================================================================
@@ -324,17 +309,17 @@ void TestDspAnnotateArtifact::testAmplitudeFlat()
 void TestDspAnnotateArtifact::testAmplitudeNoArtifact()
 {
     const double sfreq = 1000.0;
-    const int nCh = 3;
-    const int nSamples = 1000;
-    FiffInfo info = makeMegInfo(nCh, sfreq);
-    MatrixXd data = makeCleanSine(nCh, nSamples, sfreq, 10.0);
+    FiffInfo info = makeMagInfo(3);
+    MatrixXd data = makeCleanSine(3, 1000, sfreq, 10.0);
 
     AnnotateAmplitudeParams params;
-    params.dPeakMax = 1000.0;
-    params.dPeakMin = -1000.0;
+    params.peak = 1000.0;
+    QStringList bads{"stale"};
+    QCOMPARE(annotateAmplitude(data, info, sfreq, params, &bads).size(), 0);
+    QVERIFY(bads.isEmpty());
 
-    FiffAnnotations annot = annotateAmplitude(data, info, sfreq, params);
-    QCOMPARE(annot.size(), 0);
+    // Without a threshold nothing is checked
+    QCOMPARE(annotateAmplitude(data, info, sfreq, AnnotateAmplitudeParams()).size(), 0);
 }
 
 //=============================================================================================================
@@ -350,44 +335,9 @@ void TestDspAnnotateArtifact::testEmptyData()
     QCOMPARE(mAnnot.size(), 0);
 
     AnnotateAmplitudeParams aParams;
-    aParams.dPeakMax = 10.0;
+    aParams.peak = 10.0;
     FiffAnnotations aAnnot = annotateAmplitude(emptyData, info, 1000.0, aParams);
     QCOMPARE(aAnnot.size(), 0);
-}
-
-//=============================================================================================================
-
-void TestDspAnnotateArtifact::testAnnotationTiming()
-{
-    const double sfreq = 1000.0;
-    const int nCh = 1;
-    const int nSamples = 2000;
-    FiffInfo info = makeMegInfo(nCh, sfreq);
-    MatrixXd data = MatrixXd::Constant(nCh, nSamples, 5.0);
-
-    // Create a spike block at samples 100-109 (10 ms at 1000 Hz)
-    for (int s = 100; s <= 109; ++s)
-        data(0, s) = 1000.0;
-
-    AnnotateAmplitudeParams params;
-    params.dPeakMax = 500.0;
-
-    FiffAnnotations annot = annotateAmplitude(data, info, sfreq, params);
-
-    QVERIFY2(annot.size() >= 1, "Should find at least one annotation");
-
-    // Find annotation covering the 100-109 block
-    bool foundTiming = false;
-    for (int i = 0; i < annot.size(); ++i) {
-        const double expectedOnset = 100.0 / sfreq; // 0.1 s
-        const double expectedDur = 10.0 / sfreq;    // 0.01 s
-
-        if (std::abs(annot[i].onset - expectedOnset) < 1e-6 &&
-            std::abs(annot[i].duration - expectedDur) < 1e-6) {
-            foundTiming = true;
-        }
-    }
-    QVERIFY2(foundTiming, "Annotation onset and duration should match sample positions exactly");
 }
 
 //=============================================================================================================

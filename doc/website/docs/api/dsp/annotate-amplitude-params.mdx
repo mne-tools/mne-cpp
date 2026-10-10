@@ -19,9 +19,9 @@ Parameters for amplitude-based annotation.
 
 ```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
 AnnotateAmplitudeParams amplitude;
-amplitude.dPeakMax = 200e-6;
-const FiffInfo eogInfo = info.pick_info(RowVectorXi::Constant(1, kEog));
-const FiffAnnotations exceeded = annotateAmplitude(data.row(kEog), eogInfo, kSFreq, amplitude);
+amplitude.flat = 1e-12; // consecutive samples within 1 pV of each other
+QStringList flatChannels;
+const FiffAnnotations flatSpans = annotateAmplitude(loose, info, kSFreq, amplitude, &flatChannels);
 ```
 
 ---

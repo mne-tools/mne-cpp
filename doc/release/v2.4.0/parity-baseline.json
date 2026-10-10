@@ -94,7 +94,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **57.1%",
+      "text": "parity: **57.2%",
       "status": "generated-with-denominator"
     }
   ],
@@ -2055,7 +2055,7 @@
       "source": "parity",
       "mne_cpp": "UTILSLIB::annotateAmplitude",
       "python": "mne.preprocessing.annotate_amplitude",
-      "claimed": "partial",
+      "claimed": "implemented",
       "test": "test_dsp_annotate_artifact",
       "evidence": "cross-validated-static"
     },

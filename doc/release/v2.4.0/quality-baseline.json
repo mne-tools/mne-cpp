@@ -78,8 +78,8 @@
       "unpinned_ci_packages": [],
       "inventoried_apis": 443,
       "by_status": {
-        "implemented": 198,
-        "partial": 101,
+        "implemented": 199,
+        "partial": 100,
         "missing": 136,
         "not-applicable": 8
       },
