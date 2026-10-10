@@ -34,8 +34,10 @@ endif()
 
 enable_testing()
 mne_add_test(${PROJECT_NAME}
-    LABELS unit gui
-    TIMEOUT 60
+    LABELS integration gui
+    TIMEOUT 120
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
     ENVIRONMENT QT_QPA_PLATFORM=offscreen)
 
 if(NOT BUILD_SHARED_LIBS)

@@ -29,9 +29,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38000906824 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 19 |
-| test-data | 104 |
+| test-data | 105 |
 | GUI (`QTEST_MAIN`) | 33 |
-| Contains `QSKIP` | 74 |
+| Contains `QSKIP` | 75 |
 
 ## Conditional and unregistered tests
 

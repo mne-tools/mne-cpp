@@ -20,10 +20,10 @@
       "freesurfer": 2,
       "python": 9,
       "sample-data": 19,
-      "test-data": 104
+      "test-data": 105
     },
     "gui": 33,
-    "with_qskip": 74,
+    "with_qskip": 75,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -4914,12 +4914,15 @@
       ],
       "labels": [
         "gui",
-        "unit"
+        "integration",
+        "requires-data"
       ],
-      "timeout": 60,
-      "requirements": [],
+      "timeout": 120,
+      "requirements": [
+        "test-data"
+      ],
       "gui": true,
-      "qskip_sites": 0,
+      "qskip_sites": 1,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
