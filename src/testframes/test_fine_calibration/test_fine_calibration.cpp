@@ -55,7 +55,7 @@ private slots:
         // Magnetometers (numbers ending in 1) contribute their calibration, gradiometers their imbalance
         QVERIFY((cal.gainVector() - Vector3d(1.0, 0.996645, 1.0)).norm() < 1e-12);
         const MatrixXd imb = cal.imbalanceMatrix();
-        QVERIFY(std::abs(imb(0, 0) + 0.008282) < 1e-12 && imb.row(1).isZero() && std::abs(imb(2, 2) - 0.003) < 1e-12);
+        QVERIFY(std::abs(imb(0, 0) + 0.008282) < 1e-12 && (imb.row(1).array() == 0.0).all() && std::abs(imb(2, 2) - 0.003) < 1e-12);
     }
 
     void testWriteAndRead()
