@@ -83,7 +83,7 @@ private:
             ch.ch_name = names[i];
             ch.range = 1.0f;
             ch.cal = 1.0f;
-            ch.unit = 107; // FIFF_UNIT_V
+            ch.unit = kinds[i] == FIFFV_MEG_CH ? FIFF_UNIT_T : FIFF_UNIT_V;
             ch.unit_mul = 0;
             ch.coord_frame = 0;
             info.chs.append(ch);
@@ -153,6 +153,53 @@ private slots:
     /**
      * @brief EOG artifact amplitude should be reduced by >80% after fitApply.
      */
+    void testMatchesPython()
+    {
+        // Reference values produced by mne.preprocessing.EOGRegression().fit(raw).apply(raw) (mne 1.11.0) on
+        // this RawArray: sEEG1/2 mix both EOGs on top of offsets, sEEG3 is bad and STI is no data channel.
+        const int n = 500;
+        MatrixXd data = MatrixXd::Zero(6, n);
+        for (int t = 0; t < n; ++t) {
+            const double eog1 = std::sin(2 * M_PI * t / 97.0) + 0.3 + 0.2 * std::sin(2 * M_PI * t / 13.0);
+            const double eog2 = std::cos(2 * M_PI * t / 41.0) - 0.1;
+            data(4, t) = eog1;
+            data(5, t) = eog2;
+            data(0, t) = 0.5 * std::sin(2 * M_PI * t / 7.0) + 0.8 * eog1 + 2.0;
+            data(1, t) = 0.4 * std::cos(2 * M_PI * t / 11.0) + 0.3 * eog1 - 0.6 * eog2 - 1.0;
+            data(2, t) = 0.7 * eog2 + std::sin(t / 5.0);
+            data(3, t) = (t / 50) % 2;
+        }
+        data *= 1e-5;
+        FiffInfo info;
+        const QList<int> kinds{FIFFV_SEEG_CH, FIFFV_SEEG_CH, FIFFV_SEEG_CH, FIFFV_STIM_CH, FIFFV_EOG_CH, FIFFV_EOG_CH};
+        const QStringList names{"EEG1", "EEG2", "EEG3", "STI", "EOG1", "EOG2"};
+        for (int i = 0; i < 6; ++i) {
+            FiffChInfo ch;
+            ch.kind = kinds[i];
+            ch.ch_name = names[i];
+            info.chs.append(ch);
+        }
+        info.ch_names = names;
+        info.nchan = 6;
+        info.bads = QStringList{"EEG3"};
+
+        const MatrixXd original = data;
+        EogRegression reg;
+        reg.fit(data, info);
+        reg.apply(data, info);
+        MatrixXd expected(2, 2);
+        expected << 0.8010814086290897, 0.00240334589394143, 0.30073710196663533, -0.5979629657184007;
+        QVERIFY2((reg.coefficients() - expected).cwiseAbs().maxCoeff() < 1e-12, "coefficients differ from mne");
+        const auto near = [](double a, double b) {
+            return std::abs(a - b) <= 1e-9 * std::abs(b);
+        };
+        QVERIFY(near(data(0, 0), 2.2489904041658036e-05) && near(data(0, n - 1), 2.7367144766439542e-05));
+        QVERIFY(near(data.row(0).sum(), 0.011265520590820817));
+        QVERIFY(near(data(1, 0), -4.5549728635560728e-06) && near(data(1, n - 1), -1.1170559526140545e-05));
+        QVERIFY(near(data.row(1).sum(), -0.004261647161752561));
+        QCOMPARE(data.bottomRows(4), original.bottomRows(4));
+    }
+
     void testFitApplyReducesEog()
     {
         FiffInfo info = makeTestInfo();
@@ -228,10 +275,8 @@ private slots:
         reg.fit(data, info, eogNames);
 
         QVERIFY(reg.isFitted());
-        // Beta should have 3 target channels (MEG1, MEG2, EEG1) x 1 EOG channel
-        // Note: when only EOG1 is specified, EOG2 becomes a target channel too
-        // Actually: target = all not in EOG set, so targets = MEG1, MEG2, EEG1, EOG2 = 4 targets
-        QCOMPARE(reg.coefficients().rows(), static_cast<Eigen::Index>(4));
+        // The data channels MEG1, MEG2, EEG1 x EOG1; the unused EOG2 is not a data channel
+        QCOMPARE(reg.coefficients().rows(), static_cast<Eigen::Index>(3));
         QCOMPARE(reg.coefficients().cols(), static_cast<Eigen::Index>(1));
     }
 

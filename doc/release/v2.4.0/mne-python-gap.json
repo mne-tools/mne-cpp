@@ -1604,7 +1604,7 @@
       "domain": "preprocessing",
       "status": "partial",
       "mne_cpp": "UTILSLIB::EogRegression",
-      "note": "matrix input; no Epochs/Evoked/picks/proj or saving",
+      "note": "matrix input; no Epochs/Evoked, picks argument, proj handling or saving",
       "evidence": "parity-record"
     },
     {

@@ -55,8 +55,8 @@ namespace UTILSLIB
 /**
  * @brief Remove EOG artifacts via linear regression.
  *
- * Fits a least-squares model: data_ch = beta * EOG + residual,
- * then subtracts beta * EOG from each non-EOG channel.
+ * As mne.preprocessing.EOGRegression: fits data_ch = beta * EOG + residual on time-demeaned
+ * signals for every good data channel and subtracts beta times the demeaned EOG.
  *
  * @snippet ex_dsp_artifacts/main.cpp eog_regression_usage
  */
@@ -73,11 +73,12 @@ public:
     /**
      * @brief Fit regression coefficients from EOG to all other channels.
      *
-     * Uses ordinary least squares: beta = T * E^T * (E * E^T)^{-1}
+     * Ordinary least squares on demeaned signals: beta = T * E^T * (E * E^T)^{-1}, T being the
+     * good data channels (FiffInfoBase::pick_data_channels without the bads).
      *
      * @param[in] data         Data matrix (n_channels x n_times).
      * @param[in] info         Measurement info (identifies EOG channels by kind == FIFFV_EOG_CH).
-     * @param[in] eogChannels  Optional explicit EOG channel names. If empty, auto-detect from info.
+     * @param[in] eogChannels  Optional explicit EOG channel names. If empty, the good channels of kind FIFFV_EOG_CH.
      */
     void fit(const Eigen::MatrixXd& data,
              const FIFFLIB::FiffInfo& info,
@@ -87,7 +88,7 @@ public:
     /**
      * @brief Apply the fitted regression to remove EOG artifacts in-place.
      *
-     * Subtracts beta * EOG from all non-EOG channels.
+     * Subtracts beta times the demeaned EOG from the channels fit() regressed.
      * fit() must be called first.
      *
      * @param[in,out] data   Data matrix (n_channels x n_times). Modified in-place.
@@ -132,7 +133,7 @@ public:
 private:
     Eigen::MatrixXd m_matBeta;       /**< Regression coefficients (n_targets x n_eog). */
     QVector<int> m_vecEogIndices;    /**< Indices of EOG channels in the data matrix. */
-    QVector<int> m_vecTargetIndices; /**< Indices of non-EOG channels. */
+    QVector<int> m_vecTargetIndices; /**< Indices of the regressed data channels. */
     bool m_bFitted = false;          /**< Whether fit() has been called. */
 };
 

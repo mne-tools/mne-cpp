@@ -22,22 +22,22 @@
   "summary": {
     "claims": 360,
     "by_evidence": {
-      "cross-validated-static": 104,
+      "cross-validated-static": 107,
       "cross-validated-live": 4,
-      "tested": 247,
+      "tested": 244,
       "unverified": 5
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 10,
+        "cross-validated-static": 11,
         "cross-validated-live": 1,
-        "tested": 78,
+        "tested": 77,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 94,
+        "cross-validated-static": 96,
         "cross-validated-live": 3,
-        "tested": 169,
+        "tested": 167,
         "unverified": 5
       }
     },
@@ -45,6 +45,7 @@
       "cross-validated-static": [
         "test_anshared_models",
         "test_dsp_annotate_artifact",
+        "test_dsp_eog_regression",
         "test_edf2fiff_rwr",
         "test_fiff_core_python",
         "test_fiff_cov_python",
@@ -465,7 +466,7 @@
       "python": "mne.preprocessing.regress_artifact",
       "claimed": "implemented",
       "test": "test_dsp_eog_regression",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -2041,7 +2042,7 @@
       "python": "mne.preprocessing.EOGRegression",
       "claimed": "partial",
       "test": "test_dsp_eog_regression",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2185,7 +2186,7 @@
       "python": "mne.preprocessing.regress_artifact",
       "claimed": "partial",
       "test": "test_dsp_eog_regression",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

@@ -21,7 +21,7 @@ class UTILSLIB::EogRegression
 
 Remove EOG artifacts via linear regression.
 
-Fits a least-squares model: data_ch = beta * EOG + residual, then subtracts beta * EOG from each non-EOG channel.
+As mne.preprocessing.EOGRegression: fits data_ch = beta * EOG + residual on time-demeaned signals for every good data channel and subtracts beta times the demeaned EOG.
 
 ```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
 MatrixXd cleaned = data;
@@ -44,7 +44,7 @@ Constructs a default [`EogRegression`](/docs/api/dsp/eog-regression) object.
 
 Fit regression coefficients from EOG to all other channels.
 
-Uses ordinary least squares: beta = T * E^T * (E * E^T)^\{-1\}
+Ordinary least squares on demeaned signals: beta = T * E^T * (E * E^T)^\{-1\}, T being the good data channels ([FiffInfoBase](/docs/api/fiff/fiff-info-base)::pick_data_channels without the bads).
 
 **Parameters:**
 
@@ -55,7 +55,7 @@ Uses ordinary least squares: beta = T * E^T * (E * E^T)^\{-1\}
   Measurement info (identifies EOG channels by kind == FIFFV_EOG_CH).
 
 - **eogChannels** : *const QStringList &*
-  Optional explicit EOG channel names. If empty, auto-detect from info.
+  Optional explicit EOG channel names. If empty, the good channels of kind FIFFV_EOG_CH.
 
 ---
 
@@ -63,7 +63,7 @@ Uses ordinary least squares: beta = T * E^T * (E * E^T)^\{-1\}
 
 Apply the fitted regression to remove EOG artifacts in-place.
 
-Subtracts beta * EOG from all non-EOG channels. `fit()` must be called first.
+Subtracts beta times the demeaned EOG from the channels `fit()` regressed. `fit()` must be called first.
 
 **Parameters:**
 

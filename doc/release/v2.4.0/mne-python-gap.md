@@ -111,7 +111,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
-| `mne.preprocessing.EOGRegression` | partial | UTILSLIB::EogRegression | matrix input; no Epochs/Evoked/picks/proj or saving |
+| `mne.preprocessing.EOGRegression` | partial | UTILSLIB::EogRegression | matrix input; no Epochs/Evoked, picks argument, proj handling or saving |
 | `mne.preprocessing.ICA` | partial | UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax | stateless functions; no info-aware object or save |
 | `mne.preprocessing.compute_proj_ecg` | partial | ArtifactDetect::detectEcg, FiffProj::compute_from_raw | detection plus SSP exist; no combined helper |
 | `mne.preprocessing.compute_proj_eog` | partial | ArtifactDetect::detectEog, compute_from_raw | detection plus SSP exist; no combined helper |

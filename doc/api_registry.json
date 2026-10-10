@@ -12997,7 +12997,7 @@
         "python": "mne.preprocessing.EOGRegression",
         "status": "partial",
         "mne_cpp": "UTILSLIB::EogRegression",
-        "note": "matrix input; no Epochs/Evoked/picks/proj or saving",
+        "note": "matrix input; no Epochs/Evoked, picks argument, proj handling or saving",
         "test": "test_dsp_eog_regression"
       },
       {
