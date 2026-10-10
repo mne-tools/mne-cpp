@@ -201,6 +201,7 @@ private:
     QPointer<QWidget> m_pProgressViewWidget;         /**< Window for ProgressView. */
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel> m_pSelectedModel; /**< Pointer to currently selected Fiff model. */
+    QSharedPointer<ANSHAREDLIB::AbstractModel> m_pSelectedAverage;  /**< Pointer to the currently selected average. */
     QString m_sSettingsPath;                                        /**< Variable that stores the key where to store settings for this plugin.*/
     QString m_sLastDir;                                             /**< Variable to store the last directory from where data were loaded.*/
 };

@@ -158,6 +158,23 @@ Save this evoked data set to a FIFF file.
 
 ---
 
+### save(device)
+
+Save this evoked data set as FIFF to an I/O device, e.g.
+
+a QBuffer.
+
+**Parameters:**
+
+- **device** : *QIODevice &*
+  The device to write to; it is opened for writing.
+
+**Returns:**
+
+- *bool* — true on success.
+
+---
+
 ## Static Methods
 
 ### read(p_IODevice, p_FiffEvokedSet, baseline, proj)

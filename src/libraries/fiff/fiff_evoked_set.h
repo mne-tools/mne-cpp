@@ -290,6 +290,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Save this evoked data set as FIFF to an I/O device, e.g. a QBuffer.
+     *
+     * @param[in] device  The device to write to; it is opened for writing.
+     * @return true on success.
+     */
+    bool save(QIODevice& device) const;
+
+    //=========================================================================================================
+    /**
      * Compute a grand average across multiple evoked data sets.
      * Corresponding categories are averaged by summing data and dividing by the
      * number of sets. The nave field accumulates the total count.

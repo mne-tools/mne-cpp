@@ -179,7 +179,7 @@ QMenu* DataLoader::getMenu()
     QMenu* pSaveMenu = new QMenu(tr("Save"));
     pSaveMenu->addAction(pActionSaveData);
     pSaveMenu->addAction(pActionSaveAnn);
-    //pSaveMenu->addAction(pActionSaveAvg);
+    pSaveMenu->addAction(pActionSaveAvg);
 
     pMenuFile->addAction(pActionLoadFile);
     pMenuFile->addAction(pActionLoadScanSession);
@@ -360,7 +360,7 @@ void DataLoader::loadSettings()
 
 void DataLoader::onSaveFilePressed(FileType type)
 {
-    if (!m_pSelectedModel) {
+    if (type == AVERAGE_FILE ? !m_pSelectedAverage : !m_pSelectedModel) {
         qWarning() << "[DataLoader::onSaveFilePressed] No model selected.";
         return;
     }
@@ -377,7 +377,7 @@ void DataLoader::onSaveFilePressed(FileType type)
             break;
         }
         case AVERAGE_FILE: {
-            qDebug() << "[DataLoader::onSaveFilePressed] AVERAGE_FILE Not yet implemented";
+            m_pSelectedAverage->saveToFile("");
             break;
         }
         default: {
@@ -402,8 +402,10 @@ void DataLoader::onSaveFilePressed(FileType type)
             break;
         }
         case AVERAGE_FILE: {
-            qDebug() << "[DataLoader::onSaveFilePressed] Not yet implemented";
-            return;
+            sFile = tr("Save Average");
+            sFileType = tr("Fiff average file(*-ave.fif)");
+            sDir = "/../resources/data/MNE-sample-data";
+            break;
         }
         default: {
             qWarning() << "[DataLoader::onSaveFilePressed] Saving operation not supported.";
@@ -433,7 +435,7 @@ void DataLoader::onSaveFilePressed(FileType type)
             break;
         }
         case AVERAGE_FILE: {
-            qDebug() << "[DataLoader::onSaveFilePressed] AVERAGE_FILE Not yet implemented";
+            m_pSelectedAverage->saveToFile(sFilePath);
             break;
         }
         default: {
@@ -521,6 +523,8 @@ void DataLoader::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewM
             }
         }
         m_pSelectedModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+    } else if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
+        m_pSelectedAverage = pNewModel;
     }
 }
 

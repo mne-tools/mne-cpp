@@ -21,6 +21,7 @@
 #include <anShared/Model/eventmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 
+#include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_events.h>
 
 #include <QtTest>
@@ -40,6 +41,7 @@ private slots:
     void initTestCase();
     void loadsEveryFileKind();
     void attachesEventFilesToTheRecording();
+    void savesTheSelectedAverage();
 };
 
 //=============================================================================================================
@@ -55,6 +57,32 @@ QString sampleFile(const QString& name)
 void open(DataLoader& loader, const QString& path)
 {
     loader.cmdLineStartup({QStringLiteral("file"), path});
+}
+
+/** Types sPath into the next file dialog and accepts it. */
+void chooseFileInNextDialog(const QString& sPath)
+{
+    QTimer::singleShot(10, qApp, [sPath]() {
+        auto* pDialog = qobject_cast<QFileDialog*>(QApplication::activeModalWidget());
+        if (!pDialog) {
+            chooseFileInNextDialog(sPath);
+            return;
+        }
+        pDialog->setDirectory(QFileInfo(sPath).absolutePath());
+        pDialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(sPath).fileName());
+        static_cast<QDialog*>(pDialog)->accept();
+    });
+}
+
+QAction* findAction(QMenu* pMenu, const QString& sText)
+{
+    for (QAction* pAction : pMenu->actions()) {
+        if (pAction->text() == sText)
+            return pAction;
+        if (QAction* pFound = pAction->menu() ? findAction(pAction->menu(), sText) : nullptr)
+            return pFound;
+    }
+    return nullptr;
 }
 
 } // namespace
@@ -135,6 +163,40 @@ void TestAnalyzeDataLoader::attachesEventFilesToTheRecording()
         QVERIFY2(model->rowCount() == 2, qPrintable(path));
         QCOMPARE(model->getFiffModel(), raw);
         QCOMPARE(model->getSampleFreq(), raw->getFiffInfo()->sfreq);
+    }
+}
+
+//=============================================================================================================
+
+void TestAnalyzeDataLoader::savesTheSelectedAverage()
+{
+    auto data = QSharedPointer<AnalyzeData>::create();
+    DataLoader loader;
+    loader.setGlobalData(data);
+    loader.init();
+    const QString avePath = sampleFile("MEG/sample/sample_audvis-ave.fif");
+    open(loader, avePath);
+    loader.handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(data->getModelByPath(avePath))));
+
+    // File > Save > Save average writes the selected average
+    QTemporaryDir dir;
+    const QString outPath = dir.filePath("copy-ave.fif");
+    std::unique_ptr<QMenu> menu(loader.getMenu());
+    QAction* pSave = findAction(menu.get(), QStringLiteral("Save average"));
+    QVERIFY(pSave);
+    chooseFileInNextDialog(outPath);
+    pSave->trigger();
+    QVERIFY(QFile::exists(outPath));
+
+    QFile original(avePath);
+    QFile copy(outPath);
+    const FIFFLIB::FiffEvokedSet expected(original);
+    const FIFFLIB::FiffEvokedSet saved(copy);
+    QCOMPARE(saved.evoked.size(), expected.evoked.size());
+    for (int k = 0; k < expected.evoked.size(); ++k) {
+        QCOMPARE(saved.evoked[k].comment, expected.evoked[k].comment);
+        QCOMPARE(saved.evoked[k].nave, expected.evoked[k].nave);
+        QVERIFY(saved.evoked[k].data.isApprox(expected.evoked[k].data, 1e-6));
     }
 }
 

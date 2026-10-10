@@ -176,6 +176,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Saves the evoked set as a FIFF average file (in the browser: offers it as a download).
+     *
+     * @param[in] sPath    The file path to write to.
+     *
+     * @return True if saving was successful.
+     */
+    bool saveToFile(const QString& sPath) override;
+
+    //=========================================================================================================
+    /**
      * Gets FiffInfo of the evoked model. To be used if loading avg from file without raw file present
      *
      * @return  Shared pointer to FiffInfo of m_pFiffEvokedSet.

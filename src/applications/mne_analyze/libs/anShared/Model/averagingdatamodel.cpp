@@ -24,6 +24,10 @@
 //=============================================================================================================
 
 #include <QFile>
+#ifdef WASMBUILD
+#include <QBuffer>
+#include <QFileDialog>
+#endif
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -128,4 +132,25 @@ QSharedPointer<FIFFLIB::FiffInfo> AveragingDataModel::getFiffInfo()
 QSharedPointer<FIFFLIB::FiffEvokedSet> AveragingDataModel::getEvokedSet()
 {
     return m_pFiffEvokedSet;
+}
+
+//=============================================================================================================
+
+bool AveragingDataModel::saveToFile(const QString& sPath)
+{
+    if (!m_pFiffEvokedSet || m_pFiffEvokedSet->evoked.isEmpty()) {
+        return false;
+    }
+#ifdef WASMBUILD
+    // The browser offers the bytes as a download; sPath has no meaning there.
+    Q_UNUSED(sPath)
+    QBuffer device;
+    const bool ok = m_pFiffEvokedSet->save(device);
+    if (ok) {
+        QFileDialog::saveFileContent(device.data(), getModelName());
+    }
+    return ok;
+#else
+    return m_pFiffEvokedSet->save(sPath);
+#endif
 }

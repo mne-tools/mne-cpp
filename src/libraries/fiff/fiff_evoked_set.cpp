@@ -234,17 +234,28 @@ bool FiffEvokedSet::save(const QString& fileName) const
     }
 
     QFile file(fileName);
-    FiffStream::SPtr pStream = FiffStream::start_file(file);
-    if (!pStream) {
+    if (!save(file)) {
         qWarning() << "[FiffEvokedSet::save] Cannot open" << fileName;
+        return false;
+    }
+
+    qInfo() << "[FiffEvokedSet::save] Saved" << evoked.size()
+            << "average(s) to" << fileName;
+    return true;
+}
+
+//=============================================================================================================
+
+bool FiffEvokedSet::save(QIODevice& device) const
+{
+    FiffStream::SPtr pStream = FiffStream::start_file(device);
+    if (!pStream) {
         return false;
     }
 
     pStream->write_evoked_set(*this);
     pStream->end_file();
-
-    qInfo() << "[FiffEvokedSet::save] Saved" << evoked.size()
-            << "average(s) to" << fileName;
+    device.close();
     return true;
 }
 
