@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_tests.py",
   "ci_source": {
-    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38000906824",
-    "commit": "aaef74112dba471ff38e5c0ed429a4b6800b0c8f"
+    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38044849533",
+    "commit": "abbf6c29b8c6b6d6fa33f56c368b1cd49fecde1b"
   },
   "summary": {
     "directories": 255,
@@ -28,14 +28,49 @@
     "retry_paths": [],
     "ci": {
       "macos-26": {
-        "executed": 276,
+        "executed": 279,
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_averaging",
-          "test_analyze_coregistration",
-          "test_analyze_dataloader",
-          "test_analyze_dipolefit"
+          "test_analyze_coregistration"
+        ],
+        "executed_not_in_inventory": [
+          "ex_bids",
+          "ex_connectivity_metrics",
+          "ex_decoding",
+          "ex_disp3d_scene",
+          "ex_disp_plots",
+          "ex_dsp_analysis",
+          "ex_dsp_artifacts",
+          "ex_dsp_filter",
+          "ex_dsp_maxwell",
+          "ex_dsp_preprocessing",
+          "ex_dsp_rt",
+          "ex_dsp_spectral",
+          "ex_fiff_api",
+          "ex_fiff_structure",
+          "ex_fs",
+          "ex_fwd_api",
+          "ex_inv_api",
+          "ex_inv_beamformer",
+          "ex_inv_dipole_fit",
+          "ex_inv_hpi",
+          "ex_lsl",
+          "ex_math",
+          "ex_ml",
+          "ex_mna",
+          "ex_mne_api",
+          "ex_mri",
+          "ex_sts_statistics",
+          "ex_utils"
+        ]
+      },
+      "macos-26-qt-min": {
+        "executed": 279,
+        "failures": 0,
+        "skipped": 0,
+        "registered_not_executed": [
+          "test_analyze_coregistration"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -69,14 +104,49 @@
         ]
       },
       "ubuntu-24.04": {
-        "executed": 276,
+        "executed": 279,
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_averaging",
-          "test_analyze_coregistration",
-          "test_analyze_dataloader",
-          "test_analyze_dipolefit"
+          "test_analyze_coregistration"
+        ],
+        "executed_not_in_inventory": [
+          "ex_bids",
+          "ex_connectivity_metrics",
+          "ex_decoding",
+          "ex_disp3d_scene",
+          "ex_disp_plots",
+          "ex_dsp_analysis",
+          "ex_dsp_artifacts",
+          "ex_dsp_filter",
+          "ex_dsp_maxwell",
+          "ex_dsp_preprocessing",
+          "ex_dsp_rt",
+          "ex_dsp_spectral",
+          "ex_fiff_api",
+          "ex_fiff_structure",
+          "ex_fs",
+          "ex_fwd_api",
+          "ex_inv_api",
+          "ex_inv_beamformer",
+          "ex_inv_dipole_fit",
+          "ex_inv_hpi",
+          "ex_lsl",
+          "ex_math",
+          "ex_ml",
+          "ex_mna",
+          "ex_mne_api",
+          "ex_mri",
+          "ex_sts_statistics",
+          "ex_utils"
+        ]
+      },
+      "ubuntu-24.04-qt-min": {
+        "executed": 279,
+        "failures": 0,
+        "skipped": 0,
+        "registered_not_executed": [
+          "test_analyze_coregistration"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -110,14 +180,49 @@
         ]
       },
       "windows-2025-vs2026": {
-        "executed": 276,
+        "executed": 279,
         "failures": 0,
         "skipped": 2,
         "registered_not_executed": [
-          "test_analyze_averaging",
-          "test_analyze_coregistration",
-          "test_analyze_dataloader",
-          "test_analyze_dipolefit"
+          "test_analyze_coregistration"
+        ],
+        "executed_not_in_inventory": [
+          "ex_bids",
+          "ex_connectivity_metrics",
+          "ex_decoding",
+          "ex_disp3d_scene",
+          "ex_disp_plots",
+          "ex_dsp_analysis",
+          "ex_dsp_artifacts",
+          "ex_dsp_filter",
+          "ex_dsp_maxwell",
+          "ex_dsp_preprocessing",
+          "ex_dsp_rt",
+          "ex_dsp_spectral",
+          "ex_fiff_api",
+          "ex_fiff_structure",
+          "ex_fs",
+          "ex_fwd_api",
+          "ex_inv_api",
+          "ex_inv_beamformer",
+          "ex_inv_dipole_fit",
+          "ex_inv_hpi",
+          "ex_lsl",
+          "ex_math",
+          "ex_ml",
+          "ex_mna",
+          "ex_mne_api",
+          "ex_mri",
+          "ex_sts_statistics",
+          "ex_utils"
+        ]
+      },
+      "windows-2025-vs2026-qt-min": {
+        "executed": 279,
+        "failures": 0,
+        "skipped": 2,
+        "registered_not_executed": [
+          "test_analyze_coregistration"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -180,9 +285,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -214,8 +322,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "absent",
+        "macos-26-qt-min": "absent",
         "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": []
     },
@@ -246,9 +357,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -279,9 +393,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -313,8 +430,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -342,8 +462,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -374,8 +497,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -406,8 +532,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "BIDSPath",
@@ -441,8 +570,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -470,8 +602,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -499,8 +634,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Command",
@@ -533,8 +671,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MetaData",
@@ -573,8 +714,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvMinimumNorm"
@@ -604,8 +748,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -633,8 +780,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "ConnectivityAec"
@@ -664,8 +814,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Coherence",
@@ -701,8 +854,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MneICP"
@@ -736,8 +892,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -766,8 +925,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -798,8 +960,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -828,8 +993,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -861,8 +1029,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -890,8 +1061,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "DecodingCsp"
@@ -921,8 +1095,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "DecodingSpoc"
@@ -952,8 +1129,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "DecodingSsd"
@@ -986,8 +1166,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvDipoleFit"
@@ -1017,8 +1200,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "BrainSurface"
@@ -1051,8 +1237,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "BemTreeItem",
@@ -1108,8 +1297,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "DataLoader",
@@ -1140,8 +1332,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "SubView",
@@ -1172,8 +1367,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1202,8 +1400,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1232,8 +1433,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1264,8 +1468,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "ChannelDataView",
@@ -1300,8 +1507,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1332,8 +1542,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1361,8 +1574,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "AnnotateArtifact"
@@ -1392,8 +1608,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1421,8 +1640,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1450,8 +1672,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "BadChannelsLof"
@@ -1481,8 +1706,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "BadChannelsMaxwell"
@@ -1512,8 +1740,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "BridgedElectrodes"
@@ -1543,8 +1774,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1572,8 +1806,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1601,8 +1838,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "EegReference"
@@ -1632,8 +1872,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "EogRegression"
@@ -1663,8 +1906,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1692,8 +1938,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FilterChpi"
@@ -1723,8 +1972,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -1752,8 +2004,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FirFilter"
@@ -1783,8 +2038,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "ICA"
@@ -1814,8 +2072,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "IirFilter"
@@ -1845,8 +2106,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "ExtendedInfomax"
@@ -1876,8 +2140,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MorletTfr"
@@ -1907,8 +2174,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MultitaperPsd",
@@ -1939,8 +2209,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "PeakFinder"
@@ -1970,8 +2243,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Resample"
@@ -2001,8 +2277,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2030,8 +2309,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Simulate"
@@ -2061,8 +2343,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2090,8 +2375,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Sphara"
@@ -2121,8 +2409,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "SSS"
@@ -2152,8 +2443,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "StimArtifact"
@@ -2183,8 +2477,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "WelchPsd"
@@ -2214,8 +2511,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Xdawn"
@@ -2248,8 +2548,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2277,8 +2580,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2306,8 +2612,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2335,8 +2644,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FiffEpochs"
@@ -2366,8 +2678,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2401,8 +2716,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2430,8 +2748,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FiffAnnotationEventUtils"
@@ -2461,8 +2782,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FiffAnnotations"
@@ -2492,8 +2816,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2524,8 +2851,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FiffCoordTrans"
@@ -2555,8 +2885,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2588,8 +2921,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2620,8 +2956,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FiffCov"
@@ -2655,8 +2994,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2687,8 +3029,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2719,8 +3064,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2752,8 +3100,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2784,8 +3135,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2817,8 +3171,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2849,8 +3206,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2881,8 +3241,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -2913,8 +3276,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FiffInfo"
@@ -2947,8 +3313,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FiffEvoked"
@@ -2981,8 +3350,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3015,8 +3387,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3045,8 +3420,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3077,8 +3455,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FiffRawData",
@@ -3113,8 +3494,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3145,8 +3529,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3175,8 +3562,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3206,8 +3596,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3238,8 +3631,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3267,8 +3663,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FilterKernel"
@@ -3302,8 +3701,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3333,8 +3735,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FineCalibration"
@@ -3364,8 +3769,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FsSurface"
@@ -3398,8 +3806,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FsAnnotation",
@@ -3433,8 +3844,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3462,8 +3876,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3491,8 +3908,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3523,8 +3943,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FwdBemModel",
@@ -3556,8 +3979,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3589,8 +4015,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3618,8 +4047,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3649,8 +4081,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3681,8 +4116,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3713,8 +4151,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3746,8 +4187,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3775,8 +4219,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FwdEegSphereModel"
@@ -3809,8 +4256,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3841,8 +4291,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3873,8 +4326,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvHpiFit",
@@ -3909,8 +4365,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3938,8 +4397,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -3967,8 +4429,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MlIcaLabel"
@@ -4001,8 +4466,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4033,8 +4501,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvDICS",
@@ -4066,8 +4537,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4095,8 +4569,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvCMNE"
@@ -4126,8 +4603,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvConvenience"
@@ -4161,8 +4641,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4194,8 +4677,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvRapMusic"
@@ -4229,8 +4715,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MNEMneData"
@@ -4265,8 +4754,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4298,8 +4790,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4327,8 +4822,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4359,8 +4857,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4388,8 +4889,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4417,8 +4921,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvGammaMap",
@@ -4452,8 +4959,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4485,8 +4995,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4514,8 +5027,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvLabelTimeCourse"
@@ -4545,8 +5061,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FsLabelUtils"
@@ -4576,8 +5095,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4605,8 +5127,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MaxwellMovementComp"
@@ -4636,8 +5161,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MlModel",
@@ -4672,8 +5200,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MLTrainer"
@@ -4703,8 +5234,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4730,8 +5264,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "absent",
+        "macos-26-qt-min": "absent",
         "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": []
     },
@@ -4759,8 +5296,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4791,8 +5331,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4820,8 +5363,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4849,8 +5395,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4880,8 +5429,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4913,8 +5465,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4942,8 +5497,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -4975,8 +5533,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5007,8 +5568,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5039,8 +5603,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5074,8 +5641,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5107,8 +5677,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5136,8 +5709,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5171,8 +5747,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5203,8 +5782,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5236,8 +5818,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5266,8 +5851,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5299,8 +5887,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5330,8 +5921,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5362,8 +5956,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5395,8 +5992,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "skipped"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "skipped",
+        "windows-2025-vs2026-qt-min": "skipped"
       },
       "registry_classes": []
     },
@@ -5427,8 +6027,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5460,8 +6063,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MNEForwardSolution"
@@ -5494,8 +6100,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5523,8 +6132,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5555,8 +6167,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5587,8 +6202,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5620,8 +6238,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5653,8 +6274,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5685,8 +6309,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5717,8 +6344,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5749,8 +6379,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "FiffProj"
@@ -5784,8 +6417,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5816,8 +6452,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5847,8 +6486,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5880,8 +6522,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5912,8 +6557,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MNESourceSpace"
@@ -5947,8 +6595,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5981,8 +6632,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6012,8 +6666,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6041,8 +6698,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6075,8 +6735,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "skipped"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "skipped",
+        "windows-2025-vs2026-qt-min": "skipped"
       },
       "registry_classes": []
     },
@@ -6106,8 +6769,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6135,8 +6801,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6166,8 +6835,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6195,8 +6867,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6224,8 +6899,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6253,8 +6931,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6282,8 +6963,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6311,8 +6995,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "PicardIca"
@@ -6342,8 +7029,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6372,8 +7062,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6404,8 +7097,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6433,8 +7129,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Report"
@@ -6464,8 +7163,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvResolutionMatrix"
@@ -6495,8 +7197,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "RtSourceDataController"
@@ -6529,8 +7234,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6558,8 +7266,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6588,8 +7299,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6618,8 +7332,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6648,8 +7365,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6680,8 +7400,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6711,8 +7434,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "SensorFieldMapper"
@@ -6742,8 +7468,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "RtSensorDataController",
@@ -6774,8 +7503,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6803,8 +7535,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6832,8 +7567,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvSourceEstimateIO"
@@ -6863,8 +7601,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvSourceEstimate",
@@ -6896,8 +7637,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "SourceMorph"
@@ -6931,8 +7675,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "DirectedTransferFunction",
@@ -6964,8 +7711,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "StandardMontage"
@@ -6995,8 +7745,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "StatsAdjacency",
@@ -7030,8 +7783,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "StsCovEstimators"
@@ -7065,8 +7821,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7095,8 +7854,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7125,8 +7887,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7154,8 +7919,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7186,8 +7954,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7218,8 +7989,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7247,8 +8021,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7279,8 +8056,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7308,8 +8088,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "SurfaceLaplacian"
@@ -7339,8 +8122,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvTfMxne"
@@ -7374,8 +8160,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7405,8 +8194,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7437,8 +8229,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7470,8 +8265,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7502,8 +8300,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7533,8 +8334,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "ComputeFwd"
@@ -7566,8 +8370,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7598,8 +8405,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7630,8 +8440,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "MNEInverseOperator"
@@ -7665,8 +8478,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7696,8 +8512,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7728,8 +8547,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7760,8 +8582,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7791,8 +8616,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7820,8 +8648,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "InvTrapMusic"
@@ -7851,8 +8682,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7880,8 +8714,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7909,8 +8746,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "KMeans"
@@ -7940,8 +8780,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7969,8 +8812,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -7998,8 +8844,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Linalg",
@@ -8030,8 +8879,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -8059,8 +8911,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Spectral"
@@ -8090,8 +8945,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Sphere"
@@ -8121,8 +8979,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": [
         "Warp"
@@ -8150,8 +9011,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "absent",
+        "macos-26-qt-min": "absent",
         "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": []
     },
@@ -8177,8 +9041,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "absent",
+        "macos-26-qt-min": "absent",
         "ubuntu-24.04": "absent",
-        "windows-2025-vs2026": "absent"
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": []
     },
@@ -8207,8 +9074,11 @@
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
+        "macos-26-qt-min": "run",
         "ubuntu-24.04": "run",
-        "windows-2025-vs2026": "run"
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     }
