@@ -92,6 +92,23 @@ Allocate filter output buffers spanning the entire raw data range (with taper ov
 
 ---
 
+### setFilter(newFilter)
+
+Switch to another filter.
+
+Already filtered data is discarded, so later pick_data_filt calls return data filtered with the new definition. Refactored: filter change handling of mne_browse_raw (analyze.c, mne_compare_filters, mne_raw_forget_filtered).
+
+**Parameters:**
+
+- **newFilter** : *const [MNEFilterDef](/docs/api/mne/mne-filter-def) &*
+  The new filter definition.
+
+**Returns:**
+
+- *bool* — true if the filter changed, false if it equals the current one.
+
+---
+
 ### load_one_buffer(buf)
 
 Read a single raw data buffer from the FIFF file into memory, allocating from the ring buffer if needed.

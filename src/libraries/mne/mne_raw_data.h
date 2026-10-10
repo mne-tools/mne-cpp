@@ -116,6 +116,17 @@ public:
     void setup_filter_bufs();
 
     /**
+     * Switch to another filter. Already filtered data is discarded, so later
+     * pick_data_filt calls return data filtered with the new definition.
+     * Refactored: filter change handling of mne_browse_raw (analyze.c, mne_compare_filters, mne_raw_forget_filtered).
+     *
+     * @param[in] newFilter  The new filter definition.
+     *
+     * @return true if the filter changed, false if it equals the current one.
+     */
+    bool setFilter(const MNEFilterDef& newFilter);
+
+    /**
      * Read a single raw data buffer from the FIFF file into memory,
      * allocating from the ring buffer if needed.
      *

@@ -127,8 +127,8 @@ struct FilterData
 
 }
 
-int mne_compare_filters(const MNEFilterDef& f1,
-                        const MNEFilterDef& f2)
+static int mne_compare_filters(const MNEFilterDef& f1,
+                               const MNEFilterDef& f2)
 /*
       * Return 0 if the two filter definitions are same, 1 otherwise
       */
@@ -631,6 +631,25 @@ void MNERawData::setup_filter_bufs()
     add_filter_response(&highpass_effective);
 
     return;
+}
+
+//=============================================================================================================
+
+bool MNERawData::setFilter(const MNEFilterDef& newFilter)
+{
+    const bool sameLayout = filter && newFilter.size == filter->size && newFilter.taper_size == filter->taper_size;
+    if (sameLayout && !mne_compare_filters(newFilter, *filter))
+        return false;
+    filter = std::make_unique<MNEFilterDef>(newFilter);
+    if (sameLayout) {
+        for (MNERawBufDef& buf : filt_bufs)
+            buf.valid = false;
+        int highpass_effective;
+        add_filter_response(&highpass_effective);
+    } else {
+        setup_filter_bufs();
+    }
+    return true;
 }
 
 //=============================================================================================================

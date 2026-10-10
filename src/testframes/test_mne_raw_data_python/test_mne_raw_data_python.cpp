@@ -392,6 +392,19 @@ void TestMneRawDataPython::filtersSegments()
     QCOMPARE(fresh->pick_data_filt(nullptr, fresh->first_samp + offset, ns, all.rows.data()), 0);
     for (int c = 0; c < sel.nchan; ++c)
         QCOMPARE(all.values.row(sel.pick[c]), buf.values.row(c));
+
+    // Switching to this filter from another one, after data was filtered with that, gives the same data
+    MNEFilterDef other = filter;
+    other.highpass = other.eog_highpass = static_cast<float>(1.0 - highpass);
+    std::unique_ptr<MNERawData> switched(MNERawData::open_file(m_rawPath, false, false, other));
+    PickBuffer before(sel.nchan, ns);
+    QCOMPARE(switched->pick_data_filt(&sel, switched->first_samp + offset, ns, before.rows.data()), 0);
+    QVERIFY(before.values != buf.values);
+    QVERIFY(switched->setFilter(filter));
+    QVERIFY(!switched->setFilter(filter));
+    PickBuffer after(sel.nchan, ns);
+    QCOMPARE(switched->pick_data_filt(&sel, switched->first_samp + offset, ns, after.rows.data()), 0);
+    QCOMPARE(after.values, buf.values);
 }
 
 //=============================================================================================================
