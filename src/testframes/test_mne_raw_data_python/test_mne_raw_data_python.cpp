@@ -419,7 +419,7 @@ void TestMneRawDataPython::rejectsMissingFile()
 
 void TestMneRawDataPython::picksDerivedChannel()
 {
-    // A bipolar derivation MEG0113 - MEG0112: every read path is linear, so it must equal the difference of the reads.
+    // A bipolar derivation MEG0111 - MEG0121: every read path is linear, so it must equal the difference of the reads.
     MNEFilterDef filter;
     filter.filter_on = true;
     filter.size = 4096;
@@ -428,10 +428,10 @@ void TestMneRawDataPython::picksDerivedChannel()
     filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
     std::unique_ptr<MNERawData> raw(MNERawData::open_file(m_rawPath, false, false, filter));
     QVERIFY(raw);
-    const int a = static_cast<int>(raw->ch_names.indexOf("MEG0113"));
-    const int b = static_cast<int>(raw->ch_names.indexOf("MEG0112"));
+    const int a = static_cast<int>(raw->ch_names.indexOf("MEG0111"));
+    const int b = static_cast<int>(raw->ch_names.indexOf("MEG0121"));
     // A derivation set with one usable row and one whose input is not recorded.
-    const MNEDerivSet set = MNEDerivSet::fromDefinitions({{"BIP", {{"MEG0113", 1.0}, {"MEG0112", -1.0}}}, {"MISSING", {{"MEG0113", 1.0}, {"EEG999", -1.0}}}});
+    const MNEDerivSet set = MNEDerivSet::fromDefinitions({{"BIP", {{"MEG0111", 1.0}, {"MEG0121", -1.0}}}, {"MISSING", {{"MEG0111", 1.0}, {"EEG999", -1.0}}}});
     std::unique_ptr<MNEDeriv> deriv = set.match(raw->ch_names);
     QVERIFY(deriv);
     // Matching keeps the usable row, takes the data's channel order and counts per channel how many rows use it.
@@ -441,10 +441,10 @@ void TestMneRawDataPython::picksDerivedChannel()
     inUse(a) = inUse(b) = 1;
     QCOMPARE(deriv->in_use, inUse);
     QVERIFY(!MNEDerivSet::fromDefinitions({{"MISSING", {{"EEG999", 1.0}}}}).match(raw->ch_names));
-    // Attaching matches and validates in one step; both inputs are gradiometers, so BIP is valid.
+    // Attaching matches and validates in one step; both inputs are magnetometers, which the projectors act on, so BIP is valid.
     QCOMPARE(raw->attachDerivations(set), 1);
     QCOMPARE(raw->deriv_matched->in_use, inUse);
-    QCOMPARE(raw->deriv_matched->chs[0].ch_name, QString("MEG0113"));
+    QCOMPARE(raw->deriv_matched->chs[0].ch_name, QString("MEG0111"));
 
     // Channel 0 is derived, 1 and 2 are its inputs.
     MNEChSelection sel;
@@ -454,17 +454,33 @@ void TestMneRawDataPython::picksDerivedChannel()
     sel.pick_deriv = VectorXi(3);
     sel.pick_deriv << 0, -1, -1;
     sel.nderiv = 1;
-    sel.chspick = sel.chspick_nospace = {"BIP", "MEG0113", "MEG0112"};
+    sel.chspick = sel.chspick_nospace = {"BIP", "MEG0111", "MEG0121"};
+
+    // The projected path derives from projected inputs; the read starts before the data to cover the zero padding
+    std::unique_ptr<MNEProjOp> proj;
+    QVERIFY(MNEProjOp::makeProjection({m_rawPath}, raw->info->chInfo, raw->info->nchan, proj));
+    QCOMPARE(proj->assign_channels(raw->ch_names, raw->info->nchan), 0);
+    QCOMPARE(proj->make_proj(), 0);
 
     const int first = raw->first_samp + 2990;
+    PickBuffer unprojected(3, 25);
     for (int path = 0; path < 3; ++path) {
         PickBuffer buf(3, 25);
-        if (path == 0)
+        if (path == 0) {
             QCOMPARE(raw->pick_data(&sel, first, 25, buf.rows.data()), 0);
-        else if (path == 1)
+            unprojected.values = buf.values;
+        } else if (path == 1) {
+            raw->proj = std::move(proj);
+            PickBuffer padded(3, 28);
+            QCOMPARE(raw->pick_data_proj(&sel, first - 3 - 2990, 28, padded.rows.data()), 0);
+            QVERIFY((padded.values.leftCols(3).array() == 0.0f).all());
+            QVERIFY(padded.values.col(3).cwiseAbs().minCoeff() > 0.0f);
             QCOMPARE(raw->pick_data_proj(&sel, first, 25, buf.rows.data()), 0);
-        else
+            raw->proj.reset();
+            QVERIFY(!buf.values.isApprox(unprojected.values));
+        } else {
             QCOMPARE(raw->pick_data_filt(&sel, first, 25, buf.rows.data()), 0);
+        }
         const RowVectorXf expected = buf.values.row(1) - buf.values.row(2);
         QVERIFY2((buf.values.row(0) - expected).cwiseAbs().maxCoeff() <= 1e-5f * expected.cwiseAbs().maxCoeff(),
                  qPrintable(QStringLiteral("path %1").arg(path)));
