@@ -253,6 +253,10 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
 
 void ChannelSelection::onModelRemoved([[maybe_unused]] QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
+    // The view is only created with the first recording
+    if (!m_bIsInit) {
+        return;
+    }
     if (m_pAnalyzeData->getModelsByType(ANSHAREDLIB_FIFFRAW_MODEL).size() == 0 && m_pAnalyzeData->getModelsByType(ANSHAREDLIB_AVERAGING_MODEL).size() == 0) {
         m_pChannelSelectionView->clearView();
     }

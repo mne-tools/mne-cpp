@@ -6,9 +6,9 @@
     "commit": "57ebf2c2d56eef6ae0acb60c34d8608f8ab2972a"
   },
   "summary": {
-    "directories": 257,
+    "directories": 258,
     "registration": {
-      "unconditional": 250,
+      "unconditional": 251,
       "conditional": 4,
       "unregistered": 3
     },
@@ -20,10 +20,10 @@
       "freesurfer": 2,
       "python": 9,
       "sample-data": 19,
-      "test-data": 111
+      "test-data": 112
     },
-    "gui": 39,
-    "with_qskip": 81,
+    "gui": 40,
+    "with_qskip": 82,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -31,7 +31,9 @@
         "executed": 282,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_analyze_channelselection"
+        ],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -67,7 +69,9 @@
         "executed": 282,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_analyze_channelselection"
+        ],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -103,7 +107,9 @@
         "executed": 282,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_analyze_channelselection"
+        ],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -139,7 +145,9 @@
         "executed": 282,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_analyze_channelselection"
+        ],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -175,7 +183,9 @@
         "executed": 282,
         "failures": 0,
         "skipped": 2,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_analyze_channelselection"
+        ],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -211,7 +221,9 @@
         "executed": 282,
         "failures": 0,
         "skipped": 2,
-        "registered_not_executed": [],
+        "registered_not_executed": [
+          "test_analyze_channelselection"
+        ],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_connectivity_metrics",
@@ -279,6 +291,42 @@
         "ubuntu-24.04-qt-min": "run",
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_analyze_channelselection",
+      "cmake": "src/testframes/test_analyze_channelselection/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_analyze_channelselection"
+      ],
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": []
     },
