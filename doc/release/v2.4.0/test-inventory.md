@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38044849533 (comm
 
 ## Registration
 
-- Test directories: 255
-- Registered unconditionally: 248
+- Test directories: 256
+- Registered unconditionally: 249
 - Registered behind a CMake condition or early `return()`: 4
 - Not registered: 3
 - Registered without `LABELS`: 0
@@ -18,12 +18,12 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38044849533 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 279 | 0 | 0 | `test_analyze_coregistration` |
-| macos-26-qt-min | 279 | 0 | 0 | `test_analyze_coregistration` |
-| ubuntu-24.04 | 279 | 0 | 0 | `test_analyze_coregistration` |
-| ubuntu-24.04-qt-min | 279 | 0 | 0 | `test_analyze_coregistration` |
-| windows-2025-vs2026 | 279 | 0 | 2 | `test_analyze_coregistration` |
-| windows-2025-vs2026-qt-min | 279 | 0 | 2 | `test_analyze_coregistration` |
+| macos-26 | 279 | 0 | 0 | `test_analyze_coregistration`, `test_analyze_events` |
+| macos-26-qt-min | 279 | 0 | 0 | `test_analyze_coregistration`, `test_analyze_events` |
+| ubuntu-24.04 | 279 | 0 | 0 | `test_analyze_coregistration`, `test_analyze_events` |
+| ubuntu-24.04-qt-min | 279 | 0 | 0 | `test_analyze_coregistration`, `test_analyze_events` |
+| windows-2025-vs2026 | 279 | 0 | 2 | `test_analyze_coregistration`, `test_analyze_events` |
+| windows-2025-vs2026-qt-min | 279 | 0 | 2 | `test_analyze_coregistration`, `test_analyze_events` |
 
 ## Run-time requirements (lexical signals)
 
@@ -32,9 +32,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38044849533 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 19 |
-| test-data | 109 |
-| GUI (`QTEST_MAIN`) | 37 |
-| Contains `QSKIP` | 79 |
+| test-data | 110 |
+| GUI (`QTEST_MAIN`) | 38 |
+| Contains `QSKIP` | 80 |
 
 ## Conditional and unregistered tests
 

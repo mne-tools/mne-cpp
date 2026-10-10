@@ -22,7 +22,7 @@
 #include "ui_eventview.h"
 
 #include <fiff/fiff.h>
-#include <dsp/rt/rt_detect_trigger.h>
+#include <fiff/fiff_events.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <disp/viewers/triggerdetectionview.h>
 
@@ -474,8 +474,11 @@ void EventView::onDetectTriggers(const QString& sChannelName,
 
     emit loadingStart("Detecting triggers...");
 
-    m_Future = QtConcurrent::run([&, this] {
-        return this->detectTriggerCalculations(sChannelName, dThreshold, *m_pFiffRawModel->getFiffInfo(), *this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
+    // The arguments are temporaries of the emitting call, so the worker gets copies
+    m_sDetectedStimChannel = sChannelName;
+    QSharedPointer<FIFFLIB::FiffRawData> raw = m_pFiffRawModel->getFiffIO()->m_qlistRaw.first();
+    m_Future = QtConcurrent::run([sChannelName = QString(sChannelName), dThreshold, raw] {
+        return detectTriggerCalculations(sChannelName, dThreshold, *raw);
     });
     m_FutureWatcher.setFuture(m_Future);
 }
@@ -484,41 +487,18 @@ void EventView::onDetectTriggers(const QString& sChannelName,
 
 QMap<double, QList<int>> EventView::detectTriggerCalculations(const QString& sChannelName,
                                                               double dThreshold,
-                                                              FIFFLIB::FiffInfo fiffInfo,
-                                                              FIFFLIB::FiffRawData fiffRaw)
+                                                              const FIFFLIB::FiffRawData& fiffRaw)
 {
-    int iCurrentTriggerChIndex = 9999;
-
-    for (int i = 0; i < fiffInfo.chs.size(); ++i) {
-        if (fiffInfo.chs[i].ch_name == sChannelName) {
-            iCurrentTriggerChIndex = i;
-            break;
+    QMap<double, QList<int>> mEventsinTypes;
+    FIFFLIB::FiffEvents events;
+    if (!FIFFLIB::FiffEvents::detect_from_raw(fiffRaw, events, sChannelName)) {
+        return mEventsinTypes;
+    }
+    for (int k = 0; k < events.events.rows(); ++k) {
+        if (events.events(k, 2) >= dThreshold) {
+            mEventsinTypes[events.events(k, 2)].append(events.events(k, 0));
         }
     }
-
-    if (iCurrentTriggerChIndex == 9999) {
-        qWarning() << "[EventView::onDetectTriggers] Channel Index not valid";
-        QMap<double, QList<int>> map;
-        return map;
-    }
-
-    Eigen::MatrixXd mSampleData, mSampleTimes;
-
-    fiffRaw.read_raw_segment(mSampleData,
-                             mSampleTimes);
-
-    QList<QPair<int, double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
-                                                                                               iCurrentTriggerChIndex,
-                                                                                               0,
-                                                                                               dThreshold,
-                                                                                               0);
-
-    QMap<double, QList<int>> mEventsinTypes;
-
-    for (QPair<int, double> pair : detectedTriggerSamples) {
-        mEventsinTypes[pair.second].append(pair.first);
-    }
-
     return mEventsinTypes;
 }
 
@@ -555,7 +535,6 @@ void EventView::createGroupsFromTriggers()
     QMap<double, QList<int>> mEventGroupMap = m_Future.result();
 
     QList<double> keyList = mEventGroupMap.keys();
-    int iFirstSample = m_pFiffRawModel->absoluteFirstSample();
 
     QColor colors[10] = {QColor("cyan"), QColor("magenta"), QColor("red"),
                          QColor("darkRed"), QColor("darkCyan"), QColor("darkMagenta"),
@@ -563,12 +542,13 @@ void EventView::createGroupsFromTriggers()
                          QColor("blue")};
 
     for (int i = 0; i < keyList.size(); i++) {
-        if ((m_pUi->m_listWidget_groupListWidget->findItems(m_pTriggerDetectView->getSelectedStimChannel() + "_" + QString::number(static_cast<int>(keyList[i])), Qt::MatchExactly).isEmpty())) {
-            newStimGroup(m_pTriggerDetectView->getSelectedStimChannel(),
-                         static_cast<int>(keyList[i]),
+        const int iCode = static_cast<int>(keyList[i]);
+        if ((m_pUi->m_listWidget_groupListWidget->findItems(m_sDetectedStimChannel + "_" + QString::number(iCode), Qt::MatchExactly).isEmpty())) {
+            newStimGroup(m_sDetectedStimChannel,
+                         iCode,
                          colors[i % 10]);
             for (int j : mEventGroupMap[keyList[i]]) {
-                m_pEventModel->addEvent(j + iFirstSample);
+                m_pEventModel->addEventWithCode(j, iCode);
             }
         }
     }

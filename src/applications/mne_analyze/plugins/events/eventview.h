@@ -347,17 +347,17 @@ private:
 
     //=========================================================================================================
     /**
-     * Perfroms trigger detection and sorts events into map of events by group based on detection threshold
+     * Finds the trigger onsets on a stimulus channel, as mne.find_events, grouped by trigger code
      *
      * @param[in] sChannelName      name of stim channel from which we will be reading.
-     * @param[in] dThreshold        threshold for a spike to count as a trigger.
+     * @param[in] dThreshold        smallest trigger code to keep.
+     * @param[in] fiffRaw           the recording.
      *
-     * @return      returns map of events sorted by groups based on threshold.
+     * @return      absolute onset samples per trigger code.
      */
-    QMap<double, QList<int>> detectTriggerCalculations(const QString& sChannelName,
-                                                       double dThreshold,
-                                                       FIFFLIB::FiffInfo fiffInfo,
-                                                       FIFFLIB::FiffRawData fiffRaw);
+    static QMap<double, QList<int>> detectTriggerCalculations(const QString& sChannelName,
+                                                              double dThreshold,
+                                                              const FIFFLIB::FiffRawData& fiffRaw);
 
     //=========================================================================================================
     /**
@@ -385,6 +385,7 @@ private:
 
     QFutureWatcher<QMap<double, QList<int>>> m_FutureWatcher; /** < Watches m_Future and signals when calculations are done */
     QFuture<QMap<double, QList<int>>> m_Future;               /** < Used to perfom trigger detection on a separate thread */
+    QString m_sDetectedStimChannel;                           /** < Stimulus channel of the running detection. */
 
     QPointer<QMenu> m_pEventContexMenu;
     QPointer<QMenu> m_pGroupContexMenu;
