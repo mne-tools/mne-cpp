@@ -120,7 +120,9 @@ void TestAnalyzeAveraging::averagesEveryEventCodeLikePython()
         const int meg = static_cast<int>(evoked.info.ch_names.indexOf("MEG1332"));
         const int eeg = static_cast<int>(evoked.info.ch_names.indexOf("EEG021"));
         QVERIFY(meg >= 0 && eeg >= 0);
-        const auto near = [](double a, double b) { return std::abs(a - b) < 1e-5 * std::abs(b); };
+        const auto near = [](double a, double b) {
+            return std::abs(a - b) < 1e-5 * std::abs(b);
+        };
         QVERIFY2(near(evoked.data.row(meg).sum(), expected[k].megSum), qPrintable(QString::number(evoked.data.row(meg).sum(), 'g', 17)));
         QVERIFY2(near(evoked.data.row(eeg).sum(), expected[k].eegSum), qPrintable(QString::number(evoked.data.row(eeg).sum(), 'g', 17)));
         QVERIFY(near(evoked.data(eeg, 60), expected[k].eeg60));
