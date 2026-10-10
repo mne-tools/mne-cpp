@@ -604,8 +604,24 @@ void TestFiffStreamPython::refusesUnwritablePath()
     QVERIFY(!FiffDigPointSet().write(dig));
     QVERIFY(!QFileInfo::exists(path));
 
-    // The channel list, not the nchan field (-1 when never set), decides what is written
+    // The channel list, not the nchan field (-1 when never set), decides what is written.
+    // Without a source file, digitizer points, acquisition parameters and the CTF head transform come from info
+    // (mne.io.read_raw_fif reads the same three points, both strings and the 4 mm CTF shift).
     info.nchan = -1;
+    for (int k = 0; k < 3; ++k) {
+        FiffDigPoint point;
+        point.kind = FIFFV_POINT_CARDINAL;
+        point.ident = k + 1;
+        point.coord_frame = FIFFV_COORD_HEAD;
+        point.r[0] = 0.01f * (k + 1);
+        point.r[1] = point.r[2] = 0.0f;
+        info.dig << point;
+    }
+    info.acq_pars = QStringLiteral("ACQch001 110113");
+    info.acq_stim = QStringLiteral("STIM 1");
+    Matrix4f ctf = Matrix4f::Identity();
+    ctf(0, 3) = 0.004f;
+    info.ctf_head_t = FiffCoordTrans(FIFFV_MNE_COORD_CTF_HEAD, FIFFV_COORD_HEAD, ctf);
     QFile written(dir.filePath(QStringLiteral("one_channel_raw.fif")));
     FiffStream::SPtr stream = FiffStream::start_writing_raw(written, info, cals);
     QVERIFY(stream);
@@ -616,6 +632,12 @@ void TestFiffStreamPython::refusesUnwritablePath()
     FiffRawData raw1(readBack);
     QCOMPARE(raw1.info.nchan, 1);
     QCOMPARE(raw1.last_samp, 9);
+    QCOMPARE(raw1.info.dig.size(), 3);
+    QCOMPARE(raw1.info.dig[2].ident, 3);
+    QCOMPARE(raw1.info.dig[2].r[0], 0.03f);
+    QCOMPARE(raw1.info.acq_pars, info.acq_pars);
+    QCOMPARE(raw1.info.acq_stim, info.acq_stim);
+    QCOMPARE(raw1.info.ctf_head_t.trans, ctf);
 }
 
 //=============================================================================================================
