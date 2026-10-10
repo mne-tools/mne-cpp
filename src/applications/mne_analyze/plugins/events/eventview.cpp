@@ -124,10 +124,12 @@ void EventView::initMVCSettings()
 void EventView::initGUIFunctionality()
 {
     //'Activate events' checkbox
-    connect(m_pUi->m_checkBox_activateEvents, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) { emit activeEventsChecked(static_cast<int>(state)); }, Qt::UniqueConnection);
+    connect(m_pUi->m_checkBox_activateEvents, &QCheckBox::checkStateChanged,
+            this, &EventView::onActiveEventsChecked, Qt::UniqueConnection);
 
     //'Show selected event' checkbox
-    connect(m_pUi->m_checkBox_showSelectedEventsOnly, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) { onSelectedEventsChecked(static_cast<int>(state)); }, Qt::UniqueConnection);
+    connect(m_pUi->m_checkBox_showSelectedEventsOnly, &QCheckBox::checkStateChanged,
+            this, &EventView::onSelectedEventsChecked, Qt::UniqueConnection);
     connect(m_pUi->m_tableView_eventTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &EventView::onCurrentSelectedChanged, Qt::UniqueConnection);
 
@@ -278,12 +280,16 @@ void EventView::onSelectedEventsChecked(int iCheckBoxState)
 
 void EventView::disconnectFromModel()
 {
-    disconnect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::dataChanged,
-               this, &EventView::onDataChanged);
+    if (m_pEventModel) {
+        disconnect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::dataChanged,
+                   this, &EventView::onDataChanged);
+        disconnect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
+                   this, &EventView::redrawGroups);
+    }
     disconnect(m_pUi->m_checkBox_activateEvents, &QCheckBox::checkStateChanged,
-               this, nullptr);
+               this, &EventView::onActiveEventsChecked);
     disconnect(m_pUi->m_checkBox_showSelectedEventsOnly, &QCheckBox::checkStateChanged,
-               this, nullptr);
+               this, &EventView::onSelectedEventsChecked);
     disconnect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
                this, &EventView::addEventGroup);
     disconnect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
@@ -298,8 +304,6 @@ void EventView::disconnectFromModel()
                this, &EventView::onStimButtonClicked);
     disconnect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
                this, &EventView::onDetectTriggers);
-    disconnect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
-               this, &EventView::redrawGroups);
 }
 
 //=============================================================================================================

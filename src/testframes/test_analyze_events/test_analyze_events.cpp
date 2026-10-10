@@ -24,12 +24,14 @@
 #include <disp/viewers/triggerdetectionview.h>
 
 #include <QtTest>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDockWidget>
 #include <QDoubleSpinBox>
 #include <QPushButton>
 #include <QSemaphore>
 #include <QSpinBox>
+#include <QTableView>
 #include <QThreadPool>
 
 #include <map>
@@ -138,6 +140,20 @@ void TestAnalyzeEvents::detectsTriggersLikePython()
     QCOMPARE(found.size(), expected.size());
     for (const auto& [code, samples] : expected)
         QVERIFY2(found[code] == samples, qPrintable(QStringLiteral("code %1: %2 events").arg(code).arg(found[code].size())));
+
+    // The panel's check boxes reach the viewer and the model, once each, also after the model was set again
+    plugin.handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(raw.staticCast<AbstractModel>())));
+    auto* activate = dock->findChild<QCheckBox*>(QStringLiteral("m_checkBox_activateEvents"));
+    auto* selectedOnly = dock->findChild<QCheckBox*>(QStringLiteral("m_checkBox_showSelectedEventsOnly"));
+    QVERIFY(activate && selectedOnly);
+    QSignalSpy toggled(dock->widget(), SIGNAL(activeEventsChecked(int)));
+    activate->setChecked(!activate->isChecked());
+    QCOMPARE(toggled.size(), 1);
+    QCOMPARE(toggled.first().first().toInt(), static_cast<int>(activate->checkState()));
+    auto* shown = qobject_cast<EventModel*>(dock->findChild<QTableView*>(QStringLiteral("m_tableView_eventTableView"))->model());
+    QVERIFY(shown);
+    selectedOnly->setChecked(true);
+    QCOMPARE(shown->getShowSelected(), static_cast<int>(Qt::Checked));
 }
 
 //=============================================================================================================
