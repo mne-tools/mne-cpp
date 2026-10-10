@@ -185,6 +185,7 @@ private slots:
     void sphereGuessGrid();
     void guessesFromFile();
     void fitsOneTimePoint();
+    void fitsMagneticDipole();
     void printsFields();
     void commandLine();
     void commandLineRejects_data();
@@ -597,6 +598,37 @@ void TestInvDipoleFitPython::sphereGuessGrid()
     InvGuessData guess(QString(), QString(), 0.0f, 0.02f, static_cast<float>(grid), m_fitData.get(), static_cast<float>(radius));
     QCOMPARE(guess.nguess, nguess);
     QVERIFY(std::abs(guess.rr.cast<double>().sum() - rrSum) < 1e-3);
+}
+
+//=============================================================================================================
+
+void TestInvDipoleFitPython::fitsMagneticDipole()
+{
+    // The field of a magnetic dipole (e.g. a marker coil), fitted with magnetic dipoles (mne_dipole_fit --mag)
+    QStringList projnames{m_sampleAve};
+    Vector3f r0(0.0f, 0.0f, 0.04f);
+    std::unique_ptr<InvDipoleFitData> fwdData(InvDipoleFitData::setup_dipole_fit_data(
+        QString(), m_sampleAve, QString(), &r0, nullptr, false, QString(), QString(),
+        5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, false, projnames, true, false));
+    QVERIFY(fwdData);
+    fwdData->funcs = fwdData->mag_dipole_funcs.get();
+    const Vector3f pos(0.02f, -0.01f, 0.07f);
+    const Vector3f moment(0.0f, 2e-9f, -1e-9f);
+    MatrixXf g(fwdData->nmeg, 3);
+    QCOMPARE(InvDipoleFitData::compute_dipole_field(*fwdData, pos, false, g), 0);
+    VectorXf B = g * moment;
+
+    dipoleFitFuncs funcs = m_fitData->funcs;
+    m_fitData->fit_mag_dipoles = true;
+    InvGuessData guess(QString(), QString(), 0.0f, 0.02f, 0.015f, m_fitData.get(), 0.08f);
+    InvEcd dip;
+    const bool fitted = InvDipoleFitData::fit_one(m_fitData.get(), &guess, 0.0f, B, false, dip);
+    m_fitData->fit_mag_dipoles = false;
+    m_fitData->funcs = funcs;
+    QVERIFY(fitted && dip.valid);
+    QVERIFY2((dip.rd - pos).norm() < 1e-3f, qPrintable(QStringLiteral("%1 mm off").arg(1e3 * (dip.rd - pos).norm())));
+    QVERIFY2((dip.Q - moment).norm() < 0.01f * moment.norm(), qPrintable(QStringLiteral("moment (%1, %2, %3)").arg(dip.Q[0]).arg(dip.Q[1]).arg(dip.Q[2])));
+    QVERIFY(dip.good > 0.9999f);
 }
 
 //=============================================================================================================

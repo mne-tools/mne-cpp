@@ -1194,7 +1194,9 @@ bool InvDipoleFitData::fit_one(InvDipoleFitData* fit,
         /*
      * Do first pass with the sphere model
      */
-        if (k == 0)
+        if (fit->fit_mag_dipoles)
+            fit->funcs = fit->mag_dipole_funcs.get(); // the guesses were computed with these too
+        else if (k == 0)
             fit->funcs = fit->sphere_funcs.get();
         else
             fit->funcs = !fit->bemname.isEmpty() ? fit->bem_funcs.get() : fit->sphere_funcs.get();
