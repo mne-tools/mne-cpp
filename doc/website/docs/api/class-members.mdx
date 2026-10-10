@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6266 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6268 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -321,7 +321,7 @@ Index of 6266 public class members (functions, variables, typedefs, enums) acros
 - **bmin** `[var]` in [AverageCategory](/docs/api/fiff/average-category) — Baseline min (s).
 - **bmin** `[var]` in [CovDefinition](/docs/api/mne/cov-definition) — Baseline min (s).
 - **bmin** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Baseline start time (s).
-- **bonferroni** `[fn]` in [StatsMcCorrection](/docs/api/sts/stats-mc-correction) — Bonferroni correction: corrected_p = min(p * n, 1.0).
+- **bonferroni** `[fn]` in [StatsMcCorrection](/docs/api/sts/stats-mc-correction) — Bonferroni correction as mne.stats.bonferroni_correction: corrected_p = min(p * n, 1.0).
 - **border** `[var]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Per-vertex flag: non-zero if the vertex lies on the patch border (size np).
 - **borderChanged** `[signal]` in [Spline](/docs/api/disp/spline) — emit signal consisting of three threshold lines x-axis value if any one of them is changed
 - **boundingBox** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface) — Get bounding box of the surface.
@@ -1585,7 +1585,8 @@ Index of 6266 public class members (functions, variables, typedefs, enums) acros
 - **factorAnalysis** `[fn]` in [StsCovEstimators](/docs/api/sts/sts-cov-estimators) — Factor Analysis covariance estimator via EM algorithm.
 - **FastrakParser** `[fn]` in [FastrakParser](/docs/api/utils/fastrak-parser)
 - **fCdf** `[fn]` in [StatsFtest](/docs/api/sts/stats-ftest) — Compute the CDF of the F-distribution using the regularized incomplete beta function.
-- **fdr** `[fn]` in [StatsMcCorrection](/docs/api/sts/stats-mc-correction) — False Discovery Rate (Benjamini-Hochberg) correction.
+- **fdr** `[fn]` in [StatsMcCorrection](/docs/api/sts/stats-mc-correction) — False Discovery Rate correction as mne.stats.fdr_correction.
+- **FdrMethod** `[enum]` in [StatsMcCorrection](/docs/api/sts/stats-mc-correction) — Dependence assumed by the FDR correction (mne's method "indep" / "negcorr").
 - **fHeadMovementAngle** `[var]` in [HpiFitResult](/docs/api/inv/hpi-fit-result)
 - **fHeadMovementDistance** `[var]` in [HpiFitResult](/docs/api/inv/hpi-fit-result)
 - **fidFileChanged** `[signal]` in [CoregSettingsView](/docs/api/disp/coreg-settings-view) — Emit this signal whenever new fiducials were loaded.
@@ -4293,6 +4294,7 @@ Index of 6266 public class members (functions, variables, typedefs, enums) acros
 - **rej** `[var]` in [AverageDescription](/docs/api/fiff/average-description) — Rejection limits.
 - **rej** `[var]` in [CovDescription](/docs/api/mne/cov-description) — Rejection limits.
 - **rejectMarked** `[fn]` in [EpochExtractor](/docs/api/utils/epoch-extractor) — Return only the epochs that are NOT marked for rejection.
+- **RejectMask** `[type]` in [StatsMcCorrection](/docs/api/sts/stats-mc-correction) — Hypotheses rejected by a correction, same shape as the p-values.
 - **rel_rad** `[var]` in [FwdEegSphereLayer](/docs/api/fwd/fwd-eeg-sphere-layer) — Relative rads.
 - **relative** `[var]` in [MNEMshColorScaleDef](/docs/api/mne/mne-msh-color-scale-def)
 - **Remez2** `[fn]` in [ParksMcClellan](/docs/api/utils/parks-mc-clellan)

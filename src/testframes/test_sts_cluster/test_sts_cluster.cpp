@@ -584,6 +584,31 @@ void TestStsCluster::testCorrectionsMatchMne()
     compareValues(StatsMcCorrection::fdr(pv), {0.04, 0.064, 0.064, 0.266666666667, 0.04, 0.571428571429, 0.064, 0.9},
                   1e-11);
     compareValues(StatsMcCorrection::holmBonferroni(pv), {0.07, 0.2, 0.18, 0.6, 0.04, 1, 0.2, 1}, 1e-12);
+    compareValues(StatsMcCorrection::fdr(pv, 0.05, StatsMcCorrection::FdrMethod::NegativelyCorrelated),
+                  {0.10871428571428571, 0.17394285714285715, 0.17394285714285715, 0.7247619047619048, 0.10871428571428571, 1, 0.17394285714285715, 1},
+                  1e-12);
+
+    // The reject masks of mne's (reject, pval_corrected) pairs
+    const auto mask = [](const StatsMcCorrection::RejectMask& reject) {
+        QString bits;
+        for (Index i = 0; i < reject.size(); ++i)
+            bits += reject.data()[i] ? '1' : '0';
+        return bits;
+    };
+    StatsMcCorrection::RejectMask reject;
+    StatsMcCorrection::fdr(pv, 0.05, StatsMcCorrection::FdrMethod::Independent, &reject);
+    QCOMPARE(reject.rows(), pv.rows());
+    QCOMPARE(mask(reject), QStringLiteral("10001000"));
+    StatsMcCorrection::fdr(pv, 0.02, StatsMcCorrection::FdrMethod::Independent, &reject);
+    QCOMPARE(mask(reject), QStringLiteral("00000000"));
+    StatsMcCorrection::bonferroni(pv, 0.05, &reject);
+    QCOMPARE(mask(reject), QStringLiteral("00001000"));
+
+    // Step-up: 0.02 fails its own bound (1/3 * 0.05) but is rejected with the later 0.021
+    MatrixXd stepUp(1, 3);
+    stepUp << 0.03, 0.021, 0.02;
+    StatsMcCorrection::fdr(stepUp, 0.05, StatsMcCorrection::FdrMethod::Independent, &reject);
+    QCOMPARE(mask(reject), QStringLiteral("111"));
 }
 
 //=============================================================================================================

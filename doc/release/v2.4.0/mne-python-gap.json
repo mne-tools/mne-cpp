@@ -9,8 +9,8 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 199,
-      "partial": 100,
+      "implemented": 200,
+      "partial": 99,
       "missing": 136,
       "not-applicable": 8
     },
@@ -94,8 +94,8 @@
         "not-applicable": 2
       },
       "stats": {
-        "implemented": 9,
-        "partial": 2,
+        "implemented": 10,
+        "partial": 1,
         "missing": 6,
         "not-applicable": 0
       },
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 57.2
+    "parity_percent": 57.4
   },
   "apis": [
     {
@@ -4695,7 +4695,7 @@
       "domain": "stats",
       "status": "implemented",
       "mne_cpp": "STSLIB::StatsMcCorrection::bonferroni",
-      "note": "corrected p-values only, no reject mask",
+      "note": "",
       "evidence": "parity-record"
     },
     {
@@ -4706,6 +4706,17 @@
       "domain": "stats",
       "status": "implemented",
       "mne_cpp": "StatsCluster f-test",
+      "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.stats.fdr_correction",
+      "name": "fdr_correction",
+      "submodule": "stats",
+      "kind": "function",
+      "domain": "stats",
+      "status": "implemented",
+      "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
       "note": "",
       "evidence": "parity-record"
     },
@@ -4794,17 +4805,6 @@
       "domain": "stats",
       "status": "partial",
       "mne_cpp": "StatsAdjacency (partial)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.stats.fdr_correction",
-      "name": "fdr_correction",
-      "submodule": "stats",
-      "kind": "function",
-      "domain": "stats",
-      "status": "partial",
-      "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
       "note": "",
       "evidence": "parity-record"
     },

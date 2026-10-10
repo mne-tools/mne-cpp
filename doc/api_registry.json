@@ -13676,7 +13676,7 @@
         "python": "mne.stats.bonferroni_correction",
         "status": "implemented",
         "mne_cpp": "STSLIB::StatsMcCorrection::bonferroni",
-        "note": "corrected p-values only, no reject mask",
+        "note": "",
         "test": "test_sts_cluster"
       },
       {
@@ -13713,7 +13713,7 @@
       },
       {
         "python": "mne.stats.fdr_correction",
-        "status": "partial",
+        "status": "implemented",
         "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
         "note": "",
         "test": "test_sts_cluster"

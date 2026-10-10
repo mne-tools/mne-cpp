@@ -8,11 +8,11 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **199**
-- Partial: **100**
+- Implemented: **200**
+- Partial: **99**
 - Missing: **136**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **57.2%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **57.4%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -31,7 +31,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Source Space & Morphing | 15 | 5 | 7 | 0 | 27 |
 | Time-Frequency | 6 | 22 | 13 | 0 | 41 |
 | Decoding & Machine Learning | 4 | 6 | 12 | 2 | 24 |
-| Statistics | 9 | 2 | 6 | 0 | 17 |
+| Statistics | 10 | 1 | 6 | 0 | 17 |
 | Simulation | 0 | 3 | 7 | 0 | 10 |
 | Visualisation | 0 | 0 | 0 | 1 | 1 |
 
@@ -316,7 +316,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
 | `mne.stats.combine_adjacency` | partial | StatsAdjacency (partial) |  |
-| `mne.stats.fdr_correction` | partial | STSLIB::StatsMcCorrection::fdr |  |
 | `mne.stats.bootstrap_confidence_interval` | missing | — | bootstrap CI not ported |
 | `mne.stats.f_mway_rm` | missing | — | RM-ANOVA not ported |
 | `mne.stats.f_threshold_mway_rm` | missing | — | RM-ANOVA threshold not ported |
@@ -341,5 +340,5 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 ## Already implemented (do not re-implement)
 
-199 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
+200 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
 

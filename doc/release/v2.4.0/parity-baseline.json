@@ -94,7 +94,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **57.2%",
+      "text": "parity: **57.4%",
       "status": "generated-with-denominator"
     }
   ],
@@ -2559,7 +2559,7 @@
       "source": "parity",
       "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
       "python": "mne.stats.fdr_correction",
-      "claimed": "partial",
+      "claimed": "implemented",
       "test": "test_sts_cluster",
       "evidence": "cross-validated-static"
     },

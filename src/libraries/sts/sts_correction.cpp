@@ -40,11 +40,11 @@ using namespace Eigen;
 // DEFINE METHODS
 //=============================================================================================================
 
-MatrixXd StatsMcCorrection::bonferroni(const MatrixXd& pValues)
+MatrixXd StatsMcCorrection::bonferroni(const MatrixXd& pValues, double alpha, RejectMask* reject)
 {
-    const int n = static_cast<int>(pValues.size());
-    MatrixXd corrected = pValues * static_cast<double>(n);
-    corrected = corrected.cwiseMin(1.0);
+    const MatrixXd corrected = (pValues * static_cast<double>(pValues.size())).cwiseMin(1.0);
+    if (reject)
+        *reject = corrected.array() < alpha;
     return corrected;
 }
 
@@ -85,38 +85,41 @@ MatrixXd StatsMcCorrection::holmBonferroni(const MatrixXd& pValues)
 
 //=============================================================================================================
 
-MatrixXd StatsMcCorrection::fdr(const MatrixXd& pValues, double alpha)
+MatrixXd StatsMcCorrection::fdr(const MatrixXd& pValues, double alpha, FdrMethod method, RejectMask* reject)
 {
-    Q_UNUSED(alpha);
-
     const int n = static_cast<int>(pValues.size());
 
-    // Flatten to a vector with indices
     std::vector<std::pair<double, int>> indexed(n);
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i)
         indexed[i] = {pValues.data()[i], i};
-    }
-
-    // Sort ascending by p-value
     std::sort(indexed.begin(), indexed.end());
 
-    // Compute adjusted p-values: adjusted_p = p * n / rank (rank is 1-based)
+    // Benjamini-Yekutieli divides the rank factor by the harmonic number of n
+    double harmonic = 1.0;
+    if (method == FdrMethod::NegativelyCorrelated) {
+        harmonic = 0.0;
+        for (int k = 1; k <= n; ++k)
+            harmonic += 1.0 / k;
+    }
+
     std::vector<double> adjusted(n);
+    int lastRejected = -1;
     for (int i = 0; i < n; ++i) {
-        int rank = i + 1;
-        adjusted[i] = indexed[i].first * static_cast<double>(n) / static_cast<double>(rank);
+        const double factor = (i + 1) / (static_cast<double>(n) * harmonic);
+        adjusted[i] = indexed[i].first / factor;
+        if (indexed[i].first < factor * alpha)
+            lastRejected = i;
     }
-
-    // Enforce monotonicity: from last to first, corrected[i] = min(corrected[i], corrected[i+1])
-    for (int i = n - 2; i >= 0; --i) {
+    for (int i = n - 2; i >= 0; --i)
         adjusted[i] = std::min(adjusted[i], adjusted[i + 1]);
-    }
 
-    // Cap at 1.0 and place back in original order
     MatrixXd corrected(pValues.rows(), pValues.cols());
+    if (reject)
+        *reject = RejectMask::Constant(pValues.rows(), pValues.cols(), false);
     for (int i = 0; i < n; ++i) {
         corrected.data()[indexed[i].second] = std::min(adjusted[i], 1.0);
+        if (reject)
+            reject->data()[indexed[i].second] = i <= lastRejected;
     }
-
     return corrected;
 }

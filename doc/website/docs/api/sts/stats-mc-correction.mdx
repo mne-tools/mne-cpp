@@ -31,14 +31,20 @@ const MatrixXd pFdr = StatsMcCorrection::fdr(pValues); // Benjamini-Hochberg adj
 
 ## Static Methods
 
-### bonferroni(pValues)
+### bonferroni(pValues, alpha, reject)
 
-Bonferroni correction: corrected_p = min(p * n, 1.0).
+Bonferroni correction as mne.stats.bonferroni_correction: corrected_p = min(p * n, 1.0).
 
 **Parameters:**
 
 - **pValues** : *const Eigen::MatrixXd &*
   Matrix of p-values.
+
+- **alpha** : *double*
+  Significance level for `reject`.
+
+- **reject** : *RejectMask **
+  If not null, receives corrected_p &lt; alpha.
 
 **Returns:**
 
@@ -61,9 +67,9 @@ Holm-Bonferroni step-down correction.
 
 ---
 
-### fdr(pValues, alpha)
+### fdr(pValues, alpha, method, reject)
 
-False Discovery Rate (Benjamini-Hochberg) correction.
+False Discovery Rate correction as mne.stats.fdr_correction.
 
 **Parameters:**
 
@@ -71,7 +77,13 @@ False Discovery Rate (Benjamini-Hochberg) correction.
   Matrix of p-values.
 
 - **alpha** : *double*
-  Significance level (default 0.05, used for reference only; correction is applied regardless).
+  False discovery rate for `reject`.
+
+- **method** : *FdrMethod*
+  Benjamini-Hochberg or Benjamini-Yekutieli.
+
+- **reject** : *RejectMask **
+  If not null, receives the hypotheses rejected by the step-up procedure.
 
 **Returns:**
 

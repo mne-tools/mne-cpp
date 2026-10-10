@@ -62,13 +62,30 @@ class STSSHARED_EXPORT StatsMcCorrection
 public:
     //=========================================================================================================
     /**
-     * Bonferroni correction: corrected_p = min(p * n, 1.0).
+     * Hypotheses rejected by a correction, same shape as the p-values.
+     */
+    using RejectMask = Eigen::Array<bool, Eigen::Dynamic, Eigen::Dynamic>;
+
+    /**
+     * Dependence assumed by the FDR correction (mne's method "indep" / "negcorr").
+     */
+    enum class FdrMethod
+    {
+        Independent,         /**< Benjamini-Hochberg: independent or positively correlated tests. */
+        NegativelyCorrelated /**< Benjamini-Yekutieli: arbitrary dependence. */
+    };
+
+    //=========================================================================================================
+    /**
+     * Bonferroni correction as mne.stats.bonferroni_correction: corrected_p = min(p * n, 1.0).
      *
-     * @param[in] pValues  Matrix of p-values.
+     * @param[in]  pValues  Matrix of p-values.
+     * @param[in]  alpha    Significance level for @p reject.
+     * @param[out] reject   If not null, receives corrected_p < alpha.
      *
      * @return Corrected p-values (same shape as input).
      */
-    static Eigen::MatrixXd bonferroni(const Eigen::MatrixXd& pValues);
+    static Eigen::MatrixXd bonferroni(const Eigen::MatrixXd& pValues, double alpha = 0.05, RejectMask* reject = nullptr);
 
     //=========================================================================================================
     /**
@@ -82,14 +99,19 @@ public:
 
     //=========================================================================================================
     /**
-     * False Discovery Rate (Benjamini-Hochberg) correction.
+     * False Discovery Rate correction as mne.stats.fdr_correction.
      *
-     * @param[in] pValues  Matrix of p-values.
-     * @param[in] alpha    Significance level (default 0.05, used for reference only; correction is applied regardless).
+     * @param[in]  pValues  Matrix of p-values.
+     * @param[in]  alpha    False discovery rate for @p reject.
+     * @param[in]  method   Benjamini-Hochberg or Benjamini-Yekutieli.
+     * @param[out] reject   If not null, receives the hypotheses rejected by the step-up procedure.
      *
      * @return Corrected p-values (same shape as input).
      */
-    static Eigen::MatrixXd fdr(const Eigen::MatrixXd& pValues, double alpha = 0.05);
+    static Eigen::MatrixXd fdr(const Eigen::MatrixXd& pValues,
+                               double alpha = 0.05,
+                               FdrMethod method = FdrMethod::Independent,
+                               RejectMask* reject = nullptr);
 };
 
 } // namespace STSLIB
