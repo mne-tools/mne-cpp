@@ -23,6 +23,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_evoked_set.h>
 
 #include <QAction>
 #include <QDialog>
@@ -197,6 +198,24 @@ void TestMneBrowseApp::recomputesEvokedLikePython()
         QVERIFY2(std::abs(evoked->data.row(eeg).sum() - expected[row].eegSum) < 1e-5 * std::abs(expected[row].eegSum),
                  qPrintable(QString::number(evoked->data.row(eeg).sum(), 'g', 17)));
         QVERIFY(std::abs(evoked->data(eeg, 60) - expected[row].eeg60) < 1e-5 * std::abs(expected[row].eeg60));
+    }
+
+    // Save Evoked (fif)... writes the same averages
+    QTemporaryDir dir;
+    const QString avePath = dir.filePath("recomputed-ave.fif");
+    answerNextModal([avePath](QWidget* pModal) {
+        auto* dialog = qobject_cast<QFileDialog*>(pModal);
+        dialog->setDirectory(QFileInfo(avePath).absolutePath());
+        dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(avePath).fileName());
+        static_cast<QDialog*>(dialog)->accept();
+    });
+    findAction(window, QStringLiteral("Save Evoked (fif)..."))->trigger();
+    QFile aveFile(avePath);
+    const FIFFLIB::FiffEvokedSet saved(aveFile);
+    QCOMPARE(saved.evoked.size(), 2);
+    for (int row = 0; row < 2; ++row) {
+        QCOMPARE(saved.evoked[row].nave, 6);
+        QVERIFY(saved.evoked[row].data.isApprox(model->getEvoked(row)->data, 1e-6));
     }
     window->hide();
     QCoreApplication::processEvents();
