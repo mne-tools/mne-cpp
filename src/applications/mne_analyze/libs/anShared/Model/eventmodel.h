@@ -481,6 +481,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns the sample of the first selected event, as listed in the event table.
+     *
+     * @return the absolute sample, or -1 if no listed event is selected.
+     */
+    int firstSelectedSample() const;
+
+    //=========================================================================================================
+    /**
      * Updates selection based on input list
      *
      * @param[in] indexList     List of selected indeces.

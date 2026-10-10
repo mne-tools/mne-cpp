@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38051494577 (comm
 
 ## Registration
 
-- Test directories: 256
-- Registered unconditionally: 249
+- Test directories: 257
+- Registered unconditionally: 250
 - Registered behind a CMake condition or early `return()`: 4
 - Not registered: 3
 - Registered without `LABELS`: 0
@@ -18,12 +18,12 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38051494577 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 280 | 0 | 0 | `test_analyze_events` |
-| macos-26-qt-min | 280 | 0 | 0 | `test_analyze_events` |
-| ubuntu-24.04 | 280 | 0 | 0 | `test_analyze_events` |
-| ubuntu-24.04-qt-min | 280 | 0 | 0 | `test_analyze_events` |
-| windows-2025-vs2026 | 280 | 0 | 2 | `test_analyze_events` |
-| windows-2025-vs2026-qt-min | 280 | 0 | 2 | `test_analyze_events` |
+| macos-26 | 280 | 0 | 0 | `test_analyze_events`, `test_analyze_rawdataviewer` |
+| macos-26-qt-min | 280 | 0 | 0 | `test_analyze_events`, `test_analyze_rawdataviewer` |
+| ubuntu-24.04 | 280 | 0 | 0 | `test_analyze_events`, `test_analyze_rawdataviewer` |
+| ubuntu-24.04-qt-min | 280 | 0 | 0 | `test_analyze_events`, `test_analyze_rawdataviewer` |
+| windows-2025-vs2026 | 280 | 0 | 2 | `test_analyze_events`, `test_analyze_rawdataviewer` |
+| windows-2025-vs2026-qt-min | 280 | 0 | 2 | `test_analyze_events`, `test_analyze_rawdataviewer` |
 
 ## Run-time requirements (lexical signals)
 
@@ -32,9 +32,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38051494577 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 19 |
-| test-data | 110 |
-| GUI (`QTEST_MAIN`) | 38 |
-| Contains `QSKIP` | 80 |
+| test-data | 111 |
+| GUI (`QTEST_MAIN`) | 39 |
+| Contains `QSKIP` | 81 |
 
 ## Conditional and unregistered tests
 

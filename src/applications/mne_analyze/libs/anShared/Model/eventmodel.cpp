@@ -753,6 +753,18 @@ std::vector<uint> EventModel::getEventSelection() const
 
 //=============================================================================================================
 
+int EventModel::firstSelectedSample() const
+{
+    if (m_listEventSelection.empty())
+        return -1;
+    // Selection indices are rows of the table, which lists the events of the selected groups
+    auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
+    const uint row = m_listEventSelection.front();
+    return row < events->size() ? events->at(row).sample : -1;
+}
+
+//=============================================================================================================
+
 void EventModel::updateSelectedGroups(const QList<QModelIndex>& indexList)
 {
     clearGroupSelection();

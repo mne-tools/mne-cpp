@@ -6,9 +6,9 @@
     "commit": "bb3a55f70811f45e0e9eb5a970afb26376cfb62a"
   },
   "summary": {
-    "directories": 256,
+    "directories": 257,
     "registration": {
-      "unconditional": 249,
+      "unconditional": 250,
       "conditional": 4,
       "unregistered": 3
     },
@@ -20,10 +20,10 @@
       "freesurfer": 2,
       "python": 9,
       "sample-data": 19,
-      "test-data": 110
+      "test-data": 111
     },
-    "gui": 38,
-    "with_qskip": 80,
+    "gui": 39,
+    "with_qskip": 81,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -32,7 +32,8 @@
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_events"
+          "test_analyze_events",
+          "test_analyze_rawdataviewer"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -70,7 +71,8 @@
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_events"
+          "test_analyze_events",
+          "test_analyze_rawdataviewer"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -108,7 +110,8 @@
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_events"
+          "test_analyze_events",
+          "test_analyze_rawdataviewer"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -146,7 +149,8 @@
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_events"
+          "test_analyze_events",
+          "test_analyze_rawdataviewer"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -184,7 +188,8 @@
         "failures": 0,
         "skipped": 2,
         "registered_not_executed": [
-          "test_analyze_events"
+          "test_analyze_events",
+          "test_analyze_rawdataviewer"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -222,7 +227,8 @@
         "failures": 0,
         "skipped": 2,
         "registered_not_executed": [
-          "test_analyze_events"
+          "test_analyze_events",
+          "test_analyze_rawdataviewer"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -414,6 +420,42 @@
       },
       "add_test_names": [
         "test_analyze_events"
+      ],
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_analyze_rawdataviewer",
+      "cmake": "src/testframes/test_analyze_rawdataviewer/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_analyze_rawdataviewer"
       ],
       "labels": [
         "gui",
