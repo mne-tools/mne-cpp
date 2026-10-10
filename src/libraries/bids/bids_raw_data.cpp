@@ -51,31 +51,42 @@ namespace
 {
 
 //=========================================================================================================
-int bidsUnitToFiffUnit(const QString& sUnit)
+/** channels.tsv units and their FIFF unit and multiplier (mne-bids UNITS_BIDS_TO_FIFF_MAP and UNITS_FIFF_TO_BIDS_MAP). */
+struct BidsUnit
 {
-    QString u = sUnit.toLower().trimmed();
-    if (u == "v" || u == "\u00B5v" || u == "uv" || u == "mv" || u == "nv")
-        return FIFF_UNIT_V;
-    if (u == "t" || u == "ft" || u == "pt")
-        return FIFF_UNIT_T;
-    return FIFF_UNIT_NONE;
-}
+    const char16_t* bids;
+    int unit;
+    int mul;
+};
+const BidsUnit bidsUnits[] = {
+    {u"V", FIFF_UNIT_V, FIFF_UNITM_NONE},
+    {u"\u00B5V", FIFF_UNIT_V, FIFF_UNITM_MU},
+    {u"uV", FIFF_UNIT_V, FIFF_UNITM_MU},
+    {u"mV", FIFF_UNIT_V, FIFF_UNITM_M},
+    {u"nV", FIFF_UNIT_V, FIFF_UNITM_N},
+    {u"T", FIFF_UNIT_T, FIFF_UNITM_NONE},
+    {u"fT", FIFF_UNIT_T, FIFF_UNITM_F},
+    {u"pT", FIFF_UNIT_T, FIFF_UNITM_P},
+    {u"T/m", FIFF_UNIT_T_M, FIFF_UNITM_NONE},
+    {u"rad", FIFF_UNIT_RAD, FIFF_UNITM_NONE},
+    {u"S", FIFF_UNIT_MHO, FIFF_UNITM_NONE},
+    {u"oC", FIFF_UNIT_CEL, FIFF_UNITM_NONE},
+    {u"M", FIFF_UNIT_MOL, FIFF_UNITM_NONE},
+    {u"arbitrary", FIFF_UNIT_NONE, FIFF_UNITM_NONE},
+};
 
 //=========================================================================================================
-int bidsUnitToFiffUnitMul(const QString& sUnit)
+/** FIFF unit of a channels.tsv unit as mne-bids UNITS_BIDS_TO_FIFF_MAP (unknown units are left alone); the multiplier keeps the stored unit for writing. */
+void bidsUnitToFiff(const QString& sUnit, int& unit, int& unitMul)
 {
-    QString u = sUnit.toLower().trimmed();
-    if (u == "\u00B5v" || u == "uv" || u == "\u00B5s" || u == "us")
-        return FIFF_UNITM_MU;
-    if (u == "mv")
-        return FIFF_UNITM_M;
-    if (u == "nv")
-        return FIFF_UNITM_N;
-    if (u == "ft")
-        return FIFF_UNITM_F;
-    if (u == "pt")
-        return FIFF_UNITM_P;
-    return FIFF_UNITM_NONE;
+    const QString u = sUnit.trimmed();
+    for (const BidsUnit& e : bidsUnits) {
+        if (u == QStringView(e.bids)) {
+            unit = e.unit;
+            unitMul = e.mul;
+            return;
+        }
+    }
 }
 
 //=========================================================================================================
@@ -103,10 +114,7 @@ void applyChannelsTsv(FiffInfo& info, const QList<BidsChannel>& channels)
         if (bidsToFiff.contains(typeUpper))
             fiffCh.kind = bidsToFiff[typeUpper];
 
-        if (!rec->units.isEmpty() && rec->units != "n/a") {
-            fiffCh.unit = bidsUnitToFiffUnit(rec->units);
-            fiffCh.unit_mul = bidsUnitToFiffUnitMul(rec->units);
-        }
+        bidsUnitToFiff(rec->units, fiffCh.unit, fiffCh.unit_mul);
 
         if (rec->status.toLower() == "bad")
             info.bads.append(fiffCh.ch_name);
@@ -219,27 +227,14 @@ void readSidecarJson(const QString& sFilePath,
 //=========================================================================================================
 QString fiffUnitToBidsString(int unit, int unitMul)
 {
-    if (unit == FIFF_UNIT_V) {
-        switch (unitMul) {
-            case FIFF_UNITM_MU:
-                return QStringLiteral("\u00B5V");
-            case FIFF_UNITM_M:
-                return QStringLiteral("mV");
-            case FIFF_UNITM_N:
-                return QStringLiteral("nV");
-            default:
-                return QStringLiteral("V");
-        }
+    for (const BidsUnit& e : bidsUnits) {
+        if (e.unit == unit && e.mul == unitMul && e.unit != FIFF_UNIT_NONE)
+            return QString::fromUtf16(e.bids);
     }
-    if (unit == FIFF_UNIT_T) {
-        switch (unitMul) {
-            case FIFF_UNITM_F:
-                return QStringLiteral("fT");
-            case FIFF_UNITM_P:
-                return QStringLiteral("pT");
-            default:
-                return QStringLiteral("T");
-        }
+    // A multiplier BIDS has no name for: the SI unit
+    for (const BidsUnit& e : bidsUnits) {
+        if (e.unit == unit && e.mul == FIFF_UNITM_NONE && e.unit != FIFF_UNIT_NONE)
+            return QString::fromUtf16(e.bids);
     }
     return QStringLiteral("n/a");
 }

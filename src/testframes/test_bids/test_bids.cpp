@@ -633,6 +633,36 @@ void TestBids::testWriteRoundTrip()
     QCOMPARE(edfBack.events[1].trialType, QStringLiteral("visual"));
     QCOMPARE(edfBack.events[2].trialType, QStringLiteral("response"));
     QVERIFY(edfBack.raw.info.bads.contains(QStringLiteral("EEG O1")));
+
+    // channels.tsv units other than volts, as mne_bids.read_raw_bids: known ones set the unit, unknown ones keep it
+    QFile channelsTsv(edfDst.channelsTsvPath().filePath());
+    QVERIFY(channelsTsv.open(QIODevice::ReadOnly));
+    QStringList rows = QString::fromUtf8(channelsTsv.readAll()).split('\n');
+    channelsTsv.close();
+    const QStringList newUnits{"oC", "S", "foo"};
+    for (int i = 0; i < newUnits.size(); ++i) {
+        QStringList cols = rows[i + 1].split('\t');
+        cols[2] = newUnits[i];
+        rows[i + 1] = cols.join('\t');
+    }
+    QVERIFY(channelsTsv.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    channelsTsv.write(rows.join('\n').toUtf8());
+    channelsTsv.close();
+    BidsRawData units = BidsRawData::read(edfDst);
+    QVERIFY(units.isValid());
+    QCOMPARE(units.raw.info.chs[0].unit, FIFF_UNIT_CEL);
+    QCOMPARE(units.raw.info.chs[1].unit, FIFF_UNIT_MHO);
+    QCOMPARE(units.raw.info.chs[2].unit, FIFF_UNIT_V);
+
+    // ... and are written back under their BIDS names
+    BIDSPath unitsDst(tmpDir.path(), "03", "01", "rest", "eeg", "eeg", ".edf");
+    QVERIFY(units.write(unitsDst, edfDst.filePath(), opts) == unitsDst);
+    QFile unitsTsv(unitsDst.channelsTsvPath().filePath());
+    QVERIFY(unitsTsv.open(QIODevice::ReadOnly));
+    const QStringList writtenRows = QString::fromUtf8(unitsTsv.readAll()).split('\n');
+    QCOMPARE(writtenRows[1].split('\t')[2], QStringLiteral("oC"));
+    QCOMPARE(writtenRows[2].split('\t')[2], QStringLiteral("S"));
+    QCOMPARE(writtenRows[3].split('\t')[2], QStringLiteral("V")); // the unknown unit left the samples' SI unit
 }
 
 //=============================================================================================================
