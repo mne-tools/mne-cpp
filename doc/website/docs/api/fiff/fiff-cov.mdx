@@ -227,7 +227,7 @@ Ported from compute_cov.c (MNE-C).
   Whether to apply baseline correction before covariance computation.
 
 - **removeMean** : *bool*
-  Whether to remove sample mean from the covariance estimate.
+  Whether to remove each event code's average response from the epochs (mne keep_sample_mean=False).
 
 - **ignoreMask** : *unsigned int*
   Bit mask ANDed away from event codes before matching (default: 0 = no masking).

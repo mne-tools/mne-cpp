@@ -375,10 +375,10 @@ int main(int argc, char* argv[])
     const FiffCov noiseCov = FiffCov::compute_from_epochs(raw, events.events, {1, 2}, preStim.tmin, preStim.tmax, preStim.bmin, preStim.bmax, preStim.doBaseline,
                                                           covariance.removeSampleMean, preStim.ignore, preStim.delay, &covariance.rej);
     //! [mne_cov_description_usage]
-    // mne.compute_covariance of mne.Epochs(event_id=[1, 2], tmin=-0.2, tmax=0, baseline=None, reject=dict(eeg=14.23e-9)):
-    // 6 of 12 epochs kept, nfree 365, C[EEG001, EEG001] = 8.497450692077036e-18
+    // mne.compute_covariance(mne.Epochs(event_id=[1, 2], tmin=-0.2, tmax=0, baseline=None, reject=dict(eeg=14.23e-9)),
+    // keep_sample_mean=False, rank="full"): 6 of 12 epochs kept, nfree 365, C[EEG001, EEG001] = 8.784207369943824e-18
     const int eeg001 = noiseCov.names.indexOf("EEG001");
-    ok &= expect(preStim.events == QVector<unsigned int>({1, 2}) && noiseCov.nfree == 365 && near(noiseCov.data(eeg001, eeg001), 8.497450692077036e-18, 1e-6),
+    ok &= expect(preStim.events == QVector<unsigned int>({1, 2}) && noiseCov.nfree == 365 && near(noiseCov.data(eeg001, eeg001), 8.784207369943824e-18, 1e-6),
                  QString("MNEDescriptionParser: a .cov description with EEG rejection gives nfree %1 like mne.compute_covariance").arg(noiseCov.nfree));
 
     //! [mne_meas_data_usage]

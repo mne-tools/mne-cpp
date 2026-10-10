@@ -483,23 +483,17 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
     }
 
     MatrixXd covAccum = MatrixXd::Zero(nchan, nchan);
-    VectorXd meanAccum = VectorXd::Zero(nchan);
+    // Per event code: sum of the accepted epochs and their count (the evoked response is removed per code)
+    QList<MatrixXd> epochSums(eventCodes.size(), MatrixXd::Zero(nchan, ns));
+    QList<int> epochCounts(eventCodes.size(), 0);
     int totalSamples = 0;
-    int nAccepted = 0;
 
     for (int k = 0; k < events.rows(); ++k) {
         int evFrom = events(k, 1) & ~static_cast<int>(ignoreMask);
         int evTo = events(k, 2) & ~static_cast<int>(ignoreMask);
 
-        // Check if event matches any of the desired event codes
-        bool match = false;
-        for (int ec = 0; ec < eventCodes.size(); ++ec) {
-            if (evFrom == 0 && evTo == eventCodes[ec]) {
-                match = true;
-                break;
-            }
-        }
-        if (!match)
+        const int iCode = evFrom == 0 ? static_cast<int>(eventCodes.indexOf(evTo)) : -1;
+        if (iCode < 0)
             continue;
 
         int evSample = events(k, 0);
@@ -532,14 +526,12 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
             }
         }
 
-        // Accumulate
-        if (removeMean) {
-            VectorXd epochMean = epochData.rowwise().mean();
-            meanAccum += epochMean * static_cast<double>(ns);
-        }
         covAccum += epochData * epochData.transpose();
+        if (removeMean) {
+            epochSums[iCode] += epochData;
+        }
+        epochCounts[iCode]++;
         totalSamples += ns;
-        nAccepted++;
     }
 
     if (totalSamples < 2) {
@@ -548,8 +540,19 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
     }
 
     if (removeMean) {
-        VectorXd grandMean = meanAccum / static_cast<double>(totalSamples);
-        cov.data = (covAccum / static_cast<double>(totalSamples - 1)) - (grandMean * grandMean.transpose()) * (static_cast<double>(totalSamples) / (totalSamples - 1));
+        // As mne.compute_covariance(keep_sample_mean=False) and MNE-C compute_cov: subtract each code's evoked response
+        double norm = 0.0;
+        for (int c = 0; c < eventCodes.size(); ++c) {
+            if (epochCounts[c] > 0) {
+                covAccum -= epochSums[c] * epochSums[c].transpose() / static_cast<double>(epochCounts[c]);
+                norm += static_cast<double>(ns) * (epochCounts[c] - 1);
+            }
+        }
+        if (norm <= 0.0) {
+            qWarning() << "[FiffCov::compute_from_epochs] Removing the sample mean needs two epochs of one event code.";
+            return cov;
+        }
+        cov.data = covAccum / norm;
     } else {
         cov.data = covAccum / static_cast<double>(totalSamples - 1);
     }
@@ -562,7 +565,7 @@ FiffCov FiffCov::compute_from_epochs(const FiffRawData& raw,
     cov.projs = raw.info.projs;
 
     qInfo() << "[FiffCov::compute_from_epochs] Computed:" << nchan << "channels,"
-            << nAccepted << "epochs," << totalSamples << "total samples.";
+            << totalSamples / ns << "epochs," << totalSamples << "total samples.";
 
     return cov;
 }

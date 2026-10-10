@@ -258,9 +258,9 @@ void TestFiffCov::computeFromEpochs_sampleRaw()
 
 void TestFiffCov::computeFromEpochs_matchesPython_data()
 {
-    // mne.Epochs(raw, find_events(raw), event_id=codes, tmin, tmax, baseline, proj=False, picks="all",
-    // reject=None) with events shifted by round(delay * sfreq); C = sum_e X X^T / (N - 1), minus
-    // N/(N - 1) m m^T with the grand mean m if the mean is removed. C[MEG0113], C[EEG001], C[MEG0113,EEG001].
+    // mne.compute_covariance(mne.Epochs(raw, find_events(raw), event_id=codes, tmin, tmax, baseline, proj=False,
+    // reject) with events shifted by round(delay * sfreq), keep_sample_mean=not removeMean, method="empirical",
+    // rank="full") (mne 1.11.0). C[MEG0113], C[EEG001], C[MEG0113,EEG001].
     QTest::addColumn<QList<int>>("codes");
     QTest::addColumn<float>("tmin");
     QTest::addColumn<float>("tmax");
@@ -272,14 +272,14 @@ void TestFiffCov::computeFromEpochs_matchesPython_data()
     QTest::addColumn<Vector3d>("ref");
     QTest::addColumn<double>("eegReject");
     QTest::newRow("baseline whole window") << QList<int>{1, 2} << -0.2f << 0.0f << true << 0.0f << true << 0.0f << 731
-                                           << Vector3d(2.652924332488991e-30, 7.054628857691069e-17, 5.769123724874705e-24) << 0.0;
+                                           << Vector3d(2.6601752968048106e-30, 6.996080895615044e-17, 5.42158928127522e-24) << 0.0;
     QTest::newRow("pre-stimulus baseline, mean kept") << QList<int>{3} << -0.1f << 0.1f << true << 0.0f << false << 0.0f << 365
                                                       << Vector3d(1.4593490861834027e-30, 6.011250385749755e-18, 2.5599899614022574e-25) << 0.0;
     QTest::newRow("no baseline, 50 ms delay") << QList<int>{1, 2, 3, 4} << -0.2f << 0.0f << false << 0.0f << true << 0.05f << 1402
-                                              << Vector3d(2.7808598052155747e-30, 1.5451764897172425e-16, 7.910586499046573e-24) << 0.0;
+                                              << Vector3d(2.9895179185798132e-30, 1.660296559341988e-16, 9.214041994032018e-24) << 0.0;
     // reject=dict(eeg=1.4230782369752743e-08), the median EEG peak-to-peak: 6 of 12 epochs kept
     QTest::newRow("EEG rejection") << QList<int>{1, 2} << -0.2f << 0.0f << false << 0.0f << true << 0.0f << 365
-                                   << Vector3d(2.1310039616688094e-30, 8.497450692077036e-18, -2.3499708997499783e-26) << 1.4230782369752743e-08;
+                                   << Vector3d(1.9540370059529494e-30, 8.784207369943824e-18, -2.2173673269083468e-25) << 1.4230782369752743e-08;
 }
 
 void TestFiffCov::computeFromEpochs_matchesPython()

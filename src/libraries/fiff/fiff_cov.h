@@ -184,7 +184,7 @@ public:
      * @param[in] bmin          Baseline start (seconds, relative to event). Only used if doBaseline is true.
      * @param[in] bmax          Baseline end (seconds, relative to event). Only used if doBaseline is true.
      * @param[in] doBaseline    Whether to apply baseline correction before covariance computation.
-     * @param[in] removeMean    Whether to remove sample mean from the covariance estimate.
+     * @param[in] removeMean    Whether to remove each event code's average response from the epochs (mne keep_sample_mean=False).
      * @param[in] ignoreMask    Bit mask ANDed away from event codes before matching (default: 0 = no masking).
      * @param[in] delay         Delay in seconds applied to the event sample before extracting the epoch (default: 0).
      * @param[in] rej           If given, epochs failing these limits (before baseline, as MNE-C compute_cov) are skipped.
