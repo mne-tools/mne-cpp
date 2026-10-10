@@ -45,6 +45,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     analyze_events
     anShared
+    mne_events
     mne_disp
     mne_mne
     mne_fiff
