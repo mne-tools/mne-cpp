@@ -140,7 +140,7 @@ QMenu* DataLoader::getMenu()
             this, &DataLoader::onLoadFilePressed);
 
     QAction* pActionLoadScanSession = new QAction(tr("Open MNE Scan Session"));
-    pActionLoadFile->setStatusTip(tr("Load a data file"));
+    pActionLoadScanSession->setStatusTip(tr("Load a recording saved by MNE Scan"));
     connect(pActionLoadScanSession, &QAction::triggered,
             this, &DataLoader::onLoadScanSessionPressed);
 
@@ -155,19 +155,19 @@ QMenu* DataLoader::getMenu()
             this, &DataLoader::onLoadSessionPressed);
 
     QAction* pActionSaveData = new QAction(tr("Save data"));
-    pActionLoadFile->setStatusTip(tr("Save the selected data file"));
+    pActionSaveData->setStatusTip(tr("Save the selected data file"));
     connect(pActionSaveData, &QAction::triggered, [=, this] {
         onSaveFilePressed(DATA_FILE);
     });
 
     QAction* pActionSaveAvg = new QAction(tr("Save average"));
-    pActionLoadFile->setStatusTip(tr("Save the selected data file"));
+    pActionSaveAvg->setStatusTip(tr("Save the selected average"));
     connect(pActionSaveAvg, &QAction::triggered, [=, this] {
         onSaveFilePressed(AVERAGE_FILE);
     });
 
     QAction* pActionSaveAnn = new QAction(tr("Save events"));
-    pActionLoadFile->setStatusTip(tr("Save the selected data file"));
+    pActionSaveAnn->setStatusTip(tr("Save the events of the selected data file"));
     connect(pActionSaveAnn, &QAction::triggered, [=, this] {
         onSaveFilePressed(EVENT_FILE);
     });

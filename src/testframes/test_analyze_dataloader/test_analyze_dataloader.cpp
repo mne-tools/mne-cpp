@@ -184,6 +184,9 @@ void TestAnalyzeDataLoader::savesTheSelectedAverage()
     std::unique_ptr<QMenu> menu(loader.getMenu());
     QAction* pSave = findAction(menu.get(), QStringLiteral("Save average"));
     QVERIFY(pSave);
+    // Each action's status tip describes that action
+    QCOMPARE(findAction(menu.get(), QStringLiteral("Open File"))->statusTip(), QStringLiteral("Load a data file"));
+    QCOMPARE(pSave->statusTip(), QStringLiteral("Save the selected average"));
     chooseFileInNextDialog(outPath);
     pSave->trigger();
     QVERIFY(QFile::exists(outPath));
