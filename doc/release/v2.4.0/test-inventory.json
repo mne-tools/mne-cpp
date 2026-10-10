@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_tests.py",
   "ci_source": {
-    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38044849533",
-    "commit": "abbf6c29b8c6b6d6fa33f56c368b1cd49fecde1b"
+    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38051494577",
+    "commit": "bb3a55f70811f45e0e9eb5a970afb26376cfb62a"
   },
   "summary": {
     "directories": 256,
@@ -28,11 +28,10 @@
     "retry_paths": [],
     "ci": {
       "macos-26": {
-        "executed": 279,
+        "executed": 280,
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_coregistration",
           "test_analyze_events"
         ],
         "executed_not_in_inventory": [
@@ -67,11 +66,10 @@
         ]
       },
       "macos-26-qt-min": {
-        "executed": 279,
+        "executed": 280,
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_coregistration",
           "test_analyze_events"
         ],
         "executed_not_in_inventory": [
@@ -106,11 +104,10 @@
         ]
       },
       "ubuntu-24.04": {
-        "executed": 279,
+        "executed": 280,
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_coregistration",
           "test_analyze_events"
         ],
         "executed_not_in_inventory": [
@@ -145,11 +142,10 @@
         ]
       },
       "ubuntu-24.04-qt-min": {
-        "executed": 279,
+        "executed": 280,
         "failures": 0,
         "skipped": 0,
         "registered_not_executed": [
-          "test_analyze_coregistration",
           "test_analyze_events"
         ],
         "executed_not_in_inventory": [
@@ -184,11 +180,10 @@
         ]
       },
       "windows-2025-vs2026": {
-        "executed": 279,
+        "executed": 280,
         "failures": 0,
         "skipped": 2,
         "registered_not_executed": [
-          "test_analyze_coregistration",
           "test_analyze_events"
         ],
         "executed_not_in_inventory": [
@@ -223,11 +218,10 @@
         ]
       },
       "windows-2025-vs2026-qt-min": {
-        "executed": 279,
+        "executed": 280,
         "failures": 0,
         "skipped": 2,
         "registered_not_executed": [
-          "test_analyze_coregistration",
           "test_analyze_events"
         ],
         "executed_not_in_inventory": [
@@ -327,12 +321,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },

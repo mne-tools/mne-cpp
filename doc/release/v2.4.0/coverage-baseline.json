@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": {
-    "commit": "abbf6c29b8c6b6d6fa33f56c368b1cd49fecde1b",
-    "coverage_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38044849533"
+    "commit": "bb3a55f70811f45e0e9eb5a970afb26376cfb62a",
+    "coverage_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38051494577"
   },
   "scope": [
     "src/libraries",
@@ -106,42 +106,42 @@
   ],
   "totals": {
     "files": 1230,
-    "lines_found": 125212,
-    "lines_hit": 82754,
-    "lines_missed": 42458,
-    "line_percent": 66.09,
-    "branches_found": 73348,
-    "branches_hit": 36064,
-    "branches_missed": 37284,
-    "branch_percent": 49.17
+    "lines_found": 125211,
+    "lines_hit": 83429,
+    "lines_missed": 41782,
+    "line_percent": 66.63,
+    "branches_found": 73379,
+    "branches_hit": 36275,
+    "branches_missed": 37104,
+    "branch_percent": 49.44
   },
   "codecov_model": {
-    "lines": 125212,
-    "hits": 81653,
-    "line_percent": 65.21
+    "lines": 125211,
+    "hits": 82326,
+    "line_percent": 65.75
   },
   "scopes": {
     "libraries": {
       "files": 696,
-      "lines_found": 65971,
-      "lines_hit": 57331,
-      "lines_missed": 8640,
-      "line_percent": 86.9,
-      "branches_found": 45329,
-      "branches_hit": 28392,
-      "branches_missed": 16937,
-      "branch_percent": 62.64
+      "lines_found": 65985,
+      "lines_hit": 57350,
+      "lines_missed": 8635,
+      "line_percent": 86.91,
+      "branches_found": 45331,
+      "branches_hit": 28410,
+      "branches_missed": 16921,
+      "branch_percent": 62.67
     },
     "applications": {
       "files": 409,
-      "lines_found": 44344,
-      "lines_hit": 16327,
-      "lines_missed": 28017,
-      "line_percent": 36.82,
-      "branches_found": 20734,
-      "branches_hit": 4623,
-      "branches_missed": 16111,
-      "branch_percent": 22.3
+      "lines_found": 44329,
+      "lines_hit": 16983,
+      "lines_missed": 27346,
+      "line_percent": 38.31,
+      "branches_found": 20763,
+      "branches_hit": 4816,
+      "branches_missed": 15947,
+      "branch_percent": 23.2
     },
     "tools": {
       "files": 125,
@@ -169,14 +169,14 @@
     },
     "src/applications/mne_analyze": {
       "files": 81,
-      "lines_found": 6935,
-      "lines_hit": 1907,
-      "lines_missed": 5028,
-      "line_percent": 27.5,
-      "branches_found": 2349,
-      "branches_hit": 435,
-      "branches_missed": 1914,
-      "branch_percent": 18.52
+      "lines_found": 6943,
+      "lines_hit": 2243,
+      "lines_missed": 4700,
+      "line_percent": 32.31,
+      "branches_found": 2392,
+      "branches_hit": 504,
+      "branches_missed": 1888,
+      "branch_percent": 21.07
     },
     "src/applications/mne_analyze_studio": {
       "files": 89,
@@ -191,14 +191,14 @@
     },
     "src/applications/mne_browse": {
       "files": 69,
-      "lines_found": 10585,
-      "lines_hit": 4468,
-      "lines_missed": 6117,
-      "line_percent": 42.21,
-      "branches_found": 5798,
-      "branches_hit": 1353,
-      "branches_missed": 4445,
-      "branch_percent": 23.34
+      "lines_found": 10562,
+      "lines_hit": 4788,
+      "lines_missed": 5774,
+      "line_percent": 45.33,
+      "branches_found": 5784,
+      "branches_hit": 1477,
+      "branches_missed": 4307,
+      "branch_percent": 25.54
     },
     "src/applications/mne_dipole_fit": {
       "files": 1,
@@ -262,9 +262,9 @@
       "lines_missed": 244,
       "line_percent": 86.54,
       "branches_found": 1622,
-      "branches_hit": 904,
-      "branches_missed": 718,
-      "branch_percent": 55.73
+      "branches_hit": 903,
+      "branches_missed": 719,
+      "branch_percent": 55.67
     },
     "src/libraries/decoding": {
       "files": 5,
@@ -280,9 +280,9 @@
     "src/libraries/disp": {
       "files": 129,
       "lines_found": 12562,
-      "lines_hit": 10889,
-      "lines_missed": 1673,
-      "line_percent": 86.68,
+      "lines_hit": 10893,
+      "lines_missed": 1669,
+      "line_percent": 86.71,
       "branches_found": 5572,
       "branches_hit": 3580,
       "branches_missed": 1992,
@@ -306,20 +306,20 @@
       "lines_missed": 422,
       "line_percent": 90.99,
       "branches_found": 3891,
-      "branches_hit": 2407,
-      "branches_missed": 1484,
-      "branch_percent": 61.86
+      "branches_hit": 2408,
+      "branches_missed": 1483,
+      "branch_percent": 61.89
     },
     "src/libraries/fiff": {
       "files": 59,
-      "lines_found": 6732,
-      "lines_hit": 5955,
-      "lines_missed": 777,
-      "line_percent": 88.46,
-      "branches_found": 4500,
-      "branches_hit": 3076,
-      "branches_missed": 1424,
-      "branch_percent": 68.36
+      "lines_found": 6746,
+      "lines_hit": 5973,
+      "lines_missed": 773,
+      "line_percent": 88.54,
+      "branches_found": 4502,
+      "branches_hit": 3092,
+      "branches_missed": 1410,
+      "branch_percent": 68.68
     },
     "src/libraries/fs": {
       "files": 15,
@@ -339,9 +339,9 @@
       "lines_missed": 329,
       "line_percent": 90.85,
       "branches_found": 2784,
-      "branches_hit": 1816,
-      "branches_missed": 968,
-      "branch_percent": 65.23
+      "branches_hit": 1819,
+      "branches_missed": 965,
+      "branch_percent": 65.34
     },
     "src/libraries/inv": {
       "files": 63,
@@ -368,13 +368,13 @@
     "src/libraries/math": {
       "files": 13,
       "lines_found": 1189,
-      "lines_hit": 1093,
-      "lines_missed": 96,
-      "line_percent": 91.93,
+      "lines_hit": 1090,
+      "lines_missed": 99,
+      "line_percent": 91.67,
       "branches_found": 1348,
-      "branches_hit": 797,
-      "branches_missed": 551,
-      "branch_percent": 59.12
+      "branches_hit": 788,
+      "branches_missed": 560,
+      "branch_percent": 58.46
     },
     "src/libraries/ml": {
       "files": 7,
@@ -405,9 +405,9 @@
       "lines_missed": 1321,
       "line_percent": 87.1,
       "branches_found": 7958,
-      "branches_hit": 5272,
-      "branches_missed": 2686,
-      "branch_percent": 66.25
+      "branches_hit": 5273,
+      "branches_missed": 2685,
+      "branch_percent": 66.26
     },
     "src/libraries/mri": {
       "files": 9,
@@ -427,9 +427,9 @@
       "lines_missed": 141,
       "line_percent": 83.87,
       "branches_found": 650,
-      "branches_hit": 375,
-      "branches_missed": 275,
-      "branch_percent": 57.69
+      "branches_hit": 382,
+      "branches_missed": 268,
+      "branch_percent": 58.77
     },
     "src/libraries/utils": {
       "files": 24,
@@ -553,9 +553,9 @@
     {
       "path": "src/applications/mne_browse/Windows/mainwindow.cpp",
       "component": "src/applications/mne_browse",
-      "lines_found": 2737,
-      "lines_hit": 952,
-      "lines_missed": 1785
+      "lines_found": 2714,
+      "lines_hit": 1143,
+      "lines_missed": 1571
     },
     {
       "path": "src/applications/mne_inspect/app/mainwindow.cpp",
@@ -575,8 +575,8 @@
       "path": "src/applications/mne_browse/Windows/datawindow.cpp",
       "component": "src/applications/mne_browse",
       "lines_found": 1006,
-      "lines_hit": 357,
-      "lines_missed": 649
+      "lines_hit": 383,
+      "lines_missed": 623
     },
     {
       "path": "src/libraries/disp3D/view/brainview.cpp",
@@ -605,13 +605,6 @@
       "lines_found": 422,
       "lines_hit": 0,
       "lines_missed": 422
-    },
-    {
-      "path": "src/applications/mne_analyze/plugins/coregistration/coregistration.cpp",
-      "component": "src/applications/mne_analyze",
-      "lines_found": 421,
-      "lines_hit": 0,
-      "lines_missed": 421
     },
     {
       "path": "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Models/rawmodel.cpp",
@@ -717,6 +710,13 @@
       "lines_found": 321,
       "lines_hit": 22,
       "lines_missed": 299
+    },
+    {
+      "path": "src/applications/mne_scan/mne_scan/mainwindow.cpp",
+      "component": "src/applications/mne_scan",
+      "lines_found": 588,
+      "lines_hit": 291,
+      "lines_missed": 297
     }
   ],
   "files": [
@@ -858,7 +858,7 @@
       "lines_hit": 4,
       "lines_missed": 3,
       "branches_found": 14,
-      "branches_hit": 1
+      "branches_hit": 2
     },
     {
       "path": "src/applications/mne_analyze/libs/anShared/Management/eventmanager.cpp",
@@ -934,11 +934,11 @@
       "path": "src/applications/mne_analyze/libs/anShared/Model/averagingdatamodel.cpp",
       "scope": "applications",
       "component": "src/applications/mne_analyze",
-      "lines_found": 36,
-      "lines_hit": 18,
-      "lines_missed": 18,
-      "branches_found": 4,
-      "branches_hit": 3
+      "lines_found": 40,
+      "lines_hit": 21,
+      "lines_missed": 19,
+      "branches_found": 8,
+      "branches_hit": 5
     },
     {
       "path": "src/applications/mne_analyze/libs/anShared/Model/averagingdatamodel.h",
@@ -965,10 +965,10 @@
       "scope": "applications",
       "component": "src/applications/mne_analyze",
       "lines_found": 4,
-      "lines_hit": 2,
-      "lines_missed": 2,
+      "lines_hit": 4,
+      "lines_missed": 0,
       "branches_found": 4,
-      "branches_hit": 0
+      "branches_hit": 1
     },
     {
       "path": "src/applications/mne_analyze/libs/anShared/Model/covariancemodel.cpp",
@@ -1314,11 +1314,11 @@
       "path": "src/applications/mne_analyze/plugins/coregistration/coregistration.cpp",
       "scope": "applications",
       "component": "src/applications/mne_analyze",
-      "lines_found": 421,
-      "lines_hit": 0,
-      "lines_missed": 421,
-      "branches_found": 92,
-      "branches_hit": 0
+      "lines_found": 422,
+      "lines_hit": 270,
+      "lines_missed": 152,
+      "branches_found": 127,
+      "branches_hit": 58
     },
     {
       "path": "src/applications/mne_analyze/plugins/coregistration/coregistration_global.cpp",
@@ -1364,19 +1364,19 @@
       "path": "src/applications/mne_analyze/plugins/dataloader/dataloader.cpp",
       "scope": "applications",
       "component": "src/applications/mne_analyze",
-      "lines_found": 235,
-      "lines_hit": 92,
-      "lines_missed": 143,
-      "branches_found": 78,
-      "branches_hit": 38
+      "lines_found": 238,
+      "lines_hit": 152,
+      "lines_missed": 86,
+      "branches_found": 82,
+      "branches_hit": 45
     },
     {
       "path": "src/applications/mne_analyze/plugins/dataloader/dataloader.h",
       "scope": "applications",
       "component": "src/applications/mne_analyze",
       "lines_found": 1,
-      "lines_hit": 0,
-      "lines_missed": 1,
+      "lines_hit": 1,
+      "lines_missed": 0,
       "branches_found": 0,
       "branches_hit": 0
     },
@@ -2585,10 +2585,10 @@
       "scope": "applications",
       "component": "src/applications/mne_browse",
       "lines_found": 159,
-      "lines_hit": 75,
-      "lines_missed": 84,
+      "lines_hit": 78,
+      "lines_missed": 81,
       "branches_found": 72,
-      "branches_hit": 39
+      "branches_hit": 42
     },
     {
       "path": "src/applications/mne_browse/Models/averagemodel.h",
@@ -2598,7 +2598,7 @@
       "lines_hit": 2,
       "lines_missed": 0,
       "branches_found": 6,
-      "branches_hit": 2
+      "branches_hit": 3
     },
     {
       "path": "src/applications/mne_browse/Models/epochmodel.cpp",
@@ -2728,7 +2728,7 @@
       "lines_hit": 194,
       "lines_missed": 129,
       "branches_found": 153,
-      "branches_hit": 41
+      "branches_hit": 43
     },
     {
       "path": "src/applications/mne_browse/Utils/butterflysceneitem.h",
@@ -2925,8 +2925,8 @@
       "scope": "applications",
       "component": "src/applications/mne_browse",
       "lines_found": 622,
-      "lines_hit": 437,
-      "lines_missed": 185,
+      "lines_hit": 441,
+      "lines_missed": 181,
       "branches_found": 340,
       "branches_hit": 185
     },
@@ -2965,10 +2965,10 @@
       "scope": "applications",
       "component": "src/applications/mne_browse",
       "lines_found": 277,
-      "lines_hit": 130,
-      "lines_missed": 147,
+      "lines_hit": 226,
+      "lines_missed": 51,
       "branches_found": 132,
-      "branches_hit": 6
+      "branches_hit": 64
     },
     {
       "path": "src/applications/mne_browse/Windows/covariancewindow.h",
@@ -2985,10 +2985,10 @@
       "scope": "applications",
       "component": "src/applications/mne_browse",
       "lines_found": 1006,
-      "lines_hit": 357,
-      "lines_missed": 649,
+      "lines_hit": 383,
+      "lines_missed": 623,
       "branches_found": 782,
-      "branches_hit": 179
+      "branches_hit": 196
     },
     {
       "path": "src/applications/mne_browse/Windows/datawindow.h",
@@ -2998,7 +2998,7 @@
       "lines_hit": 4,
       "lines_missed": 3,
       "branches_found": 16,
-      "branches_hit": 4
+      "branches_hit": 5
     },
     {
       "path": "src/applications/mne_browse/Windows/epochwindow.cpp",
@@ -3104,11 +3104,11 @@
       "path": "src/applications/mne_browse/Windows/mainwindow.cpp",
       "scope": "applications",
       "component": "src/applications/mne_browse",
-      "lines_found": 2737,
-      "lines_hit": 952,
-      "lines_missed": 1785,
-      "branches_found": 1270,
-      "branches_hit": 200
+      "lines_found": 2714,
+      "lines_hit": 1143,
+      "lines_missed": 1571,
+      "branches_found": 1256,
+      "branches_hit": 242
     },
     {
       "path": "src/applications/mne_browse/Windows/mainwindow.h",
@@ -5258,7 +5258,7 @@
       "lines_hit": 80,
       "lines_missed": 5,
       "branches_found": 78,
-      "branches_hit": 45
+      "branches_hit": 44
     },
     {
       "path": "src/libraries/connectivity/metrics/debiasedsquaredweightedphaselagindex.cpp",
@@ -5268,7 +5268,7 @@
       "lines_hit": 112,
       "lines_missed": 29,
       "branches_found": 144,
-      "branches_hit": 70
+      "branches_hit": 67
     },
     {
       "path": "src/libraries/connectivity/metrics/directed_transfer_function.cpp",
@@ -5338,7 +5338,7 @@
       "lines_hit": 99,
       "lines_missed": 19,
       "branches_found": 122,
-      "branches_hit": 65
+      "branches_hit": 66
     },
     {
       "path": "src/libraries/connectivity/metrics/phaselockingvalue.cpp",
@@ -5348,7 +5348,7 @@
       "lines_hit": 102,
       "lines_missed": 16,
       "branches_found": 124,
-      "branches_hit": 68
+      "branches_hit": 67
     },
     {
       "path": "src/libraries/connectivity/metrics/unbiasedsquaredphaselagindex.cpp",
@@ -5358,7 +5358,7 @@
       "lines_hit": 103,
       "lines_missed": 19,
       "branches_found": 126,
-      "branches_hit": 66
+      "branches_hit": 68
     },
     {
       "path": "src/libraries/connectivity/metrics/weightedphaselagindex.cpp",
@@ -5368,7 +5368,7 @@
       "lines_hit": 106,
       "lines_missed": 19,
       "branches_found": 130,
-      "branches_hit": 70
+      "branches_hit": 71
     },
     {
       "path": "src/libraries/connectivity/network/network.cpp",
@@ -5915,8 +5915,8 @@
       "scope": "libraries",
       "component": "src/libraries/disp",
       "lines_found": 309,
-      "lines_hit": 269,
-      "lines_missed": 40,
+      "lines_hit": 273,
+      "lines_missed": 36,
       "branches_found": 46,
       "branches_hit": 34
     },
@@ -7798,7 +7798,7 @@
       "lines_hit": 232,
       "lines_missed": 11,
       "branches_found": 105,
-      "branches_hit": 69
+      "branches_hit": 70
     },
     {
       "path": "src/libraries/dsp/filterkernel.h",
@@ -8404,10 +8404,10 @@
       "path": "src/libraries/fiff/fiff_cov.cpp",
       "scope": "libraries",
       "component": "src/libraries/fiff",
-      "lines_found": 370,
-      "lines_hit": 351,
-      "lines_missed": 19,
-      "branches_found": 328,
+      "lines_found": 380,
+      "lines_hit": 358,
+      "lines_missed": 22,
+      "branches_found": 326,
       "branches_hit": 229
     },
     {
@@ -8418,7 +8418,7 @@
       "lines_hit": 4,
       "lines_missed": 0,
       "branches_found": 28,
-      "branches_hit": 11
+      "branches_hit": 13
     },
     {
       "path": "src/libraries/fiff/fiff_ctf_comp.cpp",
@@ -8465,10 +8465,10 @@
       "scope": "libraries",
       "component": "src/libraries/fiff",
       "lines_found": 8,
-      "lines_hit": 3,
-      "lines_missed": 5,
-      "branches_found": 16,
-      "branches_hit": 2
+      "lines_hit": 8,
+      "lines_missed": 0,
+      "branches_found": 18,
+      "branches_hit": 14
     },
     {
       "path": "src/libraries/fiff/fiff_digitizer_data.cpp",
@@ -8565,10 +8565,10 @@
       "scope": "libraries",
       "component": "src/libraries/fiff",
       "lines_found": 289,
-      "lines_hit": 239,
-      "lines_missed": 50,
+      "lines_hit": 241,
+      "lines_missed": 48,
       "branches_found": 198,
-      "branches_hit": 117
+      "branches_hit": 119
     },
     {
       "path": "src/libraries/fiff/fiff_evoked.h",
@@ -8584,11 +8584,11 @@
       "path": "src/libraries/fiff/fiff_evoked_set.cpp",
       "scope": "libraries",
       "component": "src/libraries/fiff",
-      "lines_found": 268,
-      "lines_hit": 243,
+      "lines_found": 272,
+      "lines_hit": 247,
       "lines_missed": 25,
-      "branches_found": 180,
-      "branches_hit": 130
+      "branches_found": 182,
+      "branches_hit": 131
     },
     {
       "path": "src/libraries/fiff/fiff_evoked_set.h",
@@ -8828,7 +8828,7 @@
       "lines_hit": 238,
       "lines_missed": 80,
       "branches_found": 173,
-      "branches_hit": 126
+      "branches_hit": 125
     },
     {
       "path": "src/libraries/fiff/fiff_tag.h",
@@ -9038,7 +9038,7 @@
       "lines_hit": 1651,
       "lines_missed": 178,
       "branches_found": 1332,
-      "branches_hit": 883
+      "branches_hit": 886
     },
     {
       "path": "src/libraries/fwd/fwd_bem_model.h",
@@ -9925,10 +9925,10 @@
       "scope": "libraries",
       "component": "src/libraries/math",
       "lines_found": 514,
-      "lines_hit": 489,
-      "lines_missed": 25,
+      "lines_hit": 486,
+      "lines_missed": 28,
       "branches_found": 740,
-      "branches_hit": 468
+      "branches_hit": 460
     },
     {
       "path": "src/libraries/math/kmeans.h",
@@ -10008,7 +10008,7 @@
       "lines_hit": 98,
       "lines_missed": 18,
       "branches_found": 94,
-      "branches_hit": 46
+      "branches_hit": 45
     },
     {
       "path": "src/libraries/math/spectral.h",
@@ -10508,7 +10508,7 @@
       "lines_hit": 4,
       "lines_missed": 1,
       "branches_found": 12,
-      "branches_hit": 5
+      "branches_hit": 6
     },
     {
       "path": "src/libraries/mne/mne_bem_surface.cpp",
@@ -11438,7 +11438,7 @@
       "lines_hit": 363,
       "lines_missed": 55,
       "branches_found": 300,
-      "branches_hit": 205
+      "branches_hit": 212
     },
     {
       "path": "src/libraries/sts/sts_cluster.h",
