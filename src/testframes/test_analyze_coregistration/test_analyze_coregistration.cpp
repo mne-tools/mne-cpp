@@ -27,7 +27,13 @@
 #include <fiff/fiff_dig_point_set.h>
 
 #include <QtTest>
+#include <QCheckBox>
 #include <QDockWidget>
+#include <QLabel>
+#include <QSemaphore>
+#include <QThreadPool>
+
+#include <functional>
 
 #include <memory>
 
@@ -45,6 +51,7 @@ class TestAnalyzeCoregistration : public QObject
 private slots:
     void initTestCase();
     void fitsFiducialsByIdentity();
+    void icpUsesTheSettingsAtClickTime();
 };
 
 //=============================================================================================================
@@ -55,6 +62,49 @@ namespace
 QString sampleFile(const QString& name)
 {
     return QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/" + name;
+}
+
+/** Loads the sample head surface, digitizer and MRI fiducials into the panel and fits the fiducials. */
+void prepareFit(CoRegistration& plugin, AnalyzeData& data, CoregSettingsView* view, const QString& sDir)
+{
+    auto bem = data.loadModel<BemDataModel>(sampleFile("subjects/sample/bem/sample-1280-1280-1280-bem.fif"));
+    plugin.handleEvent(QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(bem.staticCast<AbstractModel>())));
+    const QString avePath = sampleFile("MEG/sample/sample_audvis-ave.fif");
+    QFile aveFile(avePath);
+    FiffDigPointSet fids = FiffDigPointSet(aveFile).pickTypes({FIFFV_POINT_CARDINAL});
+    fids.applyTransform(FiffCoordTrans::readTransform(sampleFile("MEG/sample/all-trans.fif"), FIFFV_COORD_HEAD, FIFFV_COORD_MRI));
+    const QString fidPath = sDir + "/sample-fiducials.fif";
+    QVERIFY(fids.write(fidPath));
+    emit view->digFileChanged(avePath);
+    emit view->fidFileChanged(fidPath);
+    emit view->fitFiducials();
+}
+
+/** Runs ICP from the panel; pChange (if set) edits the panel after the click but before the fit starts. */
+FiffCoordTrans runIcp(CoRegistration& plugin, CoregSettingsView* view, const QString& sDir, const std::function<void()>& change = {})
+{
+    Q_UNUSED(plugin)
+    auto* pRmse = view->findChild<QLabel*>(QStringLiteral("m_qLabel_RMSE"));
+    pRmse->setText(QString());
+
+    // Hold the only pool thread until the panel has been edited
+    QThreadPool* pPool = QThreadPool::globalInstance();
+    const int iMaxThreads = pPool->maxThreadCount();
+    pPool->setMaxThreadCount(1);
+    QSemaphore gate;
+    pPool->start([&gate] { gate.acquire(); });
+    emit view->fitICP();
+    if (change)
+        change();
+    gate.release();
+    pPool->waitForDone();
+    pPool->setMaxThreadCount(iMaxThreads);
+
+    if (!QTest::qWaitFor([pRmse] { return !pRmse->text().isEmpty(); }, 10000))
+        return FiffCoordTrans();
+    const QString transPath = sDir + "/icp-trans.fif";
+    emit view->storeTrans(transPath);
+    return FiffCoordTrans::readTransform(transPath, FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
 }
 
 } // namespace
@@ -119,6 +169,36 @@ void TestAnalyzeCoregistration::fitsFiducialsByIdentity()
     const FiffCoordTrans fitted = FiffCoordTrans::readTransform(transPath, FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
     QVERIFY2((fitted.trans - reference.trans).cwiseAbs().maxCoeff() < 1e-4f,
              qPrintable(QStringLiteral("max deviation %1").arg((fitted.trans - reference.trans).cwiseAbs().maxCoeff())));
+}
+
+//=============================================================================================================
+
+void TestAnalyzeCoregistration::icpUsesTheSettingsAtClickTime()
+{
+    QTemporaryDir dir;
+    auto fit = [&dir](const std::function<void(CoregSettingsView*)>& change) {
+        auto data = QSharedPointer<AnalyzeData>::create();
+        CoRegistration plugin;
+        plugin.setGlobalData(data);
+        plugin.init();
+        std::unique_ptr<QDockWidget> dock(plugin.getControl());
+        auto* view = qobject_cast<CoregSettingsView*>(dock->widget());
+        prepareFit(plugin, *data, view, dir.path());
+        return runIcp(plugin, view, dir.path(), change ? std::function<void()>([&] { change(view); }) : std::function<void()>());
+    };
+
+    const FiffCoordTrans clicked = fit({});
+    QVERIFY(!clicked.isEmpty());
+    // ICP moves the fiducial fit onto the head shape
+    const FiffCoordTrans fiducialFit = FiffCoordTrans::readTransform(sampleFile("MEG/sample/all-trans.fif"), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
+    QVERIFY((clicked.trans - fiducialFit.trans).cwiseAbs().maxCoeff() > 1e-4f);
+    // Unticking the head shape points after Fit ICP was clicked must not change the running fit
+    const FiffCoordTrans changed = fit([](CoregSettingsView* view) {
+        view->findChild<QCheckBox*>(QStringLiteral("m_qCheckBox_HSP"))->setChecked(false);
+    });
+    QVERIFY(!changed.isEmpty());
+    QVERIFY2((changed.trans - clicked.trans).cwiseAbs().maxCoeff() < 1e-6f,
+             qPrintable(QStringLiteral("max deviation %1").arg((changed.trans - clicked.trans).cwiseAbs().maxCoeff())));
 }
 
 //=============================================================================================================

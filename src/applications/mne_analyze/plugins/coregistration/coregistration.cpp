@@ -61,7 +61,9 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 CoRegistration::CoRegistration()
-: m_pCoregSettingsView(Q_NULLPTR)
+: m_fRMSE(0.0f)
+, m_iNDiscarded(0)
+, m_pCoregSettingsView(Q_NULLPTR)
 {
     m_vecBemDataModels = QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>();
 
@@ -531,6 +533,7 @@ void CoRegistration::setIcpProperties()
     m_fMaxDist = m_pCoregSettingsView->getOmmitDistance();
     m_fTol = m_pCoregSettingsView->getConvergence();
     m_iMaxIter = m_pCoregSettingsView->getMaxIter();
+    m_lPickHSP = m_pCoregSettingsView->getDigitizerCheckState();
 }
 
 //=============================================================================================================
@@ -551,6 +554,7 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     float fMaxDist = m_fMaxDist;
     float fTol = m_fTol;
     int iMaxIter = m_iMaxIter;
+    const QList<int> lPickHSP = m_lPickHSP;
     m_ParameterMutex.unlock();
 
     float fRMSE = 0.0;
@@ -560,7 +564,6 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
     MNEProjectToSurface::SPtr mneSurfacePoints = MNEProjectToSurface::SPtr::create(*bemSurface);
 
     // get selected digitizers
-    QList<int> lPickHSP = m_pCoregSettingsView->getDigitizerCheckState();
     FiffDigPointSet digSetHSP = digSetHead.pickTypes(lPickHSP);
 
     VectorXf vecWeightsICP(digSetHSP.size()); // Weigths vector
@@ -609,8 +612,7 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
                                         fMaxDist)) {
         qWarning() << "Discard outliers was not succesfull.";
     }
-    int iNDiscarded = vecWeightsICP.size() - vecTake.size();
-    m_pCoregSettingsView->setOmittedPoints(iNDiscarded);
+    const int iNDiscarded = static_cast<int>(vecWeightsICP.size() - vecTake.size());
 
     VectorXf vecWeightsICPClean(vecTake.size());
     for (int i = 0; i < vecTake.size(); ++i) {
@@ -627,17 +629,13 @@ FiffCoordTrans CoRegistration::computeICP(FiffCoordTrans transInit,
                        fTol,
                        vecWeightsICPClean);
 
-    FiffCoordTrans transHeadMri = transInit;
+    // The panel is updated on the GUI thread, in createNewTrans
+    m_ParameterMutex.lock();
+    m_fRMSE = fRMSE;
+    m_iNDiscarded = iNDiscarded;
+    m_ParameterMutex.unlock();
 
-    // update GUI
-    Vector3f vecRot;
-    Vector3f vecScale;
-    Vector3f vecTrans;
-    getParamFromTrans(transHeadMri.trans, vecRot, vecTrans, vecScale);
-    m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
-    m_pCoregSettingsView->setRMSE(fRMSE);
-
-    return transHeadMri;
+    return transInit;
 }
 
 //=============================================================================================================
@@ -652,6 +650,11 @@ void CoRegistration::createNewTrans()
     Vector3f vecTrans;
     getParamFromTrans(m_transHeadMri.trans, vecRot, vecTrans, vecScale);
     m_pCoregSettingsView->setTransParams(vecTrans, vecRot, vecScale);
+    {
+        QMutexLocker locker(&m_ParameterMutex);
+        m_pCoregSettingsView->setOmittedPoints(m_iNDiscarded);
+        m_pCoregSettingsView->setRMSE(m_fRMSE);
+    }
 
     // send event
     QVariant data = QVariant::fromValue(m_transHeadMri);

@@ -306,17 +306,20 @@ private:
     FIFFLIB::FiffDigPointSet m_digFidMri;                                   /**< The currently selected mri fiducials. */
     FIFFLIB::FiffCoordTrans m_transHeadMri;                                 /**< The resulting head-mri transformation. */
 
-    int m_iFiducial;    /**< Currently selected fiducial. */
-    bool m_bScale;      /**< Wether to apply automatic scaling. */
-    float m_fWeightLPA; /**< Weight LPA. */
-    float m_fWeightNAS; /**< Weight NAS. */
-    float m_fWeightRPA; /**< Weight RPA. */
-    float m_fWeightHPI; /**< Weight HPI. */
-    float m_fWeightHSP; /**< Weight HSP (Head Shape Point). */
-    float m_fWeightEEG; /**< Weight EEG . */
-    float m_fMaxDist;   /**< Maximum distace - electrode surface. */
-    float m_fTol;       /**< Divergence Tolerance . */
-    int m_iMaxIter;     /**< Maximum ammount of iterations. */
+    int m_iFiducial;       /**< Currently selected fiducial. */
+    bool m_bScale;         /**< Wether to apply automatic scaling. */
+    float m_fWeightLPA;    /**< Weight LPA. */
+    float m_fWeightNAS;    /**< Weight NAS. */
+    float m_fWeightRPA;    /**< Weight RPA. */
+    float m_fWeightHPI;    /**< Weight HPI. */
+    float m_fWeightHSP;    /**< Weight HSP (Head Shape Point). */
+    float m_fWeightEEG;    /**< Weight EEG . */
+    float m_fMaxDist;      /**< Maximum distace - electrode surface. */
+    float m_fTol;          /**< Divergence Tolerance . */
+    int m_iMaxIter;        /**< Maximum ammount of iterations. */
+    QList<int> m_lPickHSP; /**< Digitizer kinds used by the ICP fit. */
+    float m_fRMSE;         /**< RMSE of the last ICP fit, in m. */
+    int m_iNDiscarded;     /**< Number of digitizers the last ICP fit discarded as outliers. */
 
     QPointer<ANSHAREDLIB::Communicator> m_pCommu;
 
