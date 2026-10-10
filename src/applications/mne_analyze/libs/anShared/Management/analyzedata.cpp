@@ -136,6 +136,11 @@ QStandardItemModel* AnalyzeData::getDataModel()
 
 bool AnalyzeData::removeModel(const QModelIndex& index)
 {
+    // An invalid index is the tree root: getAllModels() would report every model as removed
+    if (!index.isValid()) {
+        return false;
+    }
+
     QVector<QSharedPointer<AbstractModel>> lModels = getAllModels(index);
 
     for (QSharedPointer<AbstractModel> pModel : lModels) {

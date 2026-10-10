@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38068428651 (comm
 
 ## Registration
 
-- Test directories: 258
-- Registered unconditionally: 251
+- Test directories: 259
+- Registered unconditionally: 252
 - Registered behind a CMake condition or early `return()`: 4
 - Not registered: 3
 - Registered without `LABELS`: 0
@@ -18,12 +18,12 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38068428651 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 282 | 0 | 0 | `test_analyze_channelselection` |
-| macos-26-qt-min | 282 | 0 | 0 | `test_analyze_channelselection` |
-| ubuntu-24.04 | 282 | 0 | 0 | `test_analyze_channelselection` |
-| ubuntu-24.04-qt-min | 282 | 0 | 0 | `test_analyze_channelselection` |
-| windows-2025-vs2026 | 282 | 0 | 2 | `test_analyze_channelselection` |
-| windows-2025-vs2026-qt-min | 282 | 0 | 2 | `test_analyze_channelselection` |
+| macos-26 | 282 | 0 | 0 | `test_analyze_channelselection`, `test_analyze_datamanager` |
+| macos-26-qt-min | 282 | 0 | 0 | `test_analyze_channelselection`, `test_analyze_datamanager` |
+| ubuntu-24.04 | 282 | 0 | 0 | `test_analyze_channelselection`, `test_analyze_datamanager` |
+| ubuntu-24.04-qt-min | 282 | 0 | 0 | `test_analyze_channelselection`, `test_analyze_datamanager` |
+| windows-2025-vs2026 | 282 | 0 | 2 | `test_analyze_channelselection`, `test_analyze_datamanager` |
+| windows-2025-vs2026-qt-min | 282 | 0 | 2 | `test_analyze_channelselection`, `test_analyze_datamanager` |
 
 ## Run-time requirements (lexical signals)
 
@@ -32,9 +32,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38068428651 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 19 |
-| test-data | 112 |
-| GUI (`QTEST_MAIN`) | 40 |
-| Contains `QSKIP` | 82 |
+| test-data | 113 |
+| GUI (`QTEST_MAIN`) | 41 |
+| Contains `QSKIP` | 83 |
 
 ## Conditional and unregistered tests
 
