@@ -464,8 +464,8 @@ private slots:
         QVERIFY(QFile::exists(settings.srcname));
         QVERIFY(QFile::exists(settings.bemname));
 
-        settings.checkIntegrity();
-        QVERIFY(true);
+        settings.solname = "fwd.fif";
+        QVERIFY(settings.checkIntegrity());
     }
 
     //=========================================================================

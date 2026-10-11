@@ -223,13 +223,22 @@ int main(int argc, char* argv[])
     // Run forward computation
     //=========================================================================================================
 
-    settings->checkIntegrity();
+    if (!settings->checkIntegrity()) {
+        return 1;
+    }
 
     ComputeFwd computer(settings);
     auto fwdSolution = computer.calculateFwd();
+    if (!fwdSolution) {
+        qCritical("The forward solution could not be computed.");
+        return 1;
+    }
 
     QFile fwdFile(settings->solname);
-    fwdSolution->write(fwdFile);
+    if (!fwdSolution->write(fwdFile)) {
+        qCritical("The forward solution could not be written to %s.", settings->solname.toUtf8().constData());
+        return 1;
+    }
 
-    return app.exec();
+    return 0;
 }

@@ -429,7 +429,9 @@ INVLIB::InvEcdSet InvDipoleFit::dipoleFitCalculation()
     QMutexLocker lock(&m_FitMutex);
 
     qInfo() << "Checking integrity...";
-    m_DipoleSettings.checkIntegrity();
+    if (!m_DipoleSettings.checkIntegrity()) {
+        return INVLIB::InvEcdSet();
+    }
 
     qInfo() << "Initializing settings...";
     INVLIB::InvDipoleFit dipFit(&m_DipoleSettings);

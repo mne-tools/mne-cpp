@@ -101,9 +101,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Check whether Dipole Fit Settings are correctly set.
+     * Check whether Dipole Fit Settings are correctly set and report them.
+     *
+     * @return true if all required settings are present; otherwise the missing one is reported.
      */
-    void checkIntegrity();
+    bool checkIntegrity();
 
 public:
     QString bemname;    /**< Boundary-element model. */

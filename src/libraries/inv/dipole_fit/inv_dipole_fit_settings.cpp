@@ -194,25 +194,26 @@ void InvDipoleFitSettings::initMembers()
 
 //=============================================================================================================
 
-void InvDipoleFitSettings::checkIntegrity()
+bool InvDipoleFitSettings::checkIntegrity()
 {
     do_baseline = (bmin < BIG_TIME && bmax < BIG_TIME);
 
     if (measname.isEmpty()) {
         qCritical("Data file name missing. Please specify one using the --meas option.");
-        return;
+        return false;
     }
     if (guessname.isEmpty()) {
         if (bemname.isEmpty() && !guess_surfname.isEmpty() && mriname.isEmpty()) {
             qCritical("Please specify the MRI/head coordinate transformation with the --mri option");
-            return;
+            return false;
         }
     }
     if (!include_meg && !include_eeg) {
         qCritical("Specify one or both of the --eeg and --meg options");
-        return;
+        return false;
     }
-    if (!omit_data_proj)
+    // Calling this again (e.g. once per fit) must not add the data file's projections twice
+    if (!omit_data_proj && !projnames.contains(measname))
         projnames.prepend(measname);
 
     if (!bemname.isEmpty())
@@ -264,6 +265,7 @@ void InvDipoleFitSettings::checkIntegrity()
         qInfo("dip output      : %s", dipname.toUtf8().data());
     if (!bdipname.isEmpty())
         qInfo("bdip output     : %s", bdipname.toUtf8().data());
+    return true;
 }
 
 //=============================================================================================================

@@ -220,10 +220,18 @@ private slots:
             if (type == QtCriticalMsg)
                 criticals << msg;
         });
-        settings.checkIntegrity();
+        const bool accepted = settings.checkIntegrity();
         qInstallMessageHandler(previous);
+        QVERIFY(!accepted);
         QCOMPARE(criticals.size(), 1);
         QVERIFY(criticals.first().startsWith("Data file name missing"));
+
+        // Checked again for every fit: the data file's projections are added once
+        settings.measname = "data-ave.fif";
+        settings.include_meg = true;
+        QVERIFY(settings.checkIntegrity());
+        QVERIFY(settings.checkIntegrity());
+        QCOMPARE(settings.projnames, QStringList{"data-ave.fif"});
     }
 
     //=========================================================================

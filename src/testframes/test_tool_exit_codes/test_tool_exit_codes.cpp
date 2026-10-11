@@ -217,6 +217,7 @@ void TestToolExitCodes::missingRequiredArguments_data()
     QTest::newRow("mne_compute_cmne") << "mne_compute_cmne";
     QTest::newRow("mne_make_scalp_surfaces") << "mne_make_scalp_surfaces";
     QTest::newRow("mne_dipole_fit") << "mne_dipole_fit";
+    QTest::newRow("mne_forward_solution") << "mne_forward_solution";
     QTest::newRow("mne_toggle_skips") << "mne_toggle_skips";
 }
 

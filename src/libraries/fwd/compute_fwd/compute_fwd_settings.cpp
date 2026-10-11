@@ -62,30 +62,31 @@ ComputeFwdSettings::~ComputeFwdSettings()
  * Checks for source space name, MRI-to-head transform, measurement file,
  * solution output name, and that at least MEG or EEG is selected.
  */
-void ComputeFwdSettings::checkIntegrity()
+bool ComputeFwdSettings::checkIntegrity() const
 {
     if (srcname.isEmpty()) {
         qCritical("Source space name is missing. Use the --src option to specify it.");
-        return;
+        return false;
     }
     if (!mri_head_ident) {
         if (mriname.isEmpty() && transname.isEmpty()) {
             qCritical("MRI <-> head coordinate transformation is missing. Use the --mri or --trans option to specify it.");
-            return;
+            return false;
         }
     }
     if (measname.isEmpty()) {
         qCritical("Source of coil and electrode locations is missing. Use the --meas option to specify it.");
-        return;
+        return false;
     }
     if (solname.isEmpty()) {
         qCritical("Solution name is missing. Use the --fwd option to specify it.");
-        return;
+        return false;
     }
     if (!(include_meg || include_eeg)) {
         qCritical("Employ the --meg and --eeg options to select MEG and/or EEG");
-        return;
+        return false;
     }
+    return true;
 }
 
 //=============================================================================================================

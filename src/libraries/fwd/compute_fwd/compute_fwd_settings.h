@@ -83,8 +83,10 @@ public:
     //=========================================================================================================
     /**
      * Check whether Compute Forward Settings are correctly set.
+     *
+     * @return true if all required settings are present; otherwise the missing one is reported.
      */
-    void checkIntegrity();
+    bool checkIntegrity() const;
 
 public:
     QString srcname;        /**< Source space. */

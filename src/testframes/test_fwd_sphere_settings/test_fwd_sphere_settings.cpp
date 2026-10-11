@@ -476,10 +476,19 @@ private slots:
 
     void settings_checkIntegrity()
     {
+        // Every required setting is checked in turn
         ComputeFwdSettings s;
-        // checkIntegrity prints warnings but doesn't crash
-        s.checkIntegrity();
-        QVERIFY(true);
+        QVERIFY(!s.checkIntegrity());
+        s.srcname = "src.fif";
+        QVERIFY(!s.checkIntegrity());
+        s.mri_head_ident = true;
+        QVERIFY(!s.checkIntegrity());
+        s.measname = "meas.fif";
+        QVERIFY(!s.checkIntegrity());
+        s.solname = "fwd.fif";
+        QVERIFY(!s.checkIntegrity());
+        s.include_eeg = true;
+        QVERIFY(s.checkIntegrity());
     }
 
     //=========================================================================
