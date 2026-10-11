@@ -40,7 +40,9 @@
 #include <QCoreApplication>
 #include <QTemporaryDir>
 #include <QTemporaryFile>
+#include <QSettings>
 #include <QSignalSpy>
+#include <QStandardPaths>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -171,8 +173,7 @@ private slots:
     //=========================================================================================================
     // RawSettings tests
     //=========================================================================================================
-    void testRawSettingsConstruct();
-    void testRawSettingsValues();
+    void testRawSettingsEventTypeColors();
 
     void cleanupTestCase();
 
@@ -185,6 +186,9 @@ private:
 
 void TestMneBrowseData::initTestCase()
 {
+    QStandardPaths::setTestModeEnabled(true);
+    QCoreApplication::setOrganizationName("mne-cpp-tests");
+    QCoreApplication::setApplicationName("test_mne_browse_data");
     QString binDir = QCoreApplication::applicationDirPath();
     m_sResourcePath = binDir + "/../resources/data/mne-cpp-test-data/";
     QVERIFY(m_tempDir.isValid());
@@ -1236,17 +1240,20 @@ void TestMneBrowseData::testSessionFilterDesignMethods()
 // RawSettings tests
 //=============================================================================================================
 
-void TestMneBrowseData::testRawSettingsConstruct()
+void TestMneBrowseData::testRawSettingsEventTypeColors()
 {
-    RawSettings settings;
-    QVERIFY(true); // Should not crash
-}
+    QSettings().remove("EventDesignParameters");
+    QCOMPARE(RawSettings().eventTypeColors().value(2), QColor(Qt::magenta));
+    QVERIFY(!RawSettings().eventTypeColors().contains(7));
 
-void TestMneBrowseData::testRawSettingsValues()
-{
-    RawSettings settings;
-    // Exercise settings accessors
-    QVERIFY(true);
+    // A colour picked for a type persists, overrides a default, and seeds new event models
+    EventModel model(nullptr);
+    model.addNewEventType("7", QColor(1, 2, 3));
+    RawSettings().setEventTypeColor(2, QColor(4, 5, 6));
+    QCOMPARE(RawSettings().eventTypeColors().value(7), QColor(1, 2, 3));
+    QCOMPARE(EventModel(nullptr).getEventTypeColors().value(2), QColor(4, 5, 6));
+    QCOMPARE(EventModel(nullptr).getEventTypeColors().value(3), QColor(Qt::green));
+    QSettings().remove("EventDesignParameters");
 }
 
 //=============================================================================================================

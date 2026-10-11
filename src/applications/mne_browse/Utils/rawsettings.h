@@ -32,10 +32,10 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QObject>
+#include <QColor>
+#include <QMap>
 #include <QSettings>
 #include <QSize>
-#include <QColor>
 #include <QPoint>
 #include <QStringList>
 
@@ -117,34 +117,36 @@ namespace MNEBROWSE
 /**
  * DECLARE CLASS RawSettings
  */
-class RawSettings : public QObject
+class RawSettings
 {
-    Q_OBJECT
-
 public:
-    RawSettings(QObject* parent = 0);
-
-    ~RawSettings();
-
-    QColor m_event_color_default, m_event_color_1, m_event_color_2, m_event_color_3, m_event_color_4, m_event_color_5,
-        m_event_color_32, m_event_color_998, m_event_color_999, m_data_marker_color;
-
-    int m_mainwindow_size_w, m_mainwindow_size_h, m_mainwindow_position_x, m_mainwindow_position_y;
+    //=========================================================================================================
+    /**
+     * Returns the colour of every event type: the defaults, overridden and extended by the stored ones.
+     *
+     * @return Colour per event type (trigger code).
+     */
+    QMap<int, QColor> eventTypeColors() const;
 
     //=========================================================================================================
     /**
-     * write writes all the application settings values from the macros
+     * Stores the colour of an event type for this and later sessions.
+     *
+     * @param[in] iType     Event type (trigger code).
+     * @param[in] color     Colour to show it in.
      */
-    void write();
+    void setEventTypeColor(int iType, const QColor& color);
+
+    //=========================================================================================================
+    /**
+     * Returns the stored colour of the data markers.
+     *
+     * @return The marker colour.
+     */
+    QColor dataMarkerColor() const;
 
 private:
-    QSettings m_qSettings; /**< QSettings object that initializes all the RawSettings */
-
-    //=========================================================================================================
-    /**
-     * init inits all the application settings values
-     */
-    void init();
+    QSettings m_qSettings; /**< The application settings of mne_browse. */
 };
 
 } //NAMESPACE

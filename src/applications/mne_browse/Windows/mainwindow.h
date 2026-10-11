@@ -554,8 +554,7 @@ protected:
     QDockWidget* m_pChannelSelectionViewDock;
 
     //application settings
-    QSettings m_qSettings;     /**< QSettings variable used to write or read from independent application sessions. */
-    RawSettings m_rawSettings; /**< The software specific mne brose raw qt settings. */
+    QSettings m_qSettings; /**< QSettings variable used to write or read from independent application sessions. */
 
     std::unique_ptr<Ui::MainWindowWidget> ui; /**< Pointer to the qt designer generated ui class.*/
 

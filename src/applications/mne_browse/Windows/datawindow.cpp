@@ -270,6 +270,53 @@ void DataWindow::computeAutoScale()
 void DataWindow::updateDataTableViews()
 {
     ui->m_tableView_rawTableView->viewport()->update();
+
+    // Event type colours may have been changed in the event window
+    bool colorsChanged = false;
+    for (DISPLIB::ChannelRhiView::EventMarker& ev : m_stimEvents) {
+        const QColor color = eventTypeColor(ev.type);
+        colorsChanged = colorsChanged || ev.color != color;
+        ev.color = color;
+    }
+    if (colorsChanged && m_pChannelDataView) {
+        m_pChannelDataView->setEvents(m_stimEvents);
+    }
+}
+
+//=============================================================================================================
+
+const QVector<DISPLIB::ChannelRhiView::EventMarker>& DataWindow::stimEvents() const
+{
+    return m_stimEvents;
+}
+
+//=============================================================================================================
+
+QColor DataWindow::eventTypeColor(int type)
+{
+    if (m_pMainWindow && m_pMainWindow->eventWindow() && m_pMainWindow->eventWindow()->getEventModel()) {
+        const QMap<int, QColor>& colors = m_pMainWindow->eventWindow()->getEventModel()->getEventTypeColors();
+        if (colors.contains(type)) {
+            return colors.value(type);
+        }
+    }
+
+    // Codes without a colour of their own cycle through a fixed palette
+    static const QColor kEventPalette[] = {
+        QColor(220, 50, 50),  // red
+        QColor(50, 140, 220), // blue
+        QColor(50, 180, 80),  // green
+        QColor(210, 130, 30), // orange
+        QColor(140, 60, 200), // purple
+        QColor(30, 180, 180), // teal
+        QColor(200, 50, 160), // pink
+        QColor(100, 160, 40), // olive
+    };
+    constexpr int kPaletteSize = static_cast<int>(sizeof(kEventPalette) / sizeof(kEventPalette[0]));
+    if (!m_eventTypeColors.contains(type)) {
+        m_eventTypeColors[type] = kEventPalette[m_eventTypeColors.size() % kPaletteSize];
+    }
+    return m_eventTypeColors.value(type);
 }
 
 
@@ -959,19 +1006,6 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd& matData, int firstSample)
     // ── Scan STIM channels for rising-edge events ─────────────────────
     auto fiffInfo = m_pFiffReader->fiffInfo();
     if (fiffInfo && m_iStimChannel >= 0) {
-        // Fixed colour palette for event types (cycled by type index)
-        static const QColor kEventPalette[] = {
-            QColor(220, 50, 50),  // red
-            QColor(50, 140, 220), // blue
-            QColor(50, 180, 80),  // green
-            QColor(210, 130, 30), // orange
-            QColor(140, 60, 200), // purple
-            QColor(30, 180, 180), // teal
-            QColor(200, 50, 160), // pink
-            QColor(100, 160, 40), // olive
-        };
-        constexpr int kPaletteSize = static_cast<int>(sizeof(kEventPalette) / sizeof(kEventPalette[0]));
-
         // Prefer the combined trigger channel ("STI 014" for Neuromag Vectorview).
         // The remaining edge case is block boundaries and revisit loads: if we
         // always assume the previous value is zero, we can invent a false event
@@ -999,15 +1033,10 @@ void DataWindow::onBlockLoaded(const Eigen::MatrixXd& matData, int firstSample)
                     const quint64 key = makeStimEventKey(absSample, type);
 
                     if (!m_seenStimEventKeys.contains(key)) {
-                        if (!m_eventTypeColors.contains(type)) {
-                            const int idx = m_eventTypeColors.size() % kPaletteSize;
-                            m_eventTypeColors[type] = kEventPalette[idx];
-                        }
-
                         DISPLIB::ChannelRhiView::EventMarker ev;
                         ev.sample = absSample;
                         ev.type = type;
-                        ev.color = m_eventTypeColors[type];
+                        ev.color = eventTypeColor(type);
                         ev.label = QString::number(type);
 
                         m_seenStimEventKeys.insert(key);

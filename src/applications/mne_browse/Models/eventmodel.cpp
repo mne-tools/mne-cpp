@@ -54,15 +54,7 @@ EventModel::EventModel(QObject* parent)
 , m_iCurrentMarkerPos(0)
 , m_sFilterEventType("All")
 {
-    //Create default event type color map
-    m_eventTypeColor[1] = QColor(Qt::black);
-    m_eventTypeColor[2] = QColor(Qt::magenta);
-    m_eventTypeColor[3] = QColor(Qt::green);
-    m_eventTypeColor[4] = QColor(Qt::red);
-    m_eventTypeColor[5] = QColor(Qt::cyan);
-    m_eventTypeColor[32] = QColor(Qt::yellow);
-    m_eventTypeColor[998] = QColor(Qt::darkBlue);
-    m_eventTypeColor[999] = QColor(Qt::darkCyan);
+    m_eventTypeColor = RawSettings().eventTypeColors();
 }
 
 
@@ -75,16 +67,7 @@ EventModel::EventModel(QFile& qFile, QObject* parent)
 , m_iFirstSample(0)
 , m_sFilterEventType("All")
 {
-    //Create default event type color map
-    m_eventTypeColor[1] = QColor(Qt::black);
-    m_eventTypeColor[2] = QColor(Qt::magenta);
-    m_eventTypeColor[3] = QColor(Qt::green);
-    m_eventTypeColor[4] = QColor(Qt::red);
-    m_eventTypeColor[5] = QColor(Qt::cyan);
-    m_eventTypeColor[32] = QColor(Qt::yellow);
-    m_eventTypeColor[998] = QColor(Qt::darkBlue);
-    m_eventTypeColor[999] = QColor(Qt::darkCyan);
-
+    m_eventTypeColor = RawSettings().eventTypeColors();
     loadEventData(qFile);
 }
 
@@ -564,8 +547,8 @@ void EventModel::clearModel()
 
 void EventModel::addNewEventType(const QString& eventType, const QColor& typeColor)
 {
-    //Add type color
     m_eventTypeColor[eventType.toInt()] = typeColor;
+    RawSettings().setEventTypeColor(eventType.toInt(), typeColor);
 
     //Add event type to event type list
     if (!m_eventTypeList.contains(eventType))

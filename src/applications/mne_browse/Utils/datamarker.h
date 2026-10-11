@@ -34,7 +34,6 @@
 #include <QRegion>
 #include <QDebug>
 #include <QEvent>
-#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -111,8 +110,6 @@ private:
 
     QPoint m_oldPos;         /**< The old mouse position */
     QRegion m_movableRegion; /**< The movement boundary */
-
-    QSettings m_qSettings; /**< QSettings variable used to write or read from independent application sessions */
 
 
 signals:

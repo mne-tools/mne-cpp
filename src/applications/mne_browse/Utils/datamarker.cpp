@@ -37,8 +37,7 @@ DataMarker::DataMarker(QWidget* parent)
 , m_oldPos(QPoint(0, 0))
 , m_movableRegion(QRegion())
 {
-    QColor color = m_qSettings.value("DataMarker/data_marker_color", QColor(93, 177, 47)).value<QColor>();
-    setMarkerColor(color);
+    setMarkerColor(RawSettings().dataMarkerColor());
 }
 
 

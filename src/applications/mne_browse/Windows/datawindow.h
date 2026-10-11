@@ -212,6 +212,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns the events detected on the trigger channel in the blocks loaded so far.
+     *
+     * @return The event markers, sorted by sample.
+     */
+    const QVector<DISPLIB::ChannelRhiView::EventMarker>& stimEvents() const;
+
+    //=========================================================================================================
+    /**
      * Only shows the channels defined in the QStringList selectedChannels
      *
      * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
@@ -498,6 +506,16 @@ private:
 
     bool m_bHideBadChannels; /**< hide bad channels flag. */
 
+    //=========================================================================================================
+    /**
+     * Returns the colour of an event type: the event model's colour, else a palette colour.
+     *
+     * @param[in] type  Event type (trigger code).
+     *
+     * @return The colour to draw its markers in.
+     */
+    QColor eventTypeColor(int type);
+
     // ── ChannelDataView (GPU-accelerated renderer) ─────────────────────
     RawView* m_pChannelDataView = nullptr;    /**< Application-level raw browser view wrapper. */
     FiffBlockReader* m_pFiffReader = nullptr; /**< Demand-paging FIFF reader. */
@@ -508,7 +526,7 @@ private:
 
     // ── STIM event cache ───────────────────────────────────────────────
     QVector<DISPLIB::ChannelRhiView::EventMarker> m_stimEvents; /**< Accumulated STIM-channel events across loaded blocks. */
-    QMap<int, QColor> m_eventTypeColors;                        /**< Per-type colour palette (built on demand). */
+    QMap<int, QColor> m_eventTypeColors;                        /**< Palette colours of codes the event model has no colour for. */
     QSet<quint64> m_seenStimEventKeys;                          /**< De-duplicates events when blocks are revisited. */
     int m_iStimChannel = -1;                                    /**< Selected trigger channel index (prefer STI 014). */
     int m_iStimLastSample = std::numeric_limits<int>::min();    /**< Last scanned sample on the trigger channel. */

@@ -15,6 +15,9 @@
 //=============================================================================================================
 
 #include <Windows/averagewindow.h>
+#include <Windows/datawindow.h>
+#include <Windows/eventwindow.h>
+#include <Models/eventmodel.h>
 #include <Windows/mainwindow.h>
 #include <Models/averagemodel.h>
 
@@ -54,6 +57,7 @@ private slots:
     void constructsAndRendersMainWindow();
     void recomputesEvokedLikePython();
     void computesAndSavesCovarianceLikePython();
+    void eventMarkersUseEventTypeColors();
 
 private:
     static MainWindow* makeWindow();
@@ -274,6 +278,38 @@ void TestMneBrowseApp::computesAndSavesCovarianceLikePython()
     const double got[3] = {cov.data(meg, meg), cov.data(eeg, eeg), cov.data(meg, eeg)};
     for (int k = 0; k < 3; ++k)
         QVERIFY2(std::abs(got[k] - expected[k]) < 1e-5 * std::abs(expected[k]), qPrintable(QString::number(got[k], 'g', 17)));
+}
+
+void TestMneBrowseApp::eventMarkersUseEventTypeColors()
+{
+    const QString rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(rawPath))
+        QSKIP("Sample test data not found");
+    QSettings().remove("EventDesignParameters");
+
+    auto* window = makeWindow();
+    window->resize(1200, 800);
+    window->show();
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    window->applyCommandLineOptions(rawPath, QString(), -1.0, -1.0);
+    DataWindow* dataWindow = window->dataWindow();
+    QTRY_VERIFY_WITH_TIMEOUT(!dataWindow->stimEvents().isEmpty(), 10000);
+
+    // Markers of the trigger channel are drawn in the colours the event list shows
+    EventModel* eventModel = window->eventWindow()->getEventModel();
+    for (const auto& marker : dataWindow->stimEvents())
+        QCOMPARE(marker.color, eventModel->getEventTypeColors().value(marker.type));
+
+    // A colour picked in the event window recolours the markers of that type
+    const int type = dataWindow->stimEvents().first().type;
+    const QColor picked(12, 34, 56);
+    eventModel->addNewEventType(QString::number(type), picked);
+    dataWindow->updateDataTableViews();
+    for (const auto& marker : dataWindow->stimEvents()) {
+        if (marker.type == type)
+            QCOMPARE(marker.color, picked);
+    }
+    QSettings().remove("EventDesignParameters");
 }
 
 //=============================================================================================================
