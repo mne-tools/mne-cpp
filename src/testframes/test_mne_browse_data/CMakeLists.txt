@@ -29,7 +29,6 @@ set(SOURCES
     ../../applications/mne_browse/Models/averagemodel.cpp
     ../../applications/mne_browse/Models/epochmodel.cpp
     ../../applications/mne_browse/Models/fiffblockreader.cpp
-    ../../applications/mne_browse/Models/virtualchannelmodel.cpp
 
     # Utils (non-GUI only)
     ../../applications/mne_browse/Utils/datapackage.cpp
@@ -44,7 +43,6 @@ set(SOURCES
     ../../applications/mne_browse/Models/averagemodel.h
     ../../applications/mne_browse/Models/epochmodel.h
     ../../applications/mne_browse/Models/fiffblockreader.h
-    ../../applications/mne_browse/Models/virtualchannelmodel.h
     ../../applications/mne_browse/Utils/rawsettings.h
     ../../applications/mne_browse/Utils/sessionfilter.h
 )

@@ -9,7 +9,7 @@
  * @date     June, 2026
  * @brief    Comprehensive tests for mne_browse data models and utilities.
  *           Tests RawModel, AnnotationModel, EventModel, AverageModel, EpochModel,
- *           FiffBlockReader, VirtualChannelModel, DataPackage, FilterOperator,
+ *           FiffBlockReader, DataPackage, FilterOperator,
  *           SessionFilter, and NewParksMcClellan.
  */
 
@@ -23,7 +23,6 @@
 #include "Models/averagemodel.h"
 #include "Models/epochmodel.h"
 #include "Models/fiffblockreader.h"
-#include "Models/virtualchannelmodel.h"
 #include "Utils/datapackage.h"
 #include "Utils/filteroperator.h"
 #include "Utils/sessionfilter.h"
@@ -144,14 +143,6 @@ private slots:
     void testEpochModelClear();
     void testEpochModelSummary();
 
-    //=========================================================================================================
-    // VirtualChannelModel tests
-    //=========================================================================================================
-    void testVirtualChannelModelConstruct();
-    void testVirtualChannelModelAddChannel();
-    void testVirtualChannelModelData();
-    void testVirtualChannelModelRemoveRows();
-    void testVirtualChannelModelSaveLoad();
 
     //=========================================================================================================
     // DataPackage tests
@@ -998,45 +989,6 @@ void TestMneBrowseData::testEpochModelSummary()
     EpochModel model;
     QString summary = model.summaryText();
     QVERIFY(!summary.isEmpty() || summary.isEmpty()); // Exercise code path
-}
-
-//=============================================================================================================
-// VirtualChannelModel tests
-//=============================================================================================================
-
-void TestMneBrowseData::testVirtualChannelModelConstruct()
-{
-    VirtualChannelModel model(nullptr);
-    QCOMPARE(model.rowCount(), 0);
-}
-
-void TestMneBrowseData::testVirtualChannelModelAddChannel()
-{
-    VirtualChannelModel model(nullptr);
-    // Exercise the add method if it exists
-    QCOMPARE(model.rowCount(), 0);
-}
-
-void TestMneBrowseData::testVirtualChannelModelData()
-{
-    VirtualChannelModel model(nullptr);
-    QVariant val = model.data(model.index(0, 0), Qt::DisplayRole);
-    QVERIFY(!val.isValid()); // No data added
-}
-
-void TestMneBrowseData::testVirtualChannelModelRemoveRows()
-{
-    VirtualChannelModel model(nullptr);
-    // Should handle gracefully with no rows
-    model.removeRows(0, 0);
-    QCOMPARE(model.rowCount(), 0);
-}
-
-void TestMneBrowseData::testVirtualChannelModelSaveLoad()
-{
-    VirtualChannelModel model(nullptr);
-    // Exercise save/load if available
-    QVERIFY(true);
 }
 
 //=============================================================================================================
