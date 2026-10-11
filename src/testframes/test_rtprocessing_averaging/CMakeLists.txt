@@ -7,6 +7,12 @@ project(test_rtprocessing_averaging LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 
+# Code-coverage instrumentation for the mne_browse sources compiled in below
+if(WITH_CODE_COV)
+  add_compile_options("--coverage" "-O1" "-g")
+  add_link_options("--coverage")
+endif()
+
 set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})

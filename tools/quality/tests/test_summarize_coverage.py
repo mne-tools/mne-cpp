@@ -225,6 +225,24 @@ class TestRepositoryConfiguration(unittest.TestCase):
         self.assertIn("disable_file_fixes: true", text)
         self.assertIn("check_coverage_gate.py coverage_filtered.info", text)
 
+    def test_tests_compiling_measured_sources_are_instrumented(self) -> None:
+        # An uninstrumented copy of a measured source makes its tests count as 0 % covered.
+        measured = [_REPO_ROOT / "src" / scope for scope in coverage.SCOPES]
+        uninstrumented = []
+        for cmake in sorted((_REPO_ROOT / "src" / "testframes").glob("*/CMakeLists.txt")):
+            text = cmake.read_text(encoding="utf-8")
+            variables = {"CMAKE_SOURCE_DIR": str(_REPO_ROOT)}
+            variables.update(re.findall(r"set\((\w+)\s+([^\s)]+)\)", text))
+            for source in re.findall(r"[^\s()\"]+\.cpp", text):
+                resolved = source
+                for _ in range(3):
+                    resolved = re.sub(r"\$\{(\w+)\}", lambda m: variables.get(m.group(1), m.group(0)), resolved)
+                path = (cmake.parent / resolved).resolve()
+                if any(path.is_relative_to(root) for root in measured) and "WITH_CODE_COV" not in text:
+                    uninstrumented.append(cmake.parent.name)
+                    break
+        self.assertEqual([], uninstrumented)
+
 
 if __name__ == "__main__":
     unittest.main()

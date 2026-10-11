@@ -10,6 +10,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
+# Code-coverage instrumentation for the mne_browse source compiled in below
+if(WITH_CODE_COV)
+  add_compile_options("--coverage" "-O1" "-g")
+  add_link_options("--coverage")
+endif()
+
 set(QT_REQUIRED_COMPONENTS Core Gui Test Widgets)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
