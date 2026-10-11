@@ -36,41 +36,6 @@ private slots:
         srand(42);
     }
 
-    void testDefaultCtor()
-    {
-        KMeans kmeans;
-        Q_UNUSED(kmeans);
-        QVERIFY(true);
-    }
-
-    void testCtorSqEuclidean()
-    {
-        KMeans kmeans("sqeuclidean", "sample", 1, "error", true, 100);
-        Q_UNUSED(kmeans);
-        QVERIFY(true);
-    }
-
-    void testCtorCityblock()
-    {
-        KMeans kmeans("cityblock", "sample", 1, "error", true, 50);
-        Q_UNUSED(kmeans);
-        QVERIFY(true);
-    }
-
-    void testCtorCosine()
-    {
-        KMeans kmeans("cosine", "sample", 1, "error", true, 50);
-        Q_UNUSED(kmeans);
-        QVERIFY(true);
-    }
-
-    void testCtorCorrelation()
-    {
-        KMeans kmeans("correlation", "sample", 1, "error", true, 50);
-        Q_UNUSED(kmeans);
-        QVERIFY(true);
-    }
-
     void testCalculateSqEuclidean()
     {
         KMeans kmeans("sqeuclidean", "sample", 1, "singleton", true, 100);

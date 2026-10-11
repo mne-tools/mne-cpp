@@ -36,7 +36,6 @@ class TestSensorStreaming : public QObject
 private slots:
     // ── Worker tests ───────────────────────────────────────────────────
 
-    void testWorkerConstruction();
     void testWorkerAddData();
     void testWorkerClear();
     void testWorkerStreamDataNoMapping();
@@ -54,7 +53,6 @@ private slots:
 
     void testControllerConstruction();
     void testControllerStreamingState();
-    void testControllerTimeInterval();
     void testControllerSignalForwarding();
     void testControllerClearData();
 
@@ -100,26 +98,20 @@ static std::shared_ptr<Eigen::MatrixXf> createUniformMapping(int nVertices, int 
 // WORKER TESTS
 //=============================================================================================================
 
-void TestSensorStreaming::testWorkerConstruction()
-{
-    RtSensorDataWorker worker;
-    // Worker should be constructible without crashing
-    QVERIFY(true);
-}
-
-//=============================================================================================================
-
 void TestSensorStreaming::testWorkerAddData()
 {
+    // Unsmoothed streaming hands out the queued measurements in arrival order
     RtSensorDataWorker worker;
-    Eigen::VectorXf data(10);
-    data.setRandom();
-
-    // Adding data should not crash
-    worker.addData(data);
-    worker.addData(data);
-    worker.addData(data);
-    QVERIFY(true);
+    worker.setStreamSmoothedData(false);
+    worker.setLoopState(false);
+    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtRawSensorData);
+    for (float v : {1.0f, 2.0f, 3.0f})
+        worker.addData(Eigen::VectorXf::Constant(4, v));
+    for (int i = 0; i < 4; ++i)
+        worker.streamData();
+    QCOMPARE(spy.count(), 3);
+    for (int i = 0; i < 3; ++i)
+        QCOMPARE(spy.at(i).at(0).value<Eigen::VectorXf>(), Eigen::VectorXf::Constant(4, i + 1.0f).eval());
 }
 
 //=============================================================================================================
@@ -264,19 +256,18 @@ void TestSensorStreaming::testWorkerLooping()
 
 void TestSensorStreaming::testWorkerQueueCap()
 {
+    // The queue holds at most one second of data
     RtSensorDataWorker worker;
-    worker.setSFreq(10.0); // Cap at 10 samples
-
-    Eigen::VectorXf data(3);
-    data.setRandom();
-
-    // Add more than the cap
-    for (int i = 0; i < 20; ++i) {
-        worker.addData(data);
-    }
-
-    // Should not crash — queue is capped
-    QVERIFY(true);
+    worker.setStreamSmoothedData(false);
+    worker.setLoopState(false);
+    worker.setSFreq(10.0);
+    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtRawSensorData);
+    for (int i = 0; i < 20; ++i)
+        worker.addData(Eigen::VectorXf::Constant(3, i));
+    for (int i = 0; i < 20; ++i)
+        worker.streamData();
+    QCOMPARE(spy.count(), 10);
+    QCOMPARE(spy.first().at(0).value<Eigen::VectorXf>()(0), 0.0f);
 }
 
 //=============================================================================================================
@@ -424,12 +415,17 @@ void TestSensorStreaming::testWorkerColormapChange()
 
 void TestSensorStreaming::testWorkerSFreq()
 {
+    // Sampling frequencies below 1 Hz still keep one sample
     RtSensorDataWorker worker;
-    // Setting sampling frequency should not crash
-    worker.setSFreq(100.0);
+    worker.setStreamSmoothedData(false);
+    worker.setLoopState(false);
     worker.setSFreq(0.5);
-    worker.setSFreq(10000.0);
-    QVERIFY(true);
+    QSignalSpy spy(&worker, &RtSensorDataWorker::newRtRawSensorData);
+    worker.addData(Eigen::VectorXf::Constant(3, 1.0f));
+    worker.addData(Eigen::VectorXf::Constant(3, 2.0f));
+    worker.streamData();
+    worker.streamData();
+    QCOMPARE(spy.count(), 1);
 }
 
 //=============================================================================================================
@@ -455,19 +451,6 @@ void TestSensorStreaming::testControllerStreamingState()
 
     controller.setStreamingState(false);
     QVERIFY(!controller.isStreaming());
-}
-
-//=============================================================================================================
-
-void TestSensorStreaming::testControllerTimeInterval()
-{
-    RtSensorDataController controller;
-
-    controller.setTimeInterval(50);
-    // Should not crash
-    controller.setTimeInterval(1);
-    controller.setTimeInterval(100);
-    QVERIFY(true);
 }
 
 //=============================================================================================================
@@ -509,15 +492,16 @@ void TestSensorStreaming::testControllerSignalForwarding()
 void TestSensorStreaming::testControllerClearData()
 {
     RtSensorDataController controller;
+    controller.setMappingMatrix(QStringLiteral("head"), createUniformMapping(6, 5));
+    controller.addData(Eigen::VectorXf::Constant(5, 1.0f));
+    controller.addData(Eigen::VectorXf::Constant(5, 2.0f));
 
-    Eigen::VectorXf data(5);
-    data.setRandom();
-    controller.addData(data);
-    controller.addData(data);
-
-    // Clear should not crash
+    // Cleared data is never streamed
     controller.clearData();
-    QVERIFY(true);
+    QSignalSpy spy(&controller, &RtSensorDataController::newSensorColorsAvailable);
+    controller.setStreamingState(true);
+    QVERIFY(!spy.wait(300));
+    controller.setStreamingState(false);
 }
 
 //=============================================================================================================
