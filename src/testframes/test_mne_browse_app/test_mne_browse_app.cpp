@@ -489,6 +489,8 @@ void TestMneBrowseApp::annotatesDraggedRangeLikePython()
     findAction(first, QStringLiteral("Save Annotations..."))->trigger();
     first->hide();
 
+    // Reference values produced by t = raw.times[[600, 900]]; raw.set_annotations(mne.Annotations([t[0]],
+    // [t[1] - t[0]], ["BAD_drag"])) (mne 1.11.0): onsets count from orig_time = meas_date
     QFile annotFile(annotPath);
     FIFFLIB::FiffStream stream(&annotFile);
     QVERIFY(stream.open());
@@ -502,6 +504,7 @@ void TestMneBrowseApp::annotatesDraggedRangeLikePython()
     }
     annotFile.close();
     QCOMPARE(times[3568].size(), 1);
+    QVERIFY2(std::abs(times[3568][0] - 44.95392282905339) < 1e-5, qPrintable(QString::number(times[3568][0], 'g', 10)));
 
     // Loading the file again restores the same span and label
     auto* second = openWindow();

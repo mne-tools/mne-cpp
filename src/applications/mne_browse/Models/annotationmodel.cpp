@@ -792,6 +792,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
     QStringList descriptions;
     QVector<QStringList> channelNames;
     QVector<QVariantMap> extras;
+    bool haveOrigTime = false;
 
     for (int entryIndex = 0; entryIndex < annotationBlocks.first()->nent(); ++entryIndex) {
         const auto& directoryEntry = annotationBlocks.first()->dir.at(entryIndex);
@@ -816,6 +817,8 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
                     endSeconds[index] = values[index];
                 }
             }
+        } else if (directoryEntry->kind == FIFF_MEAS_DATE) {
+            haveOrigTime = true;
         } else if (directoryEntry->kind == FIFF_COMMENT) {
             descriptions = decodeMneChannelNames(tag->toString());
         } else if (directoryEntry->kind == FiffMneEpochsDropLog) {
@@ -864,7 +867,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
         const QString comment = extraValues.value(QStringLiteral("comment")).toString().trimmed();
         extraValues.remove(QStringLiteral("comment"));
 
-        const int startSample = onsetSecondsToSample(onsetSeconds.at(index));
+        const int startSample = onsetSecondsToSample(onsetSeconds.at(index) + (haveOrigTime ? sampleToOnsetSeconds(0) : 0.0));
         const int endSample = startSample + durationSecondsToSamples(endSeconds.at(index) - onsetSeconds.at(index)) - 1;
         parsedEntries.append(normalizeEntry(startSample,
                                             endSample,
@@ -1188,9 +1191,14 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
     QJsonArray extrasRows;
     bool haveExtras = false;
 
+    bool haveMeasurementStart = false;
+    const qint64 measurementStartUsecs = measurementStartUsecsSinceEpoch(&haveMeasurementStart);
+    // With an orig_time, MNE counts onsets from the measurement start rather than the first sample
+    const double origTimeOffset = haveMeasurementStart ? sampleToOnsetSeconds(0) * -1.0 : 0.0;
+
     const QVector<AnnotationEntry> entries = exportEntries();
     for (const AnnotationEntry& entry : entries) {
-        const float onset = static_cast<float>(sampleToOnsetSeconds(entry.startSample));
+        const float onset = static_cast<float>(sampleToOnsetSeconds(entry.startSample) + origTimeOffset);
         const float duration = static_cast<float>((entry.endSample - entry.startSample + 1) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
 
         onsetSeconds.append(onset);
@@ -1227,8 +1235,6 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
         stream->write_string(FIFF_COMMENT, encodedDescriptions);
     }
 
-    bool haveMeasurementStart = false;
-    const qint64 measurementStartUsecs = measurementStartUsecsSinceEpoch(&haveMeasurementStart);
     if (haveMeasurementStart) {
         const double measurementStamp[2] = {
             static_cast<double>(measurementStartUsecs / 1000000LL),
