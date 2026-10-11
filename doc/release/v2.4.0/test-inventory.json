@@ -6,9 +6,9 @@
     "commit": "c78efbf82cc2b7ff71b996e1fd6f46a562b1f0bc"
   },
   "summary": {
-    "directories": 262,
+    "directories": 263,
     "registration": {
-      "unconditional": 254,
+      "unconditional": 255,
       "conditional": 5,
       "unregistered": 3
     },
@@ -19,11 +19,11 @@
     "requirements": {
       "freesurfer": 2,
       "python": 9,
-      "sample-data": 19,
-      "test-data": 116
+      "sample-data": 20,
+      "test-data": 117
     },
-    "gui": 44,
-    "with_qskip": 86,
+    "gui": 45,
+    "with_qskip": 87,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -33,7 +33,8 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app"
+          "test_mne_inspect_app",
+          "test_mne_scan_plugins"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -76,7 +77,8 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app"
+          "test_mne_inspect_app",
+          "test_mne_scan_plugins"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -119,7 +121,8 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app"
+          "test_mne_inspect_app",
+          "test_mne_scan_plugins"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -162,7 +165,8 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app"
+          "test_mne_inspect_app",
+          "test_mne_scan_plugins"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -205,7 +209,8 @@
         "skipped": 2,
         "registered_not_executed": [
           "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app"
+          "test_mne_inspect_app",
+          "test_mne_scan_plugins"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -248,7 +253,8 @@
         "skipped": 2,
         "registered_not_executed": [
           "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app"
+          "test_mne_inspect_app",
+          "test_mne_scan_plugins"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -6741,6 +6747,43 @@
         "ubuntu-24.04-qt-min": "run",
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_scan_plugins",
+      "cmake": "src/testframes/test_mne_scan_plugins/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_scan_plugins"
+      ],
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
+      "requirements": [
+        "sample-data",
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 3,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": []
     },

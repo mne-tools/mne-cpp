@@ -361,6 +361,7 @@ add_subdirectory(test_mne_inspect_app)
 # WriteToFile recording-status + project-resume-layout tests
 # + FiffSimulator SSP/bad-ch replay round trip
 add_subdirectory(test_writetofile_status)
+add_subdirectory(test_mne_scan_plugins)
 add_subdirectory(test_project_resume_layout)
 add_subdirectory(test_fiffsimulator_ssp)
 

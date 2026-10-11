@@ -22,7 +22,6 @@
 
 #include "rtfwd_global.h"
 
-#include "FormFiles/rtfwdsetupwidget.h"
 
 #include <scShared/Plugins/abstractalgorithm.h>
 

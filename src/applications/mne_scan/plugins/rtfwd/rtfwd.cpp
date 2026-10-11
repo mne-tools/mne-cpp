@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "rtfwd.h"
+#include "FormFiles/rtfwdsetupwidget.h"
 
 #include <disp/viewers/fwdsettingsview.h>
 
