@@ -7415,7 +7415,7 @@
         "test-data"
       ],
       "gui": false,
-      "qskip_sites": 24,
+      "qskip_sites": 22,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
