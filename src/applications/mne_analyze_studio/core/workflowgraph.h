@@ -32,6 +32,13 @@ class STUDIOCORESHARED_EXPORT WorkflowValidationError : public std::runtime_erro
 {
 public:
     explicit WorkflowValidationError(const QString& message);
+
+    // Out of line, so the exported vftable is emitted by one object file only (MSVC LNK4197)
+    WorkflowValidationError(const WorkflowValidationError& other) noexcept;
+    WorkflowValidationError(WorkflowValidationError&& other) noexcept;
+    WorkflowValidationError& operator=(const WorkflowValidationError& other) noexcept;
+    WorkflowValidationError& operator=(WorkflowValidationError&& other) noexcept;
+    ~WorkflowValidationError() override;
 };
 
 /**
