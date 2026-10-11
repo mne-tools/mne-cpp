@@ -193,16 +193,6 @@ protected:
      */
     void doAveraging(const Eigen::MatrixXd& rawSegment);
 
-    //=========================================================================================================
-    /**
-     * Prepends incoming data to front/pre stim buffer.
-     *
-     * @param[in] data            Incoming data block (n_channels × n_samples).
-     * @param[in] dTriggerType    Trigger type whose pre-stimulus buffer is updated (-1.0 for the shared buffer).
-     */
-    void fillFrontBuffer(const Eigen::MatrixXd& data,
-                         double dTriggerType);
-
     void emitEvoked(double dTriggerType,
                     QStringList& lResponsibleTriggerTypes);
 
@@ -265,6 +255,7 @@ protected:
 
     QMap<QString, double> m_mapThresholds;             /**< Holds the current thresholds for artifact rejection. */
     QMap<double, QList<Eigen::MatrixXd>> m_mapStimAve; /**< the current stimulus average buffer. Holds m_iNumAverages vectors. */
+    Eigen::MatrixXd m_matPreHistory;                   /**< The last m_iPreStimSamples samples before the current block. */
     QMap<double, Eigen::MatrixXd> m_mapDataPre;        /**< The matrix holding pre stim data. */
     QMap<double, Eigen::MatrixXd> m_mapDataPost;       /**< The matrix holding post stim data. */
     QMap<double, qint32> m_mapMatDataPostIdx;          /**< Current index inside of the matrix m_matDataPost. */

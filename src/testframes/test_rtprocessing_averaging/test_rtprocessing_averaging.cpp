@@ -240,63 +240,6 @@ private slots:
     }
 
     //=========================================================================
-    // RtConnectivity - construction and lifecycle
-    //=========================================================================
-    void rtConnectivity_construct()
-    {
-        RtConnectivity conn;
-        // Just verify construction
-        QVERIFY(true);
-    }
-
-    void rtConnectivity_stopEmpty()
-    {
-        RtConnectivity conn;
-        conn.stop();
-        QVERIFY(true);
-    }
-
-    void rtConnectivity_restart()
-    {
-        RtConnectivity conn;
-        conn.restart();
-        QVERIFY(true);
-    }
-
-    //=========================================================================
-    // RtInvOp - construction and lifecycle
-    //=========================================================================
-    void rtInvOp_construct()
-    {
-        FiffInfo::SPtr info = createSyntheticFiffInfo(10, 1000.0f);
-        QSharedPointer<MNEForwardSolution> fwd(new MNEForwardSolution());
-
-        RtInvOp invOp(info, fwd);
-        QVERIFY(true);
-    }
-
-    void rtInvOp_stop()
-    {
-        FiffInfo::SPtr info = createSyntheticFiffInfo(10, 1000.0f);
-        QSharedPointer<MNEForwardSolution> fwd(new MNEForwardSolution());
-
-        RtInvOp invOp(info, fwd);
-        invOp.stop();
-        QVERIFY(true);
-    }
-
-    void rtInvOp_setFwd()
-    {
-        FiffInfo::SPtr info = createSyntheticFiffInfo(10, 1000.0f);
-        QSharedPointer<MNEForwardSolution> fwd(new MNEForwardSolution());
-        QSharedPointer<MNEForwardSolution> fwd2(new MNEForwardSolution());
-
-        RtInvOp invOp(info, fwd);
-        invOp.setFwdSolution(fwd2);
-        QVERIFY(true);
-    }
-
-    //=========================================================================
     // FiffInfo synthetic - coverage for FiffInfo methods
     //=========================================================================
     void fiffInfo_syntheticChannels()
@@ -307,73 +250,54 @@ private slots:
     }
 
     //=========================================================================
-    // DATA-DRIVEN: RtAveraging with real raw data
+    // DATA-DRIVEN: RtAveraging streamed in blocks == offline average at the stim onsets
     //=========================================================================
-    void data_rtAveraging_withRealInfo()
+    void data_rtAveraging_matchesOfflineAverage()
     {
         if (!hasData())
             QSKIP("No test data");
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
-        if (!file.exists())
-            QSKIP("Raw file not found");
-
         FiffRawData raw(file);
         FiffInfo::SPtr info = FiffInfo::SPtr::create(raw.info);
+        const int stiIdx = info->ch_names.indexOf("STI014");
+        QVERIFY(stiIdx >= 0);
+        MatrixXd data, times;
+        QVERIFY(raw.read_raw_segment(data, times));
 
-        // Find STI channel index
-        int stiIdx = -1;
-        for (int i = 0; i < info->nchan; ++i) {
-            if (info->chs[i].kind == FIFFV_STIM_CH) {
-                stiIdx = i;
-                break;
+        const int pre = 50;
+        const int post = 100;
+        const int block = 200;
+        const MatrixXi events = deriveStimEvents(raw);
+        const int code = events(0, 2);
+        MatrixXd expected = MatrixXd::Zero(data.rows(), pre + post);
+        int nave = 0;
+        for (int row = 0; row < events.rows(); ++row) {
+            const int onset = events(row, 0) - raw.first_samp;
+            if (events(row, 2) == code && events(row, 1) == 0 && onset >= pre && onset + post <= data.cols()) {
+                expected += data.middleCols(onset - pre, pre + post);
+                ++nave;
             }
         }
-        if (stiIdx < 0)
-            QSKIP("No stimulus channel found");
+        QVERIFY(nave > 3);
+        expected /= nave;
 
-        RtAveraging avg(10, 50, 100, 0, 0, stiIdx, info);
-        avg.setBaselineActive(true);
-        avg.setBaselineFrom(0, 0);
-        avg.setBaselineTo(50, 100);
+        RtAveragingWorker worker(1000, pre, post, 0, 0, stiIdx, info);
+        FiffEvokedSet result;
+        connect(&worker, &RtAveragingWorker::resultReady, this, [&](const FiffEvokedSet& set, const QStringList&) { result = set; });
+        for (int start = 0; start + block <= data.cols(); start += block)
+            worker.doWork(data.middleCols(start, block));
 
-        // Read a segment and feed it
-        MatrixXd data, times;
-        fiff_int_t from = raw.first_samp;
-        fiff_int_t to = qMin(raw.first_samp + 2000, raw.last_samp);
-        raw.read_raw_segment(data, times, from, to);
-
-        avg.append(data);
-        avg.stop();
-        QVERIFY(true);
-    }
-
-    //=========================================================================
-    // DATA-DRIVEN: RtInvOp with real forward solution
-    //=========================================================================
-    void data_rtInvOp_withRealFwd()
-    {
-        if (!hasData())
-            QSKIP("No test data");
-
-        QString fwdPath = m_sDataPath + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
-        QString rawPath = m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif";
-
-        QFile fwdFile(fwdPath), rawFile(rawPath);
-        if (!fwdFile.exists() || !rawFile.exists())
-            QSKIP("Required files not found");
-
-        MNEForwardSolution fwdSol(fwdFile);
-        FiffRawData raw(rawFile);
-
-        if (fwdSol.isEmpty())
-            QSKIP("Forward solution empty");
-
-        FiffInfo::SPtr info = FiffInfo::SPtr::create(raw.info);
-        QSharedPointer<MNEForwardSolution> fwd(new MNEForwardSolution(fwdSol));
-
-        RtInvOp invOp(info, fwd);
-        invOp.stop();
-        QVERIFY(true);
+        FiffEvoked evoked;
+        for (const FiffEvoked& candidate : std::as_const(result.evoked)) {
+            if (candidate.comment == QString::number(code))
+                evoked = candidate;
+        }
+        QCOMPARE(evoked.nave, nave);
+        const MatrixXd diff = evoked.data - expected;
+        for (int ch = 0; ch < data.rows(); ++ch) {
+            const double scale = expected.row(ch).cwiseAbs().maxCoeff();
+            QVERIFY2(diff.row(ch).cwiseAbs().maxCoeff() <= 1e-9 * scale + 1e-30, qPrintable(info->ch_names.at(ch)));
+        }
     }
 
     //=========================================================================

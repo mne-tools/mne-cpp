@@ -225,10 +225,9 @@ void RtAveragingWorker::doAveraging(const MatrixXd& rawSegment)
         }
     }
 
-    //Fill front / pre stim buffer even if no triggers have been located at all yet
-    if (m_mapFillingBackBuffer.isEmpty()) {
-        fillFrontBuffer(rawSegment, -1.0);
-    }
+    // Pre-stimulus samples of a trigger may reach back into the previous blocks
+    MatrixXd matHistoryAndBlock(rawSegment.rows(), m_matPreHistory.cols() + rawSegment.cols());
+    matHistoryAndBlock << m_matPreHistory, rawSegment;
 
     //Do averaging for each trigger type
     QMutableMapIterator<double, bool> idx(m_mapFillingBackBuffer);
@@ -238,11 +237,6 @@ void RtAveragingWorker::doAveraging(const MatrixXd& rawSegment)
         idx.next();
 
         double dTriggerType = idx.key();
-
-        //Fill front / pre stim buffer
-        if (lDetectedTriggers.isEmpty()) {
-            fillFrontBuffer(rawSegment, -1.0);
-        }
 
         //Fill back buffer and decide when to do the data packing of the different buffers
         if (m_mapFillingBackBuffer[dTriggerType]) {
@@ -256,60 +250,38 @@ void RtAveragingWorker::doAveraging(const MatrixXd& rawSegment)
                 emitEvoked(dTriggerType, lResponsibleTriggerTypes);
             }
         } else {
-            if (lDetectedTriggers.isEmpty()) {
-                //Fill front / pre stim buffer
-                fillFrontBuffer(rawSegment, dTriggerType);
-            } else {
-                for (int i = 0; i < lDetectedTriggers.size(); ++i) {
-                    if (dTriggerType == lDetectedTriggers.at(i).second) {
-                        int iTriggerPos = lDetectedTriggers.at(i).first;
+            for (int i = 0; i < lDetectedTriggers.size(); ++i) {
+                if (dTriggerType == lDetectedTriggers.at(i).second) {
+                    int iTriggerPos = lDetectedTriggers.at(i).first;
 
-                        //Do front buffer stuff
-                        MatrixXd tempMat;
+                    m_mapDataPre[dTriggerType] = matHistoryAndBlock.middleCols(iTriggerPos, m_iPreStimSamples);
 
-                        if (iTriggerPos >= m_iPreStimSamples) {
-                            tempMat = rawSegment.block(0,
-                                                       iTriggerPos - m_iPreStimSamples,
-                                                       rawSegment.rows(),
-                                                       m_iPreStimSamples);
-                        } else {
-                            tempMat = rawSegment.block(0,
-                                                       0,
-                                                       rawSegment.rows(),
-                                                       iTriggerPos);
-                        }
-
-                        fillFrontBuffer(tempMat, dTriggerType);
-
-                        //Do back buffer stuff
-                        if (rawSegment.cols() - iTriggerPos >= m_mapDataPost[dTriggerType].cols()) {
-                            m_mapDataPost[dTriggerType] = rawSegment.block(0,
-                                                                           iTriggerPos,
-                                                                           m_mapDataPost[dTriggerType].rows(),
-                                                                           m_mapDataPost[dTriggerType].cols());
-                            emitEvoked(dTriggerType, lResponsibleTriggerTypes);
-                            m_mapMatDataPostIdx[dTriggerType] = 0;
-                            m_mapFillingBackBuffer[dTriggerType] = false;
-                        } else {
-                            m_mapDataPost[dTriggerType].block(0,
-                                                              0,
-                                                              m_mapDataPost[dTriggerType].rows(),
-                                                              rawSegment.cols() - iTriggerPos) = rawSegment.block(0,
-                                                                                                                  iTriggerPos,
-                                                                                                                  rawSegment.rows(),
-                                                                                                                  rawSegment.cols() - iTriggerPos);
-                            m_mapMatDataPostIdx[dTriggerType] = rawSegment.cols() - iTriggerPos;
-                            m_mapFillingBackBuffer[dTriggerType] = true;
-                        }
-
-                        //qDebug()<<"Trigger type "<<dTriggerType<<" found at "<<iTriggerPos;
+                    //Do back buffer stuff
+                    if (rawSegment.cols() - iTriggerPos >= m_mapDataPost[dTriggerType].cols()) {
+                        m_mapDataPost[dTriggerType] = rawSegment.block(0,
+                                                                       iTriggerPos,
+                                                                       m_mapDataPost[dTriggerType].rows(),
+                                                                       m_mapDataPost[dTriggerType].cols());
+                        emitEvoked(dTriggerType, lResponsibleTriggerTypes);
+                        m_mapMatDataPostIdx[dTriggerType] = 0;
+                        m_mapFillingBackBuffer[dTriggerType] = false;
+                    } else {
+                        m_mapDataPost[dTriggerType].block(0,
+                                                          0,
+                                                          m_mapDataPost[dTriggerType].rows(),
+                                                          rawSegment.cols() - iTriggerPos) = rawSegment.block(0,
+                                                                                                              iTriggerPos,
+                                                                                                              rawSegment.rows(),
+                                                                                                              rawSegment.cols() - iTriggerPos);
+                        m_mapMatDataPostIdx[dTriggerType] = rawSegment.cols() - iTriggerPos;
+                        m_mapFillingBackBuffer[dTriggerType] = true;
                     }
                 }
             }
         }
     }
 
-    //qDebug()<<"RtAveragingWorker::doAveraging() - time for procesing"<<time.elapsed();
+    m_matPreHistory = matHistoryAndBlock.rightCols(m_iPreStimSamples);
 }
 
 //=============================================================================================================
@@ -348,47 +320,6 @@ void RtAveragingWorker::fillBackBuffer(const MatrixXd& data, double dTriggerType
     }
 
     m_mapMatDataPostIdx[dTriggerType] += iResidualCols;
-}
-
-//=============================================================================================================
-
-void RtAveragingWorker::fillFrontBuffer(const MatrixXd& data, double dTriggerType)
-{
-    //Init m_mapDataPre
-    if (!m_mapDataPre.contains(dTriggerType)) {
-        if (dTriggerType != -1.0) {
-            m_mapDataPre[dTriggerType] = m_mapDataPre[-1.0];
-        } else {
-            m_mapDataPre[-1.0].resize(m_pFiffInfo->chs.size(), m_iPreStimSamples);
-            m_mapDataPre[-1.0].setZero();
-        }
-    }
-
-    if (m_mapDataPre[dTriggerType].cols() <= data.cols()) {
-        if (m_iPreStimSamples > 0 && data.cols() >= m_iPreStimSamples) {
-            m_mapDataPre[dTriggerType] = data.block(0,
-                                                    data.cols() - m_iPreStimSamples,
-                                                    data.rows(),
-                                                    m_iPreStimSamples);
-        }
-    } else {
-        int residual = m_mapDataPre[dTriggerType].cols() - data.cols();
-
-        //Copy shift data
-        m_mapDataPre[dTriggerType].block(0,
-                                         0,
-                                         m_mapDataPre[dTriggerType].rows(),
-                                         residual) = m_mapDataPre[dTriggerType].block(0,
-                                                                                      m_mapDataPre[dTriggerType].cols() - residual,
-                                                                                      m_mapDataPre[dTriggerType].rows(),
-                                                                                      residual);
-
-        //Copy new data in
-        m_mapDataPre[dTriggerType].block(0,
-                                         residual,
-                                         m_mapDataPre[dTriggerType].rows(),
-                                         data.cols()) = data;
-    }
 }
 
 //=============================================================================================================
@@ -508,7 +439,7 @@ void RtAveragingWorker::reset()
     //Clear all maps
     m_mapStimAve.clear();
     m_mapDataPre.clear();
-    m_mapDataPre[-1.0] = MatrixXd::Zero(m_pFiffInfo->chs.size(), m_iPreStimSamples);
+    m_matPreHistory = MatrixXd::Zero(m_pFiffInfo->chs.size(), m_iPreStimSamples);
     m_mapDataPost.clear();
     m_mapMatDataPostIdx.clear();
     m_mapFillingBackBuffer.clear();
