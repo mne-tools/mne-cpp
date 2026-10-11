@@ -10,7 +10,7 @@
  * @brief    Comprehensive tests for mne_browse data models and utilities.
  *           Tests RawModel, AnnotationModel, EventModel, AverageModel, EpochModel,
  *           FiffBlockReader, DataPackage, FilterOperator,
- *           SessionFilter, and NewParksMcClellan.
+ *           and SessionFilter.
  */
 
 //=============================================================================================================

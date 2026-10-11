@@ -18,7 +18,7 @@ Coverage from `d757a49a8` (https://github.com/mne-tools/mne-cpp/actions/runs/380
 | G4 | Documentation images generated in CI | 19 referenced, 0 without producer, placeholders in 0 workflows | met |
 | G4 | Visual regression compares to goldens | 19 golden comparisons | met |
 | G5 | Zero compiler warnings | enforced by -Werror on every matrix entry | met |
-| G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 419, raw_new 169, raw_delete 275, console_io 356, numeric_define 852, qt_new_unparented 819, oversized_unit 8 | baseline recorded |
+| G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 403, raw_new 169, raw_delete 275, console_io 356, numeric_define 847, qt_new_unparented 819, oversized_unit 8 | baseline recorded |
 | G6 | Pinned reference environment | MNE-Python 1.11.0; unpinned in CI: none | met |
 | G6 | Parity claims cross-validated | cross-validated-static 107, cross-validated-live 4, tested 244, unverified 5 | **open** |
 

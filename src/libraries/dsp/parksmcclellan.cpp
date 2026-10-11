@@ -7,8 +7,12 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    TODO: describe this file in one substantive sentence.
+ * @brief    Definition of the ParksMcClellan class: Remez exchange design of linear-phase FIR filters.
  */
+
+// Adapted from the C port of the Parks-McClellan Fortran program by Iowa Hills Software
+// (http://www.iowahills.com/A7ExampleCodePage.html, October 19, 2013); ported to MNE-CPP by
+// Christoph Dinh and Florian Schlembach in February 2014.
 
 //=============================================================================================================
 // INCLUDES

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
-  "scanned_files": 1502,
-  "scanned_lines": 395013,
+  "scanned_files": 1500,
+  "scanned_lines": 394250,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -55,10 +55,10 @@
       }
     },
     "c_style_cast": {
-      "total": 419,
-      "files": 71,
+      "total": 403,
+      "files": 70,
       "by_scope": {
-        "applications": 61,
+        "applications": 45,
         "libraries": 265,
         "tools": 93
       },
@@ -70,7 +70,6 @@
         "src/libraries/fiff/fiff_tag.cpp": 20,
         "src/tools/inverse/mne_compute_raw_inverse/main.cpp": 18,
         "src/tools/inverse/mne_compute_mne/main.cpp": 17,
-        "src/applications/mne_browse/Utils/newparksmcclellan.cpp": 16,
         "src/libraries/disp/viewers/helpers/frequencyspectrumdelegate.cpp": 16,
         "src/libraries/dsp/parksmcclellan.cpp": 16,
         "src/libraries/disp/viewers/butterflyview.cpp": 10,
@@ -78,7 +77,8 @@
         "src/applications/mne_scan/plugins/averaging/averaging.cpp": 8,
         "src/libraries/disp/viewers/helpers/filterplotscene.cpp": 8,
         "src/applications/mne_analyze/libs/anShared/Model/fiffrawviewmodel.cpp": 7,
-        "src/tools/info/mne_show_fiff/mne_fiff_exp_set.cpp": 7
+        "src/tools/info/mne_show_fiff/mne_fiff_exp_set.cpp": 7,
+        "src/libraries/disp/viewers/filterdesignview.cpp": 6
       },
       "all_files": {
         "src/applications/mne_analyze/libs/anShared/Management/eventmanager.cpp": 1,
@@ -92,7 +92,6 @@
         "src/applications/mne_browse/Models/eventmodel.cpp": 1,
         "src/applications/mne_browse/Models/fiffblockreader.cpp": 1,
         "src/applications/mne_browse/Models/rawmodel.cpp": 3,
-        "src/applications/mne_browse/Utils/newparksmcclellan.cpp": 16,
         "src/applications/mne_browse/Windows/datawindow.cpp": 2,
         "src/applications/mne_browse/Windows/noisereductionwindow.cpp": 1,
         "src/applications/mne_scan/plugins/averaging/averaging.cpp": 8,
@@ -486,10 +485,10 @@
       }
     },
     "numeric_define": {
-      "total": 852,
-      "files": 31,
+      "total": 847,
+      "files": 30,
       "by_scope": {
-        "applications": 69,
+        "applications": 64,
         "libraries": 748,
         "tools": 35
       },
@@ -507,13 +506,12 @@
         "src/libraries/mne/mne_surface_or_volume.h": 6,
         "src/tools/conversion/mne_kit2fiff/main.cpp": 6,
         "src/tools/info/mne_show_fiff/mne_fiff_exp_set.cpp": 6,
-        "src/applications/mne_browse/Utils/newparksmcclellan.cpp": 5,
         "src/libraries/fiff/fiff_tag.h": 5,
-        "src/libraries/inv/dipole_fit/inv_dipole_fit_data.cpp": 4
+        "src/libraries/inv/dipole_fit/inv_dipole_fit_data.cpp": 4,
+        "src/libraries/mne/mne_cov_matrix.h": 4
       },
       "all_files": {
         "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/rawsettings.h": 35,
-        "src/applications/mne_browse/Utils/newparksmcclellan.cpp": 5,
         "src/applications/mne_scan/plugins/babymeg/babymeg.h": 2,
         "src/applications/mne_scan/plugins/eegosports/eegosports.h": 1,
         "src/applications/mne_scan/plugins/hpi/hpi.h": 1,

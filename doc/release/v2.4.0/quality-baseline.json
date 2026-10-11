@@ -71,11 +71,11 @@
       "compiler_warnings": 0,
       "null_macro": 43,
       "typedef_struct": 12,
-      "c_style_cast": 419,
+      "c_style_cast": 403,
       "raw_new": 169,
       "raw_delete": 275,
       "console_io": 356,
-      "numeric_define": 852,
+      "numeric_define": 847,
       "qt_new_unparented": 819,
       "oversized_unit": 8
     },
