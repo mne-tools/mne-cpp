@@ -188,10 +188,10 @@ void TestMneAnalyzeStudioWorkbench::answersTerminalCommandsForOpenRaw()
 
     // Without a Neuro-Kernel the request cannot be delivered, so it must surface as a problem.
     QListWidget* problems = nullptr;
-    for (QTabWidget* tabs : window->findChildren<QTabWidget*>()) {
-        for (int i = 0; i < tabs->count(); ++i) {
-            if (tabs->tabText(i) == "Problems")
-                problems = qobject_cast<QListWidget*>(tabs->widget(i));
+    for (QTabWidget* panel : window->findChildren<QTabWidget*>()) {
+        for (int i = 0; i < panel->count(); ++i) {
+            if (panel->tabText(i) == "Problems")
+                problems = qobject_cast<QListWidget*>(panel->widget(i));
         }
     }
     if (!problems)
