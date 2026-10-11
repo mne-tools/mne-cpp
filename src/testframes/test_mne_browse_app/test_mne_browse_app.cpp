@@ -31,6 +31,7 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_events.h>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_tag.h>
@@ -38,6 +39,7 @@
 #include <mna/mna_project.h>
 
 #include <QAction>
+#include <QBuffer>
 #include <QColorDialog>
 #include <QComboBox>
 #include <QCryptographicHash>
@@ -524,11 +526,14 @@ void TestMneBrowseApp::annotatesDraggedRangeLikePython()
 
 void TestMneBrowseApp::savesAndOpensProjects()
 {
-    const QString rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
-    if (!QFile::exists(rawPath))
+    const QString samplePath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(samplePath))
         QSKIP("Sample test data not found");
 
+    // Saving a project writes sidecars beside the raw, so work on a copy
     QTemporaryDir dir;
+    const QString rawPath = dir.filePath("sample_raw.fif");
+    QVERIFY(QFile::copy(samplePath, rawPath));
     const auto chooseFile = [](const QString& path) {
         answerNextModal([path](QWidget* pModal) {
             auto* dialog = qobject_cast<QFileDialog*>(pModal);
@@ -559,6 +564,17 @@ void TestMneBrowseApp::savesAndOpensProjects()
     QCOMPARE(rawRef.role, MNALIB::MnaFileRole::Raw);
     QVERIFY(rawRef.embedded);
     QCOMPARE(rawRef.data.size(), QFileInfo(rawPath).size());
+    // The events detected on load travel with it, like mne.find_events(raw, "STI 014") (mne 1.11.0)
+    QByteArray eventData;
+    for (const MNALIB::MnaFileRef& ref : mnx.subjects[0].sessions[0].recordings[0].files) {
+        if (ref.role == MNALIB::MnaFileRole::Event)
+            eventData = ref.data;
+    }
+    QBuffer eventBuffer(&eventData);
+    FIFFLIB::FiffEvents events;
+    QVERIFY(FIFFLIB::FiffEvents::read_from_fif(eventBuffer, events));
+    QCOMPARE(events.num_events(), 25);
+    QCOMPARE(events.events.row(0), Eigen::RowVector3i(13988, 0, 2));
     first->hide();
 
     // Opened again it shows the same recording, extracted from the project

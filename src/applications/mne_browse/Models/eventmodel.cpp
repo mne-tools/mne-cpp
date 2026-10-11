@@ -376,6 +376,7 @@ bool EventModel::saveEventData(QFile& qFile)
     } else {
         writeSuccess = MNE::write_events_to_fif(qFile, events);
     }
+    qFile.close();
 
     if (!writeSuccess) {
         qWarning() << "Error while writing events.";
