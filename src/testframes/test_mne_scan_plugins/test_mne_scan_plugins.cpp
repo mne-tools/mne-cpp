@@ -159,7 +159,7 @@ QList<Measurement::SPtr> TestMneScanPlugins::stream(AbstractPlugin& plugin, int 
 void TestMneScanPlugins::addPluginRows()
 {
     QTest::addColumn<QString>("name");
-    for (const char* name : {"Averaging", "Covariance", "Hpi", "NeuronalConnectivity", "NoiseReduction", "RtFwd"})
+    for (const char* name : {"Averaging", "Covariance", "Hpi", "NeuronalConnectivity", "NoiseReduction", "RtClustMne", "RtFwd"})
         QTest::newRow(name) << QString(name);
 }
 

@@ -116,7 +116,10 @@ void RtClustMne::init()
     // Inits
     m_pAnnotationSet = FsAnnotationSet::SPtr(new FsAnnotationSet(m_sAtlasDir + "/lh.aparc.a2009s.annot", m_sAtlasDir + "/rh.aparc.a2009s.annot"));
     m_pSurfaceSet = FsSurfaceSet::SPtr(new FsSurfaceSet(m_sSurfaceDir + "/lh.orig", m_sSurfaceDir + "/rh.orig"));
-    m_mriHeadTrans = FIFFLIB::FiffCoordTrans(m_fMriHeadTrans);
+    // The sample-data transform is optional; a missing file leaves the identity
+    if (!FIFFLIB::FiffCoordTrans::read(m_fMriHeadTrans, m_mriHeadTrans)) {
+        m_mriHeadTrans = FIFFLIB::FiffCoordTrans();
+    }
 
     // Input
     m_pRTMSAInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "MNE RTMSA In", "MNE real-time multi sample array input data");
