@@ -19,6 +19,7 @@
 #include <Windows/eventwindow.h>
 #include <Models/eventmodel.h>
 #include <Windows/mainwindow.h>
+#include <Utils/sessionfilter.h>
 #include <Models/averagemodel.h>
 
 //=============================================================================================================
@@ -67,7 +68,7 @@ private slots:
     void computesAndSavesCovarianceLikePython();
     void eventMarkersUseEventTypeColors();
     void savesAndOpensProjects();
-    void refusesToWriteRawOverItsSource();
+    void writesRawCopyButNotOverItsSource();
 
 private:
     static MainWindow* makeWindow();
@@ -354,7 +355,7 @@ void TestMneBrowseApp::eventMarkersUseEventTypeColors()
 
 //=============================================================================================================
 
-void TestMneBrowseApp::refusesToWriteRawOverItsSource()
+void TestMneBrowseApp::writesRawCopyButNotOverItsSource()
 {
     const QString rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
     if (!QFile::exists(rawPath))
@@ -378,6 +379,15 @@ void TestMneBrowseApp::refusesToWriteRawOverItsSource()
     window->applyCommandLineOptions(dir.filePath("sub/../raw.fif"), QString(), -1.0, -1.0);
     QAction* write = window->findChild<QAction*>(QStringLiteral("m_writeAction"));
     QVERIFY(write);
+    const auto chooseFile = [](const QString& path) {
+        answerNextModal([path](QWidget* pModal) {
+            auto* dialog = qobject_cast<QFileDialog*>(pModal);
+            dialog->setDirectory(QFileInfo(path).absolutePath());
+            dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(path).fileName());
+            static_cast<QDialog*>(dialog)->accept();
+        });
+    };
+
     // Writing over the file the data is read from is refused, however the path was spelled
     QString refusal;
     answerNextModal([&refusal, sourcePath](QWidget* pModal) {
@@ -398,8 +408,41 @@ void TestMneBrowseApp::refusesToWriteRawOverItsSource()
     QVERIFY2(refusal.contains("currently loading the data from"), qPrintable(refusal));
     QCOMPARE(fileHash(sourcePath), sourceHash);
 
+    // A copy holds the same data
+    const QString copyPath = dir.filePath("copy_raw.fif");
+    chooseFile(copyPath);
+    write->trigger();
+
+    // With an EEG-only session filter the copy goes through the filtered writer; MEG and EOG stay untouched
+    const QString filteredPath = dir.filePath("filtered_raw.fif");
+    window->dataWindow()->setUserDefinedFilter(QSharedPointer<MNEBROWSE::SessionFilter>::create(
+        QStringLiteral("lp"), MNEBROWSE::SessionFilter::DesignMethod::Butterworth, MNEBROWSE::SessionFilter::FilterType::LowPass,
+        4, 40.0, 0.0, 5.0, window->dataWindow()->fiffInfo()->sfreq, QStringLiteral("EEG")));
+    chooseFile(filteredPath);
+    write->trigger();
     window->hide();
     QCoreApplication::processEvents();
+
+    QFile sourceFile(sourcePath);
+    FIFFLIB::FiffRawData source(sourceFile);
+    Eigen::MatrixXd sourceData, times;
+    QVERIFY(source.read_raw_segment(sourceData, times));
+    const int meg = static_cast<int>(source.info.ch_names.indexOf("MEG1332"));
+    const int eeg = static_cast<int>(source.info.ch_names.indexOf("EEG021"));
+    const int eog = static_cast<int>(source.info.ch_names.indexOf("EOG061"));
+    QVERIFY(meg >= 0 && eeg >= 0 && eog >= 0);
+    for (const QString& path : {copyPath, filteredPath}) {
+        QFile file(path);
+        FIFFLIB::FiffRawData written(file);
+        QCOMPARE(written.info.nchan, source.info.nchan);
+        QCOMPARE(written.first_samp, source.first_samp);
+        QCOMPARE(written.last_samp, source.last_samp);
+        Eigen::MatrixXd writtenData;
+        QVERIFY(written.read_raw_segment(writtenData, times));
+        QVERIFY2(writtenData.row(meg).isApprox(sourceData.row(meg), 1e-6), qPrintable(path));
+        QVERIFY2(writtenData.row(eog).isApprox(sourceData.row(eog), 1e-6), qPrintable(path));
+        QVERIFY2(writtenData.row(eeg).isApprox(sourceData.row(eeg), 1e-6) == (path == copyPath), qPrintable(path));
+    }
 }
 
 //=============================================================================================================

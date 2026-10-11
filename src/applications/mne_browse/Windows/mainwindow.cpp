@@ -223,8 +223,6 @@ bool writeFilteredRawFile(const QString& rawFilePath,
     }
 
     Eigen::RowVectorXd cals;
-    Eigen::SparseMatrix<double> mult;
-    Eigen::RowVectorXi sel;
 
     FIFFLIB::FiffStream::SPtr outfid = FIFFLIB::FiffStream::start_writing_raw(*pIODevice, raw.info, cals);
     if (!outfid) {
@@ -245,7 +243,7 @@ bool writeFilteredRawFile(const QString& rawFilePath,
 
         Eigen::MatrixXd data;
         Eigen::MatrixXd times;
-        if (!raw.read_raw_segment(data, times, mult, paddedFirst, paddedLast, sel)) {
+        if (!raw.read_raw_segment(data, times, paddedFirst, paddedLast)) {
             qWarning() << "[MainWindow] Error during filtered read_raw_segment.";
             return false;
         }
@@ -265,7 +263,8 @@ bool writeFilteredRawFile(const QString& rawFilePath,
             firstBuffer = false;
         }
 
-        outfid->write_raw_buffer(croppedData, mult);
+        // start_writing_raw stores range 1, so the buffer is scaled by cal alone
+        outfid->write_raw_buffer(croppedData, cals);
     }
 
     outfid->finish_writing_raw();
