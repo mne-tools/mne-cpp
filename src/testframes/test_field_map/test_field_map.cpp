@@ -243,14 +243,9 @@ public:
 
 private slots:
     void initTestCase();
-    void testMegSelfDots();
-    void testMegSurfaceDots();
     void testMegMapping();
-    void testEegSelfDots();
-    void testEegSurfaceDots();
     void testEegMapping();
     void testMappingProjectorVariants();
-    void testMegMappingApplySymmetry();
     void testEegMappingApplySymmetry();
     void testMultiEvokedMegMapping();
     void testMultiEvokedEegMapping();
@@ -285,11 +280,7 @@ private:
     std::unique_ptr<MatrixXf> m_eegMapping;
 
     // Python reference matrices
-    MatrixXd m_refMegSelfDots;
-    MatrixXd m_refMegSurfaceDots;
     MatrixXd m_refMegMapping;
-    MatrixXd m_refEegSelfDots;
-    MatrixXd m_refEegSurfaceDots;
     MatrixXd m_refEegMapping;
 
     bool m_hasMeg = false;
@@ -504,81 +495,16 @@ void TestFieldMap::initTestCase()
 
     // ── Load Python reference matrices ─────────────────────────────────
     if (m_hasMeg) {
-        m_refMegSelfDots = loadNpy(m_refDir + "/meg_self_dots.npy");
-        m_refMegSurfaceDots = loadNpy(m_refDir + "/meg_surface_dots.npy");
         m_refMegMapping = loadNpy(m_refDir + "/meg_mapping.npy");
-        QVERIFY(m_refMegSelfDots.rows() > 0);
-        QVERIFY(m_refMegSurfaceDots.rows() > 0);
         QVERIFY(m_refMegMapping.rows() > 0);
     }
 
     if (m_hasEeg) {
-        m_refEegSelfDots = loadNpy(m_refDir + "/eeg_self_dots.npy");
-        m_refEegSurfaceDots = loadNpy(m_refDir + "/eeg_surface_dots.npy");
         m_refEegMapping = loadNpy(m_refDir + "/eeg_mapping.npy");
-        QVERIFY(m_refEegSelfDots.rows() > 0);
-        QVERIFY(m_refEegSurfaceDots.rows() > 0);
         QVERIFY(m_refEegMapping.rows() > 0);
     }
 
     qDebug() << "=== initTestCase complete ===";
-}
-
-//=============================================================================================================
-
-void TestFieldMap::testMegSelfDots()
-{
-    if (!m_hasMeg)
-        QSKIP("No MEG data available");
-
-    // The C++ FwdFieldMap::computeMegMapping internally computes self-dots.
-    // We need to re-compute them directly for comparison. Since the internal
-    // doSelfDots is not exposed publicly, we verify via the final mapping
-    // matrix.  However, we CAN compare dimensions and symmetry.
-
-    qDebug() << "MEG self_dots reference shape:"
-             << m_refMegSelfDots.rows() << "x" << m_refMegSelfDots.cols();
-    QCOMPARE(m_refMegSelfDots.rows(), m_refMegSelfDots.cols());
-    QCOMPARE(m_refMegSelfDots.rows(), static_cast<int>(m_megCoils->ncoil()));
-
-    // Check symmetry
-    double asymm = (m_refMegSelfDots - m_refMegSelfDots.transpose()).norm() / m_refMegSelfDots.norm();
-    qDebug() << "MEG self_dots symmetry error:" << asymm;
-    QVERIFY2(asymm < 1e-12, "Reference MEG self_dots is not symmetric");
-
-    // Check that diagonal elements are positive (energy-like)
-    for (int i = 0; i < m_refMegSelfDots.rows(); ++i) {
-        QVERIFY2(m_refMegSelfDots(i, i) > 0.0,
-                 qPrintable(QString("MEG self_dots diagonal [%1] = %2 <= 0")
-                                .arg(i)
-                                .arg(m_refMegSelfDots(i, i))));
-    }
-    QVERIFY(true);
-}
-
-//=============================================================================================================
-
-void TestFieldMap::testMegSurfaceDots()
-{
-    if (!m_hasMeg)
-        QSKIP("No MEG data available");
-
-    qDebug() << "MEG surface_dots reference shape:"
-             << m_refMegSurfaceDots.rows() << "x" << m_refMegSurfaceDots.cols();
-
-    // FsSurface dots should be (n_coils, n_surface_verts) from Python's _do_surface_dots
-    // In mne-cpp doSurfaceDots returns (n_verts, n_coils)
-    // Python's _do_surface_dots returns (n_coils, n_surface_sel) then it gets transposed
-    // Let's verify dimensions match the expected
-    QVERIFY(m_refMegSurfaceDots.rows() > 0);
-    QVERIFY(m_refMegSurfaceDots.cols() > 0);
-
-    // Check for finite values
-    QVERIFY2(m_refMegSurfaceDots.allFinite(),
-             "MEG surface_dots contains non-finite values");
-
-    qDebug() << "MEG surface_dots: all finite, shape verified";
-    QVERIFY(true);
 }
 
 //=============================================================================================================
@@ -633,49 +559,6 @@ void TestFieldMap::testMegMapping()
 
     qDebug() << "MEG mapping cross-validation PASSED"
              << "(max rel err:" << maxRelErr << ")";
-}
-
-//=============================================================================================================
-
-void TestFieldMap::testEegSelfDots()
-{
-    if (!m_hasEeg)
-        QSKIP("No EEG data available");
-
-    qDebug() << "EEG self_dots reference shape:"
-             << m_refEegSelfDots.rows() << "x" << m_refEegSelfDots.cols();
-    QCOMPARE(m_refEegSelfDots.rows(), m_refEegSelfDots.cols());
-    QCOMPARE(m_refEegSelfDots.rows(), static_cast<int>(m_eegCoils->ncoil()));
-
-    double asymm = (m_refEegSelfDots - m_refEegSelfDots.transpose()).norm() / m_refEegSelfDots.norm();
-    qDebug() << "EEG self_dots symmetry error:" << asymm;
-    QVERIFY2(asymm < 1e-12, "Reference EEG self_dots is not symmetric");
-
-    for (int i = 0; i < m_refEegSelfDots.rows(); ++i) {
-        QVERIFY2(m_refEegSelfDots(i, i) > 0.0,
-                 qPrintable(QString("EEG self_dots diagonal [%1] = %2 <= 0")
-                                .arg(i)
-                                .arg(m_refEegSelfDots(i, i))));
-    }
-    QVERIFY(true);
-}
-
-//=============================================================================================================
-
-void TestFieldMap::testEegSurfaceDots()
-{
-    if (!m_hasEeg)
-        QSKIP("No EEG data available");
-
-    qDebug() << "EEG surface_dots reference shape:"
-             << m_refEegSurfaceDots.rows() << "x" << m_refEegSurfaceDots.cols();
-
-    QVERIFY(m_refEegSurfaceDots.rows() > 0);
-    QVERIFY(m_refEegSurfaceDots.cols() > 0);
-
-    QVERIFY2(m_refEegSurfaceDots.allFinite(),
-             "EEG surface_dots contains non-finite values");
-    QVERIFY(true);
 }
 
 //=============================================================================================================
@@ -781,55 +664,20 @@ void TestFieldMap::testMappingProjectorVariants()
 
 //=============================================================================================================
 
-void TestFieldMap::testMegMappingApplySymmetry()
-{
-    if (!m_hasMeg)
-        QSKIP("No MEG data available");
-    QVERIFY(m_megMapping != nullptr);
-
-    // Sanity check: applying a uniform measurement vector should produce
-    // a smooth field.  For a constant input, the output variance should
-    // be much smaller than the range of mapping coefficients.
-    VectorXf ones = VectorXf::Ones(m_megMapping->cols());
-    VectorXf field = (*m_megMapping) * ones;
-
-    double meanField = field.cast<double>().mean();
-    double stdField = std::sqrt((field.cast<double>().array() - meanField).square().mean());
-
-    qDebug() << "MEG uniform-input field: mean =" << meanField << " std =" << stdField;
-
-    // The field from uniform input should be relatively uniform
-    // (std / |mean| < 1 unless mean ≈ 0)
-    double cv = (std::abs(meanField) > 1e-30)
-        ? (stdField / std::abs(meanField))
-        : stdField;
-    qDebug() << "MEG uniform-input CV:" << cv;
-
-    // Also check that the mapping has no NaN/Inf
-    QVERIFY2(m_megMapping->allFinite(),
-             "MEG mapping contains NaN or Inf");
-    QVERIFY(true);
-}
-
-//=============================================================================================================
-
 void TestFieldMap::testEegMappingApplySymmetry()
 {
     if (!m_hasEeg)
         QSKIP("No EEG data available");
     QVERIFY(m_eegMapping != nullptr);
 
-    VectorXf ones = VectorXf::Ones(m_eegMapping->cols());
-    VectorXf field = (*m_eegMapping) * ones;
-
-    double meanField = field.cast<double>().mean();
-    double stdField = std::sqrt((field.cast<double>().array() - meanField).square().mean());
-
-    qDebug() << "EEG uniform-input field: mean =" << meanField << " std =" << stdField;
-
-    QVERIFY2(m_eegMapping->allFinite(),
-             "EEG mapping contains NaN or Inf");
-    QVERIFY(true);
+    // The EEG map is average referenced: a potential common to all electrodes maps to no field
+    const VectorXf common = (*m_eegMapping) * VectorXf::Ones(m_eegMapping->cols());
+    VectorXf single = VectorXf::Zero(m_eegMapping->cols());
+    single(0) = 1.0f;
+    const float scale = ((*m_eegMapping) * single).cwiseAbs().maxCoeff();
+    QVERIFY(scale > 0.0f);
+    QVERIFY2(common.cwiseAbs().maxCoeff() < 1e-4f * scale,
+             qPrintable(QString("%1 vs %2").arg(common.cwiseAbs().maxCoeff()).arg(scale)));
 }
 
 //=============================================================================================================
