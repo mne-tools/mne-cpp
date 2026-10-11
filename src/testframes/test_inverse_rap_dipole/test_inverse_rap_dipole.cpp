@@ -183,9 +183,12 @@ private slots:
     {
         InvDipoleFitSettings settings;
         QVERIFY(settings.measname.isEmpty());
-        // Just verify these are bool; actual defaults may vary
-        QVERIFY(settings.include_meg || !settings.include_meg);
-        QVERIFY(settings.include_eeg || !settings.include_eeg);
+        // MNE-C mne_dipole_fit: neither modality until --meg/--eeg, 40 Hz low-pass, origin (0, 0, 40) mm
+        QVERIFY(!settings.include_meg);
+        QVERIFY(!settings.include_eeg);
+        QVERIFY(settings.filter.filter_on);
+        QCOMPARE(settings.filter.lowpass, 40.0f);
+        QVERIFY(settings.r0.isApprox(Vector3f(0.0f, 0.0f, 0.04f)));
     }
 
     void dipoleFitSettings_setFields()
@@ -210,9 +213,17 @@ private slots:
     void dipoleFitSettings_checkIntegrity()
     {
         InvDipoleFitSettings settings;
-        // checkIntegrity on defaults should not crash
+        // Without a measurement file the settings are rejected
+        static QStringList criticals;
+        criticals.clear();
+        const QtMessageHandler previous = qInstallMessageHandler([](QtMsgType type, const QMessageLogContext&, const QString& msg) {
+            if (type == QtCriticalMsg)
+                criticals << msg;
+        });
         settings.checkIntegrity();
-        QVERIFY(true);
+        qInstallMessageHandler(previous);
+        QCOMPARE(criticals.size(), 1);
+        QVERIFY(criticals.first().startsWith("Data file name missing"));
     }
 
     //=========================================================================
@@ -308,20 +319,6 @@ private slots:
         QVERIFY(rap.getName() != nullptr);
     }
 
-    void rapMusic_makeSquareMat()
-    {
-        // makeSquareMat is protected — test indirectly
-        // Verify InvRapMusic can be constructed with valid params
-        InvRapMusic rap;
-        QVERIFY(true);
-    }
-
-    void rapMusic_setStcAttr()
-    {
-        InvRapMusic rap;
-        rap.setStcAttr(100, 0.001f);
-        QVERIFY(true); // just check no crash
-    }
 
     //=========================================================================
     // InvPwlRapMusic static methods
@@ -398,24 +395,7 @@ private slots:
     //=========================================================================
     // InvMinimumNorm (construct with empty MNEInverseOperator)
     //=========================================================================
-    void minimumNorm_construct()
-    {
-        MNELIB::MNEInverseOperator invOp;
-        InvMinimumNorm mn(invOp, 1.0f / 9.0f, QString("MNE"));
-        mn.setRegularization(1.0f / 6.0f);
-        mn.setMethod("dSPM");
-        QVERIFY(true);
-    }
 
-    void minimumNorm_setMethod()
-    {
-        MNELIB::MNEInverseOperator invOp;
-        InvMinimumNorm mn(invOp, 1.0f / 9.0f, false, false);
-        mn.setMethod(true, false);  // sLORETA
-        mn.setMethod(false, true);  // dSPM
-        mn.setMethod(false, false); // MNE
-        QVERIFY(true);
-    }
 
     //=========================================================================
     // DATA-DRIVEN: Build inverse operator from real forward + covariance
@@ -641,10 +621,7 @@ private slots:
             QSKIP("Fwd load failed");
 
         InvRapMusic rap;
-        bool ok = rap.init(fwd, false, 2, 0.5);
-        // Exercises init code path regardless of result
-        Q_UNUSED(ok)
-        QVERIFY(true);
+        QVERIFY(rap.init(fwd, false, 2, 0.5));
     }
 
     //=========================================================================
@@ -672,14 +649,6 @@ private slots:
     //=========================================================================
     // DATA-DRIVEN: HPI model params construction
     //=========================================================================
-    void data_hpiModelParams()
-    {
-        QVector<int> coils;
-        coils << 293 << 307 << 314 << 321;
-        // The last parameter is bool bBasic, not a coil count (MSVC C4305).
-        InvHpiModelParameters params(coils, 600, 200, true);
-        QVERIFY(true);
-    }
 
     //=========================================================================
     // DATA-DRIVEN: InvSensorSet construction
