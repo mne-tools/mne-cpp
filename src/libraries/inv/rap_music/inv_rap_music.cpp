@@ -205,7 +205,7 @@ InvSourceEstimate InvRapMusic::calculateInverse(const FiffEvoked& p_fiffEvoked, 
     p_sourceEstimate.tmin = p_fiffEvoked.times[0];
     p_sourceEstimate.tstep = p_fiffEvoked.times[1] - p_fiffEvoked.times[0];
 
-    if (m_iSamplesStcWindow <= 3) //if samples per stc aren't set -> use full window
+    if (m_iSamplesStcWindow <= 3 || m_iSamplesStcWindow >= p_fiffEvoked.data.cols()) // no window set, or it spans the data
     {
         QList<InvDipolePair<double>> t_RapDipoles;
         calculateInverse(p_fiffEvoked.data, t_RapDipoles);

@@ -267,6 +267,18 @@ void TestInvRapMusicTruth::evokedEstimate()
     QCOMPARE(static_cast<int>(windowed.data.cols()), kSamples);
     QVERIFY((windowed.data - whole.data).cwiseAbs().maxCoeff() < 1e-9);
 
+    // A window longer than the data is the whole data
+    rap.setStcAttr(kSamples + 10, 0.5f);
+    QCOMPARE(rap.calculateInverse(evoked).data, whole.data);
+
+    // Pair (2, 9) in the first half, pair (4, 7) in the second: each window finds its own
+    FiffEvoked switching = evoked;
+    switching.data.rightCols(kSamples / 2) = makeData(makeLeadField(), {{4, 7}}, {o}).rightCols(kSamples / 2);
+    rap.setStcAttr(20, 0.5f);
+    const InvSourceEstimate tracked = rap.calculateInverse(switching);
+    QVERIFY(tracked.data(2, 0) > 0.0 && tracked.data(4, 0) == 0.0);
+    QVERIFY(tracked.data(4, kSamples - 1) > 0.0 && tracked.data(2, kSamples - 1) == 0.0);
+
     evoked.data.conservativeResize(kChannels - 1, NoChange);
     QVERIFY(rap.calculateInverse(evoked).isEmpty());
 }
