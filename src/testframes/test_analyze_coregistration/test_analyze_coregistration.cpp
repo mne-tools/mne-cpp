@@ -170,12 +170,19 @@ void TestAnalyzeCoregistration::fitsFiducialsByIdentity()
     QVERIFY2((fitted.trans - reference.trans).cwiseAbs().maxCoeff() < 1e-4f,
              qPrintable(QStringLiteral("max deviation %1").arg((fitted.trans - reference.trans).cwiseAbs().maxCoeff())));
 
-    // Loading a file without a transform keeps the current one; the reference loads as stored
+    // A file that is not FIFF is refused as digitizer, fiducial or transform file
     const QString notTrans = dir.filePath("notes.txt");
     QFile notes(notTrans);
     QVERIFY(notes.open(QIODevice::WriteOnly));
     notes.write("not a transform");
     notes.close();
+    emit view->digFileChanged(notTrans);
+    emit view->fidFileChanged(notTrans);
+    emit view->fitFiducials();
+    emit view->storeTrans(transPath);
+    QVERIFY(FiffCoordTrans::readTransform(transPath, FIFFV_COORD_HEAD, FIFFV_COORD_MRI).trans.isApprox(fitted.trans));
+
+    // Loading a file without a transform keeps the current one; the reference loads as stored
     emit view->loadTrans(notTrans);
     emit view->loadTrans(sampleFile("MEG/sample/all-trans.fif"));
     emit view->storeTrans(transPath);

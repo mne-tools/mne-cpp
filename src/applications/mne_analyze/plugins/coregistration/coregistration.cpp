@@ -313,8 +313,13 @@ void CoRegistration::onPickedFiducialChanged(const int iFiducial)
 void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
-    m_digSetHead.clear();
-    m_digSetHead = FiffDigPointSet(fileDig);
+    FiffStream::SPtr stream(new FiffStream(&fileDig));
+    FiffDigPointSet digSet;
+    if (!FiffDigPointSet::readFromStream(stream, digSet)) {
+        qWarning() << "[CoRegistration::onDigitizersChanged] No digitizer points found in" << sFilePath;
+        return;
+    }
+    m_digSetHead = digSet;
 
     // send digitizer to 3DView
     QVariant data = QVariant::fromValue(m_digSetHead);
@@ -334,8 +339,13 @@ void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
-    m_digFidMri.clear();
-    m_digFidMri = FiffDigPointSet(fileDig);
+    FiffStream::SPtr stream(new FiffStream(&fileDig));
+    FiffDigPointSet fiducials;
+    if (!FiffDigPointSet::readFromStream(stream, fiducials)) {
+        qWarning() << "[CoRegistration::onFiducialsChanged] No fiducials found in" << sFilePath;
+        return;
+    }
+    m_digFidMri = fiducials;
 
     QVariant data = QVariant::fromValue(m_digFidMri);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIALS_ADDED, data);
