@@ -23,7 +23,7 @@
     "$comment": "Counts of registered tests still missing metadata. These numbers may only decrease. Both reached zero when every leaf test moved to mne_add_test() (T1.2/T1.3), which now also refuses to configure a test without them. max_placeholder_assertions counts QVERIFY(true) and QVERIFY(x || !x) in test sources; the four left are crash regressions (construction/teardown of MNE Scan and mne_analyze types).",
     "max_tests_without_labels": 0,
     "max_tests_without_timeout": 0,
-    "max_placeholder_assertions": 4
+    "max_placeholder_assertions": 3
   },
   "$conditional_comment": "Tests whose add_test() sits behind an early return(), so they vanish from CTest whenever the guard fires. Each needs a reason naming the guard. This list is a defect inventory, not an approved pattern, and is empty since T1.3: a missing target is declared with mne_add_test(... REQUIRES_TARGETS ...), which registers a visible skip before any return().",
   "conditional": {},

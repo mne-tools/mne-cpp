@@ -279,8 +279,17 @@ void TestAnSharedModels::construct_remainingModels()
         MriCoordModel model("/no/such/file.fif");
         Q_UNUSED(model)
     }
-
-    QVERIFY(true);
+    // A FIFF file the user picks as BEM may hold no BEM surfaces at all.
+    {
+        BemDataModel model(rawPath());
+        QVERIFY(!model.isInit());
+        QVERIFY(model.getBem()->isEmpty());
+    }
+    {
+        BemDataModel model(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif");
+        QVERIFY(model.isInit());
+        QCOMPARE(model.getBem()->size(), 3);
+    }
 }
 
 //=============================================================================================================

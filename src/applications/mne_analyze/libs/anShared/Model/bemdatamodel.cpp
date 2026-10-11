@@ -18,6 +18,8 @@
 
 #include "bemdatamodel.h"
 
+#include <fiff/fiff_stream.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -76,17 +78,17 @@ BemDataModel::~BemDataModel()
 void BemDataModel::initBemData(QIODevice& qIODevice)
 {
     // build Bem
-    m_pBem = MNEBem::SPtr::create(qIODevice);
-
-    if (m_pBem->isEmpty()) {
+    FIFFLIB::FiffStream::SPtr stream(new FIFFLIB::FiffStream(&qIODevice));
+    MNEBem bem;
+    const bool read = MNEBem::readFromStream(stream, true, bem);
+    qIODevice.close();
+    if (!read || bem.isEmpty()) {
         qWarning() << "[BemDataModel::initBemData] File does not contain any Bem data";
         return;
     }
 
+    *m_pBem = bem;
     emit newBemAvailable(m_pBem);
-
-    // need to close the file manually
-    qIODevice.close();
     m_bIsInit = true;
 }
 
