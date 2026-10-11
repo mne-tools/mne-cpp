@@ -228,6 +228,22 @@ void TestMneBrowseApp::recomputesEvokedLikePython()
         QCOMPARE(saved.evoked[row].nave, 6);
         QVERIFY(saved.evoked[row].data.isApprox(model->getEvoked(row)->data, 1e-6));
     }
+
+    // H shows the peak-to-peak histogram of the 12 epochs; the fullest bin spans the plot height
+    QImage histogram;
+    QString histogramTitle;
+    answerNextModal([&histogram, &histogramTitle](QWidget* pModal) {
+        histogramTitle = pModal->windowTitle();
+        histogram = pModal->findChild<QLabel*>()->pixmap().toImage();
+        qobject_cast<QDialog*>(pModal)->accept();
+    });
+    QTest::keyClick(window->dataWindow(), Qt::Key_H);
+    QCOMPARE(histogramTitle, QStringLiteral("Epoch PTP Histogram (12 epochs)"));
+    QCOMPARE(histogram.size(), QSize(500, 300));
+    bool fullBin = false;
+    for (int x = 50; x < histogram.width() - 20; ++x)
+        fullBin = fullBin || QColor(histogram.pixel(x, 21)) == QColor(70, 130, 180);
+    QVERIFY(fullBin);
     window->hide();
     QCoreApplication::processEvents();
 }
