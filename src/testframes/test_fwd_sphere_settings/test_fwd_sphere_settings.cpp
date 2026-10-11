@@ -376,18 +376,23 @@ private slots:
     void fwdBem_freeSolution()
     {
         FwdBemModel bem;
+        bem.solution = Eigen::MatrixXf::Ones(3, 3);
+        bem.nsol = 3;
         bem.fwd_bem_free_solution();
-        // No crash
-        QVERIFY(true);
+        QCOMPARE(bem.solution.size(), Eigen::Index(0));
+        QCOMPARE(bem.nsol, 0);
     }
 
     void fwdBem_setHeadMri()
     {
+        // Either direction is stored as head -> MRI; other frames are refused
         FwdBemModel bem;
-        FiffCoordTrans t = FiffCoordTrans::identity(FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
-        int ok = bem.fwd_bem_set_head_mri_t(t);
-        Q_UNUSED(ok);
-        QVERIFY(true);
+        FiffCoordTrans headMri = FiffCoordTrans::identity(FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
+        headMri.trans(0, 3) = 0.01f;
+        QCOMPARE(bem.fwd_bem_set_head_mri_t(headMri.inverted()), 0);
+        QCOMPARE(bem.head_mri_t.from, FIFFV_COORD_HEAD);
+        QVERIFY(std::fabs(bem.head_mri_t.trans(0, 3) - 0.01f) < 1e-7f);
+        QCOMPARE(bem.fwd_bem_set_head_mri_t(FiffCoordTrans::identity(FIFFV_COORD_HEAD, FIFFV_COORD_DEVICE)), -1);
     }
 
     //=========================================================================
@@ -400,24 +405,6 @@ private slots:
         QCOMPARE(sol.np, 0);
     }
 
-    //=========================================================================
-    // FwdCompData
-    //=========================================================================
-    void fwdCompData_defaultCtor()
-    {
-        FwdCompData cd;
-        // Just verify construction without crash
-        QVERIFY(true);
-    }
-
-    //=========================================================================
-    // FwdThreadArg
-    //=========================================================================
-    void fwdThreadArg_defaultCtor()
-    {
-        FwdThreadArg ta;
-        QVERIFY(true);
-    }
 
     //=========================================================================
     // ComputeFwdSettings

@@ -473,32 +473,13 @@ private slots:
     //=========================================================================
     void coilSet_createFromTemplate()
     {
-        // Create a FwdCoilSet and exercise basic API
+        // No channels give an empty coil set, not a null one
         FwdCoilSet coilDefs;
-        QList<FiffChInfo> emptyList;
-        auto coils = coilDefs.create_meg_coils(emptyList, 0, FWD_COIL_ACCURACY_NORMAL);
-        // May return null or empty — that's ok, we exercise the code path
-        QVERIFY(true);
+        auto coils = coilDefs.create_meg_coils(QList<FiffChInfo>(), 0, FWD_COIL_ACCURACY_NORMAL);
+        QVERIFY(coils);
+        QCOMPARE(coils->ncoil(), 0);
     }
 
-    //=========================================================================
-    // FwdEegSphereModel: default construction and basic ops
-    //=========================================================================
-    void eegSphereModel_default()
-    {
-        FwdEegSphereModel model;
-        // Default sphere model should be valid
-        QVERIFY(true);
-    }
-
-    //=========================================================================
-    // FwdEegSphereModelSet: default set
-    //=========================================================================
-    void eegSphereModelSet_default()
-    {
-        FwdEegSphereModelSet set;
-        QVERIFY(true);
-    }
 
     //=========================================================================
     void cleanupTestCase()
