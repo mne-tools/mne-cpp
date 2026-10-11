@@ -484,11 +484,11 @@ void TestDispPlots::testPlotUpdateData()
 {
     Plot plot;
     plot.resize(400, 300);
-    plot.setTitle("Ramp");
     VectorXd vec(4);
     vec << 10.0, 20.0, 30.0, 40.0;
     plot.updateData(vec);
-    const QImage image = plot.grab().toImage();
+    // Grabbed without a title: subpixel-antialiased text has blue fringes on Linux
+    QImage image = plot.grab().toImage();
 
     // The curve stays inside the 200 x 200 plot area (borders 100/50) and rises to the right
     const auto isCurve = [](QRgb c) {
@@ -511,6 +511,8 @@ void TestDispPlots::testPlotUpdateData()
     QVERIFY2(leftY > 0 && rightY > 0 && rightY < leftY, qPrintable(QString("left %1 right %2").arg(leftY).arg(rightY)));
 
     // The title is drawn above the plot area
+    plot.setTitle("Ramp");
+    image = plot.grab().toImage();
     int titlePixels = 0;
     for (int y = 0; y < 45; ++y)
         for (int x = 150; x < 250; ++x)
