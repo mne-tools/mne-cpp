@@ -2801,8 +2801,8 @@ void MainWindow::openProject()
                             f.close();
                         }
                     } else {
-                        // Resolve relative path from project file location
-                        filePath = QDir(projectDir).absoluteFilePath(ref.path);
+                        // Resolve ".." lexically, as written; the OS would follow symlinks out of the project folder
+                        filePath = QDir::cleanPath(QDir(projectDir).absoluteFilePath(ref.path));
                     }
 
                     if (!QFileInfo::exists(filePath))

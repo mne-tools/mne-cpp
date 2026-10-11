@@ -700,6 +700,40 @@ void TestMneBrowseApp::savesAndOpensProjects()
     QCOMPARE(third->dataWindow()->fiffInfo()->nchan, nchan);
     third->hide();
     QCoreApplication::processEvents();
+
+#ifdef Q_OS_UNIX
+    // A project saved through a symlinked folder still finds a recording that sits outside of it
+    QVERIFY(QDir(dir.path()).mkpath("elsewhere/real"));
+    QVERIFY(QFile::link(dir.filePath("elsewhere/real"), dir.filePath("link")));
+    const QString linkedPath = dir.filePath("link/linked.mna");
+    auto* fourth = openWindow();
+    QVERIFY(QTest::qWaitForWindowExposed(fourth));
+    fourth->applyCommandLineOptions(rawPath, QString(), -1.0, -1.0);
+    chooseFile(linkedPath);
+    findAction(fourth, QStringLiteral("Save Project (.mna/.mnx)..."))->trigger();
+    fourth->hide();
+
+    auto* fifth = openWindow();
+    QVERIFY(QTest::qWaitForWindowExposed(fifth));
+    // Record and dismiss a warning, should one come, so a failure does not block the test
+    QString warning;
+    QTimer warningWatch;
+    connect(&warningWatch, &QTimer::timeout, [&warning]() {
+        if (auto* box = qobject_cast<QMessageBox*>(QApplication::activeModalWidget())) {
+            warning = box->text();
+            box->accept();
+        }
+    });
+    warningWatch.start(10);
+    chooseFile(linkedPath);
+    findAction(fifth, QStringLiteral("Open Project (.mna/.mnx)..."))->trigger();
+    warningWatch.stop();
+    QVERIFY2(warning.isEmpty(), qPrintable(warning));
+    QVERIFY(fifth->dataWindow()->fiffInfo());
+    QCOMPARE(fifth->dataWindow()->fiffInfo()->nchan, nchan);
+    fifth->hide();
+    QCoreApplication::processEvents();
+#endif
 }
 
 QTEST_MAIN(TestMneBrowseApp)
