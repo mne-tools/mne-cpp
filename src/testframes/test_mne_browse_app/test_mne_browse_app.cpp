@@ -36,6 +36,9 @@
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_tag.h>
 #include <mna/mna_io.h>
+#include <mne/mne_forward_solution.h>
+#include <mne/mne_inverse_operator.h>
+#include <inv/inv_source_estimate.h>
 #include <mna/mna_project.h>
 
 #include <QAction>
@@ -78,6 +81,7 @@ private slots:
     void savesAndOpensProjects();
     void writesRawCopyButNotOverItsSource();
     void annotatesDraggedRangeLikePython();
+    void exportsSourceEstimatesLikePython();
 
 private:
     static MainWindow* makeWindow();
@@ -520,6 +524,97 @@ void TestMneBrowseApp::annotatesDraggedRangeLikePython()
     QCOMPARE(spans[0].startSample, 13500);
     QCOMPARE(spans[0].endSample, 13800);
     QCOMPARE(spans[0].label, QStringLiteral("BAD_drag"));
+}
+
+//=============================================================================================================
+
+void TestMneBrowseApp::exportsSourceEstimatesLikePython()
+{
+    const QString dataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/";
+    const QString rawPath = dataPath + "MEG/sample/sample_audvis_trunc_raw.fif";
+    const QString evokedPath = dataPath + "MEG/sample/sample_audvis-ave.fif";
+    const QString fwdPath = dataPath + "Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif";
+    const QString covPath = dataPath + "MEG/sample/sample_audvis-cov.fif";
+    if (!QFile::exists(rawPath) || !QFile::exists(fwdPath))
+        QSKIP("Sample test data not found");
+
+    // The inverse MNE-Python builds with make_inverse_operator(info, fwd, cov, loose=0.2, depth=0.8)
+    QTemporaryDir dir;
+    const QString invPath = dir.filePath("sample-inv.fif");
+    {
+        QFile rawFile(rawPath);
+        QFile fwdFile(fwdPath);
+        QFile covFile(covPath);
+        MNELIB::MNEForwardSolution fwd;
+        QVERIFY(MNELIB::MNEForwardSolution::read(fwdFile, fwd));
+        MNELIB::MNEInverseOperator inv = MNELIB::MNEInverseOperator::make_inverse_operator(
+            FIFFLIB::FiffRawData(rawFile).info, fwd, FIFFLIB::FiffCov(covFile), 0.2f, 0.8f);
+        QFile invFile(invPath);
+        QVERIFY(inv.write(invFile));
+    }
+
+    QSettings settings;
+    settings.remove("MainWindow/SourceEstimate");
+    settings.sync();
+    auto* window = makeWindow();
+    window->resize(1200, 800);
+    window->show();
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    window->applyCommandLineOptions(rawPath, QString(), -1.0, -1.0);
+    answerNextModal([evokedPath](QWidget* pModal) {
+        auto* dialog = qobject_cast<QFileDialog*>(pModal);
+        dialog->setDirectory(QFileInfo(evokedPath).absolutePath());
+        dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(evokedPath).fileName());
+        static_cast<QDialog*>(dialog)->accept();
+    });
+    findAction(window, QStringLiteral("Load evoked (fif)..."))->trigger();
+
+    // No inverse is loaded yet: agree to load one, pick it, keep dSPM / SNR 3 and export into the temp dir
+    const QString outDir = dir.filePath("stc");
+    QString result;
+    answerNextModal([&result, invPath, outDir](QWidget* pQuestion) {
+        qobject_cast<QMessageBox*>(pQuestion)->button(QMessageBox::Yes)->click();
+        answerNextModal([&result, invPath, outDir](QWidget* pModal) {
+            auto* dialog = qobject_cast<QFileDialog*>(pModal);
+            dialog->setDirectory(QFileInfo(invPath).absolutePath());
+            dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(invPath).fileName());
+            static_cast<QDialog*>(dialog)->accept();
+            answerNextModal([&result, outDir](QWidget* pSettings) {
+                for (QLineEdit* edit : pSettings->findChildren<QLineEdit*>()) {
+                    if (!qobject_cast<QAbstractSpinBox*>(edit->parentWidget()))
+                        edit->setText(outDir);
+                }
+                qobject_cast<QDialog*>(pSettings)->accept();
+                answerNextModal([&result](QWidget* pInfo) {
+                    result = qobject_cast<QMessageBox*>(pInfo)->text();
+                    qobject_cast<QDialog*>(pInfo)->accept();
+                });
+            });
+        });
+    });
+    findAction(window, QStringLiteral("Compute Source Estimate..."))->trigger();
+    window->hide();
+    QCoreApplication::processEvents();
+    QVERIFY2(result.startsWith("Exported 8 source-estimate file(s)"), qPrintable(result));
+
+    INVLIB::InvSourceEstimate lh, rh;
+    QFile lhFile(QDir(outDir).filePath("sample_audvis_left_auditory_dspm-lh.stc"));
+    QFile rhFile(QDir(outDir).filePath("sample_audvis_left_auditory_dspm-rh.stc"));
+    QVERIFY(INVLIB::InvSourceEstimate::read(lhFile, lh));
+    QVERIFY(INVLIB::InvSourceEstimate::read(rhFile, rh));
+    // Reference values produced by mne.minimum_norm.apply_inverse(evoked["Left Auditory"], inv, 1 / 9, "dSPM")
+    // with the inverse above (mne 1.11.0, channel names without spaces like the forward's)
+    QCOMPARE(lh.data.rows(), Eigen::Index(3956));
+    QCOMPARE(rh.data.rows(), Eigen::Index(3972));
+    QCOMPARE(lh.data.cols(), Eigen::Index(421));
+    QCOMPARE(lh.vertices.head(3), Eigen::Vector3i(54, 364, 582));
+    QVERIFY(std::abs(lh.tmin + 0.19979521315838786) < 1e-6);
+    QVERIFY(std::abs(lh.tstep - 0.0016649601096532323) < 1e-9);
+    const double col60 = lh.data.col(60).sum() + rh.data.col(60).sum();
+    QVERIFY2(std::abs(col60 - 142706.10979962072) < 1e-4 * 142706.10979962072, qPrintable(QString::number(col60, 'g', 12)));
+    Eigen::Index peak = 0;
+    QVERIFY(std::abs(rh.data.rowwise().maxCoeff().maxCoeff(&peak) - 86.27972642080445) < 1e-4 * 86.27972642080445);
+    QCOMPARE(peak + lh.data.rows(), Eigen::Index(4891));
 }
 
 //=============================================================================================================
