@@ -3046,7 +3046,14 @@ void MainWindow::saveProject()
                 f.close();
             }
         } else {
-            ref.path = QDir(projectDir).relativeFilePath(filePath);
+            // Files extracted from an opened .mnx live in a temp dir that goes away with this window
+            QString externalPath = filePath;
+            if (m_mnxTempDir && QFileInfo(filePath).absoluteFilePath().startsWith(QDir(m_mnxTempDir->path()).absolutePath() + QLatin1Char('/'))) {
+                externalPath = QDir(projectDir).absoluteFilePath(QFileInfo(filePath).fileName());
+                QFile::remove(externalPath);
+                QFile::copy(filePath, externalPath);
+            }
+            ref.path = QDir(projectDir).relativeFilePath(externalPath);
             ref.embedded = false;
         }
         rec.files.append(ref);

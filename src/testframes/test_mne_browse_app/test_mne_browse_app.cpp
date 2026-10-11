@@ -27,6 +27,9 @@
 
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_raw_data.h>
+#include <mna/mna_io.h>
+#include <mna/mna_project.h>
 
 #include <QAction>
 #include <QColorDialog>
@@ -61,6 +64,7 @@ private slots:
     void recomputesEvokedLikePython();
     void computesAndSavesCovarianceLikePython();
     void eventMarkersUseEventTypeColors();
+    void savesAndOpensProjects();
 
 private:
     static MainWindow* makeWindow();
@@ -330,6 +334,75 @@ void TestMneBrowseApp::eventMarkersUseEventTypeColors()
 }
 
 //=============================================================================================================
+
+void TestMneBrowseApp::savesAndOpensProjects()
+{
+    const QString rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(rawPath))
+        QSKIP("Sample test data not found");
+
+    QTemporaryDir dir;
+    const auto chooseFile = [](const QString& path) {
+        answerNextModal([path](QWidget* pModal) {
+            auto* dialog = qobject_cast<QFileDialog*>(pModal);
+            dialog->setDirectory(QFileInfo(path).absolutePath());
+            dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(path).fileName());
+            static_cast<QDialog*>(dialog)->accept();
+        });
+    };
+    const auto openWindow = []() {
+        auto* window = makeWindow();
+        window->resize(1200, 800);
+        window->show();
+        return window;
+    };
+    QFile rawFile(rawPath);
+    const int nchan = FIFFLIB::FiffRawData(rawFile).info.nchan;
+
+    // A binary project embeds the recording
+    auto* first = openWindow();
+    QVERIFY(QTest::qWaitForWindowExposed(first));
+    first->applyCommandLineOptions(rawPath, QString(), -1.0, -1.0);
+    const QString mnxPath = dir.filePath("study.mnx");
+    chooseFile(mnxPath);
+    findAction(first, QStringLiteral("Save Project (.mna/.mnx)..."))->trigger();
+    const MNALIB::MnaProject mnx = MNALIB::MnaIO::read(mnxPath);
+    QCOMPARE(mnx.subjects.size(), 1);
+    const MNALIB::MnaFileRef rawRef = mnx.subjects[0].sessions[0].recordings[0].files.first();
+    QCOMPARE(rawRef.role, MNALIB::MnaFileRole::Raw);
+    QVERIFY(rawRef.embedded);
+    QCOMPARE(rawRef.data.size(), QFileInfo(rawPath).size());
+    first->hide();
+
+    // Opened again it shows the same recording, extracted from the project
+    auto* second = openWindow();
+    QVERIFY(QTest::qWaitForWindowExposed(second));
+    chooseFile(mnxPath);
+    findAction(second, QStringLiteral("Open Project (.mna/.mnx)..."))->trigger();
+    QVERIFY(second->dataWindow()->fiffInfo());
+    QCOMPARE(second->dataWindow()->fiffInfo()->nchan, nchan);
+
+    // Saved as a JSON project, the recording must live next to the project, not in the session's temp dir
+    const QString mnaPath = dir.filePath("study.mna");
+    chooseFile(mnaPath);
+    findAction(second, QStringLiteral("Save Project (.mna/.mnx)..."))->trigger();
+    second->hide();
+    const MNALIB::MnaProject mna = MNALIB::MnaIO::read(mnaPath);
+    const MNALIB::MnaFileRef mnaRaw = mna.subjects[0].sessions[0].recordings[0].files.first();
+    QVERIFY(!mnaRaw.embedded);
+    const QString referenced = QDir(dir.path()).absoluteFilePath(mnaRaw.path);
+    QVERIFY2(QFileInfo(referenced).absolutePath() == QFileInfo(mnaPath).absolutePath(), qPrintable(mnaRaw.path));
+    QCOMPARE(QFileInfo(referenced).size(), QFileInfo(rawPath).size());
+
+    auto* third = openWindow();
+    QVERIFY(QTest::qWaitForWindowExposed(third));
+    chooseFile(mnaPath);
+    findAction(third, QStringLiteral("Open Project (.mna/.mnx)..."))->trigger();
+    QVERIFY(third->dataWindow()->fiffInfo());
+    QCOMPARE(third->dataWindow()->fiffInfo()->nchan, nchan);
+    third->hide();
+    QCoreApplication::processEvents();
+}
 
 QTEST_MAIN(TestMneBrowseApp)
 #include "test_mne_browse_app.moc"
