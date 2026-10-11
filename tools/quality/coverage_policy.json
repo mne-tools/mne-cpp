@@ -38,10 +38,6 @@
     {
       "pattern": "src/applications/mne_browse/Utils/mnxproject.cpp",
       "reason": "Orphan: in no target's sources."
-    },
-    {
-      "pattern": "src/applications/mne_browse/Utils/newparksmcclellan.cpp",
-      "reason": "Orphan: in no target's sources."
     }
   ]
 }

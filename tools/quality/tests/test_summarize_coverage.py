@@ -202,6 +202,9 @@ class TestRepositoryConfiguration(unittest.TestCase):
         entries = coverage.load_exclusions(coverage.POLICY_FILE)
         self.assertTrue(entries)
         self.assertEqual(len(entries), len({entry["pattern"] for entry in entries}))
+        # CI fails on an exclusion that matches no tracked source; catch it before pushing
+        source_entries = [entry for entry in entries if entry["pattern"].startswith("src/")]
+        self.assertEqual([], coverage.stale_exclusions(source_entries, set(coverage.tracked_sources(_REPO_ROOT))))
 
     def test_every_module_has_a_codecov_component(self) -> None:
         text = (_REPO_ROOT / "codecov.yml").read_text(encoding="utf-8")
