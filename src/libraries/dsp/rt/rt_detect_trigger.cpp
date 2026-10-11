@@ -75,8 +75,8 @@ QMap<int, QList<QPair<int, double>>> RTPROCESSINGLIB::detectTriggerFlanksMax(con
         qMapDetectedTrigger.insert(iChIdx, temp);
 
         //detect the actual triggers in the current data matrix
-        if (iChIdx > data.rows() || iChIdx < 0) {
-            return qMapDetectedTrigger;
+        if (iChIdx >= data.rows() || iChIdx < 0) {
+            continue;
         }
 
         //Find positive maximum in data vector.
@@ -111,7 +111,7 @@ QList<QPair<int, double>> RTPROCESSINGLIB::detectTriggerFlanksMax(const MatrixXd
 
     //Find all triggers above threshold in the data block
     //detect the actual triggers in the current data matrix
-    if (iTriggerChannelIdx > data.rows() || iTriggerChannelIdx < 0) {
+    if (iTriggerChannelIdx >= data.rows() || iTriggerChannelIdx < 0) {
         return lDetectedTriggers;
     }
 
@@ -155,8 +155,8 @@ QMap<int, QList<QPair<int, double>>> RTPROCESSINGLIB::detectTriggerFlanksGrad(co
         qMapDetectedTrigger.insert(iChIdx, temp);
 
         //detect the actual triggers in the current data matrix
-        if (iChIdx > data.rows() || iChIdx < 0) {
-            return qMapDetectedTrigger;
+        if (iChIdx >= data.rows() || iChIdx < 0) {
+            continue;
         }
 
         //Compute gradient
@@ -203,7 +203,7 @@ QList<QPair<int, double>> RTPROCESSINGLIB::detectTriggerFlanksGrad(const MatrixX
     RowVectorXd tGradient = RowVectorXd::Zero(data.cols());
 
     //detect the actual triggers in the current data matrix
-    if (iTriggerChannelIdx > data.rows() || iTriggerChannelIdx < 0) {
+    if (iTriggerChannelIdx >= data.rows() || iTriggerChannelIdx < 0) {
         return lDetectedTriggers;
     }
 
