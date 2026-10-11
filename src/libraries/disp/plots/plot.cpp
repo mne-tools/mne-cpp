@@ -79,8 +79,14 @@ void Plot::init()
 void Plot::updateData(VectorXd& p_dVec)
 {
     if (p_dVec.size() > 0) {
-        if (!m_bHoldOn)
-            init();
+        if (!m_bHoldOn) {
+            // Replace the curves; title and axis labels stay
+            m_qListVecPointFPaths.clear();
+            m_dMinX = 0;
+            m_dMaxX = 0;
+            m_dMinY = 0;
+            m_dMaxY = 0;
+        }
 
         QVector<QPointF> t_qVecPointFPaths;
         //No X data given
@@ -128,28 +134,23 @@ void Plot::paintEvent(QPaintEvent* event)
         //Draw border
         painter.drawRect(t_qPointTopLeft.x() - 1, t_qPointTopLeft.y() - 1, t_qSizePlot.width() + 1, t_qSizePlot.height() + 1);
 
-        // -- Data --
-        painter.save();
+        // -- Data --: x from min to max over the width, y upwards over 90 % of the height
         QPen pen;
         pen.setWidth(1);
         pen.setBrush(Qt::blue);
         painter.setPen(pen);
-        painter.translate(m_iBorderLeftRight - m_dMinX, m_iBorderTopBottom + t_qSizePlot.height() / 2);
-        for (qint32 i = 0; i < m_qListVecPointFPaths.size(); ++i) {
-            double scale_x = t_qSizePlot.width() / (m_dMaxX - m_dMinX);
-            double scale_y = (t_qSizePlot.height() - (t_qSizePlot.height() * 0.1)) / (m_dMaxY - m_dMinY);
-
-            //scale
-            QVector<QPointF> t_qVecPointFPath;
-            QVector<QPointF>::ConstIterator it;
-            for (it = m_qListVecPointFPaths[i].begin(); it != m_qListVecPointFPaths[i].end(); ++it)
-                t_qVecPointFPath.append(QPointF(it->x() * scale_x, it->y() * scale_y));
-
-            //draw
-            for (it = t_qVecPointFPath.begin() + 1; it != t_qVecPointFPath.end(); ++it)
-                painter.drawLine(*(it - 1), *it);
+        const double rangeX = m_dMaxX > m_dMinX ? m_dMaxX - m_dMinX : 1.0;
+        const double rangeY = m_dMaxY > m_dMinY ? m_dMaxY - m_dMinY : 1.0;
+        const double scale_x = t_qSizePlot.width() / rangeX;
+        const double scale_y = 0.9 * t_qSizePlot.height() / rangeY;
+        const double bottom = t_qPointTopLeft.y() + 0.95 * t_qSizePlot.height();
+        for (const QVector<QPointF>& path : std::as_const(m_qListVecPointFPaths)) {
+            for (qsizetype k = 1; k < path.size(); ++k) {
+                painter.drawLine(QPointF(t_qPointTopLeft.x() + (path[k - 1].x() - m_dMinX) * scale_x, bottom - (path[k - 1].y() - m_dMinY) * scale_y),
+                                 QPointF(t_qPointTopLeft.x() + (path[k].x() - m_dMinX) * scale_x, bottom - (path[k].y() - m_dMinY) * scale_y));
+            }
         }
-        painter.restore();
+        painter.end();
 
         //Draw title & axes
         Graph::drawLabels(t_qSizePlot.width(), t_qSizePlot.height());

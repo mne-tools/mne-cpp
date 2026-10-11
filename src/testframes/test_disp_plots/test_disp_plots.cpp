@@ -493,10 +493,39 @@ void TestDispPlots::testPlotWithVector()
 void TestDispPlots::testPlotUpdateData()
 {
     Plot plot;
+    plot.resize(400, 300);
+    plot.setTitle("Ramp");
     VectorXd vec(4);
     vec << 10.0, 20.0, 30.0, 40.0;
     plot.updateData(vec);
-    QVERIFY(true);
+    const QImage image = plot.grab().toImage();
+
+    // The curve stays inside the 200 x 200 plot area (borders 100/50) and rises to the right
+    const auto isCurve = [](QRgb c) {
+        return qBlue(c) > 150 && qRed(c) < 120 && qGreen(c) < 120;
+    };
+    int leftY = -1, rightY = -1, outside = 0;
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            if (!isCurve(image.pixel(x, y)))
+                continue;
+            if (x < 100 || x > 300 || y < 50 || y > 250)
+                ++outside;
+            if (x <= 103)
+                leftY = y;
+            if (x >= 297 && rightY < 0)
+                rightY = y;
+        }
+    }
+    QCOMPARE(outside, 0);
+    QVERIFY2(leftY > 0 && rightY > 0 && rightY < leftY, qPrintable(QString("left %1 right %2").arg(leftY).arg(rightY)));
+
+    // The title is drawn above the plot area
+    int titlePixels = 0;
+    for (int y = 0; y < 45; ++y)
+        for (int x = 150; x < 250; ++x)
+            titlePixels += qGray(image.pixel(x, y)) < 100;
+    QVERIFY(titlePixels > 0);
 }
 
 //=============================================================================================================
