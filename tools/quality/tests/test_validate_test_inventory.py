@@ -57,7 +57,7 @@ DEFAULT_POLICY = {
     "allowed_labels": ["unit", "integration", "parity", "example", "gui", "slow", "requires-data"],
     "timeout_seconds": {"min": 5, "max": 3600},
     "unregistered": {},
-    "ratchet": {"max_tests_without_labels": 100, "max_tests_without_timeout": 100},
+    "ratchet": {"max_tests_without_labels": 100, "max_tests_without_timeout": 100, "max_placeholder_assertions": 100},
     "quarantine": [],
 }
 
@@ -174,7 +174,7 @@ class TestMneAddTest(ValidatorTestCase):
         self.assertEqual(300, entry.timeout)
         self.assertEqual([], vti.check_add_test(entries))
         findings, actual = vti.check_ratchets(entries, self.policy)
-        self.assertEqual({"max_tests_without_labels": 0, "max_tests_without_timeout": 0}, actual)
+        self.assertEqual({"max_tests_without_labels": 0, "max_tests_without_timeout": 0, "max_placeholder_assertions": 0}, actual)
 
     def test_helper_labels_are_checked_against_the_vocabulary(self) -> None:
         self.fixture.add_test_dir("test_alpha", extra="mne_add_test(${PROJECT_NAME} LABELS banana TIMEOUT 60)")
@@ -475,15 +475,28 @@ class TestRatchet(ValidatorTestCase):
     def test_exceeding_the_ratchet_is_an_error(self) -> None:
         self.fixture.add_test_dir("test_alpha")
         entries, _ = self.fixture.collect()
-        self.policy["ratchet"] = {"max_tests_without_labels": 0, "max_tests_without_timeout": 0}
+        self.policy["ratchet"] = {"max_tests_without_labels": 0, "max_tests_without_timeout": 0, "max_placeholder_assertions": 0}
         findings, actual = vti.check_ratchets(entries, self.policy)
-        self.assertEqual({"max_tests_without_labels": 1, "max_tests_without_timeout": 1}, actual)
+        self.assertEqual({"max_tests_without_labels": 1, "max_tests_without_timeout": 1, "max_placeholder_assertions": 0}, actual)
         self.assertEqual(["TI051", "TI051"], self.codes(findings))
+
+    def test_placeholder_assertions_are_counted(self) -> None:
+        # Assertions that cannot fail: QVERIFY(true) and "x || !x"
+        self.fixture.add_test_dir("test_alpha", extra="mne_add_test(${PROJECT_NAME} LABELS unit TIMEOUT 60)")
+        (self.fixture.testframes / "test_alpha" / "test_alpha.cpp").write_text(
+            "QVERIFY(true);\nQVERIFY( true );\nQVERIFY(a.isEmpty() || !a.isEmpty());\nQVERIFY(ok);\n",
+            encoding="utf-8",
+        )
+        entries, _ = self.fixture.collect()
+        self.policy["ratchet"] = {"max_tests_without_labels": 0, "max_tests_without_timeout": 0, "max_placeholder_assertions": 2}
+        findings, actual = vti.check_ratchets(entries, self.policy)
+        self.assertEqual(3, actual["max_placeholder_assertions"])
+        self.assertEqual(["TI051"], self.codes(findings))
 
     def test_slack_in_the_ratchet_only_warns(self) -> None:
         self.fixture.add_test_dir("test_alpha")
         entries, _ = self.fixture.collect()
-        self.policy["ratchet"] = {"max_tests_without_labels": 5, "max_tests_without_timeout": 5}
+        self.policy["ratchet"] = {"max_tests_without_labels": 5, "max_tests_without_timeout": 5, "max_placeholder_assertions": 0}
         findings, _ = vti.check_ratchets(entries, self.policy)
         self.assertEqual(["TI052", "TI052"], self.codes(findings))
         self.assertTrue(all(f.severity == "warning" for f in findings))

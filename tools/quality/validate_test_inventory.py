@@ -115,6 +115,8 @@ _LABELS_RE = re.compile(r"\bLABELS\s+(\"[^\"]*\"|[^\s)]+)", re.IGNORECASE)
 _TIMEOUT_RE = re.compile(r"\bTIMEOUT\s+([0-9]+)", re.IGNORECASE)
 _OUTPUT_DIR_RE = re.compile(r"\bRUNTIME_OUTPUT_DIRECTORY(?:_[A-Z]+)?\b")
 _BARE_RETURN_RE = re.compile(r"^[ \t]*return[ \t]*\([ \t]*\)", re.MULTILINE | re.IGNORECASE)
+# Assertions that cannot fail: QVERIFY(true) and QVERIFY(x || !x)
+_PLACEHOLDER_ASSERT_RE = re.compile(r"QVERIFY\(\s*true\s*\)|QVERIFY\(\s*!?\s*(.+?)\s*\|\|\s*!?\s*\1\s*\)")
 
 
 def strip_cmake_comments(text: str) -> str:
@@ -152,6 +154,7 @@ class TestEntry:
     timeout: int | None = None
     overrides_output_dir: bool = False
     guarded_registration: bool = False
+    placeholder_assertions: int = 0
 
     @property
     def cmake_path(self) -> str:
@@ -198,6 +201,9 @@ def parse_registered_directories(root_cmake: Path) -> list[str]:
 
 def parse_leaf(directory: Path) -> TestEntry:
     entry = TestEntry(name=directory.name, directory=directory.name)
+    entry.placeholder_assertions = sum(
+        len(_PLACEHOLDER_ASSERT_RE.findall(source.read_text(encoding="utf-8", errors="replace")))
+        for source in sorted(directory.glob("*.cpp")))
     cmake = directory / "CMakeLists.txt"
     if not cmake.is_file():
         return entry
@@ -518,11 +524,13 @@ def check_ratchets(entries: dict[str, TestEntry], policy: dict[str, Any]) -> tup
     actual = {
         "max_tests_without_labels": sum(1 for e in registered if not e.labels),
         "max_tests_without_timeout": sum(1 for e in registered if e.timeout is None),
+        "max_placeholder_assertions": sum(e.placeholder_assertions for e in registered),
     }
     ratchet = policy.get("ratchet", {})
     labels_text = {
         "max_tests_without_labels": "tests without a LABELS property",
         "max_tests_without_timeout": "tests without an explicit TIMEOUT",
+        "max_placeholder_assertions": "assertions that cannot fail (QVERIFY(true), x || !x)",
     }
     policy_location = display_path(POLICY_FILE)
 
@@ -538,7 +546,8 @@ def check_ratchets(entries: dict[str, TestEntry], policy: dict[str, Any]) -> tup
                     "TI051",
                     policy_location,
                     f"{count} {labels_text[key]}, but the ratchet allows at most {allowed}. "
-                    "New tests must carry the metadata; the ratchet only moves down.",
+                    + ("Assert what the code does instead; " if key == "max_placeholder_assertions" else "New tests must carry the metadata; ")
+                    + "the ratchet only moves down.",
                 )
             )
         elif count < allowed:
