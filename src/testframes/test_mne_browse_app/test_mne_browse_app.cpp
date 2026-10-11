@@ -29,6 +29,9 @@
 #include <fiff/fiff_evoked_set.h>
 
 #include <QAction>
+#include <QColorDialog>
+#include <QPushButton>
+#include <QSpinBox>
 #include <QDialog>
 #include <QDockWidget>
 #include <QFileDialog>
@@ -309,6 +312,20 @@ void TestMneBrowseApp::eventMarkersUseEventTypeColors()
         if (marker.type == type)
             QCOMPARE(marker.color, picked);
     }
+
+    // Adding a type in the event window: cancelling the colour dialog adds nothing
+    EventWindow* eventWindow = window->eventWindow();
+    eventWindow->findChild<QSpinBox*>("m_spinBox_addEventType")->setValue(77);
+    auto* addButton = eventWindow->findChild<QPushButton*>("m_pushButton_addEventType");
+    answerNextModal([](QWidget* dialog) { qobject_cast<QDialog*>(dialog)->reject(); });
+    addButton->click();
+    QVERIFY(!eventModel->getEventTypeColors().contains(77));
+    answerNextModal([](QWidget* dialog) {
+        qobject_cast<QColorDialog*>(dialog)->setCurrentColor(QColor(7, 8, 9));
+        qobject_cast<QDialog*>(dialog)->accept();
+    });
+    addButton->click();
+    QCOMPARE(eventModel->getEventTypeColors().value(77), QColor(7, 8, 9));
     QSettings().remove("EventDesignParameters");
 }
 

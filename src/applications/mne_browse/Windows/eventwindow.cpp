@@ -37,12 +37,8 @@ EventWindow::EventWindow(QWidget* parent)
 , ui(new Ui::EventWindowDockWidget)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
 , m_pEventDelegate(nullptr)
-, m_pColordialog(new QColorDialog(this))
 {
     ui->setupUi(this);
-
-    //hide the color dialog
-    m_pColordialog->hide();
 
     //------------------------
     //--- Setup data model ---
@@ -283,8 +279,13 @@ void EventWindow::addEventToEventModel()
 
 void EventWindow::addNewEventType()
 {
-    //Open add event type dialog
-    m_pEventModel->addNewEventType(QString().number(ui->m_spinBox_addEventType->value()), m_pColordialog->getColor(Qt::black, this));
-    m_pEventModel->setEventFilterType(QString().number(ui->m_spinBox_addEventType->value()));
+    const int iType = ui->m_spinBox_addEventType->value();
+    const QColor color = QColorDialog::getColor(m_pEventModel->getEventTypeColors().value(iType, Qt::black), this);
+    if (!color.isValid()) {
+        return;
+    }
+
+    m_pEventModel->addNewEventType(QString::number(iType), color);
+    m_pEventModel->setEventFilterType(QString::number(iType));
     m_pMainWindow->dataWindow()->updateDataTableViews();
 }

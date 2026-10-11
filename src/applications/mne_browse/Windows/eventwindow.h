@@ -152,7 +152,6 @@ private:
     EventDelegate* m_pEventDelegate; /**< the QAbstractDelegate being part of the event model/view framework of Qt. */
     EventModel* m_pEventModel;       /**< the QAbstractTable event model being part of the model/view framework of Qt. */
 
-    QColorDialog* m_pColordialog; /**< The qt color dialog for changing event type colors.*/
 
 protected slots:
     //=========================================================================================================
