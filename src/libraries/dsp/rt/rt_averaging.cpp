@@ -455,13 +455,12 @@ void RtAveragingWorker::generateEvoked(double dTriggerType)
     //If the evoked is not yet present add it here
     if (iEvokedIdx == -1) {
         evoked.baseline = m_pairBaselineSec;
-        evoked.times.resize(m_iPreStimSamples + m_iPostStimSamples);
         evoked.times = RowVectorXf::LinSpaced(m_iPreStimSamples + m_iPostStimSamples,
-                                              -1 * m_iPreStimSamples / m_pFiffInfo->sfreq,
-                                              m_iPostStimSamples / m_pFiffInfo->sfreq);
-        evoked.times[m_iPreStimSamples] = 0.0;
-        evoked.first = 0;
-        evoked.last = m_iPreStimSamples + m_iPostStimSamples;
+                                              -m_iPreStimSamples,
+                                              m_iPostStimSamples - 1) /
+            m_pFiffInfo->sfreq;
+        evoked.first = -m_iPreStimSamples;
+        evoked.last = m_iPostStimSamples - 1;
         evoked.comment = QString::number(dTriggerType);
     }
 

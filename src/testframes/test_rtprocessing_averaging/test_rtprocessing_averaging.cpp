@@ -173,63 +173,66 @@ private slots:
     //=========================================================================
     // RtAveraging - construction and lifecycle
     //=========================================================================
-    void rtAveraging_construct()
+    void rtAveraging_baselineAndTimes()
     {
-        FiffInfo::SPtr info = createSyntheticFiffInfo(10, 1000.0f);
+        // 1 kHz, trigger row 1; pre-stimulus 1.0 on the MEG channel, post-stimulus k for epoch k = 1..4
+        FiffInfo::SPtr info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveragingWorker worker(10, 20, 80, 0, 0, 1, info);
+        FiffEvokedSet result;
+        connect(&worker, &RtAveragingWorker::resultReady, this, [&](const FiffEvokedSet& set, const QStringList&) { result = set; });
+        for (int k = 1; k <= 4; ++k) {
+            MatrixXd block = MatrixXd::Zero(2, 200);
+            block.row(0).setConstant(1.0);
+            block.row(0).segment(50, 100).setConstant(k);
+            block(1, 50) = 1.0;
+            worker.doWork(block);
+        }
 
-        RtAveraging avg(20,  // numAverages
-                        100, // preStim samples
-                        200, // postStim samples
-                        0,   // baseline from
-                        0,   // baseline to
-                        10,  // trigger channel index (STI014)
-                        info);
-        // Just verify no crash during construction
-        QVERIFY(true);
+        QCOMPARE(result.evoked.size(), 1);
+        const FiffEvoked& evoked = result.evoked.first();
+        QCOMPARE(evoked.nave, 4);
+        // Sample i is at (i - pre) / sfreq, like mne.Epochs times
+        QCOMPARE(evoked.times.size(), 100);
+        for (int i = 0; i < evoked.times.size(); ++i)
+            QVERIFY2(std::fabs(evoked.times(i) - (i - 20) / 1000.0f) < 1e-6f, qPrintable(QString::number(i)));
+        QCOMPARE(evoked.first, -20);
+        QCOMPARE(evoked.last, 79);
+        QVERIFY(std::fabs(evoked.data(0, 10) - 1.0) < 1e-12);
+        QVERIFY(std::fabs(evoked.data(0, 60) - 2.5) < 1e-12);
     }
 
-    void rtAveraging_setters()
+    void rtAveraging_settersReachTheWorkerThread()
     {
-        FiffInfo::SPtr info = createSyntheticFiffInfo(5, 500.0f);
+        FiffInfo::SPtr info = createSyntheticFiffInfo(1, 1000.0f);
+        RtAveraging avg(10, 20, 80, 0, 0, 1, info);
+        QList<FiffEvokedSet> results;
+        connect(&avg, &RtAveraging::evokedStim, this, [&](const FiffEvokedSet& set, const QStringList&) { results << set; });
 
-        RtAveraging avg(10, 50, 100, 0, 0, 5, info);
+        avg.setPreStim(10, 10);
+        avg.setPostStim(40, 40);
+        avg.setAverageNumber(2);
+        for (int k = 1; k <= 3; ++k) {
+            MatrixXd block = MatrixXd::Zero(2, 200);
+            block.row(0).segment(50, 100).setConstant(k);
+            block(1, 50) = 1.0;
+            avg.append(block);
+        }
+        QTRY_COMPARE_WITH_TIMEOUT(results.size(), 3, 5000);
+        const FiffEvoked& evoked = results.last().evoked.first();
+        QCOMPARE(evoked.data.cols(), 50);
+        QCOMPARE(evoked.nave, 2);
+        QVERIFY(std::fabs(evoked.data(0, 20) - 2.5) < 1e-12);
 
-        avg.setAverageNumber(30);
-        avg.setPreStim(150, 300);
-        avg.setPostStim(250, 500);
-        avg.setTriggerChIndx(5);
-        avg.setBaselineActive(true);
-        avg.setBaselineFrom(0, 0);
-        avg.setBaselineTo(50, 100);
-
-        QMap<QString, double> thresholds;
-        thresholds["eeg"] = 150e-6;
-        avg.setArtifactReduction(thresholds);
-
+        // A reset drops the collected epochs
         avg.reset();
-        // No crash
-        QVERIFY(true);
-    }
-
-    void rtAveraging_appendData()
-    {
-        FiffInfo::SPtr info = createSyntheticFiffInfo(5, 500.0f);
-
-        RtAveraging avg(10, 50, 100, 0, 0, 5, info);
-
-        // Append some synthetic data blocks
-        MatrixXd data = MatrixXd::Zero(6, 200); // 5 MEG + 1 STI channel
-        avg.append(data);
-        QVERIFY(true);
-    }
-
-    void rtAveraging_stop()
-    {
-        FiffInfo::SPtr info = createSyntheticFiffInfo(5, 500.0f);
-
-        RtAveraging avg(10, 50, 100, 0, 0, 5, info);
+        MatrixXd block = MatrixXd::Zero(2, 200);
+        block.row(0).segment(50, 100).setConstant(7.0);
+        block(1, 50) = 1.0;
+        avg.append(block);
+        QTRY_COMPARE_WITH_TIMEOUT(results.size(), 4, 5000);
+        QCOMPARE(results.last().evoked.first().nave, 1);
+        QVERIFY(std::fabs(results.last().evoked.first().data(0, 20) - 7.0) < 1e-12);
         avg.stop();
-        QVERIFY(true);
     }
 
     //=========================================================================
