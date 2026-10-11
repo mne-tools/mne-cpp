@@ -144,9 +144,9 @@ void RtClustMneSetupWidget::showMriHeadFileDialog()
 
     QFile file(t_sMriHeadFile);
 
-    FIFFLIB::FiffCoordTrans mriHeadTrans = FIFFLIB::FiffCoordTrans(file);
+    FIFFLIB::FiffCoordTrans mriHeadTrans;
 
-    if (!mriHeadTrans.isEmpty()) {
+    if (FIFFLIB::FiffCoordTrans::read(file, mriHeadTrans) && !mriHeadTrans.isEmpty()) {
         m_pMNE->m_mriHeadTrans = mriHeadTrans;
         ui.m_qLineEdit_MriHeadTrans->setText(t_sMriHeadFile);
     }

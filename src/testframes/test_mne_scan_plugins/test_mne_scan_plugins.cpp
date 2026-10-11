@@ -35,7 +35,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFileDialog>
+#include <QLineEdit>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QtTest>
@@ -60,6 +63,7 @@ private slots:
     void stopsWhenStartedWithoutData();
     void rtFwdRefusesMissingInputFiles_data();
     void rtFwdRefusesMissingInputFiles();
+    void rtClustMneKeepsTransformItCannotRead();
     void averagesTheStimulusEvents();
     void estimatesTheCovariance();
     void passesTheStreamThrough();
@@ -239,6 +243,39 @@ void TestMneScanPlugins::rtFwdRefusesMissingInputFiles()
     }
     QVERIFY2(!started, qPrintable(attribute));
     QVERIFY(message.contains("cannot be op"));
+}
+
+//=============================================================================================================
+
+void TestMneScanPlugins::rtClustMneKeepsTransformItCannotRead()
+{
+    if (!m_info)
+        QSKIP("Sample test data not found");
+
+    std::unique_ptr<AbstractPlugin> plugin = makePlugin("RtClustMne");
+    std::unique_ptr<QWidget> setup(plugin->setupWidget());
+    auto* button = setup->findChild<QPushButton*>("m_qPushButton_MriHeadTrans");
+    auto* path = setup->findChild<QLineEdit*>("m_qLineEdit_MriHeadTrans");
+    QVERIFY(button && path);
+
+    // Cancelling the dialog, a FIFF file without a transform, then a real one
+    const QString sample = QFileInfo(m_rawPath).absolutePath();
+    for (const QString& choice : {QString(), sample + "/sample_audvis-cov.fif", sample + "/all-trans.fif"}) {
+        const QString before = path->text();
+        QTimer::singleShot(10, qApp, [choice]() {
+            auto* dialog = qobject_cast<QFileDialog*>(QApplication::activeModalWidget());
+            QVERIFY(dialog);
+            if (choice.isEmpty()) {
+                dialog->reject();
+                return;
+            }
+            dialog->setDirectory(QFileInfo(choice).absolutePath());
+            dialog->findChild<QLineEdit*>("fileNameEdit")->setText(QFileInfo(choice).fileName());
+            static_cast<QDialog*>(dialog)->accept();
+        });
+        QTest::mouseClick(button, Qt::LeftButton);
+        QCOMPARE(path->text(), choice.endsWith("all-trans.fif") ? choice : before);
+    }
 }
 
 //=============================================================================================================
