@@ -726,6 +726,31 @@ void TestMnaBids::testConverterConvert()
     QVERIFY(QFile::exists(mnxPath));
     MnaProject verify = MnaIO::read(mnxPath);
     QCOMPARE(verify.name, "BIDS Test Project");
+
+#ifdef Q_OS_UNIX
+    // A linked file outside a project folder reached through a symlink is still embedded
+    QDir root(m_tempDir.filePath("cli_convert_link"));
+    QVERIFY(root.mkpath("elsewhere/real"));
+    QVERIFY(QFile::link(root.filePath("elsewhere/real"), root.filePath("link")));
+    QFile outside(root.filePath("outside.fif"));
+    QVERIFY(outside.open(QIODevice::WriteOnly));
+    outside.write("payload");
+    outside.close();
+    MnaProject linked = createTestProject(false);
+    linked.subjects[0].sessions[0].recordings[0].files = {MnaFileRef{}};
+    linked.subjects[0].sessions[0].recordings[0].files[0].role = MnaFileRole::Raw;
+    linked.subjects[0].sessions[0].recordings[0].files[0].path = "../outside.fif";
+    const QString linkedMna = root.filePath("link/linked.mna");
+    QVERIFY(MnaIO::write(linked, linkedMna));
+    const QString linkedMnx = root.filePath("linked.mnx");
+    QProcess linkedProc;
+    linkedProc.start(m_converterPath, QStringList() << "convert" << linkedMna << linkedMnx);
+    QVERIFY(linkedProc.waitForFinished(10000));
+    QCOMPARE(linkedProc.exitCode(), 0);
+    const MnaFileRef embedded = MnaIO::read(linkedMnx).subjects[0].sessions[0].recordings[0].files[0];
+    QVERIFY2(embedded.embedded, qPrintable(QString::fromUtf8(linkedProc.readAllStandardError())));
+    QCOMPARE(embedded.data, QByteArray("payload"));
+#endif
 }
 
 void TestMnaBids::testConverterInvalidCommand()

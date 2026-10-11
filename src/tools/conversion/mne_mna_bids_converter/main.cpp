@@ -185,7 +185,8 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
                     } else if (!ref.embedded) {
                         // Copy from source location relative to the project file
                         const QString srcDir = QFileInfo(inputPath).absolutePath();
-                        const QString srcPath = QDir(srcDir).filePath(ref.path);
+                        // Resolve ".." lexically, as written; the OS would follow symlinks out of the project folder
+                        const QString srcPath = QDir::cleanPath(QDir(srcDir).filePath(ref.path));
                         if (QFile::exists(srcPath)) {
                             QDir().mkpath(QFileInfo(fullPath).absolutePath());
                             if (QFile::copy(srcPath, fullPath)) {
@@ -393,7 +394,7 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
                 for (MnaRecording& rec : sess.recordings) {
                     for (MnaFileRef& ref : rec.files) {
                         if (!ref.embedded) {
-                            const QString filePath = QDir(projDir).filePath(ref.path);
+                            const QString filePath = QDir::cleanPath(QDir(projDir).filePath(ref.path));
                             QFile f(filePath);
                             if (f.open(QIODevice::ReadOnly)) {
                                 ref.data = f.readAll();
