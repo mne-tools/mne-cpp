@@ -40,8 +40,7 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <dsp/parksmcclellan.h>
-#include <dsp/cosinefilter.h>
+#include <dsp/filterkernel.h>
 
 
 //*************************************************************************************************************

@@ -60,61 +60,20 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
 , m_dBandwidth(bandwidth)
 , m_sName(unique_name)
 {
-    switch (designMethod) {
-        case Tschebyscheff: {
-            ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
-            m_dCoeffA = filter.FirCoeff;
+    // Frequencies are relative to Nyquist. The kernel is linear phase with a delay of half its length.
+    const UTILSLIB::FilterKernel kernel(unique_name,
+                                        type,
+                                        order,
+                                        centerfreq,
+                                        bandwidth,
+                                        parkswidth,
+                                        sFreq,
+                                        designMethod == Cosine ? 0 : 1);
+    m_dCoeffA = kernel.getCoefficients();
+    m_iFilterOrder = static_cast<int>(m_dCoeffA.cols());
 
-            //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
-            fftTransformCoeffs();
-
-            break;
-        }
-
-        case Cosine: {
-            CosineFilter filtercos;
-
-            switch (type) {
-                case FilterType::LPF:
-                    filtercos = CosineFilter(fftlength,
-                                             (centerfreq) * (sFreq / 2),
-                                             parkswidth * (sFreq / 2),
-                                             (centerfreq) * (sFreq / 2),
-                                             parkswidth * (sFreq / 2),
-                                             sFreq,
-                                             (CosineFilter::TPassType)type);
-                    break;
-
-                case FilterType::HPF:
-                    filtercos = CosineFilter(fftlength,
-                                             (centerfreq) * (sFreq / 2),
-                                             parkswidth * (sFreq / 2),
-                                             (centerfreq) * (sFreq / 2),
-                                             parkswidth * (sFreq / 2),
-                                             sFreq,
-                                             (CosineFilter::TPassType)type);
-                    break;
-
-                case FilterType::BPF:
-                    filtercos = CosineFilter(fftlength,
-                                             (centerfreq + bandwidth / 2) * (sFreq / 2),
-                                             parkswidth * (sFreq / 2),
-                                             (centerfreq - bandwidth / 2) * (sFreq / 2),
-                                             parkswidth * (sFreq / 2),
-                                             sFreq,
-                                             (CosineFilter::TPassType)type);
-                    break;
-                case FilterType::NOTCH:
-                    break;
-            }
-
-            m_dCoeffA = filtercos.m_vecCoeff;
-            m_dFFTCoeffA = filtercos.m_vecFftCoeff;
-            m_iFilterOrder = static_cast<int>(m_dCoeffA.cols());
-
-            break;
-        }
-    }
+    //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
+    fftTransformCoeffs();
 }
 
 

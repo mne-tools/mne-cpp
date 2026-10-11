@@ -155,20 +155,10 @@ private slots:
     //=========================================================================================================
     // FilterOperator tests
     //=========================================================================================================
-    void testFilterOperatorConstruct();
     void testFilterOperatorLPF();
     void testFilterOperatorHPF();
     void testFilterOperatorBPF();
     void testFilterOperatorApplyFFTFilter();
-
-    //=========================================================================================================
-    // SessionFilter tests
-    //=========================================================================================================
-    void testSessionFilterConstruct();
-    void testSessionFilterCosine();
-    void testSessionFilterIsValid();
-    void testSessionFilterIsFir();
-    void testSessionFilterDesignMethods();
 
     //=========================================================================================================
     // RawSettings tests
@@ -354,11 +344,9 @@ void TestMneBrowseData::testRawModelData()
     QFile file(rawPath);
     model.loadFiffData(&file);
 
-    // Access valid data
-    QModelIndex idx = model.index(0, 0);
-    QVariant val = model.data(idx, Qt::DisplayRole);
-    // May be valid or invalid depending on implementation
-    QVERIFY(true); // Exercise the code path
+    // Column 0 names the channel, column 1 carries its loaded samples
+    QCOMPARE(model.data(model.index(0, 0), Qt::DisplayRole).toString(), model.fiffInfo()->ch_names.first());
+    QVERIFY(model.data(model.index(0, 1), Qt::DisplayRole).isValid());
 
     // Access invalid index
     QVariant invalid = model.data(QModelIndex(), Qt::DisplayRole);
@@ -929,9 +917,6 @@ void TestMneBrowseData::testAverageModelClear()
     QFile file(avePath);
     model.loadEvokedData(file);
     QVERIFY(model.rowCount() > 0);
-
-    // clearModel is protected, test via destructor or reload
-    QVERIFY(true);
 }
 
 //=============================================================================================================
@@ -1097,12 +1082,6 @@ void TestMneBrowseData::testDataPackageCutData()
 // FilterOperator tests
 //=============================================================================================================
 
-void TestMneBrowseData::testFilterOperatorConstruct()
-{
-    FilterOperator filter;
-    QVERIFY(true); // Should not crash
-}
-
 void TestMneBrowseData::testFilterOperatorLPF()
 {
     double sFreq = 600.0;
@@ -1170,12 +1149,14 @@ void TestMneBrowseData::testFilterOperatorApplyFFTFilter()
     double sFreq = 600.0;
     int order = 128;
 
+    // Frequencies are relative to Nyquist, as RawModel passes them: 40 Hz cut-off, 5 Hz transition
+    const double nyquist = sFreq / 2.0;
     FilterOperator filter("LPF_40Hz",
                           FilterOperator::LPF,
                           order,
-                          40.0 / sFreq,
-                          0.0,
-                          0.1,
+                          40.0 / nyquist,
+                          5.0 / nyquist,
+                          5.0 / nyquist,
                           sFreq,
                           4096,
                           FilterOperator::Cosine);
@@ -1191,49 +1172,17 @@ void TestMneBrowseData::testFilterOperatorApplyFFTFilter()
     RowVectorXd filtered = filter.applyFFTFilter(signal);
     QCOMPARE(filtered.size(), signal.size());
 
-    // The 100 Hz component should be attenuated (LPF at 40 Hz)
-    // Just verify the output is valid (not NaN/Inf)
-    QVERIFY(filtered.allFinite());
-}
-
-//=============================================================================================================
-// SessionFilter tests
-//=============================================================================================================
-
-void TestMneBrowseData::testSessionFilterConstruct()
-{
-    SessionFilter filter;
-    QVERIFY(true); // Default construction should not crash
-}
-
-void TestMneBrowseData::testSessionFilterCosine()
-{
-    SessionFilter filter;
-    // Exercise cosine filter design
-    QVERIFY(true);
-}
-
-void TestMneBrowseData::testSessionFilterIsValid()
-{
-    SessionFilter filter;
-    // An uninitialized filter might not be valid
-    // Just exercise the code path
-    filter.isValid();
-    QVERIFY(true);
-}
-
-void TestMneBrowseData::testSessionFilterIsFir()
-{
-    SessionFilter filter;
-    filter.isFir();
-    QVERIFY(true);
-}
-
-void TestMneBrowseData::testSessionFilterDesignMethods()
-{
-    // Exercise different filter design methods
-    SessionFilter filter;
-    QVERIFY(true);
+    // Amplitude of each component over the middle half, away from the edges: 10 Hz passes, 100 Hz is stopped
+    const auto amplitude = [&](double freq) {
+        double re = 0.0, im = 0.0;
+        for (int i = nSamples / 4; i < 3 * nSamples / 4; ++i) {
+            re += filtered(i) * std::cos(2.0 * M_PI * freq * i / sFreq);
+            im += filtered(i) * std::sin(2.0 * M_PI * freq * i / sFreq);
+        }
+        return 4.0 * std::hypot(re, im) / nSamples;
+    };
+    QVERIFY2(std::fabs(amplitude(10.0) - 1.0) < 0.02, qPrintable(QString::number(amplitude(10.0))));
+    QVERIFY2(amplitude(100.0) < 0.01, qPrintable(QString::number(amplitude(100.0))));
 }
 
 //=============================================================================================================
