@@ -35,6 +35,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QMessageBox>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QtTest>
@@ -57,6 +58,8 @@ private slots:
     void initialisesWithoutSampleData();
     void stopsWhenStartedWithoutData_data();
     void stopsWhenStartedWithoutData();
+    void rtFwdRefusesMissingInputFiles_data();
+    void rtFwdRefusesMissingInputFiles();
     void averagesTheStimulusEvents();
     void estimatesTheCovariance();
     void passesTheStreamThrough();
@@ -200,6 +203,42 @@ void TestMneScanPlugins::stopsWhenStartedWithoutData()
         stillRunning.append(plugin.release());
         QFAIL("The processing thread is still running after stop()");
     }
+}
+
+//=============================================================================================================
+
+void TestMneScanPlugins::rtFwdRefusesMissingInputFiles_data()
+{
+    QTest::addColumn<QString>("attribute");
+    for (const char* attribute : {"bemname", "mriname", "measname"})
+        QTest::newRow(attribute) << QString(attribute);
+}
+
+void TestMneScanPlugins::rtFwdRefusesMissingInputFiles()
+{
+    QFETCH(QString, attribute);
+    if (!m_info)
+        QSKIP("Sample test data not found");
+
+    std::unique_ptr<AbstractPlugin> plugin = makePlugin("RtFwd");
+    plugin->setAttributes({{attribute, QDir::temp().filePath("no-such-mne-scan-input.fif")}});
+    QString message;
+    QTimer dismiss;
+    connect(&dismiss, &QTimer::timeout, [&message]() {
+        if (auto* box = qobject_cast<QMessageBox*>(QApplication::activeModalWidget())) {
+            message = box->text();
+            box->accept();
+        }
+    });
+    dismiss.start(10);
+    const bool started = plugin->start();
+    dismiss.stop();
+    if (started) {
+        plugin->stop();
+        QVERIFY(plugin->wait(5000));
+    }
+    QVERIFY2(!started, qPrintable(attribute));
+    QVERIFY(message.contains("cannot be op"));
 }
 
 //=============================================================================================================

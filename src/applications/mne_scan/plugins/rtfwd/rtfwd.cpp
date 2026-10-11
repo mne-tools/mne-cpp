@@ -194,7 +194,7 @@ bool RtFwd::start()
 
     // Read measurement
     QFile t_fMeas(m_pFwdSettings->measname);
-    stream = FiffStream::SPtr(new FiffStream(&t_fMri));
+    stream = FiffStream::SPtr(new FiffStream(&t_fMeas));
     if (!stream->open()) {
         QMessageBox msgBox;
         msgBox.setText("The meaurement file cannot be opend. Chosse another file.");
