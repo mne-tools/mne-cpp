@@ -82,7 +82,6 @@ private slots:
 
     // ── Graph base class ──────────────────────────────────────────────
     void testGraphInit();
-    void testGraphSetTitle();
 
     // ── ImageSc ───────────────────────────────────────────────────────
     void testImageScDefaultCtor();
@@ -97,12 +96,9 @@ private slots:
     void testPlotUpdateData();
 
     // ── Spline ────────────────────────────────────────────────────────
-    void testSplineDefaultCtor();
-    void testSplineSetData();
     void testSplineThreshold();
 
     // ── Bar ───────────────────────────────────────────────────────────
-    void testBarDefaultCtor();
     void testBarSetData();
 
     // ── TFplot ────────────────────────────────────────────────────────
@@ -366,10 +362,13 @@ void TestDispPlots::testLinePlotUpdateData()
 void TestDispPlots::testLinePlotSetLabels()
 {
     LinePlot plot;
+    plot.resize(400, 300);
+    plot.updateData(QVector<double>{1.0, 2.0, 3.0});
+    const QImage plain = plot.grab().toImage();
     plot.setTitle("My Title");
     plot.setXLabel("X Axis");
     plot.setYLabel("Y Axis");
-    QVERIFY(true); // No crash
+    QVERIFY(plot.grab().toImage() != plain);
 }
 
 //=============================================================================================================
@@ -381,15 +380,6 @@ void TestDispPlots::testGraphInit()
     Graph graph;
     QVERIFY(graph.minimumWidth() > 0);
     QVERIFY(graph.minimumHeight() > 0);
-}
-
-//=============================================================================================================
-
-void TestDispPlots::testGraphSetTitle()
-{
-    Graph graph;
-    graph.setTitle("Test Title");
-    QVERIFY(true); // No crash
 }
 
 //=============================================================================================================
@@ -532,29 +522,6 @@ void TestDispPlots::testPlotUpdateData()
 // Spline
 //=============================================================================================================
 
-void TestDispPlots::testSplineDefaultCtor()
-{
-    Spline spline;
-    QVERIFY(true); // Construction without crash
-}
-
-//=============================================================================================================
-
-void TestDispPlots::testSplineSetData()
-{
-    Spline spline;
-
-    VectorXd limits(5);
-    limits << 0.0, 1.0, 2.0, 3.0, 4.0;
-    VectorXi freq(5);
-    freq << 10, 25, 15, 30, 5;
-
-    spline.setData(limits, freq);
-    QVERIFY(true);
-}
-
-//=============================================================================================================
-
 void TestDispPlots::testSplineThreshold()
 {
     Spline spline;
@@ -606,25 +573,29 @@ void TestDispPlots::testSplineThreshold()
 // Bar
 //=============================================================================================================
 
-void TestDispPlots::testBarDefaultCtor()
-{
-    Bar bar("Test Bar");
-    QVERIFY(true);
-}
-
-//=============================================================================================================
-
 void TestDispPlots::testBarSetData()
 {
     Bar bar("Histogram");
+    bar.resize(380, 300);
 
+    // Four class limits bound three classes; the fourth frequency has no class
     VectorXd limits(4);
     limits << 0.0, 1.0, 2.0, 3.0;
     VectorXi freq(4);
     freq << 5, 15, 10, 20;
-
     bar.setData(limits, freq, 2);
-    QVERIFY(true);
+    const QImage image = bar.grab().toImage();
+
+    // Plot area x 60..360, y 40..200: bar heights relative to the largest class (15)
+    const auto isBar = [&](double x, int y) {
+        return image.pixelColor(static_cast<int>(x), y) == QColor(70, 130, 180);
+    };
+    const double barWidth = 300.0 / 3;
+    const int halfHeight = 40 + 80;
+    QVERIFY(isBar(60 + 0.5 * barWidth, 195) && !isBar(60 + 0.5 * barWidth, halfHeight));
+    QVERIFY(isBar(60 + 1.5 * barWidth, 195) && isBar(60 + 1.5 * barWidth, 45));
+    QVERIFY(isBar(60 + 2.5 * barWidth, 195) && isBar(60 + 2.5 * barWidth, halfHeight));
+    QVERIFY(!isBar(60 + 2.5 * barWidth, 60));
 }
 
 //=============================================================================================================
