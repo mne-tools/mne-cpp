@@ -5822,7 +5822,7 @@
         "test-data"
       ],
       "gui": true,
-      "qskip_sites": 5,
+      "qskip_sites": 6,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {

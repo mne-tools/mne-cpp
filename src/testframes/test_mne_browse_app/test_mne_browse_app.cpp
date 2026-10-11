@@ -19,6 +19,8 @@
 #include <Windows/eventwindow.h>
 #include <Models/eventmodel.h>
 #include <Windows/mainwindow.h>
+#include <Windows/annotationwindow.h>
+#include <Models/annotationmodel.h>
 #include <Utils/sessionfilter.h>
 #include <Models/averagemodel.h>
 
@@ -29,11 +31,15 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_stream.h>
+#include <fiff/fiff_dir_node.h>
+#include <fiff/fiff_tag.h>
 #include <mna/mna_io.h>
 #include <mna/mna_project.h>
 
 #include <QAction>
 #include <QColorDialog>
+#include <QComboBox>
 #include <QCryptographicHash>
 #include <QMessageBox>
 #include <QPushButton>
@@ -69,6 +75,7 @@ private slots:
     void eventMarkersUseEventTypeColors();
     void savesAndOpensProjects();
     void writesRawCopyButNotOverItsSource();
+    void annotatesDraggedRangeLikePython();
 
 private:
     static MainWindow* makeWindow();
@@ -443,6 +450,69 @@ void TestMneBrowseApp::writesRawCopyButNotOverItsSource()
         QVERIFY2(writtenData.row(eog).isApprox(sourceData.row(eog), 1e-6), qPrintable(path));
         QVERIFY2(writtenData.row(eeg).isApprox(sourceData.row(eeg), 1e-6) == (path == copyPath), qPrintable(path));
     }
+}
+
+//=============================================================================================================
+
+void TestMneBrowseApp::annotatesDraggedRangeLikePython()
+{
+    const QString rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(rawPath))
+        QSKIP("Sample test data not found");
+
+    QTemporaryDir dir;
+    const QString annotPath = dir.filePath("drag-annot.fif");
+    const auto chooseFile = [](const QString& path) {
+        answerNextModal([path](QWidget* pModal) {
+            auto* dialog = qobject_cast<QFileDialog*>(pModal);
+            dialog->setDirectory(QFileInfo(path).absolutePath());
+            dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(path).fileName());
+            static_cast<QDialog*>(dialog)->accept();
+        });
+    };
+    const auto openWindow = [rawPath]() {
+        auto* window = makeWindow();
+        window->resize(1200, 800);
+        window->show();
+        window->applyCommandLineOptions(rawPath, QString(), -1.0, -1.0);
+        return window;
+    };
+
+    // A right-to-left drag over samples 13500..13800, labelled in the dialog
+    auto* first = openWindow();
+    answerNextModal([](QWidget* pModal) {
+        pModal->findChild<QComboBox*>()->setCurrentText(QStringLiteral(" BAD_drag "));
+        qobject_cast<QDialog*>(pModal)->accept();
+    });
+    emit first->dataWindow()->annotationRangeSelected(13800, 13500);
+    chooseFile(annotPath);
+    findAction(first, QStringLiteral("Save Annotations..."))->trigger();
+    first->hide();
+
+    QFile annotFile(annotPath);
+    FIFFLIB::FiffStream stream(&annotFile);
+    QVERIFY(stream.open());
+    const QList<FIFFLIB::FiffDirNode::SPtr> blocks = stream.dirtree()->dir_tree_find(3810);
+    QCOMPARE(blocks.size(), 1);
+    QMap<int, QVector<float>> times;
+    for (const auto& entry : blocks.first()->dir) {
+        FIFFLIB::FiffTag::UPtr tag;
+        if ((entry->kind == 3568 || entry->kind == 3569) && stream.read_tag(tag, entry->pos))
+            times[entry->kind] = QVector<float>(tag->toFloat(), tag->toFloat() + tag->size() / 4);
+    }
+    annotFile.close();
+    QCOMPARE(times[3568].size(), 1);
+
+    // Loading the file again restores the same span and label
+    auto* second = openWindow();
+    chooseFile(annotPath);
+    findAction(second, QStringLiteral("Load Annotations..."))->trigger();
+    const QVector<MNEBROWSE::AnnotationSpanData> spans = second->findChild<MNEBROWSE::AnnotationWindow*>()->getAnnotationModel()->getAnnotationSpans();
+    second->hide();
+    QCoreApplication::processEvents();
+    QCOMPARE(spans.size(), 1);
+    QCOMPARE(spans[0].startSample, 13500);
+    QCOMPARE(spans[0].label, QStringLiteral("BAD_drag"));
 }
 
 //=============================================================================================================

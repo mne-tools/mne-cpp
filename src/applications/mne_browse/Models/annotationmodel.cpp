@@ -1248,6 +1248,7 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
 
     stream->end_block(FiffBlockMneAnnotations);
     stream->end_file();
+    qFile.close();
     return true;
 }
 
