@@ -17,12 +17,12 @@
       "without_labels": 0,
       "without_timeout": 0,
       "ci_executed": {
-        "macos-26": 283,
-        "macos-26-qt-min": 283,
-        "ubuntu-24.04": 283,
-        "ubuntu-24.04-qt-min": 283,
-        "windows-2025-vs2026": 283,
-        "windows-2025-vs2026-qt-min": 283
+        "macos-26": 289,
+        "macos-26-qt-min": 289,
+        "ubuntu-24.04": 289,
+        "ubuntu-24.04-qt-min": 289,
+        "windows-2025-vs2026": 289,
+        "windows-2025-vs2026-qt-min": 289
       },
       "ci_skipped": {
         "macos-26": 0,
@@ -37,18 +37,18 @@
       "retry_paths": 0
     },
     "G2_coverage": {
-      "commit": "d757a49a8e0097be7e12d0dd0a28133bfd15555f",
-      "source": "https://github.com/mne-tools/mne-cpp/actions/runs/38077322878",
-      "line_combined": 67.62,
-      "line_libraries": 87.14,
-      "line_applications": 40.78,
-      "line_tools": 61.06,
+      "commit": "c78efbf82cc2b7ff71b996e1fd6f46a562b1f0bc",
+      "source": "https://github.com/mne-tools/mne-cpp/actions/runs/38144982990",
+      "line_combined": 68.92,
+      "line_libraries": 87.21,
+      "line_applications": 44.28,
+      "line_tools": 61.16,
       "branch_reported": true,
-      "branch_libraries": 62.96,
+      "branch_libraries": 63.12,
       "lines_to_combined_target": 0,
       "lines_to_scope_targets": {
         "libraries": 0,
-        "applications": 4089,
+        "applications": 2532,
         "tools": 0
       }
     },
