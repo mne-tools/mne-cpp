@@ -267,7 +267,7 @@ public:
      * @param[in] channelList   The channel list to create the MEG sensor set from.
      * @param[in] accuracy     The accuracy level to use for the sensor set.
      *
-     * @return Sensor set built from the MEG coil definitions, or an empty set if channelList is empty.
+     * @return Sensor set built from the MEG coil definitions, or an empty set if channelList is empty or holds a channel without a MEG coil.
      */
     InvSensorSet updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
                                  const Accuracy& accuracy);

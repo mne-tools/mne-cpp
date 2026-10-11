@@ -117,7 +117,6 @@ private slots:
     void hpiFit_storeHeadPosition();
     void hpiFit_fitWithSyntheticData();
     void hpiFitData_defaultConstruction();
-    void hpiFitData_setMembersAndFit();
 
     // ---- InvHpiModelParameters (from boost) ----
     void hpiModelParams_construction();
@@ -136,7 +135,6 @@ private slots:
     void filter_applyWithChannelSelection();
 
     // ---- RtNoise extras (from coverage_push) ----
-    void rtNoise_appendData();
 
     // ---- RtAveragingWorker extras (from coverage_push) ----
     void rtAveragingWorker_doWork();
@@ -532,9 +530,15 @@ void TestInvRtLibrary::hpiFit_constructWithSensorSet()
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
     InvSensorSetCreator creator;
-    InvSensorSet sensorSet = creator.updateSensorSet(raw.info.chs, Accuracy::medium);
-    InvHpiFit hpiFit(sensorSet);
-    QVERIFY(true);
+    // Only MEG channels have coils: a list with EEG/stim channels gives no sensor set
+    QCOMPARE(creator.updateSensorSet(raw.info.chs, Accuracy::medium).ncoils(), 0);
+    RowVectorXi megPicks = raw.info.pick_types(true, false, false);
+    QList<FiffChInfo> megChs;
+    for (int i = 0; i < megPicks.size(); ++i)
+        megChs << raw.info.chs[megPicks(i)];
+    const InvSensorSet sensorSet = creator.updateSensorSet(megChs, Accuracy::medium);
+    QCOMPARE(sensorSet.ncoils(), static_cast<int>(megPicks.size()));
+    QVERIFY(sensorSet.np() > 0);
 }
 
 void TestInvRtLibrary::hpiFit_storeHeadPosition()
@@ -645,17 +649,11 @@ void TestInvRtLibrary::hpiFit_fitWithSyntheticData()
 
 void TestInvRtLibrary::hpiFitData_defaultConstruction()
 {
+    // InvHpiFit's documented defaults: 500 iterations, abort at an error of 1e-9
     InvHpiFitData data;
-    // m_iMaxIterations is uninitialized by default; just verify the object can be constructed
-    QVERIFY(true);
-}
-
-void TestInvRtLibrary::hpiFitData_setMembersAndFit()
-{
-    // Test that InvHpiFitData can be constructed and its members set
-    InvHpiFitData data;
-    // Verify the object is usable (specific fitting requires full setup with coils)
-    QVERIFY(true);
+    QCOMPARE(data.m_iMaxIterations, 500);
+    QCOMPARE(data.m_fAbortError, 1e-9f);
+    QCOMPARE(data.m_errorInfo.numIterations, 0);
 }
 
 //=============================================================================================================
@@ -758,20 +756,6 @@ void TestInvRtLibrary::filter_applyWithChannelSelection()
 // RtNoise extras (from coverage_push)
 //=============================================================================================================
 
-void TestInvRtLibrary::rtNoise_appendData()
-{
-    if (!hasData())
-        QSKIP("No test data");
-    QFile rawFile(rawPath());
-    FiffRawData raw(rawFile);
-    FiffInfo::SPtr pInfo = FiffInfo::SPtr(new FiffInfo(raw.info));
-    RtNoise rtNoise(512, pInfo, 3);
-    MatrixXd data, times;
-    raw.read_raw_segment(data, times, raw.first_samp, raw.first_samp + 511);
-    rtNoise.append(data);
-    QVERIFY(true);
-}
-
 //=============================================================================================================
 // RtAveragingWorker extras (from coverage_push)
 //=============================================================================================================
@@ -796,6 +780,8 @@ void TestInvRtLibrary::rtAveragingWorker_doWork()
     pInfo->ch_names << "MEG0111" << "STI014";
     quint32 preStim = 50, postStim = 100;
     RTPROCESSINGLIB::RtAveragingWorker worker(2, preStim, postStim, 0, 0, 1, pInfo);
+    QList<FiffEvokedSet> results;
+    connect(&worker, &RTPROCESSINGLIB::RtAveragingWorker::resultReady, this, [&](const FiffEvokedSet& set, const QStringList&) { results << set; });
     for (int block = 0; block < 5; ++block) {
         MatrixXd data = MatrixXd::Zero(2, 200);
         for (int j = 0; j < 200; ++j)
@@ -804,7 +790,12 @@ void TestInvRtLibrary::rtAveragingWorker_doWork()
             data(1, 100) = 5.0;
         worker.doWork(data);
     }
-    QVERIFY(true);
+    // Three epochs, two averaged: the epoch of the stationary sine is samples 50..199 of any block
+    QCOMPARE(results.size(), 3);
+    const FiffEvoked& evoked = results.last().evoked.first();
+    QCOMPARE(evoked.nave, 2);
+    for (int k = 0; k < 150; ++k)
+        QVERIFY(std::fabs(evoked.data(0, k) - std::sin(2.0 * M_PI * 10.0 * (50 + k) / 1000.0)) < 1e-12);
 }
 
 //=============================================================================================================
