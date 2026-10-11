@@ -169,6 +169,18 @@ void TestAnalyzeCoregistration::fitsFiducialsByIdentity()
     const FiffCoordTrans fitted = FiffCoordTrans::readTransform(transPath, FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
     QVERIFY2((fitted.trans - reference.trans).cwiseAbs().maxCoeff() < 1e-4f,
              qPrintable(QStringLiteral("max deviation %1").arg((fitted.trans - reference.trans).cwiseAbs().maxCoeff())));
+
+    // Loading a file without a transform keeps the current one; the reference loads as stored
+    const QString notTrans = dir.filePath("notes.txt");
+    QFile notes(notTrans);
+    QVERIFY(notes.open(QIODevice::WriteOnly));
+    notes.write("not a transform");
+    notes.close();
+    emit view->loadTrans(notTrans);
+    emit view->loadTrans(sampleFile("MEG/sample/all-trans.fif"));
+    emit view->storeTrans(transPath);
+    const FiffCoordTrans loaded = FiffCoordTrans::readTransform(transPath, FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
+    QVERIFY(loaded.trans.isApprox(reference.trans));
 }
 
 //=============================================================================================================

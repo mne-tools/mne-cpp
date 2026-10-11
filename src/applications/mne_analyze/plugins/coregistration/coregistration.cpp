@@ -356,7 +356,11 @@ void CoRegistration::onStoreFiducials(const QString& sFilePath)
 void CoRegistration::onLoadTrans(const QString& sFilePath)
 {
     QFile fileTrans(sFilePath);
-    FiffCoordTrans transTemp = FiffCoordTrans(fileTrans);
+    FiffCoordTrans transTemp;
+    if (!FiffCoordTrans::read(fileTrans, transTemp)) {
+        qWarning() << "[CoRegistration::onLoadTrans] No transformation found in" << sFilePath;
+        return;
+    }
 
     // Transformation parameters
     Vector3f vecRot;
