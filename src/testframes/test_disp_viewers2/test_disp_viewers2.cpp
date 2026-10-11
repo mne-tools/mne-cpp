@@ -272,10 +272,10 @@ void clickNextMessageBoxButton(const QString& sText)
     });
 }
 
-/** Selects sPath in the next modal QFileDialog and accepts it. */
-void chooseFileInNextDialog(const QString& sPath)
+/** Selects sPath in the next modal QFileDialog and accepts it, then runs afterAccept (e.g. to answer a follow-up dialog). */
+void chooseFileInNextDialog(const QString& sPath, const std::function<void()>& afterAccept = {})
 {
-    answerNextModal([sPath](QWidget* pModal) {
+    answerNextModal([sPath, afterAccept](QWidget* pModal) {
         auto* pDialog = qobject_cast<QFileDialog*>(pModal);
         QVERIFY(pDialog);
         // Typing the name works for open dialogs too, whose selectFile() is dropped for an existing file
@@ -284,6 +284,9 @@ void chooseFileInNextDialog(const QString& sPath)
         pDialog->setDirectory(QFileInfo(sPath).absolutePath());
         pName->setText(QFileInfo(sPath).fileName());
         static_cast<QDialog*>(pDialog)->accept();
+        if (afterAccept) {
+            afterAccept();
+        }
     });
 }
 
@@ -815,6 +818,21 @@ void TestDispViewers2::hpiSettingsView_coilTablesPresetsAndFeedback()
     QCOMPARE(contSpy.size(), 1);
     QCOMPARE(windowSpy.last().at(0).toInt(), 450);
     QCOMPARE(view.getFittingWindowSize(), 450);
+
+    // Loading digitizers from a file; a FIFF file without any is refused with a message
+    const QString sampleDir = QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/MEG/sample/");
+    QSignalSpy digSpy(&view, &HpiSettingsView::digitizersChanged);
+    auto* loadButton = view.findChild<QPushButton*>(QStringLiteral("m_pushButton_loadDigitizers"));
+    chooseFileInNextDialog(sampleDir + QStringLiteral("sample_audvis_trunc_raw.fif"));
+    QTest::mouseClick(loadButton, Qt::LeftButton);
+    QCOMPARE(digSpy.size(), 1);
+    QCOMPARE(label("m_label_numberLoadedCoils"), QStringLiteral("4"));
+    QCOMPARE(label("m_label_numberLoadedEEG"), QStringLiteral("61"));
+    chooseFileInNextDialog(sampleDir + QStringLiteral("sample_audvis-cov.fif"),
+                           []() { clickNextMessageBoxButton(QStringLiteral("OK")); });
+    QTest::mouseClick(loadButton, Qt::LeftButton);
+    QCOMPARE(digSpy.size(), 1);
+    QCOMPARE(label("m_label_numberLoadedEEG"), QStringLiteral("61"));
 }
 
 //=============================================================================================================

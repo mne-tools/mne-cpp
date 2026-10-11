@@ -24,6 +24,7 @@
 #include "ui_hpisettingsview.h"
 
 #include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_stream.h>
 #include <iostream>
 
 //=============================================================================================================
@@ -310,10 +311,12 @@ void HpiSettingsView::onLoadDigitizers()
         fileName_HPI = fileName_HPI.trimmed();
         QFileInfo checkFile(fileName_HPI);
 
-        if (checkFile.exists() && checkFile.isFile()) {
+        const QList<FiffDigPoint> digitizers = checkFile.isFile() ? readDigitizersFromFile(fileName_HPI)
+                                                                  : QList<FiffDigPoint>();
+        if (!digitizers.isEmpty()) {
             // Stop cont HPI first
             m_pUi->m_checkBox_continousHPI->setChecked(false);
-            emit digitizersChanged(readDigitizersFromFile(fileName_HPI), fileName_HPI);
+            emit digitizersChanged(digitizers, fileName_HPI);
         } else {
             QMessageBox msgBox;
             msgBox.setText("File could not be loaded!");
@@ -427,10 +430,14 @@ void HpiSettingsView::onRemoveCoil()
 
 QList<FiffDigPoint> HpiSettingsView::readDigitizersFromFile(const QString& fileName)
 {
-    clearCoilGUI();
-
     QFile t_fileDig(fileName);
-    FiffDigPointSet t_digSet(t_fileDig);
+    FIFFLIB::FiffStream::SPtr t_pStream(new FIFFLIB::FiffStream(&t_fileDig));
+    FiffDigPointSet t_digSet;
+    if (!FiffDigPointSet::readFromStream(t_pStream, t_digSet) || t_digSet.size() == 0) {
+        return {};
+    }
+
+    clearCoilGUI();
     updateDigitizerInfoGUI(t_digSet);
 
     return t_digSet.getList();
