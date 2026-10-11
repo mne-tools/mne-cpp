@@ -46,6 +46,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     analyze_dataloader
     anShared
     mne_disp
+    mne_inv
     mne_mne
     mne_fiff
     mne_utils

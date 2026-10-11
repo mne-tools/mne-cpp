@@ -213,6 +213,11 @@ public:
                 index = m_SelectedFunctionalData;
                 break;
             }
+            case ANSHAREDLIB_DIPOLEFIT_MODEL: {
+                iType = BIDS_DIPOLE;
+                index = m_SelectedFunctionalData;
+                break;
+            }
             default: {
                 iType = BIDS_UNKNOWN;
                 index = m_SelectedItem;

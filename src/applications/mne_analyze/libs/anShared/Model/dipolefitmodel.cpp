@@ -53,6 +53,7 @@ DipoleFitModel::DipoleFitModel(const QString& sFilePath,
                                const QByteArray& byteLoadedData,
                                QObject* parent)
 : AbstractModel(sFilePath, parent)
+, m_ECD_Set(INVLIB::InvEcdSet::read_dipoles_dip(sFilePath))
 {
     Q_UNUSED(byteLoadedData);
 }

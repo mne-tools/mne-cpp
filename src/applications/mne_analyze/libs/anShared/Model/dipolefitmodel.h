@@ -49,6 +49,13 @@ public:
 
 public:
     //=========================================================================================================
+    /**
+     * Loads the dipoles of a text dipole file (.dip) as written by mne_dipole_fit.
+     *
+     * @param[in] sFilePath         Path of the dipole file.
+     * @param[in] byteLoadedData    Unused.
+     * @param[in] parent            Parent object.
+     */
     DipoleFitModel(const QString& sFilePath,
                    const QByteArray& byteLoadedData = QByteArray(),
                    QObject* parent = Q_NULLPTR);

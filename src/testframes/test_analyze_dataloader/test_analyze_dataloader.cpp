@@ -23,13 +23,16 @@
 
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_events.h>
+#include <inv/dipole_fit/inv_ecd_set.h>
 
 #include <QtTest>
+#include <QTemporaryDir>
 
 #include <memory>
 
 using namespace DATALOADERPLUGIN;
 using namespace ANSHAREDLIB;
+using namespace INVLIB;
 
 //=============================================================================================================
 
@@ -42,6 +45,7 @@ private slots:
     void loadsEveryFileKind();
     void attachesEventFilesToTheRecording();
     void savesTheSelectedAverage();
+    void loadsDipoleFiles();
 };
 
 //=============================================================================================================
@@ -201,6 +205,39 @@ void TestAnalyzeDataLoader::savesTheSelectedAverage()
         QCOMPARE(saved.evoked[k].nave, expected.evoked[k].nave);
         QVERIFY(saved.evoked[k].data.isApprox(expected.evoked[k].data, 1e-6));
     }
+}
+
+//=============================================================================================================
+
+void TestAnalyzeDataLoader::loadsDipoleFiles()
+{
+    // A dipole file as mne_dipole_fit writes it
+    QTemporaryDir dir;
+    InvEcdSet written;
+    for (int k = 0; k < 3; ++k) {
+        InvEcd ecd;
+        ecd.valid = true;
+        ecd.time = 0.01f * k;
+        ecd.rd = Eigen::Vector3f(0.01f * k, 0.02f, 0.05f);
+        ecd.Q = Eigen::Vector3f(1e-8f, 0.0f, 0.0f);
+        ecd.good = 0.9f;
+        written.addEcd(ecd);
+    }
+    const QString path = dir.filePath("sample-dipoles.dip");
+    QVERIFY(written.save_dipoles_dip(path));
+
+    auto data = QSharedPointer<AnalyzeData>::create();
+    DataLoader loader;
+    loader.setGlobalData(data);
+    loader.init();
+    open(loader, path);
+
+    const QSharedPointer<AbstractModel> model = data->getModelByPath(path);
+    QVERIFY(model);
+    QCOMPARE(model->getType(), ANSHAREDLIB_DIPOLEFIT_MODEL);
+    const InvEcdSet loaded = model->data(QModelIndex()).value<InvEcdSet>();
+    QCOMPARE(loaded.size(), 3);
+    QVERIFY((loaded[2].rd - written[2].rd).norm() < 1e-6f);
 }
 
 //=============================================================================================================

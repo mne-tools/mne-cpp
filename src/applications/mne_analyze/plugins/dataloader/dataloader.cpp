@@ -26,6 +26,7 @@
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/mricoordmodel.h>
+#include <anShared/Model/dipolefitmodel.h>
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dir_node.h>
@@ -254,6 +255,8 @@ void DataLoader::loadFilePath(const QString& sFilePath)
 
     if (fileInfo.exists() && (fileInfo.completeSuffix() == "eve")) {
         attachToRecording(m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath));
+    } else if (fileInfo.exists() && fileInfo.suffix() == "dip") {
+        m_pAnalyzeData->loadModel<ANSHAREDLIB::DipoleFitModel>(sFilePath);
     } else if (fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         if (fileInfo.completeBaseName().endsWith("eve")) {
             attachToRecording(m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath));
@@ -303,7 +306,7 @@ void DataLoader::onLoadFilePressed()
     QString sFilePath = QFileDialog::getOpenFileName(Q_NULLPTR,
                                                      tr("Open File"),
                                                      m_sLastDir,
-                                                     tr("Fiff file (*.fif *.fiff);;Event file (*.eve)"));
+                                                     tr("Fiff file (*.fif *.fiff);;Event file (*.eve);;Dipole file (*.dip)"));
 
     QFileInfo fileInfo(sFilePath);
 
