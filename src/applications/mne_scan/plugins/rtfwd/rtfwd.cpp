@@ -169,7 +169,7 @@ bool RtFwd::start()
     if (!stream->open()) {
         QMessageBox msgBox;
         msgBox.setText("The source space cannot be opend. Chosse another file.");
-        msgBox.setText(m_pFwdSettings->srcname);
+        msgBox.setInformativeText(m_pFwdSettings->srcname);
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
         msgBox.exec();

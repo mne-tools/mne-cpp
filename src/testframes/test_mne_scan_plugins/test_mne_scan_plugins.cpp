@@ -210,7 +210,7 @@ void TestMneScanPlugins::stopsWhenStartedWithoutData()
 void TestMneScanPlugins::rtFwdRefusesMissingInputFiles_data()
 {
     QTest::addColumn<QString>("attribute");
-    for (const char* attribute : {"bemname", "mriname", "measname"})
+    for (const char* attribute : {"bemname", "srcname", "mriname", "measname"})
         QTest::newRow(attribute) << QString(attribute);
 }
 
