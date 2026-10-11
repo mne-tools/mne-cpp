@@ -683,9 +683,10 @@ void TestInvDipoleRapMne::dipoleFitSettings_checkIntegrity()
 {
     InvDipoleFitSettings settings;
     settings.measname = "/tmp/test.fif";
-    // checkIntegrity should not crash on valid settings
-    settings.checkIntegrity();
-    QVERIFY(true); // If we get here, no crash
+    // A measurement alone is not enough: MEG and/or EEG must be selected
+    QVERIFY(!settings.checkIntegrity());
+    settings.include_eeg = true;
+    QVERIFY(settings.checkIntegrity());
 }
 
 //=============================================================================================================
@@ -709,9 +710,9 @@ void TestInvDipoleRapMne::dipoleFitData_adHocNoise()
 
     auto noise = InvDipoleFitData::ad_hoc_noise(nullptr, nullptr,
                                                 grad_std, mag_std, eeg_std);
-    // With no coils, should return nullptr or empty
-    // This mainly exercises the code path
-    QVERIFY(true); // If we get here without crash, the test passes
+    // No sensors: an empty diagonal covariance
+    QVERIFY(noise);
+    QCOMPARE(noise->ncov, 0);
 }
 
 //=============================================================================================================

@@ -344,8 +344,7 @@ private slots:
     void rtSourceDataController_defaultCtor()
     {
         RtSourceDataController ctrl;
-        // Just verify it can be constructed without crash
-        QVERIFY(true);
+        QVERIFY(!ctrl.isStreaming());
     }
 
     //=========================================================================
@@ -354,7 +353,7 @@ private slots:
     void rtSensorDataController_defaultCtor()
     {
         RtSensorDataController ctrl;
-        QVERIFY(true);
+        QVERIFY(!ctrl.isStreaming());
     }
 };
 

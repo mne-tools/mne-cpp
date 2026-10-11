@@ -143,8 +143,6 @@ private slots:
     void testCheckThicknesses();
 
     // Triangle area reporting
-    void testReportTriangleAreas();
-    void testReportTriangleAreasNoData();
 
     void cleanupTestCase();
 
@@ -278,34 +276,6 @@ void TestSurfaceChecks::testCheckThicknesses()
 }
 
 //=============================================================================================================
-
-void TestSurfaceChecks::testReportTriangleAreas()
-{
-    MNEBemSurface surf = createIcosahedron(0.1f, FIFFV_BEM_SURF_ID_HEAD);
-
-    // Compute triangle areas
-    surf.tri_area.resize(surf.ntri);
-    for (int k = 0; k < surf.ntri; ++k) {
-        Vector3f v0 = surf.rr.row(surf.itris(k, 0));
-        Vector3f v1 = surf.rr.row(surf.itris(k, 1));
-        Vector3f v2 = surf.rr.row(surf.itris(k, 2));
-        Eigen::Vector3f a = v1 - v0;
-        Eigen::Vector3f b = v2 - v0;
-        surf.tri_area(k) = 0.5f * a.cross(b).norm();
-    }
-
-    // Should not crash, just reports
-    SurfaceChecks::reportTriangleAreas(surf, "test_icosahedron");
-    QVERIFY(true);
-}
-
-void TestSurfaceChecks::testReportTriangleAreasNoData()
-{
-    MNEBemSurface surf = createIcosahedron(0.1f, FIFFV_BEM_SURF_ID_HEAD);
-    // tri_area is empty by default — should handle gracefully
-    SurfaceChecks::reportTriangleAreas(surf, "test_no_area_data");
-    QVERIFY(true);
-}
 
 //=============================================================================================================
 

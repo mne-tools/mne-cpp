@@ -44,7 +44,6 @@ private slots:
     void initTestCase();
 
     // PythonRunner tests
-    void testIsPythonAvailable();
     void testPythonVersion();
     void testRunCodeHelloWorld();
     void testRunCodeStdErr();
@@ -77,17 +76,6 @@ void TestPythonRunner::initTestCase()
     m_bPythonAvailable = runner.isPythonAvailable();
     qDebug() << "Python detection: available=" << m_bPythonAvailable
              << " MNE_REQUIRE_PYTHON=" << PythonTestHelper::isPythonRequired();
-}
-
-//=============================================================================================================
-
-void TestPythonRunner::testIsPythonAvailable()
-{
-    PythonRunner runner;
-    // Just verify the method is callable and returns a bool
-    bool available = runner.isPythonAvailable();
-    Q_UNUSED(available);
-    QVERIFY(true); // Method didn't crash
 }
 
 //=============================================================================================================
@@ -259,11 +247,9 @@ void TestPythonRunner::testProgressParsing()
 
 void TestPythonRunner::testHelperIsAvailable()
 {
+    // The test helper finds an interpreter exactly when the runner does
     PythonTestHelper helper;
-    // Just check the method is callable
-    bool available = helper.isPythonAvailable();
-    Q_UNUSED(available);
-    QVERIFY(true);
+    QCOMPARE(helper.isPythonAvailable(), PythonRunner().isPythonAvailable());
 }
 
 //=============================================================================================================

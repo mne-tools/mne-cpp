@@ -364,7 +364,7 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
 
     // Size queries must not crash
     QVERIFY(view.viewCount() > 0);
-    QVERIFY(!view.isInfoPanelVisible() || view.isInfoPanelVisible()); // just check it doesn't crash
+    QVERIFY(view.isInfoPanelVisible());
 
     view.setInitialCameraRotation(QQuaternion::fromAxisAndAngle(0, 1, 0, 90));
 
@@ -1194,7 +1194,11 @@ void TestDisp3dBrainView::multiViewLayout_geometry()
     // separatorGeometries
     QRect vr, hr;
     layout.separatorGeometries(1, sz, vr, hr);
-    QVERIFY(vr.isEmpty() || !vr.isEmpty()); // just no crash
+    QVERIFY(vr.isEmpty() && hr.isEmpty());
+    layout.separatorGeometries(2, sz, vr, hr);
+    QVERIFY(!vr.isEmpty() && hr.isEmpty());
+    layout.separatorGeometries(4, sz, vr, hr);
+    QVERIFY(!vr.isEmpty() && !hr.isEmpty());
     layout.separatorGeometries(2, sz, vr, hr);
     QVERIFY(vr.width() > 0 || vr.isEmpty());
     layout.separatorGeometries(4, sz, vr, hr);

@@ -94,7 +94,6 @@ private slots:
     void fiffInfo_makeCompensator();
     void fiffInfo_writeToStream();
     void fiffInfo_readMegEegChannels();
-    void fiffInfo_print();
 
     // ── FiffDigitizerData ──
     void digitizerData_defaultConstruction();
@@ -104,7 +103,6 @@ private slots:
     void digitizerData_pickCardinalFiducials();
 
     // ── FiffFileSharer ──
-    void fileSharer_defaultConstruction();
     void fileSharer_withDirectory();
 };
 
@@ -497,16 +495,6 @@ void TestFiffIoEvokedInfo::fiffInfo_readMegEegChannels()
     QVERIFY(chsp.size() == nmeg + neeg);
 }
 
-void TestFiffIoEvokedInfo::fiffInfo_print()
-{
-    QFile file(rawPath());
-    FiffRawData raw(file);
-
-    // print() writes to qDebug, just verify it doesn't crash
-    raw.info.print();
-    QVERIFY(true);
-}
-
 //=============================================================================================================
 // FiffDigitizerData tests
 //=============================================================================================================
@@ -599,12 +587,6 @@ void TestFiffIoEvokedInfo::digitizerData_pickCardinalFiducials()
 //=============================================================================================================
 // FiffFileSharer tests
 //=============================================================================================================
-
-void TestFiffIoEvokedInfo::fileSharer_defaultConstruction()
-{
-    FiffFileSharer sharer;
-    QVERIFY(true); // Just verify construction doesn't crash
-}
 
 void TestFiffIoEvokedInfo::fileSharer_withDirectory()
 {
