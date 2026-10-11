@@ -217,11 +217,8 @@ private slots:
         QList<FsLabel> labels;
         QList<RowVector4i> rgbas;
 
-        bool ok = a.toLabels(s, labels, rgbas);
-        // Should fail or return empty gracefully on empty annotation
-        Q_UNUSED(ok);
-        // Just verify no crash
-        QVERIFY(true);
+        QVERIFY(!a.toLabels(s, labels, rgbas));
+        QVERIFY(labels.isEmpty());
     }
 
     //=========================================================================

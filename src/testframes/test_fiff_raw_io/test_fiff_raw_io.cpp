@@ -395,9 +395,12 @@ private slots:
 
         QFile file(m_sDataPath + "/MEG/sample/sample_audvis-cov.fif");
 
+        // Reference values produced by mne.read_cov (mne 1.11.0)
         FiffCov cov(file);
-        // May be empty depending on format, but constructor should not crash
-        QVERIFY(true);
+        QCOMPARE(cov.dim, 366);
+        QCOMPARE(cov.nfree, 15972);
+        QCOMPARE(cov.bads.size(), 2);
+        QCOMPARE(cov.projs.size(), 4);
 
         // Try stream-based reading
         QFile file2(m_sDataPath + "/MEG/sample/sample_audvis-cov.fif");

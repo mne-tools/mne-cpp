@@ -98,7 +98,6 @@ private slots:
     void testCircularBufferFillAndDrain();
 
     // ── MNELogger ─────────────────────────────────────────────
-    void testMNELoggerInstall();
 
     void cleanupTestCase();
 };
@@ -309,19 +308,6 @@ void TestUtilsObserverPattern::testCircularBufferFillAndDrain()
 //=============================================================================================================
 // MNELogger
 //=============================================================================================================
-
-void TestUtilsObserverPattern::testMNELoggerInstall()
-{
-    qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
-
-    // Trigger different log levels
-    qDebug() << "Test debug message from MNELogger test";
-    qInfo() << "Test info message from MNELogger test";
-    qWarning() << "Test warning message from MNELogger test";
-
-    // If we got here without crashing, the logger works
-    QVERIFY(true);
-}
 
 //=============================================================================================================
 

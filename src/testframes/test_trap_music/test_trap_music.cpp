@@ -53,7 +53,6 @@ class TestTrapMusic : public QObject
 
 private slots:
     void initTestCase();
-    void testConstructor();
     void testSingleSource();
     void testTwoSources();
     void testCorrelationAboveThreshold();
@@ -101,13 +100,6 @@ void TestTrapMusic::initTestCase()
 }
 
 //=============================================================================================================
-
-void TestTrapMusic::testConstructor()
-{
-    InvTrapMusic trap(3, 0.9);
-    // No crash = pass
-    QVERIFY(true);
-}
 
 //=============================================================================================================
 

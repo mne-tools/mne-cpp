@@ -347,13 +347,6 @@ private slots:
         QCOMPARE(result.size(), 5);
     }
 
-    void testFiffInfoPrint()
-    {
-        FiffInfo info = createSyntheticInfo(5);
-        // Just verify it doesn't crash
-        info.print();
-        QVERIFY(true);
-    }
 
     void testFiffInfoWriteToStream()
     {

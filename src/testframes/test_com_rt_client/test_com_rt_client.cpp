@@ -73,7 +73,6 @@ private slots:
     // ── RtDataClient (offline) ────────────────────────────────────────
     void testRtDataClientConstruction();
     void testRtDataClientDisconnectedState();
-    void testRtDataClientSetClientAlias();
     void testRtDataClientReadsWhatTheServerWrites_data();
     void testRtDataClientReadsWhatTheServerWrites();
     void testRtDataClientClientIdAliasAndRawBuffer();
@@ -186,14 +185,6 @@ void TestComRtClient::testRtDataClientDisconnectedState()
 }
 
 //=============================================================================================================
-
-void TestComRtClient::testRtDataClientSetClientAlias()
-{
-    RtDataClient client;
-    // setClientAlias should not crash when disconnected
-    client.setClientAlias("test_alias");
-    QVERIFY(true); // No crash
-}
 
 //=============================================================================================================
 

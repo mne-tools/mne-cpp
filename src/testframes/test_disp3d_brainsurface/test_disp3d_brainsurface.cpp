@@ -67,9 +67,6 @@ private slots:
     void testBoundingBox();
     void testVertexCount();
 
-    // ── Visualization mode ────────────────────────────────────────────
-    void testSetVisualizationMode();
-
     // ── Source estimate colors ────────────────────────────────────────
     void testApplySourceEstimateColors();
 
@@ -324,24 +321,6 @@ void TestDisp3dBrainSurface::testVertexCount()
     QCOMPARE(surf.vertexDataRef()[2].norm, QVector3D(0.0f, 0.0f, 1.0f));
 }
 
-//=============================================================================================================
-// Visualization mode
-//=============================================================================================================
-
-void TestDisp3dBrainSurface::testSetVisualizationMode()
-{
-    BrainSurface surf;
-    createMinimalSurface(surf);
-
-    // Should not crash for any mode
-    surf.setVisualizationMode(ModeSurface);
-    surf.setVisualizationMode(ModeAnnotation);
-    surf.setVisualizationMode(ModeScientific);
-    surf.setVisualizationMode(ModeSourceEstimate);
-    QVERIFY(true);
-}
-
-//=============================================================================================================
 // Source estimate colors
 //=============================================================================================================
 

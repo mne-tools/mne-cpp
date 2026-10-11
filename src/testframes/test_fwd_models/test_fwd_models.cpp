@@ -30,11 +30,6 @@ private slots:
     //=========================================================================
     // FwdBemModel - static utility functions
     //=========================================================================
-    void bemModel_defaultCtor()
-    {
-        FwdBemModel model;
-        QVERIFY(true);
-    }
 
     void bemModel_makeSolName()
     {

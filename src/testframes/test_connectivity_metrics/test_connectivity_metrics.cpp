@@ -17,12 +17,6 @@ class TestConnectivityMetrics : public QObject
     Q_OBJECT
 
 private slots:
-    void testConnectivityDefaultCtor()
-    {
-        Connectivity conn;
-        Q_UNUSED(conn);
-        QVERIFY(true);
-    }
 
     void testConnectivitySettingsCtor()
     {

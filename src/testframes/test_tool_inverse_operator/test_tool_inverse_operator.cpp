@@ -101,15 +101,8 @@ private slots:
 
         QString output = runTool("mne_inverse_operator", {"--fwd", fwdFile, "--noisecov", covFile, "--meg", "--inv", outPath}, 60000);
 
-        // Check the tool ran (output may indicate success or error)
-        // If output file was created, the tool worked
-        if (QFile::exists(outPath) && QFileInfo(outPath).size() > 0) {
-            m_sInvFile = outPath;
-            QVERIFY(true);
-        } else {
-            // Tool may have produced error output, verify it at least ran
-            QVERIFY(!output.isEmpty());
-        }
+        QVERIFY2(QFileInfo(outPath).size() > 0, qPrintable(output));
+        m_sInvFile = outPath;
     }
 
     //=========================================================================================================
