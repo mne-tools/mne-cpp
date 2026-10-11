@@ -2564,7 +2564,8 @@ void MainWindow::importMnaProject(const QString& path)
                         }
                     } else {
                         // Resolve relative path against the project file directory
-                        filePath = QDir(projectDir).filePath(ref.path);
+                        // Resolve ".." lexically, as written; the OS would follow symlinks out of the project folder
+                        filePath = QDir::cleanPath(QDir(projectDir).filePath(ref.path));
                         if (!QFile::exists(filePath)) {
                             qWarning() << "Referenced file not found:" << filePath;
                             continue;

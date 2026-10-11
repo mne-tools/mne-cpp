@@ -5,7 +5,7 @@ Coverage from `d757a49a8` (https://github.com/mne-tools/mne-cpp/actions/runs/380
 
 | Gate | Criterion | Current | Status |
 |---|---|---|---|
-| G1 | Every registered test runs in CI | 258 registered; CI ran 283 on macos-26, 283 on macos-26-qt-min, 283 on ubuntu-24.04, 283 on ubuntu-24.04-qt-min, 283 on windows-2025-vs2026 (2 declared skips), 283 on windows-2025-vs2026-qt-min (2 declared skips) | met |
+| G1 | Every registered test runs in CI | 259 registered; CI ran 283 on macos-26, 283 on macos-26-qt-min, 283 on ubuntu-24.04, 283 on ubuntu-24.04-qt-min, 283 on windows-2025-vs2026 (2 declared skips), 283 on windows-2025-vs2026-qt-min (2 declared skips) | met |
 | G1 | Tests carry labels and timeouts | 0 unlabelled, 0 untimed | met |
 | G1 | No retry-to-pass path | 0 retry lines in local scripts | met |
 | G2 | Combined line coverage >= 60.0% | 67.62% (0 lines short) | met |

@@ -356,6 +356,7 @@ add_subdirectory(test_cortical_surface_labels)
 add_subdirectory(test_electrodes_plugin)
 add_subdirectory(test_mri_slices_plugin)
 add_subdirectory(test_mne_inspect_multimodal)
+add_subdirectory(test_mne_inspect_app)
 
 # WriteToFile recording-status + project-resume-layout tests
 # + FiffSimulator SSP/bad-ch replay round trip
