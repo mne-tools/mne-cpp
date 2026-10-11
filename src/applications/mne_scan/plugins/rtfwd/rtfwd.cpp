@@ -390,7 +390,7 @@ void RtFwd::onClusterNumberChanged(int iNClusterNumber)
 void RtFwd::run()
 {
     // Wait for fiff the info to arrive
-    while (true) {
+    while (!isInterruptionRequested()) {
         m_mutex.lock();
         if (m_pFiffInfo) {
             m_mutex.unlock();
@@ -398,6 +398,9 @@ void RtFwd::run()
         }
         m_mutex.unlock();
         msleep(200);
+    }
+    if (isInterruptionRequested()) {
+        return;
     }
 
     m_mutex.lock();

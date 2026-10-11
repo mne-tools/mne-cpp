@@ -482,7 +482,7 @@ void NeuronalConnectivity::generateNodeVertices()
 void NeuronalConnectivity::run()
 {
     // Wait for fiff info
-    while (true) {
+    while (!isInterruptionRequested()) {
         m_mutex.lock();
         if (m_pFiffInfo) {
             m_mutex.unlock();
@@ -490,6 +490,9 @@ void NeuronalConnectivity::run()
         }
         m_mutex.unlock();
         msleep(100);
+    }
+    if (isInterruptionRequested()) {
+        return;
     }
 
     int skip_count = 0;

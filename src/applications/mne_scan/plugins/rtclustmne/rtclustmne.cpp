@@ -567,6 +567,9 @@ void RtClustMne::run()
 {
     // Wait for fiff info to arrive
     while (!calcFiffInfo()) {
+        if (isInterruptionRequested()) {
+            return;
+        }
         msleep(200);
     }
 

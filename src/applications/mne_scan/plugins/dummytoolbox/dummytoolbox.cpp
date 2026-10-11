@@ -198,6 +198,9 @@ void DummyToolbox::run()
 
     // Wait for Fiff Info
     while (!m_pFiffInfo) {
+        if (isInterruptionRequested()) {
+            return;
+        }
         msleep(10);
     }
 

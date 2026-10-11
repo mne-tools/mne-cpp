@@ -221,7 +221,7 @@ void Covariance::changeSamples(qint32 samples)
 void Covariance::run()
 {
     // Wait for fiff info
-    while (true) {
+    while (!isInterruptionRequested()) {
         m_mutex.lock();
         if (m_pFiffInfo) {
             m_mutex.unlock();
@@ -229,6 +229,9 @@ void Covariance::run()
         }
         m_mutex.unlock();
         msleep(100);
+    }
+    if (isInterruptionRequested()) {
+        return;
     }
 
     MatrixXd matData;

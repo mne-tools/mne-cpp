@@ -539,7 +539,7 @@ void Hpi::run()
     // Wait for fiff info
     bool bFiffInfo = false;
 
-    while (true) {
+    while (!isInterruptionRequested()) {
         m_mutex.lock();
         if (m_pFiffInfo) {
             bFiffInfo = true;
@@ -549,6 +549,9 @@ void Hpi::run()
             break;
         }
         msleep(100);
+    }
+    if (isInterruptionRequested()) {
+        return;
     }
 
     // init hpi fit
