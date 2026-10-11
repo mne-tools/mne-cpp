@@ -26,6 +26,7 @@
 #include <workflowgraph.h>
 
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_stream.h>
 #include <mne/mne_inverse_operator.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <inv/inv_source_estimate.h>
@@ -165,8 +166,8 @@ QJsonObject SourceEstimationSkill::executeSkill(const WorkflowNode& nodeState)
 
     // ── Load raw FIFF ─────────────────────────────────────────────────────────
     QFile rawFile(rawPath);
-    FiffRawData raw(rawFile);
-    if (raw.isEmpty()) {
+    FiffRawData raw;
+    if (!FiffStream::setup_read_raw(rawFile, raw)) {
         return QJsonObject{
             {"status", "error"},
             {"message", QString("Source estimation node `%1`: could not parse FIFF file `%2`.").arg(nodeState.uid, rawPath)}};

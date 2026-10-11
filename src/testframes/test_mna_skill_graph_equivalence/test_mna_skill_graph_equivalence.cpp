@@ -323,6 +323,20 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     TemporalFilterSkill filterSkillB;
     SourceEstimationSkill sourceSkillB;
 
+    // A FIFF file that holds no raw data (here the inverse operator) is reported by both skills
+    WorkflowNode notRawNode;
+    notRawNode.uid = QStringLiteral("not_raw");
+    notRawNode.parameters = QJsonObject{{"highpass", 1.0}, {"lowpass", 40.0}};
+    notRawNode.resolvedInputs = QJsonObject{
+        {"raw_data", QJsonObject{{"uri", QStringLiteral("file://") + invCopyB}}},
+        {"inverse_operator", QJsonObject{{"uri", QStringLiteral("file://") + invCopyB}}}};
+    for (ISkillOperator* skill : std::initializer_list<ISkillOperator*>{&filterSkillB, &sourceSkillB}) {
+        const QJsonObject result = skill->executeSkill(notRawNode);
+        QCOMPARE(result.value(QStringLiteral("status")).toString(), QStringLiteral("error"));
+        QVERIFY2(result.value(QStringLiteral("message")).toString().contains(QStringLiteral("could not parse FIFF file")),
+                 qPrintable(result.value(QStringLiteral("message")).toString()));
+    }
+
     // Build the filter node manually.  resolvedInputs is what the manager
     // would have populated from the resources table.
     WorkflowNode filterNodeB;

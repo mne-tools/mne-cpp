@@ -127,8 +127,8 @@ QJsonObject TemporalFilterSkill::executeSkill(const WorkflowNode& nodeState)
 
     // Open FIFF raw data.
     QFile inputFile(inputPath);
-    FiffRawData raw(inputFile);
-    if (raw.isEmpty()) {
+    FiffRawData raw;
+    if (!FiffStream::setup_read_raw(inputFile, raw)) {
         return QJsonObject{
             {"status", "error"},
             {"message", QString("Temporal filter node `%1`: could not parse FIFF file `%2`.").arg(nodeState.uid, inputPath)}};
