@@ -28,6 +28,7 @@
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QRhiWidget>
 #include <QSettings>
 #include <QStandardPaths>
@@ -48,6 +49,7 @@ private slots:
     void initTestCase();
     void loadsSubjectDataLikeTheCommandLine();
     void exportsAndReopensProjects();
+    void loadsFilesThroughTheFileMenu();
 
 private:
     MainWindow* makeWindow();
@@ -219,6 +221,87 @@ void TestMneInspectApp::exportsAndReopensProjects()
         openProject->trigger();
         QCOMPARE(loadedFiles(reopened), expected);
     }
+}
+
+//=============================================================================================================
+
+void TestMneInspectApp::loadsFilesThroughTheFileMenu()
+{
+    if (!QFile::exists(m_dataPath + "subjects/sample/surf/lh.white"))
+        QSKIP("Sample test data not found");
+
+    MainWindow* window = makeWindow();
+    const QString subject = m_dataPath + "subjects/sample/";
+    // Each hemisphere's sibling is picked up with it
+    const QList<QPair<QString, QString>> menuFiles{{"Load &Surface...", subject + "surf/lh.white"},
+                                                   {"Load &Atlas...", subject + "label/rh.aparc.annot"},
+                                                   {"Load &BEM...", subject + "bem/sample-5120-bem.fif"},
+                                                   {"Load T&ransformation...", m_dataPath + "MEG/sample/all-trans.fif"},
+                                                   {"Load Digi&tizer...", m_dataPath + "MEG/sample/sample_audvis_trunc_raw.fif"},
+                                                   {"Load Source S&pace...", subject + "bem/sample-oct-6-src.fif"},
+                                                   {"Load E&voked...", m_dataPath + "MEG/sample/sample_audvis-ave.fif"}};
+    for (const auto& [text, path] : menuFiles) {
+        QAction* action = findAction(window, text);
+        QVERIFY2(action, qPrintable(text));
+        chooseFile(path);
+        action->trigger();
+    }
+    const QMap<QString, QString> expected{{"lh.white", "surface"},
+                                          {"rh.white", "surface"},
+                                          {"lh.aparc.annot", "annotation"},
+                                          {"rh.aparc.annot", "annotation"},
+                                          {"sample-5120-bem.fif", "bem"},
+                                          {"all-trans.fif", "transform"},
+                                          {"sample_audvis_trunc_raw.fif", "digitizer"},
+                                          {"sample-oct-6-src.fif", "source_space"},
+                                          {"sample_audvis-ave.fif", "evoked"}};
+    QCOMPARE(loadedFiles(window), expected);
+
+    // An evoked file without averages is reported in the set list instead of loading
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    QComboBox* evokedSets = nullptr;
+    for (QComboBox* combo : window->findChildren<QComboBox*>()) {
+        if (combo->property("evokedPath").isValid())
+            evokedSets = combo;
+    }
+    if (!evokedSets)
+        QFAIL("No evoked set selector");
+    QCOMPARE(evokedSets->count(), 4);
+    chooseFile(subject + "bem/sample-oct-6-src.fif");
+    findAction(window, "Load E&voked...")->trigger();
+    QCOMPARE(evokedSets->count(), 1);
+    QVERIFY(!evokedSets->isEnabled());
+
+    // Electrode contacts from a CSV of name, x, y, z, array
+    const QString csvPath = dir.filePath("contacts.csv");
+    QFile csv(csvPath);
+    QVERIFY(csv.open(QIODevice::WriteOnly | QIODevice::Text));
+    csv.write("name,x,y,z,array\nA1,0.01,0.02,0.03,A\nA2,0.01,0.02,0.04,A\nB1,-0.01,0.0,0.05,B\n");
+    csv.close();
+    chooseFile(csvPath);
+    findAction(window, "Load &Electrodes...")->trigger();
+    QCOMPARE(window->electrodesPlugin().contactCount(), 3);
+
+    // A file that holds no electrodes is refused with a message
+    const QString emptyPath = dir.filePath("empty.csv");
+    QFile empty(emptyPath);
+    QVERIFY(empty.open(QIODevice::WriteOnly));
+    empty.close();
+    QString warning;
+    answerNextModal([&warning, emptyPath](QWidget* pModal) {
+        auto* dialog = qobject_cast<QFileDialog*>(pModal);
+        dialog->setDirectory(QFileInfo(emptyPath).absolutePath());
+        dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(emptyPath).fileName());
+        answerNextModal([&warning](QWidget* pBox) {
+            warning = qobject_cast<QMessageBox*>(pBox)->text();
+            qobject_cast<QDialog*>(pBox)->accept();
+        });
+        static_cast<QDialog*>(dialog)->accept();
+    });
+    findAction(window, "Load &Electrodes...")->trigger();
+    QVERIFY2(warning.contains("Failed to load electrode data"), qPrintable(warning));
+    QCOMPARE(window->electrodesPlugin().contactCount(), 3);
 }
 
 //=============================================================================================================
