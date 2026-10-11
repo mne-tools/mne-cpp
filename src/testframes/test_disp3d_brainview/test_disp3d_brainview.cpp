@@ -394,6 +394,8 @@ void TestDisp3dBrainView::brainView_constructAndSetters()
     // probeEvokedSets with non-existent path returns empty list
     QStringList evoked = BrainView::probeEvokedSets("/nonexistent/path.fif");
     QVERIFY(evoked.isEmpty());
+    // ... and so does a FIFF file without averages
+    QVERIFY(BrainView::probeEvokedSets(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif").isEmpty());
 
     // setMegHelmetOverride must not crash
     view.setMegHelmetOverride("");
