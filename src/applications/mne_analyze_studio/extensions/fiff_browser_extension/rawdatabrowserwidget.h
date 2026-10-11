@@ -46,6 +46,9 @@ class RawDataBrowserWidget : public QWidget, public IRawDataView
 public:
     explicit RawDataBrowserWidget(QWidget* parent = nullptr);
 
+    /** Makes the workbench create this view for its widget type; call before opening files. */
+    static void registerViewFactory();
+
     bool loadFile(const QString& filePath);
     QString filePath() const override;
     QString summaryText() const override;

@@ -42,6 +42,9 @@ class Dummy3DHostedViewWidget : public QWidget
 public:
     explicit Dummy3DHostedViewWidget(QWidget* parent = nullptr);
 
+    /** Makes the workbench create this view for its widget type; call before opening files. */
+    static void registerViewFactory();
+
     void setSessionDescriptor(const QJsonObject& descriptor);
     QString sessionId() const;
     QString sceneId() const;

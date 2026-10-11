@@ -90,21 +90,15 @@ public:
     }
 };
 
-class Dummy3DExtensionViewFactoryRegistration
-{
-public:
-    Dummy3DExtensionViewFactoryRegistration()
-    {
-        ExtensionViewFactoryRegistry::instance().registerFactory(&m_factory);
-    }
-
-private:
-    Dummy3DExtensionViewFactory m_factory;
-};
-
-Dummy3DExtensionViewFactoryRegistration s_dummy3dFactoryRegistration;
-
 }
+
+void Dummy3DHostedViewWidget::registerViewFactory()
+{
+    static const Dummy3DExtensionViewFactory factory;
+    ExtensionViewFactoryRegistry::instance().registerFactory(&factory);
+}
+
+//=============================================================================================================
 
 Dummy3DHostedViewWidget::Dummy3DHostedViewWidget(QWidget* parent)
 : QWidget(parent)

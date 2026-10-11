@@ -20,6 +20,7 @@
 #include "editortabwidget.h"
 #include "extensionsettingswidget.h"
 #include <dummy3dhostedviewwidget.h>
+#include <rawdatabrowserwidget.h>
 #include "extensionhostedviewwidget.h"
 #include "llmsettingsdialog.h"
 #include "workflowminimapwidget.h"
@@ -1358,6 +1359,9 @@ MainWindow::MainWindow(QWidget* parent)
 {
     setWindowTitle("MNE Analyze Studio");
     resize(1440, 900);
+    // Explicit calls keep the view libraries linked; Linux drops unreferenced shared libraries
+    RawDataBrowserWidget::registerViewFactory();
+    Dummy3DHostedViewWidget::registerViewFactory();
     m_activeWorkflowHasUnsavedChanges = false;
 
     reloadExtensionRegistry();

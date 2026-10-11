@@ -63,20 +63,6 @@ public:
     }
 };
 
-class FiffBrowserExtensionViewFactoryRegistration
-{
-public:
-    FiffBrowserExtensionViewFactoryRegistration()
-    {
-        ExtensionViewFactoryRegistry::instance().registerFactory(&m_factory);
-    }
-
-private:
-    FiffBrowserExtensionViewFactory m_factory;
-};
-
-FiffBrowserExtensionViewFactoryRegistration s_fiffBrowserFactoryRegistration;
-
 } // anonymous namespace
 
 // =============================================================================
@@ -194,6 +180,14 @@ private:
     int m_scrollValue = 0;
     int m_labelColumnWidth = 0;
 };
+
+void RawDataBrowserWidget::registerViewFactory()
+{
+    static const FiffBrowserExtensionViewFactory factory;
+    ExtensionViewFactoryRegistry::instance().registerFactory(&factory);
+}
+
+//=============================================================================================================
 
 RawDataBrowserWidget::RawDataBrowserWidget(QWidget* parent)
 : QWidget(parent)
