@@ -17,6 +17,7 @@
 #include <Eigen/Core>
 
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_stream.h>
 
 #include <jsonrpcmessage.h>
 #include <capabilityutils.h>
@@ -190,8 +191,8 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         }
 
         QFile file(filePath);
-        FIFFLIB::FiffRawData raw(file);
-        if (raw.isEmpty()) {
+        FIFFLIB::FiffRawData raw;
+        if (!FIFFLIB::FiffStream::setup_read_raw(file, raw)) {
             return QJsonObject{
                 {"status", "error"},
                 {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
@@ -276,8 +277,8 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         }
 
         QFile file(filePath);
-        FIFFLIB::FiffRawData raw(file);
-        if (raw.isEmpty()) {
+        FIFFLIB::FiffRawData raw;
+        if (!FIFFLIB::FiffStream::setup_read_raw(file, raw)) {
             return QJsonObject{
                 {"status", "error"},
                 {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
@@ -362,8 +363,8 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         }
 
         QFile file(filePath);
-        FIFFLIB::FiffRawData raw(file);
-        if (raw.isEmpty()) {
+        FIFFLIB::FiffRawData raw;
+        if (!FIFFLIB::FiffStream::setup_read_raw(file, raw)) {
             return QJsonObject{
                 {"status", "error"},
                 {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};
@@ -434,8 +435,8 @@ QJsonObject NeuroKernelService::handleToolCallUnchecked(const QJsonObject& param
         }
 
         QFile file(filePath);
-        FIFFLIB::FiffRawData raw(file);
-        if (raw.isEmpty()) {
+        FIFFLIB::FiffRawData raw;
+        if (!FIFFLIB::FiffStream::setup_read_raw(file, raw)) {
             return QJsonObject{
                 {"status", "error"},
                 {"message", QString("Neuro-Kernel could not parse raw file: %1").arg(filePath)}};

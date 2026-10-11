@@ -36,6 +36,7 @@ private slots:
     void unknownTool();
     void missingFiles_data();
     void missingFiles();
+    void malformedFile_data();
     void malformedFile();
     void analyzeRawData_data();
     void analyzeRawData();
@@ -166,8 +167,15 @@ void TestStudioNeuroKernel::missingFiles()
     QVERIFY(result.value(QStringLiteral("message")).toString().contains(QStringLiteral("could not find")));
 }
 
+void TestStudioNeuroKernel::malformedFile_data()
+{
+    missingFiles_data();
+}
+
 void TestStudioNeuroKernel::malformedFile()
 {
+    QFETCH(QString, toolName);
+
     QTemporaryFile malformedFile;
     QVERIFY(malformedFile.open());
     QCOMPARE(malformedFile.write("not a fiff file"), 15);
@@ -175,7 +183,7 @@ void TestStudioNeuroKernel::malformedFile()
 
     const QJsonObject arguments{{QStringLiteral("file"), malformedFile.fileName()}};
     const QJsonObject params{
-        {QStringLiteral("name"), QStringLiteral("neurokernel.raw_stats")},
+        {QStringLiteral("name"), toolName},
         {QStringLiteral("arguments"), arguments}};
     const QJsonObject request = JsonRpcMessage::createRequest(QStringLiteral("malformed"),
                                                               QStringLiteral("tools/call"),
@@ -184,7 +192,7 @@ void TestStudioNeuroKernel::malformedFile()
     sendRequest(request, response);
     const QJsonObject result = response.value(QStringLiteral("result")).toObject();
     QCOMPARE(result.value(QStringLiteral("status")).toString(), QStringLiteral("error"));
-    QVERIFY(result.value(QStringLiteral("message")).toString().contains(QStringLiteral("failed")));
+    QVERIFY(result.value(QStringLiteral("message")).toString().contains(QStringLiteral("could not parse raw file")));
 }
 
 void TestStudioNeuroKernel::analyzeRawData_data()
