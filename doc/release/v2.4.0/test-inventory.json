@@ -6,10 +6,10 @@
     "commit": "d757a49a8e0097be7e12d0dd0a28133bfd15555f"
   },
   "summary": {
-    "directories": 260,
+    "directories": 261,
     "registration": {
       "unconditional": 253,
-      "conditional": 4,
+      "conditional": 5,
       "unregistered": 3
     },
     "missing_directories": [],
@@ -20,10 +20,10 @@
       "freesurfer": 2,
       "python": 9,
       "sample-data": 19,
-      "test-data": 114
+      "test-data": 115
     },
-    "gui": 42,
-    "with_qskip": 84,
+    "gui": 43,
+    "with_qskip": 85,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -33,7 +33,8 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_controlmanager",
-          "test_analyze_datamanager"
+          "test_analyze_datamanager",
+          "test_mne_analyze_studio_workbench"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -72,7 +73,8 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_controlmanager",
-          "test_analyze_datamanager"
+          "test_analyze_datamanager",
+          "test_mne_analyze_studio_workbench"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -111,7 +113,8 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_controlmanager",
-          "test_analyze_datamanager"
+          "test_analyze_datamanager",
+          "test_mne_analyze_studio_workbench"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -150,7 +153,8 @@
         "skipped": 0,
         "registered_not_executed": [
           "test_analyze_controlmanager",
-          "test_analyze_datamanager"
+          "test_analyze_datamanager",
+          "test_mne_analyze_studio_workbench"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -189,7 +193,8 @@
         "skipped": 2,
         "registered_not_executed": [
           "test_analyze_controlmanager",
-          "test_analyze_datamanager"
+          "test_analyze_datamanager",
+          "test_mne_analyze_studio_workbench"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -228,7 +233,8 @@
         "skipped": 2,
         "registered_not_executed": [
           "test_analyze_controlmanager",
-          "test_analyze_datamanager"
+          "test_analyze_datamanager",
+          "test_mne_analyze_studio_workbench"
         ],
         "executed_not_in_inventory": [
           "ex_bids",
@@ -5724,6 +5730,44 @@
         "ubuntu-24.04-qt-min": "run",
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
+      },
+      "registry_classes": []
+    },
+    {
+      "name": "test_mne_analyze_studio_workbench",
+      "cmake": "src/testframes/test_mne_analyze_studio_workbench/CMakeLists.txt",
+      "registration": {
+        "state": "conditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [
+          "BUILD_MNE_ANALYZE_STUDIO"
+        ],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_mne_analyze_studio_workbench"
+      ],
+      "labels": [
+        "gui",
+        "integration",
+        "requires-data"
+      ],
+      "timeout": 120,
+      "requirements": [
+        "test-data"
+      ],
+      "gui": true,
+      "qskip_sites": 4,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
       },
       "registry_classes": []
     },

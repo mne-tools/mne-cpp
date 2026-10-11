@@ -6,9 +6,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38077322878 (comm
 
 ## Registration
 
-- Test directories: 260
+- Test directories: 261
 - Registered unconditionally: 253
-- Registered behind a CMake condition or early `return()`: 4
+- Registered behind a CMake condition or early `return()`: 5
 - Not registered: 3
 - Registered without `LABELS`: 0
 - Registered without explicit `TIMEOUT`: 0
@@ -18,12 +18,12 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38077322878 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 283 | 0 | 0 | `test_analyze_controlmanager`, `test_analyze_datamanager` |
-| macos-26-qt-min | 283 | 0 | 0 | `test_analyze_controlmanager`, `test_analyze_datamanager` |
-| ubuntu-24.04 | 283 | 0 | 0 | `test_analyze_controlmanager`, `test_analyze_datamanager` |
-| ubuntu-24.04-qt-min | 283 | 0 | 0 | `test_analyze_controlmanager`, `test_analyze_datamanager` |
-| windows-2025-vs2026 | 283 | 0 | 2 | `test_analyze_controlmanager`, `test_analyze_datamanager` |
-| windows-2025-vs2026-qt-min | 283 | 0 | 2 | `test_analyze_controlmanager`, `test_analyze_datamanager` |
+| macos-26 | 283 | 0 | 0 | `test_analyze_controlmanager`, `test_analyze_datamanager`, `test_mne_analyze_studio_workbench` |
+| macos-26-qt-min | 283 | 0 | 0 | `test_analyze_controlmanager`, `test_analyze_datamanager`, `test_mne_analyze_studio_workbench` |
+| ubuntu-24.04 | 283 | 0 | 0 | `test_analyze_controlmanager`, `test_analyze_datamanager`, `test_mne_analyze_studio_workbench` |
+| ubuntu-24.04-qt-min | 283 | 0 | 0 | `test_analyze_controlmanager`, `test_analyze_datamanager`, `test_mne_analyze_studio_workbench` |
+| windows-2025-vs2026 | 283 | 0 | 2 | `test_analyze_controlmanager`, `test_analyze_datamanager`, `test_mne_analyze_studio_workbench` |
+| windows-2025-vs2026-qt-min | 283 | 0 | 2 | `test_analyze_controlmanager`, `test_analyze_datamanager`, `test_mne_analyze_studio_workbench` |
 
 ## Run-time requirements (lexical signals)
 
@@ -32,9 +32,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38077322878 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 19 |
-| test-data | 114 |
-| GUI (`QTEST_MAIN`) | 42 |
-| Contains `QSKIP` | 84 |
+| test-data | 115 |
+| GUI (`QTEST_MAIN`) | 43 |
+| Contains `QSKIP` | 85 |
 
 ## Conditional and unregistered tests
 
@@ -42,6 +42,7 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38077322878 (comm
 |---|---|---|
 | `test_doc_shots` | conditional | BUILD_TESTS AND TARGET mne_doc_shots |
 | `test_mna_coverage` | unregistered | Placeholder directory; its CMakeLists.txt names a test_mna_coverage.cpp that was never written. Kept out of the build until the MNA coverage test is authored. |
+| `test_mne_analyze_studio_workbench` | conditional | BUILD_MNE_ANALYZE_STUDIO |
 | `test_mne_browse_app` | conditional | BUILD_MNE_BROWSE |
 | `test_mne_flash_bem` | conditional | BUILD_MNE_FLASH_BEM |
 | `test_mne_watershed_bem` | conditional | BUILD_MNE_WATERSHED_BEM |

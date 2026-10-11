@@ -209,6 +209,9 @@ add_subdirectory(test_disp3d_brainview)
 # MNE Analyze Studio coverage tests
 add_subdirectory(test_mne_analyze_studio_core_capabilities)
 add_subdirectory(test_mne_analyze_studio_workflow_integration)
+if(BUILD_MNE_ANALYZE_STUDIO)
+  add_subdirectory(test_mne_analyze_studio_workbench)
+endif()
 
 # v2.1.0 coverage gap-closing tests
 add_subdirectory(test_conn_network)
