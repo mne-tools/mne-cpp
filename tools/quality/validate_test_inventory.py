@@ -717,6 +717,21 @@ def check_ctest_json(entries: dict[str, TestEntry], ctest_json: Path) -> list[Fi
             )
         )
 
+    for test in data.get("tests", []):
+        properties = {prop.get("name"): prop.get("value") for prop in test.get("properties", [])}
+        environment = properties.get("ENVIRONMENT") or []
+        if "gui" in (properties.get("LABELS") or []) and not any(
+            str(entry).startswith("QT_QPA_PLATFORM=") for entry in environment
+        ):
+            findings.append(
+                error(
+                    "TI083",
+                    location,
+                    f"gui test '{test.get('name')}' sets no QT_QPA_PLATFORM, so it needs a desktop session. "
+                    "Append to ENVIRONMENT (set_property(TEST ... APPEND ...)) instead of replacing it.",
+                )
+            )
+
     return findings
 
 

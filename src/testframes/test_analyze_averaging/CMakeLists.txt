@@ -79,11 +79,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 set(_repo_lib_dir   "${CMAKE_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE}/lib")
 set(_repo_plugins   "${CMAKE_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE}/bin/mne_analyze_plugins")
 if(APPLE)
-    set_tests_properties(${PROJECT_NAME} PROPERTIES
+    set_property(TEST ${PROJECT_NAME} APPEND PROPERTY
         ENVIRONMENT "DYLD_LIBRARY_PATH=${_repo_lib_dir}:${_repo_plugins}"
     )
 elseif(UNIX)
-    set_tests_properties(${PROJECT_NAME} PROPERTIES
+    set_property(TEST ${PROJECT_NAME} APPEND PROPERTY
         ENVIRONMENT "LD_LIBRARY_PATH=${_repo_lib_dir}:${_repo_plugins}"
     )
 endif()

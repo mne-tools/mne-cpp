@@ -31,6 +31,9 @@ long it may run, and what it needs.
   a bare ``add_test(NAME <name> COMMAND <name>)`` would; the target's name and
   output location are not touched.
 
+  Tests labelled ``gui`` run on the ``offscreen`` Qt platform unless
+  ``ENVIRONMENT`` sets ``QT_QPA_PLATFORM`` itself.
+
   ``REQUIRES_DATA`` paths are relative to ``MNE_TEST_DATA_DIR`` (default:
   ``resources/data``). They become ``REQUIRED_FILES``, so a missing file makes
   CTest report the test as not run, and the ``requires-data`` label is added.
@@ -184,8 +187,13 @@ function(mne_add_test name)
         if(arg_WORKING_DIRECTORY)
             set_property(TEST ${name} PROPERTY WORKING_DIRECTORY "${arg_WORKING_DIRECTORY}")
         endif()
-        if(arg_ENVIRONMENT)
-            set_property(TEST ${name} PROPERTY ENVIRONMENT ${arg_ENVIRONMENT})
+        # A gui test must not depend on a desktop session; an explicit platform still wins.
+        set(environment ${arg_ENVIRONMENT})
+        if("gui" IN_LIST arg_LABELS AND NOT environment MATCHES "QT_QPA_PLATFORM=")
+            list(APPEND environment QT_QPA_PLATFORM=offscreen)
+        endif()
+        if(environment)
+            set_property(TEST ${name} PROPERTY ENVIRONMENT ${environment})
         endif()
         if(required_files)
             set_property(TEST ${name} PROPERTY REQUIRED_FILES ${required_files})

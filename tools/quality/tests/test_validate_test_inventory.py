@@ -517,6 +517,25 @@ class TestCTestCrossCheck(ValidatorTestCase):
         ctest.write_text(json.dumps({"tests": [{"name": "test_alpha"}]}), encoding="utf-8")
         self.assertEqual([], vti.check_ctest_json(entries, ctest))
 
+    def test_gui_test_needs_a_qt_platform(self) -> None:
+        self.fixture.add_test_dir("test_alpha")
+        entries, _ = self.fixture.collect()
+        ctest = self.root / "ctest.json"
+
+        def gui_test(environment: list[str]) -> dict:
+            return {
+                "name": "test_alpha",
+                "properties": [
+                    {"name": "LABELS", "value": ["unit", "gui"]},
+                    {"name": "ENVIRONMENT", "value": environment},
+                ],
+            }
+
+        ctest.write_text(json.dumps({"tests": [gui_test(["DYLD_LIBRARY_PATH=/x"])]}), encoding="utf-8")
+        self.assertIn("TI083", self.codes(vti.check_ctest_json(entries, ctest)))
+        ctest.write_text(json.dumps({"tests": [gui_test(["QT_QPA_PLATFORM=offscreen"])]}), encoding="utf-8")
+        self.assertEqual([], vti.check_ctest_json(entries, ctest))
+
 class TestConditionalRegistration(ValidatorTestCase):
     GUARDED = "\n".join(
         [
