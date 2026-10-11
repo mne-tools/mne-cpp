@@ -78,31 +78,6 @@ void installUnixSignalHandlers(QCoreApplication&)
 }
 #endif
 
-QString resolveStudioExtensionsDirectory()
-{
-    const QString relativePath = "src/applications/mne_analyze_studio/extensions";
-    const QStringList seedDirectories{
-        QDir::currentPath(),
-        QCoreApplication::applicationDirPath()};
-
-    for (const QString& seedDirectory : seedDirectories) {
-        QDir searchDir(seedDirectory);
-        for (int depth = 0; depth < 8; ++depth) {
-            const QString candidate = searchDir.filePath(relativePath);
-            QFileInfo candidateInfo(candidate);
-            if (candidateInfo.exists() && candidateInfo.isDir()) {
-                return candidateInfo.absoluteFilePath();
-            }
-
-            if (!searchDir.cdUp()) {
-                break;
-            }
-        }
-    }
-
-    return QDir::current().filePath(relativePath);
-}
-
 }
 
 int main(int argc, char* argv[])
@@ -111,7 +86,7 @@ int main(int argc, char* argv[])
     installUnixSignalHandlers(application);
     MNEANALYZESTUDIO::SkillHostService service;
 
-    const QString extensionsDirectory = resolveStudioExtensionsDirectory();
+    const QString extensionsDirectory = MNEANALYZESTUDIO::ViewProviderRegistry::locateExtensionsDirectory();
     if (!service.start("mne_analyze_studio.extension_host", extensionsDirectory)) {
         return 1;
     }

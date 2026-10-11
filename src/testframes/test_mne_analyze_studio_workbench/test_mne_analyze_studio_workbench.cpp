@@ -63,6 +63,7 @@ private:
     static QTabWidget* tabsWithFile(MainWindow* window, const QString& filePath);
 
     QString m_rawPath;
+    QTemporaryDir m_workDir;
     QList<MainWindow*> m_windows;
 };
 
@@ -76,6 +77,11 @@ void TestMneAnalyzeStudioWorkbench::initTestCase()
     QSettings(QStringLiteral("MNE-CPP"), QStringLiteral("MNEAnalyzeStudio")).clear();
 
     m_rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+
+    // Started from a build tree, the working directory holds a same-named folder with no manifests in it
+    QVERIFY(m_workDir.isValid());
+    QVERIFY(QDir(m_workDir.path()).mkpath("src/applications/mne_analyze_studio/extensions/fiff_browser_extension"));
+    QVERIFY(QDir::setCurrent(m_workDir.path()));
 }
 
 //=============================================================================================================

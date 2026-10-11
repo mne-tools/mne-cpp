@@ -38,6 +38,13 @@ class STUDIOCORESHARED_EXPORT ViewProviderRegistry : public QObject
 public:
     explicit ViewProviderRegistry(QObject* parent = nullptr);
 
+    /**
+     * Finds the extensions folder above the working directory or the executable.
+     *
+     * @return   The first such folder that holds a manifest, else the path relative to the working directory.
+     */
+    static QString locateExtensionsDirectory();
+
     bool loadFromDirectory(const QString& directoryPath, QString* errorMessage = nullptr);
     void setDisabledExtensionIds(const QStringList& extensionIds);
     QStringList disabledExtensionIds() const;

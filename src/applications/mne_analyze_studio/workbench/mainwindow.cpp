@@ -695,31 +695,6 @@ QString extensionSettingsToolName(const QString& extensionId,
              verb.trimmed());
 }
 
-QString resolveStudioExtensionsDirectory()
-{
-    const QString relativePath = "src/applications/mne_analyze_studio/extensions";
-    const QStringList seedDirectories{
-        QDir::currentPath(),
-        QCoreApplication::applicationDirPath()};
-
-    for (const QString& seedDirectory : seedDirectories) {
-        QDir searchDir(seedDirectory);
-        for (int depth = 0; depth < 8; ++depth) {
-            const QString candidate = searchDir.filePath(relativePath);
-            QFileInfo candidateInfo(candidate);
-            if (candidateInfo.exists() && candidateInfo.isDir()) {
-                return candidateInfo.absoluteFilePath();
-            }
-
-            if (!searchDir.cdUp()) {
-                break;
-            }
-        }
-    }
-
-    return QDir::current().filePath(relativePath);
-}
-
 bool copyDirectoryRecursively(const QString& sourcePath, const QString& targetPath)
 {
     QDir sourceDir(sourcePath);
@@ -5442,7 +5417,7 @@ void MainWindow::requestExtensionHostReload()
     }
 
     const QJsonObject params{
-        {"extensions_directory", resolveStudioExtensionsDirectory()},
+        {"extensions_directory", ViewProviderRegistry::locateExtensionsDirectory()},
         {"disabled_extension_ids", disabledArray}};
     const QJsonObject message = JsonRpcMessage::createRequest("workbench-extension-reload", "extensions.reload", params);
     m_extensionSocket->write(JsonRpcMessage::serialize(message));
@@ -7165,7 +7140,7 @@ void MainWindow::reloadExtensionRegistry()
 {
     QSettings settings("MNE-CPP", "MNEAnalyzeStudio");
     const QStringList disabledExtensions = settings.value("extensions/disabled_ids").toStringList();
-    const QString extensionsDirectory = resolveStudioExtensionsDirectory();
+    const QString extensionsDirectory = ViewProviderRegistry::locateExtensionsDirectory();
     QString errorMessage;
     m_viewProviderRegistry->loadFromDirectory(extensionsDirectory, &errorMessage);
     m_viewProviderRegistry->setDisabledExtensionIds(disabledExtensions);
@@ -7403,7 +7378,7 @@ void MainWindow::installExtensionFromDirectory()
         return;
     }
 
-    const QString extensionsRoot = resolveStudioExtensionsDirectory();
+    const QString extensionsRoot = ViewProviderRegistry::locateExtensionsDirectory();
     const QString targetDirectory = QDir(extensionsRoot).filePath(QFileInfo(sourceDirectory).fileName());
     if (QFileInfo::exists(targetDirectory)) {
         appendProblemMessage(QString("An extension folder already exists at %1").arg(targetDirectory));

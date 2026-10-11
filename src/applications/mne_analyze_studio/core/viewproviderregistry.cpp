@@ -17,6 +17,8 @@
 #include "capabilityutils.h"
 #include "manifestparser.h"
 
+#include <QCoreApplication>
+#include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QHash>
@@ -72,6 +74,26 @@ QJsonObject integerSchema(const QString& title,
 ViewProviderRegistry::ViewProviderRegistry(QObject* parent)
 : QObject(parent)
 {
+}
+
+QString ViewProviderRegistry::locateExtensionsDirectory()
+{
+    const QString relativePath = QStringLiteral("src/applications/mne_analyze_studio/extensions");
+    for (const QString& seedDirectory : {QDir::currentPath(), QCoreApplication::applicationDirPath()}) {
+        QDir searchDir(seedDirectory);
+        for (int depth = 0; depth < 8; ++depth) {
+            // A build tree mirrors this folder without the manifests, so require one
+            const QString candidate = searchDir.filePath(relativePath);
+            if (QDirIterator(candidate, {QStringLiteral("manifest.json")}, QDir::Files, QDirIterator::Subdirectories).hasNext()) {
+                return QFileInfo(candidate).absoluteFilePath();
+            }
+            if (!searchDir.cdUp()) {
+                break;
+            }
+        }
+    }
+
+    return QDir::current().filePath(relativePath);
 }
 
 bool ViewProviderRegistry::loadFromDirectory(const QString& directoryPath, QString* errorMessage)
