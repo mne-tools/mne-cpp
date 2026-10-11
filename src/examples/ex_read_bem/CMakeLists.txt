@@ -51,14 +51,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
-    MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
-    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE FALSE
+    WIN32_EXECUTABLE FALSE
 )
 
 install(TARGETS ${PROJECT_NAME}
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
@@ -66,4 +64,9 @@ endif()
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()
+
+if(BUILD_TESTS)
+    mne_add_test(${PROJECT_NAME} LABELS example integration TIMEOUT 120
+        REQUIRES_DATA mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif)
 endif()

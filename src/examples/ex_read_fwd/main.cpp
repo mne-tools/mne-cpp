@@ -29,6 +29,7 @@
 #include <QtCore/QCoreApplication>
 #include <QDebug>
 #include <QCommandLineParser>
+#include <QDir>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -61,11 +62,11 @@ int main(int argc, char* argv[])
     parser.setApplicationDescription("Read Forward Example");
     parser.addHelpOption();
 
-    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption fwdFileOption("fwd", "Path to the forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
-    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
+    QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc");
     QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
-    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
+    QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects");
     QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
 
     parser.addOption(fwdFileOption);
@@ -80,6 +81,10 @@ int main(int argc, char* argv[])
     //Load data
     QFile t_fileForwardSolution(parser.value(fwdFileOption));
     MNEForwardSolution t_Fwd(t_fileForwardSolution);
+    if (t_Fwd.isEmpty()) {
+        qWarning() << "Could not read the forward solution" << t_fileForwardSolution.fileName();
+        return 1;
+    }
 
     if (t_Fwd.source_ori != -1) {
         std::cout << "\nfirst 10 rows and columns of the Gain Matrix:\n"
@@ -106,8 +111,8 @@ int main(int argc, char* argv[])
     qDebug() << "col_names:";
     qDebug() << t_clusteredFwd.sol->col_names;
     qDebug() << "write fwd data to ./test_fwd.txt ...";
-    IOUtils::write_eigen_matrix(t_clusteredFwd.sol->data, QString("./test_fwd.txt"));
+    IOUtils::write_eigen_matrix(t_clusteredFwd.sol->data, QDir::temp().filePath("ex_read_fwd-clustered.txt"));
     qDebug() << "[done]";
 
-    return app.exec();
+    return t_clusteredFwd.sol->ncol > 0 && t_clusteredFwd.sol->ncol < t_Fwd.sol->ncol ? 0 : 1;
 }

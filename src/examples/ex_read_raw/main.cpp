@@ -65,9 +65,9 @@ int main(int argc, char* argv[])
     parser.setApplicationDescription("Read Raw Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
     QCommandLineOption fromOption("from", "Read data from <from> (in seconds).", "from", "42.956");
-    QCommandLineOption toOption("to", "Read data from <to> (in seconds).", "to", "320.670");
+    QCommandLineOption toOption("to", "Read data from <to> (in seconds).", "to", "52.956");
     QCommandLineOption inSamplesOption("inSamples", "Timing is set in samples.", "inSamples", "false");
     QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
 
@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
 
     std::cout << data.block(0, 0, 10, 10) << std::endl;
 
-    return app.exec();
+    return 0;
 }
 
 //=============================================================================================================

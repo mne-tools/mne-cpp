@@ -29,6 +29,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QCommandLineParser>
+#include <QDir>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -60,8 +61,8 @@ int main(int argc, char* argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Read BEM Example");
     parser.addHelpOption();
-    QCommandLineOption bemFileInOption("bem", "Path to BEM <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    QCommandLineOption bemFileOutOption("bemOut", "Path to BEM <file>, which is to be written.", "file", "./sample-head-test.fif");
+    QCommandLineOption bemFileInOption("bem", "Path to BEM <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif");
+    QCommandLineOption bemFileOutOption("bemOut", "Path to BEM <file>, which is to be written.", "file", QDir::temp().filePath("ex_read_bem-bem.fif"));
 
     //    QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
     //    QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
@@ -97,5 +98,5 @@ int main(int argc, char* argv[])
         qDebug() << "t_BemTest[0].rr:" << t_BemTest[0].rr(2, 0) << t_BemTest[0].rr(2, 1) << t_BemTest[0].rr(2, 2);
     }
 
-    return app.exec();
+    return t_BemTest.size() == t_Bem.size() && t_Bem.size() > 0 ? 0 : 1;
 }
