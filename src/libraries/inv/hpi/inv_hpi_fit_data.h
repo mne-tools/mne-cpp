@@ -72,9 +72,9 @@ namespace INVLIB
  */
 struct DipFitError
 {
-    double error;
+    double error = 0.0;
     Eigen::MatrixXd moment;
-    int numIterations;
+    int numIterations = 0;
 };
 
 //=========================================================================================================
@@ -129,8 +129,8 @@ public:
     InvSensorSet m_sensors;
     Eigen::MatrixXd m_matProjector;
 
-    int m_iMaxIterations;
-    float m_fAbortError;
+    int m_iMaxIterations = 500;
+    float m_fAbortError = 1e-9f;
 
 protected:
     //=========================================================================================================
