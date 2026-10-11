@@ -540,21 +540,18 @@ void TestMneLibrary::sourceEstimate_writeReadFile()
     QVERIFY(!stc.isEmpty());
 
     QString tmpPath = QCoreApplication::applicationDirPath() + "/test_stc_tmp.stc";
-    {
-        QFile outFile(tmpPath);
-        QVERIFY(outFile.open(QIODevice::WriteOnly));
-        stc.write(outFile);
-        outFile.close();
-    }
-    if (QFile::exists(tmpPath)) {
-        QFile inFile(tmpPath);
-        QVERIFY(inFile.open(QIODevice::ReadOnly));
-        InvSourceEstimate stcRead;
-        InvSourceEstimate::read(inFile, stcRead);
-        inFile.close();
-    }
+    // write() and read() open the file themselves
+    QFile outFile(tmpPath);
+    QVERIFY(stc.write(outFile));
+    outFile.close();
+    QFile inFile(tmpPath);
+    InvSourceEstimate stcRead;
+    QVERIFY(InvSourceEstimate::read(inFile, stcRead));
+    inFile.close();
     QFile::remove(tmpPath);
-    QVERIFY(true);
+    QCOMPARE(stcRead.vertices, stc.vertices);
+    QVERIFY(stcRead.data.isApprox(stc.data, 1e-6));
+    QVERIFY(std::fabs(stcRead.tstep - stc.tstep) < 1e-7f);
 }
 
 //=============================================================================================================
@@ -901,9 +898,17 @@ void TestMneLibrary::displaySurf_setupCurvatureColors()
 {
     MNEMshDisplaySurface surf;
     surf.np = 10;
-    surf.curv = VectorXf::Random(10).eval();
+    surf.curv = VectorXf::LinSpaced(10, -1.0f, 1.0f);
+
+    // White/inflated/sphere show the curvature sign in two greys, other surfaces one grey
+    surf.decide_curv_display("inflated");
     surf.setup_curvature_colors();
-    QVERIFY(true);
+    QCOMPARE(surf.vertex_colors.size(), Eigen::Index(3 * 10));
+    QVERIFY(surf.vertex_colors[0] != surf.vertex_colors[3 * 9]);
+    QCOMPARE(surf.vertex_colors[0], surf.vertex_colors[3 * 1]);
+    surf.decide_curv_display("pial");
+    surf.setup_curvature_colors();
+    QCOMPARE(surf.vertex_colors[0], surf.vertex_colors[3 * 9]);
 }
 
 void TestMneLibrary::displaySurf_alignFiducials_data()
@@ -1098,10 +1103,8 @@ void TestMneLibrary::displaySurfSet_addBem()
     MNEMshDisplaySurfaceSet surfSet;
     int result = surfSet.add_bem_surface(bemPath(), FIFFV_BEM_SURF_ID_BRAIN,
                                          QString("innerskull"), 1, 0);
-    if (result == 0)
-        QVERIFY(surfSet.surfs.size() > 0);
-    else
-        QVERIFY(true);
+    QCOMPARE(result, 0);
+    QCOMPARE(surfSet.surfs.size(), static_cast<size_t>(1));
 }
 
 //=============================================================================================================

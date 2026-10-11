@@ -111,8 +111,6 @@ private slots:
     void eegSphere_modelSet();
 
     // ── FwdCompData ──
-    void compData_constructDestroy();
-    void compData_defaultCtor();
 
     // ── FwdCoilSet ──
     void coilSet_readDefs();
@@ -329,8 +327,9 @@ void TestFwdLibrary::bemModel_accessors()
     QVERIFY(model->surfs[0]->ntri > 0);
     QVERIFY(model->surfs[0]->rr.rows() > 0);
 
-    if (model->gamma.size() > 0)
-        QVERIFY(true);
+    // A homogeneous model has one surface and no BEM solution yet
+    QCOMPARE(model->nsurf, 1);
+    QCOMPARE(model->nsol, 0);
 
     // Load 3-layer for more coverage
     QString bem3Path = m_sDataPath + "/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
@@ -681,18 +680,6 @@ void TestFwdLibrary::eegSphere_modelSet()
 // FwdCompData
 //=============================================================================================================
 
-void TestFwdLibrary::compData_constructDestroy()
-{
-    FwdCompData data;
-    Q_UNUSED(data);
-}
-
-void TestFwdLibrary::compData_defaultCtor()
-{
-    FwdCompData comp;
-    QVERIFY(true);
-}
-
 //=============================================================================================================
 // FwdCoilSet
 //=============================================================================================================
@@ -704,12 +691,15 @@ void TestFwdLibrary::coilSet_readDefs()
     QFile rawFile(rawPath());
     FiffRawData raw(rawFile);
 
-    auto eegEls = FwdCoilSet::create_eeg_els(raw.info.chs, raw.info.nchan);
-    if (eegEls) {
-        QVERIFY(eegEls->ncoil() > 0);
-    } else {
-        QVERIFY(true);
-    }
+    // Electrodes are made from EEG channels only
+    QVERIFY(!FwdCoilSet::create_eeg_els(raw.info.chs, raw.info.nchan));
+    const RowVectorXi eegPicks = raw.info.pick_types(false, true, false);
+    QList<FiffChInfo> eegChs;
+    for (int i = 0; i < eegPicks.size(); ++i)
+        eegChs << raw.info.chs[eegPicks(i)];
+    auto eegEls = FwdCoilSet::create_eeg_els(eegChs, static_cast<int>(eegChs.size()));
+    QVERIFY(eegEls);
+    QCOMPARE(eegEls->ncoil(), static_cast<int>(eegChs.size()));
 }
 
 //=============================================================================================================

@@ -614,11 +614,7 @@ private slots:
 
         // InvRapMusic needs a forward solution
         InvRapMusic rap;
-        bool ok = rap.init(m_fwd, false, 2, 0.5);
-
-        // Even if init fails due to orientation, we exercised the code path
-        Q_UNUSED(ok)
-        QVERIFY(true); // Exercise the init path
+        QVERIFY(rap.init(m_fwd, false, 2, 0.5));
     }
 
     //=========================================================================
@@ -683,18 +679,13 @@ private slots:
     //=========================================================================
     void hpiModelParams_construct()
     {
-        InvHpiModelParameters params;
-        // Default construction should be valid
-        QVERIFY(true);
-
-        // Construct with specific values
-        QVector<int> hpiCoils;
-        hpiCoils << 293 << 307 << 314 << 321;
-
-        // The last parameter is bool bBasic, not a coil count. Passing 4 here
-        // silently converted to true and MSVC reports it as C4305.
-        InvHpiModelParameters params2(hpiCoils, 600, 200, true);
-        QVERIFY(true);
+        // The coil count follows the frequencies; without a line frequency the basic model is used
+        const QVector<int> hpiFreqs{293, 307, 314, 321};
+        const InvHpiModelParameters params(hpiFreqs, 600, 0, false);
+        QCOMPARE(params.iNHpiCoils(), 4);
+        QCOMPARE(params.iSampleFreq(), 600);
+        QVERIFY(params.bBasic());
+        QVERIFY(!InvHpiModelParameters(hpiFreqs, 600, 50, false).bBasic());
     }
 
     //=========================================================================
