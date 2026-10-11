@@ -194,6 +194,24 @@ Assignment Operator.
 
 ## Static Methods
 
+### read(p_IODevice, p_cov)
+
+Reads the noise covariance stored in a FIFF file, like mne.read_cov.
+
+**Parameters:**
+
+- **p_IODevice** : *QIODevice &*
+  IO device to read from.
+
+- **p_cov** : *[FiffCov](/docs/api/fiff/fiff-cov) &*
+  The covariance; unchanged when reading fails.
+
+**Returns:**
+
+- *bool* — true when the device holds a noise covariance, false otherwise.
+
+---
+
 ### compute_from_epochs(raw, events, eventCodes, tmin, tmax, bmin, bmax, doBaseline, removeMean, ignoreMask, delay, rej)
 
 Compute a noise covariance matrix from raw data based on event-locked epochs.

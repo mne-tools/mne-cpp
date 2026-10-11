@@ -77,17 +77,29 @@ FiffCov::FiffCov(QIODevice& p_IODevice)
 , dim(-1)
 , nfree(-1)
 {
-    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
-
-    if (!t_pStream->open()) {
-        throw std::runtime_error("Not able to open IODevice");
-    }
-
-    if (!t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, *this))
+    if (!read(p_IODevice, *this))
         throw std::runtime_error("Fiff covariance not found");
 
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffCov>>("QSharedPointer<FIFFLIB::FiffCov>");
     qRegisterMetaType<FIFFLIB::FiffCov>("FIFFLIB::FiffCov");
+}
+
+//=============================================================================================================
+
+bool FiffCov::read(QIODevice& p_IODevice, FiffCov& p_cov)
+{
+    FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
+    if (!t_pStream->open()) {
+        return false;
+    }
+
+    FiffCov cov;
+    const bool found = t_pStream->read_cov(t_pStream->dirtree(), FIFFV_MNE_NOISE_COV, cov);
+    t_pStream->close();
+    if (found) {
+        p_cov = cov;
+    }
+    return found;
 }
 
 //=============================================================================================================

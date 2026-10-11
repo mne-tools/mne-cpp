@@ -2853,8 +2853,8 @@ void MainWindow::openProject()
     // Load additional files that auto-discovery might miss
     if (!covPath.isEmpty() && QFileInfo::exists(covPath)) {
         QFile covFile(covPath);
-        FIFFLIB::FiffCov cov(covFile);
-        if (!cov.isEmpty()) {
+        FIFFLIB::FiffCov cov;
+        if (FIFFLIB::FiffCov::read(covFile, cov) && !cov.isEmpty()) {
             m_qCovFile.setFileName(covPath);
             m_covariance = cov;
             m_pAverageWindow->setNoiseCovariance(m_covariance);
@@ -4305,9 +4305,9 @@ void MainWindow::loadCovariance()
     }
 
     QFile covarianceFile(filename);
-    FIFFLIB::FiffCov covariance(covarianceFile);
+    FIFFLIB::FiffCov covariance;
 
-    if (covariance.isEmpty()) {
+    if (!FIFFLIB::FiffCov::read(covarianceFile, covariance) || covariance.isEmpty()) {
         QMessageBox::warning(this,
                              "Load Covariance",
                              QString("Could not load covariance data from %1.").arg(filename));

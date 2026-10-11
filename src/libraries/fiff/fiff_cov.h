@@ -103,6 +103,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Reads the noise covariance stored in a FIFF file, like mne.read_cov.
+     *
+     * @param[in] p_IODevice     IO device to read from.
+     * @param[out] p_cov         The covariance; unchanged when reading fails.
+     *
+     * @return true when the device holds a noise covariance, false otherwise.
+     */
+    static bool read(QIODevice& p_IODevice, FiffCov& p_cov);
+
+    //=========================================================================================================
+    /**
      * Copy constructor.
      *
      * @param[in] p_FiffCov   Covariance data matrix which should be copied.

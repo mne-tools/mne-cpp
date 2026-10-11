@@ -354,6 +354,14 @@ void TestFiffCov::saveRoundTrip_computedCovariance()
     QCOMPARE(roundTrip.dim, cov.dim);
     QCOMPARE(roundTrip.names, cov.names);
     QVERIFY(roundTrip.data.isApprox(cov.data, 1e-9));
+
+    FiffCov readBack;
+    QVERIFY(FiffCov::read(savedFile, readBack));
+    QVERIFY(readBack.data.isApprox(cov.data, 1e-9));
+    QFile noCovFile(rawFile.fileName());
+    QVERIFY(!FiffCov::read(noCovFile, readBack));
+    QCOMPARE(readBack.names, cov.names);
+    QVERIFY(readBack.data.isApprox(cov.data, 1e-9));
 }
 
 //=============================================================================================================

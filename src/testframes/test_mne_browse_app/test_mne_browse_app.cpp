@@ -302,6 +302,30 @@ void TestMneBrowseApp::computesAndSavesCovarianceLikePython()
         static_cast<QDialog*>(dialog)->accept();
     });
     save->trigger();
+
+    // The saved covariance loads back; a file without one is refused with a message
+    QAction* load = findAction(window, QStringLiteral("Load Covariance..."));
+    QVERIFY(load);
+    for (const QString& path : {covPath, rawPath}) {
+        QString warning;
+        answerNextModal([path](QWidget* pModal) {
+            auto* dialog = qobject_cast<QFileDialog*>(pModal);
+            dialog->setDirectory(QFileInfo(path).absolutePath());
+            dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(path).fileName());
+            static_cast<QDialog*>(dialog)->accept();
+        });
+        QTimer warningWatch;
+        connect(&warningWatch, &QTimer::timeout, [&warning]() {
+            if (auto* box = qobject_cast<QMessageBox*>(QApplication::activeModalWidget())) {
+                warning = box->text();
+                box->accept();
+            }
+        });
+        warningWatch.start(10);
+        load->trigger();
+        warningWatch.stop();
+        QCOMPARE(warning.contains("Could not load covariance data"), path == rawPath);
+    }
     window->hide();
     QCoreApplication::processEvents();
 
