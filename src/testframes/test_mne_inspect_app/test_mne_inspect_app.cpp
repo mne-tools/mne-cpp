@@ -273,6 +273,11 @@ void TestMneInspectApp::loadsFilesThroughTheFileMenu()
     QCOMPARE(evokedSets->count(), 1);
     QVERIFY(!evokedSets->isEnabled());
 
+    // A FIFF file without BEM surfaces is not listed as a BEM
+    chooseFile(m_dataPath + "MEG/sample/sample_audvis-cov.fif");
+    findAction(window, "Load &BEM...")->trigger();
+    QVERIFY(!loadedFiles(window).contains("sample_audvis-cov.fif"));
+
     // Electrode contacts from a CSV of name, x, y, z, array
     const QString csvPath = dir.filePath("contacts.csv");
     QFile csv(csvPath);

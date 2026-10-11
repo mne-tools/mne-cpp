@@ -2292,8 +2292,13 @@ void MainWindow::loadBem(const QString& subjectName, const QString& bemPath)
 {
     QFile bemFile(bemPath);
     if (bemFile.exists()) {
+        MNEBem bem;
+        FIFFLIB::FiffStream::SPtr stream(new FIFFLIB::FiffStream(&bemFile));
+        if (!MNEBem::readFromStream(stream, true, bem)) {
+            qWarning() << "No BEM surfaces found in" << bemPath;
+            return;
+        }
         trackLoadedFile(bemPath, static_cast<int>(MnaFileRole::Bem));
-        MNEBem bem(bemFile);
         for (int i = 0; i < bem.size(); ++i) {
             QString name;
             switch (bem[i].id) {
