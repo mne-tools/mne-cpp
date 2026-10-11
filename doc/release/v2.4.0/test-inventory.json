@@ -3422,7 +3422,7 @@
         "test-data"
       ],
       "gui": false,
-      "qskip_sites": 51,
+      "qskip_sites": 49,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {

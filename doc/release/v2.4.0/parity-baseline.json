@@ -22,9 +22,9 @@
   "summary": {
     "claims": 360,
     "by_evidence": {
-      "cross-validated-static": 107,
+      "cross-validated-static": 108,
       "cross-validated-live": 4,
-      "tested": 244,
+      "tested": 243,
       "unverified": 5
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 96,
+        "cross-validated-static": 97,
         "cross-validated-live": 3,
-        "tested": 167,
+        "tested": 166,
         "unverified": 5
       }
     },
@@ -53,6 +53,7 @@
         "test_fiff_cov_python",
         "test_fiff_dig_point_python",
         "test_fiff_evoked_python",
+        "test_fiff_fs_library",
         "test_fiff_proj_python",
         "test_fiff_raw_formats_python",
         "test_fiff_raw_save_python",
@@ -1757,7 +1758,7 @@
       "python": "mne.io.write_fiducials",
       "claimed": "implemented",
       "test": "test_fiff_fs_library",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

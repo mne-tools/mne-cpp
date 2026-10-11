@@ -150,7 +150,6 @@ private slots:
     void fiff_infoBaseAccessors();
 
     // ── FIFF: Events ──
-    void fiff_detectEventsFromRaw();
 
     // ── FS: FsSurface ──
     void fs_surfaceComputeNormals();
@@ -596,28 +595,6 @@ void TestFiffFsLibrary::fiff_infoBaseAccessors()
 //=============================================================================================================
 // FIFF: Events
 //=============================================================================================================
-
-void TestFiffFsLibrary::fiff_detectEventsFromRaw()
-{
-    if (!hasData())
-        QSKIP("No test data");
-    QFile rawFile(rawPath());
-    FiffRawData raw(rawFile);
-
-    QString stimChName;
-    for (int i = 0; i < raw.info.nchan; i++) {
-        if (raw.info.chs[i].ch_name.contains("STI")) {
-            stimChName = raw.info.chs[i].ch_name;
-            break;
-        }
-    }
-    QVERIFY2(!stimChName.isEmpty(), "No STI channel in sample data");
-
-    FiffEvents events;
-    bool ok = FiffEvents::detect_from_raw(raw, events, stimChName);
-    Q_UNUSED(ok);
-    QVERIFY(true);
-}
 
 //=============================================================================================================
 // FS: FsSurface
@@ -1694,20 +1671,21 @@ void TestFiffFsLibrary::fs_surfaceSetOperators()
     FsSurface lhSurf, rhSurf;
     bool ok1 = FsSurface::read(lhPath, lhSurf);
     bool ok2 = FsSurface::read(rhPath, rhSurf);
-    if (ok1 && ok2) {
-        FsSurfaceSet surfSet;
-        surfSet.insert(lhSurf);
-        surfSet.insert(rhSurf);
-        QVERIFY(surfSet.size() == 2);
-        FsSurface& s0 = surfSet[0];
-        FsSurface& s1 = surfSet[1];
-        Q_UNUSED(s0);
-        Q_UNUSED(s1);
-        const FsSurfaceSet& constSet = surfSet;
-        const FsSurface& cs0 = constSet[0];
-        Q_UNUSED(cs0);
-    }
-    QVERIFY(true);
+    QVERIFY(ok1 && ok2);
+    QCOMPARE(lhSurf.hemi(), 0);
+    QCOMPARE(rhSurf.hemi(), 1);
+    // FreeSurfer stores mm, MNE-CPP holds m
+    QVERIFY(lhSurf.rr().isApprox(verts * 0.001f));
+    QCOMPARE(lhSurf.tris(), tris);
+
+    FsSurfaceSet surfSet;
+    surfSet.insert(lhSurf);
+    surfSet.insert(rhSurf);
+    QCOMPARE(surfSet.size(), 2);
+    QCOMPARE(surfSet[0].hemi(), 0);
+    QCOMPARE(surfSet[1].hemi(), 1);
+    const FsSurfaceSet& constSet = surfSet;
+    QCOMPARE(constSet[1].hemi(), 1);
 }
 
 void TestFiffFsLibrary::fs_annotationSetOperators()
@@ -1723,19 +1701,22 @@ void TestFiffFsLibrary::fs_annotationSetOperators()
     FsAnnotation lhAnnot, rhAnnot;
     bool ok1 = FsAnnotation::read(lhPath, lhAnnot);
     bool ok2 = FsAnnotation::read(rhPath, rhAnnot);
-    if (ok1 && ok2) {
-        FsAnnotationSet annotSet;
-        annotSet.insert(lhAnnot);
-        annotSet.insert(rhAnnot);
-        QVERIFY(annotSet.size() == 2);
-        FsAnnotation& a0 = annotSet[0];
-        Q_UNUSED(a0);
-        const FsAnnotationSet& constAnnot = annotSet;
-        const FsAnnotation ca0 = constAnnot[0];
-        VectorXi verts = ca0.getVertices();
-        Q_UNUSED(verts);
-    }
-    QVERIFY(true);
+    QVERIFY(ok1 && ok2);
+    QCOMPARE(lhAnnot.getVertices(), vertIdx);
+    QCOMPARE(lhAnnot.getLabelIds(), labels);
+    QCOMPARE(lhAnnot.getColortable().numEntries, 1);
+    QCOMPARE(lhAnnot.getColortable().struct_names.first(), QString("unknown"));
+    // Packed label id = r + g*2^8 + b*2^16
+    QCOMPARE(lhAnnot.getColortable().table(0, 4), 25 + 5 * 256 + 25 * 65536);
+
+    FsAnnotationSet annotSet;
+    annotSet.insert(lhAnnot);
+    annotSet.insert(rhAnnot);
+    QCOMPARE(annotSet.size(), 2);
+    QCOMPARE(annotSet[0].hemi(), 0);
+    const FsAnnotationSet& constAnnot = annotSet;
+    QCOMPARE(constAnnot[1].hemi(), 1);
+    QCOMPARE(constAnnot[0].getVertices(), vertIdx);
 }
 
 void TestFiffFsLibrary::fs_surfaceReadFromSynthetic()
@@ -1749,10 +1730,11 @@ void TestFiffFsLibrary::fs_surfaceReadFromSynthetic()
     writeSyntheticSurface(surfDir + "/lh.inflated", 4, 2, verts, tris);
     writeSyntheticSurface(surfDir + "/rh.inflated", 4, 2, verts, tris);
     FsSurface s1(surfDir + "/lh.inflated");
-    FsSurface s2(surfDir, 0, "inflated");
-    Q_UNUSED(s1);
-    Q_UNUSED(s2);
-    QVERIFY(true);
+    FsSurface s2(surfDir, 1, "inflated");
+    QCOMPARE(s1.hemi(), 0);
+    QCOMPARE(s1.surf(), QString("inflated"));
+    QCOMPARE(s2.hemi(), 1);
+    QVERIFY(s2.rr().isApprox(verts * 0.001f));
 }
 
 void TestFiffFsLibrary::fs_annotationReadFromSynthetic()
@@ -1766,10 +1748,11 @@ void TestFiffFsLibrary::fs_annotationReadFromSynthetic()
     writeSyntheticAnnotation(annotDir + "/lh.aparc.annot", 4, vertIdx, labels);
     writeSyntheticAnnotation(annotDir + "/rh.aparc.annot", 4, vertIdx, labels);
     FsAnnotation a1(annotDir + "/lh.aparc.annot");
-    FsAnnotation a2(annotDir, 0, "aparc");
-    Q_UNUSED(a1);
-    Q_UNUSED(a2);
-    QVERIFY(true);
+    FsAnnotation a2(annotDir, 1, "aparc");
+    QCOMPARE(a1.hemi(), 0);
+    QCOMPARE(a1.getLabelIds(), labels);
+    QCOMPARE(a2.hemi(), 1);
+    QCOMPARE(a2.getVertices(), vertIdx);
 }
 
 void TestFiffFsLibrary::fs_surfaceSetCalcOffset()
@@ -1783,9 +1766,11 @@ void TestFiffFsLibrary::fs_surfaceSetCalcOffset()
     writeSyntheticSurface(surfDir + "/lh.inflated", 4, 2, verts, tris);
     writeSyntheticSurface(surfDir + "/rh.inflated", 4, 2, verts, tris);
     FsSurfaceSet surfSet;
-    bool ok = FsSurfaceSet::read(surfDir + "/lh.inflated", surfDir + "/rh.inflated", surfSet);
-    Q_UNUSED(ok);
-    QVERIFY(true);
+    QVERIFY(FsSurfaceSet::read(surfDir + "/lh.inflated", surfDir + "/rh.inflated", surfSet));
+    // Inflated hemispheres overlap; they are pushed apart by half of (lh max x - rh min x) each
+    const float xOffset = 0.001f - (-0.001f);
+    QVERIFY(surfSet[0].offset().isApprox(Vector3f(xOffset / 2.0f, 0.0f, 0.0f)));
+    QVERIFY(surfSet[1].offset().isApprox(Vector3f(-xOffset / 2.0f, 0.0f, 0.0f)));
 }
 
 void TestFiffFsLibrary::fs_surfaceSetReadNonInflated()
@@ -1799,9 +1784,11 @@ void TestFiffFsLibrary::fs_surfaceSetReadNonInflated()
     writeSyntheticSurface(surfDir + "/lh.orig", 4, 2, verts, tris);
     writeSyntheticSurface(surfDir + "/rh.orig", 4, 2, verts, tris);
     FsSurfaceSet surfSet;
-    bool ok = FsSurfaceSet::read(surfDir + "/lh.orig", surfDir + "/rh.orig", surfSet);
-    Q_UNUSED(ok);
-    QVERIFY(true);
+    QVERIFY(FsSurfaceSet::read(surfDir + "/lh.orig", surfDir + "/rh.orig", surfSet));
+    QCOMPARE(surfSet.size(), 2);
+    // Only inflated surfaces are offset
+    QCOMPARE(surfSet[0].offset(), Vector3f::Zero().eval());
+    QCOMPARE(surfSet[1].offset(), Vector3f::Zero().eval());
 }
 
 void TestFiffFsLibrary::fs_annotationSetReadSynthetic()
@@ -1815,34 +1802,29 @@ void TestFiffFsLibrary::fs_annotationSetReadSynthetic()
     writeSyntheticAnnotation(annotDir + "/lh.aparc.annot", 4, vertIdx, labels);
     writeSyntheticAnnotation(annotDir + "/rh.aparc.annot", 4, vertIdx, labels);
     FsAnnotationSet annotSet;
-    bool ok = FsAnnotationSet::read(annotDir + "/lh.aparc.annot", annotDir + "/rh.aparc.annot", annotSet);
-    Q_UNUSED(ok);
-    QVERIFY(true);
+    QVERIFY(FsAnnotationSet::read(annotDir + "/lh.aparc.annot", annotDir + "/rh.aparc.annot", annotSet));
+    QCOMPARE(annotSet.size(), 2);
+    QCOMPARE(annotSet[1].getLabelIds(), labels);
 }
 
 void TestFiffFsLibrary::fs_labelSelectTris()
 {
-    if (!hasData())
-        QSKIP("No test data");
-    MatrixX3f verts(4, 3);
-    verts << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
-    MatrixX3i tris(2, 3);
-    tris << 0, 1, 2, 0, 2, 3;
+    MatrixX3f verts(5, 3);
+    verts << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1;
+    MatrixX3i tris(3, 3);
+    tris << 0, 1, 2, 0, 2, 3, 1, 4, 3;
     QString surfPath = m_tempDir.filePath("lh.labeltest");
-    writeSyntheticSurface(surfPath, 4, 2, verts, tris);
+    writeSyntheticSurface(surfPath, 5, 3, verts, tris);
     FsSurface surf;
-    bool ok = FsSurface::read(surfPath, surf);
-    if (ok) {
-        FsLabel label;
-        label.read(m_sDataPath + "/subjects/sample/label/lh.BA1_exvivo.label", label);
-        if (!label.isEmpty()) {
-            label.selectTris(surf);
-        } else {
-            FsLabel synthLabel;
-            synthLabel.selectTris(surf);
-        }
-    }
-    QVERIFY(true);
+    QVERIFY(FsSurface::read(surfPath, surf));
+
+    // Every triangle with at least one corner in the label
+    FsLabel label;
+    QCOMPARE(label.selectTris(surf).rows(), 0);
+    label.vertices = VectorXi::Constant(1, 4);
+    QCOMPARE(label.selectTris(surf), tris.bottomRows(1).eval());
+    label.vertices = VectorXi::Constant(1, 2);
+    QCOMPARE(label.selectTris(surf), tris.topRows(2).eval());
 }
 
 //=============================================================================================================
@@ -1887,14 +1869,15 @@ void TestFiffFsLibrary::fs_surfaceNnCurvOffset()
     FsSurface surf;
     FsSurface::read(surfLhPath(), surf);
 
-    // Curv data might be empty if not loaded separately
-    const Eigen::MatrixX3f& normals = surf.nn();
-    Q_UNUSED(normals);
-    const Eigen::VectorXf& curv = surf.curv();
-    Q_UNUSED(curv);
-    const Eigen::Vector3f& off = surf.offset();
-    Q_UNUSED(off);
-    QVERIFY(true);
+    // One unit normal per vertex; lh.curv next to the surface is loaded with it.
+    // Reference values produced by mne.surface.read_curvature(lh.curv, binary=False) (mne 1.11.0)
+    QCOMPARE(surf.nn().rows(), surf.rr().rows());
+    QVERIFY((surf.nn().rowwise().norm().array() - 1.0f).abs().maxCoeff() < 1e-4f);
+    QCOMPARE(surf.curv().size(), 155407);
+    QVERIFY(std::fabs(surf.curv()(0) - (-0.205397367477417f)) < 1e-6f);
+    QVERIFY(std::fabs(surf.curv().minCoeff() - (-2.2410364f)) < 1e-6f);
+    QVERIFY(std::fabs(surf.curv().maxCoeff() - 0.96878314f) < 1e-6f);
+    QCOMPARE(surf.offset(), Vector3f::Zero().eval());
 }
 
 //=============================================================================================================
