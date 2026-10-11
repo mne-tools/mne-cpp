@@ -139,6 +139,17 @@ void TestStudioDummy3DView::descriptor_missingFileIsSurvivable()
     // which session failed rather than losing track of it.
     QCOMPARE(widget.sessionId(), QString("session-1"));
     QCOMPARE(widget.filePath(), QString("/no/such/directory/missing-scene.fif"));
+
+    // A .bem file that holds no BEM surfaces is reported, a real one is added
+    const QString data = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/";
+    QTemporaryDir dir;
+    QVERIFY(QFile::copy(data + "MEG/sample/sample_audvis-cov.fif", dir.filePath("cov.bem")));
+    QVERIFY(QFile::copy(data + "subjects/sample/bem/sample-1280-1280-1280-bem.fif", dir.filePath("head.bem")));
+    QSignalSpy status(&widget, &Dummy3DHostedViewWidget::statusMessage);
+    QVERIFY(!widget.addFileToScene(dir.filePath("cov.bem")));
+    QVERIFY(status.last().at(0).toString().startsWith("Failed to load BEM surface set"));
+    QVERIFY(widget.addFileToScene(dir.filePath("head.bem")));
+    QVERIFY(widget.hasLoadedFile(dir.filePath("head.bem")));
 }
 
 //=============================================================================================================

@@ -19,6 +19,7 @@
 
 #include <disp3D/model/braintreemodel.h>
 #include <disp3D/view/brainview.h>
+#include <fiff/fiff_stream.h>
 #include <fs/fs_surface.h>
 #include <mne/mne_bem.h>
 
@@ -357,8 +358,9 @@ bool Dummy3DHostedViewWidget::loadBemFile(const QString& filePath, QString* erro
         return false;
     }
 
-    MNELIB::MNEBem bem(file);
-    if (bem.isEmpty()) {
+    FIFFLIB::FiffStream::SPtr stream(new FIFFLIB::FiffStream(&file));
+    MNELIB::MNEBem bem;
+    if (!MNELIB::MNEBem::readFromStream(stream, true, bem) || bem.isEmpty()) {
         if (errorMessage) {
             *errorMessage = QString("Failed to load BEM surface set %1.").arg(filePath);
         }
