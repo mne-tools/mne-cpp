@@ -137,11 +137,7 @@ private slots:
     // EpochModel tests
     //=========================================================================================================
     void testEpochModelConstruct();
-    void testEpochModelSetEpochs();
-    void testEpochModelData();
-    void testEpochModelAutoRejects();
-    void testEpochModelClear();
-    void testEpochModelSummary();
+    void testEpochModelReviewsEpochs();
 
 
     //=========================================================================================================
@@ -945,50 +941,66 @@ void TestMneBrowseData::testEpochModelConstruct()
     QVERIFY(model.respectAutoRejects());
 }
 
-void TestMneBrowseData::testEpochModelSetEpochs()
+void TestMneBrowseData::testEpochModelReviewsEpochs()
 {
-    // Create a simple epoch list for testing
+    // Two event codes; epochs listed out of time order; the code-3 epoch at sample 1300 is auto-rejected
+    const auto makeEpoch = [](int sample, double ptp, bool reject) {
+        auto epoch = MNEEpochData::SPtr::create();
+        epoch->eventSample = sample;
+        epoch->epoch = MatrixXd::Zero(2, 10);
+        epoch->epoch(1, 4) = ptp;
+        epoch->bReject = reject;
+        return epoch;
+    };
+    MNEEpochDataList code1;
+    code1 << makeEpoch(1900, 2.0, false) << makeEpoch(1100, 1.0, false);
+    MNEEpochDataList code3;
+    code3 << makeEpoch(1300, 5.0, true);
+
     EpochModel model;
+    QSignalSpy changed(&model, &EpochModel::epochsChanged);
+    model.setEpochs({code1, code3}, {1, 3}, 1000, 100.0f);
+    QCOMPARE(changed.size(), 1);
+    QCOMPARE(model.rowCount(), 3);
+    QCOMPARE(model.columnCount(), 6);
+    QCOMPARE(model.headerData(3, Qt::Horizontal).toString(), QString("Time (s)"));
 
-    // Empty set of epochs
-    QList<MNELIB::MNEEpochDataList> epochLists;
-    QList<int> eventCodes;
-    model.setEpochs(epochLists, eventCodes, 0, 600.0);
-    QCOMPARE(model.rowCount(), 0);
-}
+    // Sorted by sample, relative to the first sample
+    const QList<int> rowSamples{model.sampleAt(0), model.sampleAt(1), model.sampleAt(2)};
+    QCOMPARE(rowSamples, (QList<int>{1100, 1300, 1900}));
+    QCOMPARE(model.data(model.index(1, 1)).toInt(), 3);
+    QCOMPARE(model.data(model.index(1, 2)).toInt(), 300);
+    QCOMPARE(model.data(model.index(1, 3)).toString(), QString("3.000"));
+    QCOMPARE(model.data(model.index(1, 4)).toString(), QString("yes"));
+    QCOMPARE(model.data(model.index(1, 5)).toString(), QString("auto drop"));
+    QCOMPARE(model.data(model.index(1, 0), Qt::CheckStateRole).toInt(), int(Qt::Unchecked));
+    QCOMPARE(model.summaryText(), QString("2 / 3 epochs currently contribute to the evoked response. 1 auto-rejected, 0 manually excluded."));
+    QCOMPARE(model.ptpAmplitudes(), (QVector<double>{1.0, 2.0}));
 
-void TestMneBrowseData::testEpochModelData()
-{
-    EpochModel model;
-    // With no data, should return invalid for any index
-    QVariant val = model.data(model.index(0, 0), Qt::DisplayRole);
-    QVERIFY(!val.isValid());
-}
+    // An auto-rejected epoch cannot be ticked while auto rejects are respected
+    QVERIFY(!(model.flags(model.index(1, 0)) & Qt::ItemIsUserCheckable));
+    QVERIFY(!model.setData(model.index(1, 0), Qt::Checked, Qt::CheckStateRole));
 
-void TestMneBrowseData::testEpochModelAutoRejects()
-{
-    EpochModel model;
-    QVERIFY(model.respectAutoRejects());
+    // Manually dropping a kept epoch
+    QVERIFY(model.setData(model.index(2, 0), Qt::Unchecked, Qt::CheckStateRole));
+    QVERIFY(!model.setData(model.index(2, 0), Qt::Unchecked, Qt::CheckStateRole));
+    QCOMPARE(model.data(model.index(2, 5)).toString(), QString("manual drop"));
+    QCOMPARE(model.ptpAmplitudes(), (QVector<double>{1.0}));
+    QCOMPARE(model.summaryText(), QString("1 / 3 epochs currently contribute to the evoked response. 1 auto-rejected, 1 manually excluded."));
 
+    // Ignoring auto rejects brings the rejected epoch back
     model.setRespectAutoRejects(false);
-    QVERIFY(!model.respectAutoRejects());
+    QVERIFY(model.flags(model.index(1, 0)) & Qt::ItemIsUserCheckable);
+    QCOMPARE(model.data(model.index(1, 5)).toString(), QString("kept"));
+    QCOMPARE(model.ptpAmplitudes(), (QVector<double>{1.0, 5.0}));
 
-    model.setRespectAutoRejects(true);
-    QVERIFY(model.respectAutoRejects());
-}
+    model.resetManualExclusions();
+    QCOMPARE(model.data(model.index(2, 5)).toString(), QString("kept"));
+    QCOMPARE(model.ptpAmplitudes(), (QVector<double>{1.0, 5.0, 2.0}));
 
-void TestMneBrowseData::testEpochModelClear()
-{
-    EpochModel model;
     model.clearModel();
     QCOMPARE(model.rowCount(), 0);
-}
-
-void TestMneBrowseData::testEpochModelSummary()
-{
-    EpochModel model;
-    QString summary = model.summaryText();
-    QVERIFY(!summary.isEmpty() || summary.isEmpty()); // Exercise code path
+    QVERIFY(!model.data(model.index(0, 0)).isValid());
 }
 
 //=============================================================================================================
