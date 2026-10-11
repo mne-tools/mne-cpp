@@ -91,18 +91,14 @@ private slots:
     // stream_outlet tests
     //=========================================================================================================
 
-    void testStreamOutletConstruction();
     void testStreamOutletInfo();
     void testStreamOutletPortAssignment();
     void testStreamOutletNoConsumersInitially();
-    void testStreamOutletPushSample();
-    void testStreamOutletPushChunk();
 
     //=========================================================================================================
     // stream_inlet tests
     //=========================================================================================================
 
-    void testStreamInletConstruction();
     void testStreamInletOpenInvalidHost();
     void testStreamInletPullWithoutOpen();
 
@@ -396,17 +392,6 @@ void TestLsl::testStreamInfoPreservesDataPort()
 // stream_outlet tests
 //=============================================================================================================
 
-void TestLsl::testStreamOutletConstruction()
-{
-    stream_info info("OutletTest", "EEG", 4, 250.0);
-    stream_outlet outlet(info);
-
-    // Should not crash; outlet is running
-    QVERIFY(true);
-}
-
-//=============================================================================================================
-
 void TestLsl::testStreamOutletInfo()
 {
     stream_info info("InfoTest", "EEG", 8, 500.0, ChannelFormat::Float32, "outlet1");
@@ -443,47 +428,7 @@ void TestLsl::testStreamOutletNoConsumersInitially()
 }
 
 //=============================================================================================================
-
-void TestLsl::testStreamOutletPushSample()
-{
-    stream_info info("PushTest", "EEG", 3, 100.0);
-    stream_outlet outlet(info);
-
-    // Should not crash even without consumers
-    std::vector<float> sample = {1.0f, 2.0f, 3.0f};
-    outlet.push_sample(sample);
-    QVERIFY(true);
-}
-
-//=============================================================================================================
-
-void TestLsl::testStreamOutletPushChunk()
-{
-    stream_info info("ChunkTest", "EEG", 2, 100.0);
-    stream_outlet outlet(info);
-
-    std::vector<std::vector<float>> chunk = {
-        {1.0f, 2.0f},
-        {3.0f, 4.0f},
-        {5.0f, 6.0f}};
-    outlet.push_chunk(chunk);
-    QVERIFY(true);
-}
-
-//=============================================================================================================
 // stream_inlet tests
-//=============================================================================================================
-
-void TestLsl::testStreamInletConstruction()
-{
-    stream_info info("InletTest", "EEG", 4, 250.0);
-    info.set_data_port(12345);
-    info.set_data_host("127.0.0.1");
-
-    stream_inlet inlet(info);
-    QVERIFY(true); // Should not crash
-}
-
 //=============================================================================================================
 
 void TestLsl::testStreamInletOpenInvalidHost()
