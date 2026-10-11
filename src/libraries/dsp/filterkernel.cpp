@@ -530,22 +530,14 @@ UTILSLIB::FilterParameter FilterKernel::getFilterType() const
 
 void FilterKernel::setDesignMethod(int iDesignMethod)
 {
-    if (iDesignMethod < 0) {
-        m_iDesignMethod = 0;
-    } else {
-        m_iDesignMethod = iDesignMethod;
-    }
+    m_iDesignMethod = (iDesignMethod >= 0 && iDesignMethod < m_designMethods.size()) ? iDesignMethod : 0;
 }
 
 //=============================================================================================================
 
 void FilterKernel::setFilterType(int iFilterType)
 {
-    if (iFilterType < 0) {
-        m_iFilterType = 0;
-    } else {
-        m_iFilterType = iFilterType;
-    }
+    m_iFilterType = (iFilterType >= 0 && iFilterType < m_filterTypes.size()) ? iFilterType : 0;
 }
 
 //=============================================================================================================

@@ -117,12 +117,6 @@ private slots:
     }
 
     // ==================== ParksMcClellan tests ====================
-    void testParksMcClellanDefaultCtor()
-    {
-        ParksMcClellan pm;
-        Q_UNUSED(pm);
-        QVERIFY(true);
-    }
 
     void testParksMcClellanLPF()
     {
@@ -227,16 +221,24 @@ private slots:
     void testFilterKernelSetters()
     {
         FilterKernel fk;
-        fk.setDesignMethod(0);
+        fk.setDesignMethod(1);
         fk.setFilterType(1);
-        QVERIFY(true);
+        QCOMPARE(fk.getDesignMethod().getName(), QString("Tschebyscheff"));
+        QCOMPARE(fk.getFilterType().getName(), QString("HPF"));
+
+        // Unknown indices (e.g. indexOf() of an unknown name) fall back to the first entry
+        fk.setDesignMethod(-1);
+        fk.setFilterType(99);
+        QCOMPARE(fk.getDesignMethod().getName(), QString("Cosine"));
+        QCOMPARE(fk.getFilterType().getName(), QString("LPF"));
     }
 
     void testFilterKernelPrepareFilter()
     {
+        // Coefficients are transformed for the next power of two that holds data plus filter
         FilterKernel fk("TestLPF", 0, 64, 0.1, 0.0, 0.01, 1000.0, 0);
         fk.prepareFilter(256);
-        QVERIFY(true);
+        QCOMPARE(fk.getFftCoefficients().cols(), Eigen::Index(512 / 2 + 1));
     }
 
     void testFilterKernelApplyConvFilter()
@@ -345,8 +347,10 @@ private slots:
         MatrixXd result2 = filter.calculate(block2, fk, picks);
         QCOMPARE(result2.rows(), nCh);
 
+        // After a reset the next block is filtered like a first block
         filter.reset();
-        QVERIFY(true);
+        FilterOverlapAdd fresh;
+        QCOMPARE(filter.calculate(block2, fk, picks), fresh.calculate(block2, fk, picks));
     }
 
     void testFilterOverlapAddWithPicks()
