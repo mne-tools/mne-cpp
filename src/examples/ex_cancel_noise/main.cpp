@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
     qint32 dest_comp = parser.value(destCompsOption).toInt();
 
     if (comp_now != dest_comp)
-        p_FiffEvokedSet.compensate_to(p_FiffEvokedSet, dest_comp);
+        p_FiffEvokedSet.compensate_to(dest_comp);
 
     //example for compensator generation
     FiffCtfComp comp;

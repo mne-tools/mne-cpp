@@ -125,26 +125,26 @@ FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include,
 
 //=============================================================================================================
 
-bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet,
-                                  fiff_int_t to) const
+bool FiffEvokedSet::compensate_to(fiff_int_t to)
 {
-    qint32 now = p_FiffEvokedSet.info.get_current_comp();
-    FiffCtfComp ctf_comp;
+    const qint32 now = info.get_current_comp();
 
     if (now == to) {
         qInfo("Data is already compensated as desired.\n");
         return false;
     }
 
-    //Make the compensator and apply it to all data sets
-    p_FiffEvokedSet.info.make_compensator(now, to, ctf_comp);
-
-    for (qsizetype i = 0; i < p_FiffEvokedSet.evoked.size(); ++i) {
-        p_FiffEvokedSet.evoked[i].data = ctf_comp.data->data * p_FiffEvokedSet.evoked[i].data;
+    FiffCtfComp ctf_comp;
+    if (!info.make_compensator(now, to, ctf_comp)) {
+        qWarning("[FiffEvokedSet::compensate_to] Cannot change compensation from grade %d to %d.", now, to);
+        return false;
     }
 
-    //Update the compensation info in the channel descriptors
-    p_FiffEvokedSet.info.set_current_comp(to);
+    for (FiffEvoked& response : evoked) {
+        response.data = ctf_comp.data->data * response.data;
+        response.info.set_current_comp(to);
+    }
+    info.set_current_comp(to);
 
     return true;
 }

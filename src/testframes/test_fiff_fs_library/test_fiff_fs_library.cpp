@@ -404,9 +404,11 @@ void TestFiffFsLibrary::fiff_evokedSetCompensate()
     FiffEvokedSet evokedSet(aveFile);
     QVERIFY(evokedSet.evoked.size() > 0);
 
-    FiffEvokedSet compensated;
-    evokedSet.compensate_to(compensated, 0);
-    QVERIFY(true);
+    // Neuromag data carry no CTF compensation: nothing to change, data untouched
+    const MatrixXd before = evokedSet.evoked.first().data;
+    QVERIFY(!evokedSet.compensate_to(0));
+    QVERIFY(!evokedSet.compensate_to(3));
+    QCOMPARE(evokedSet.evoked.first().data, before);
 }
 
 //=============================================================================================================

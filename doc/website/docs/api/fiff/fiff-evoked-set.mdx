@@ -106,23 +106,20 @@ Pick desired channels from evoked-response data
 
 ---
 
-### compensate_to(p_FiffEvokedSet, to)
+### compensate_to(to)
 
 mne_compensate_to
 
-Apply compensation to the data as desired
+Changes the CTF gradient compensation grade of all evoked responses in place.
 
 **Parameters:**
 
 - **to** : *fiff_int_t*
-  desired compensation in the output.
-
-- **p_FiffEvokedSet** : *[FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) &*
-  Evoked set to compensate.
+  Desired compensation grade.
 
 **Returns:**
 
-- *bool* — true if succeeded, false otherwise.
+- *bool* — true if the data were changed, false if they already had that grade or it is not available.
 
 ---
 

@@ -234,15 +234,13 @@ public:
     /**
      * mne_compensate_to
      *
-     * Apply compensation to the data as desired
+     * Changes the CTF gradient compensation grade of all evoked responses in place.
      *
-     * @param[in] to                  desired compensation in the output.
-     * @param[in, out] p_FiffEvokedSet Evoked set to compensate.
+     * @param[in] to    Desired compensation grade.
      *
-     * @return true if succeeded, false otherwise.
+     * @return true if the data were changed, false if they already had that grade or it is not available.
      */
-    bool compensate_to(FiffEvokedSet& p_FiffEvokedSet,
-                       fiff_int_t to) const;
+    bool compensate_to(fiff_int_t to);
 
     //=========================================================================================================
     /**

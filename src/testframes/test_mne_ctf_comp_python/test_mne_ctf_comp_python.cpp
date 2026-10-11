@@ -31,6 +31,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_constants.h>
 #include <mne/mne.h>
@@ -144,6 +145,8 @@ private slots:
     void mneRawDataChangesGrade_data();
     void mneRawDataChangesGrade();
     void mneRawDataRejectsMissingGrade();
+    void evokedSetChangesGrade_data();
+    void evokedSetChangesGrade();
 
 private:
     MatrixXd m_reference[4];
@@ -306,6 +309,40 @@ void TestMneCtfCompPython::mneRawDataRejectsMissingGrade()
     // The fixture carries grades 1, 2, 3 and two 4D-style kinds, but no 101 (4D comp 1).
     std::unique_ptr<MNERawData> raw(MNERawData::open_file_comp(fixture(3), false, false, MNEFilterDef(), 101));
     QVERIFY(!raw);
+}
+
+void TestMneCtfCompPython::evokedSetChangesGrade_data()
+{
+    QTest::addColumn<int>("from");
+    QTest::addColumn<int>("to");
+    QTest::newRow("3->0") << 3 << 0;
+    QTest::newRow("0->3") << 0 << 3;
+    QTest::newRow("1->3") << 1 << 3;
+}
+
+void TestMneCtfCompPython::evokedSetChangesGrade()
+{
+    QFETCH(int, from);
+    QFETCH(int, to);
+
+    // An evoked set holding the stored fixture data at grade 'from'
+    QFile file(fixture(from));
+    FiffRawData raw(file);
+    FiffEvokedSet set;
+    set.info = raw.info;
+    FiffEvoked evoked;
+    evoked.setInfo(raw.info);
+    evoked.data = m_reference[from];
+    set.evoked.append(evoked);
+
+    QVERIFY(set.compensate_to(to));
+    QCOMPARE(set.info.get_current_comp(), to);
+    QCOMPARE(set.evoked.first().info.get_current_comp(), to);
+    QVERIFY2(relError(set.evoked.first().data, m_reference[to], m_reference[from]) < 1e-4,
+             qPrintable(QString::number(relError(set.evoked.first().data, m_reference[to], m_reference[from]))));
+
+    // Already at the requested grade: nothing to do
+    QVERIFY(!set.compensate_to(to));
 }
 
 //=============================================================================================================
