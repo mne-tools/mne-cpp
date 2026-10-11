@@ -61,6 +61,7 @@
 #include <QtTest>
 #include <QCoreApplication>
 #include <QFile>
+#include <QTemporaryDir>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -109,6 +110,8 @@ private slots:
     void kernel_matchesPython();
     void noiseNorm_matchesPython_data();
     void noiseNorm_matchesPython();
+    void writtenOperator_readsBack_data();
+    void writtenOperator_readsBack();
 };
 
 //=============================================================================================================
@@ -557,6 +560,37 @@ void TestInvEloretaPython::noiseNorm_matchesPython()
         sum += 1.0 / v;
     }
     QVERIFY2(std::fabs(sum - normSum) <= 1e-4 * normSum, qPrintable(QString("sum 1/noisenorm %1, mne-python %2").arg(sum, 0, 'g', 17).arg(normSum, 0, 'g', 17)));
+}
+
+//=============================================================================================================
+
+void TestInvEloretaPython::writtenOperator_readsBack_data()
+{
+    QTest::addColumn<bool>("fixed");
+    QTest::newRow("loose") << false;
+    QTest::newRow("fixed") << true;
+}
+
+void TestInvEloretaPython::writtenOperator_readsBack()
+{
+    QFETCH(bool, fixed);
+    const MNEInverseOperator& inv = fixed ? m_fixed : m_loose;
+
+    QTemporaryDir dir;
+    QFile file(dir.filePath("label-inv.fif"));
+    QVERIFY(MNEInverseOperator(inv).write(file));
+    file.close();
+    MNEInverseOperator read;
+    QVERIFY(MNEInverseOperator::read_inverse_operator(file, read));
+
+    QCOMPARE(read.isFixedOrient(), fixed);
+    QCOMPARE(read.nsource, inv.nsource);
+    QVERIFY(read.sing.isApprox(inv.sing, 1e-6));
+    QVERIFY(read.eigen_fields->data.isApprox(inv.eigen_fields->data, 1e-6));
+    QVERIFY(read.eigen_leads->data.isApprox(inv.eigen_leads->data, 1e-6));
+    QVERIFY(read.source_cov->data.isApprox(inv.source_cov->data, 1e-6));
+    QVERIFY(read.noise_cov->data.isApprox(inv.noise_cov->data, 1e-6));
+    QCOMPARE(read.source_nn.rows(), inv.source_nn.rows());
 }
 
 //=============================================================================================================

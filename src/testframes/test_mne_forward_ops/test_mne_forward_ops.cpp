@@ -13,6 +13,7 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
+#include <QTemporaryDir>
 
 #include <Eigen/Core>
 
@@ -124,6 +125,43 @@ private slots:
         if (!eegFwd.isEmpty()) {
             QVERIFY(eegFwd.nchan > 0);
         }
+    }
+
+    void testSingleModalityFilesReadBack_data()
+    {
+        // Sum |G| of mne.pick_types_forward(fwd, meg=..., eeg=...) (mne 1.11)
+        QTest::addColumn<bool>("meg");
+        QTest::addColumn<int>("nchan");
+        QTest::addColumn<double>("absSum");
+        QTest::newRow("MEG") << true << 306 << 117.14173126220703;
+        QTest::newRow("EEG") << false << 60 << 66901760.0;
+    }
+
+    void testSingleModalityFilesReadBack()
+    {
+        QFETCH(bool, meg);
+        QFETCH(int, nchan);
+        QFETCH(double, absSum);
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
+
+        // A file with only an MEG or only an EEG solution, as mne.write_forward_solution writes it
+        QTemporaryDir dir;
+        QFile file(dir.filePath("single-fwd.fif"));
+        QVERIFY(m_fwd.pick_types(meg, !meg).write(file));
+        file.close();
+        MNEForwardSolution read(file);
+        QVERIFY(!read.isEmpty());
+        QCOMPARE(read.nchan, nchan);
+        QCOMPARE(read.nsource, 7928);
+        QCOMPARE(read.sol->data.cols(), 3 * 7928);
+        QVERIFY(qAbs(read.sol->data.cwiseAbs().sum() - absSum) < 1e-5 * absSum);
+
+        // Read with fixed orientation it keeps one column per source
+        file.close();
+        MNEForwardSolution fixed(file, true);
+        QCOMPARE(fixed.nchan, nchan);
+        QCOMPARE(fixed.sol->data.cols(), 7928);
     }
 
     // ── to_fixed_ori ────────────────────────────────────────────────────────
