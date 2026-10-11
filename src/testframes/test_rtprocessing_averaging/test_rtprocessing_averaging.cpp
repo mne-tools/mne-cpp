@@ -177,7 +177,8 @@ private slots:
     {
         // 1 kHz, trigger row 1; pre-stimulus 1.0 on the MEG channel, post-stimulus k for epoch k = 1..4
         FiffInfo::SPtr info = createSyntheticFiffInfo(1, 1000.0f);
-        RtAveragingWorker worker(10, 20, 80, 0, 0, 1, info);
+        RtAveragingWorker worker(10, 20, 80, -20, -5, 1, info);
+        worker.setBaselineActive(true);
         FiffEvokedSet result;
         connect(&worker, &RtAveragingWorker::resultReady, this, [&](const FiffEvokedSet& set, const QStringList&) { result = set; });
         for (int k = 1; k <= 4; ++k) {
@@ -197,8 +198,11 @@ private slots:
             QVERIFY2(std::fabs(evoked.times(i) - (i - 20) / 1000.0f) < 1e-6f, qPrintable(QString::number(i)));
         QCOMPARE(evoked.first, -20);
         QCOMPARE(evoked.last, 79);
-        QVERIFY(std::fabs(evoked.data(0, 10) - 1.0) < 1e-12);
-        QVERIFY(std::fabs(evoked.data(0, 60) - 2.5) < 1e-12);
+        // The constructor's baseline is given in ms and may lie before the stimulus
+        QCOMPARE(evoked.baseline.first, -0.020f);
+        QCOMPARE(evoked.baseline.second, -0.005f);
+        QVERIFY(std::fabs(evoked.data(0, 10)) < 1e-12);
+        QVERIFY(std::fabs(evoked.data(0, 60) - 1.5) < 1e-12);
     }
 
     void rtAveraging_settersReachTheWorkerThread()

@@ -93,8 +93,8 @@ public:
     RtAveragingWorker(quint32 numAverages,
                       quint32 iPreStimSamples,
                       quint32 iPostStimSamples,
-                      quint32 iBaselineFromMSecs,
-                      quint32 iBaselineToMSecs,
+                      qint32 iBaselineFromMSecs,
+                      qint32 iBaselineToMSecs,
                       quint32 iTriggerIndex,
                       FIFFLIB::FiffInfo::SPtr pFiffInfo);
 
@@ -305,8 +305,8 @@ public:
      * @param[in] numAverages            Number of evkos to average.
      * @param[in] iPreStimSamples      Number of samples averaged before the stimulus.
      * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus).
-     * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs.
-     * @param[in] iBaselineToSecs     End of baseline area which was/is used for correction in msecs.
+     * @param[in] iBaselineFromMSecs    Start of baseline area which was/is used for correction in msecs.
+     * @param[in] iBaselineToMSecs     End of baseline area which was/is used for correction in msecs.
      * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers.
      * @param[in] pFiffInfo            Associated Fiff Information.
      * @param[in] parent     Parent QObject (optional).
@@ -314,8 +314,8 @@ public:
     explicit RtAveraging(quint32 numAverages,
                          quint32 iPreStimSamples,
                          quint32 iPostStimSamples,
-                         quint32 iBaselineFromSecs,
-                         quint32 iBaselineToSecs,
+                         qint32 iBaselineFromMSecs,
+                         qint32 iBaselineToMSecs,
                          quint32 iTriggerIndex,
                          FIFFLIB::FiffInfo::SPtr pFiffInfo,
                          QObject* parent = 0);
@@ -341,16 +341,16 @@ public:
      * @param[in] numAverages            Number of evkos to average.
      * @param[in] iPreStimSamples      Number of samples averaged before the stimulus.
      * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus).
-     * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs.
-     * @param[in] iBaselineToSecs     End of baseline area which was/is used for correction in msecs.
+     * @param[in] iBaselineFromMSecs    Start of baseline area which was/is used for correction in msecs.
+     * @param[in] iBaselineToMSecs     End of baseline area which was/is used for correction in msecs.
      * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers.
      * @param[in] pFiffInfo            Associated Fiff Information.
      */
     void restart(quint32 numAverages,
                  quint32 iPreStimSamples,
                  quint32 iPostStimSamples,
-                 quint32 iBaselineFromSecs,
-                 quint32 iBaselineToSecs,
+                 qint32 iBaselineFromMSecs,
+                 qint32 iBaselineToMSecs,
                  quint32 iTriggerIndex,
                  FIFFLIB::FiffInfo::SPtr pFiffInfo);
 

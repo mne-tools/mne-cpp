@@ -49,8 +49,8 @@ using namespace MNELIB;
 RtAveragingWorker::RtAveragingWorker(quint32 numAverages,
                                      quint32 iPreStimSamples,
                                      quint32 iPostStimSamples,
-                                     quint32 iBaselineFromMSecs,
-                                     quint32 iBaselineToMSecs,
+                                     qint32 iBaselineFromMSecs,
+                                     qint32 iBaselineToMSecs,
                                      quint32 iTriggerIndex,
                                      FiffInfo::SPtr pFiffInfo)
 : QObject()
@@ -62,7 +62,7 @@ RtAveragingWorker::RtAveragingWorker(quint32 numAverages,
 , m_fTriggerThreshold(0.5f)
 , m_bActivateThreshold(false)
 , m_bDoBaselineCorrection(false)
-, m_pairBaselineSec(qMakePair(float(iBaselineFromMSecs), float(iBaselineToMSecs)))
+, m_pairBaselineSec(qMakePair(float(iBaselineFromMSecs) / 1000.0f, float(iBaselineToMSecs) / 1000.0f))
 , m_pFiffInfo(pFiffInfo)
 {
     m_mapThresholds["eog"] = 300e-6;
@@ -521,8 +521,8 @@ void RtAveragingWorker::reset()
 RtAveraging::RtAveraging(quint32 numAverages,
                          quint32 iPreStimSamples,
                          quint32 iPostStimSamples,
-                         quint32 iBaselineFromSecs,
-                         quint32 iBaselineToSecs,
+                         qint32 iBaselineFromMSecs,
+                         qint32 iBaselineToMSecs,
                          quint32 iTriggerIndex,
                          FiffInfo::SPtr pFiffInfo,
                          QObject* parent)
@@ -533,8 +533,8 @@ RtAveraging::RtAveraging(quint32 numAverages,
     RtAveragingWorker* worker = new RtAveragingWorker(numAverages,
                                                       iPreStimSamples,
                                                       iPostStimSamples,
-                                                      iBaselineFromSecs,
-                                                      iBaselineToSecs,
+                                                      iBaselineFromMSecs,
+                                                      iBaselineToMSecs,
                                                       iTriggerIndex,
                                                       pFiffInfo);
     worker->moveToThread(&m_workerThread);
@@ -598,8 +598,8 @@ void RtAveraging::handleResults(const FiffEvokedSet& evokedStimSet,
 void RtAveraging::restart(quint32 numAverages,
                           quint32 iPreStimSamples,
                           quint32 iPostStimSamples,
-                          quint32 iBaselineFromSecs,
-                          quint32 iBaselineToSecs,
+                          qint32 iBaselineFromMSecs,
+                          qint32 iBaselineToMSecs,
                           quint32 iTriggerIndex,
                           FiffInfo::SPtr pFiffInfo)
 {
@@ -608,8 +608,8 @@ void RtAveraging::restart(quint32 numAverages,
     RtAveragingWorker* worker = new RtAveragingWorker(numAverages,
                                                       iPreStimSamples,
                                                       iPostStimSamples,
-                                                      iBaselineFromSecs,
-                                                      iBaselineToSecs,
+                                                      iBaselineFromMSecs,
+                                                      iBaselineToMSecs,
                                                       iTriggerIndex,
                                                       pFiffInfo);
     worker->moveToThread(&m_workerThread);

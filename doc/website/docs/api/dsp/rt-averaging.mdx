@@ -40,7 +40,7 @@ classDiagram
 
 ## Public Methods
 
-### RtAveraging(numAverages, iPreStimSamples, iPostStimSamples, iBaselineFromSecs, iBaselineToSecs, iTriggerIndex, pFiffInfo, parent)
+### RtAveraging(numAverages, iPreStimSamples, iPostStimSamples, iBaselineFromMSecs, iBaselineToMSecs, iTriggerIndex, pFiffInfo, parent)
 
 Creates the real-time averaging object.
 
@@ -55,10 +55,10 @@ Creates the real-time averaging object.
 - **iPostStimSamples** : *quint32*
   Number of samples averaged after the stimulus (including the stimulus).
 
-- **iBaselineFromSecs** : *quint32*
+- **iBaselineFromMSecs** : *qint32*
   Start of baseline area which was/is used for correction in msecs.
 
-- **iBaselineToSecs** : *quint32*
+- **iBaselineToMSecs** : *qint32*
   End of baseline area which was/is used for correction in msecs.
 
 - **iTriggerIndex** : *quint32*
@@ -89,7 +89,7 @@ Slot to receive incoming data.
 
 ---
 
-### restart(numAverages, iPreStimSamples, iPostStimSamples, iBaselineFromSecs, iBaselineToSecs, iTriggerIndex, pFiffInfo)
+### restart(numAverages, iPreStimSamples, iPostStimSamples, iBaselineFromMSecs, iBaselineToMSecs, iTriggerIndex, pFiffInfo)
 
 Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
 
@@ -104,10 +104,10 @@ Restarts the thread by interrupting its computation queue, quitting, waiting and
 - **iPostStimSamples** : *quint32*
   Number of samples averaged after the stimulus (including the stimulus).
 
-- **iBaselineFromSecs** : *quint32*
+- **iBaselineFromMSecs** : *qint32*
   Start of baseline area which was/is used for correction in msecs.
 
-- **iBaselineToSecs** : *quint32*
+- **iBaselineToMSecs** : *qint32*
   End of baseline area which was/is used for correction in msecs.
 
 - **iTriggerIndex** : *quint32*
