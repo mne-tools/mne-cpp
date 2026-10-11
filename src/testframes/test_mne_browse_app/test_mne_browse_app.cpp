@@ -505,6 +505,7 @@ void TestMneBrowseApp::annotatesDraggedRangeLikePython()
     annotFile.close();
     QCOMPARE(times[3568].size(), 1);
     QVERIFY2(std::abs(times[3568][0] - 44.95392282905339) < 1e-5, qPrintable(QString::number(times[3568][0], 'g', 10)));
+    QVERIFY(std::abs(times[3569][0] - times[3568][0] - 0.9989760657919393) < 1e-5);
 
     // Loading the file again restores the same span and label
     auto* second = openWindow();
@@ -515,6 +516,7 @@ void TestMneBrowseApp::annotatesDraggedRangeLikePython()
     QCoreApplication::processEvents();
     QCOMPARE(spans.size(), 1);
     QCOMPARE(spans[0].startSample, 13500);
+    QCOMPARE(spans[0].endSample, 13800);
     QCOMPARE(spans[0].label, QStringLiteral("BAD_drag"));
 }
 

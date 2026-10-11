@@ -752,7 +752,7 @@ bool AnnotationModel::loadAnnotationJson(QFile& qFile)
             : onsetSecondsToSample(object.value(QStringLiteral("onset")).toDouble());
         int endSample = object.contains(QStringLiteral("end_sample"))
             ? object.value(QStringLiteral("end_sample")).toInt(startSample)
-            : startSample + durationSecondsToSamples(object.value(QStringLiteral("duration")).toDouble()) - 1;
+            : startSample + durationSecondsToSamples(object.value(QStringLiteral("duration")).toDouble());
 
         QVariantMap extras = object.value(QStringLiteral("extras")).toObject().toVariantMap();
         parsedEntries.append(normalizeEntry(startSample, endSample, description, channelNames, comment, extras));
@@ -868,7 +868,7 @@ bool AnnotationModel::loadAnnotationFif(QFile& qFile)
         extraValues.remove(QStringLiteral("comment"));
 
         const int startSample = onsetSecondsToSample(onsetSeconds.at(index) + (haveOrigTime ? sampleToOnsetSeconds(0) : 0.0));
-        const int endSample = startSample + durationSecondsToSamples(endSeconds.at(index) - onsetSeconds.at(index)) - 1;
+        const int endSample = startSample + durationSecondsToSamples(endSeconds.at(index) - onsetSeconds.at(index));
         parsedEntries.append(normalizeEntry(startSample,
                                             endSample,
                                             descriptions.at(index),
@@ -990,7 +990,7 @@ bool AnnotationModel::loadAnnotationCsv(QFile& qFile)
         }
 
         const int startSample = onsetSecondsToSample(onsetSeconds);
-        const int endSample = startSample + durationSecondsToSamples(durationSeconds) - 1;
+        const int endSample = startSample + durationSecondsToSamples(durationSeconds);
         parsedEntries.append(normalizeEntry(startSample, endSample, description, channelNames, comment, extras));
     }
 
@@ -1091,7 +1091,7 @@ bool AnnotationModel::loadAnnotationTxt(QFile& qFile)
         }
 
         const int startSample = onsetSecondsToSample(onsetSeconds);
-        const int endSample = startSample + durationSecondsToSamples(durationSeconds) - 1;
+        const int endSample = startSample + durationSecondsToSamples(durationSeconds);
         parsedEntries.append(normalizeEntry(startSample, endSample, description, channelNames, comment, extras));
     }
 
@@ -1124,7 +1124,7 @@ bool AnnotationModel::saveAnnotationJson(QFile& qFile) const
         object.insert(QStringLiteral("end_sample"), entry.endSample);
         object.insert(QStringLiteral("onset"), sampleToOnsetSeconds(entry.startSample));
         object.insert(QStringLiteral("duration"),
-                      static_cast<double>(entry.endSample - entry.startSample + 1) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
+                      static_cast<double>(entry.endSample - entry.startSample) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
         object.insert(QStringLiteral("description"), entry.description);
         object.insert(QStringLiteral("label"), entry.description);
         object.insert(QStringLiteral("comment"), entry.comment);
@@ -1199,7 +1199,7 @@ bool AnnotationModel::saveAnnotationFif(QFile& qFile) const
     const QVector<AnnotationEntry> entries = exportEntries();
     for (const AnnotationEntry& entry : entries) {
         const float onset = static_cast<float>(sampleToOnsetSeconds(entry.startSample) + origTimeOffset);
-        const float duration = static_cast<float>((entry.endSample - entry.startSample + 1) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
+        const float duration = static_cast<float>((entry.endSample - entry.startSample) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0));
 
         onsetSeconds.append(onset);
         endSeconds.append(onset + duration);
@@ -1310,7 +1310,7 @@ bool AnnotationModel::saveAnnotationCsv(QFile& qFile) const
         QStringList values;
         values.reserve(columns.size());
         values.append(formatTimestampFromUsecs(onsetUsecs));
-        values.append(QString::number(static_cast<double>(entry.endSample - entry.startSample + 1) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0),
+        values.append(QString::number(static_cast<double>(entry.endSample - entry.startSample) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0),
                                       'g',
                                       15));
         values.append(entry.description);
@@ -1390,7 +1390,7 @@ bool AnnotationModel::saveAnnotationTxt(QFile& qFile) const
         QStringList values;
         values.reserve(columns.size());
         values.append(QString::number(sampleToOnsetSeconds(entry.startSample), 'g', 15));
-        values.append(QString::number(static_cast<double>(entry.endSample - entry.startSample + 1) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0),
+        values.append(QString::number(static_cast<double>(entry.endSample - entry.startSample) / ((m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0),
                                       'g',
                                       15));
         values.append(sanitizeTxtField(entry.description));
@@ -1520,7 +1520,7 @@ int AnnotationModel::onsetSecondsToSample(double onsetSeconds) const
 int AnnotationModel::durationSecondsToSamples(double durationSeconds) const
 {
     const double sfreq = (m_pFiffInfo && m_pFiffInfo->sfreq > 0.0f) ? m_pFiffInfo->sfreq : 1.0;
-    return qMax(1, qRound(durationSeconds * sfreq));
+    return qMax(0, qRound(durationSeconds * sfreq));
 }
 
 //=============================================================================================================
@@ -1549,7 +1549,7 @@ void AnnotationModel::importEntries(const QVector<AnnotationEntry>& entries)
     m_fiffAnnotations.clear();
     for (const AnnotationEntry& e : entries) {
         double onset = static_cast<double>(e.startSample - m_iFirstSample) / sfreq;
-        double duration = static_cast<double>(e.endSample - e.startSample + 1) / sfreq;
+        double duration = static_cast<double>(e.endSample - e.startSample) / sfreq;
         if (onset < 0.0)
             onset = 0.0;
         if (duration < 0.0)
