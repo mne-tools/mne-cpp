@@ -3094,7 +3094,7 @@ void MainWindow::writeFile()
     if (filename.isEmpty())
         return;
 
-    if (filename == m_qFileRaw.fileName()) {
+    if (QFileInfo(filename) == QFileInfo(m_qFileRaw)) {
         QMessageBox msgBox;
         msgBox.setText("You are trying to write to the file you are currently loading the data from. Please choose another file to write to.");
         msgBox.exec();

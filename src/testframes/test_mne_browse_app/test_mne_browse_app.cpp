@@ -33,6 +33,8 @@
 
 #include <QAction>
 #include <QColorDialog>
+#include <QCryptographicHash>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QDialog>
@@ -65,6 +67,7 @@ private slots:
     void computesAndSavesCovarianceLikePython();
     void eventMarkersUseEventTypeColors();
     void savesAndOpensProjects();
+    void refusesToWriteRawOverItsSource();
 
 private:
     static MainWindow* makeWindow();
@@ -347,6 +350,56 @@ void TestMneBrowseApp::eventMarkersUseEventTypeColors()
     addButton->click();
     QCOMPARE(eventModel->getEventTypeColors().value(77), QColor(7, 8, 9));
     QSettings().remove("EventDesignParameters");
+}
+
+//=============================================================================================================
+
+void TestMneBrowseApp::refusesToWriteRawOverItsSource()
+{
+    const QString rawPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(rawPath))
+        QSKIP("Sample test data not found");
+
+    QTemporaryDir dir;
+    QVERIFY(QDir(dir.path()).mkdir("sub"));
+    const QString sourcePath = dir.filePath("raw.fif");
+    QVERIFY(QFile::copy(rawPath, sourcePath));
+    const auto fileHash = [](const QString& path) {
+        QFile file(path);
+        QCryptographicHash hash(QCryptographicHash::Sha256);
+        return file.open(QIODevice::ReadOnly) && hash.addData(&file) ? hash.result() : QByteArray();
+    };
+    const QByteArray sourceHash = fileHash(sourcePath);
+
+    auto* window = makeWindow();
+    window->resize(1200, 800);
+    window->show();
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    window->applyCommandLineOptions(dir.filePath("sub/../raw.fif"), QString(), -1.0, -1.0);
+    QAction* write = window->findChild<QAction*>(QStringLiteral("m_writeAction"));
+    QVERIFY(write);
+    // Writing over the file the data is read from is refused, however the path was spelled
+    QString refusal;
+    answerNextModal([&refusal, sourcePath](QWidget* pModal) {
+        auto* dialog = qobject_cast<QFileDialog*>(pModal);
+        dialog->setDirectory(QFileInfo(sourcePath).absolutePath());
+        dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(sourcePath).fileName());
+        // The dialog first asks to replace the existing file, then the app refuses
+        answerNextModal([&refusal](QWidget* pReplace) {
+            qobject_cast<QMessageBox*>(pReplace)->button(QMessageBox::Yes)->click();
+            answerNextModal([&refusal](QWidget* pBox) {
+                refusal = qobject_cast<QMessageBox*>(pBox)->text();
+                qobject_cast<QDialog*>(pBox)->accept();
+            });
+        });
+        static_cast<QDialog*>(dialog)->accept();
+    });
+    write->trigger();
+    QVERIFY2(refusal.contains("currently loading the data from"), qPrintable(refusal));
+    QCOMPARE(fileHash(sourcePath), sourceHash);
+
+    window->hide();
+    QCoreApplication::processEvents();
 }
 
 //=============================================================================================================
