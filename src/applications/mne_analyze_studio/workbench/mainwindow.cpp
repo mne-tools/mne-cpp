@@ -8838,6 +8838,11 @@ bool MainWindow::isExtensionHostTool(const QString& toolName) const
 
 void MainWindow::sendKernelToolCall(const QString& toolName, const QJsonObject& arguments)
 {
+    if (!m_kernelSocket || m_kernelSocket->state() != QLocalSocket::ConnectedState) {
+        appendProblemMessage(QString("Neuro-Kernel is not connected for tool %1.").arg(toolName));
+        return;
+    }
+
     QJsonObject params{
         {"name", toolName},
         {"arguments", arguments}};

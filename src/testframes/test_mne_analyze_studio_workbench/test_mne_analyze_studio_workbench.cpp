@@ -25,6 +25,7 @@
 //=============================================================================================================
 
 #include <QLineEdit>
+#include <QListWidget>
 #include <QLocalSocket>
 #include <QPushButton>
 #include <QRhiWidget>
@@ -178,6 +179,18 @@ void TestMneAnalyzeStudioWorkbench::answersTerminalCommandsForOpenRaw()
 
     QVERIFY(runCommand(window, "kernel.raw_stats abc").contains("Invalid window size: abc"));
     QVERIFY(runCommand(window, "kernel.psd 600 meg").contains("with match MEG"));
+
+    // Without a Neuro-Kernel the request cannot be delivered, so it must surface as a problem.
+    QListWidget* problems = nullptr;
+    for (QTabWidget* tabs : window->findChildren<QTabWidget*>()) {
+        for (int i = 0; i < tabs->count(); ++i) {
+            if (tabs->tabText(i) == "Problems")
+                problems = qobject_cast<QListWidget*>(tabs->widget(i));
+        }
+    }
+    if (!problems)
+        QFAIL("No Problems panel");
+    QVERIFY(!problems->findItems("Neuro-Kernel is not connected for tool neurokernel.psd_summary.", Qt::MatchExactly).isEmpty());
 }
 
 //=============================================================================================================
