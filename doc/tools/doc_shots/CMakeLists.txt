@@ -50,7 +50,7 @@ set(SOURCES
     shot_capture.cpp
     shot_mne_inspect_app.cpp
     shot_mne_align_app.cpp
-    fonts/fonts.qrc
+    fonts/doc_shots_fonts.qrc
 )
 
 set(HEADERS

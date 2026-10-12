@@ -370,6 +370,11 @@ void TestMneScanPlugins::mainWindowSwitchesStyle()
     for (const char* text : {"Default", "Dark", "Research", "Clinical"})
         QVERIFY2(action(text), text);
 
+    action("Dark")->trigger();
+    QVERIFY2(!qApp->styleSheet().isEmpty(), "the dark stylesheet is not bundled");
+    QCOMPARE(qApp->font().family(), QStringLiteral("Roboto"));
+    action("Default")->trigger();
+    QVERIFY(qApp->styleSheet().isEmpty());
 }
 
 //=============================================================================================================

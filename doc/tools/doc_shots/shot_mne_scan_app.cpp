@@ -141,7 +141,10 @@ bool renderMneScanApp(const ShotSpec& spec, const QString& outPath, bool& skippe
     }();
     Q_UNUSED(typesRegistered);
 
+    const QFont deterministicFont = QApplication::font();
     MNESCAN::MainWindow mw;
+    // MNE Scan applies its own Roboto font; screenshots keep the bundled one
+    QApplication::setFont(deterministicFont);
     forceQRhiNullOnRhiWidgets(&mw);
     auto* gui = mw.findChild<MNESCAN::PluginGui*>();
     if (!gui) {

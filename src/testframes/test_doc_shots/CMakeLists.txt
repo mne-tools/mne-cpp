@@ -27,7 +27,7 @@ if(NOT TARGET mne_doc_shots)
 endif()
 
 set(_doc_shots_dir ${CMAKE_SOURCE_DIR}/doc/tools/doc_shots)
-set(SOURCES test_doc_shots.cpp ${_doc_shots_dir}/shot_capture.cpp ${_doc_shots_dir}/fonts/fonts.qrc)
+set(SOURCES test_doc_shots.cpp ${_doc_shots_dir}/shot_capture.cpp ${_doc_shots_dir}/fonts/doc_shots_fonts.qrc)
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
 else()

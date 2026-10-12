@@ -71,6 +71,12 @@ using namespace DISPLIB;
 const QString pluginDir = "/mne_scan_plugins";          /**< holds path to plugins.*/
 constexpr unsigned long waitUntilHidingSplashScreen(1); /**< Seconds to wait after the application setup has finished, before hiding the splash screen.*/
 
+/** Registers the dark style and fonts, whose static-library initializers the linker may drop. */
+static void initSharedResources()
+{
+    Q_INIT_RESOURCE(styles);
+    Q_INIT_RESOURCE(fonts);
+}
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -92,6 +98,8 @@ MainWindow::MainWindow(QWidget* parent)
     qInfo("%s - Version %s",
           CInfo::AppNameShort().toUtf8().constData(),
           CInfo::AppVersion().toUtf8().constData());
+
+    initSharedResources();
 
     setCentralWidget(m_pStartUpWidget);
 

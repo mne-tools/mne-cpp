@@ -26,6 +26,8 @@ set(MNE_SCAN_CORE_SOURCES
     arrow.cpp
     mainwindow.cpp
     mne_scan.qrc
+    ${PROJECT_RESOURCES_DIR}/general/styles/styles.qrc
+    ${PROJECT_RESOURCES_DIR}/general/fonts/fonts.qrc
 )
 
 set(MNE_SCAN_CORE_HEADERS
