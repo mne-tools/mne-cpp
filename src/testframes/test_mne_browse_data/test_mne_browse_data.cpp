@@ -37,6 +37,8 @@
 //=============================================================================================================
 
 #include <QtTest>
+
+#include <memory>
 #include <QCoreApplication>
 #include <QTemporaryDir>
 #include <QTemporaryFile>
@@ -316,6 +318,14 @@ void TestMneBrowseData::testRawModelLoadFiff()
     QVERIFY(model.fiffInfo()->nchan > 0);
     QVERIFY(model.rowCount() > 0);
     QVERIFY(model.columnCount() > 0);
+
+    // Scrolling to the end starts a background read; destroying the model must wait for it
+    for (int i = 0; i < 20; ++i) {
+        auto scrolled = std::make_unique<RawModel>(nullptr);
+        QFile again(rawPath);
+        QVERIFY(scrolled->loadFiffData(&again));
+        scrolled->updateScrollPos(scrolled->sizeOfPreloadedData() - 1);
+    }
 }
 
 void TestMneBrowseData::testRawModelRowColumnCount()

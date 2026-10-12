@@ -98,6 +98,14 @@ RawModel::RawModel(QObject* parent)
 
 //*************************************************************************************************************
 
+RawModel::~RawModel()
+{
+    m_reloadFutureWatcher.waitForFinished();
+    m_operatorFutureWatcher.waitForFinished();
+}
+
+//*************************************************************************************************************
+
 RawModel::RawModel(QFile& qFile, QObject* parent)
 : QAbstractTableModel(parent)
 , m_bFileloaded(false)
