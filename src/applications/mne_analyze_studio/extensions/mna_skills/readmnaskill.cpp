@@ -39,10 +39,7 @@ QJsonObject objectSchema(const QJsonObject& properties, const QJsonArray& requir
 
 QString resolveUri(const QString& uri)
 {
-    if (uri.startsWith(QLatin1String("file://"))) {
-        return uri.mid(7);
-    }
-    return uri;
+    return ISkillOperator::localPathFromUri(uri);
 }
 
 } // namespace

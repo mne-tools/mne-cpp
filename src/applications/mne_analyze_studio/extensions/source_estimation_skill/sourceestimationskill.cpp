@@ -51,13 +51,8 @@ namespace
 // Resolve a file:// URI or bare absolute path to a filesystem path.
 QString resolveUri(const QString& uri)
 {
-    if (uri.startsWith(QLatin1String("file://"))) {
-        return uri.mid(7);
-    }
-    if (QFileInfo(uri).isAbsolute()) {
-        return uri;
-    }
-    return {};
+    const QString path = ISkillOperator::localPathFromUri(uri);
+    return QFileInfo(path).isAbsolute() ? path : QString();
 }
 
 // Build the STC output path next to the raw file.
@@ -277,7 +272,7 @@ QJsonObject SourceEstimationSkill::executeSkill(const WorkflowNode& nodeState)
         }
     }
 
-    const QString outputUri = QString("file://%1").arg(stcPath);
+    const QString outputUri = ISkillOperator::fileUriFromPath(stcPath);
 
     return QJsonObject{
         {"status", "completed"},

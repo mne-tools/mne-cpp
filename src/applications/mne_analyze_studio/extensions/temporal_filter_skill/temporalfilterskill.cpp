@@ -48,13 +48,8 @@ QJsonObject objectSchema(const QJsonObject& properties, const QJsonArray& requir
 // unresolvable mne://workspace/ or relative URIs.
 QString resolveInputUri(const QString& uri)
 {
-    if (uri.startsWith(QLatin1String("file://"))) {
-        return uri.mid(7);
-    }
-    if (QFileInfo(uri).isAbsolute()) {
-        return uri;
-    }
-    return {};
+    const QString path = ISkillOperator::localPathFromUri(uri);
+    return QFileInfo(path).isAbsolute() ? path : QString();
 }
 
 // Derive the output FIFF file path from the input path and filter parameters.
@@ -189,7 +184,7 @@ QJsonObject TemporalFilterSkill::executeSkill(const WorkflowNode& nodeState)
 
     outStream->finish_writing_raw();
 
-    const QString outputUri = QString("file://%1").arg(outputPath);
+    const QString outputUri = ISkillOperator::fileUriFromPath(outputPath);
 
     return QJsonObject{
         {"status", "completed"},

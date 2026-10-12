@@ -33,6 +33,7 @@
 #include <QJsonArray>
 #include <QTemporaryDir>
 #include <QTemporaryFile>
+#include <QUrl>
 #include <QtTest>
 
 using namespace MNEANALYZESTUDIO;
@@ -123,6 +124,7 @@ private slots:
     void testTwoNodeChainBothFilesProduced();
     void testNodeStatusUpdatedAfterExecution();
     void testHighpassAboveLowpassReturnsError();
+    void testFilterAcceptsStandardFileUrls();
 
 private:
     QString m_sampleFifPath;
@@ -457,6 +459,32 @@ void TestWorkflowIntegration::testHighpassAboveLowpassReturnsError()
     }
     QVERIFY2(threw,
              "WorkflowManager must throw when the skill returns an error status.");
+}
+
+void TestWorkflowIntegration::testFilterAcceptsStandardFileUrls()
+{
+    if (!m_hasFifData) {
+        QSKIP("FIFF test data not available.");
+    }
+
+    // A standard file URL percent-encodes the space, and on Windows is file:///C:/...
+    QTemporaryDir dir;
+    QVERIFY(QDir(dir.path()).mkdir("with space"));
+    const QString rawCopy = dir.filePath("with space/raw.fif");
+    QVERIFY(QFile::copy(m_sampleFifPath, rawCopy));
+
+    WorkflowNode node;
+    node.uid = QStringLiteral("filter");
+    node.parameters = QJsonObject{{"highpass", 1.0}, {"lowpass", 40.0}};
+    node.outputs = QJsonObject{{"filtered_data", "filtered"}};
+    node.resolvedInputs = QJsonObject{{"raw_data", QJsonObject{{"uri", QUrl::fromLocalFile(rawCopy).toString(QUrl::FullyEncoded)}}}};
+
+    TemporalFilterSkill skill;
+    const QJsonObject result = skill.executeSkill(node);
+    QVERIFY2(result.value("status").toString() == "completed", qPrintable(result.value("message").toString()));
+    const QUrl output(result.value("outputs").toObject().value("filtered_data").toString());
+    QVERIFY(output.isLocalFile());
+    QVERIFY(QFileInfo::exists(output.toLocalFile()));
 }
 
 QTEST_GUILESS_MAIN(TestWorkflowIntegration)

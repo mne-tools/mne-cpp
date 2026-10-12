@@ -15,6 +15,8 @@
 #include "ibuffer.h"
 #include "iskilloperator.h"
 
+#include <QUrl>
+
 using namespace MNEANALYZESTUDIO;
 
 IBuffer::IBuffer(QObject* parent)
@@ -30,3 +32,14 @@ ISkillOperator::ISkillOperator(QObject* parent)
 }
 
 ISkillOperator::~ISkillOperator() = default;
+
+QString ISkillOperator::localPathFromUri(const QString& uri)
+{
+    const QUrl url(uri);
+    return url.isLocalFile() ? url.toLocalFile() : uri;
+}
+
+QString ISkillOperator::fileUriFromPath(const QString& path)
+{
+    return QUrl::fromLocalFile(path).toString(QUrl::FullyEncoded);
+}

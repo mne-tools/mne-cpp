@@ -36,6 +36,12 @@ public:
 
     virtual QJsonObject getOperatorDefinition() const = 0;
     virtual QJsonObject executeSkill(const WorkflowNode& nodeState) = 0;
+
+    /** Local path of a file:// URL (decoded, Windows drive letters included); any other URI is returned unchanged. */
+    static QString localPathFromUri(const QString& uri);
+
+    /** The file:// URL for a local path. */
+    static QString fileUriFromPath(const QString& path);
 };
 
 } // namespace MNEANALYZESTUDIO
