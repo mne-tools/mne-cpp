@@ -129,12 +129,18 @@ public:
 
     //=========================================================================================================
     /**
+     * Waits for background reads and filtering, which use the model and its FIFF file.
+     */
+    ~RawModel() override;
+
+    //=========================================================================================================
+    /**
      * Returns the number of rows currently exposed by the legacy table model.
      *
      * @param[in] parent    Parent index supplied by Qt.
      * @return Number of visible channels.
      */
-    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -143,7 +149,7 @@ public:
      * @param[in] parent    Parent index supplied by Qt.
      * @return Number of model columns.
      */
-    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
     //=========================================================================================================
     /**
@@ -153,7 +159,7 @@ public:
      * @param[in] role      Requested Qt role.
      * @return Cell data for the requested role.
      */
-    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
     /**
@@ -164,7 +170,7 @@ public:
      * @param[in] role          Requested Qt role.
      * @return Header value for the requested role.
      */
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     //=========================================================================================================
     /**
