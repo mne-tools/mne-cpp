@@ -110,6 +110,7 @@ private slots:
     // ── MnaVerification (composite) ──────────────────────────────────
     void testVerificationJsonRoundTrip();
     void testVerificationCborRoundTrip();
+    void testVerificationRoundTripsEveryField();
 
     // ── MnaNode with IPC/Script/Verification ─────────────────────────
     void testNodeExecModeIpcJson();
@@ -774,6 +775,112 @@ void TestMnaSerialization::testVerificationCborRoundTrip()
     QCOMPARE(restored.explanation, "BEM solution check");
     QCOMPARE(restored.checks.size(), 1);
     QCOMPARE(restored.postResults.size(), 1);
+}
+
+void TestMnaSerialization::testVerificationRoundTripsEveryField()
+{
+    const QDateTime t0(QDate(2026, 10, 12), QTime(9, 30, 15, 250), QTimeZone::UTC);
+    MnaVerification full;
+    full.explanation = "Inverse operator checks";
+    MnaVerificationCheck check;
+    check.id = "cov_posdef";
+    check.description = "Covariance matrix must be positive-definite";
+    check.phase = "pre";
+    check.expression = "rank > 0";
+    check.script.language = "python";
+    check.script.interpreter = "python3";
+    check.script.interpreterArgs = {"-u"};
+    check.script.code = "import sys; sys.exit(0)";
+    check.script.sourceUri = "file:///lab/check.py";
+    check.script.codeSha256 = "abc123";
+    check.script.keepTempFile = true;
+    check.severity = "warning";
+    check.onFail = "Regularize the covariance";
+    full.checks << check << MnaVerificationCheck();
+    MnaVerificationResult pre;
+    pre.checkId = "cov_posdef";
+    pre.passed = true;
+    pre.severity = "warning";
+    pre.message = "PASS: rank > 0";
+    pre.actualValue = 305;
+    pre.evaluatedAt = t0;
+    MnaVerificationResult post;
+    post.checkId = "sol_finite";
+    post.message = "FAIL [error]: not finite";
+    post.actualValue = QStringLiteral("nan");
+    full.preResults << pre;
+    full.postResults << post << MnaVerificationResult();
+    MnaProvenance& prov = full.provenance;
+    prov.inputHashes = {{"fwd", "sha256:1"}, {"cov", "sha256:2"}};
+    prov.resolvedAttributes = {{"snr", 3.0}, {"method", "dSPM"}, {"pick_ori", QVariant()}};
+    prov.mneCppVersion = "2.4.0";
+    prov.qtVersion = "6.11.2";
+    prov.compilerInfo = "AppleClang 17";
+    prov.osInfo = "macOS 26 arm64";
+    prov.hostName = "lab-01";
+    prov.externalToolVersion = "mne 1.11.0";
+    prov.startedAt = t0;
+    prov.finishedAt = t0.addMSecs(1500);
+    prov.wallTimeMs = 1500;
+    prov.peakMemoryBytes = 123456789;
+    prov.randomSeed = 0;
+
+    const auto same = [](const MnaVerification& a, const MnaVerification& b) {
+        QCOMPARE(b.explanation, a.explanation);
+        QCOMPARE(b.checks.size(), a.checks.size());
+        for (int i = 0; i < a.checks.size(); ++i) {
+            const MnaVerificationCheck &x = a.checks[i], &y = b.checks[i];
+            QCOMPARE(y.id, x.id);
+            QCOMPARE(y.description, x.description);
+            QCOMPARE(y.phase, x.phase);
+            QCOMPARE(y.expression, x.expression);
+            QCOMPARE(y.severity, x.severity);
+            QCOMPARE(y.onFail, x.onFail);
+            QCOMPARE(y.script.language, x.script.language);
+            QCOMPARE(y.script.interpreter, x.script.interpreter);
+            QCOMPARE(y.script.interpreterArgs, x.script.interpreterArgs);
+            QCOMPARE(y.script.code, x.script.code);
+            QCOMPARE(y.script.sourceUri, x.script.sourceUri);
+            QCOMPARE(y.script.codeSha256, x.script.codeSha256);
+            QCOMPARE(y.script.keepTempFile, x.script.keepTempFile);
+        }
+        for (const auto& [as, bs] : {std::pair{&a.preResults, &b.preResults}, std::pair{&a.postResults, &b.postResults}}) {
+            QCOMPARE(bs->size(), as->size());
+            for (int i = 0; i < as->size(); ++i) {
+                const MnaVerificationResult &x = as->at(i), &y = bs->at(i);
+                QCOMPARE(y.checkId, x.checkId);
+                QCOMPARE(y.passed, x.passed);
+                QCOMPARE(y.severity, x.severity);
+                QCOMPARE(y.message, x.message);
+                QCOMPARE(y.actualValue.toString(), x.actualValue.toString());
+                QCOMPARE(y.evaluatedAt, x.evaluatedAt);
+            }
+        }
+        const MnaProvenance &x = a.provenance, &y = b.provenance;
+        QCOMPARE(y.inputHashes, x.inputHashes);
+        QCOMPARE(y.resolvedAttributes.keys(), x.resolvedAttributes.keys());
+        for (auto it = x.resolvedAttributes.cbegin(); it != x.resolvedAttributes.cend(); ++it)
+            QCOMPARE(y.resolvedAttributes.value(it.key()).toString(), it.value().toString());
+        QCOMPARE(y.mneCppVersion, x.mneCppVersion);
+        QCOMPARE(y.qtVersion, x.qtVersion);
+        QCOMPARE(y.compilerInfo, x.compilerInfo);
+        QCOMPARE(y.osInfo, x.osInfo);
+        QCOMPARE(y.hostName, x.hostName);
+        QCOMPARE(y.externalToolVersion, x.externalToolVersion);
+        QCOMPARE(y.startedAt, x.startedAt);
+        QCOMPARE(y.finishedAt, x.finishedAt);
+        QCOMPARE(y.wallTimeMs, x.wallTimeMs);
+        QCOMPARE(y.peakMemoryBytes, x.peakMemoryBytes);
+        QCOMPARE(y.randomSeed, x.randomSeed);
+    };
+    for (const MnaVerification& v : {full, MnaVerification()}) {
+        same(v, MnaVerification::fromJson(v.toJson()));
+        if (QTest::currentTestFailed())
+            return;
+        same(v, MnaVerification::fromCbor(v.toCbor()));
+        if (QTest::currentTestFailed())
+            return;
+    }
 }
 
 //=============================================================================================================
