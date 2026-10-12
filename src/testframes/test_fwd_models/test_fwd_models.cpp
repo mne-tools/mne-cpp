@@ -10,6 +10,9 @@
 #include <fwd/fwd_eeg_sphere_model.h>
 #include <fwd/fwd_eeg_sphere_layer.h>
 #include <fwd/fwd_eeg_sphere_model_set.h>
+
+#include <cstring>
+#include <new>
 #include <fwd/fwd_coil_set.h>
 #include <fwd/fwd_coil.h>
 #include <fwd/compute_fwd/compute_fwd_settings.h>
@@ -136,6 +139,19 @@ private slots:
         auto model = FwdEegSphereModel::fwd_create_eeg_sphere_model("test", 3, rads, sigmas);
         QVERIFY(model != nullptr);
         QVERIFY(model->nlayer() >= 3);
+
+        // A copy (as FwdEegSphereModelSet::fwd_select_eeg_sphere_model hands out) has the original's counts,
+        // also when nothing has been fitted yet; built in poisoned memory so stale values cannot pass
+        alignas(FwdEegSphereModel) unsigned char storage[sizeof(FwdEegSphereModel)];
+        std::memset(storage, 0x7f, sizeof(storage));
+        auto* copy = new (storage) FwdEegSphereModel(*model);
+        QCOMPARE(copy->name, model->name);
+        QCOMPARE(copy->nlayer(), model->nlayer());
+        QCOMPARE(copy->nterms, model->nterms);
+        QCOMPARE(copy->nfit, model->nfit);
+        QCOMPARE(copy->scale_pos, model->scale_pos);
+        QCOMPARE(copy->r0, model->r0);
+        copy->~FwdEegSphereModel();
     }
 
     void sphereModel_setupAndFit()

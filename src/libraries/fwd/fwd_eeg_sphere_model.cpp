@@ -67,34 +67,7 @@ FwdEegSphereModel::FwdEegSphereModel()
 
 //=============================================================================================================
 
-FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel)
-{
-    int k;
-
-    if (!p_FwdEegSphereModel.name.isEmpty())
-        this->name = p_FwdEegSphereModel.name;
-    if (p_FwdEegSphereModel.nlayer() > 0) {
-        for (k = 0; k < p_FwdEegSphereModel.nlayer(); k++)
-            this->layers.push_back(p_FwdEegSphereModel.layers[k]);
-    }
-    this->r0 = p_FwdEegSphereModel.r0;
-    if (p_FwdEegSphereModel.nterms > 0) {
-        this->fn = VectorXd(p_FwdEegSphereModel.nterms);
-        this->nterms = p_FwdEegSphereModel.nterms;
-        for (k = 0; k < p_FwdEegSphereModel.nterms; k++)
-            this->fn[k] = p_FwdEegSphereModel.fn[k];
-    }
-    if (p_FwdEegSphereModel.nfit > 0) {
-        this->mu = VectorXf(p_FwdEegSphereModel.nfit);
-        this->lambda = VectorXf(p_FwdEegSphereModel.nfit);
-        this->nfit = p_FwdEegSphereModel.nfit;
-        for (k = 0; k < p_FwdEegSphereModel.nfit; k++) {
-            this->mu[k] = p_FwdEegSphereModel.mu[k];
-            this->lambda[k] = p_FwdEegSphereModel.lambda[k];
-        }
-    }
-    this->scale_pos = p_FwdEegSphereModel.scale_pos;
-}
+FwdEegSphereModel::FwdEegSphereModel(const FwdEegSphereModel& p_FwdEegSphereModel) = default;
 
 //=============================================================================================================
 
