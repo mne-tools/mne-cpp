@@ -89,7 +89,7 @@ void InvDipoleFit::unload()
 
 QString InvDipoleFit::getName() const
 {
-    return "InvDipole Fit";
+    return "Dipole Fit";
 }
 
 //=============================================================================================================
@@ -202,7 +202,7 @@ void InvDipoleFit::onPerformDipoleFit(const QString& sFitName)
 {
     m_sFitName = sFitName;
 
-    triggerLoadingStart("Performing InvDipole Fit...");
+    triggerLoadingStart("Performing Dipole Fit...");
 
     m_Future = QtConcurrent::run([this] {
         return this->dipoleFitCalculation();
@@ -449,7 +449,7 @@ void InvDipoleFit::dipoleFitResults()
 {
     newDipoleFit(m_Future.result(), m_sFitName);
 
-    triggerLoadingEnd("Performing InvDipole Fit...");
+    triggerLoadingEnd("Performing Dipole Fit...");
 }
 
 //=============================================================================================================

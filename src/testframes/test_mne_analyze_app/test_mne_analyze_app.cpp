@@ -113,7 +113,7 @@ void TestMneAnalyzeApp::loadsPluginsAndTheFileFromTheCommandLine()
     QStringList names;
     for (ANSHAREDLIB::AbstractPlugin* plugin : m_core->getLoadedPlugins())
         names << plugin->getName();
-    for (const char* name : {"Data Loader", "Data", "Signal Viewer", "Filter", "Averaging"})
+    for (const char* name : {"Data Loader", "Data", "Signal Viewer", "Filter", "Averaging", "Dipole Fit"})
         QVERIFY2(names.contains(name), qPrintable(names.join(", ")));
 
     // Each plugin control becomes a docked tab with a toggle under Control

@@ -359,7 +359,7 @@ static bool writeDipFile(const QString& fileName,
     out.setRealNumberNotation(QTextStream::ScientificNotation);
     out.setRealNumberPrecision(6);
 
-    out << "# InvDipole snapshot at " << time_ms << " ms\n";
+    out << "# Dipole snapshot at " << time_ms << " ms\n";
     out << "# vertex x(m) y(m) z(m) nx ny nz amplitude\n";
 
     int row = 0;
@@ -391,7 +391,7 @@ static bool writeDipFile(const QString& fileName,
     }
 
     file.close();
-    qInfo("  InvDipole snapshot: %d sources at %.1f ms -> %s",
+    qInfo("  Dipole snapshot: %d sources at %.1f ms -> %s",
           row, time_ms, fileName.toUtf8().constData());
     return true;
 }
@@ -1185,7 +1185,7 @@ int main(int argc, char* argv[])
     }
 
     //=========================================================================================================
-    // InvDipole snapshot output (--dip / --diptime)
+    // Dipole snapshot output (--dip / --diptime)
     //=========================================================================================================
 
     if (parser.isSet(dipOpt)) {
