@@ -492,6 +492,14 @@ void TestFiffCoverage::testCtfCompRoundTrip()
     const QList<FiffCtfComp> second = readComps(secondPath);
     QCOMPARE(second.size(), 1);
     QVERIFY2(second[0].data->data.isApprox(calibrated), qPrintable(QString::number(second[0].data->data(0, 0))));
+
+    // A compensator naming a channel the data lack makes the set unusable (mne raises), not half-read
+    FiffCtfComp unknown = raw;
+    unknown.ctfkind = 1194476114;
+    unknown.data = FiffNamedMatrix::SDPtr(new FiffNamedMatrix(1, 1, {"MEG0111"}, {"REF99"}, MatrixXd::Ones(1, 1)));
+    const QString brokenPath = m_tmpDir.path() + "/ctf_comp_unknown.fif";
+    writeComps(brokenPath, {raw, unknown});
+    QVERIFY(readComps(brokenPath).isEmpty());
 }
 
 //=============================================================================================================

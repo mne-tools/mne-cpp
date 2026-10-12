@@ -747,7 +747,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
         }
         if (!t_pTag) {
             qWarning("Compensation type not found\n");
-            return compdata;
+            return {};
         }
         //
         //   Get the compensation kind and map it to a simple number
@@ -812,10 +812,10 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
                 }
                 if (count == 0) {
                     qWarning("Channel %s is not available in data", mat->col_names.at(col).toUtf8().constData());
-                    return compdata;
+                    return {};
                 } else if (count > 1) {
                     qWarning("Ambiguous channel %s", mat->col_names.at(col).toUtf8().constData());
-                    return compdata;
+                    return {};
                 }
                 col_cals(col, 0) = 1.0f / (p_Chs[p].range * p_Chs[p].cal);
             }
@@ -835,10 +835,10 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
 
                 if (count == 0) {
                     qWarning("Channel %s is not available in data", mat->row_names.at(row).toUtf8().constData());
-                    return compdata;
+                    return {};
                 } else if (count > 1) {
                     qWarning("Ambiguous channel %s", mat->row_names.at(row).toUtf8().constData());
-                    return compdata;
+                    return {};
                 }
 
                 row_cals(row, 0) = static_cast<double>(p_Chs[p].range) * p_Chs[p].cal;

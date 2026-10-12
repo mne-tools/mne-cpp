@@ -320,7 +320,8 @@ public:
      * @param[in] p_Node The node of interest.
      * @param[in] p_Chs  channels with the calibration info.
      *
-     * @return the CTF software compensation data.
+     * @return the CTF software compensation data, or none if a compensator is incomplete or names a
+     *         channel that is missing from, or ambiguous in, p_Chs.
      */
     QList<FiffCtfComp> read_ctf_comp(const FiffDirNode::SPtr& p_Node, const QList<FiffChInfo>& p_Chs);
 
