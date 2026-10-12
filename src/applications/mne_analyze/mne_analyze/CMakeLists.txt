@@ -20,6 +20,8 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 set(APP_CORE_SOURCES
     mainwindow.cpp
     analyzecore.cpp
+    ${PROJECT_RESOURCES_DIR}/general/styles/styles.qrc
+    ${PROJECT_RESOURCES_DIR}/general/fonts/fonts.qrc
 )
 
 set(HEADERS info.h mainwindow.h analyzecore.h)

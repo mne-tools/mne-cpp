@@ -133,6 +133,13 @@ void TestMneAnalyzeApp::loadsPluginsAndTheFileFromTheCommandLine()
 
 void TestMneAnalyzeApp::switchesStyleAndMode()
 {
+    auto* app = qobject_cast<QApplication*>(QCoreApplication::instance());
+    QVERIFY(trigger(m_window, "Dark"));
+    QVERIFY2(!app->styleSheet().isEmpty(), "the dark stylesheet is not bundled");
+    QCOMPARE(app->font().family(), QStringLiteral("Roboto"));
+    QVERIFY(trigger(m_window, "Default"));
+    QVERIFY(app->styleSheet().isEmpty());
+
     QVERIFY(trigger(m_window, "Clinical"));
     QVERIFY(findAction(m_window, "Clinical")->isChecked());
     QVERIFY(trigger(m_window, "Research"));

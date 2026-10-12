@@ -71,6 +71,13 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext& context,
     appMainWindowHandler->writeToLog(type, context, msg);
 }
 
+/** Registers the dark style and fonts, whose static-library initializers the linker may drop. */
+static void initSharedResources()
+{
+    Q_INIT_RESOURCE(styles);
+    Q_INIT_RESOURCE(fonts);
+}
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -81,6 +88,8 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 , m_pAnalyzeData(Q_NULLPTR)
 , m_pMainWindow(Q_NULLPTR)
 {
+    initSharedResources();
+
     // Initialize cmd line parser
     initCmdLineParser();
 
