@@ -68,12 +68,6 @@ WorkflowValidationError::WorkflowValidationError(const QString& message)
 {
 }
 
-WorkflowValidationError::WorkflowValidationError(const WorkflowValidationError& other) noexcept = default;
-WorkflowValidationError::WorkflowValidationError(WorkflowValidationError&& other) noexcept = default;
-WorkflowValidationError& WorkflowValidationError::operator=(const WorkflowValidationError& other) noexcept = default;
-WorkflowValidationError& WorkflowValidationError::operator=(WorkflowValidationError&& other) noexcept = default;
-WorkflowValidationError::~WorkflowValidationError() = default;
-
 QJsonObject WorkflowResource::toJson() const
 {
     QJsonObject object{

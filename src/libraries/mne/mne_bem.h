@@ -94,7 +94,17 @@ public:
      *
      * @param[in] p_MNEBem   MNE BEM.
      */
-    MNEBem(const MNEBem& p_MNEBem);
+    MNEBem(const MNEBem& p_MNEBem) = default;
+
+    //=========================================================================================================
+    /**
+     * Copy assignment.
+     *
+     * @param[in] p_MNEBem   MNE BEM.
+     *
+     * @return This BEM.
+     */
+    MNEBem& operator=(const MNEBem& p_MNEBem) = default;
 
     //=========================================================================================================
     /**
