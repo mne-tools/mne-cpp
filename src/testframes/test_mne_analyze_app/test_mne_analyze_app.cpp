@@ -32,6 +32,7 @@
 #include <QApplication>
 #include <QDockWidget>
 #include <QMenuBar>
+#include <QRhiWidget>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTextBrowser>
@@ -105,12 +106,17 @@ void TestMneAnalyzeApp::initTestCase()
     if (!QFile::exists(rawPath()))
         QSKIP("Sample raw file not found");
     m_core = std::make_unique<AnalyzeCore>();
-    m_core->showMainWindow();
     for (QWidget* widget : QApplication::topLevelWidgets()) {
         if (widget->objectName() == "mainwindow")
             m_window = qobject_cast<QMainWindow*>(widget);
     }
     QVERIFY(m_window);
+    // As in the other app tests: real offscreen rendering of the 3D views is not usable on CI
+    for (QWidget* widget : QApplication::allWidgets()) {
+        if (auto* rhiWidget = qobject_cast<QRhiWidget*>(widget))
+            rhiWidget->setApi(QRhiWidget::Api::Null);
+    }
+    m_core->showMainWindow();
 }
 
 //=============================================================================================================
