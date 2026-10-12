@@ -86,8 +86,20 @@ class TestMneAnalyzeApp : public QObject
 {
     Q_OBJECT
 
+public:
+    // Views created later (a dipole fit, a plugin reload) get the Null backend before they first show
+    bool eventFilter(QObject* watched, QEvent* event) override
+    {
+        if (event->type() == QEvent::Polish) {
+            if (auto* rhiWidget = qobject_cast<QRhiWidget*>(watched))
+                rhiWidget->setApi(QRhiWidget::Api::Null);
+        }
+        return QObject::eventFilter(watched, event);
+    }
+
 private slots:
     void initTestCase();
+    void cleanup();
     void loadsPluginsAndTheFileFromTheCommandLine();
     void switchesStyleAndMode();
     void reloadsPluginsWithoutDuplicatingTheirUi();
@@ -105,6 +117,7 @@ void TestMneAnalyzeApp::initTestCase()
 {
     if (!QFile::exists(rawPath()))
         QSKIP("Sample raw file not found");
+    qApp->installEventFilter(this);
     m_core = std::make_unique<AnalyzeCore>();
     for (QWidget* widget : QApplication::topLevelWidgets()) {
         if (widget->objectName() == "mainwindow")
@@ -117,6 +130,17 @@ void TestMneAnalyzeApp::initTestCase()
             rhiWidget->setApi(QRhiWidget::Api::Null);
     }
     m_core->showMainWindow();
+}
+
+//=============================================================================================================
+
+void TestMneAnalyzeApp::cleanup()
+{
+    // Views a test created (a reload, a dipole fit) must not have rendered for real either
+    for (QWidget* widget : QApplication::allWidgets()) {
+        if (auto* rhiWidget = qobject_cast<QRhiWidget*>(widget))
+            QVERIFY2(rhiWidget->api() == QRhiWidget::Api::Null, qPrintable(rhiWidget->metaObject()->className()));
+    }
 }
 
 //=============================================================================================================
