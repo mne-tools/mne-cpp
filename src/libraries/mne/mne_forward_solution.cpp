@@ -1104,7 +1104,7 @@ void MNEForwardSolution::prepare_forward(const FiffInfo& p_info,
             p_outWhitener = MatrixXd::Zero(n_chan, n_chan);
             for (qint32 i = 0; i < p_outNumNonZero; ++i)
                 p_outWhitener(t_vecNonZero[i], t_vecNonZero[i]) = 1.0 / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
-            // Cols of eigvec are the eigenvectors
+            // Rows of eigvec are the eigenvectors: W = diag(1/sqrt(eig)) * eigvec
             p_outWhitener *= p_outNoiseCov.eigvec;
         }
     }
