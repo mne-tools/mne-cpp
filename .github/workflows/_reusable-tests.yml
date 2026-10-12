@@ -63,7 +63,8 @@ jobs:
         # libxkbcommon-dev: the dynamic Qt toolchain is built with -xcb, so
         # Qt6::GuiPrivate now declares a third-party dependency on XKB::XKB.
         # find_package(Qt6 COMPONENTS GuiPrivate) and linking require xkbcommon.
-        sudo apt-get install -q libgl1-mesa-dev libxkbcommon-dev
+        # gdb: the test step prints the stacks of a test that runs away with memory
+        sudo apt-get install -q libgl1-mesa-dev libxkbcommon-dev gdb
 
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
@@ -235,10 +236,17 @@ jobs:
         MNE_DATA: ~/mne_data
         MNE_REQUIRE_PYTHON: 'true'
       run: |
-        # A runner that runs out of memory is shut down without a log, so record what is using it
-        (while sleep 5; do
+        # A runner that runs out of memory is shut down without a log, so record what is using it,
+        # and stop a test past 6 GB with its stacks printed so it fails instead of taking the runner down
+        (while sleep 2; do
            echo "[mem] $(date +%T) $(free -m | awk '/Mem:/ {print $3 "/" $2 " MB used"}')" \
                 "$(ps -eo rss,comm --sort=-rss | awk 'NR>1 && NR<=4 {printf "%s:%dMB ", $2, $1/1024}')"
+           read -r rss pid comm < <(ps -eo rss=,pid=,comm= --sort=-rss | head -1)
+           if [ "${rss:-0}" -gt 6000000 ] && [[ "$comm" == test_* ]]; then
+             echo "[mem] $comm ($pid) uses $((rss / 1024)) MB, stacks:"
+             sudo gdb -p "$pid" -batch -ex "thread apply all bt 25" 2>&1 | grep -E '^(Thread|#)' | head -200
+             kill -9 "$pid"
+           fi
          done) &
         ctest --test-dir build \
               --output-on-failure \
