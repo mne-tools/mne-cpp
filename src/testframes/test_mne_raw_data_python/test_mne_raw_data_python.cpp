@@ -229,6 +229,34 @@ void TestMneRawDataPython::padsOutsideData()
     QCOMPARE(m_raw->pick_data(&sel, m_raw->first_samp + 6000, 10, after.rows.data()), 0);
     for (int s = 7; s < 10; ++s)
         QCOMPARE(after.values.col(s), after.values.col(6));
+    PickBuffer allAfter(m_raw->info->nchan, 10);
+    QCOMPARE(m_raw->pick_data(nullptr, m_raw->first_samp + 6000, 10, allAfter.rows.data()), 0);
+    for (int s = 7; s < 10; ++s)
+        QCOMPARE(allAfter.values.col(s), allAfter.values.col(6));
+    // A request that starts past the end has no sample to repeat
+    PickBuffer beyond(sel.nchan, 4);
+    beyond.values.setConstant(1.0f);
+    QCOMPARE(m_raw->pick_data(&sel, m_raw->first_samp + 7000, 4, beyond.rows.data()), 0);
+    QVERIFY((beyond.values.array() == 0.0f).all());
+
+    // Projected reads pad the same way
+    std::unique_ptr<MNEProjOp> proj;
+    QVERIFY(MNEProjOp::makeProjection({m_rawPath}, m_raw->info->chInfo, m_raw->info->nchan, proj));
+    QCOMPARE(proj->assign_channels(m_raw->ch_names, m_raw->info->nchan), 0);
+    QCOMPARE(proj->make_proj(), 0);
+    m_raw->proj = std::move(proj);
+    for (MNEChSelection* picks : {&sel, static_cast<MNEChSelection*>(nullptr)}) {
+        const int nchan = picks ? sel.nchan : m_raw->info->nchan;
+        PickBuffer projected(nchan, 10);
+        QCOMPARE(m_raw->pick_data_proj(picks, m_raw->first_samp + 6000, 10, projected.rows.data()), 0);
+        for (int s = 7; s < 10; ++s)
+            QCOMPARE(projected.values.col(s), projected.values.col(6));
+        PickBuffer projectedBeyond(nchan, 4);
+        projectedBeyond.values.setConstant(1.0f);
+        QCOMPARE(m_raw->pick_data_proj(picks, m_raw->first_samp + 7000, 4, projectedBeyond.rows.data()), 0);
+        QVERIFY((projectedBeyond.values.array() == 0.0f).all());
+    }
+    m_raw->proj.reset();
 
     // A trigger channel is read uncalibrated: the first event (sample 13988) has code 2.
     PickBuffer stim(sel.nchan, 3);
