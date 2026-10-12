@@ -731,7 +731,7 @@ bool KMeans::onlineUpdate(const MatrixXd& X, MatrixXd& C, VectorXi& idx)
             }
         } else if (m_distance == KMeansDistance::Cosine || m_distance == KMeansDistance::Correlation) {
             C.row(nidx_pt).array() += (X.row(movedPt) - C.row(nidx_pt)).array() / m[nidx_pt];
-            C.row(oidx).array() += (X.row(movedPt) - C.row(oidx)).array() / m[oidx];
+            C.row(oidx).array() -= (X.row(movedPt) - C.row(oidx)).array() / m[oidx];
         }
 
         VectorXi sorted_onidx(2);

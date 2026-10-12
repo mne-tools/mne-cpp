@@ -6,6 +6,11 @@
 #include <Eigen/Dense>
 #include <math/kmeans.h>
 
+#include <algorithm>
+#include <numeric>
+#include <cmath>
+#include <vector>
+
 using namespace UTILSLIB;
 using namespace Eigen;
 
@@ -480,6 +485,106 @@ private slots:
             }
         }
         QVERIFY(idx(0) != idx(40) && idx(0) != idx(80) && idx(40) != idx(80));
+    }
+
+    void testOnlineOptimumPerMetric_data()
+    {
+        QTest::addColumn<QString>("distance");
+        QTest::addColumn<QString>("start");
+        for (const char* distance : {"cityblock", "cosine", "correlation", "hamming"}) {
+            for (const char* start : {"uniform", "cluster"}) {
+                QTest::newRow(qPrintable(QStringLiteral("%1-%2").arg(distance, start))) << QString(distance) << QString(start);
+            }
+        }
+    }
+
+    void testOnlineOptimumPerMetric()
+    {
+        // Overlapping groups, so the online phase still has moves to make after the batch phase
+        QFETCH(QString, distance);
+        QFETCH(QString, start);
+        const bool hamming = distance == QStringLiteral("hamming");
+        MatrixXd X(40, 4);
+        for (int i = 0; i < X.rows(); ++i) {
+            for (int j = 0; j < X.cols(); ++j) {
+                const double noise = std::abs(std::fmod(std::sin(i * 12.9898 + j * 78.233) * 43758.5453, 1.0));
+                const double value = noise + ((i < 20) == (j < 2) ? 0.6 : 0.0);
+                X(i, j) = hamming ? std::round(value * 0.8) : value;
+            }
+        }
+        KMeans kmeans(distance, start, 3, "singleton", true, 100);
+        VectorXi idx;
+        MatrixXd C, D;
+        VectorXd sumD;
+        const bool ok = kmeans.calculate(X, 3, idx, C, sumD, D);
+        if (hamming && start == QStringLiteral("uniform")) {
+            // MATLAB refuses uniform seeds for Hamming distance
+            QVERIFY(!ok);
+            return;
+        }
+        QVERIFY(ok);
+
+        // The metric on the rows kmeans clusters: cosine and correlation work on (centred) unit rows
+        MatrixXd Xn = X;
+        if (distance == QStringLiteral("correlation"))
+            Xn.colwise() -= Xn.rowwise().mean();
+        if (distance == QStringLiteral("cosine") || distance == QStringLiteral("correlation"))
+            Xn.array().colwise() /= Xn.rowwise().norm().array();
+        const bool median = distance == QStringLiteral("cityblock") || hamming;
+        const auto centroid = [&](const VectorXi& labels, int c) {
+            std::vector<int> members;
+            for (int i = 0; i < labels.size(); ++i) {
+                if (labels(i) == c)
+                    members.push_back(i);
+            }
+            RowVectorXd result(Xn.cols());
+            for (int j = 0; j < Xn.cols(); ++j) {
+                std::vector<double> values;
+                values.reserve(members.size());
+                for (int i : members)
+                    values.push_back(Xn(i, j));
+                std::sort(values.begin(), values.end());
+                const size_t m = values.size();
+                result(j) = median ? 0.5 * (values[(m - 1) / 2] + values[m / 2]) : std::accumulate(values.begin(), values.end(), 0.0) / m;
+            }
+            return result;
+        };
+        const auto dist = [&](int i, const RowVectorXd& c) {
+            if (median)
+                return (Xn.row(i) - c).cwiseAbs().sum() / (hamming ? Xn.cols() : 1);
+            return 1.0 - Xn.row(i).dot(c) / c.norm();
+        };
+        const auto total = [&](const VectorXi& labels) {
+            double sum = 0.0;
+            for (int c = 0; c < 3; ++c) {
+                const RowVectorXd centre = centroid(labels, c);
+                for (int i = 0; i < labels.size(); ++i) {
+                    if (labels(i) == c)
+                        sum += dist(i, centre);
+                }
+            }
+            return sum;
+        };
+
+        for (int c = 0; c < 3; ++c) {
+            QVERIFY((idx.array() == c).any());
+            QVERIFY((C.row(c) - centroid(idx, c)).cwiseAbs().maxCoeff() < 1e-9);
+            for (int i = 0; i < X.rows(); ++i)
+                QVERIFY(std::abs(D(i, c) - std::max(0.0, dist(i, C.row(c)))) < 1e-9);
+        }
+        QVERIFY(std::abs(sumD.sum() - total(idx)) < 1e-9);
+        // No single point can be moved to another cluster for a lower total
+        for (int i = 0; i < X.rows(); ++i) {
+            if ((idx.array() == idx(i)).count() < 2)
+                continue;
+            for (int c = 0; c < 3; ++c) {
+                if (c == idx(i))
+                    continue;
+                VectorXi moved = idx;
+                moved(i) = c;
+                QVERIFY2(total(moved) >= total(idx) - 1e-9, qPrintable(QStringLiteral("point %1 to %2").arg(i).arg(c)));
+            }
+        }
     }
 };
 
