@@ -458,7 +458,7 @@ int FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(const Eigen::Vector3f& rd, 
     FwdCoil* el;
 
     Vval.resize(els.ncoil());
-    for (k = 0; k < els.ncoil(); k++, el++) {
+    for (k = 0; k < els.ncoil(); k++) {
         el = els.coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
@@ -589,7 +589,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil_vec(const Eigen::Vector3f& rd, Fwd
     int k, c, p;
     FwdCoil* el;
 
-    for (k = 0; k < els.ncoil(); k++, el++) {
+    for (k = 0; k < els.ncoil(); k++) {
         el = els.coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
@@ -763,7 +763,7 @@ int FwdEegSphereModel::fwd_eeg_spherepot_coil(const Eigen::Vector3f& rd, const E
     int k, c;
     FwdCoil* el;
 
-    for (k = 0; k < els.ncoil(); k++, el++) {
+    for (k = 0; k < els.ncoil(); k++) {
         el = els.coils[k].get();
         if (el->coil_class == FWD_COILC_EEG) {
             if (el->np > nvval) {
