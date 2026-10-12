@@ -23,6 +23,8 @@
 #include <Models/annotationmodel.h>
 #include <Utils/sessionfilter.h>
 #include <Models/averagemodel.h>
+#include <Models/virtualchannelmodel.h>
+#include <Windows/virtualchannelwindow.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -50,6 +52,8 @@
 #include <QPushButton>
 #include <QSpinBox>
 #include <QDialog>
+#include <QListWidget>
+#include <QTableWidget>
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QLineEdit>
@@ -82,6 +86,7 @@ private slots:
     void writesRawCopyButNotOverItsSource();
     void annotatesDraggedRangeLikePython();
     void exportsSourceEstimatesLikePython();
+    void managesVirtualChannelsThroughTheirDialogs();
 
 private:
     static MainWindow* makeWindow();
@@ -639,6 +644,125 @@ void TestMneBrowseApp::exportsSourceEstimatesLikePython()
     Eigen::Index peak = 0;
     QVERIFY(std::abs(rh.data.rowwise().maxCoeff().maxCoeff(&peak) - 86.27972642080445) < 1e-4 * 86.27972642080445);
     QCOMPARE(peak + lh.data.rows(), Eigen::Index(4891));
+}
+
+//=============================================================================================================
+
+void TestMneBrowseApp::managesVirtualChannelsThroughTheirDialogs()
+{
+    const QString samplePath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(samplePath))
+        QSKIP("Sample test data not found");
+
+    QTemporaryDir dir;
+    const QString rawPath = dir.filePath("sample_raw.fif");
+    QVERIFY(QFile::copy(samplePath, rawPath));
+    auto* window = makeWindow();
+    window->resize(1200, 800);
+    window->show();
+    QVERIFY(QTest::qWaitForWindowExposed(window));
+    auto* manager = window->findChild<VirtualChannelWindow*>();
+    QVERIFY(manager);
+    VirtualChannelModel* model = manager->getVirtualChannelModel();
+
+    // Without a recording there is nothing to derive channels from
+    QString warning;
+    answerNextModal([&warning](QWidget* pModal) {
+        warning = qobject_cast<QMessageBox*>(pModal)->text();
+        qobject_cast<QDialog*>(pModal)->accept();
+    });
+    findAction(manager, "Add virtual channel")->trigger();
+    QVERIFY(warning.contains("at least two channels"));
+
+    window->applyCommandLineOptions(rawPath, QString(), -1.0, -1.0);
+    QTRY_VERIFY_WITH_TIMEOUT(!window->dataWindow()->stimEvents().isEmpty(), 10000);
+
+    // A reference set made of EEG001..EEG003 through the reference-set manager
+    answerNextModal([](QWidget* pManage) {
+        QPushButton* add = nullptr;
+        for (QPushButton* button : pManage->findChildren<QPushButton*>()) {
+            if (button->text() == "Add")
+                add = button;
+        }
+        answerNextModal([](QWidget* pSet) {
+            auto* channels = pSet->findChild<QListWidget*>();
+            pSet->findChild<QLineEdit*>()->setText("frontal");
+            for (const char* name : {"EEG001", "EEG002", "EEG003"})
+                channels->findItems(name, Qt::MatchExactly).first()->setSelected(true);
+            qobject_cast<QDialog*>(pSet)->accept();
+            answerNextModal([](QWidget* pManageAgain) { qobject_cast<QDialog*>(pManageAgain)->reject(); });
+        });
+        add->click();
+    });
+    findAction(manager, "Manage reference sets")->trigger();
+    QCOMPARE(model->referenceSetNames(), QStringList{"frontal"});
+
+    // A bipolar pair: the dialog picks the first other channel as reference and names it after both
+    answerNextModal([](QWidget* pAdd) {
+        const auto combos = pAdd->findChildren<QComboBox*>();
+        combos.at(1)->setCurrentText("EEG004");
+        qobject_cast<QDialog*>(pAdd)->accept();
+    });
+    findAction(manager, "Add virtual channel")->trigger();
+    QCOMPARE(model->rowCount(), 1);
+    const VirtualChannelDefinition bipolar = model->virtualChannels().first();
+    QCOMPARE(bipolar.kind, VirtualChannelKind::Bipolar);
+    QCOMPARE(bipolar.primaryChannel, QStringLiteral("EEG004"));
+    QCOMPARE(bipolar.referenceChannels.size(), 1);
+    QCOMPARE(bipolar.name, QStringLiteral("EEG004-%1").arg(bipolar.referenceChannels.first()));
+
+    // A weighted reference against the saved set, with one weight edited
+    answerNextModal([](QWidget* pAdd) {
+        const auto combos = pAdd->findChildren<QComboBox*>();
+        combos.at(0)->setCurrentIndex(2);
+        combos.at(1)->setCurrentText("EEG010");
+        combos.at(2)->setCurrentIndex(1);
+        auto* weights = pAdd->findChild<QTableWidget*>();
+        QCOMPARE(weights->rowCount(), 3);
+        weights->item(1, 1)->setText("0.5");
+        weights->item(2, 1)->setText("not a number");
+        QCOMPARE(weights->item(2, 1)->text(), QStringLiteral("1"));
+        qobject_cast<QDialog*>(pAdd)->accept();
+    });
+    findAction(manager, "Add virtual channel")->trigger();
+    QCOMPARE(model->rowCount(), 2);
+    const VirtualChannelDefinition weighted = model->virtualChannels().at(1);
+    QCOMPARE(weighted.name, QStringLiteral("EEG010-wref-frontal"));
+    QCOMPARE(weighted.referenceSetName, QStringLiteral("frontal"));
+    QCOMPARE(weighted.referenceChannels, (QStringList{"EEG001", "EEG002", "EEG003"}));
+    QCOMPARE(weighted.referenceWeights, (QVector<double>{1.0, 0.5, 1.0}));
+
+    // Cancelling adds nothing
+    answerNextModal([](QWidget* pAdd) { qobject_cast<QDialog*>(pAdd)->reject(); });
+    findAction(manager, "Add virtual channel")->trigger();
+    QCOMPARE(model->rowCount(), 2);
+
+    // Saved and loaded back through the File menu
+    const QString jsonPath = dir.filePath("sample_raw-virtchan.json");
+    answerNextModal([jsonPath](QWidget* pModal) {
+        auto* dialog = qobject_cast<QFileDialog*>(pModal);
+        dialog->setDirectory(QFileInfo(jsonPath).absolutePath());
+        dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(jsonPath).fileName());
+        static_cast<QDialog*>(dialog)->accept();
+    });
+    findAction(window, "Save Virtual Channels...")->trigger();
+    QVERIFY(QFile::exists(jsonPath));
+
+    // Removing the selected channel, then restoring both from the file
+    manager->getVirtualChannelTableView()->selectRow(0);
+    findAction(manager, "Remove virtual channel")->trigger();
+    QCOMPARE(model->rowCount(), 1);
+    QCOMPARE(model->virtualChannels().first().name, weighted.name);
+    answerNextModal([jsonPath](QWidget* pModal) {
+        auto* dialog = qobject_cast<QFileDialog*>(pModal);
+        dialog->setDirectory(QFileInfo(jsonPath).absolutePath());
+        dialog->findChild<QLineEdit*>(QStringLiteral("fileNameEdit"))->setText(QFileInfo(jsonPath).fileName());
+        static_cast<QDialog*>(dialog)->accept();
+    });
+    findAction(window, "Load Virtual Channels...")->trigger();
+    QCOMPARE(model->rowCount(), 2);
+    QCOMPARE(model->virtualChannels().at(1).referenceWeights, weighted.referenceWeights);
+    window->hide();
 }
 
 //=============================================================================================================
