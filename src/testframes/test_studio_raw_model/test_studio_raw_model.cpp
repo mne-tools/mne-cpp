@@ -177,8 +177,9 @@ void TestStudioRawModel::browserWidgetNavigatesTheRecording()
     MNEANALYZESTUDIO::RawDataBrowserWidget widget;
     widget.resize(900, 600);
     widget.show();
-    QSignalSpy output(&widget, &MNEANALYZESTUDIO::RawDataBrowserWidget::outputMessage);
-    QSignalSpy status(&widget, &MNEANALYZESTUDIO::RawDataBrowserWidget::statusMessage);
+    // String-based: the extension library exports no data symbols on Windows, so no staticMetaObject
+    QSignalSpy output(&widget, SIGNAL(outputMessage(QString)));
+    QSignalSpy status(&widget, SIGNAL(statusMessage(QString)));
 
     QCOMPARE(widget.summaryText(), QStringLiteral("No raw browser loaded."));
     QCOMPARE(widget.stateText().left(25), QStringLiteral("Visible range unavailable"));
