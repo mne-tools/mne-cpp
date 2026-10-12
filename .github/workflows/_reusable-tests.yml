@@ -235,6 +235,11 @@ jobs:
         MNE_DATA: ~/mne_data
         MNE_REQUIRE_PYTHON: 'true'
       run: |
+        # A runner that runs out of memory is shut down without a log, so record what is using it
+        (while sleep 5; do
+           echo "[mem] $(date +%T) $(free -m | awk '/Mem:/ {print $3 "/" $2 " MB used"}')" \
+                "$(ps -eo rss,comm --sort=-rss | awk 'NR>1 && NR<=4 {printf "%s:%dMB ", $2, $1/1024}')"
+         done) &
         ctest --test-dir build \
               --output-on-failure \
               --no-tests=error \
