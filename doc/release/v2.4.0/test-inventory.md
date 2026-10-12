@@ -6,9 +6,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38144982990 (comm
 
 ## Registration
 
-- Test directories: 263
+- Test directories: 264
 - Registered unconditionally: 255
-- Registered behind a CMake condition or early `return()`: 5
+- Registered behind a CMake condition or early `return()`: 6
 - Not registered: 3
 - Registered without `LABELS`: 0
 - Registered without explicit `TIMEOUT`: 0
@@ -18,12 +18,12 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38144982990 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 289 | 0 | 0 | `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
-| macos-26-qt-min | 289 | 0 | 0 | `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
-| ubuntu-24.04 | 289 | 0 | 0 | `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
-| ubuntu-24.04-qt-min | 289 | 0 | 0 | `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
-| windows-2025-vs2026 | 289 | 0 | 2 | `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
-| windows-2025-vs2026-qt-min | 289 | 0 | 2 | `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
+| macos-26 | 289 | 0 | 0 | `test_mne_analyze_app`, `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
+| macos-26-qt-min | 289 | 0 | 0 | `test_mne_analyze_app`, `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
+| ubuntu-24.04 | 289 | 0 | 0 | `test_mne_analyze_app`, `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
+| ubuntu-24.04-qt-min | 289 | 0 | 0 | `test_mne_analyze_app`, `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
+| windows-2025-vs2026 | 289 | 0 | 2 | `test_mne_analyze_app`, `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
+| windows-2025-vs2026-qt-min | 289 | 0 | 2 | `test_mne_analyze_app`, `test_mne_analyze_studio_workbench`, `test_mne_inspect_app`, `test_mne_scan_plugins` |
 
 ## Run-time requirements (lexical signals)
 
@@ -32,9 +32,9 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38144982990 (comm
 | freesurfer | 2 |
 | python | 9 |
 | sample-data | 20 |
-| test-data | 118 |
+| test-data | 119 |
 | GUI (`QTEST_MAIN`) | 45 |
-| Contains `QSKIP` | 87 |
+| Contains `QSKIP` | 88 |
 
 ## Conditional and unregistered tests
 
@@ -42,6 +42,7 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38144982990 (comm
 |---|---|---|
 | `test_doc_shots` | conditional | BUILD_TESTS AND TARGET mne_doc_shots |
 | `test_mna_coverage` | unregistered | Placeholder directory; its CMakeLists.txt names a test_mna_coverage.cpp that was never written. Kept out of the build until the MNA coverage test is authored. |
+| `test_mne_analyze_app` | conditional | BUILD_MNE_ANALYZE |
 | `test_mne_analyze_studio_workbench` | conditional | BUILD_MNE_ANALYZE_STUDIO |
 | `test_mne_browse_app` | conditional | BUILD_MNE_BROWSE |
 | `test_mne_flash_bem` | conditional | BUILD_MNE_FLASH_BEM |

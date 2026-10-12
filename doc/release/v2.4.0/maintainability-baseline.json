@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1500,
-  "scanned_lines": 394354,
+  "scanned_lines": 394366,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -544,10 +544,10 @@
       }
     },
     "qt_new_unparented": {
-      "total": 819,
+      "total": 815,
       "files": 80,
       "by_scope": {
-        "applications": 713,
+        "applications": 709,
         "libraries": 104,
         "tools": 2
       },
@@ -567,13 +567,13 @@
         "src/libraries/disp/plots/tfplot.cpp": 15,
         "src/applications/mne_scan/mne_scan/mainwindow.cpp": 14,
         "src/applications/mne_analyze/plugins/dataloader/dataloader.cpp": 12,
-        "src/applications/mne_analyze/mne_analyze/mainwindow.cpp": 9
+        "src/applications/mne_analyze_studio/workbench/analysisresultwidget.cpp": 9
       },
       "all_files": {
         "src/applications/mne_align/align_wizard.cpp": 53,
         "src/applications/mne_analyze/libs/anShared/Management/analyzedata.h": 2,
         "src/applications/mne_analyze/libs/anShared/Management/statusbar.cpp": 3,
-        "src/applications/mne_analyze/mne_analyze/mainwindow.cpp": 9,
+        "src/applications/mne_analyze/mne_analyze/mainwindow.cpp": 5,
         "src/applications/mne_analyze/plugins/averaging/averaging.cpp": 7,
         "src/applications/mne_analyze/plugins/channelselection/channelselection.cpp": 6,
         "src/applications/mne_analyze/plugins/controlmanager/controlmanager.cpp": 4,

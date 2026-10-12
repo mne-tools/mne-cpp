@@ -5,7 +5,7 @@ Coverage from `c78efbf82` (https://github.com/mne-tools/mne-cpp/actions/runs/381
 
 | Gate | Criterion | Current | Status |
 |---|---|---|---|
-| G1 | Every registered test runs in CI | 260 registered; CI ran 289 on macos-26, 289 on macos-26-qt-min, 289 on ubuntu-24.04, 289 on ubuntu-24.04-qt-min, 289 on windows-2025-vs2026 (2 declared skips), 289 on windows-2025-vs2026-qt-min (2 declared skips) | met |
+| G1 | Every registered test runs in CI | 261 registered; CI ran 289 on macos-26, 289 on macos-26-qt-min, 289 on ubuntu-24.04, 289 on ubuntu-24.04-qt-min, 289 on windows-2025-vs2026 (2 declared skips), 289 on windows-2025-vs2026-qt-min (2 declared skips) | met |
 | G1 | Tests carry labels and timeouts | 0 unlabelled, 0 untimed | met |
 | G1 | No retry-to-pass path | 0 retry lines in local scripts | met |
 | G2 | Combined line coverage >= 60.0% | 68.92% (0 lines short) | met |
@@ -18,7 +18,7 @@ Coverage from `c78efbf82` (https://github.com/mne-tools/mne-cpp/actions/runs/381
 | G4 | Documentation images generated in CI | 19 referenced, 0 without producer, placeholders in 0 workflows | met |
 | G4 | Visual regression compares to goldens | 19 golden comparisons | met |
 | G5 | Zero compiler warnings | enforced by -Werror on every matrix entry | met |
-| G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 403, raw_new 169, raw_delete 275, console_io 356, numeric_define 847, qt_new_unparented 819, oversized_unit 8 | baseline recorded |
+| G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 403, raw_new 169, raw_delete 275, console_io 356, numeric_define 847, qt_new_unparented 815, oversized_unit 8 | baseline recorded |
 | G6 | Pinned reference environment | MNE-Python 1.11.0; unpinned in CI: none | met |
 | G6 | Parity claims cross-validated | cross-validated-static 114, cross-validated-live 4, tested 237, unverified 5 | **open** |
 

@@ -11,8 +11,8 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 260,
-      "conditional": 5,
+      "registered": 261,
+      "conditional": 6,
       "unregistered": 3,
       "without_labels": 0,
       "without_timeout": 0,
@@ -76,7 +76,7 @@
       "raw_delete": 275,
       "console_io": 356,
       "numeric_define": 847,
-      "qt_new_unparented": 819,
+      "qt_new_unparented": 815,
       "oversized_unit": 8
     },
     "G6_parity": {
