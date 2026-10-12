@@ -85,6 +85,7 @@ private slots:
     void loadsPluginsAndTheFileFromTheCommandLine();
     void switchesStyleAndMode();
     void reloadsPluginsWithoutDuplicatingTheirUi();
+    void closesAndShutsDown();
 
 private:
     std::unique_ptr<AnalyzeCore> m_core;
@@ -162,6 +163,20 @@ void TestMneAnalyzeApp::reloadsPluginsWithoutDuplicatingTheirUi()
     QCOMPARE(menu(m_window, "Control")->actions().size(), controls);
 }
 
+//=============================================================================================================
+
+void TestMneAnalyzeApp::closesAndShutsDown()
+{
+    QPointer<QMainWindow> window = m_window;
+    QVERIFY(trigger(m_window, "Exit"));
+    QTRY_VERIFY(window.isNull());
+    // Logging after the main window is gone must not reach it
+    qInfo() << "after close";
+    m_core.reset();
+}
+
+//=============================================================================================================
+// MAIN
 //=============================================================================================================
 
 int main(int argc, char* argv[])

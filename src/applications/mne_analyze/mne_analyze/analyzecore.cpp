@@ -56,6 +56,7 @@ const char* pluginsDir = "/mne_analyze_plugins"; /**< Holds path to the plugins.
 //=============================================================================================================
 
 QPointer<MainWindow> appMainWindowHandler(Q_NULLPTR); /**< The main window. */
+QtMessageHandler previousMessageHandler = nullptr;    /**< Handler to use once the main window is gone. */
 
 //=============================================================================================================
 /**
@@ -68,7 +69,11 @@ QPointer<MainWindow> appMainWindowHandler(Q_NULLPTR); /**< The main window. */
 void customMessageHandler(QtMsgType type, const QMessageLogContext& context,
                           const QString& msg)
 {
-    appMainWindowHandler->writeToLog(type, context, msg);
+    if (appMainWindowHandler) {
+        appMainWindowHandler->writeToLog(type, context, msg);
+    } else if (previousMessageHandler) {
+        previousMessageHandler(type, context, msg);
+    }
 }
 
 /** Registers the dark style and fonts, whose static-library initializers the linker may drop. */
@@ -110,7 +115,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 
     // Setup log window
     appMainWindowHandler = m_pMainWindow;
-    qInstallMessageHandler(customMessageHandler);
+    previousMessageHandler = qInstallMessageHandler(customMessageHandler);
 
     // Initialize cmd line inputs if provided by the user
     parseCmdLineInputs();
@@ -120,6 +125,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 
 AnalyzeCore::~AnalyzeCore()
 {
+    qInstallMessageHandler(previousMessageHandler);
 }
 
 //=============================================================================================================
