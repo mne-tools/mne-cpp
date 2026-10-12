@@ -166,13 +166,14 @@ bool MNEBemSurface::add_geometry_info()
 
     //Create neighboring triangle vector using temporary std::vector for efficient appending
     {
-        std::vector<std::vector<int>> temp_ntri(this->itris.rows());
+        // One list per vertex, as mne-python's neighbor_tri
+        std::vector<std::vector<int>> temp_ntri(this->np);
         for (p = 0; p < this->itris.rows(); p++) {
             for (k = 0; k < 3; k++) {
                 temp_ntri[this->itris(p, k)].push_back(p);
             }
         }
-        neighbor_tri.resize(this->itris.rows());
+        neighbor_tri.resize(this->np);
         for (k = 0; k < static_cast<int>(temp_ntri.size()); k++) {
             neighbor_tri[k] = Eigen::Map<Eigen::VectorXi>(temp_ntri[k].data(), temp_ntri[k].size());
         }

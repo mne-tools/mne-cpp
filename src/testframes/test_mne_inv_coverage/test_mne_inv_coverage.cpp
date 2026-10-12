@@ -38,6 +38,7 @@
 
 #include <QtTest>
 #include <QCoreApplication>
+#include <QBuffer>
 #include <QFile>
 #include <QTemporaryDir>
 
@@ -75,6 +76,7 @@ private slots:
     void testReadBemFromFile();
     void testBemSurfaceProperties();
     void testBemSurfaceNormals();
+    void testBemSurfaceGeometryOfSmallMesh();
 
     // --- MNESourceSpaces ---
     void testSourceSpaceFromFile();
@@ -258,6 +260,28 @@ void TestMneInvCoverage::testBemSurfaceNormals()
         float norm = surf.nn.row(i).norm();
         QVERIFY(qAbs(norm - 1.0f) < 0.01f);
     }
+}
+
+void TestMneInvCoverage::testBemSurfaceGeometryOfSmallMesh()
+{
+    // One triangle and an unused fourth vertex: more vertices than triangles
+    MNEBemSurface surf;
+    surf.np = 4;
+    surf.ntri = 1;
+    surf.rr = Eigen::MatrixX3f::Zero(4, 3);
+    surf.rr.topRows(3) = Eigen::Matrix3f::Identity();
+    surf.itris = Eigen::MatrixX3i(1, 3);
+    surf.itris << 0, 1, 2;
+    QVERIFY(surf.addTriangleData());
+    QCOMPARE(static_cast<int>(surf.neighbor_tri.size()), 4);
+    QCOMPARE(static_cast<int>(surf.neighbor_vert.size()), 4);
+    for (int k = 0; k < 3; ++k) {
+        QCOMPARE(surf.neighbor_tri[k], Eigen::VectorXi::Zero(1).eval());
+        QCOMPARE(surf.neighbor_vert[k].size(), Eigen::Index(2));
+    }
+    QCOMPARE(surf.neighbor_tri[3].size(), Eigen::Index(0));
+    QCOMPARE(surf.neighbor_vert[3].size(), Eigen::Index(0));
+    QVERIFY(std::abs(surf.tri_area(0) - std::sqrt(3.0) / 2.0) < 1e-6);
 }
 
 //=============================================================================================================
