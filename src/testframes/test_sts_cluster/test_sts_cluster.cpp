@@ -628,6 +628,20 @@ void TestStsCluster::testTrisAdjacencyMatchesMne()
                                .split(' ');
     expected.sort();
     QCOMPARE(upperEdges(StatsAdjacency::fromSourceSpaceTemporal(tris, 6, 4)), expected);
+
+    // Channels at x = 0, 1, 2, 3 and 10: neighbours lie within 3x the median nearest-neighbour distance
+    FIFFLIB::FiffInfo info;
+    for (const float x : {0.0f, 1.0f, 2.0f, 3.0f, 10.0f}) {
+        FIFFLIB::FiffChInfo ch;
+        ch.ch_name = QStringLiteral("EEG%1").arg(static_cast<int>(x));
+        ch.chpos.r0 = Eigen::Vector3f(x, 0.0f, 0.0f);
+        info.chs.append(ch);
+    }
+    QCOMPARE(upperEdges(StatsAdjacency::fromChannelPositions(info)).join(' '), QStringLiteral("0-1 0-2 0-3 1-2 1-3 2-3"));
+    // An even number of picks takes the mean of the middle two: median(1, 1, 1, 8) = 1
+    QCOMPARE(upperEdges(StatsAdjacency::fromChannelPositions(info, {"EEG0", "EEG1", "EEG2", "EEG10"})).join(' '), QStringLiteral("0-1 0-2 1-2"));
+    QCOMPARE(upperEdges(StatsAdjacency::fromChannelPositions(info, {"EEG0", "EEG10"})).join(' '), QStringLiteral("0-1"));
+    QCOMPARE(StatsAdjacency::fromChannelPositions(info, {"MEG0111"}).rows(), 0);
 }
 
 //=============================================================================================================
