@@ -312,7 +312,7 @@ void MainWindow::initMenuBar()
     // Styles
     QActionGroup* pActionStyleGroup = new QActionGroup(this);
 
-    QAction* pActionDefaultStyle = new QAction("Default");
+    QAction* pActionDefaultStyle = new QAction("Default", this);
     pActionDefaultStyle->setStatusTip(tr("Activate default style"));
     pActionDefaultStyle->setCheckable(true);
     pActionDefaultStyle->setChecked(true);
@@ -322,7 +322,7 @@ void MainWindow::initMenuBar()
                 setCurrentStyle("default");
             });
 
-    m_pActionDarkMode = new QAction("Dark");
+    m_pActionDarkMode = new QAction("Dark", this);
     m_pActionDarkMode->setStatusTip(tr("Activate dark style"));
     m_pActionDarkMode->setCheckable(true);
     m_pActionDarkMode->setChecked(false);
@@ -335,7 +335,7 @@ void MainWindow::initMenuBar()
     // Modes
     QActionGroup* pActionModeGroup = new QActionGroup(this);
 
-    m_pActionResearchMode = new QAction("Research");
+    m_pActionResearchMode = new QAction("Research", this);
     m_pActionResearchMode->setStatusTip(tr("Activate the research GUI mode"));
     m_pActionResearchMode->setCheckable(true);
     m_pActionResearchMode->setChecked(true);
@@ -343,7 +343,7 @@ void MainWindow::initMenuBar()
     connect(m_pActionResearchMode.data(), &QAction::triggered,
             this, &MainWindow::manageGuiModeChanged);
 
-    m_pActionClinicalMode = new QAction("Clinical");
+    m_pActionClinicalMode = new QAction("Clinical", this);
     m_pActionClinicalMode->setStatusTip(tr("Activate the clinical GUI mode"));
     m_pActionClinicalMode->setCheckable(true);
     m_pActionClinicalMode->setChecked(false);

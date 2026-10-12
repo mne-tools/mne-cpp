@@ -1,0 +1,53 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+cmake_minimum_required(VERSION 3.14)
+project(test_mne_analyze_app LANGUAGES CXX)
+
+set(CMAKE_AUTOMOC ON)
+
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Test)
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION test_mne_analyze_app.cpp)
+else()
+    add_executable(${PROJECT_NAME} test_mne_analyze_app.cpp)
+endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    mne_analyze_app_core
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Test
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    WIN32_EXECUTABLE FALSE
+    MACOSX_BUNDLE FALSE
+)
+
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(${PROJECT_NAME})
+endif()
+
+# AnalyzeCore loads its plugins from <exe dir>/mne_analyze_plugins; Windows already puts tests in bin
+if(NOT WIN32)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+            "${CMAKE_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE}/bin/mne_analyze_plugins"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/mne_analyze_plugins")
+endif()
+
+enable_testing()
+mne_add_test(${PROJECT_NAME}
+    LABELS integration gui
+    TIMEOUT 120
+    REQUIRES_DATA
+        mne-cpp-test-data/MEG/sample
+    ENVIRONMENT QT_QPA_PLATFORM=offscreen)
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()
