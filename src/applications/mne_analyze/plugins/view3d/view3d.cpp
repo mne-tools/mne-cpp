@@ -313,8 +313,9 @@ void View3D::newDipoleFit(const INVLIB::InvEcdSet& ecdSet)
 
 void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
+    if (pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL && !m_dipoleItems.contains(pNewModel.data())) {
         newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<INVLIB::InvEcdSet>());
+        m_dipoleItems.insert(pNewModel.data(), QPersistentModelIndex(m_p3DModel->index(m_p3DModel->rowCount() - 1, 0)));
     }
 }
 
@@ -323,14 +324,9 @@ void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
 void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     if (pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
-        QList<QStandardItem*> lItemList = m_p3DModel->findItems("InvDipole Fit");
-        if (!lItemList.isEmpty()) {
-            for (QStandardItem* pItem : lItemList) {
-                QModelIndex index = m_p3DModel->indexFromItem(pItem);
-                m_p3DModel->removeRows(index.row(),
-                                       1,
-                                       index.parent());
-            }
+        const QPersistentModelIndex index = m_dipoleItems.take(pRemovedModel.data());
+        if (index.isValid()) {
+            m_p3DModel->removeRow(index.row(), index.parent());
         }
 
         if (m_pView3D) {

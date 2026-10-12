@@ -17,7 +17,12 @@
 #include <analyzecore.h>
 #include <mainwindow.h>
 
+#include <anShared/Management/communicator.h>
+#include <anShared/Management/event.h>
+#include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Plugins/abstractplugin.h>
+#include <disp3D/model/braintreemodel.h>
+#include <inv/dipole_fit/inv_ecd_set.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -85,6 +90,7 @@ private slots:
     void loadsPluginsAndTheFileFromTheCommandLine();
     void switchesStyleAndMode();
     void reloadsPluginsWithoutDuplicatingTheirUi();
+    void showsEachDipoleFitOnceAndRemovesIt();
     void closesAndShutsDown();
 
 private:
@@ -161,6 +167,39 @@ void TestMneAnalyzeApp::reloadsPluginsWithoutDuplicatingTheirUi()
     QVERIFY(trigger(m_window, "Reload Plugins"));
     QCOMPARE(m_window->findChildren<QDockWidget*>().size(), docks);
     QCOMPARE(menu(m_window, "Control")->actions().size(), controls);
+}
+
+//=============================================================================================================
+
+void TestMneAnalyzeApp::showsEachDipoleFitOnceAndRemovesIt()
+{
+    ANSHAREDLIB::AbstractPlugin* view3d = nullptr;
+    for (ANSHAREDLIB::AbstractPlugin* plugin : m_core->getLoadedPlugins()) {
+        if (plugin->getName() == "3D View")
+            view3d = plugin;
+    }
+    if (!view3d)
+        QSKIP("Built without the 3D view plugin");
+
+    // The plugin publishes its scene model when asked for its view
+    ANSHAREDLIB::Communicator listener(QVector<ANSHAREDLIB::EVENT_TYPE>{ANSHAREDLIB::SET_DATA3D_TREE_MODEL});
+    QSharedPointer<DISP3DLIB::BrainTreeModel> tree;
+    connect(&listener, &ANSHAREDLIB::Communicator::receivedEvent, this, [&tree](const QSharedPointer<ANSHAREDLIB::Event> e) {
+        tree = e->getData().value<QSharedPointer<DISP3DLIB::BrainTreeModel>>();
+    });
+    view3d->getView();
+    QTRY_VERIFY(tree);
+    const int rows = tree->rowCount();
+
+    INVLIB::InvEcdSet set;
+    set << INVLIB::InvEcd();
+    const QVariant fit = QVariant::fromValue(QSharedPointer<ANSHAREDLIB::DipoleFitModel>::create(set).staticCast<ANSHAREDLIB::AbstractModel>());
+    // Selecting the same fit again must not draw a second copy
+    for (int i = 0; i < 2; ++i)
+        view3d->handleEvent(QSharedPointer<ANSHAREDLIB::Event>::create(ANSHAREDLIB::SELECTED_MODEL_CHANGED, nullptr, fit));
+    QCOMPARE(tree->rowCount(), rows + 1);
+    view3d->handleEvent(QSharedPointer<ANSHAREDLIB::Event>::create(ANSHAREDLIB::MODEL_REMOVED, nullptr, fit));
+    QCOMPARE(tree->rowCount(), rows);
 }
 
 //=============================================================================================================

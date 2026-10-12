@@ -205,8 +205,9 @@ private:
 
     int m_iFiducial; /**< Currently selected fiducial. */
 
-    QSharedPointer<DISP3DLIB::BrainTreeModel> m_p3DModel; /**< The 3D model data. */
-    DISP3DLIB::BemTreeItem* m_pBemTreeCoreg;              /**< TThe BEM head model of the coregistration plugin. */
+    QSharedPointer<DISP3DLIB::BrainTreeModel> m_p3DModel;                          /**< The 3D model data. */
+    QHash<const ANSHAREDLIB::AbstractModel*, QPersistentModelIndex> m_dipoleItems; /**< Scene item of each dipole fit model. */
+    DISP3DLIB::BemTreeItem* m_pBemTreeCoreg;                                       /**< TThe BEM head model of the coregistration plugin. */
 
     DISP3DLIB::BrainView* m_pView3D;          /**< The Disp3D view. */
     DISPLIB::Control3DView* m_pControl3DView; /**< The 3D Control view. */
