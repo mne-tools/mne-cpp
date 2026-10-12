@@ -48,6 +48,7 @@
 #include <QJsonObject>
 #include <QString>
 #include <QTemporaryDir>
+#include <QUrl>
 #include <QtTest>
 
 #ifndef MNA_WORKFLOWS_SRC_DIR
@@ -117,10 +118,7 @@ bool copyOrFail(const QString& from, const QString& to)
 // Resolve `file://...` URI to a filesystem path.
 QString uriToPath(const QString& uri)
 {
-    if (uri.startsWith(QLatin1String("file://"))) {
-        return uri.mid(7);
-    }
-    return uri;
+    return ISkillOperator::localPathFromUri(uri);
 }
 
 QString findStcInDir(const QDir& dir)
@@ -172,9 +170,9 @@ QByteArray patchShowcase(const QByteArray& showcaseJson,
         QJsonObject r = resources.at(i).toObject();
         const QString uid = r.value(QStringLiteral("uid")).toString();
         if (uid == QLatin1String("raw_meg")) {
-            r.insert(QStringLiteral("uri"), QStringLiteral("file://") + copyRawPath);
+            r.insert(QStringLiteral("uri"), QUrl::fromLocalFile(copyRawPath).toString());
         } else if (uid == QLatin1String("inv_op")) {
-            r.insert(QStringLiteral("uri"), QStringLiteral("file://") + copyInvPath);
+            r.insert(QStringLiteral("uri"), QUrl::fromLocalFile(copyInvPath).toString());
         }
         resources.replace(i, r);
     }
@@ -328,8 +326,8 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     notRawNode.uid = QStringLiteral("not_raw");
     notRawNode.parameters = QJsonObject{{"highpass", 1.0}, {"lowpass", 40.0}};
     notRawNode.resolvedInputs = QJsonObject{
-        {"raw_data", QJsonObject{{"uri", QStringLiteral("file://") + invCopyB}}},
-        {"inverse_operator", QJsonObject{{"uri", QStringLiteral("file://") + invCopyB}}}};
+        {"raw_data", QJsonObject{{"uri", QUrl::fromLocalFile(invCopyB).toString()}}},
+        {"inverse_operator", QJsonObject{{"uri", QUrl::fromLocalFile(invCopyB).toString()}}}};
     for (ISkillOperator* skill : std::initializer_list<ISkillOperator*>{&filterSkillB, &sourceSkillB}) {
         const QJsonObject result = skill->executeSkill(notRawNode);
         QCOMPARE(result.value(QStringLiteral("status")).toString(), QStringLiteral("error"));
@@ -345,7 +343,7 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     filterNodeB.parameters = filterParams;
     filterNodeB.outputs = filterNodeSpec.value(QStringLiteral("outputs")).toObject();
     filterNodeB.resolvedInputs = QJsonObject{
-        {"raw_data", QJsonObject{{"uid", QStringLiteral("raw_meg")}, {"type", QStringLiteral("fiff_raw")}, {"uri", QStringLiteral("file://") + rawCopyB}}}};
+        {"raw_data", QJsonObject{{"uid", QStringLiteral("raw_meg")}, {"type", QStringLiteral("fiff_raw")}, {"uri", QUrl::fromLocalFile(rawCopyB).toString()}}}};
 
     const QJsonObject filterResultB = filterSkillB.executeSkill(filterNodeB);
     if (filterResultB.value(QStringLiteral("status")).toString() != QLatin1String("completed")) {
@@ -369,7 +367,7 @@ void TestMnaSkillGraphEquivalence::testFilterThenSourceEstimationEquivalence()
     sourceNodeB.outputs = sourceNodeSpec.value(QStringLiteral("outputs")).toObject();
     sourceNodeB.resolvedInputs = QJsonObject{
         {"raw_data", QJsonObject{{"uid", QStringLiteral("bandpass_out")}, {"type", QStringLiteral("fiff_raw")}, {"uri", filteredUriB}}},
-        {"inverse_operator", QJsonObject{{"uid", QStringLiteral("inv_op")}, {"type", QStringLiteral("fiff_inv")}, {"uri", QStringLiteral("file://") + invCopyB}}}};
+        {"inverse_operator", QJsonObject{{"uid", QStringLiteral("inv_op")}, {"type", QStringLiteral("fiff_inv")}, {"uri", QUrl::fromLocalFile(invCopyB).toString()}}}};
 
     const QJsonObject sourceResultB = sourceSkillB.executeSkill(sourceNodeB);
     if (sourceResultB.value(QStringLiteral("status")).toString() != QLatin1String("completed")) {

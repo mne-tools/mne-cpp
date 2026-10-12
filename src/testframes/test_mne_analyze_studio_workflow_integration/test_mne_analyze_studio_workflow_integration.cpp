@@ -257,7 +257,7 @@ void TestWorkflowIntegration::testSingleNodeFilterProducesOutputFile()
     QTemporaryFile tmp(QDir::tempPath() + "/tst_single_XXXXXX.mne");
     QVERIFY(tmp.open());
 
-    const QString inputUri = QString("file://%1").arg(m_sampleFifPath);
+    const QString inputUri = QUrl::fromLocalFile(m_sampleFifPath).toString();
     const QByteArray json = singleNodeWorkflowJson(inputUri, 1.0, 40.0);
     tmp.write(json);
     tmp.flush();
@@ -302,7 +302,7 @@ void TestWorkflowIntegration::testTwoNodeChainBothFilesProduced()
         QSKIP("FIFF test data not available.");
     }
 
-    const QString inputUri = QString("file://%1").arg(m_sampleFifPath);
+    const QString inputUri = QUrl::fromLocalFile(m_sampleFifPath).toString();
     const QByteArray json = twoNodeChainJson(inputUri);
 
     PipelineParser parser;
@@ -379,7 +379,7 @@ void TestWorkflowIntegration::testNodeStatusUpdatedAfterExecution()
         QSKIP("FIFF test data not available.");
     }
 
-    const QString inputUri = QString("file://%1").arg(m_sampleFifPath);
+    const QString inputUri = QUrl::fromLocalFile(m_sampleFifPath).toString();
     const QByteArray json = singleNodeWorkflowJson(inputUri, 1.0, 40.0);
 
     PipelineParser parser;
@@ -433,7 +433,7 @@ void TestWorkflowIntegration::testHighpassAboveLowpassReturnsError()
 
     // highpass (50 Hz) > lowpass (10 Hz) → TemporalFilterSkill should return error
     // and WorkflowManager should propagate it as a WorkflowValidationError.
-    const QString inputUri = QString("file://%1").arg(m_sampleFifPath);
+    const QString inputUri = QUrl::fromLocalFile(m_sampleFifPath).toString();
     const QByteArray json = singleNodeWorkflowJson(inputUri, 50.0, 10.0);
 
     PipelineParser parser;
