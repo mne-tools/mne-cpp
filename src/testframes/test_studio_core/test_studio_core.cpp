@@ -14,10 +14,10 @@
  * to, whether a request round trips through serialisation, what a buffer
  * reports for a file that does not exist.
  *
- * The planner is only exercised in mock mode and through its configuration
- * accessors. Nothing here performs a network request, and the environment
- * variables the planner reads are cleared in initTestCase so the result does
- * not depend on whatever happens to be set in the shell that runs the suite.
+ * The planner's HTTP requests only go to a local fake endpoint, and the
+ * environment variables the planner reads are cleared in initTestCase so the
+ * result does not depend on whatever happens to be set in the shell that runs
+ * the suite.
  */
 
 //=============================================================================================================
@@ -56,9 +56,67 @@
 #include <QStackedWidget>
 #include <QTableWidget>
 #include <QToolButton>
+#include <QTcpServer>
+#include <QTcpSocket>
 #include <QTreeWidget>
 
 #include <algorithm>
+
+namespace
+{
+
+/** Answers one HTTP request with a fixed status and body, and keeps the request it received. */
+class FakeLlmEndpoint : public QTcpServer
+{
+public:
+    FakeLlmEndpoint(int status, QByteArray body)
+    : m_status(status)
+    , m_body(std::move(body))
+    {
+        connect(this, &QTcpServer::newConnection, this, [this]() {
+            QTcpSocket* socket = nextPendingConnection();
+            connect(socket, &QTcpSocket::readyRead, socket, [this, socket]() {
+                m_request += socket->readAll();
+                const int headerEnd = m_request.indexOf("\r\n\r\n");
+                if (headerEnd < 0)
+                    return;
+                const QByteArray length = header("content-length");
+                if (m_request.size() - headerEnd - 4 < length.toInt())
+                    return;
+                socket->write("HTTP/1.1 " + QByteArray::number(m_status) + " X\r\nContent-Type: application/json\r\nContent-Length: " + QByteArray::number(m_body.size()) + "\r\nConnection: close\r\n\r\n" + m_body);
+                socket->disconnectFromHost();
+            });
+        });
+        listen(QHostAddress::LocalHost);
+    }
+
+    QString url() const
+    {
+        return QString("http://127.0.0.1:%1/v1").arg(serverPort());
+    }
+
+    QByteArray header(const QByteArray& name) const
+    {
+        for (const QByteArray& line : m_request.left(m_request.indexOf("\r\n\r\n")).split('\n')) {
+            const int colon = line.indexOf(':');
+            if (colon > 0 && line.left(colon).trimmed().toLower() == name)
+                return line.mid(colon + 1).trimmed();
+        }
+        return {};
+    }
+
+    QJsonObject payload() const
+    {
+        return QJsonDocument::fromJson(m_request.mid(m_request.indexOf("\r\n\r\n") + 4)).object();
+    }
+
+private:
+    int m_status;
+    QByteArray m_body;
+    QByteArray m_request;
+};
+
+} // namespace
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -95,6 +153,9 @@ private slots:
     void planner_mockModeIsConfiguredWithoutCredentials();
     void planner_httpModeNeedsEndpointAndModel();
     void planner_statusSummaryMentionsMode();
+    void planner_mockPlansFollowTheRequest();
+    void planner_talksToEachProvider_data();
+    void planner_talksToEachProvider();
     void agentChatDockWidget_conversationAndConfirmations();
     void llmSettingsDialog_ruleBasedAndProfileFlow();
     void workflowMiniMapWidget_graphRenderingAndActivation();
@@ -329,6 +390,127 @@ void TestStudioCore::planner_statusSummaryMentionsMode()
     QVERIFY2(!summary.isEmpty(), "status summary is empty");
     QVERIFY2(summary.contains("Mock", Qt::CaseInsensitive),
              qPrintable(QString("summary does not mention the mode: %1").arg(summary)));
+}
+
+//=============================================================================================================
+
+void TestStudioCore::planner_mockPlansFollowTheRequest()
+{
+    LlmToolPlanner planner;
+    LlmPlannerConfig config;
+    config.mode = "mock";
+    planner.setConfiguration(config);
+
+    LlmPlanResult burst = planner.plan("Find the strongest EEG burst and show its stats", {}, {});
+    QVERIFY(burst.success && burst.usedModel);
+    QCOMPARE(burst.plannedCommands.size(), 3);
+    QVERIFY(burst.plannedCommands.first().contains("\"match\":\"EEG\""));
+    QVERIFY(burst.plannedCommands.at(1).contains("${last_peak_sample}"));
+
+    const QStringList top = planner.plan("top MEG channels", {}, {}).plannedCommands;
+    QCOMPARE(top, QStringList{"tools.call neurokernel.channel_stats {\"window_samples\":1200,\"match\":\"MEG\",\"limit\":5}"});
+    QCOMPARE(planner.plan("give me a summary", {}, {}).plannedCommands, QStringList{"tools.call view.raw.summary {}"});
+    QCOMPARE(planner.plan("hello", {}, {}).plannedCommands, QStringList{"tools.call view.raw.state {}"});
+
+    // Without a configuration nothing is planned, and the status says how to configure one
+    for (const char* mode : {"", "openai_responses", "gemini_openai", "github_models", "anthropic_messages"}) {
+        config.mode = mode;
+        planner.setConfiguration(config);
+        QVERIFY(!planner.plan("hello", {}, {}).success);
+        QVERIFY2(planner.statusSummary().startsWith("LLM: Deterministic fallback only"), mode);
+    }
+}
+
+//=============================================================================================================
+
+void TestStudioCore::planner_talksToEachProvider_data()
+{
+    QTest::addColumn<QString>("mode");
+    QTest::addColumn<int>("status");
+    QTest::addColumn<QByteArray>("response");
+    QTest::addColumn<QString>("payloadKey");
+    QTest::addColumn<QStringList>("commands");
+    QTest::addColumn<QString>("error");
+
+    const QString plan = R"({"summary":"Two steps","steps":[{"tool_name":"view.raw.goto","description":"Go","arguments":{"sample":5}},{"tool_name":"","arguments":{}},{"tool_name":"view.raw.state","description":"State","arguments":{}}]})";
+    const QJsonValue planText(QString("Here is the plan:\n") + plan + "\nDone.");
+    const QStringList commands{"tools.call view.raw.goto {\"sample\":5}", "tools.call view.raw.state {}"};
+    auto json = [](const QJsonObject& o) {
+        return QJsonDocument(o).toJson(QJsonDocument::Compact);
+    };
+
+    QTest::newRow("chat completions") << "" << 200
+                                      << json({{"choices", QJsonArray{QJsonObject{{"message", QJsonObject{{"content", planText}}}}}}})
+                                      << "temperature" << commands << "";
+    QTest::newRow("github models content parts") << "github_models" << 200
+                                                 << json({{"choices", QJsonArray{QJsonObject{{"message", QJsonObject{{"content", QJsonArray{QJsonObject{{"type", "text"}, {"text", planText}}}}}}}}}})
+                                                 << "messages" << commands << "";
+    QTest::newRow("responses output_text") << "openai_responses" << 200
+                                           << json({{"status", "completed"}, {"output_text", planText}})
+                                           << "instructions" << commands << "";
+    QTest::newRow("responses output items") << "openai_responses" << 200
+                                            << json({{"output", QJsonArray{QJsonObject{{"content", QJsonArray{QJsonObject{{"type", "output_text"}, {"text", planText}}}}}}}})
+                                            << "text" << commands << "";
+    QTest::newRow("responses incomplete") << "openai_responses" << 200
+                                          << json({{"status", "incomplete"}, {"incomplete_details", QJsonObject{{"reason", "max_output_tokens"}}}})
+                                          << "" << QStringList{} << "status is `incomplete`. Details: {\"reason\":\"max_output_tokens\"}";
+    QTest::newRow("responses refusal item") << "openai_responses" << 200
+                                            << json({{"output", QJsonArray{QJsonObject{{"type", "refusal"}, {"content", QJsonArray{QJsonObject{{"refusal", "I cannot"}}}}}}}})
+                                            << "" << QStringList{} << "I cannot";
+    QTest::newRow("anthropic messages") << "anthropic_messages" << 200
+                                        << json({{"content", QJsonArray{QJsonObject{{"type", "text"}, {"text", planText}}}}})
+                                        << "max_tokens" << commands << "";
+    QTest::newRow("http error with api message") << "" << 401
+                                                 << json({{"error", QJsonObject{{"message", "bad key"}, {"type", "auth"}}}})
+                                                 << "" << QStringList{} << "bad key";
+    QTest::newRow("top-level refusal") << "" << 200 << json({{"refusal", "no"}}) << "" << QStringList{} << "no";
+    QTest::newRow("not json") << "" << 200 << QByteArray("<html>") << "" << QStringList{} << "illegal";
+    QTest::newRow("no plan in reply") << "" << 200
+                                      << json({{"choices", QJsonArray{QJsonObject{{"message", QJsonObject{{"content", "sorry"}}}}}}})
+                                      << "" << QStringList{} << "did not contain a JSON plan";
+    QTest::newRow("plan without steps") << "" << 200
+                                        << json({{"choices", QJsonArray{QJsonObject{{"message", QJsonObject{{"content", R"({"summary":"x","steps":[]})"}}}}}}})
+                                        << "" << QStringList{} << "returned no executable steps";
+}
+
+//=============================================================================================================
+
+void TestStudioCore::planner_talksToEachProvider()
+{
+    QFETCH(QString, mode);
+    QFETCH(int, status);
+    QFETCH(QByteArray, response);
+    QFETCH(QString, payloadKey);
+    QFETCH(QStringList, commands);
+    QFETCH(QString, error);
+
+    FakeLlmEndpoint endpoint(status, response);
+    QVERIFY(endpoint.isListening());
+    LlmToolPlanner planner;
+    planner.setConfiguration(LlmPlannerConfig{mode, "", endpoint.url(), "secret", "model-1"});
+    QVERIFY(planner.statusSummary().startsWith("LLM: Connected"));
+
+    const LlmPlanResult result = planner.plan("go to sample 5", QJsonArray{QJsonObject{{"name", "view.raw.goto"}}}, QJsonObject{});
+    QCOMPARE(result.httpStatusCode, status);
+    QCOMPARE(result.plannedCommands, commands);
+    QCOMPARE(result.success, !commands.isEmpty());
+    QVERIFY2(result.errorMessage.contains(error), qPrintable(result.errorMessage));
+    if (!commands.isEmpty()) {
+        QCOMPARE(result.summary, QStringLiteral("Two steps"));
+        QCOMPARE(result.plannedStepDescriptions, (QStringList{"Go", "State"}));
+    }
+
+    // The request carries the model, the provider's own payload shape and its authentication headers
+    QCOMPARE(endpoint.payload().value("model").toString(), QStringLiteral("model-1"));
+    if (!payloadKey.isEmpty())
+        QVERIFY2(endpoint.payload().contains(payloadKey), qPrintable(payloadKey));
+    if (mode == "anthropic_messages") {
+        QCOMPARE(endpoint.header("x-api-key"), QByteArray("secret"));
+        QVERIFY(!endpoint.header("anthropic-version").isEmpty());
+    } else {
+        QCOMPARE(endpoint.header("authorization"), QByteArray("Bearer secret"));
+    }
+    QCOMPARE(endpoint.header("x-github-api-version").isEmpty(), mode != "github_models");
 }
 
 //=============================================================================================================
