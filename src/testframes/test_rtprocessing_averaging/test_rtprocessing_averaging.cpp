@@ -583,6 +583,14 @@ private slots:
         QVERIFY(evoked.nave > 0);
         QVERIFY(qAbs(evoked.baseline.first + 0.1f) < 1e-6f);
         QVERIFY(qAbs(evoked.baseline.second - 0.0f) < 1e-6f);
+        // Like mne's Evoked.first/last: the samples of tmin and tmax relative to the event
+        const int from = static_cast<int>(std::lround(-0.1 * raw.info.sfreq));
+        const int to = static_cast<int>(std::lround(0.3 * raw.info.sfreq));
+        QCOMPARE(evoked.first, from);
+        QCOMPARE(evoked.last, to);
+        QCOMPARE(evoked.data.cols(), static_cast<Index>(to - from + 1));
+        // Without a matching event there is nothing to average
+        QCOMPARE(MNEEpochDataList::computeAverage(raw, events, -0.1f, 0.3f, 9999, false, 0.0f, 0.0f, {}).data.size(), Index(0));
     }
 
     //=========================================================================

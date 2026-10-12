@@ -477,9 +477,13 @@ FiffEvoked MNEEpochDataList::computeAverage(const FiffRawData& raw,
         lstEpochDataList.dropRejected();
     }
 
+    if (lstEpochDataList.isEmpty())
+        return FiffEvoked();
+
+    const fiff_int_t first = static_cast<fiff_int_t>(std::lround(fTMinS * raw.info.sfreq));
     FiffEvoked evoked = lstEpochDataList.average(raw.info,
-                                                 0,
-                                                 lstEpochDataList.first()->epoch.cols());
+                                                 first,
+                                                 first + static_cast<fiff_int_t>(lstEpochDataList.first()->epoch.cols()) - 1);
     evoked.baseline = bApplyBaseline ? QPair<float, float>(fTBaselineFromS, fTBaselineToS)
                                      : QPair<float, float>(0.0f, 0.0f);
     return evoked;
