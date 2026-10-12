@@ -277,6 +277,33 @@ void TestMneRawDataPython::projectsSegment()
              qPrintable(QStringLiteral("all projected %1").arg(all.values.cast<double>().cwiseAbs().sum(), 0, 'g', 12)));
     m_raw->proj.reset();
 
+    // Without projection files EEG channels still get MNE-C's average reference; MEG alone needs nothing
+    QList<FiffChInfo> eeg, meg, stim;
+    for (const FiffChInfo& ch : std::as_const(m_raw->info->chInfo)) {
+        (ch.kind == FIFFV_EEG_CH ? eeg : ch.kind == FIFFV_MEG_CH ? meg
+                                                                 : stim)
+            .append(ch);
+    }
+    QVERIFY(MNEProjOp::makeProjection({}, eeg, static_cast<int>(eeg.size()), proj));
+    QVERIFY(proj);
+    QCOMPARE(proj->nitems, 1);
+    QCOMPARE(proj->items[0].kind, FIFFV_MNE_PROJ_ITEM_EEG_AVREF);
+    QCOMPARE(proj->items[0].vecs->ncol, static_cast<int>(eeg.size()));
+    QVERIFY(std::fabs(proj->items[0].vecs->data(0, 0) - 1.0 / std::sqrt(static_cast<double>(eeg.size()))) < 1e-7);
+    QString listing;
+    QTextStream out(&listing);
+    proj->report_data(out, QStringLiteral("#"), true, {eeg[1].ch_name});
+    QVERIFY2(listing.startsWith(QStringLiteral("#\n## 1 : Average EEG reference : 1 vecs : %1 chs EEG active\n#\n").arg(eeg.size())), qPrintable(listing));
+    QVERIFY(listing.contains(eeg[0].ch_name));
+    // The excluded channel's weight is listed as zero
+    QCOMPARE(listing.count(QStringLiteral(" 0.0000 ")), 1);
+    QVERIFY(MNEProjOp::makeProjection({}, meg, static_cast<int>(meg.size()), proj));
+    QVERIFY(!proj);
+    // Projectors that touch none of the channels are dropped, and an unreadable file fails
+    QVERIFY(MNEProjOp::makeProjection({m_rawPath}, stim, static_cast<int>(stim.size()), proj));
+    QVERIFY(!proj);
+    QVERIFY(!MNEProjOp::makeProjection({m_rawPath + QStringLiteral(".missing")}, meg, static_cast<int>(meg.size()), proj));
+
     // Bad channels are left out of the vectors before orthogonalisation (mne make_projector(projs, ch_names, bads)):
     // the average EEG reference then spans 59 channels, and with every EEG channel bad it disappears
     const auto projector = [&](const QStringList& bads, int& nvec) {
