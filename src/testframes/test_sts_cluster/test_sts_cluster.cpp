@@ -88,6 +88,7 @@ private slots:
     void testCorrectionsMatchMne();
     void testTrisAdjacencyMatchesMne();
     void testClusterThresholdMatchesMne();
+    void testTfceMatchesMne();
     void testClusterSumsMatchMne();
 
     void cleanupTestCase();
@@ -642,6 +643,30 @@ void TestStsCluster::testTrisAdjacencyMatchesMne()
     QCOMPARE(upperEdges(StatsAdjacency::fromChannelPositions(info, {"EEG0", "EEG1", "EEG2", "EEG10"})).join(' '), QStringLiteral("0-1 0-2 1-2"));
     QCOMPARE(upperEdges(StatsAdjacency::fromChannelPositions(info, {"EEG0", "EEG10"})).join(' '), QStringLiteral("0-1"));
     QCOMPARE(StatsAdjacency::fromChannelPositions(info, {"MEG0111"}).rows(), 0);
+}
+
+//=============================================================================================================
+
+void TestStsCluster::testTfceMatchesMne()
+{
+    MatrixX3i tris(4, 3);
+    tris << 0, 1, 2, 1, 3, 2, 2, 3, 4, 3, 5, 4;
+    const SparseMatrix<int> adj = StatsAdjacency::fromSourceSpace(tris, 6);
+    MatrixXd x(6, 1);
+    x << 3.0, 2.2, -1.4, 0.7, -2.6, 1.9;
+    // mne main (#14286): dh = max|x| / (nSteps + 1); _find_clusters(x, dict(start=dh, step=dh), tail=0, adjacency)
+    // scores * sign(x), as permutation_cluster_test returns them
+    const QVector<std::pair<int, QVector<double>>> cases = {
+        {4, {7.85911168314365, 4.403111683143649, -1.5273506473629428, 0.432, -6.9273506473629425, 3.2399999999999993}},
+        {100, {10.429225992540047, 5.174281078383893, -1.323811321249914, 0.2266289171805132, -6.2395204198531395, 2.349833689378152}}};
+    for (const auto& [nSteps, expected] : cases) {
+        const MatrixXd scores = StatsCluster::tfce(x, adj, 0.5, 2.0, nSteps);
+        for (int v = 0; v < 6; ++v) {
+            QVERIFY2(std::fabs(scores(v, 0) - expected[v]) < 1e-9,
+                     qPrintable(QString("%1 steps, vertex %2: %3 vs %4").arg(nSteps).arg(v).arg(scores(v, 0), 0, 'g', 12).arg(expected[v], 0, 'g', 12)));
+        }
+    }
+    QCOMPARE(StatsCluster::tfce(MatrixXd::Zero(6, 1), adj, 0.5, 2.0, 4), MatrixXd::Zero(6, 1).eval());
 }
 
 //=============================================================================================================

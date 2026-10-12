@@ -166,6 +166,8 @@ public:
      *
      * Enhances a statistic map by integrating cluster extent and height over a range
      * of thresholds (Smith & Nichols 2009). Handles both positive and negative values.
+     * Both signs are swept by the thresholds h = k * dh, k = 1..nSteps, with dh = max|statMap| / (nSteps + 1),
+     * like MNE-Python's threshold=dict(start=dh, step=dh).
      *
      * @param[in] statMap     Statistic map (nVertices x nTimes).
      * @param[in] adjacency   Spatio-temporal adjacency matrix (nVertices*nTimes x nVertices*nTimes).

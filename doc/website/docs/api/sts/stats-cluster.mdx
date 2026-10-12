@@ -141,7 +141,7 @@ Tests for differences across conditions by randomly reassigning condition labels
 
 Threshold-Free Cluster Enhancement (TFCE).
 
-Enhances a statistic map by integrating cluster extent and height over a range of thresholds (Smith & Nichols 2009). Handles both positive and negative values.
+Enhances a statistic map by integrating cluster extent and height over a range of thresholds (Smith & Nichols 2009). Handles both positive and negative values. Both signs are swept by the thresholds h = k * dh, k = 1..nSteps, with dh = max|statMap| / (nSteps + 1), like MNE-Python's threshold=dict(start=dh, step=dh).
 
 **Parameters:**
 

@@ -28,7 +28,8 @@
  * MNE-Python does: p = (1 + #exceedances) / (1 + nPermutations).
  *
  * TFCE follows Smith & Nichols (2009): the statistic map is swept by
- * @c nSteps thresholds and each supra-threshold connected component
+ * @c nSteps thresholds below the largest absolute statistic, as MNE-Python
+ * does, and each supra-threshold connected component
  * contributes @f$\text{extent}^E \cdot h^H \cdot \Delta h@f$ to every
  * sample it covers. Positive and negative tails are handled separately
  * and recombined so signed enhancement is preserved.
@@ -712,14 +713,13 @@ MatrixXd StatsCluster::tfce(
 
     MatrixXd tfceMap = MatrixXd::Zero(nVertices, nTimes);
 
+    // Like mne's threshold=dict(start=dh, step=dh): both signs share the nSteps levels below the largest |statistic|
+    const double dh = statMap.cwiseAbs().maxCoeff() / static_cast<double>(nSteps + 1);
+    if (dh <= 0.0)
+        return tfceMap;
+
     // Helper: run TFCE on one polarity
     auto runTfce = [&](const MatrixXd& absMap, bool isPositive) {
-        double maxVal = absMap.maxCoeff();
-        if (maxVal <= 0.0)
-            return;
-
-        double dh = maxVal / static_cast<double>(nSteps);
-
         for (int step = 1; step <= nSteps; ++step) {
             double h = dh * static_cast<double>(step);
 
@@ -730,7 +730,7 @@ MatrixXd StatsCluster::tfce(
                 int v = idx / nTimes;
                 int t = idx % nTimes;
 
-                if (absMap(v, t) < h || visited[idx])
+                if (absMap(v, t) <= h || visited[idx])
                     continue;
 
                 // BFS to find cluster
@@ -750,7 +750,7 @@ MatrixXd StatsCluster::tfce(
                             continue;
                         int nV = nIdx / nTimes;
                         int nT = nIdx % nTimes;
-                        if (absMap(nV, nT) >= h) {
+                        if (absMap(nV, nT) > h) {
                             visited[nIdx] = true;
                             queue.push(nIdx);
                         }
