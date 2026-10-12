@@ -17,6 +17,8 @@
 
 #include <Eigen/Core>
 
+#include <cmath>
+
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_cov.h>
@@ -309,6 +311,27 @@ private slots:
         QVERIFY(gain.cols() > 0);
         QVERIFY(numNonZero > 0);
         QVERIFY(whitener.rows() > 0);
+
+        // Both whiteners invert the noise covariance on its non-zero subspace (mne _get_whitener):
+        // the PCA one (n_nzero x n_chan) whitens it to the identity and has the same W^T W
+        Eigen::MatrixXd pcaWhitener;
+        qint32 pcaNumNonZero = 0;
+        m_fwd.prepare_forward(raw.info, noiseCov, true,
+                              outFwdInfo, gain, outNoiseCov, pcaWhitener, pcaNumNonZero);
+        const Eigen::Index nChan = whitener.cols();
+        QCOMPARE(pcaNumNonZero, numNonZero);
+        QCOMPARE(pcaWhitener.rows(), Eigen::Index(numNonZero));
+        QCOMPARE(pcaWhitener.cols(), nChan);
+        // Its rows are the eigenvectors of the non-zero eigenvalues, each scaled by 1/sqrt(eigenvalue)
+        Eigen::VectorXd scale(numNonZero);
+        for (Eigen::Index i = 0, k = 0; i < outNoiseCov.eig.size(); ++i) {
+            if (outNoiseCov.eig(i) > 0)
+                scale(k++) = std::sqrt(outNoiseCov.eig(i));
+        }
+        const Eigen::MatrixXd orthonormal = scale.asDiagonal() * pcaWhitener * pcaWhitener.transpose() * scale.asDiagonal();
+        QVERIFY((orthonormal - Eigen::MatrixXd::Identity(numNonZero, numNonZero)).cwiseAbs().maxCoeff() < 1e-9);
+        const Eigen::MatrixXd full = whitener.transpose() * whitener;
+        QVERIFY((pcaWhitener.transpose() * pcaWhitener - full).cwiseAbs().maxCoeff() < 1e-6 * full.cwiseAbs().maxCoeff());
     }
 
     // ── Forward solution write/read round-trip ──────────────────────────────

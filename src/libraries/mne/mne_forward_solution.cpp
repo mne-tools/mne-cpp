@@ -1094,11 +1094,10 @@ void MNEForwardSolution::prepare_forward(const FiffInfo& p_info,
 
     if (p_outNumNonZero > 0) {
         if (p_pca) {
-            qWarning("Warning in MNEForwardSolution::prepare_forward: if (p_pca) havent been debugged.");
-            p_outWhitener = MatrixXd::Zero(n_chan, p_outNumNonZero);
-            // Rows of eigvec are the eigenvectors
+            // Rows of eigvec are the eigenvectors: one whitened component per non-zero eigenvalue (mne _get_whitener)
+            p_outWhitener = MatrixXd(p_outNumNonZero, n_chan);
             for (qint32 i = 0; i < p_outNumNonZero; ++i)
-                p_outWhitener.col(t_vecNonZero[i]) = p_outNoiseCov.eigvec.col(t_vecNonZero[i]).array() / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
+                p_outWhitener.row(i) = p_outNoiseCov.eigvec.row(t_vecNonZero[i]) / sqrt(p_outNoiseCov.eig(t_vecNonZero[i]));
             qInfo("\tReducing data rank to %d.", p_outNumNonZero);
         } else {
             qInfo("Creating non pca whitener.");
