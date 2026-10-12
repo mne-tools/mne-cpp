@@ -165,6 +165,33 @@ private slots:
         QVERIFY(model != nullptr);
         double coeff = model->fwd_eeg_get_multi_sphere_model_coeff(1);
         QVERIFY(coeff != 0.0 || true);
+
+        // Per-electrode potentials are the series evaluated at each electrode, and vanish for dipoles outside the brain
+        QVERIFY(model->fwd_setup_eeg_sphere_model(0.09f, false, 0));
+        QVERIFY(std::abs(model->layers[0].rad - 0.07f) < 1e-6f);
+        QList<FIFFLIB::FiffChInfo> chs;
+        for (const Eigen::Vector3f& r : {Eigen::Vector3f(0.0f, 0.0f, 0.09f), Eigen::Vector3f(0.09f, 0.0f, 0.0f), Eigen::Vector3f(0.0f, -0.0636f, 0.0636f)}) {
+            FIFFLIB::FiffChInfo ch;
+            ch.ch_name = QStringLiteral("EEG%1").arg(chs.size());
+            ch.kind = FIFFV_EEG_CH;
+            ch.chpos.coil_type = FIFFV_COIL_EEG;
+            ch.chpos.r0 = r;
+            chs << ch;
+        }
+        auto els = FwdCoilSet::create_eeg_els(chs, static_cast<int>(chs.size()));
+        QVERIFY(els);
+        const Eigen::Vector3f rd(0.01f, 0.02f, 0.04f), Q(1e-8f, 0.0f, 2e-8f);
+        Eigen::VectorXf coils(3);
+        QCOMPARE(FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(rd, Q, *els, coils, model.get()), 0);
+        Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> points(3, 3);
+        for (int k = 0; k < 3; ++k)
+            points.row(k) = chs[k].chpos.r0.transpose();
+        Eigen::VectorXf direct(3);
+        QCOMPARE(FwdEegSphereModel::fwd_eeg_multi_spherepot(rd, Q, points, 3, direct, model.get()), 0);
+        QVERIFY(direct.cwiseAbs().maxCoeff() > 0.0f);
+        QVERIFY((coils - direct).cwiseAbs().maxCoeff() <= 1e-6f * direct.cwiseAbs().maxCoeff());
+        QCOMPARE(FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1(Eigen::Vector3f(0.0f, 0.0f, 0.075f), Q, *els, coils, model.get()), 0);
+        QCOMPARE(coils, Eigen::VectorXf::Zero(3).eval());
     }
 
     //=========================================================================
