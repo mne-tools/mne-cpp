@@ -24,7 +24,6 @@
 //=============================================================================================================
 
 #include "mne_bem_surface.h"
-#include <fstream>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -139,14 +138,6 @@ bool MNEBemSurface::addTriangleData()
 
         this->tri_area(i) = size / 2.0f;
         this->tri_nn.row(i) /= size;
-    }
-
-    std::fstream doc("./Output/tri_area.dat", std::ofstream::out | std::ofstream::trunc);
-    if (doc) // if succesfully opened
-    {
-        // instructions
-        doc << this->tri_area << "\n";
-        doc.close();
     }
 
     qInfo("Adding additional geometry info\n");

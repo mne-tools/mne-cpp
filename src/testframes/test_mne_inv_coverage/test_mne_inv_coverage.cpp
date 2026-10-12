@@ -272,7 +272,15 @@ void TestMneInvCoverage::testBemSurfaceGeometryOfSmallMesh()
     surf.rr.topRows(3) = Eigen::Matrix3f::Identity();
     surf.itris = Eigen::MatrixX3i(1, 3);
     surf.itris << 0, 1, 2;
-    QVERIFY(surf.addTriangleData());
+    // Computing geometry leaves the working directory alone
+    QTemporaryDir dir;
+    QVERIFY(QDir(dir.path()).mkdir(QStringLiteral("Output")));
+    const QString cwd = QDir::currentPath();
+    QVERIFY(QDir::setCurrent(dir.path()));
+    const bool added = surf.addTriangleData();
+    QDir::setCurrent(cwd);
+    QVERIFY(added);
+    QVERIFY(QDir(dir.filePath(QStringLiteral("Output"))).isEmpty());
     QCOMPARE(static_cast<int>(surf.neighbor_tri.size()), 4);
     QCOMPARE(static_cast<int>(surf.neighbor_vert.size()), 4);
     for (int k = 0; k < 3; ++k) {
