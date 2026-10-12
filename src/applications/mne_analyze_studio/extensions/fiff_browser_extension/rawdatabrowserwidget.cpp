@@ -332,7 +332,7 @@ QString RawDataBrowserWidget::filePath() const
 
 QString RawDataBrowserWidget::summaryText() const
 {
-    if (!m_rawModel->fiffInfo()) {
+    if (!m_rawModel->isFileLoaded()) {
         return "No raw browser loaded.";
     }
 
@@ -355,7 +355,7 @@ QString RawDataBrowserWidget::stateText() const
 
 bool RawDataBrowserWidget::gotoSample(int sample)
 {
-    if (!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (!m_rawModel->isFileLoaded() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return false;
     }
 
@@ -408,7 +408,7 @@ void RawDataBrowserWidget::updateScrollConfiguration()
 
 void RawDataBrowserWidget::updateTimeRuler()
 {
-    if (!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (!m_rawModel->isFileLoaded() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return;
     }
 
@@ -489,7 +489,7 @@ bool RawDataBrowserWidget::eventFilter(QObject* watched, QEvent* event)
 
 void RawDataBrowserWidget::setMarkerSample(int sample)
 {
-    if (!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (!m_rawModel->isFileLoaded() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return;
     }
 
@@ -534,7 +534,7 @@ void RawDataBrowserWidget::adjustAmplitude(double factor)
 
 QString RawDataBrowserWidget::currentVisibleRangeText() const
 {
-    if (!m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (!m_rawModel->isFileLoaded() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return "Visible range unavailable";
     }
 
@@ -551,7 +551,7 @@ QString RawDataBrowserWidget::currentVisibleRangeText() const
 
 QString RawDataBrowserWidget::currentCursorText() const
 {
-    if (m_markerSample < 0 || !m_rawModel->fiffInfo() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
+    if (m_markerSample < 0 || !m_rawModel->isFileLoaded() || m_rawModel->fiffInfo()->sfreq <= 0.0) {
         return "Cursor unavailable";
     }
 
@@ -566,7 +566,7 @@ void RawDataBrowserWidget::publishBrowserState(bool appendToOutput)
                                      .arg(currentVisibleRangeText(), currentCursorText());
     emit statusMessage(stateMessage);
 
-    if (appendToOutput && m_rawModel->fiffInfo()) {
+    if (appendToOutput && m_rawModel->isFileLoaded()) {
         const int totalSamples = std::max<qint32>(0, m_rawModel->lastSample() - m_rawModel->firstSample() + 1);
         emit outputMessage(QString("Raw Data Browser: %1").arg(m_filePath));
         emit outputMessage(QString("Channels: %1 | Sampling rate: %2 Hz | Samples: %3 | First sample: %4 | Last sample: %5")

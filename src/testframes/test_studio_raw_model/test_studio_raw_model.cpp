@@ -11,7 +11,12 @@
  */
 
 #include <browsercore/Models/rawmodel.h>
+#include <rawdatabrowserwidget.h>
 
+#include <fiff/fiff_events.h>
+
+#include <QPushButton>
+#include <QTableView>
 #include <QTemporaryDir>
 #include <QtTest>
 
@@ -27,6 +32,7 @@ private slots:
     void loadAndInspect();
     void bufferLoad();
     void writeAndReopen();
+    void browserWidgetNavigatesTheRecording();
 };
 
 QString rawFilePath()
@@ -151,5 +157,86 @@ void TestStudioRawModel::writeAndReopen()
     QCOMPARE(writtenModel.lastSample(), model.lastSample());
 }
 
-QTEST_GUILESS_MAIN(TestStudioRawModel)
+void TestStudioRawModel::browserWidgetNavigatesTheRecording()
+{
+    if (!QFile::exists(rawFilePath())) {
+        QSKIP("Sample raw data not available");
+    }
+
+    // A companion <name>-eve.fif next to the recording is picked up with it
+    QTemporaryDir dir;
+    const QString rawCopy = dir.filePath("run_raw.fif");
+    QVERIFY(QFile::copy(rawFilePath(), rawCopy));
+    FIFFLIB::FiffEvents events;
+    events.events.resize(2, 3);
+    events.events << 15000, 0, 1, 16000, 0, 2;
+    QFile eveFile(dir.filePath("run_raw-eve.fif"));
+    QVERIFY(events.write_to_fif(eveFile));
+    eveFile.close();
+
+    MNEANALYZESTUDIO::RawDataBrowserWidget widget;
+    widget.resize(900, 600);
+    widget.show();
+    QSignalSpy output(&widget, &MNEANALYZESTUDIO::RawDataBrowserWidget::outputMessage);
+    QSignalSpy status(&widget, &MNEANALYZESTUDIO::RawDataBrowserWidget::statusMessage);
+
+    QCOMPARE(widget.summaryText(), QStringLiteral("No raw browser loaded."));
+    QCOMPARE(widget.stateText().left(25), QStringLiteral("Visible range unavailable"));
+    QVERIFY(!widget.gotoSample(100));
+    QVERIFY(!widget.loadFile(dir.filePath("missing.fif")));
+
+    QVERIFY(widget.loadFile(rawCopy));
+    QCOMPARE(widget.filePath(), rawCopy);
+    QVERIFY(widget.summaryText().contains("Channels: 376"));
+    QVERIFY(std::any_of(output.cbegin(), output.cend(), [](const QList<QVariant>& args) {
+        return args.first().toString().contains("(2 events)");
+    }));
+
+    // Going to a sample moves the cursor there; out-of-range samples are clamped
+    QVERIFY(widget.gotoSample(16000));
+    QCOMPARE(widget.cursorSample(), 16000);
+    QVERIFY(status.last().first().toString().contains("Cursor: 16000"));
+    QVERIFY(widget.gotoSample(1));
+    QCOMPARE(widget.cursorSample(), 12900);
+
+    QVERIFY(!widget.setZoomPixelsPerSample(0.0));
+    QVERIFY(widget.setZoomPixelsPerSample(2.0));
+    QCOMPARE(widget.pixelsPerSample(), 2.0);
+    auto button = [&widget](const QString& text) {
+        for (QPushButton* candidate : widget.findChildren<QPushButton*>()) {
+            if (candidate->text() == text)
+                return candidate;
+        }
+        return static_cast<QPushButton*>(nullptr);
+    };
+    button("+")->click();
+    QCOMPARE(widget.pixelsPerSample(), 2.5);
+    button("-")->click();
+    QCOMPARE(widget.pixelsPerSample(), 2.0);
+    button("1:1")->click();
+    QCOMPARE(widget.pixelsPerSample(), 1.0);
+    QVERIFY(widget.stateText().endsWith("Zoom: 1.00 px/sample"));
+
+    // Keyboard: d toggles DC removal, +/- scale the amplitude
+    auto* table = widget.findChild<QTableView*>();
+    QVERIFY(table);
+    QTest::keyClick(table, Qt::Key_D);
+    QVERIFY(button("DC")->isChecked());
+    QTest::keyClick(table, Qt::Key_Plus);
+    QTest::keyClick(table, Qt::Key_Minus);
+
+    // Clicking a channel label toggles it bad; double-clicking the data moves the cursor
+    const QString firstChannel = table->model()->index(0, 0).data().toString();
+    const QPoint label(table->columnViewportPosition(0) + 5, table->rowViewportPosition(0) + 5);
+    QTest::mouseClick(table->viewport(), Qt::LeftButton, {}, label);
+    QVERIFY(table->model()->index(0, 1).data(Qt::BackgroundRole).isValid());
+    QTest::mouseClick(table->viewport(), Qt::LeftButton, {}, label);
+    QCOMPARE(table->model()->index(0, 0).data().toString(), firstChannel);
+    widget.gotoSample(15000);
+    const int dataX = table->columnViewportPosition(1);
+    QTest::mouseDClick(table->viewport(), Qt::LeftButton, {}, QPoint(dataX + 100, table->rowViewportPosition(0) + 5));
+    QVERIFY(widget.cursorSample() > 15000);
+}
+
+QTEST_MAIN(TestStudioRawModel)
 #include "test_studio_raw_model.moc"
