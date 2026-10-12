@@ -449,6 +449,49 @@ void TestFiffCoverage::testCtfCompRoundTrip()
     QVERIFY(QFile::exists(tmpPath));
     QVERIFY2(QFileInfo(tmpPath).size() > 0,
              "Written FIFF file is empty - stream not flushed");
+
+    // Read compensators are calibrated in memory and written back uncalibrated (mne _write_ctf_comp),
+    // so a read-write-read round trip returns the same matrix
+    QList<FiffChInfo> chs;
+    for (const auto& [name, cal] : {std::pair{"MEG0111", 2.0f}, std::pair{"MEG0121", 4.0f}, std::pair{"REF01", 0.5f}, std::pair{"REF02", 8.0f}, std::pair{"REF03", 1.0f}}) {
+        FiffChInfo ch;
+        ch.ch_name = name;
+        ch.range = 1.0f;
+        ch.cal = cal;
+        chs << ch;
+    }
+    FiffCtfComp raw;
+    raw.ctfkind = 1194410578;
+    raw.save_calibrated = false;
+    raw.data = FiffNamedMatrix::SDPtr(new FiffNamedMatrix(2, 3, {"MEG0111", "MEG0121"}, {"REF01", "REF02", "REF03"}, MatrixXd::Constant(2, 3, 1.0)));
+    const auto writeComps = [](const QString& path, const QList<FiffCtfComp>& list) {
+        QFile out(path);
+        FiffStream::SPtr w = FiffStream::start_file(out);
+        w->write_ctf_comp(list);
+        w->end_file();
+        w->close();
+    };
+    const auto readComps = [&chs](const QString& path) {
+        QFile in(path);
+        FiffStream::SPtr r(new FiffStream(&in));
+        QList<FiffCtfComp> read;
+        if (r->open())
+            read = r->read_ctf_comp(r->dirtree(), chs);
+        return read;
+    };
+    const QString firstPath = m_tmpDir.path() + "/ctf_comp_raw.fif";
+    writeComps(firstPath, {raw});
+    const QList<FiffCtfComp> first = readComps(firstPath);
+    QCOMPARE(first.size(), 1);
+    QCOMPARE(first[0].kind, 1);
+    MatrixXd calibrated(2, 3);
+    calibrated << 2.0 / 0.5, 2.0 / 8.0, 2.0, 4.0 / 0.5, 4.0 / 8.0, 4.0;
+    QVERIFY(first[0].data->data.isApprox(calibrated));
+    const QString secondPath = m_tmpDir.path() + "/ctf_comp_again.fif";
+    writeComps(secondPath, first);
+    const QList<FiffCtfComp> second = readComps(secondPath);
+    QCOMPARE(second.size(), 1);
+    QVERIFY2(second[0].data->data.isApprox(calibrated), qPrintable(QString::number(second[0].data->data(0, 0))));
 }
 
 //=============================================================================================================
