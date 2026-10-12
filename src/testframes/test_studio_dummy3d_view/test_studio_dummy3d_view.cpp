@@ -145,7 +145,8 @@ void TestStudioDummy3DView::descriptor_missingFileIsSurvivable()
     QTemporaryDir dir;
     QVERIFY(QFile::copy(data + "MEG/sample/sample_audvis-cov.fif", dir.filePath("cov.bem")));
     QVERIFY(QFile::copy(data + "subjects/sample/bem/sample-1280-1280-1280-bem.fif", dir.filePath("head.bem")));
-    QSignalSpy status(&widget, &Dummy3DHostedViewWidget::statusMessage);
+    // String-based: the widget library exports no data symbols (staticMetaObject) on Windows
+    QSignalSpy status(&widget, SIGNAL(statusMessage(QString)));
     QVERIFY(!widget.addFileToScene(dir.filePath("cov.bem")));
     QVERIFY(status.last().at(0).toString().startsWith("Failed to load BEM surface set"));
     QVERIFY(widget.addFileToScene(dir.filePath("head.bem")));
