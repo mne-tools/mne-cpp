@@ -55,6 +55,8 @@ set(HEADERS
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 mne_analyze_studio_configure_library_target(${PROJECT_NAME})
+# Core exports explicitly (STUDIOCORESHARED_EXPORT); exporting all symbols too duplicates vftables (LNK4197)
+set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS OFF)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
