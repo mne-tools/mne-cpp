@@ -71,6 +71,7 @@ using namespace DISPLIB;
 const QString pluginDir = "/mne_scan_plugins";          /**< holds path to plugins.*/
 constexpr unsigned long waitUntilHidingSplashScreen(1); /**< Seconds to wait after the application setup has finished, before hiding the splash screen.*/
 
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -548,7 +549,7 @@ void MainWindow::createActions()
     // Styles
     m_pActionStyleGroup = new QActionGroup(this);
 
-    m_pActionDefaultMode = new QAction("Default");
+    m_pActionDefaultMode = new QAction("Default", this);
     m_pActionDefaultMode->setStatusTip(tr("Activate default style"));
     m_pActionDefaultMode->setCheckable(true);
     m_pActionDefaultMode->setChecked(true);
@@ -558,7 +559,7 @@ void MainWindow::createActions()
                 onStyleChanged("default");
             });
 
-    m_pActionDarkMode = new QAction("Dark");
+    m_pActionDarkMode = new QAction("Dark", this);
     m_pActionDarkMode->setStatusTip(tr("Activate dark style"));
     m_pActionDarkMode->setCheckable(true);
     m_pActionDarkMode->setChecked(false);
@@ -571,7 +572,7 @@ void MainWindow::createActions()
     // Modes
     m_pActionModeGroup = new QActionGroup(this);
 
-    m_pActionResearchMode = new QAction("Research");
+    m_pActionResearchMode = new QAction("Research", this);
     m_pActionResearchMode->setStatusTip(tr("Activate the research GUI mode"));
     m_pActionResearchMode->setCheckable(true);
     m_pActionResearchMode->setChecked(true);
@@ -579,7 +580,7 @@ void MainWindow::createActions()
     connect(m_pActionResearchMode.data(), &QAction::triggered,
             this, &MainWindow::onGuiModeChanged);
 
-    m_pActionClinicalMode = new QAction("Clinical");
+    m_pActionClinicalMode = new QAction("Clinical", this);
     m_pActionClinicalMode->setStatusTip(tr("Activate the clinical GUI mode"));
     m_pActionClinicalMode->setCheckable(true);
     m_pActionClinicalMode->setChecked(false);

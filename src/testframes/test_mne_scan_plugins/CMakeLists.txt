@@ -40,6 +40,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENTS}
     ${SCAN_PLUGINS}
+    mne_scan_app_core
     scShared
     scMeas
     scDisp

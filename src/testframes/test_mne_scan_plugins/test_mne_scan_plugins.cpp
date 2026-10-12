@@ -22,6 +22,8 @@
 #include <rtclustmne/rtclustmne.h>
 #include <rtfwd/rtfwd.h>
 
+#include <mainwindow.h>
+
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -67,6 +69,7 @@ private slots:
     void averagesTheStimulusEvents();
     void estimatesTheCovariance();
     void passesTheStreamThrough();
+    void mainWindowSwitchesStyle();
 
 private:
     static void addPluginRows();
@@ -346,6 +349,27 @@ void TestMneScanPlugins::passesTheStreamThrough()
     QMutexLocker locker(&mutex);
     QVERIFY(!blocks.isEmpty());
     QVERIFY(blocks.first().isApprox(m_data.middleCols(0, 200)));
+}
+
+//=============================================================================================================
+
+void TestMneScanPlugins::mainWindowSwitchesStyle()
+{
+    QTemporaryDir noPlugins;
+    qputenv("MNE_SCAN_PLUGIN_DIR", noPlugins.path().toLocal8Bit());
+    MNESCAN::MainWindow window;
+    qunsetenv("MNE_SCAN_PLUGIN_DIR");
+
+    auto action = [&window](const QString& text) -> QAction* {
+        for (QAction* candidate : window.findChildren<QAction*>()) {
+            if (candidate->text() == text)
+                return candidate;
+        }
+        return nullptr;
+    };
+    for (const char* text : {"Default", "Dark", "Research", "Clinical"})
+        QVERIFY2(action(text), text);
+
 }
 
 //=============================================================================================================
