@@ -591,6 +591,35 @@ private slots:
         QCOMPARE(evoked.data.cols(), static_cast<Index>(to - from + 1));
         // Without a matching event there is nothing to average
         QCOMPARE(MNEEpochDataList::computeAverage(raw, events, -0.1f, 0.3f, 9999, false, 0.0f, 0.0f, {}).data.size(), Index(0));
+
+        // Filtered epochs are the epochs of the filtered recording, sampled like mne.Epochs
+        const RowVectorXi picks = RowVectorXi::LinSpaced(raw.info.nchan, 0, raw.info.nchan - 1);
+        const FilterKernel kernel("data_bp", 2, 256, 10.0 / raw.info.sfreq, 30.0 / raw.info.sfreq, 1.0 / raw.info.sfreq, raw.info.sfreq, 0);
+        const FiffEvoked filtered = RTPROCESSINGLIB::computeFilteredAverage(raw, events, -0.1f, 0.3f, codes.first(), true, -0.1f, 0.0f, {}, kernel);
+        MatrixXd all, allTimes;
+        QVERIFY(raw.read_raw_segment(all, allTimes, raw.first_samp, raw.last_samp, picks));
+        const MatrixXd allFiltered = RTPROCESSINGLIB::filterData(all, kernel);
+        const int delay = kernel.getFilterOrder() / 2;
+        MatrixXd sum = MatrixXd::Zero(all.rows(), to - from + 1);
+        int nave = 0;
+        for (int e = 0; e < events.rows(); ++e) {
+            const int start = events(e, 0) + from - raw.first_samp;
+            if (events(e, 1) != 0 || events(e, 2) != codes.first() || start < delay || start + (to - from) + delay > raw.last_samp - raw.first_samp)
+                continue;
+            MatrixXd epoch = allFiltered.middleCols(start, to - from + 1);
+            epoch.colwise() -= epoch.leftCols(1 - from).rowwise().mean();
+            sum += epoch;
+            ++nave;
+        }
+        QVERIFY(nave > 1);
+        QCOMPARE(filtered.nave, nave);
+        QCOMPARE(filtered.first, from);
+        QCOMPARE(filtered.last, to);
+        QCOMPARE(filtered.data.cols(), sum.cols());
+        QVERIFY2((filtered.data - sum / nave).cwiseAbs().maxCoeff() < 1e-6 * sum.cwiseAbs().maxCoeff() / nave,
+                 qPrintable(QString::number((filtered.data - sum / nave).cwiseAbs().maxCoeff())));
+        QVERIFY(qAbs(filtered.baseline.first + 0.1f) < 1e-6f);
+        QCOMPARE(RTPROCESSINGLIB::computeFilteredAverage(raw, events, -0.1f, 0.3f, 9999, false, 0.0f, 0.0f, {}, kernel).data.size(), Index(0));
     }
 
     //=========================================================================

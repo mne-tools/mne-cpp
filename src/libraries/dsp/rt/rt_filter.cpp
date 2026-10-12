@@ -34,6 +34,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+#include <cmath>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -568,14 +570,15 @@ FiffEvoked RTPROCESSINGLIB::computeFilteredAverage(const FiffRawData& raw,
     for (p = 0; p < count; ++p) {
         // Read a data segment
         event_samp = matEvents(selected(p), 0);
-        from = event_samp + fTMinS * raw.info.sfreq;
-        to = event_samp + floor(fTMaxS * raw.info.sfreq + 0.5);
+        // Like mne.Epochs: both ends rounded to the nearest sample
+        from = event_samp + static_cast<fiff_int_t>(std::lround(fTMinS * raw.info.sfreq));
+        to = event_samp + static_cast<fiff_int_t>(std::lround(fTMaxS * raw.info.sfreq));
 
         epoch = std::make_unique<MNEEpochData>();
 
         if (raw.read_raw_segment(epoch->epoch, timesDummy, from - iFilterDelay, to + iFilterDelay, picksNew)) {
             // Filter the data
-            epoch->epoch = RTPROCESSINGLIB::filterData(epoch->epoch, filterKernel).block(0, iFilterDelay, epoch->epoch.rows(), to - from);
+            epoch->epoch = RTPROCESSINGLIB::filterData(epoch->epoch, filterKernel).block(0, iFilterDelay, epoch->epoch.rows(), to - from + 1);
 
             if (p == 0) {
                 times.resize(1, to - from + 1);
@@ -584,6 +587,7 @@ FiffEvoked RTPROCESSINGLIB::computeFilteredAverage(const FiffRawData& raw,
             }
 
             epoch->event = eventType;
+            epoch->eventSample = event_samp;
             epoch->tmin = fTMinS;
             epoch->tmax = fTMaxS;
 
@@ -620,7 +624,14 @@ FiffEvoked RTPROCESSINGLIB::computeFilteredAverage(const FiffRawData& raw,
         lstEpochDataList.dropRejected();
     }
 
-    return lstEpochDataList.average(raw.info,
-                                    0,
-                                    lstEpochDataList.first()->epoch.cols());
+    if (lstEpochDataList.isEmpty())
+        return FiffEvoked();
+
+    const fiff_int_t first = static_cast<fiff_int_t>(std::lround(fTMinS * raw.info.sfreq));
+    FiffEvoked evoked = lstEpochDataList.average(raw.info,
+                                                 first,
+                                                 first + static_cast<fiff_int_t>(lstEpochDataList.first()->epoch.cols()) - 1);
+    evoked.baseline = bApplyBaseline ? QPair<float, float>(fTBaselineFromS, fTBaselineToS)
+                                     : QPair<float, float>(0.0f, 0.0f);
+    return evoked;
 }
