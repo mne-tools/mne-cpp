@@ -17,7 +17,10 @@ set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-set(SOURCES main.cpp mainwindow.cpp analyzecore.cpp)
+set(APP_CORE_SOURCES
+    mainwindow.cpp
+    analyzecore.cpp
+)
 
 set(HEADERS info.h mainwindow.h analyzecore.h)
 
@@ -28,12 +31,6 @@ set(RESOURCES
 
 set_source_files_properties(resources/images/appIcons/mne_analyze.icns PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
-
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
-else()
-  add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
-endif()
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
@@ -56,12 +53,23 @@ if(TARGET mne_disp3D)
   list(APPEND MNE_LIBS_REQUIRED mne_disp3D)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+# Everything but main(), so tests can drive the application
+add_library(mne_analyze_app_core STATIC ${APP_CORE_SOURCES} ${HEADERS})
+target_include_directories(mne_analyze_app_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(mne_analyze_app_core PUBLIC
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
     Eigen3::Eigen
     anShared
 )
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+  qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION main.cpp ${RESOURCES})
+else()
+  add_executable(${PROJECT_NAME} main.cpp ${RESOURCES})
+endif()
+
+target_link_libraries(${PROJECT_NAME} PRIVATE mne_analyze_app_core)
 
 if(NOT BUILD_SHARED_LIBS)
   set(MNE_ANALYZE_PLUGINS 
@@ -84,6 +92,7 @@ if(NOT BUILD_SHARED_LIBS)
 
   target_link_libraries(${PROJECT_NAME} PRIVATE ${MNE_ANALYZE_PLUGINS})
 
+  target_compile_definitions(mne_analyze_app_core PRIVATE STATICBUILD)
   target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
