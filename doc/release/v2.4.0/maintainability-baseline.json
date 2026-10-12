@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1500,
-  "scanned_lines": 394366,
+  "scanned_lines": 394375,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -544,10 +544,10 @@
       }
     },
     "qt_new_unparented": {
-      "total": 815,
+      "total": 811,
       "files": 80,
       "by_scope": {
-        "applications": 709,
+        "applications": 705,
         "libraries": 104,
         "tools": 2
       },
@@ -565,8 +565,8 @@
         "src/libraries/disp/viewers/hpisettingsview.cpp": 16,
         "src/applications/mne_browse/Windows/covariancewindow.cpp": 15,
         "src/libraries/disp/plots/tfplot.cpp": 15,
-        "src/applications/mne_scan/mne_scan/mainwindow.cpp": 14,
         "src/applications/mne_analyze/plugins/dataloader/dataloader.cpp": 12,
+        "src/applications/mne_scan/mne_scan/mainwindow.cpp": 10,
         "src/applications/mne_analyze_studio/workbench/analysisresultwidget.cpp": 9
       },
       "all_files": {
@@ -618,7 +618,7 @@
         "src/applications/mne_scan/libs/scDisp/realtimemultisamplearraywidget.cpp": 1,
         "src/applications/mne_scan/libs/scShared/Management/displaymanager.cpp": 2,
         "src/applications/mne_scan/libs/scShared/Management/pluginconnectorconnectionwidget.cpp": 3,
-        "src/applications/mne_scan/mne_scan/mainwindow.cpp": 14,
+        "src/applications/mne_scan/mne_scan/mainwindow.cpp": 10,
         "src/applications/mne_scan/mne_scan/plugingui.cpp": 9,
         "src/applications/mne_scan/mne_scan/pluginitem.cpp": 1,
         "src/applications/mne_scan/mne_scan/pluginscene.cpp": 1,
