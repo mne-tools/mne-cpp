@@ -300,6 +300,28 @@ void TestFiffStreamPython::copiesProcessingHistory()
         QCOMPARE(dstRuns[k]->dir_tree_find(FIFFB_SSS_CAL_ADJUST).size(), srcRuns[k]->dir_tree_find(FIFFB_SSS_CAL_ADJUST).size());
         QCOMPARE(dstRuns[k]->dir_tree_find(FIFFB_CHANNEL_DECOUPLER).size(), srcRuns[k]->dir_tree_find(FIFFB_CHANNEL_DECOUPLER).size());
     }
+
+    // Nothing is copied from a missing source or one without history, nor into a missing destination
+    const QByteArray before = [&dst]() {
+        QFile f(dst);
+        return f.open(QIODevice::ReadOnly) ? f.readAll() : QByteArray();
+    }();
+    QVERIFY(!FiffStream::copyProcessingHistory(m_dir.filePath("missing.fif"), dst));
+    const QString plain = m_dir.filePath("history-none.fif");
+    {
+        QFile out(plain);
+        FiffStream::SPtr w = FiffStream::start_file(out);
+        QVERIFY(w);
+        fiff_int_t nchan = 1;
+        w->write_int(FIFF_NCHAN, &nchan);
+        w->end_file();
+    }
+    QVERIFY(!FiffStream::copyProcessingHistory(plain, dst));
+    QVERIFY(!FiffStream::copyProcessingHistory(src, m_dir.filePath("missing-dst.fif")));
+    QVERIFY(!QFile::exists(m_dir.filePath("missing-dst.fif")));
+    QFile after(dst);
+    QVERIFY(after.open(QIODevice::ReadOnly));
+    QCOMPARE(after.readAll(), before);
 }
 
 //=============================================================================================================
