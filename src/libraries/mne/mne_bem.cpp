@@ -129,19 +129,25 @@ bool MNEBem::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, MNEBem& 
         return false;
     }
 
+    QList<MNEBemSurface> surfaces;
     for (int k = 0; k < bemsurf.size(); ++k) {
         MNEBemSurface p_BemSurface;
         qInfo("\tReading a BEM surface...");
-        MNEBem::readBemSurface(p_pStream, bemsurf[k], p_BemSurface);
+        if (!MNEBem::readBemSurface(p_pStream, bemsurf[k], p_BemSurface)) {
+            if (open_here) {
+                p_pStream->close();
+            }
+            return false;
+        }
         p_BemSurface.addTriangleData();
         if (add_geom || p_BemSurface.nn.rows() == 0) {
             p_BemSurface.addVertexNormals();
         }
         qInfo("\t[done]\n");
 
-        p_Bem.m_qListBemSurface.append(p_BemSurface);
-        //           src(k) = this;
+        surfaces.append(p_BemSurface);
     }
+    p_Bem.m_qListBemSurface.append(surfaces);
 
     qInfo("\t%lld bem surfaces read\n", static_cast<long long>(bemsurf.size()));
 
@@ -179,7 +185,6 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
 
     //=====================================================================
     if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NNODE, t_pTag)) {
-        p_pStream->close();
         qWarning() << "np not found!";
         return false;
     } else {
@@ -190,7 +195,6 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
 
     //=====================================================================
     if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NTRI, t_pTag)) {
-        p_pStream->close();
         qWarning() << "ntri not found!";
         return false;
     } else {
@@ -203,8 +207,8 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     if (!p_Tree->find_tag(p_pStream, FIFF_MNE_COORD_FRAME, t_pTag)) {
         qWarning() << "FIFF_MNE_COORD_FRAME not found, trying FIFF_BEM_COORD_FRAME.";
         if (!p_Tree->find_tag(p_pStream, FIFF_BEM_COORD_FRAME, t_pTag)) {
-            p_pStream->close();
-            throw std::runtime_error("Coordinate frame information not found.");
+            qWarning() << "Coordinate frame information not found.";
+            return false;
         } else {
             p_BemSurface.coord_frame = *t_pTag->toInt();
         }
@@ -220,16 +224,16 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     //
     //=====================================================================
     if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NODES, t_pTag)) {
-        p_pStream->close();
-        throw std::runtime_error("Vertex data not found.");
+        qWarning() << "Vertex data not found.";
+        return false;
     }
 
     p_BemSurface.rr = t_pTag->toFloatMatrix().transpose();
     qint32 rows_rr = p_BemSurface.rr.rows();
 
     if (rows_rr != p_BemSurface.np) {
-        p_pStream->close();
-        throw std::runtime_error("Vertex information is incorrect.");
+        qWarning() << "Vertex information is incorrect.";
+        return false;
     }
 
     //    qDebug() << "Surf Nodes; type:" << t_pTag->getType();
@@ -239,8 +243,8 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     if (p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_NORMALS, t_pTag) || p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, t_pTag)) {
         p_BemSurface.nn = t_pTag->toFloatMatrix().transpose();
         if (p_BemSurface.nn.rows() != p_BemSurface.np) {
-            p_pStream->close();
-            throw std::runtime_error("Vertex normal information is incorrect.");
+            qWarning() << "Vertex normal information is incorrect.";
+            return false;
         }
     } else {
         p_BemSurface.nn.resize(0, 3);
@@ -252,8 +256,8 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     if (p_BemSurface.ntri > 0) {
         if (!p_Tree->find_tag(p_pStream, FIFF_BEM_SURF_TRIANGLES, t_pTag)) {
             if (!p_Tree->find_tag(p_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, t_pTag)) {
-                p_pStream->close();
-                throw std::runtime_error("Triangulation not found.");
+                qWarning() << "Triangulation not found.";
+                return false;
             } else {
                 p_BemSurface.itris = t_pTag->toIntMatrix().transpose();
                 p_BemSurface.itris -= MatrixXi::Constant(p_BemSurface.itris.rows(), 3, 1); //0 based indizes
@@ -264,8 +268,8 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
         }
 
         if (p_BemSurface.itris.rows() != p_BemSurface.ntri) {
-            p_pStream->close();
-            throw std::runtime_error("Triangulation information is incorrect.");
+            qWarning() << "Triangulation information is incorrect.";
+            return false;
         }
     } else {
         p_BemSurface.itris.resize(0, 3);

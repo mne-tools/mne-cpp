@@ -77,6 +77,7 @@ private slots:
     void testBemSurfaceProperties();
     void testBemSurfaceNormals();
     void testBemSurfaceGeometryOfSmallMesh();
+    void testReadBemRejectsDamagedSurfaces();
 
     // --- MNESourceSpaces ---
     void testSourceSpaceFromFile();
@@ -290,6 +291,40 @@ void TestMneInvCoverage::testBemSurfaceGeometryOfSmallMesh()
     QCOMPARE(surf.neighbor_tri[3].size(), Eigen::Index(0));
     QCOMPARE(surf.neighbor_vert[3].size(), Eigen::Index(0));
     QVERIFY(std::abs(surf.tri_area(0) - std::sqrt(3.0) / 2.0) < 1e-6);
+}
+
+void TestMneInvCoverage::testReadBemRejectsDamagedSurfaces()
+{
+    // A file whose surface counts disagree with its data is refused, not thrown out of or half-read
+    const auto damaged = [](void (*damage)(MNEBemSurface&)) {
+        MNEBemSurface good;
+        good.np = 3;
+        good.ntri = 1;
+        good.coord_frame = FIFFV_COORD_MRI;
+        good.rr = Eigen::MatrixX3f::Identity(3, 3);
+        good.nn = good.rr;
+        good.itris = Eigen::MatrixX3i(1, 3);
+        good.itris << 0, 1, 2;
+        MNEBemSurface bad = good;
+        damage(bad);
+        MNEBem source;
+        source << good << bad;
+        QBuffer buffer;
+        buffer.open(QIODevice::ReadWrite);
+        if (!source.write(buffer))
+            return -1;
+        buffer.close();
+        FiffStream::SPtr stream(new FiffStream(&buffer));
+        if (!stream->open())
+            return -1;
+        MNEBem bem;
+        const bool ok = MNEBem::readFromStream(stream, true, bem);
+        return ok ? static_cast<int>(bem.size()) : -static_cast<int>(bem.size()) - 2;
+    };
+    QCOMPARE(damaged([](MNEBemSurface&) {}), 2);
+    QCOMPARE(damaged([](MNEBemSurface& s) { s.np = 4; }), -2);
+    QCOMPARE(damaged([](MNEBemSurface& s) { s.ntri = 2; }), -2);
+    QCOMPARE(damaged([](MNEBemSurface& s) { s.nn = Eigen::MatrixX3f::Zero(2, 3); }), -2);
 }
 
 //=============================================================================================================
