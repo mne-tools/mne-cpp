@@ -22,7 +22,7 @@
       "sample-data": 20,
       "test-data": 119
     },
-    "gui": 45,
+    "gui": 46,
     "with_qskip": 88,
     "ci_excluded": {},
     "retry_paths": [],
@@ -8356,8 +8356,8 @@
       "requirements": [
         "test-data"
       ],
-      "gui": false,
-      "qskip_sites": 3,
+      "gui": true,
+      "qskip_sites": 4,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
