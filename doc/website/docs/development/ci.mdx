@@ -20,7 +20,7 @@ Pull requests cannot be merged until all platform jobs pass. Development builds 
 
 | Branch / Event | Workflow | What Happens |
 |----------------|----------|--------------|
-| Pull request → `staging` or `main` | `pull-request.yml` | Build matrix (Qt min + max) + tests on all platforms |
+| Pull request → `staging` or `main` | `pull-request.yml` | Build + tests on all platforms (max Qt), min Qt on Linux |
 | Push to `staging` | `staging.yml` | Tests with coverage checks, quality gates |
 | Nightly (when `staging` changed) | `staging.yml` | Tests, then dev release binaries, dev website + Doxygen |
 | Push to `main` | `main.yml` | Tests, stable website + Doxygen deployment |

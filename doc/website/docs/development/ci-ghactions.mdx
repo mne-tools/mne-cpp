@@ -13,7 +13,7 @@ MNE-CPP's CI is organized around the [Main – Staging – Feature branch model]
 
 | Event type | Workflow Name | Workflow Script | Effect |
 | ---------- | ------------- | --------------- | ------ |
-| Pull Requests → `staging` or `main` | `PullRequest` | [pull-request.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/pull-request.yml) | Build matrix (Qt min + max) and tests on all platforms. PR cannot be merged until all jobs pass. |
+| Pull Requests → `staging` or `main` | `PullRequest` | [pull-request.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/pull-request.yml) | Build and tests on all platforms (maximum Qt), plus minimum Qt on Linux. PR cannot be merged until all jobs pass. |
 | Pushes to `staging`, nightly | `Staging` | [staging.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/staging.yml) | On push: tests with code coverage threshold/regression checks and quality gates. Nightly: also dev release binaries and dev website + Doxygen deployment. |
 | Pushes to `main` | `Main` | [main.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/main.yml) | Builds, tests, stable website + Doxygen deployment. |
 | Tag `v*` on `main` | `Main` (release jobs) | [main.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/main.yml) | Full stable release: platform binaries (Linux, macOS, Windows), installers, WebAssembly, Codecov upload. |
@@ -34,12 +34,11 @@ These are called by the main pipeline workflows using `workflow_call`.
 
 ## How the Pull Request Workflow Works
 
-When a contributor opens or updates a pull request targeting `staging` (or `main`), `pull-request.yml` runs a build-and-test matrix:
+When a contributor opens or updates a pull request targeting `staging` (or `main`), `pull-request.yml` runs:
 
-1. **Checks out** the PR branch.
-2. **Builds** twice — once with the **minimum** supported Qt version and once with the **maximum** — to ensure compatibility across the supported Qt range.
-3. **Runs tests** via the reusable test workflow (without coverage uploads).
-4. **Builds Doxygen** documentation to verify it compiles without errors.
+1. The static **quality gates**.
+2. **Builds and tests** with the **maximum** supported Qt version on Linux, macOS, and Windows, and with the **minimum** supported Qt version on Linux, via the reusable test workflow (without coverage uploads).
+3. **Builds the documentation** to verify it compiles without errors.
 
 The PR cannot be merged until all matrix jobs pass. This ensures that every change is validated on Linux, macOS, and Windows before it reaches the `staging` branch.
 
