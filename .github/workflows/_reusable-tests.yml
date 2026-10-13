@@ -31,6 +31,16 @@ on:
         required: false
         default: false
         type: boolean
+      os_json:
+        description: "JSON list of runner OSes to test on"
+        required: false
+        default: '["ubuntu-24.04", "macos-26", "windows-2025-vs2026"]'
+        type: string
+      save_ccache:
+        description: "Save the ccache and prune older entries (needs actions: write)"
+        required: false
+        default: false
+        type: boolean
     secrets:
       CODECOV_TOKEN:
         required: false
@@ -46,7 +56,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [ubuntu-24.04, macos-26, windows-2025-vs2026]
+        os: ${{ fromJSON(inputs.os_json) }}
 
     steps:
     - name: Clone repository
@@ -164,6 +174,38 @@ jobs:
       run: |
         python -c "import mne; mne.datasets.sample.data_path()"
 
+    # ── Compiler cache (Linux|MacOS) ───────────────────────────────────────
+    # One entry per OS/Qt/coverage configuration, capped by CCACHE_MAXSIZE.
+    # Only callers that pass save_ccache write it, and then delete the entries
+    # they supersede, so the total stays at a few hundred MB per configuration
+    # instead of growing with every run and evicting the other Actions caches.
+    - name: Set up ccache (Linux|MacOS)
+      if: runner.os != 'Windows'
+      shell: bash
+      run: |
+        if [ "$RUNNER_OS" = "Linux" ]; then
+          sudo apt-get install -q ccache
+        else
+          brew install ccache
+        fi
+        {
+          echo "CCACHE_DIR=$RUNNER_TEMP/ccache"
+          echo "CCACHE_BASEDIR=$GITHUB_WORKSPACE"
+          echo "CCACHE_COMPILERCHECK=content"
+          echo "CCACHE_MAXSIZE=400M"
+          echo "CMAKE_C_COMPILER_LAUNCHER=ccache"
+          echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          echo "CCACHE_KEY_PREFIX=ccache-v1-${{ matrix.os }}-qt${{ inputs.qt_version }}-cov${{ inputs.with_code_coverage }}-"
+        } >> "$GITHUB_ENV"
+
+    - name: Restore ccache (Linux|MacOS)
+      if: runner.os != 'Windows'
+      uses: actions/cache/restore@v5
+      with:
+        path: ${{ runner.temp }}/ccache
+        key: ${{ env.CCACHE_KEY_PREFIX }}${{ github.run_id }}
+        restore-keys: ${{ env.CCACHE_KEY_PREFIX }}
+
     # ── Build ──────────────────────────────────────────────────────────────
     # MNE_WARNINGS_AS_ERRORS enforces release gate G5 for the test build too, so
     # test sources cannot become the loophole through which warnings return.
@@ -210,6 +252,28 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DMNE_WARNINGS_AS_ERRORS=ON
         cmake --build build --config Release --parallel
+
+    - name: Save ccache (Linux|MacOS)
+      if: runner.os != 'Windows' && inputs.save_ccache
+      uses: actions/cache/save@v5
+      with:
+        path: ${{ runner.temp }}/ccache
+        key: ${{ env.CCACHE_KEY_PREFIX }}${{ github.run_id }}
+
+    - name: Prune superseded ccache entries (Linux|MacOS)
+      if: runner.os != 'Windows' && inputs.save_ccache
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        ccache --show-stats || true
+        current="${CCACHE_KEY_PREFIX}${{ github.run_id }}"
+        gh cache list --key "$CCACHE_KEY_PREFIX" --ref "$GITHUB_REF" --limit 100 --json id,key \
+            --jq ".[] | select(.key != \"$current\") | .id" |
+          while read -r id; do
+            gh cache delete "$id" || true
+          done
 
     # ── Run tests ──────────────────────────────────────────────────────────
     # CTest drives the run from the add_test() registrations rather than from a

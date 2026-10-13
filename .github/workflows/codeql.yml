@@ -5,13 +5,16 @@
 
 name: "CodeQL"
 
+# Not run on pushes to staging: the shared mne-tools runner pool cannot absorb
+# an analysis per push, and the weekly schedule covers staging.
 on:
   push:
-    branches: [ "main", "staging" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   schedule:
     - cron: '28 15 * * 1'
+  workflow_dispatch:
 
 concurrency:
   group: codeql-${{ github.ref }}
@@ -38,69 +41,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v5
 
-    - name: Install Python 3.10
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.10'
-
-    - name: Install OpenGL development libraries
-      run: |
-        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
-        sudo apt-get update -q
-        # libxkbcommon-dev: the dynamic Qt toolchain is built with -xcb, so
-        # Qt6::GuiPrivate now declares a third-party dependency on XKB::XKB.
-        # find_package(Qt6 COMPONENTS GuiPrivate) and linking require xkbcommon.
-        sudo apt-get install -q libgl1-mesa-dev libxkbcommon-dev
-
-    - name: Load external dependency versions
-      shell: bash
-      run: ./scripts/ci/load_external_deps.sh
-
-    - name: Download Qt toolchain
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        ./scripts/ci/download_toolchain.sh \
-          --kind qt \
-          --version "$QT_VERSION" \
-          --linkage dynamic \
-          --output-dir "$RUNNER_TEMP/qt"
-
-    - name: Download Eigen package
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        ./scripts/ci/download_toolchain.sh \
-          --kind eigen \
-          --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
-
-    - name: Clone Skigen
-      run: ./scripts/ci/clone_skigen.sh
-
-    # Initialize CodeQL tools for scanning.
+    # build-mode none extracts the C/C++ sources without compiling them, so no
+    # Qt/Eigen toolchain or full build (~4 h on one runner) is needed.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
-        # Disable CodeQL TRAP caching: each cache entry is ~3.7 GB and two of
-        # them (~7.4 GB) dominate the repo's 10 GB Actions cache budget, evicting
-        # the Qt/sample-data caches via LRU and forcing unnecessary re-downloads.
-        # The build is a full from-scratch compile every run, so TRAP caching
-        # only speeds extraction marginally and is not worth the footprint.
-        trap-caching: false
+        build-mode: none
         # If you wish to specify custom queries, you can do so here or in a config file.
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.
 
         # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
         # queries: security-extended,security-and-quality
-
-    # Build MNE-CPP
-    - name: Configure and compile MNE-CPP
-      run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4

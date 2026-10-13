@@ -6,7 +6,11 @@
 # Staging Branch Pipeline
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Triggered on pushes to `staging`.
+# Pushes to `staging` run only the quality gates and tests. Everything else
+# runs nightly (only when `staging` moved since the last nightly) or on manual
+# dispatch, and only once staging compiles. The mne-tools runner pool is shared
+# by the whole organization, so a full pipeline per push starves other repos.
+# A failing nightly opens an issue, which closes when a nightly passes again.
 #
 # This is the DEVELOPMENT pipeline:
 #   • Creates/updates a rolling "dev_build" pre-release on GitHub
@@ -31,11 +35,14 @@ on:
   push:
     branches:
       - staging
+  schedule:
+    - cron: '37 4 * * *'
+  workflow_dispatch:
 
-# Cancel superseded runs
+# Cancel superseded push runs; a push never cancels a nightly or manual run.
 concurrency:
-  group: staging-${{ github.ref }}
-  cancel-in-progress: true
+  group: staging-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 permissions:
   contents: write
@@ -48,11 +55,69 @@ env:
 
 jobs:
 
-  # ── Create / update dev_build pre-release ────────────────────────────────
-  CreateDevRelease:
+  # ── Decide whether this run publishes dev builds ─────────────────────────
+  # Manual runs always do, pushes never do, and a nightly does only when
+  # staging moved since the previous nightly (a failed nightly is not retried
+  # on the same commit; its issue stays open until a later nightly passes).
+  Changes:
     runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+    outputs:
+      release: ${{ steps.check.outputs.release }}
 
     steps:
+    - name: Check for new commits since the last nightly
+      id: check
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        case "${{ github.event_name }}" in
+          workflow_dispatch) release=true ;;
+          schedule)
+            last_sha=$(gh api "repos/$GH_REPO/actions/workflows/staging.yml/runs?event=schedule&branch=${{ github.ref_name }}&status=completed&per_page=1" \
+              --jq '.workflow_runs[0].head_sha // ""')
+            if [ "$last_sha" = "${{ github.sha }}" ]; then
+              echo "No new commits since the last nightly ($last_sha)"
+              release=false
+            else
+              release=true
+            fi
+            ;;
+          *) release=false ;;
+        esac
+        echo "release=$release" >> "$GITHUB_OUTPUT"
+
+  # ── Create / update dev_build pre-release ────────────────────────────────
+  # Gated on staging compiling on every test configuration, so a broken build
+  # never replaces the last good dev_build. Failing tests do not block it; they
+  # fail the run and open the nightly failure issue instead.
+  CreateDevRelease:
+    runs-on: ubuntu-24.04
+    needs: [Changes, Tests, TestsMinQt]
+    if: ${{ !cancelled() && needs.Changes.outputs.release == 'true' }}
+    permissions:
+      contents: write
+      actions: read
+
+    steps:
+    - name: Check that every test configuration compiled
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        gh api --paginate "repos/$GH_REPO/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs?per_page=100" \
+          --jq '.jobs[] | select(.name | test("^Tests(MinQt)? / ")) |
+                [.name, ([.steps[] | select(.name | startswith("Configure and compile MNE-CPP")) | select(.conclusion != "skipped") | .conclusion] | first // "missing")] | @tsv' \
+          > compiled.tsv
+        cat compiled.tsv
+        test -s compiled.tsv
+        if awk -F'\t' '$2 != "success" { bad = 1 } END { exit !bad }' compiled.tsv; then
+          echo "::error::Not every test configuration compiled, so dev_build is left unchanged."
+          exit 1
+        fi
+
     - name: Clone repository
       uses: actions/checkout@v5
 
@@ -88,57 +153,65 @@ jobs:
   # ── Platform release builds (parallel) ───────────────────────────────────
   Linux:
     needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
     uses: ./.github/workflows/release-linux.yml
     secrets: inherit
 
   MacOS:
     needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
     uses: ./.github/workflows/release-macos.yml
     secrets: inherit
 
   Windows:
     needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
     uses: ./.github/workflows/release-windows.yml
     secrets: inherit
 
   # ── Installers (after all platform builds) ─────────────────────────────
   Installer:
     needs: [Linux, MacOS, Windows]
+    if: ${{ !cancelled() && needs.Linux.result == 'success' && needs.MacOS.result == 'success' && needs.Windows.result == 'success' }}
     uses: ./.github/workflows/release-installer.yml
     secrets: inherit
 
-  # ── Build compatibility matrix (min + max Qt) ───────────────────────────
-  BuildMinQt:
-    uses: ./.github/workflows/_reusable-build.yml
-    with:
-      qt_version: min
-
-  BuildMaxQt:
-    uses: ./.github/workflows/_reusable-build.yml
-    with:
-      qt_version: max
+  # No separate min/max Qt build-only jobs here: Tests and TestsMinQt compile
+  # the same tree with the same warnings-as-errors flags, and the release
+  # builds exercise deployment.
 
   # ── Tests with coverage threshold & regression checks ────────────────────
   # Coverage is only collected on Ubuntu; macOS/Windows always run without it.
   # Floor and regression tolerance come from tools/quality/coverage_policy.json.
   Tests:
     uses: ./.github/workflows/_reusable-tests.yml
+    permissions:
+      contents: read
+      actions: write  # prune superseded ccache entries
     with:
       with_code_coverage: true
       upload_codecov: true
       enforce_coverage_gate: true
+      save_ccache: true
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  # The min-Qt endpoint is a compatibility check, so Linux is enough.
   TestsMinQt:
     uses: ./.github/workflows/_reusable-tests.yml
+    permissions:
+      contents: read
+      actions: write  # prune superseded ccache entries
     with:
       qt_version: min
+      os_json: '["ubuntu-24.04"]'
+      save_ccache: true
 
   # ── Doxygen API documentation (dev) ──────────────────────────────────────
   Doxygen:
     runs-on: ubuntu-24.04
     needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
 
     steps:
     - name: Clone repository
@@ -243,6 +316,8 @@ jobs:
 
   # ── Documentation gate (T4.4): API docs, screenshots, site build ────────
   Docs:
+    needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
     uses: ./.github/workflows/_reusable-docs.yml
     with:
       channel: dev
@@ -252,6 +327,7 @@ jobs:
   Website:
     runs-on: ubuntu-24.04
     needs: [CreateDevRelease, Quality, Docs]
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' && needs.Quality.result == 'success' && needs.Docs.result == 'success' }}
 
     steps:
     - name: Clone repository
@@ -298,6 +374,7 @@ jobs:
   WebAssembly:
     runs-on: ubuntu-24.04
     needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
 
     steps:
     - name: Clone repository
@@ -432,7 +509,42 @@ jobs:
   # ── Checksums and signing evidence (after every asset upload) ─────────
   ReleaseEvidence:
     needs: [Installer, Doxygen, WebAssembly]
+    if: ${{ !cancelled() && needs.Installer.result == 'success' && needs.Doxygen.result == 'success' && needs.WebAssembly.result == 'success' }}
     uses: ./.github/workflows/_reusable-release-evidence.yml
     with:
       tag: dev_build
     secrets: inherit
+
+  # ── Nightly failure issue ────────────────────────────────────────────────
+  # Opens (or comments on) one tracking issue when a nightly fails, and closes
+  # it when a later nightly passes.
+  NightlyStatus:
+    runs-on: ubuntu-24.04
+    needs: [Changes, Quality, Tests, TestsMinQt, CreateDevRelease, Linux, MacOS, Windows, Installer, Doxygen, Docs, Website, WebAssembly, ReleaseEvidence]
+    if: always() && github.event_name == 'schedule' && needs.Changes.outputs.release == 'true'
+    permissions:
+      issues: write
+
+    steps:
+    - name: Open, update or close the nightly failure issue
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+        FAILED: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        title="Nightly staging build failed"
+        number=$(gh issue list --state open --search "\"$title\" in:title" --json number,title \
+          --jq "map(select(.title == \"$title\")) | .[0].number // empty")
+        if [ "$FAILED" = "true" ]; then
+          body="The nightly staging pipeline failed on ${{ github.sha }}: $RUN_URL"
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body
+
+        This issue closes automatically when a nightly run passes again."
+          fi
+        elif [ -n "$number" ]; then
+          gh issue close "$number" --comment "The nightly staging pipeline passed again on ${{ github.sha }}: $RUN_URL"
+        fi

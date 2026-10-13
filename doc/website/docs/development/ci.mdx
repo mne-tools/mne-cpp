@@ -7,7 +7,7 @@ sidebar_label: Continuous Integration
 
 Every change to MNE-CPP is automatically built, tested, and — for releases — packaged across **Windows, Linux, and macOS** before it reaches users. The CI system runs on [GitHub Actions](https://docs.github.com/en/actions) and is organized around the [Main – Staging – Feature branch model](ci-releasecycle.mdx).
 
-Pull requests cannot be merged until all platform jobs pass. Development builds are published on every push to `staging`; stable release binaries are created when a version tag (`v*`) is pushed on `main`.
+Pull requests cannot be merged until all platform jobs pass. Development builds are published nightly from `staging`; stable release binaries are created when a version tag (`v*`) is pushed on `main`.
 
 ## Guides
 
@@ -21,7 +21,8 @@ Pull requests cannot be merged until all platform jobs pass. Development builds 
 | Branch / Event | Workflow | What Happens |
 |----------------|----------|--------------|
 | Pull request → `staging` or `main` | `pull-request.yml` | Build matrix (Qt min + max) + tests on all platforms |
-| Push to `staging` | `staging.yml` | Dev release binaries, coverage checks, dev website + Doxygen, CodeQL |
+| Push to `staging` | `staging.yml` | Tests with coverage checks, quality gates |
+| Nightly (when `staging` changed) | `staging.yml` | Tests, then dev release binaries, dev website + Doxygen |
 | Push to `main` | `main.yml` | Tests, stable website + Doxygen deployment |
 | Tag `v*` on `main` | `main.yml` | Full stable release: platform binaries, installers, WebAssembly |
 | Push to `wasm` | `wasmtest.yml` | WebAssembly build deployed to GitHub Pages |
