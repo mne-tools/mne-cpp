@@ -38,6 +38,7 @@
 
 #include "fiff_global.h"
 #include "fiff_types.h"
+#include "fiff_ch_info.h"
 #include "fiff_named_matrix.h"
 
 //=============================================================================================================
@@ -118,6 +119,19 @@ public:
      * Initializes the CTF software compensation data.
      */
     void clear();
+
+    //=========================================================================================================
+    /**
+     * Brings a compensator stored uncalibrated into calibrated units, as mne _read_ctf_comp does: each
+     * matrix element is scaled by its row channel's range * cal and divided by its column channel's.
+     * The factors are kept in rowcals and colcals so that write_ctf_comp can undo them. A compensator
+     * saved calibrated is left as it is.
+     *
+     * @param[in] chs   The channels the compensator refers to by name.
+     *
+     * @return false if a row or column channel is missing from, or ambiguous in, chs.
+     */
+    bool calibrate(const QList<FiffChInfo>& chs);
 
 public:
     fiff_int_t ctfkind;          /**< CTF kind. */

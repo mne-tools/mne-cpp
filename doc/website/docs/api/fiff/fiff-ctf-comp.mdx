@@ -77,6 +77,23 @@ Initializes the CTF software compensation data.
 
 ---
 
+### calibrate(chs)
+
+Brings a compensator stored uncalibrated into calibrated units, as mne _read_ctf_comp does: each matrix element is scaled by its row channel's range * cal and divided by its column channel's.
+
+The factors are kept in rowcals and colcals so that write_ctf_comp can undo them. A compensator saved calibrated is left as it is.
+
+**Parameters:**
+
+- **chs** : *const QList&lt; [FiffChInfo](/docs/api/fiff/fiff-ch-info) &gt; &*
+  The channels the compensator refers to by name.
+
+**Returns:**
+
+- *bool* — false if a row or column channel is missing from, or ambiguous in, chs.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)

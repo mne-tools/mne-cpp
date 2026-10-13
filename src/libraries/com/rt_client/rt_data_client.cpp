@@ -35,6 +35,26 @@ using namespace FIFFLIB;
 using namespace Eigen;
 
 //=============================================================================================================
+// LOCAL DEFINITIONS
+//=============================================================================================================
+
+namespace
+{
+
+// Compensators arrive as stored; bring them into calibrated units as FiffStream::read_ctf_comp does
+void calibrateCompensators(FiffInfo& info)
+{
+    for (FiffCtfComp& comp : info.comps) {
+        if (!comp.calibrate(info.chs)) {
+            info.comps.clear();
+            return;
+        }
+    }
+}
+
+} // namespace
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -318,6 +338,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
     //
     for (qint32 c = 0; c < p_pFiffInfo->nchan; ++c)
         p_pFiffInfo->ch_names << p_pFiffInfo->chs[c].ch_name;
+    calibrateCompensators(*p_pFiffInfo);
 
     return p_pFiffInfo;
 }
@@ -572,6 +593,7 @@ MetaData RtDataClient::readMetadata()
     //
     for (qint32 c = 0; c < p_pFiffInfo->nchan; ++c)
         p_pFiffInfo->ch_names << p_pFiffInfo->chs[c].ch_name;
+    calibrateCompensators(*p_pFiffInfo);
 
     p_pDigData->npoint = p_pDigData->points.size();
 

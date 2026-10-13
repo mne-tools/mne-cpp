@@ -727,7 +727,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
     QList<FiffCtfComp> compdata;
     QList<FiffDirNode::SPtr> t_qListComps = p_Node->dir_tree_find(FIFFB_MNE_CTF_COMP_DATA);
 
-    qint32 i, k, p, col, row;
+    qint32 k, p;
     fiff_int_t kind, pos;
     FiffTag::UPtr t_pTag;
     for (k = 0; k < t_qListComps.size(); ++k) {
@@ -786,68 +786,9 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
             calibrated = (bool)*t_pTag->toInt();
 
         one.save_calibrated = calibrated;
-        one.rowcals = MatrixXd::Ones(1, mat->data.rows()); //ones(1,size(mat.data,1));
-        one.colcals = MatrixXd::Ones(1, mat->data.cols()); //ones(1,size(mat.data,2));
-        if (!calibrated) {
-            //
-            //   Calibrate...
-            //
-            //
-            //   Do the columns first
-            //
-            QStringList ch_names;
-            for (p = 0; p < p_Chs.size(); ++p)
-                ch_names.append(p_Chs[p].ch_name);
-
-            qint32 count;
-            MatrixXd col_cals(mat->data.cols(), 1);
-            col_cals.setZero();
-            for (col = 0; col < mat->data.cols(); ++col) {
-                count = 0;
-                for (i = 0; i < ch_names.size(); ++i) {
-                    if (QString::compare(mat->col_names.at(col), ch_names.at(i)) == 0) {
-                        count += 1;
-                        p = i;
-                    }
-                }
-                if (count == 0) {
-                    qWarning("Channel %s is not available in data", mat->col_names.at(col).toUtf8().constData());
-                    return {};
-                } else if (count > 1) {
-                    qWarning("Ambiguous channel %s", mat->col_names.at(col).toUtf8().constData());
-                    return {};
-                }
-                col_cals(col, 0) = 1.0f / (p_Chs[p].range * p_Chs[p].cal);
-            }
-            //
-            //    Then the rows
-            //
-            MatrixXd row_cals(mat->data.rows(), 1);
-            row_cals.setZero();
-            for (row = 0; row < mat->data.rows(); ++row) {
-                count = 0;
-                for (i = 0; i < ch_names.size(); ++i) {
-                    if (QString::compare(mat->row_names.at(row), ch_names.at(i)) == 0) {
-                        count += 1;
-                        p = i;
-                    }
-                }
-
-                if (count == 0) {
-                    qWarning("Channel %s is not available in data", mat->row_names.at(row).toUtf8().constData());
-                    return {};
-                } else if (count > 1) {
-                    qWarning("Ambiguous channel %s", mat->row_names.at(row).toUtf8().constData());
-                    return {};
-                }
-
-                row_cals(row, 0) = static_cast<double>(p_Chs[p].range) * p_Chs[p].cal;
-            }
-            mat->data = row_cals.asDiagonal() * mat->data * col_cals.asDiagonal();
-            one.rowcals = row_cals;
-            one.colcals = col_cals;
-        }
         one.data = mat;
+        if (!one.calibrate(p_Chs))
+            return {};
         compdata.append(one);
     }
 
