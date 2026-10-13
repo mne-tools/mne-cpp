@@ -352,6 +352,28 @@ void TestInvDipoleFitPython::bemForwardMatches()
     QVERIFY2(std::abs(meg - megNorm) < 5e-3 * megNorm, qPrintable(QStringLiteral("MEG %1 vs %2").arg(meg, 0, 'g', 10).arg(megNorm, 0, 'g', 10)));
     QVERIFY2(std::abs(eeg - eegNorm) < 5e-3 * eegNorm, qPrintable(QStringLiteral("EEG %1 vs %2").arg(eeg, 0, 'g', 10).arg(eegNorm, 0, 'g', 10)));
 
+    // print_fields lists the prediction in fT for MEG and in uV for EEG, after the same projection
+    if (dipole == 0) {
+        std::unique_ptr<MNEMeasData> ave(MNEMeasData::mne_read_meas_data(m_sampleAve, 1, nullptr, nullptr, fitData->ch_names,
+                                                                         fitData->nmeg + fitData->neeg));
+        QVERIFY(ave);
+        QString text;
+        QTextStream out(&text);
+        QVERIFY(InvDipoleFitData::print_fields(truthPos(0), truthMoment(0), 0.1f, 0.0f, *fitData, *ave, out));
+        const QStringList lines = text.split('\n', Qt::SkipEmptyParts);
+        QCOMPARE(lines.size(), 364);
+        VectorXf projected = g * truthMoment(0);
+        QVERIFY(fitData->proj);
+        QCOMPARE(fitData->proj->project_vector(projected, true), 0);
+        for (const int k : {0, 304, 305, 363}) {
+            const QStringList cols = lines[k].split('\t');
+            QCOMPARE(cols[0], fitData->ch_names[k]);
+            const double expected = (k < 305 ? 1e15 : 1e6) * projected[k];
+            QVERIFY2(std::abs(cols[2].toDouble() - expected) <= 1e-4 * std::abs(expected) + 1e-6,
+                     qPrintable(QStringLiteral("%1: %2 vs %3").arg(cols[0], cols[2]).arg(expected)));
+        }
+    }
+
     // EEG needs a layered model; a homogeneous BEM is refused.
     QTest::ignoreMessage(QtCriticalMsg, "Cannot use a homogeneous model in EEG calculations.");
     QVERIFY(!InvDipoleFitData::setup_dipole_fit_data(
@@ -682,6 +704,14 @@ void TestInvDipoleFitPython::printsFields()
 
     QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Cannot pick time"));
     QVERIFY(!InvDipoleFitData::print_fields(truthPos(0), truthMoment(0), 10.0f, 0.0f, *m_fitData, *data, out));
+
+    // Data read for a different channel set cannot be compared channel by channel
+    std::unique_ptr<MNEMeasData> fewer(MNEMeasData::mne_read_meas_data(m_synthAve, 1, nullptr, nullptr, m_fitData->ch_names, 10));
+    QVERIFY(fewer);
+    const QString before = text;
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("do not hold the 305 fit channels"));
+    QVERIFY(!InvDipoleFitData::print_fields(truthPos(0), truthMoment(0), 0.0f, 0.0f, *m_fitData, *fewer, out));
+    QCOMPARE(text, before);
 }
 
 //=============================================================================================================
