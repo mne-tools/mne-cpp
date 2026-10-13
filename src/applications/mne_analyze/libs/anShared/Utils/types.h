@@ -132,13 +132,14 @@ struct ViewParameters
         all
     };
 
+    // Defaults are those of DISPLIB::FiffRawViewSettings
     QList<QString> m_sViewsToApply;
-    ViewSetting m_sSettingsToApply;
-    QColor m_colorSignal;
-    QColor m_colorBackground;
-    double m_dZoomValue;
-    int m_iTimeWindow;
-    int m_iTimeSpacers;
+    ViewSetting m_sSettingsToApply = all;
+    QColor m_colorSignal = Qt::blue;
+    QColor m_colorBackground = Qt::white;
+    double m_dZoomValue = 16.0;
+    int m_iTimeWindow = 10;
+    int m_iTimeSpacers = 1000;
     QString m_sImageType;
 };
 
@@ -159,13 +160,13 @@ struct View3DParameters
         screenshot
     };
 
-    View3DSetting m_settingsToApply;
+    View3DSetting m_settingsToApply = sceneColor;
     QColor m_sceneColor;
-    bool m_bToggleRotation;
-    bool m_bToogleCoordAxis;
-    bool m_bToggleFullscreen;
+    bool m_bToggleRotation = false;
+    bool m_bToogleCoordAxis = false;
+    bool m_bToggleFullscreen = false;
     QColor m_lightColor;
-    double m_dLightIntensity;
+    double m_dLightIntensity = 0.0;
 };
 
 //=========================================================================================================

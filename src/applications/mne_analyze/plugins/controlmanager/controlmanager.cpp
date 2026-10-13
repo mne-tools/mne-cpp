@@ -186,7 +186,7 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
         case EVENT_TYPE::SELECTED_MODEL_CHANGED:
-            if (e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
+            if (m_pApplyToView && e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>()->getType() != ANSHAREDLIB_BEMDATA_MODEL) {
                 onScalingChanged(m_ScalingParameters.m_mScalingMap);
                 m_ViewParameters.m_sViewsToApply = m_pApplyToView->getSelectedViews();
                 m_ViewParameters.m_sSettingsToApply = ANSHAREDLIB::ViewParameters::ViewSetting::all;
@@ -301,7 +301,8 @@ void ControlManager::onMakeScreenshot(const QString& imageType)
 #ifdef MNE_DISP3D
 void ControlManager::init3DGui(QSharedPointer<BrainTreeModel> pModel)
 {
-    m_pControl3DView->setModel(pModel.data());
+    if (m_pControl3DView)
+        m_pControl3DView->setModel(pModel.data());
 }
 #endif
 

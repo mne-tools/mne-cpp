@@ -35,7 +35,9 @@
 #include <QPushButton>
 #include <QSpinBox>
 
+#include <cstring>
 #include <memory>
+#include <new>
 
 using namespace CONTROLMANAGERPLUGIN;
 using namespace ANSHAREDLIB;
@@ -69,6 +71,29 @@ void TestAnalyzeControlManager::publishesViewSettings()
         QSKIP("Sample test data not found");
 
     auto data = QSharedPointer<AnalyzeData>::create();
+
+    // A plugin whose controls do not exist (not built yet, or closed by a plugin reload) leaves the views alone
+    QList<ViewParameters> early;
+    {
+        Communicator earlyListener(QVector<EVENT_TYPE>{VIEW_SETTINGS_CHANGED});
+        connect(&earlyListener, &Communicator::receivedEvent, this, [&](const QSharedPointer<Event> e) {
+            early << e->getData().value<ViewParameters>();
+        });
+        auto earlyRaw = data->loadModel<FiffRawViewModel>(rawPath);
+        const auto selected = QSharedPointer<Event>::create(SELECTED_MODEL_CHANGED, nullptr, QVariant::fromValue(earlyRaw.staticCast<AbstractModel>()));
+        alignas(ControlManager) unsigned char storage[sizeof(ControlManager)];
+        std::memset(storage, 0x7f, sizeof(storage));
+        auto* unbuilt = new (storage) ControlManager();
+        unbuilt->setGlobalData(data);
+        unbuilt->init();
+        unbuilt->handleEvent(selected);
+        delete unbuilt->getControl();
+        unbuilt->handleEvent(selected);
+        unbuilt->~ControlManager();
+        QTest::qWait(200);
+    }
+    QVERIFY(early.isEmpty());
+
     ControlManager plugin;
     plugin.setGlobalData(data);
     plugin.init();

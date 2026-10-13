@@ -220,9 +220,9 @@ private:
 
     QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< Communicator to send events trhoug hevent manager. */
 
-    DISPLIB::Control3DView* m_pControl3DView; /**< Controls for 3d View. */
+    QPointer<DISPLIB::Control3DView> m_pControl3DView; /**< Controls for 3d View. */
 
-    DISPLIB::ApplyToView* m_pApplyToView;               /**< Controls for selecting views to apply settings. */
+    QPointer<DISPLIB::ApplyToView> m_pApplyToView;      /**< Controls for selecting views to apply settings; null until getControl() and after the dock is closed. */
     ANSHAREDLIB::ScalingParameters m_ScalingParameters; /**< Controls for scaling. */
     ANSHAREDLIB::ViewParameters m_ViewParameters;       /**< Struct for 2D view settings. */
     ANSHAREDLIB::View3DParameters m_View3DParameters;   /**< Struct for 3D view settings. */
