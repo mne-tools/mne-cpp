@@ -23,9 +23,13 @@
 #include <anShared/Model/fiffrawviewmodel.h>
 
 #include <QtTest>
+#include <QHeaderView>
 #include <QRhiWidget>
 #include <QScrollBar>
 #include <QTableView>
+
+#include <cstring>
+#include <new>
 
 using namespace RAWDATAVIEWERPLUGIN;
 using namespace ANSHAREDLIB;
@@ -39,6 +43,7 @@ class TestAnalyzeRawDataViewer : public QObject
 private slots:
     void initTestCase();
     void jumpsToTheSelectedEvent();
+    void showsWithoutAModel();
 };
 
 //=============================================================================================================
@@ -109,6 +114,26 @@ void TestAnalyzeRawDataViewer::jumpsToTheSelectedEvent()
     QVERIFY2(std::abs(table->horizontalScrollBar()->value() - expected) <= 1,
              qPrintable(QStringLiteral("scroll %1, expected %2").arg(table->horizontalScrollBar()->value()).arg(expected)));
     view->hide();
+}
+
+//=============================================================================================================
+
+void TestAnalyzeRawDataViewer::showsWithoutAModel()
+{
+    // A view resized before a recording arrives lays out with the default zoom (16 channels), built in
+    // poisoned memory so that no stale value can pass
+    alignas(FiffRawView) unsigned char storage[sizeof(FiffRawView)];
+    std::memset(storage, 0x7f, sizeof(storage));
+    auto* view = new (storage) FiffRawView();
+    view->resize(800, 480);
+    view->show();
+    QVERIFY(QTest::qWaitForWindowExposed(view));
+    auto* table = view->findChild<QTableView*>();
+    QVERIFY(table);
+    view->resize(800, 640);
+    QCoreApplication::processEvents();
+    QCOMPARE(table->verticalHeader()->defaultSectionSize(), static_cast<int>(table->height() / 16.0));
+    view->~FiffRawView();
 }
 
 //=============================================================================================================

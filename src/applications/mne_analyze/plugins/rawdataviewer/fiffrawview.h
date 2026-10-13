@@ -374,13 +374,13 @@ private:
 
     QMap<qint32, float> m_qMapChScaling; /**< Channel scaling values. */
 
-    float m_fDefaultSectionSize; /**< Default row height */
-    float m_fZoomFactor;         /**< Zoom factor */
-    int m_iLastClickedSample;    /**< Stores last clicked sample on screen */
+    float m_fDefaultSectionSize;  /**< Default row height */
+    float m_fZoomFactor = 16.0f;  /**< Number of channels shown at once (DISPLIB::FiffRawViewSettings default) */
+    int m_iLastClickedSample = 0; /**< Stores last clicked sample on screen */
 
-    qint32 m_iT; /**< Display window size in seconds. */
+    qint32 m_iT = 10; /**< Display window size in seconds. */
 
-    QScroller* m_pKineticScroller; /**< Used for kinetic scrolling through data view. */
+    QScroller* m_pKineticScroller = nullptr; /**< Used for kinetic scrolling through data view. */
 
     QLabel* m_pInitialTimeLabel;     /**< Left 'Sample | Seconds' display label. */
     QLabel* m_pEndTimeLabel;         /**< Right 'Sample | Seconds' display label. */
