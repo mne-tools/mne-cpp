@@ -195,7 +195,8 @@ jobs:
           echo "CCACHE_MAXSIZE=400M"
           echo "CMAKE_C_COMPILER_LAUNCHER=ccache"
           echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache"
-          echo "CCACHE_KEY_PREFIX=ccache-v1-${{ matrix.os }}-qt${{ inputs.qt_version }}-cov${{ inputs.with_code_coverage }}-"
+          # Coverage only changes the compile on Linux, so macOS shares one key.
+          echo "CCACHE_KEY_PREFIX=ccache-v1-${{ matrix.os }}-qt${{ inputs.qt_version }}-cov${{ runner.os == 'Linux' && inputs.with_code_coverage }}-"
         } >> "$GITHUB_ENV"
 
     - name: Restore ccache (Linux|MacOS)
