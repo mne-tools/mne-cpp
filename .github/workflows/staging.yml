@@ -36,7 +36,11 @@ on:
     branches:
       - staging
   schedule:
-    - cron: '37 4 * * *'
+    # 01:13 UTC: over Sep–Oct 2026 the mne-tools runner pool was quietest from
+    # about 01:00 to 04:00 UTC (MNE-Python, MNE-BIDS and MNE-BIDS-Pipeline CI
+    # all near idle), and staging pushes usually start around 07:00 UTC. The
+    # tests take ~1.5 h, so the release-build burst lands around 02:45–04:15.
+    - cron: '13 1 * * *'
   workflow_dispatch:
 
 # Cancel superseded push runs; a push never cancels a nightly or manual run.
