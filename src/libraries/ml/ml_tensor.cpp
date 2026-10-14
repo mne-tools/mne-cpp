@@ -54,8 +54,7 @@ using namespace Eigen;
 
 int64_t MlTensor::computeSize(const std::vector<int64_t>& shape)
 {
-    if (shape.empty())
-        return 0;
+    // An empty shape is a scalar with one element, as in ONNX and NumPy
     return std::accumulate(shape.begin(), shape.end(),
                            int64_t(1), std::multiplies<int64_t>());
 }
