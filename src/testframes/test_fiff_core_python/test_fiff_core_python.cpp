@@ -1202,6 +1202,32 @@ void TestFiffCorePython::sparse_createAndConvert()
 
     QVERIFY(FiffSparseMatrix::fromEigenSparse(SparseMatrix<double>(4, 4)).is_empty());
     QVERIFY(FiffSparseMatrix::fromEigenSparse(SparseMatrix<float>(4, 4)).is_empty());
+
+    // From a tag (values, indices, pointers, then nz, rows, cols, ndim): the same matrix in row and
+    // column storage; a tag of another type or size, or with indices or pointers outside the matrix
+    // (a corrupt file) gives no matrix instead of writing outside it
+    const auto sparseTag = [](fiff_int_t type, const QList<float>& v, const QList<int>& inds, const QList<int>& ptrs, int ndim = 2) {
+        auto tag = std::make_unique<FiffTag>();
+        tag->type = type;
+        QByteArray bytes(reinterpret_cast<const char*>(v.constData()), v.size() * sizeof(float));
+        const QList<int> tail = QList<int>(inds) << ptrs << static_cast<int>(v.size()) << 2 << 3 << ndim;
+        bytes.append(reinterpret_cast<const char*>(tail.constData()), tail.size() * sizeof(int));
+        static_cast<QByteArray&>(*tag) = bytes;
+        return tag;
+    };
+    const QList<float> values{1.5f, -2.0f, 4.0f};
+    const FiffSparseMatrix::UPtr rcs = FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_RCS_MATRIX_FLOAT, values, {0, 2, 1}, {0, 2, 3}));
+    QVERIFY(rcs && MatrixXf(rcs->eigen()) == dense);
+    const FiffSparseMatrix::UPtr ccs = FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_CCS_MATRIX_FLOAT, {1.5f, 4.0f, -2.0f}, {0, 1, 0}, {0, 1, 2, 3}));
+    QVERIFY(ccs && MatrixXf(ccs->eigen()) == dense);
+    QVERIFY(!FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_MATRIX_FLOAT, values, {0, 2, 1}, {0, 2, 3})));
+    QVERIFY(!FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_RCS_MATRIX_FLOAT, values, {0, 2, 1}, {0, 2})));
+    QVERIFY(!FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_RCS_MATRIX_FLOAT, values, {0, 2, 1}, {0, 2, 3}, 3)));
+    QVERIFY(!FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_RCS_MATRIX_FLOAT, values, {0, 3, 1}, {0, 2, 3})));
+    QVERIFY(!FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_RCS_MATRIX_FLOAT, values, {0, -1, 1}, {0, 2, 3})));
+    QVERIFY(!FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_RCS_MATRIX_FLOAT, values, {0, 2, 1}, {0, 2, 9})));
+    QVERIFY(!FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_RCS_MATRIX_FLOAT, values, {0, 2, 1}, {2, 0, 3})));
+    QVERIFY(!FiffSparseMatrix::fiff_get_float_sparse_matrix(sparseTag(FIFFT_CCS_MATRIX_FLOAT, {1.5f, 4.0f, -2.0f}, {0, 2, 0}, {0, 1, 2, 3})));
 }
 
 //=============================================================================================================

@@ -191,6 +191,20 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(const Fiff
     const int* src_inds = reinterpret_cast<const int*>(src_data + nz);
     const int* src_ptrs = src_inds + nz;
 
+    // A corrupt file must not index outside the matrix: the pointers run from 0 to nz without going
+    // back, and every index lies within the other dimension
+    const int nOuter = (cod == FIFFTS_MC_RCS) ? m : n;
+    const int nInner = (cod == FIFFTS_MC_RCS) ? n : m;
+    bool valid = m >= 0 && n >= 0 && nz >= 0 && src_ptrs[0] == 0 && src_ptrs[nOuter] == nz;
+    for (int k = 0; valid && k < nOuter; ++k)
+        valid = src_ptrs[k] <= src_ptrs[k + 1];
+    for (int j = 0; valid && j < nz; ++j)
+        valid = src_inds[j] >= 0 && src_inds[j] < nInner;
+    if (!valid) {
+        qWarning("[FiffSparseMatrix::fiff_get_float_sparse_matrix] index or pointer outside the matrix!");
+        return nullptr;
+    }
+
     using T = Eigen::Triplet<float>;
     std::vector<T> triplets;
     triplets.reserve(nz);
