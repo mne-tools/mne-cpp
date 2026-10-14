@@ -34,7 +34,6 @@
 #define _USE_MATH_DEFINES
 #endif
 #include <cmath>
-#include <iostream>
 #include "numerics.h"
 
 //=============================================================================================================
@@ -126,73 +125,7 @@ MatrixXd Numerics::rescale(const MatrixXd& data,
                            const QPair<float, float>& baseline,
                            QString mode)
 {
-    MatrixXd data_out = data;
-    QStringList valid_modes;
-    valid_modes << "logratio" << "ratio" << "zscore" << "mean" << "percent";
-    if (!valid_modes.contains(mode)) {
-        qWarning().noquote() << "[Numerics::rescale] Mode" << mode << "is not supported. Supported modes are:" << valid_modes << "Returning input data.";
-        return data_out;
-    }
-
-    qInfo().noquote() << QString("[Numerics::rescale] Applying baseline correction ... (mode: %1)").arg(mode);
-
-    qint32 imin = 0;
-    qint32 imax = times.size();
-
-    if (baseline.second == baseline.first) {
-        imin = 0;
-    } else {
-        float bmin = baseline.first;
-        for (qint32 i = 0; i < times.size(); ++i) {
-            if (times[i] >= bmin) {
-                imin = i;
-                break;
-            }
-        }
-    }
-
-    float bmax = baseline.second;
-
-    if (baseline.second == baseline.first) {
-        bmax = 0;
-    }
-
-    for (qint32 i = times.size() - 1; i >= 0; --i) {
-        if (times[i] <= bmax) {
-            imax = i + 1;
-            break;
-        }
-    }
-
-    if (imax < imin) {
-        qWarning() << "[Numerics::rescale] imax < imin. Returning input data.";
-        return data_out;
-    }
-
-    VectorXd mean = data_out.block(0, imin, data_out.rows(), imax - imin).rowwise().mean();
-    if (mode.compare("mean") == 0) {
-        data_out -= mean.rowwise().replicate(data.cols());
-    } else if (mode.compare("logratio") == 0) {
-        for (qint32 i = 0; i < data_out.rows(); ++i)
-            for (qint32 j = 0; j < data_out.cols(); ++j)
-                data_out(i, j) = log10(data_out(i, j) / mean[i]);
-    } else if (mode.compare("ratio") == 0) {
-        data_out = data_out.cwiseQuotient(mean.rowwise().replicate(data_out.cols()));
-    } else if (mode.compare("zscore") == 0) {
-        MatrixXd std_mat = data.block(0, imin, data.rows(), imax - imin) - mean.rowwise().replicate(imax - imin);
-        std_mat = std_mat.cwiseProduct(std_mat);
-        VectorXd std_v = std_mat.rowwise().mean();
-        for (qint32 i = 0; i < std_v.size(); ++i)
-            std_v[i] = sqrt(std_v[i]);
-
-        data_out -= mean.rowwise().replicate(data_out.cols());
-        data_out = data_out.cwiseQuotient(std_v.rowwise().replicate(data_out.cols()));
-    } else if (mode.compare("percent") == 0) {
-        data_out -= mean.rowwise().replicate(data_out.cols());
-        data_out = data_out.cwiseQuotient(mean.rowwise().replicate(data_out.cols()));
-    }
-
-    return data_out;
+    return rescale(data, times, std::pair<float, float>(baseline.first, baseline.second), mode.toStdString());
 }
 
 //=============================================================================================================
@@ -203,14 +136,9 @@ MatrixXd Numerics::rescale(const MatrixXd& data,
                            const std::string& mode)
 {
     MatrixXd data_out = data;
-    std::vector<std::string> valid_modes{"logratio", "ratio", "zscore", "mean", "percent"};
-    if (std::find(valid_modes.begin(), valid_modes.end(), mode) == valid_modes.end()) {
-        qWarning().noquote() << "[Numerics::rescale] Mode" << mode.c_str() << "is not supported. Supported modes are:";
-        for (auto& m : valid_modes) {
-            std::cout << m << " ";
-        }
-        std::cout << "\n"
-                  << "Returning input data.\n";
+    const QStringList valid_modes{"logratio", "ratio", "zscore", "mean", "percent"};
+    if (!valid_modes.contains(QString::fromStdString(mode))) {
+        qWarning().noquote() << "[Numerics::rescale] Mode" << mode.c_str() << "is not supported. Supported modes are:" << valid_modes << "Returning input data.";
         return data_out;
     }
 
