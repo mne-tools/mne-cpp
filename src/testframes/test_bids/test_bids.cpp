@@ -102,6 +102,7 @@ private slots:
     // BrainVisionReader against mne.io.read_raw_brainvision
     void testBrainVisionReaderMatchesPython();
     void testBrainVisionReaderVariants();
+    void testWriteFromInfoAndReadRejects();
 
     // BIDSPath setter/getter coverage
     void testPathSettersGetters();
@@ -848,6 +849,104 @@ void TestBids::testBrainVisionReaderVariants()
     }
     BrainVisionReader missing;
     QVERIFY(!missing.open(dir.filePath("none.vhdr")));
+}
+
+//=============================================================================================================
+
+void TestBids::testWriteFromInfoAndReadRejects()
+{
+    // Sidecars written from an in-memory recording: one channel of every BIDS type, filters and metadata
+    BidsRawData data;
+    FIFFLIB::FiffInfo& info = data.raw.info;
+    info.sfreq = 256.0f;
+    info.highpass = 0.5f;
+    info.lowpass = 100.0f;
+    info.linefreq = 60.0f;
+    const QList<std::pair<QString, int>> chans = {{"E1", FIFFV_EEG_CH}, {"G1", FIFFV_ECOG_CH}, {"S1", FIFFV_SEEG_CH}, {"D1", FIFFV_DBS_CH}, {"EOG", FIFFV_EOG_CH}, {"ECG", FIFFV_ECG_CH}, {"EMG", FIFFV_EMG_CH}, {"MISC", FIFFV_MISC_CH}, {"RESP", FIFFV_RESP_CH}, {"TRG", FIFFV_STIM_CH}, {"MEG", FIFFV_MEG_CH}, {"ODD", 9999}};
+    for (const auto& [name, kind] : chans) {
+        FIFFLIB::FiffChInfo ch;
+        ch.ch_name = name;
+        ch.kind = kind;
+        ch.unit = FIFF_UNIT_V;
+        info.chs << ch;
+        info.ch_names << name;
+    }
+    info.nchan = info.chs.size();
+    info.bads = {"EOG"};
+    // E1 (1st electrode) from its digitizer point, G1 has a non-finite point and falls back to its position,
+    // S1 and D1 have no position at all
+    info.chs[1].chpos.r0 = Eigen::Vector3f(0.25f, 0.5f, 0.125f);
+    for (const auto& [ident, r] : {std::pair{1, Eigen::Vector3f(0.1f, 0.2f, 0.3f)}, std::pair{2, Eigen::Vector3f(NAN, 0.0f, 0.0f)}}) {
+        FIFFLIB::FiffDigPoint dp;
+        dp.kind = FIFFV_POINT_EEG;
+        dp.ident = ident;
+        dp.coord_frame = FIFFV_COORD_HEAD;
+        std::copy(r.data(), r.data() + 3, dp.r);
+        info.dig << dp;
+    }
+    data.raw.first_samp = 0;
+    data.raw.last_samp = 511;
+    data.recordingType = QStringLiteral("epoched");
+    data.taskDescription = QStringLiteral("rest");
+    data.manufacturer = QStringLiteral("Acme");
+    data.manufacturerModelName = QStringLiteral("A1");
+    data.softwareVersions = QStringLiteral("1.0");
+
+    QTemporaryDir dir;
+    const BIDSPath path(dir.path(), "05", "01", "rest", "ieeg", "ieeg", ".vhdr");
+    BidsRawData::WriteOptions opts;
+    opts.copyData = false;
+    QVERIFY(data.write(path, QString(), opts) == path);
+
+    const QList<BidsChannel> channels = BidsChannel::readTsv(path.channelsTsvPath().filePath());
+    QCOMPARE(channels.size(), chans.size());
+    const QStringList types{"EEG", "ECOG", "SEEG", "DBS", "EOG", "ECG", "EMG", "MISC", "RESP", "TRIG", "MEGMAG", "MISC"};
+    for (int i = 0; i < channels.size(); ++i)
+        QCOMPARE(channels[i].type, types[i]);
+    QCOMPARE(channels[0].lowCutoff, QStringLiteral("0.5"));
+    QCOMPARE(channels[0].highCutoff, QStringLiteral("100"));
+    QCOMPARE(channels[4].status, QStringLiteral("bad"));
+
+    const QList<BidsElectrode> electrodes = BidsElectrode::readTsv(path.electrodesTsvPath().filePath());
+    QCOMPARE(electrodes.size(), 4);
+    QCOMPARE(electrodes[0].x, QStringLiteral("0.1"));
+    QCOMPARE(electrodes[1].z, QStringLiteral("0.125"));
+    QCOMPARE(electrodes[2].x, QStringLiteral("n/a"));
+    QCOMPARE(BidsCoordinateSystem::readJson(path.coordsystemJsonPath().filePath()).system, QStringLiteral("CapTrak"));
+
+    QFile sidecar(path.sidecarJsonPath().filePath());
+    QVERIFY(sidecar.open(QIODevice::ReadOnly));
+    const QJsonObject json = QJsonDocument::fromJson(sidecar.readAll()).object();
+    for (const char* key : {"ECOGChannelCount", "SEEGChannelCount", "DBSChannelCount", "EEGChannelCount", "EOGChannelCount",
+                            "ECGChannelCount", "EMGChannelCount", "MiscChannelCount", "TriggerChannelCount"})
+        QVERIFY2(json.value(key).toInt() == 1, key);
+    QCOMPARE(json.value("RecordingDuration").toDouble(), 511.0 / 256.0);
+    QCOMPARE(json.value("RecordingType").toString(), QStringLiteral("epoched"));
+    QCOMPARE(json.value("ManufacturerModelName").toString(), QStringLiteral("A1"));
+    QCOMPARE(json.value("SoftwareVersions").toString(), QStringLiteral("1.0"));
+    QCOMPARE(json.value("PowerLineFrequency").toDouble(), 60.0);
+
+    // Reading needs a complete path, an existing raw file of a known format that opens
+    QVERIFY(!BidsRawData::read(BIDSPath(QString(), "05", "01", "rest", "ieeg", "ieeg", ".vhdr")).isValid());
+    QVERIFY(!BidsRawData::read(BIDSPath(dir.path(), QString(), "01", "rest", "ieeg", "ieeg", ".vhdr")).isValid());
+    QVERIFY(!BidsRawData::read(BIDSPath(dir.path(), "05", "01", "rest", "ieeg", "ieeg", QString())).isValid());
+    QVERIFY(!BidsRawData::read(path).isValid());
+    const BIDSPath odd(dir.path(), "05", "01", "rest", "ieeg", "ieeg", ".xyz");
+    QVERIFY(QFile(odd.filePath()).open(QIODevice::WriteOnly));
+    QVERIFY(!BidsRawData::read(odd).isValid());
+    QVERIFY(QFile(path.filePath()).open(QIODevice::WriteOnly));
+    QVERIFY(!BidsRawData::read(path).isValid());
+
+    // An EDF stored with an upper-case extension is found from the lower-case path
+    const BIDSPath edfSrc(bidsRoot(), "02", "01", "rest", "eeg", "eeg", ".edf");
+    BIDSPath upper(dir.path(), "06", "01", "rest", "eeg", "eeg", ".EDF");
+    QVERIFY(upper.mkdirs());
+    QVERIFY(QFile::copy(edfSrc.filePath(), upper.filePath()));
+    BIDSPath lower = upper;
+    lower.setExtension(".edf");
+    const BidsRawData found = BidsRawData::read(lower);
+    QVERIFY(found.isValid());
+    QCOMPARE(found.raw.info.nchan, 25);
 }
 
 //=============================================================================================================
