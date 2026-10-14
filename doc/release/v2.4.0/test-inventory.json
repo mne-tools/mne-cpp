@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_tests.py",
   "ci_source": {
-    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38404887493",
-    "commit": "6bd2f51107cdd77b6bb189bac59b94b24b849f0a"
+    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38576205268",
+    "commit": "21f0678d1f51992e4fc8f4a17d4653a002baa0fa"
   },
   "summary": {
     "directories": 264,

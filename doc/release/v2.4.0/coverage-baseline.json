@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "source": {
-    "commit": "6bd2f51107cdd77b6bb189bac59b94b24b849f0a",
-    "coverage_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38404887493"
+    "commit": "21f0678d1f51992e4fc8f4a17d4653a002baa0fa",
+    "coverage_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38576205268"
   },
   "scope": [
     "src/libraries",
@@ -99,31 +99,31 @@
   ],
   "totals": {
     "files": 1231,
-    "lines_found": 125144,
-    "lines_hit": 91813,
-    "lines_missed": 33331,
-    "line_percent": 73.37,
-    "branches_found": 74109,
-    "branches_hit": 39740,
-    "branches_missed": 34369,
-    "branch_percent": 53.62
+    "lines_found": 125065,
+    "lines_hit": 92341,
+    "lines_missed": 32724,
+    "line_percent": 73.83,
+    "branches_found": 74067,
+    "branches_hit": 40213,
+    "branches_missed": 33854,
+    "branch_percent": 54.29
   },
   "codecov_model": {
-    "lines": 125144,
-    "hits": 90671,
-    "line_percent": 72.45
+    "lines": 125065,
+    "hits": 91192,
+    "line_percent": 72.92
   },
   "scopes": {
     "libraries": {
       "files": 696,
-      "lines_found": 65931,
-      "lines_hit": 57971,
-      "lines_missed": 7960,
-      "line_percent": 87.93,
-      "branches_found": 45336,
-      "branches_hit": 28943,
-      "branches_missed": 16393,
-      "branch_percent": 63.84
+      "lines_found": 65852,
+      "lines_hit": 58499,
+      "lines_missed": 7353,
+      "line_percent": 88.83,
+      "branches_found": 45294,
+      "branches_hit": 29415,
+      "branches_missed": 15879,
+      "branch_percent": 64.94
     },
     "applications": {
       "files": 410,
@@ -132,9 +132,9 @@
       "lines_missed": 19590,
       "line_percent": 55.79,
       "branches_found": 21480,
-      "branches_hit": 7727,
-      "branches_missed": 13753,
-      "branch_percent": 35.97
+      "branches_hit": 7728,
+      "branches_missed": 13752,
+      "branch_percent": 35.98
     },
     "tools": {
       "files": 125,
@@ -222,20 +222,20 @@
       "lines_missed": 5749,
       "line_percent": 32.85,
       "branches_found": 3495,
-      "branches_hit": 643,
-      "branches_missed": 2852,
-      "branch_percent": 18.4
+      "branches_hit": 644,
+      "branches_missed": 2851,
+      "branch_percent": 18.43
     },
     "src/libraries/bids": {
       "files": 21,
-      "lines_found": 1787,
-      "lines_hit": 1470,
-      "lines_missed": 317,
-      "line_percent": 82.26,
-      "branches_found": 984,
-      "branches_hit": 645,
-      "branches_missed": 339,
-      "branch_percent": 65.55
+      "lines_found": 1788,
+      "lines_hit": 1614,
+      "lines_missed": 174,
+      "line_percent": 90.27,
+      "branches_found": 982,
+      "branches_hit": 746,
+      "branches_missed": 236,
+      "branch_percent": 75.97
     },
     "src/libraries/com": {
       "files": 15,
@@ -250,36 +250,36 @@
     },
     "src/libraries/connectivity": {
       "files": 26,
-      "lines_found": 1813,
-      "lines_hit": 1566,
-      "lines_missed": 247,
-      "line_percent": 86.38,
-      "branches_found": 1622,
-      "branches_hit": 906,
-      "branches_missed": 716,
-      "branch_percent": 55.86
+      "lines_found": 1799,
+      "lines_hit": 1593,
+      "lines_missed": 206,
+      "line_percent": 88.55,
+      "branches_found": 1578,
+      "branches_hit": 925,
+      "branches_missed": 653,
+      "branch_percent": 58.62
     },
     "src/libraries/decoding": {
       "files": 5,
       "lines_found": 457,
-      "lines_hit": 400,
-      "lines_missed": 57,
-      "line_percent": 87.53,
-      "branches_found": 434,
-      "branches_hit": 232,
-      "branches_missed": 202,
-      "branch_percent": 53.46
+      "lines_hit": 422,
+      "lines_missed": 35,
+      "line_percent": 92.34,
+      "branches_found": 440,
+      "branches_hit": 249,
+      "branches_missed": 191,
+      "branch_percent": 56.59
     },
     "src/libraries/disp": {
       "files": 129,
-      "lines_found": 12568,
-      "lines_hit": 11024,
+      "lines_found": 12519,
+      "lines_hit": 10975,
       "lines_missed": 1544,
-      "line_percent": 87.71,
-      "branches_found": 5592,
-      "branches_hit": 3630,
-      "branches_missed": 1962,
-      "branch_percent": 64.91
+      "line_percent": 87.67,
+      "branches_found": 5562,
+      "branches_hit": 3602,
+      "branches_missed": 1960,
+      "branch_percent": 64.76
     },
     "src/libraries/disp3D": {
       "files": 77,
@@ -295,24 +295,24 @@
     "src/libraries/dsp": {
       "files": 73,
       "lines_found": 4652,
-      "lines_hit": 4321,
-      "lines_missed": 331,
-      "line_percent": 92.88,
-      "branches_found": 3891,
-      "branches_hit": 2466,
-      "branches_missed": 1425,
-      "branch_percent": 63.38
+      "lines_hit": 4366,
+      "lines_missed": 286,
+      "line_percent": 93.85,
+      "branches_found": 3895,
+      "branches_hit": 2500,
+      "branches_missed": 1395,
+      "branch_percent": 64.18
     },
     "src/libraries/fiff": {
       "files": 59,
-      "lines_found": 6744,
-      "lines_hit": 6004,
-      "lines_missed": 740,
-      "line_percent": 89.03,
-      "branches_found": 4494,
-      "branches_hit": 3127,
-      "branches_missed": 1367,
-      "branch_percent": 69.58
+      "lines_found": 6765,
+      "lines_hit": 6085,
+      "lines_missed": 680,
+      "line_percent": 89.95,
+      "branches_found": 4524,
+      "branches_hit": 3223,
+      "branches_missed": 1301,
+      "branch_percent": 71.24
     },
     "src/libraries/fs": {
       "files": 15,
@@ -332,20 +332,20 @@
       "lines_missed": 286,
       "line_percent": 92.0,
       "branches_found": 2754,
-      "branches_hit": 1849,
-      "branches_missed": 905,
-      "branch_percent": 67.14
+      "branches_hit": 1845,
+      "branches_missed": 909,
+      "branch_percent": 66.99
     },
     "src/libraries/inv": {
       "files": 63,
-      "lines_found": 5622,
+      "lines_found": 5621,
       "lines_hit": 5211,
-      "lines_missed": 411,
-      "line_percent": 92.69,
-      "branches_found": 4831,
-      "branches_hit": 3040,
-      "branches_missed": 1791,
-      "branch_percent": 62.93
+      "lines_missed": 410,
+      "line_percent": 92.71,
+      "branches_found": 4827,
+      "branches_hit": 3072,
+      "branches_missed": 1755,
+      "branch_percent": 63.64
     },
     "src/libraries/lsl": {
       "files": 7,
@@ -360,69 +360,69 @@
     },
     "src/libraries/math": {
       "files": 13,
-      "lines_found": 1189,
-      "lines_hit": 1099,
-      "lines_missed": 90,
-      "line_percent": 92.43,
-      "branches_found": 1348,
-      "branches_hit": 803,
-      "branches_missed": 545,
-      "branch_percent": 59.57
+      "lines_found": 1143,
+      "lines_hit": 1075,
+      "lines_missed": 68,
+      "line_percent": 94.05,
+      "branches_found": 1304,
+      "branches_hit": 789,
+      "branches_missed": 515,
+      "branch_percent": 60.51
     },
     "src/libraries/ml": {
       "files": 7,
       "lines_found": 226,
-      "lines_hit": 172,
-      "lines_missed": 54,
-      "line_percent": 76.11,
-      "branches_found": 68,
-      "branches_hit": 33,
-      "branches_missed": 35,
-      "branch_percent": 48.53
+      "lines_hit": 197,
+      "lines_missed": 29,
+      "line_percent": 87.17,
+      "branches_found": 66,
+      "branches_hit": 43,
+      "branches_missed": 23,
+      "branch_percent": 65.15
     },
     "src/libraries/mna": {
       "files": 34,
-      "lines_found": 2208,
-      "lines_hit": 1919,
-      "lines_missed": 289,
-      "line_percent": 86.91,
-      "branches_found": 2078,
-      "branches_hit": 1215,
-      "branches_missed": 863,
-      "branch_percent": 58.47
+      "lines_found": 2213,
+      "lines_hit": 1960,
+      "lines_missed": 253,
+      "line_percent": 88.57,
+      "branches_found": 2104,
+      "branches_hit": 1271,
+      "branches_missed": 833,
+      "branch_percent": 60.41
     },
     "src/libraries/mne": {
       "files": 87,
       "lines_found": 10253,
-      "lines_hit": 9084,
-      "lines_missed": 1169,
-      "line_percent": 88.6,
-      "branches_found": 7982,
-      "branches_hit": 5440,
-      "branches_missed": 2542,
-      "branch_percent": 68.15
+      "lines_hit": 9220,
+      "lines_missed": 1033,
+      "line_percent": 89.92,
+      "branches_found": 7986,
+      "branches_hit": 5542,
+      "branches_missed": 2444,
+      "branch_percent": 69.4
     },
     "src/libraries/mri": {
       "files": 9,
-      "lines_found": 826,
-      "lines_hit": 671,
-      "lines_missed": 155,
-      "line_percent": 81.23,
-      "branches_found": 345,
-      "branches_hit": 202,
-      "branches_missed": 143,
-      "branch_percent": 58.55
+      "lines_found": 827,
+      "lines_hit": 754,
+      "lines_missed": 73,
+      "line_percent": 91.17,
+      "branches_found": 353,
+      "branches_hit": 251,
+      "branches_missed": 102,
+      "branch_percent": 71.1
     },
     "src/libraries/sts": {
       "files": 11,
-      "lines_found": 873,
-      "lines_hit": 828,
-      "lines_missed": 45,
-      "line_percent": 94.85,
-      "branches_found": 650,
-      "branches_hit": 444,
-      "branches_missed": 206,
-      "branch_percent": 68.31
+      "lines_found": 876,
+      "lines_hit": 825,
+      "lines_missed": 51,
+      "line_percent": 94.18,
+      "branches_found": 656,
+      "branches_hit": 446,
+      "branches_missed": 210,
+      "branch_percent": 67.99
     },
     "src/libraries/utils": {
       "files": 24,
@@ -4281,7 +4281,7 @@
       "lines_hit": 90,
       "lines_missed": 20,
       "branches_found": 44,
-      "branches_hit": 29
+      "branches_hit": 30
     },
     {
       "path": "src/applications/mne_scan/plugins/covariance/covariance_global.cpp",
@@ -4838,10 +4838,10 @@
       "scope": "libraries",
       "component": "src/libraries/bids",
       "lines_found": 53,
-      "lines_hit": 45,
-      "lines_missed": 8,
+      "lines_hit": 53,
+      "lines_missed": 0,
       "branches_found": 16,
-      "branches_hit": 6
+      "branches_hit": 8
     },
     {
       "path": "src/libraries/bids/bids_coordinate_system.cpp",
@@ -4887,11 +4887,11 @@
       "path": "src/libraries/bids/bids_electrode.cpp",
       "scope": "libraries",
       "component": "src/libraries/bids",
-      "lines_found": 75,
-      "lines_hit": 48,
-      "lines_missed": 27,
-      "branches_found": 28,
-      "branches_hit": 7
+      "lines_found": 76,
+      "lines_hit": 75,
+      "lines_missed": 1,
+      "branches_found": 26,
+      "branches_hit": 19
     },
     {
       "path": "src/libraries/bids/bids_electrode.h",
@@ -4948,10 +4948,10 @@
       "scope": "libraries",
       "component": "src/libraries/bids",
       "lines_found": 574,
-      "lines_hit": 415,
-      "lines_missed": 159,
+      "lines_hit": 475,
+      "lines_missed": 99,
       "branches_found": 372,
-      "branches_hit": 237
+      "branches_hit": 284
     },
     {
       "path": "src/libraries/bids/bids_raw_data.h",
@@ -4988,10 +4988,10 @@
       "scope": "libraries",
       "component": "src/libraries/bids",
       "lines_found": 326,
-      "lines_hit": 264,
-      "lines_missed": 62,
+      "lines_hit": 313,
+      "lines_missed": 13,
       "branches_found": 218,
-      "branches_hit": 144
+      "branches_hit": 184
     },
     {
       "path": "src/libraries/bids/readers/bids_brain_vision_reader.h",
@@ -5197,10 +5197,10 @@
       "path": "src/libraries/connectivity/connectivitysettings.cpp",
       "scope": "libraries",
       "component": "src/libraries/connectivity",
-      "lines_found": 156,
-      "lines_hit": 105,
-      "lines_missed": 51,
-      "branches_found": 100,
+      "lines_found": 141,
+      "lines_hit": 121,
+      "lines_missed": 20,
+      "branches_found": 56,
       "branches_hit": 36
     },
     {
@@ -5268,10 +5268,10 @@
       "scope": "libraries",
       "component": "src/libraries/connectivity",
       "lines_found": 141,
-      "lines_hit": 112,
-      "lines_missed": 29,
+      "lines_hit": 116,
+      "lines_missed": 25,
       "branches_found": 144,
-      "branches_hit": 69
+      "branches_hit": 78
     },
     {
       "path": "src/libraries/connectivity/metrics/directed_transfer_function.cpp",
@@ -5307,11 +5307,11 @@
       "path": "src/libraries/connectivity/metrics/mvar_model.cpp",
       "scope": "libraries",
       "component": "src/libraries/connectivity",
-      "lines_found": 97,
-      "lines_hit": 91,
-      "lines_missed": 6,
+      "lines_found": 98,
+      "lines_hit": 97,
+      "lines_missed": 1,
       "branches_found": 132,
-      "branches_hit": 55
+      "branches_hit": 70
     },
     {
       "path": "src/libraries/connectivity/metrics/mvar_model.h",
@@ -5351,7 +5351,7 @@
       "lines_hit": 102,
       "lines_missed": 16,
       "branches_found": 124,
-      "branches_hit": 68
+      "branches_hit": 67
     },
     {
       "path": "src/libraries/connectivity/metrics/unbiasedsquaredphaselagindex.cpp",
@@ -5361,7 +5361,7 @@
       "lines_hit": 103,
       "lines_missed": 19,
       "branches_found": 126,
-      "branches_hit": 70
+      "branches_hit": 67
     },
     {
       "path": "src/libraries/connectivity/metrics/weightedphaselagindex.cpp",
@@ -5398,10 +5398,10 @@
       "scope": "libraries",
       "component": "src/libraries/connectivity",
       "lines_found": 46,
-      "lines_hit": 44,
-      "lines_missed": 2,
+      "lines_hit": 45,
+      "lines_missed": 1,
       "branches_found": 30,
-      "branches_hit": 20
+      "branches_hit": 19
     },
     {
       "path": "src/libraries/connectivity/network/networkedge.h",
@@ -5468,10 +5468,10 @@
       "scope": "libraries",
       "component": "src/libraries/decoding",
       "lines_found": 118,
-      "lines_hit": 92,
-      "lines_missed": 26,
-      "branches_found": 106,
-      "branches_hit": 47
+      "lines_hit": 114,
+      "lines_missed": 4,
+      "branches_found": 112,
+      "branches_hit": 64
     },
     {
       "path": "src/libraries/decoding/decoding_ssd.cpp",
@@ -6357,11 +6357,11 @@
       "path": "src/libraries/disp/viewers/helpers/rtfiffrawviewmodel.cpp",
       "scope": "libraries",
       "component": "src/libraries/disp",
-      "lines_found": 655,
-      "lines_hit": 553,
+      "lines_found": 606,
+      "lines_hit": 504,
       "lines_missed": 102,
-      "branches_found": 527,
-      "branches_hit": 314
+      "branches_found": 497,
+      "branches_hit": 286
     },
     {
       "path": "src/libraries/disp/viewers/helpers/rtfiffrawviewmodel.h",
@@ -7761,7 +7761,7 @@
       "lines_hit": 72,
       "lines_missed": 1,
       "branches_found": 132,
-      "branches_hit": 61
+      "branches_hit": 63
     },
     {
       "path": "src/libraries/dsp/extended_infomax.h",
@@ -7801,7 +7801,7 @@
       "lines_hit": 230,
       "lines_missed": 9,
       "branches_found": 109,
-      "branches_hit": 74
+      "branches_hit": 75
     },
     {
       "path": "src/libraries/dsp/filterkernel.h",
@@ -7848,10 +7848,10 @@
       "scope": "libraries",
       "component": "src/libraries/dsp",
       "lines_found": 92,
-      "lines_hit": 83,
-      "lines_missed": 9,
+      "lines_hit": 85,
+      "lines_missed": 7,
       "branches_found": 144,
-      "branches_hit": 60
+      "branches_hit": 65
     },
     {
       "path": "src/libraries/dsp/ica.h",
@@ -7958,10 +7958,10 @@
       "scope": "libraries",
       "component": "src/libraries/dsp",
       "lines_found": 396,
-      "lines_hit": 368,
-      "lines_missed": 28,
+      "lines_hit": 386,
+      "lines_missed": 10,
       "branches_found": 310,
-      "branches_hit": 218
+      "branches_hit": 223
     },
     {
       "path": "src/libraries/dsp/peak_finder.cpp",
@@ -7998,10 +7998,10 @@
       "scope": "libraries",
       "component": "src/libraries/dsp",
       "lines_found": 303,
-      "lines_hit": 250,
-      "lines_missed": 53,
+      "lines_hit": 247,
+      "lines_missed": 56,
       "branches_found": 104,
-      "branches_hit": 62
+      "branches_hit": 61
     },
     {
       "path": "src/libraries/dsp/rt/rt_averaging.h",
@@ -8161,7 +8161,7 @@
       "lines_hit": 50,
       "lines_missed": 0,
       "branches_found": 26,
-      "branches_hit": 22
+      "branches_hit": 21
     },
     {
       "path": "src/libraries/dsp/spectrogram.h",
@@ -8258,10 +8258,10 @@
       "scope": "libraries",
       "component": "src/libraries/dsp",
       "lines_found": 125,
-      "lines_hit": 89,
-      "lines_missed": 36,
-      "branches_found": 132,
-      "branches_hit": 60
+      "lines_hit": 117,
+      "lines_missed": 8,
+      "branches_found": 136,
+      "branches_hit": 83
     },
     {
       "path": "src/libraries/dsp/xdawn.h",
@@ -8457,11 +8457,11 @@
       "path": "src/libraries/fiff/fiff_dig_point_set.cpp",
       "scope": "libraries",
       "component": "src/libraries/fiff",
-      "lines_found": 436,
-      "lines_hit": 381,
-      "lines_missed": 55,
-      "branches_found": 306,
-      "branches_hit": 213
+      "lines_found": 430,
+      "lines_hit": 419,
+      "lines_missed": 11,
+      "branches_found": 304,
+      "branches_hit": 263
     },
     {
       "path": "src/libraries/fiff/fiff_dig_point_set.h",
@@ -8567,11 +8567,11 @@
       "path": "src/libraries/fiff/fiff_evoked.cpp",
       "scope": "libraries",
       "component": "src/libraries/fiff",
-      "lines_found": 289,
-      "lines_hit": 248,
-      "lines_missed": 41,
-      "branches_found": 198,
-      "branches_hit": 122
+      "lines_found": 287,
+      "lines_hit": 250,
+      "lines_missed": 37,
+      "branches_found": 194,
+      "branches_hit": 125
     },
     {
       "path": "src/libraries/fiff/fiff_evoked.h",
@@ -8787,11 +8787,11 @@
       "path": "src/libraries/fiff/fiff_sparse_matrix.cpp",
       "scope": "libraries",
       "component": "src/libraries/fiff",
-      "lines_found": 176,
-      "lines_hit": 137,
-      "lines_missed": 39,
-      "branches_found": 98,
-      "branches_hit": 64
+      "lines_found": 186,
+      "lines_hit": 158,
+      "lines_missed": 28,
+      "branches_found": 120,
+      "branches_hit": 95
     },
     {
       "path": "src/libraries/fiff/fiff_sparse_matrix.h",
@@ -8801,7 +8801,7 @@
       "lines_hit": 15,
       "lines_missed": 0,
       "branches_found": 10,
-      "branches_hit": 7
+      "branches_hit": 8
     },
     {
       "path": "src/libraries/fiff/fiff_stream.cpp",
@@ -8827,11 +8827,11 @@
       "path": "src/libraries/fiff/fiff_tag.cpp",
       "scope": "libraries",
       "component": "src/libraries/fiff",
-      "lines_found": 318,
-      "lines_hit": 238,
-      "lines_missed": 80,
-      "branches_found": 173,
-      "branches_hit": 125
+      "lines_found": 337,
+      "lines_hit": 258,
+      "lines_missed": 79,
+      "branches_found": 187,
+      "branches_hit": 136
     },
     {
       "path": "src/libraries/fiff/fiff_tag.h",
@@ -9041,7 +9041,7 @@
       "lines_hit": 1658,
       "lines_missed": 171,
       "branches_found": 1332,
-      "branches_hit": 901
+      "branches_hit": 897
     },
     {
       "path": "src/libraries/fwd/fwd_bem_model.h",
@@ -9267,11 +9267,11 @@
       "path": "src/libraries/inv/beamformer/inv_lcmv.cpp",
       "scope": "libraries",
       "component": "src/libraries/inv",
-      "lines_found": 184,
-      "lines_hit": 165,
-      "lines_missed": 19,
-      "branches_found": 206,
-      "branches_hit": 108
+      "lines_found": 183,
+      "lines_hit": 163,
+      "lines_missed": 20,
+      "branches_found": 202,
+      "branches_hit": 104
     },
     {
       "path": "src/libraries/inv/dipole_fit/inv_dipole_fit.cpp",
@@ -9618,10 +9618,10 @@
       "scope": "libraries",
       "component": "src/libraries/inv",
       "lines_found": 471,
-      "lines_hit": 457,
-      "lines_missed": 14,
+      "lines_hit": 459,
+      "lines_missed": 12,
       "branches_found": 386,
-      "branches_hit": 319
+      "branches_hit": 355
     },
     {
       "path": "src/libraries/inv/inv_token.h",
@@ -9928,10 +9928,10 @@
       "scope": "libraries",
       "component": "src/libraries/math",
       "lines_found": 514,
-      "lines_hit": 495,
-      "lines_missed": 19,
+      "lines_hit": 494,
+      "lines_missed": 20,
       "branches_found": 740,
-      "branches_hit": 475
+      "branches_hit": 472
     },
     {
       "path": "src/libraries/math/kmeans.h",
@@ -9977,11 +9977,11 @@
       "path": "src/libraries/math/numerics.cpp",
       "scope": "libraries",
       "component": "src/libraries/math",
-      "lines_found": 125,
-      "lines_hit": 98,
-      "lines_missed": 27,
-      "branches_found": 120,
-      "branches_hit": 61
+      "lines_found": 79,
+      "lines_hit": 75,
+      "lines_missed": 4,
+      "branches_found": 76,
+      "branches_hit": 50
     },
     {
       "path": "src/libraries/math/numerics.h",
@@ -10088,10 +10088,10 @@
       "scope": "libraries",
       "component": "src/libraries/ml",
       "lines_found": 94,
-      "lines_hit": 60,
-      "lines_missed": 34,
-      "branches_found": 30,
-      "branches_hit": 5
+      "lines_hit": 85,
+      "lines_missed": 9,
+      "branches_found": 28,
+      "branches_hit": 15
     },
     {
       "path": "src/libraries/ml/ml_tensor.h",
@@ -10157,11 +10157,11 @@
       "path": "src/libraries/mna/mna_graph.cpp",
       "scope": "libraries",
       "component": "src/libraries/mna",
-      "lines_found": 277,
-      "lines_hit": 233,
-      "lines_missed": 44,
-      "branches_found": 232,
-      "branches_hit": 151
+      "lines_found": 282,
+      "lines_hit": 275,
+      "lines_missed": 7,
+      "branches_found": 258,
+      "branches_hit": 200
     },
     {
       "path": "src/libraries/mna/mna_graph.h",
@@ -10268,10 +10268,10 @@
       "scope": "libraries",
       "component": "src/libraries/mna",
       "lines_found": 54,
-      "lines_hit": 51,
-      "lines_missed": 3,
+      "lines_hit": 52,
+      "lines_missed": 2,
       "branches_found": 64,
-      "branches_hit": 27
+      "branches_hit": 35
     },
     {
       "path": "src/libraries/mna/mna_param_binding.h",
@@ -10438,10 +10438,10 @@
       "scope": "libraries",
       "component": "src/libraries/mna",
       "lines_found": 114,
-      "lines_hit": 80,
-      "lines_missed": 34,
+      "lines_hit": 78,
+      "lines_missed": 36,
       "branches_found": 122,
-      "branches_hit": 80
+      "branches_hit": 79
     },
     {
       "path": "src/libraries/mna/mna_verification.cpp",
@@ -10578,10 +10578,10 @@
       "scope": "libraries",
       "component": "src/libraries/mne",
       "lines_found": 458,
-      "lines_hit": 387,
-      "lines_missed": 71,
+      "lines_hit": 424,
+      "lines_missed": 34,
       "branches_found": 376,
-      "branches_hit": 287
+      "branches_hit": 312
     },
     {
       "path": "src/libraries/mne/mne_cov_matrix.h",
@@ -10608,10 +10608,10 @@
       "scope": "libraries",
       "component": "src/libraries/mne",
       "lines_found": 447,
-      "lines_hit": 365,
-      "lines_missed": 82,
-      "branches_found": 318,
-      "branches_hit": 208
+      "lines_hit": 375,
+      "lines_missed": 72,
+      "branches_found": 322,
+      "branches_hit": 217
     },
     {
       "path": "src/libraries/mne/mne_deriv.cpp",
@@ -10648,10 +10648,10 @@
       "scope": "libraries",
       "component": "src/libraries/mne",
       "lines_found": 645,
-      "lines_hit": 561,
-      "lines_missed": 84,
+      "lines_hit": 633,
+      "lines_missed": 12,
       "branches_found": 432,
-      "branches_hit": 343
+      "branches_hit": 397
     },
     {
       "path": "src/libraries/mne/mne_epoch_data.cpp",
@@ -11118,10 +11118,10 @@
       "scope": "libraries",
       "component": "src/libraries/mne",
       "lines_found": 424,
-      "lines_hit": 386,
-      "lines_missed": 38,
+      "lines_hit": 403,
+      "lines_missed": 21,
       "branches_found": 366,
-      "branches_hit": 273
+      "branches_hit": 287
     },
     {
       "path": "src/libraries/mne/mne_project_to_surface.cpp",
@@ -11377,11 +11377,11 @@
       "path": "src/libraries/mri/mri_nifti_io.cpp",
       "scope": "libraries",
       "component": "src/libraries/mri",
-      "lines_found": 264,
-      "lines_hit": 168,
-      "lines_missed": 96,
-      "branches_found": 119,
-      "branches_hit": 51
+      "lines_found": 265,
+      "lines_hit": 251,
+      "lines_missed": 14,
+      "branches_found": 127,
+      "branches_hit": 100
     },
     {
       "path": "src/libraries/mri/mri_slicer.cpp",
@@ -11438,8 +11438,8 @@
       "scope": "libraries",
       "component": "src/libraries/sts",
       "lines_found": 417,
-      "lines_hit": 412,
-      "lines_missed": 5,
+      "lines_hit": 413,
+      "lines_missed": 4,
       "branches_found": 300,
       "branches_hit": 238
     },
@@ -11477,11 +11477,11 @@
       "path": "src/libraries/sts/sts_ftest.cpp",
       "scope": "libraries",
       "component": "src/libraries/sts",
-      "lines_found": 41,
-      "lines_hit": 41,
-      "lines_missed": 0,
-      "branches_found": 48,
-      "branches_hit": 19
+      "lines_found": 44,
+      "lines_hit": 38,
+      "lines_missed": 6,
+      "branches_found": 52,
+      "branches_hit": 20
     },
     {
       "path": "src/libraries/sts/sts_ftest.h",
@@ -11518,10 +11518,10 @@
       "scope": "libraries",
       "component": "src/libraries/sts",
       "lines_found": 102,
-      "lines_hit": 97,
-      "lines_missed": 5,
-      "branches_found": 83,
-      "branches_hit": 39
+      "lines_hit": 96,
+      "lines_missed": 6,
+      "branches_found": 85,
+      "branches_hit": 40
     },
     {
       "path": "src/libraries/sts/sts_ttest.h",
