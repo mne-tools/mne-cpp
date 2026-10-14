@@ -83,7 +83,6 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
 , Weight(BIG)
 , InitDone2(false)
 {
-    FirCoeff = RowVectorXd::Zero(NumTaps);
     init(NumTaps, OmegaC, BW, ParksWidth, PassType);
 }
 
@@ -284,7 +283,8 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
         Coeff[HalfTapCount] = 0.5 * Alpha[1] + 0.25 * Alpha[2];
     }
 
-    // Output section.
+    // Output section: TapCount may differ from the count the object was constructed with (clamped, or init() later)
+    FirCoeff = RowVectorXd::Zero(TapCount);
     for (j = 1; j <= HalfTapCount; j++)
         FirCoeff[j - 1] = Coeff[j];
     if (OddNumTaps)
@@ -293,8 +293,6 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
     else
         for (j = 1; j <= HalfTapCount; j++)
             FirCoeff[HalfTapCount + j - 1] = Coeff[HalfTapCount - j + 1];
-
-    FirCoeff.conservativeResize(TapCount);
 
     // Parks2Label was on my application's main form.
     // These replace the original Ouch() function
