@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_tests.py",
   "ci_source": {
-    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38144982990",
-    "commit": "c78efbf82cc2b7ff71b996e1fd6f46a562b1f0bc"
+    "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/38404887493",
+    "commit": "6bd2f51107cdd77b6bb189bac59b94b24b849f0a"
   },
   "summary": {
     "directories": 264,
@@ -28,15 +28,10 @@
     "retry_paths": [],
     "ci": {
       "macos-26": {
-        "executed": 289,
+        "executed": 293,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_mne_analyze_app",
-          "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app",
-          "test_mne_scan_plugins"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_cancel_noise",
@@ -73,15 +68,10 @@
         ]
       },
       "macos-26-qt-min": {
-        "executed": 289,
+        "executed": 293,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_mne_analyze_app",
-          "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app",
-          "test_mne_scan_plugins"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_cancel_noise",
@@ -118,15 +108,10 @@
         ]
       },
       "ubuntu-24.04": {
-        "executed": 289,
+        "executed": 293,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_mne_analyze_app",
-          "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app",
-          "test_mne_scan_plugins"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_cancel_noise",
@@ -163,15 +148,10 @@
         ]
       },
       "ubuntu-24.04-qt-min": {
-        "executed": 289,
+        "executed": 293,
         "failures": 0,
         "skipped": 0,
-        "registered_not_executed": [
-          "test_mne_analyze_app",
-          "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app",
-          "test_mne_scan_plugins"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_cancel_noise",
@@ -208,15 +188,10 @@
         ]
       },
       "windows-2025-vs2026": {
-        "executed": 289,
+        "executed": 293,
         "failures": 0,
         "skipped": 2,
-        "registered_not_executed": [
-          "test_mne_analyze_app",
-          "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app",
-          "test_mne_scan_plugins"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_cancel_noise",
@@ -253,15 +228,10 @@
         ]
       },
       "windows-2025-vs2026-qt-min": {
-        "executed": 289,
+        "executed": 293,
         "failures": 0,
         "skipped": 2,
-        "registered_not_executed": [
-          "test_mne_analyze_app",
-          "test_mne_analyze_studio_workbench",
-          "test_mne_inspect_app",
-          "test_mne_scan_plugins"
-        ],
+        "registered_not_executed": [],
         "executed_not_in_inventory": [
           "ex_bids",
           "ex_cancel_noise",
@@ -5724,12 +5694,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -5830,12 +5800,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6433,12 +6403,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
@@ -6822,12 +6792,12 @@
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
-        "macos-26": "absent",
-        "macos-26-qt-min": "absent",
-        "ubuntu-24.04": "absent",
-        "ubuntu-24.04-qt-min": "absent",
-        "windows-2025-vs2026": "absent",
-        "windows-2025-vs2026-qt-min": "absent"
+        "macos-26": "run",
+        "macos-26-qt-min": "run",
+        "ubuntu-24.04": "run",
+        "ubuntu-24.04-qt-min": "run",
+        "windows-2025-vs2026": "run",
+        "windows-2025-vs2026-qt-min": "run"
       },
       "registry_classes": []
     },
