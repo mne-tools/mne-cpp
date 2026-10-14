@@ -306,6 +306,17 @@ private slots:
         include << es.info.ch_names[0] << es.info.ch_names[1];
         FiffEvokedSet picked = es.pick_channels(include);
         QCOMPARE(picked.info.nchan, 2);
+
+        // Single evoked: picks rows by name; no selection or no match keeps everything; a name past the data
+        // rows (info and data out of step) gives a zero row instead of reading past the data
+        FiffEvoked evoked = es.evoked.first();
+        const FiffEvoked one = evoked.pick_channels({include[1]});
+        QCOMPARE(one.data, evoked.data.row(1));
+        QCOMPARE(evoked.pick_channels({}).data.rows(), evoked.data.rows());
+        QCOMPARE(evoked.pick_channels({QStringLiteral("NOPE")}).data.rows(), evoked.data.rows());
+        evoked.data = evoked.data.topRows(2).eval();
+        const QString third = evoked.info.ch_names[2];
+        QVERIFY(evoked.pick_channels({third}).data.isZero(0.0));
     }
 
     //=========================================================================

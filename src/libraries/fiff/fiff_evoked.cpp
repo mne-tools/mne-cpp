@@ -124,12 +124,9 @@ FiffEvoked FiffEvoked::pick_channels(const QStringList& include,
     //
     //   Create the reduced data set
     //
-    MatrixXd selBlock(1, 1);
-
-    if (selBlock.rows() != sel.cols() || selBlock.cols() != res.data.cols())
-        selBlock.resize(sel.cols(), res.data.cols());
+    MatrixXd selBlock = MatrixXd::Zero(sel.cols(), res.data.cols());
     for (qint32 l = 0; l < sel.cols(); ++l) {
-        if (sel(0, l) <= res.data.rows()) {
+        if (sel(0, l) < res.data.rows()) {
             selBlock.block(l, 0, 1, selBlock.cols()) = res.data.block(sel(0, l), 0, 1, selBlock.cols());
         } else {
             qWarning("FiffEvoked::pick_channels - Warning : Selected channel index out of bound.\n");
