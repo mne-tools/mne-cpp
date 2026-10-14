@@ -38,7 +38,10 @@
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_file.h>
+#include <fiff/fiff_stream.h>
 
+#include <functional>
 #include <memory>
 
 //=============================================================================================================
@@ -294,6 +297,90 @@ void TestMneCovPython::rejectsBadInput()
 
     QVERIFY(!MNECovMatrix::read(m_covPath, 99));
     QVERIFY(!MNECovMatrix::read(m_dir.filePath("missing-cov.fif"), FIFFV_MNE_NOISE_COV));
+
+    // Hand-written covariance blocks, read as MNE-C mne_read_cov does: float data is accepted, all-zero
+    // double data, a data tag of another type, missing data, a wrong name count or eigenvalues without
+    // eigenvectors are not
+    const auto covFile = [this](const QString& name, const std::function<void(FiffStream&)>& body, bool block = true) {
+        QFile file(m_dir.filePath(name));
+        if (!file.open(QIODevice::WriteOnly))
+            return QString();
+        FiffStream::SPtr stream = FiffStream::start_file(file);
+        if (block)
+            stream->start_block(FIFFB_MNE_COV);
+        const fiff_int_t kind = FIFFV_MNE_NOISE_COV;
+        stream->write_int(FIFF_MNE_COV_KIND, &kind);
+        body(*stream);
+        if (block)
+            stream->end_block(FIFFB_MNE_COV);
+        stream->end_file();
+        return file.fileName();
+    };
+    const fiff_int_t three = 3;
+    const float floats[6] = {1.0f, 0.0f, 2.0f, 0.0f, 0.0f, 3.0f};
+    const double zeros[6] = {};
+    const fiff_int_t ints[6] = {1, 0, 2, 0, 0, 3};
+    const auto dim = [&](FiffStream& s) {
+        s.write_int(FIFF_MNE_COV_DIM, &three);
+    };
+    QVERIFY(!MNECovMatrix::read(covFile("nocov.fif", dim, false), FIFFV_MNE_NOISE_COV));
+    QVERIFY(!MNECovMatrix::read(covFile("nodim.fif", [](FiffStream&) {}), FIFFV_MNE_NOISE_COV));
+    QVERIFY(!MNECovMatrix::read(covFile("nodata.fif", dim), FIFFV_MNE_NOISE_COV));
+    QVERIFY(!MNECovMatrix::read(covFile("names.fif", [&](FiffStream& s) {
+                                    dim(s);
+                                    s.write_name_list(FIFF_MNE_ROW_NAMES, {"A", "B"});
+                                }),
+                                FIFFV_MNE_NOISE_COV));
+    for (const fiff_int_t tag : {FIFF_MNE_COV_DIAG, FIFF_MNE_COV}) {
+        auto floatCov = MNECovMatrix::read(covFile("float.fif", [&](FiffStream& s) {
+                                               dim(s);
+                                               s.write_float(tag, floats, tag == FIFF_MNE_COV ? 6 : 3);
+                                           }),
+                                           FIFFV_MNE_NOISE_COV);
+        QVERIFY(floatCov);
+        QCOMPARE(bool(floatCov->is_diag()), tag == FIFF_MNE_COV_DIAG);
+        QCOMPARE(floatCov->ncov, 3);
+        QVERIFY(!MNECovMatrix::read(covFile("zero.fif", [&](FiffStream& s) {
+                                        dim(s);
+                                        s.write_double(tag, zeros, tag == FIFF_MNE_COV ? 6 : 3);
+                                    }),
+                                    FIFFV_MNE_NOISE_COV));
+        if (tag == FIFF_MNE_COV_DIAG) {
+            QVERIFY(!MNECovMatrix::read(covFile("int.fif", [&](FiffStream& s) {
+                                            dim(s);
+                                            s.write_int(tag, ints, 3);
+                                        }),
+                                        FIFFV_MNE_NOISE_COV));
+        }
+    }
+    // An EEG, a magnetometer and an unclassified channel; a user-selected rank of one keeps the largest component
+    auto named = MNECovMatrix::read(covFile("named.fif", [&](FiffStream& s) {
+                                        dim(s);
+                                        s.write_name_list(FIFF_MNE_ROW_NAMES, {"E", "M", "X"});
+                                        s.write_float(FIFF_MNE_COV, floats, 6);
+                                    }),
+                                    FIFFV_MNE_NOISE_COV);
+    QVERIFY(named);
+    QVERIFY(named->classify_channels({}, 0) != 0);
+    QList<FiffChInfo> chs(3);
+    chs[0].ch_name = "E";
+    chs[0].kind = FIFFV_EEG_CH;
+    chs[1].ch_name = "M";
+    chs[1].kind = FIFFV_MEG_CH;
+    chs[1].unit = FIFF_UNIT_T;
+    chs[2].ch_name = "X";
+    chs[2].kind = FIFFV_MISC_CH;
+    QCOMPARE(named->classify_channels(chs, 3), 0);
+    QCOMPARE(named->decompose_eigen_small(-1.0f, 1), 0);
+    QCOMPARE(named->nzero, 2);
+
+    const double lambda[3] = {0.0, 1.0, 2.0};
+    QVERIFY(!MNECovMatrix::read(covFile("noeigvec.fif", [&](FiffStream& s) {
+                                    dim(s);
+                                    s.write_float(FIFF_MNE_COV, floats, 6);
+                                    s.write_double(FIFF_MNE_COV_EIGENVALUES, lambda, 3);
+                                }),
+                                FIFFV_MNE_NOISE_COV));
 }
 
 //=============================================================================================================
