@@ -183,7 +183,7 @@ MatrixXd Numerics::rescale(const MatrixXd& data,
         std_mat = std_mat.cwiseProduct(std_mat);
         VectorXd std_v = std_mat.rowwise().mean();
         for (qint32 i = 0; i < std_v.size(); ++i)
-            std_v[i] = sqrt(std_v[i] / static_cast<float>(imax - imin));
+            std_v[i] = sqrt(std_v[i]);
 
         data_out -= mean.rowwise().replicate(data_out.cols());
         data_out = data_out.cwiseQuotient(std_v.rowwise().replicate(data_out.cols()));
@@ -263,7 +263,7 @@ MatrixXd Numerics::rescale(const MatrixXd& data,
         std_mat = std_mat.cwiseProduct(std_mat);
         VectorXd std_v = std_mat.rowwise().mean();
         for (qint32 i = 0; i < std_v.size(); ++i)
-            std_v[i] = sqrt(std_v[i] / static_cast<float>(imax - imin));
+            std_v[i] = sqrt(std_v[i]);
 
         data_out -= mean.rowwise().replicate(data_out.cols());
         data_out = data_out.cwiseQuotient(std_v.rowwise().replicate(data_out.cols()));

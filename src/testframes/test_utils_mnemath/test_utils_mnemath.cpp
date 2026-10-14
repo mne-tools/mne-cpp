@@ -427,6 +427,21 @@ void TestMNEMath::testRescaleZscore()
     for (int i = 0; i < result.cols(); ++i) {
         QVERIFY(std::isfinite(result(0, i)));
     }
+
+    // mne.baseline.rescale(d, times, (None, 0), 'zscore') and (-0.1, 0.1) with 'logratio' / 'ratio'
+    MatrixXd d(2, 5);
+    d << 1, 2, 3, 4, 5, 2, 4, 4, 8, 10;
+    RowVectorXf t(5);
+    t << -0.2f, -0.1f, 0.0f, 0.1f, 0.2f;
+    MatrixXd expected(2, 5);
+    expected << -1.224744871391589, 0.0, 1.224744871391589, 2.449489742783178, 3.6742346141747673,
+        -1.4142135623730951, 0.7071067811865474, 0.7071067811865474, 4.949747468305832, 7.071067811865475;
+    QVERIFY((Numerics::rescale(d, t, QPair<float, float>(-0.2f, 0.0f), QString("zscore")) - expected).cwiseAbs().maxCoeff() < 1e-9);
+    expected << -0.47712125471966244, -0.17609125905568127, 0.0, 0.12493873660829993, 0.2218487496163564,
+        -0.42596873227228116, -0.12493873660829995, -0.12493873660829995, 0.17609125905568124, 0.27300127206373764;
+    QVERIFY((Numerics::rescale(d, t, std::pair<float, float>(-0.1f, 0.1f), std::string("logratio")) - expected).cwiseAbs().maxCoeff() < 1e-9);
+    expected << 1.0 / 3, 2.0 / 3, 1.0, 4.0 / 3, 5.0 / 3, 0.375, 0.75, 0.75, 1.5, 1.875;
+    QVERIFY((Numerics::rescale(d, t, QPair<float, float>(-0.1f, 0.1f), QString("ratio")) - expected).cwiseAbs().maxCoeff() < 1e-9);
 }
 
 //=============================================================================================================
