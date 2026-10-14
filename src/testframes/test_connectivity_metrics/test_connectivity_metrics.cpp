@@ -140,6 +140,50 @@ private slots:
         settings.append(MatrixXd::Random(4, 100));
         settings.removeLast(1);
         QCOMPARE(settings.size(), 1);
+
+        // Removing trials takes their spectra out of the running sums; sums of another length are left alone
+        const auto trial = [](double v) {
+            ConnectivitySettings::IntermediateTrialData t;
+            t.matData = MatrixXd::Zero(2, 4);
+            t.matPsd = MatrixXd::Constant(2, 3, v);
+            for (int i = 0; i < 2; ++i) {
+                t.vecPairCsd.append({i, MatrixXcd::Constant(2, 3, v)});
+                t.vecPairCsdNormalized.append({i, MatrixXcd::Constant(2, 3, v)});
+                t.vecPairCsdImagSign.append({i, MatrixXd::Constant(2, 3, v)});
+                t.vecPairCsdImagAbs.append({i, MatrixXd::Constant(2, 3, v)});
+                t.vecPairCsdImagSqrd.append({i, MatrixXd::Constant(2, 3, v)});
+            }
+            return t;
+        };
+        ConnectivitySettings sums;
+        for (const double v : {1.0, 2.0, 4.0})
+            sums.append(trial(v));
+        ConnectivitySettings::IntermediateSumData& sum = sums.getIntermediateSumData();
+        const ConnectivitySettings::IntermediateTrialData total = trial(7.0);
+        sum.matPsdSum = total.matPsd;
+        sum.vecPairCsdSum = total.vecPairCsd;
+        sum.vecPairCsdNormalizedSum = total.vecPairCsdNormalized;
+        sum.vecPairCsdImagSignSum = total.vecPairCsdImagSign;
+        sum.vecPairCsdImagAbsSum = total.vecPairCsdImagAbs;
+        sum.vecPairCsdImagSqrdSum = total.vecPairCsdImagSqrd.mid(0, 1);
+        sums.removeFirst(1);
+        sums.removeLast(1);
+        QCOMPARE(sums.size(), 1);
+        QCOMPARE(sum.matPsdSum(1, 2), 2.0);
+        QCOMPARE(sum.vecPairCsdSum[1].second(0, 0), std::complex<double>(2.0, 0.0));
+        QCOMPARE(sum.vecPairCsdNormalizedSum[0].second(1, 1), std::complex<double>(2.0, 0.0));
+        QCOMPARE(sum.vecPairCsdImagSignSum[1].second(0, 2), 2.0);
+        QCOMPARE(sum.vecPairCsdImagAbsSum[0].second(1, 0), 2.0);
+        QCOMPARE(sum.vecPairCsdImagSqrdSum[0].second(0, 0), 7.0);
+
+        // More trials than stored, or none at all, removes nothing
+        sums.removeFirst(2);
+        sums.removeLast(2);
+        QCOMPARE(sums.size(), 1);
+        sums.clearAllData();
+        sums.removeFirst(1);
+        sums.removeLast(1);
+        QVERIFY(sums.isEmpty());
     }
 
     void testCalculateCorrelation()
