@@ -255,6 +255,18 @@ void TestFiffCovPython::data_isSymmetric()
 
     // The diagonal holds variances, which cannot be negative.
     QVERIFY2(d.diagonal().minCoeff() > 0.0, "covariance has a non positive variance on its diagonal");
+
+    // The grand average weights each covariance by its degrees of freedom; mismatched sizes give none
+    FiffCov twice = m_cov;
+    twice.data *= 2.0;
+    twice.nfree = 3 * m_cov.nfree;
+    const FiffCov grand = FiffCov::computeGrandAverage({m_cov, twice});
+    QCOMPARE(grand.nfree, 4 * m_cov.nfree);
+    QVERIFY(grand.data.isApprox(1.75 * d));
+    QCOMPARE(FiffCov::computeGrandAverage({}).dim, -1);
+    FiffCov smaller = m_cov.pick_channels(m_cov.names.mid(0, 3));
+    QCOMPARE(FiffCov::computeGrandAverage({m_cov, smaller}).dim, -1);
+    QVERIFY(!m_cov.save(QString()));
 }
 
 //=============================================================================================================
