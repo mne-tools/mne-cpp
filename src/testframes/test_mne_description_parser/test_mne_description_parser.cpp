@@ -129,10 +129,18 @@ average {
     }
     CONDITION {
         name    second
-        event   2
+        event   2# comment right after a word
         tmin    -0.1
         tmax    0.3
         basemin -0.1
+    }
+    condition {
+        name    third
+        event   3
+        tmin    -0.1
+        tmax    0.3
+        basemin -0.1
+        basemax 0
     }
 }
 )");
@@ -158,7 +166,7 @@ average {
     QCOMPARE(d.rej.ecgFlat, 3e-7f);
     QCOMPARE(d.rej.stimIgnore, 0.05f);
 
-    QCOMPARE(d.categories.size(), 2);
+    QCOMPARE(d.categories.size(), 3);
     const AverageCategory& a = d.categories[0];
     QCOMPARE(a.comment, QString("Left Auditory"));
     QCOMPARE(a.events, (QVector<unsigned int>{1, 5}));
@@ -184,6 +192,11 @@ average {
     QVERIFY(!b.doBaseline);
     QVERIFY(!b.doStdErr);
     QCOMPARE(b.ignore, 0u);
+    QCOMPARE(b.events, QVector<unsigned int>{2});
+    const AverageCategory& c = d.categories[2];
+    QVERIFY(c.doBaseline);
+    QCOMPARE(c.bmin, -0.1f);
+    QCOMPARE(c.bmax, 0.0f);
 }
 
 //=============================================================================================================
@@ -259,6 +272,23 @@ void TestMneDescriptionParser::average_rejected_data()
     QTest::newRow("stderr outside category") << QString("average { stderr %1 }").arg(cat.arg(""));
     QTest::newRow("name outside average") << "name x";
     QTest::newRow("fixskew in category") << inCat("fixskew");
+    QTest::newRow("name without value") << "average { name";
+    QTest::newRow("logfile without value") << "average { logfile";
+    QTest::newRow("eventfile without value") << "average { eventfile";
+    QTest::newRow("outfile without value") << "average { outfile";
+    QTest::newRow("logfile in category") << inCat("logfile x.log");
+    QTest::newRow("eventfile in category") << inCat("eventfile x.eve");
+    QTest::newRow("bad tmax") << inCat("tmax ?");
+    QTest::newRow("bad basemin") << inCat("basemin ?");
+    QTest::newRow("bad basemax") << inCat("basemax ?");
+    QTest::newRow("bad delay") << inCat("delay ?");
+    QTest::newRow("bad color") << inCat("color 1 ?");
+    for (const char* keyword : {"event", "nextevent", "prevevent", "ignore", "prevignore", "nextignore", "mask", "prevmask", "nextmask"}) {
+        QTest::newRow(qPrintable(QStringLiteral("%1 outside category").arg(keyword))) << QString("average { %1 1 %2 }").arg(keyword, cat.arg(""));
+        QTest::newRow(qPrintable(QStringLiteral("bad %1").arg(keyword))) << inCat(QString("%1 ?").arg(keyword));
+    }
+    for (const char* keyword : {"delay 0", "abs", "color 0 0 0", "bmin 0", "bmax 0"})
+        QTest::newRow(qPrintable(QStringLiteral("%1 outside category").arg(keyword))) << QString("average { %1 %2 }").arg(keyword, cat.arg(""));
 }
 
 //=============================================================================================================
@@ -348,6 +378,21 @@ void TestMneDescriptionParser::covariance_rejected_data()
     QTest::newRow("rejection in def") << inDef("eegReject 1e-4");
     QTest::newRow("tmin outside def") << "cov { tmin 0 }";
     QTest::newRow("bad float") << inDef("delay x");
+    QTest::newRow("logfile without value") << "cov { logfile";
+    QTest::newRow("eventfile without value") << "cov { eventfile";
+    QTest::newRow("logfile in def") << inDef("logfile x.log");
+    QTest::newRow("eventfile in def") << inDef("eventfile x.eve");
+    QTest::newRow("fixskew in def") << inDef("fixskew");
+    QTest::newRow("def in def") << inDef("def {");
+    QTest::newRow("reversed basemin/basemax") << inDef("basemin 0 basemax -0.1");
+    for (const char* keyword : {"tmin", "tmax", "bmin", "bmax", "basemin", "basemax"})
+        QTest::newRow(qPrintable(QStringLiteral("bad %1").arg(keyword))) << inDef(QString("%1 ?").arg(keyword));
+    for (const char* keyword : {"event", "ignore", "mask"}) {
+        QTest::newRow(qPrintable(QStringLiteral("%1 outside def").arg(keyword))) << QString("cov { %1 1 def { event 1 tmin -0.1 tmax 0 } }").arg(keyword);
+        QTest::newRow(qPrintable(QStringLiteral("bad %1").arg(keyword))) << inDef(QString("%1 ?").arg(keyword));
+    }
+    for (const char* keyword : {"delay 0", "bmin 0", "bmax 0"})
+        QTest::newRow(qPrintable(QStringLiteral("%1 outside def").arg(keyword))) << QString("cov { %1 def { event 1 tmin -0.1 tmax 0 } }").arg(keyword);
 }
 
 //=============================================================================================================
