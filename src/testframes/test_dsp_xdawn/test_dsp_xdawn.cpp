@@ -167,6 +167,32 @@ private slots:
 
         QVERIFY(!res.bValid);
         QVERIFY(res.matFilters.size() == 0);
+
+        // No epochs, only rejected ones, empty or mismatched epochs are refused too
+        QVERIFY(!Xdawn::fit({}, 1, 2).bValid);
+        QVector<MNEEpochData> rejected = synth.epochs;
+        for (MNEEpochData& ep : rejected)
+            ep.bReject = true;
+        QVERIFY(!Xdawn::fit(rejected, 1, 2).bValid);
+        QVector<MNEEpochData> empty(1);
+        QVERIFY(!Xdawn::fit(empty, 0, 2).bValid);
+        QVector<MNEEpochData> mismatched = synth.epochs;
+        mismatched.last().epoch.conservativeResize(mismatched.last().epoch.rows() - 1, Eigen::NoChange);
+        QVERIFY(!Xdawn::fit(mismatched, 1, 2).bValid);
+
+        // An invalid result passes epochs through denoising and yields no components
+        const MatrixXd& epoch = synth.epochs.first().epoch;
+        QCOMPARE(Xdawn::denoise(epoch, res), epoch);
+        QCOMPARE(Xdawn::apply(epoch, res).size(), Index(0));
+
+        // A valid one refuses other channel counts and clamps the number of components
+        const XdawnResult fitted = Xdawn::fit(synth.epochs, 1, 2);
+        QVERIFY(fitted.bValid);
+        const MatrixXd fewer = epoch.topRows(epoch.rows() - 1);
+        QCOMPARE(Xdawn::apply(fewer, fitted).size(), Index(0));
+        QCOMPARE(Xdawn::denoise(fewer, fitted).size(), Index(0));
+        QCOMPARE(Xdawn::denoise(epoch, fitted, 0), Xdawn::denoise(epoch, fitted, 99));
+        QCOMPARE(Xdawn::denoiseEpochs(synth.epochs, fitted, 1).first().epoch, Xdawn::denoise(epoch, fitted, 1));
     }
 };
 
