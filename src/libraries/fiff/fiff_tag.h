@@ -425,9 +425,10 @@ public:
      *
      * parses a sparse fiff float matrix and returns a double sparse matrix to make sure only double is used
      *
-     * @return a sparse double matrix which is newly created from the parsed float.
+     * @return a sparse double matrix which is newly created from the parsed float; empty if the tag is
+     *         no valid sparse float matrix (see FiffSparseMatrix::fiff_get_float_sparse_matrix).
      */
-    inline Eigen::SparseMatrix<double> toSparseFloatMatrix() const;
+    Eigen::SparseMatrix<double> toSparseFloatMatrix() const;
 
     //
     //from fiff_combat.c
@@ -905,76 +906,6 @@ inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
     return p_Matrix;
 }
 
-//=============================================================================================================
-
-inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
-{
-    if (!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == nullptr)
-        return Eigen::SparseMatrix<double>(); //NULL;
-
-    if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_CCS && fiff_type_matrix_coding(this->type) != FIFFTS_MC_RCS) {
-        qCritical("Error in FiffTag::toSparseFloatMatrix(): Matrix is not sparse!\n");
-        return Eigen::SparseMatrix<double>(); //NULL;
-    }
-
-    qint32 ndim;
-    QVector<qint32> dims;
-    this->getMatrixDimensions(ndim, dims);
-
-    if (ndim != 2) {
-        qWarning("Only two-dimensional matrices are supported at this time");
-        return Eigen::SparseMatrix<double>();
-    }
-
-    qint32 nnz = dims[0];
-    qint32 nrow = dims[1];
-    qint32 ncol = dims[2];
-
-    using T = Eigen::Triplet<double>;
-    std::vector<T> tripletList;
-    tripletList.reserve(nnz);
-
-    auto* t_pFloat = reinterpret_cast<const float*>(this->data());
-    auto* t_pInt = reinterpret_cast<const int*>(this->data());
-    qint32 offset1 = nnz;
-    qint32 offset2 = 2 * nnz;
-    if (fiff_type_matrix_coding(this->type) == FIFFTS_MC_CCS) {
-        //
-        //    CCS
-        //
-        qWarning("Warning in FiffTag::toSparseFloatMatrix(): CCS has to be debugged - never done before.");
-        qint32 p = 0;
-        for (qint32 j = 0; j < ncol; ++j) {
-            while (p < t_pInt[offset2 + j + 1]) {
-                //                tripletList[p] = T(tripletList[p].row(), j, tripletList[p].value());
-                tripletList.push_back(T(t_pInt[offset1 + p], j, static_cast<double>(t_pFloat[p])));
-                ++p;
-            }
-        }
-    } else {
-        //
-        //    RCS
-        //
-        qint32 p = 0;
-        for (qint32 j = 0; j < nrow; ++j) {
-            while (p < t_pInt[offset2 + j + 1]) {
-                //                tripletList[p] = T(j, tripletList[p].col(), tripletList[p].value());
-                tripletList.push_back(T(j, t_pInt[offset1 + p], static_cast<double>(t_pFloat[p])));
-                ++p;
-            }
-        }
-    }
-
-    //    std::cout << "Size: " << tripletList.size() << std::endl;
-    //    qint32 offsetTest = tripletList.size() - 10;
-    //    for(qint32 i = 0; i < 10; ++i)
-    //        std::cout << std::endl << tripletList[offsetTest + i].row() << " " << tripletList[offsetTest + i].col() << " " << tripletList[offsetTest + i].value();
-
-    Eigen::SparseMatrix<double> p_Matrix(nrow, ncol);
-    p_Matrix.setFromTriplets(tripletList.begin(), tripletList.end());
-
-    return p_Matrix;
-}
 } // NAMESPACE
 
 #endif // FIFF_TAG_H

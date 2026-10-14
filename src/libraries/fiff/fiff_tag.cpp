@@ -24,7 +24,9 @@
 
 #include "fiff_tag.h"
 #include "fiff_byte_swap.h"
+#include "fiff_sparse_matrix.h"
 
+#include <algorithm>
 #include <complex>
 
 //=============================================================================================================
@@ -75,29 +77,44 @@ bool FiffTag::isMatrix() const
 bool FiffTag::getMatrixDimensions(qint32& p_ndim, QVector<qint32>& p_Dims) const
 {
     p_Dims.clear();
-    if (!this->isMatrix() || this->data() == nullptr) {
-        p_ndim = 0;
+    p_ndim = 0;
+    if (!this->isMatrix() || this->data() == nullptr || this->size() < 4)
         return false;
-    }
 
     //
-    // Find dimensions and return to the beginning of tag data
+    // The dimensions trail the data: [nz,] dims..., ndim. A corrupt file must not make the readers
+    // index outside the tag, so the trailer has to fit and a dense matrix has to fit before it.
     //
-    qint32* t_pInt32 = (qint32*)this->data();
-
-    p_ndim = t_pInt32[(this->size() - 4) / 4];
-
-    if (fiff_type_matrix_coding(this->type) == FIFFTS_MC_DENSE)
-        for (int i = p_ndim + 1; i > 1; --i)
-            p_Dims.append(t_pInt32[(this->size() - (i * 4)) / 4]);
-    else if (fiff_type_matrix_coding(this->type) == FIFFTS_MC_CCS || fiff_type_matrix_coding(this->type) == FIFFTS_MC_RCS)
-        for (int i = p_ndim + 2; i > 1; --i)
-            p_Dims.append(t_pInt32[(this->size() - (i * 4)) / 4]);
-    else {
+    const qint32* t_pInt32 = reinterpret_cast<const qint32*>(this->data());
+    const qsizetype nInts = this->size() / 4;
+    const qint32 ndim = t_pInt32[nInts - 1];
+    const int coding = fiff_type_matrix_coding(this->type);
+    const bool sparse = coding == FIFFTS_MC_CCS || coding == FIFFTS_MC_RCS;
+    if (coding != FIFFTS_MC_DENSE && !sparse) {
         qWarning("Cannot handle other than dense or sparse matrices yet.");
         return false;
     }
+    const qint32 nTrailer = ndim + (sparse ? 2 : 1);
+    if (ndim <= 0 || ndim > FIFFC_MATRIX_MAX_DIM || nTrailer > nInts)
+        return false;
 
+    QVector<qint32> dims;
+    qint64 nValues = 1;
+    for (qsizetype i = nInts - nTrailer; i < nInts - 1; ++i) {
+        if (t_pInt32[i] < 0)
+            return false;
+        dims.append(t_pInt32[i]);
+        nValues = std::min<qint64>(nValues * t_pInt32[i], this->size()); // capped: enough to compare, no overflow
+    }
+    if (!sparse) {
+        const int base = this->getType();
+        const qint64 valueSize = (base == FIFFT_DOUBLE || base == FIFFT_COMPLEX_FLOAT) ? 8 : (base == FIFFT_COMPLEX_DOUBLE ? 16 : 4);
+        if (nValues * valueSize > static_cast<qint64>(nInts - nTrailer) * 4)
+            return false;
+    }
+
+    p_ndim = ndim;
+    p_Dims = dims;
     return true;
 }
 
@@ -110,6 +127,15 @@ fiff_int_t FiffTag::getType() const
     } else {
         return this->type;
     }
+}
+
+//=============================================================================================================
+
+Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
+{
+    const FiffTag::UPtr copy = std::make_unique<FiffTag>(*this);
+    const FiffSparseMatrix::UPtr mat = FiffSparseMatrix::fiff_get_float_sparse_matrix(copy);
+    return mat ? Eigen::SparseMatrix<double>(mat->eigen().cast<double>()) : Eigen::SparseMatrix<double>();
 }
 
 //=============================================================================================================
