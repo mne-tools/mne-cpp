@@ -142,7 +142,6 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr& p_pStream, FiffDigPointSe
     QList<FiffDirNode::SPtr> isotrak = p_pStream->dirtree()->dir_tree_find(FIFFB_ISOTRAK);
 
     fiff_int_t coord_frame = FIFFV_COORD_HEAD;
-    FiffCoordTrans dig_trans;
     qint32 k = 0;
 
     if (isotrak.size() == 1) {
@@ -152,16 +151,10 @@ bool FiffDigPointSet::readFromStream(FiffStream::SPtr& p_pStream, FiffDigPointSe
             if (kind == FIFF_DIG_POINT) {
                 p_pStream->read_tag(t_pTag, pos);
                 p_Dig.m_qListDigPoint.append(t_pTag->toDigPoint());
-            } else {
-                if (kind == FIFF_MNE_COORD_FRAME) {
-                    p_pStream->read_tag(t_pTag, pos);
-                    qDebug() << "NEEDS To BE DEBBUGED: FIFF_MNE_COORD_FRAME" << t_pTag->getType();
-                    coord_frame = *t_pTag->toInt();
-                } else if (kind == FIFF_COORD_TRANS) {
-                    p_pStream->read_tag(t_pTag, pos);
-                    qDebug() << "NEEDS To BE DEBBUGED: FIFF_COORD_TRANS" << t_pTag->getType();
-                    dig_trans = t_pTag->toCoordTrans();
-                }
+            } else if (kind == FIFF_MNE_COORD_FRAME) {
+                // Applies to every point of the block, as mne's _read_dig_fif
+                p_pStream->read_tag(t_pTag, pos);
+                coord_frame = *t_pTag->toInt();
             }
         }
     }
