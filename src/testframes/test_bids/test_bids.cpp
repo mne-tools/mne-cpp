@@ -101,6 +101,7 @@ private slots:
 
     // BrainVisionReader against mne.io.read_raw_brainvision
     void testBrainVisionReaderMatchesPython();
+    void testBrainVisionReaderVariants();
 
     // BIDSPath setter/getter coverage
     void testPathSettersGetters();
@@ -762,6 +763,91 @@ void TestBids::testBrainVisionReaderMatchesPython()
     BrainVisionReader asciiReader;
     QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Only BINARY data is supported"));
     QVERIFY(!asciiReader.open(ascii.fileName()));
+}
+
+//=============================================================================================================
+
+void TestBids::testBrainVisionReaderVariants()
+{
+    // Channel types follow the name (as mne read_raw_brainvision), and voltage units set the FIFF multiplier
+    const QList<std::tuple<QString, QString, int, int>> types = {
+        {"ECoG1", "uV", FIFFV_ECOG_CH, FIFF_UNITM_MU}, {"SEEG2", "nV", FIFFV_SEEG_CH, FIFF_UNITM_N}, {"HEOGL", "mV", FIFFV_EOG_CH, FIFF_UNITM_M}, {"EKG", "V", FIFFV_ECG_CH, FIFF_UNITM_NONE}, {"EMG_chin", "uV", FIFFV_EMG_CH, FIFF_UNITM_MU}, {"STI 014", "uV", FIFFV_STIM_CH, FIFF_UNITM_MU}, {"Temp", "C", FIFFV_MISC_CH, FIFF_UNITM_NONE}};
+    for (const auto& [name, unit, kind, mul] : types) {
+        BrainVisionChannelInfo ch;
+        ch.name = name;
+        ch.unit = unit;
+        const FIFFLIB::FiffChInfo info = ch.toFiffChInfo();
+        QVERIFY2(info.kind == kind && info.unit_mul == mul, qPrintable(name));
+        QCOMPARE(info.unit, unit == "C" ? FIFF_UNIT_NONE : FIFF_UNIT_V);
+    }
+    QCOMPARE(BrainVisionReader::unitScale("nV"), 1e-9f);
+    QCOMPARE(BrainVisionReader::unitScale("uS"), 1e-6f);
+
+    // INT_32, multiplexed and vectorized, with the NeurOne "Common infos" spelling, a missing channel table and a comment
+    QTemporaryDir dir;
+    const auto write = [&dir](const QString& base, const QString& header, const QByteArray& data) {
+        QFile vhdr(dir.filePath(base + ".vhdr"));
+        if (!vhdr.open(QIODevice::WriteOnly | QIODevice::Text))
+            return QString();
+        vhdr.write(header.toUtf8());
+        QFile eeg(dir.filePath(base + ".eeg"));
+        if (!eeg.open(QIODevice::WriteOnly))
+            return QString();
+        eeg.write(data);
+        return vhdr.fileName();
+    };
+    QByteArray int32;
+    QDataStream bin(&int32, QIODevice::WriteOnly);
+    bin.setByteOrder(QDataStream::LittleEndian);
+    for (qint32 v = 0; v < 6; ++v)
+        bin << v;
+    for (const QString orientation : {"MULTIPLEXED", "VECTORIZED"}) {
+        const QString header = "BrainVision Data Exchange Header File Version 2.0\n; note\n[Common infos]\n"
+                               "DataFile=" +
+            orientation + ".eeg\nDataOrientation=" + orientation + "\nNumberOfChannels=2\n"
+                                                                   "[Binary Infos]\nBinaryFormat=INT_32\n[Comment]\nCh9=ignored\n";
+        BrainVisionReader reader;
+        QVERIFY(reader.open(write(orientation, header, int32)));
+        QCOMPARE(reader.getSampleCount(), 3L);
+        QCOMPARE(reader.getFrequency(), 0.0f);
+        QCOMPARE(reader.getChannelCount(), 2);
+        QCOMPARE(reader.getChannelInfos()[1].name, QStringLiteral("Ch2"));
+        QVERIFY(reader.getMarkers().isEmpty());
+        const Eigen::MatrixXf data = reader.readRawSegment(1, 3);
+        Eigen::MatrixXf expected(2, 2);
+        if (orientation == "MULTIPLEXED")
+            expected << 2, 4, 3, 5;
+        else
+            expected << 1, 2, 4, 5;
+        QCOMPARE(data, Eigen::MatrixXf(expected * 1e-6f));
+        QVERIFY(reader.readRawSegment(2, 2).size() == 0);
+        QVERIFY(reader.readRawSegment(0, 4).size() == 0);
+        QVERIFY(reader.readRawSegment(-1, 1).size() == 0);
+    }
+    BrainVisionReader probe;
+    QVERIFY(probe.supportsExtension(".VHDR") && probe.supportsExtension(".ahdr") && !probe.supportsExtension(".edf"));
+    QCOMPARE(probe.formatName(), QStringLiteral("BrainVision"));
+    QVERIFY(probe.readRawSegment(0, 1).size() == 0);
+
+    // Headers that cannot describe a recording are refused
+    const QString ok = "Brain Vision Data Exchange Header File Version 1.0\n[Common Infos]\n";
+    const QList<std::pair<QString, QString>> broken = {
+        {"version", "Not a BrainVision header\n[Common Infos]\nDataFile=x.eeg\nNumberOfChannels=1\n"},
+        {"nocommon", "Brain Vision Data Exchange Header File Version 1.0\n[Binary Infos]\nBinaryFormat=INT_16\n"},
+        {"nodatafile", ok + "NumberOfChannels=1\n"},
+        {"nochannels", ok + "DataFile=nochannels.eeg\nNumberOfChannels=0\n"},
+        {"missingdata", ok + "DataFile=absent.eeg\nNumberOfChannels=1\n"},
+    };
+    for (const auto& [base, header] : broken) {
+        QFile vhdr(dir.filePath(base + ".vhdr"));
+        QVERIFY(vhdr.open(QIODevice::WriteOnly | QIODevice::Text));
+        vhdr.write(header.toUtf8());
+        vhdr.close();
+        BrainVisionReader reader;
+        QVERIFY2(!reader.open(vhdr.fileName()), qPrintable(base));
+    }
+    BrainVisionReader missing;
+    QVERIFY(!missing.open(dir.filePath("none.vhdr")));
 }
 
 //=============================================================================================================
