@@ -143,6 +143,16 @@ void TestDecodingSpoc::testFitTransform()
     MatrixXd features = spoc.fitTransform(epochs, target);
     QVERIFY(spoc.isFitted());
     QCOMPARE(features.rows(), static_cast<int>(epochs.size()));
+
+    // Into SPoC space each epoch becomes its filtered components, stacked; no epochs give no rows
+    DecodingSpoc space(2, DecodingSpoc::TransformMode::CspSpace);
+    const MatrixXd stacked = space.fitTransform(epochs, target);
+    QCOMPARE(stacked.rows(), static_cast<Eigen::Index>(2 * epochs.size()));
+    QVERIFY(stacked.middleRows(2, 2).isApprox(space.filters() * epochs[1]));
+    QCOMPARE(space.transform({}).size(), Eigen::Index(0));
+    QCOMPARE(space.patterns().rows(), epochs[0].rows());
+    QCOMPARE(space.mean().size(), Eigen::Index(2));
+    QCOMPARE(space.stddev().size(), Eigen::Index(2));
 }
 
 //=============================================================================================================
@@ -184,6 +194,11 @@ void TestDecodingSpoc::testNotFittedThrows()
 
     QVERIFY_THROWS_EXCEPTION(std::runtime_error,
                              static_cast<void>(spoc.transform(epochs)));
+    QVERIFY_THROWS_EXCEPTION(std::runtime_error, static_cast<void>(spoc.filters()));
+    QVERIFY_THROWS_EXCEPTION(std::runtime_error, static_cast<void>(spoc.patterns()));
+    QVERIFY_THROWS_EXCEPTION(std::runtime_error, static_cast<void>(spoc.mean()));
+    QVERIFY_THROWS_EXCEPTION(std::runtime_error, static_cast<void>(spoc.stddev()));
+    QVERIFY_THROWS_EXCEPTION(std::invalid_argument, spoc.fit({}, VectorXd()));
 }
 
 //=============================================================================================================

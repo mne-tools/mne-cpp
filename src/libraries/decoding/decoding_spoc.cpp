@@ -167,7 +167,7 @@ MatrixXd DecodingSpoc::transform(const std::vector<MatrixXd>& epochs) const
     if (m_transformInto == TransformMode::CspSpace) {
         const int nEpochs = static_cast<int>(epochs.size());
         const int nComp = static_cast<int>(m_filters.rows());
-        const int nTimes = static_cast<int>(epochs[0].cols());
+        const int nTimes = epochs.empty() ? 0 : static_cast<int>(epochs[0].cols());
 
         MatrixXd result(nEpochs * nComp, nTimes);
         for (int e = 0; e < nEpochs; ++e) {
