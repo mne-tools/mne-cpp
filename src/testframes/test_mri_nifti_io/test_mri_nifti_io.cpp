@@ -35,6 +35,7 @@
 #include <QFile>
 #include <QtEndian>
 #include <QtTest>
+#include <QTemporaryDir>
 
 //=============================================================================================================
 // SYSTEM INCLUDES
@@ -42,6 +43,7 @@
 
 #include <zlib.h>
 
+#include <algorithm>
 #include <cstring>
 
 using namespace MRILIB;
@@ -168,6 +170,9 @@ class TestMriNiftiIo : public QObject
 private slots:
     void roundTripNii();
     void roundTripNiiGz();
+    void readsEveryDatatypeAndForm_data();
+    void readsEveryDatatypeAndForm();
+    void rejectsBrokenFiles();
 };
 
 void TestMriNiftiIo::roundTripNii()
@@ -222,6 +227,166 @@ void TestMriNiftiIo::roundTripNiiGz()
     QCOMPARE(vol.depth, nz);
     QVERIFY(!vol.slices.isEmpty());
     QCOMPARE(vol.slices.last().pixelsFloat.size(), nx * ny);
+}
+
+namespace
+{
+
+// Rewrites the synthetic float volume as another datatype and byte order, with a qform instead of the sform
+QByteArray variant(qint16 datatype, int bytesPerVoxel, bool bigEndian, bool qform, float slope, float inter)
+{
+    const int nx = 4, ny = 5, nz = 6, n = nx * ny * nz;
+    QByteArray buf = makeSyntheticNifti(nx, ny, nz, 1.5f, 1.25f, 2.0f);
+    buf.resize(352 + n * bytesPerVoxel);
+    const auto put = [&](int off, const void* le, int size) {
+        char bytes[4];
+        std::memcpy(bytes, le, size);
+        if (bigEndian)
+            std::reverse(bytes, bytes + size);
+        std::memcpy(buf.data() + off, bytes, size);
+    };
+    const auto putI16 = [&](int off, qint16 v) {
+        put(off, &v, 2);
+    };
+    const auto putF32 = [&](int off, float v) {
+        put(off, &v, 4);
+    };
+    const qint32 hdr = 348;
+    put(0, &hdr, 4);
+    for (const auto& [off, v] : {std::pair{40, 3}, std::pair{42, nx}, std::pair{44, ny}, std::pair{46, nz}, std::pair{48, 1}})
+        putI16(off, static_cast<qint16>(v));
+    putI16(70, datatype);
+    putI16(72, static_cast<qint16>(8 * bytesPerVoxel));
+    putF32(76, qform ? -1.0f : 1.0f);
+    putF32(80, 1.5f);
+    putF32(84, 1.25f);
+    putF32(88, 2.0f);
+    putF32(108, 352.0f);
+    putF32(112, slope);
+    putF32(116, inter);
+    putI16(252, qform ? 1 : 0);
+    putI16(254, qform ? 0 : 1);
+    for (int k = 0; k < 12; ++k) {
+        float sform;
+        std::memcpy(&sform, buf.constData() + 280 + 4 * k, 4);
+        putF32(280 + 4 * k, qFromLittleEndian(sform));
+    }
+    for (const auto& [off, v] : {std::pair{256, 0.1f}, std::pair{260, 0.2f}, std::pair{264, 0.3f}, std::pair{268, 10.0f}, std::pair{272, -20.0f}, std::pair{276, 30.0f}})
+        putF32(off, v);
+    // Voxel i holds i - 30, so that the signed types see negative values
+    for (int i = 0; i < n; ++i) {
+        const qint32 value = i - 30;
+        const float f = static_cast<float>(value);
+        const qint8 i8 = static_cast<qint8>(value);
+        const qint16 i16 = static_cast<qint16>(value);
+        put(352 + i * bytesPerVoxel, datatype == 16 ? static_cast<const void*>(&f) : bytesPerVoxel == 1 ? static_cast<const void*>(&i8)
+                : bytesPerVoxel == 2                                                                    ? static_cast<const void*>(&i16)
+                                                                                                        : static_cast<const void*>(&value),
+            bytesPerVoxel);
+    }
+    return buf;
+}
+
+QString writeTemp(QTemporaryDir& dir, const QString& name, const QByteArray& bytes)
+{
+    QFile f(dir.filePath(name));
+    if (!f.open(QIODevice::WriteOnly) || f.write(bytes) != bytes.size())
+        return {};
+    return f.fileName();
+}
+
+} // namespace
+
+void TestMriNiftiIo::readsEveryDatatypeAndForm_data()
+{
+    QTest::addColumn<int>("datatype");
+    QTest::addColumn<int>("bytes");
+    QTest::addColumn<bool>("bigEndian");
+    QTest::addColumn<bool>("qform");
+    QTest::addColumn<float>("slope");
+    QTest::addColumn<float>("inter");
+    QTest::newRow("uint8") << 2 << 1 << false << false << 1.0f << 0.0f;
+    QTest::newRow("int8 big-endian") << 256 << 1 << true << false << 1.0f << 0.0f;
+    QTest::newRow("int16 big-endian qform") << 4 << 2 << true << true << 1.0f << 0.0f;
+    QTest::newRow("uint16") << 512 << 2 << false << true << 1.0f << 0.0f;
+    QTest::newRow("int32 scaled") << 8 << 4 << false << false << 2.0f << 1.0f;
+    QTest::newRow("float32 big-endian scaled") << 16 << 4 << true << true << 0.5f << -3.0f;
+}
+
+void TestMriNiftiIo::readsEveryDatatypeAndForm()
+{
+    QFETCH(int, datatype);
+    QFETCH(int, bytes);
+    QFETCH(bool, bigEndian);
+    QFETCH(bool, qform);
+    QFETCH(float, slope);
+    QFETCH(float, inter);
+    QTemporaryDir dir;
+    MriVolData vol;
+    QVERIFY(vol.read(writeTemp(dir, "v.nii", variant(static_cast<qint16>(datatype), bytes, bigEndian, qform, slope, inter))));
+    QCOMPARE(vol.width, 4);
+    QCOMPARE(vol.depth, 6);
+
+    // The affine is the one nibabel 5.3.3 reports (get_qform / get_sform), in metres
+    Eigen::Matrix4f expected;
+    if (qform)
+        expected << 1.109999975f, -0.64552141f, -0.861889494f, 10.0f, 0.894625695f, 0.999999981f, 0.13094473f, -20.0f,
+            -0.46641711f, 0.381840473f, -1.799999994f, 30.0f, 0, 0, 0, 1;
+    else
+        expected << 1.5f, 0, 0, -3.0f, 0, 1.25f, 0, -3.125f, 0, 0, 2.0f, -6.0f, 0, 0, 0, 1;
+    expected.topRows(3) /= 1000.0f;
+    QVERIFY2((vol.computeVox2Ras() - expected).cwiseAbs().maxCoeff() < 1e-6f, qPrintable(QString::number((vol.computeVox2Ras() - expected).cwiseAbs().maxCoeff())));
+
+    // Integer data stay as stored, negative values of signed types clamp to zero, and only real values are scaled
+    for (const int i : {0, 29, 30, 119}) {
+        const MriSlice& slice = vol.slices[i / 20];
+        const int p = i % 20;
+        const int stored = i - 30;
+        switch (datatype) {
+            case 2:
+                QCOMPARE(int(slice.pixels[p]), stored & 0xff);
+                break;
+            case 256:
+                QCOMPARE(int(slice.pixels[p]), std::max(stored, 0));
+                break;
+            case 4:
+                QCOMPARE(int(slice.pixelsWord[p]), std::max(stored, 0));
+                break;
+            case 512:
+                QCOMPARE(int(slice.pixelsWord[p]), stored & 0xffff);
+                break;
+            default:
+                QCOMPARE(slice.pixelsFloat[p], stored * slope + inter);
+        }
+    }
+}
+
+void TestMriNiftiIo::rejectsBrokenFiles()
+{
+    QTemporaryDir dir;
+    const QByteArray good = variant(16, 4, false, false, 1.0f, 0.0f);
+    MriVolData vol;
+    QVERIFY(vol.read(writeTemp(dir, "good.nii", good)));
+    const auto withI16 = [&good](int off, qint16 v) {
+        QByteArray b = good;
+        qToLittleEndian(v, b.data() + off);
+        return b;
+    };
+    QByteArray notNifti = good;
+    qToLittleEndian<qint32>(347, notNifti.data());
+    const QList<std::pair<QString, QByteArray>> broken = {
+        {"short.nii", good.left(100)},
+        {"magic.nii", notNifti},
+        {"flat.nii", withI16(40, 2)},
+        {"double.nii", withI16(70, 64)},
+        {"truncated.nii", good.left(good.size() - 4)},
+        {"empty.nii.gz", QByteArray()},
+        {"garbage.nii.gz", QByteArray("not gzip at all")},
+    };
+    for (const auto& [name, bytes] : broken) {
+        QVERIFY2(!MriNiftiIO::read(writeTemp(dir, name, bytes), vol), qPrintable(name));
+    }
+    QVERIFY(!MriNiftiIO::read(dir.filePath("missing.nii"), vol));
 }
 
 QTEST_APPLESS_MAIN(TestMriNiftiIo)
