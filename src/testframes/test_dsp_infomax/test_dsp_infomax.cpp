@@ -154,6 +154,14 @@ void TestDspInfomax::testDeterminism()
     double diff = (r1.matUnmixing - r2.matUnmixing).norm();
     QVERIFY2(diff < 1e-10,
              qPrintable(QString("Two runs with same seed differ by %1").arg(diff)));
+
+    // Seed 0 starts from the identity, so plain (non-extended) Infomax is deterministic too; uniform
+    // (sub-Gaussian) sources take the extended branch with negative kurtosis
+    const InfomaxResult plain = ExtendedInfomax::compute(data, -1, 50, 0.001, 1e-7, false, 0);
+    QCOMPARE(plain.matUnmixing, ExtendedInfomax::compute(data, -1, 50, 0.001, 1e-7, false, 0).matUnmixing);
+    QCOMPARE(plain.matUnmixing.rows(), Index(nCh));
+    const MatrixXd uniform = MatrixXd::Random(nCh, nSamples);
+    QVERIFY(ExtendedInfomax::compute(uniform, -1, 50, 0.001, 1e-7, true, 0).matSources.allFinite());
 }
 
 //=============================================================================================================
