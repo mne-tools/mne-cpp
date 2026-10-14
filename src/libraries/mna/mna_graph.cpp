@@ -531,6 +531,11 @@ QCborMap MnaGraph::toCbor() const
         cbor.insert(QStringLiteral("graph_outputs"), arr);
     }
 
+    const QJsonObject ptJson = paramTree.toJson();
+    if (!ptJson.isEmpty()) {
+        cbor.insert(QStringLiteral("param_tree"), QCborValue::fromJsonValue(ptJson));
+    }
+
     return cbor;
 }
 
@@ -553,6 +558,10 @@ MnaGraph MnaGraph::fromCbor(const QCborMap& cbor)
     const QCborArray goArr = cbor.value(QStringLiteral("graph_outputs")).toArray();
     for (const QCborValue& v : goArr) {
         graph.graphOutputs.append(MnaPort::fromCbor(v.toMap()));
+    }
+
+    if (cbor.contains(QStringLiteral("param_tree"))) {
+        graph.paramTree = MnaParamTree::fromJson(cbor.value(QStringLiteral("param_tree")).toMap().toJsonObject());
     }
 
     return graph;

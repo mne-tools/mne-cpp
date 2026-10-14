@@ -1325,11 +1325,23 @@ void TestMnaSerialization::testGraphWithParamTree()
     n1.opType = "op1";
     graph.addNode(n1);
 
-    QJsonObject json = graph.toJson();
-    MnaGraph restored = MnaGraph::fromJson(json);
+    MnaPort in;
+    in.name = "raw";
+    graph.graphInputs.append(in);
+    MnaPort out;
+    out.name = "stc";
+    out.direction = MnaPortDir::Output;
+    graph.graphOutputs.append(out);
 
-    QCOMPARE(restored.paramTree.param("global/sfreq").toDouble(), 1000.0);
-    QCOMPARE(restored.paramTree.param("global/n_channels").toInt(), 306);
+    // The parameter tree and the graph ports survive both encodings
+    for (const MnaGraph& restored : {MnaGraph::fromJson(graph.toJson()), MnaGraph::fromCbor(graph.toCbor())}) {
+        QCOMPARE(restored.paramTree.param("global/sfreq").toDouble(), 1000.0);
+        QCOMPARE(restored.paramTree.param("global/n_channels").toInt(), 306);
+        QCOMPARE(restored.graphInputs.size(), 1);
+        QCOMPARE(restored.graphInputs[0].name, QStringLiteral("raw"));
+        QCOMPARE(restored.graphOutputs.size(), 1);
+        QCOMPARE(restored.graphOutputs[0].name, QStringLiteral("stc"));
+    }
 }
 
 //=============================================================================================================
