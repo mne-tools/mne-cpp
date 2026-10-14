@@ -115,19 +115,15 @@ Sphere Sphere::fit_sphere_simplex(const MatrixX3f& points, double simplex_size)
 
 bool Sphere::fit_sphere_to_points(float** rr, int np, float simplex_size, float* r0, float* R)
 {
+    if (np <= 0)
+        return false;
+
     MatrixXf rr_eigen(np, 3);
     VectorXf r0_eigen(3);
-
-    MatrixX3f dig_rr_eigen;
     for (int k = 0; k < np; k++) {
         rr_eigen(k, 0) = rr[k][0];
         rr_eigen(k, 1) = rr[k][1];
         rr_eigen(k, 2) = rr[k][2];
-    }
-
-    if (rr_eigen.rows() < 0) {
-        std::cout << "Sphere::fit_sphere_to_points - No points were passed." << std::endl;
-        return false;
     }
 
     r0_eigen(0) = r0[0];
@@ -152,6 +148,11 @@ bool Sphere::fit_sphere_to_points(const MatrixXf& rr, float simplex_size, Vector
     /*
      * Find the optimal sphere origin
      */
+    if (rr.rows() == 0) {
+        qWarning("Sphere::fit_sphere_to_points - No points were passed.");
+        return false;
+    }
+
     FitUser user;
     float ftol = 1e-5f;
     int max_eval = 500;

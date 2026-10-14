@@ -214,6 +214,9 @@ void TestSphere::testFitSphereSimplex()
     QVERIFY2(fitted.radius() > 0.0f, "Simplex fit did not converge");
     QVERIFY((fitted.center() - center).norm() < 0.005f);
     QVERIFY(std::abs(fitted.radius() - radius) < 0.005f);
+
+    // No points, no sphere
+    QCOMPARE(Sphere::fit_sphere_simplex(MatrixX3f(0, 3), 0.005).radius(), 0.0f);
 }
 
 //=============================================================================================================
@@ -264,6 +267,7 @@ void TestSphere::testFitSphereToPointsRawPtr()
     bool success = Sphere::fit_sphere_to_points(rr, np, 0.02f, r0, &R);
     QVERIFY(success);
     QVERIFY(std::abs(R - radius) < 0.005f);
+    QVERIFY(!Sphere::fit_sphere_to_points(rr, 0, 0.02f, r0, &R));
 
     // Cleanup
     for (int i = 0; i < np; ++i)

@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1500,
-  "scanned_lines": 394187,
+  "scanned_lines": 394188,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -403,11 +403,11 @@
       }
     },
     "console_io": {
-      "total": 354,
+      "total": 353,
       "files": 52,
       "by_scope": {
         "applications": 7,
-        "libraries": 57,
+        "libraries": 56,
         "tools": 290
       },
       "suppressed": [],
@@ -445,7 +445,7 @@
         "src/libraries/inv/hpi/inv_hpi_fit.cpp": 4,
         "src/libraries/inv/hpi/inv_signal_model.cpp": 2,
         "src/libraries/inv/minimum_norm/inv_minimum_norm.cpp": 1,
-        "src/libraries/math/sphere.cpp": 3,
+        "src/libraries/math/sphere.cpp": 2,
         "src/libraries/mne/mne_cov_matrix.cpp": 7,
         "src/libraries/utils/generics/mne_logger.cpp": 6,
         "src/libraries/utils/layoutmaker.cpp": 16,
