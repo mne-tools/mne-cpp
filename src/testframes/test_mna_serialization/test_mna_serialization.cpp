@@ -1051,6 +1051,22 @@ void TestMnaSerialization::testParamBindingCborRoundTrip()
     QCOMPARE(restored.trigger, "periodic");
     QCOMPARE(restored.periodMs, 1000);
     QCOMPARE(restored.dependencies.size(), 2);
+
+    // Both encodings store a period only for a periodic trigger with one, and dependencies only when there are some
+    binding.dependencies.clear();
+    for (const QString& trigger : {QStringLiteral("periodic"), QStringLiteral("on_change")}) {
+        binding.trigger = trigger;
+        for (const int period : {0, 250}) {
+            binding.periodMs = period;
+            const int stored = trigger == QStringLiteral("periodic") ? period : 0;
+            QCOMPARE(binding.toCbor().contains(QStringLiteral("period_ms")), stored > 0);
+            QCOMPARE(binding.toJson().contains(QStringLiteral("period_ms")), stored > 0);
+            QCOMPARE(MnaParamBinding::fromCbor(binding.toCbor()).periodMs, stored);
+            QCOMPARE(MnaParamBinding::fromJson(binding.toJson()).periodMs, stored);
+            QVERIFY(!binding.toCbor().contains(QStringLiteral("dependencies")));
+            QVERIFY(!binding.toJson().contains(QStringLiteral("dependencies")));
+        }
+    }
 }
 
 //=============================================================================================================
