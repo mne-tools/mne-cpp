@@ -6,10 +6,12 @@
 # Staging Branch Pipeline
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Pushes to `staging` run only the quality gates and tests. Everything else
-# runs nightly (only when `staging` moved since the last nightly) or on manual
-# dispatch, and only once staging compiles. The mne-tools runner pool is shared
-# by the whole organization, so a full pipeline per push starves other repos.
+# Every push to `staging` runs the quality and docs gates and all tests (three
+# OSes, minimum and maximum Qt). The release builds, installers, WebAssembly
+# and deployments run on pushes that touch the build or packaging, nightly
+# (only when `staging` moved since the last nightly) and on manual dispatch,
+# and only once staging compiles. The mne-tools runner pool is shared by the
+# whole organization, so they are skipped where a push cannot affect them.
 # A failing nightly opens an issue, which closes when a nightly passes again.
 #
 # This is the DEVELOPMENT pipeline:
@@ -60,25 +62,41 @@ env:
 jobs:
 
   # ── Decide whether this run publishes dev builds ─────────────────────────
-  # Manual runs always do, pushes never do, and a nightly does only when
-  # staging moved since the previous nightly (a failed nightly is not retried
-  # on the same commit; its issue stays open until a later nightly passes).
+  # Manual runs always do, pushes do when they touch the build or packaging,
+  # and a nightly does only when staging moved since the previous nightly (a
+  # failed nightly is not retried on the same commit; its issue stays open
+  # until a later nightly passes).
   Changes:
     runs-on: ubuntu-24.04
     permissions:
       actions: read
+      contents: read
     outputs:
       release: ${{ steps.check.outputs.release }}
 
     steps:
-    - name: Check for new commits since the last nightly
+    - name: Decide whether to build releases
       id: check
       env:
         GH_TOKEN: ${{ github.token }}
         GH_REPO: ${{ github.repository }}
+        BEFORE: ${{ github.event.before }}
       run: |
         case "${{ github.event_name }}" in
           workflow_dispatch) release=true ;;
+          push)
+            # Any doubt (new branch, force push, more files than the API lists) builds.
+            release=true
+            if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] &&
+               files=$(gh api "repos/$GH_REPO/compare/$BEFORE...${{ github.sha }}" \
+                         --jq 'if (.files | length) < 300 then .files[].filename else "too-many" end'); then
+              if ! printf '%s\n' "$files" |
+                   grep -qE '(^|/)CMakeLists\.txt$|^cmake/|^scripts/(build|ci|deploy)/|^\.github/workflows/|^too-many$'; then
+                echo "No build or packaging files changed"
+                release=false
+              fi
+            fi
+            ;;
           schedule)
             last_sha=$(gh api "repos/$GH_REPO/actions/workflows/staging.yml/runs?event=schedule&branch=${{ github.ref_name }}&status=completed&per_page=1" \
               --jq '.workflow_runs[0].head_sha // ""')
@@ -200,8 +218,8 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  # Min-Qt on Linux per push; on all three OSes nightly and on manual runs, so
-  # the published dev build and the G1 evidence still cover every OS x Qt pair.
+  # Min-Qt on all three OSes, so every push and the G1 evidence cover each
+  # OS x Qt pair.
   TestsMinQt:
     uses: ./.github/workflows/_reusable-tests.yml
     permissions:
@@ -209,7 +227,6 @@ jobs:
       actions: write  # prune superseded ccache entries
     with:
       qt_version: min
-      os_json: ${{ github.event_name == 'push' && '["ubuntu-24.04"]' || '["ubuntu-24.04", "macos-26", "windows-2025-vs2026"]' }}
       save_ccache: true
 
   # ── Doxygen API documentation (dev) ──────────────────────────────────────

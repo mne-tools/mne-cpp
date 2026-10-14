@@ -45,8 +45,8 @@ The `main` branch always reflects a **production-ready** state. It is updated on
 The `staging` branch is the active development integration branch. Feature branches are merged here via pull requests.
 
 - Every push to `staging` triggers:
-  - Cross-platform tests with **code coverage** — threshold checks (≥ 50%) and regression detection — plus tests against the minimum supported Qt version on Linux
-- Nightly, when `staging` has changed, the pipeline also produces:
+  - Cross-platform tests with **code coverage** — threshold checks (≥ 50%) and regression detection — plus tests against the minimum supported Qt version on all platforms
+- Pushes that touch the build or packaging, nightly runs (when `staging` has changed) and manual runs also produce:
   - A rolling **dev pre-release** (`dev_build`) with binaries for all platforms
   - Deployment of the **dev** version of the website (at `/dev/`) and Doxygen API docs (at `/dev/`)
 - CodeQL security analysis runs weekly
