@@ -113,6 +113,10 @@ private slots:
         double maxDiff = (recon - data).cwiseAbs().maxCoeff();
         QVERIFY2(maxDiff < 1e-8,
                  qPrintable(QString("Max diff with no exclusion: %1").arg(maxDiff)));
+
+        // Indices that name no component are ignored
+        QVERIFY((ICA::excludeComponents(data, res, {-1, 4}) - data).cwiseAbs().maxCoeff() < 1e-8);
+        QVERIFY(ICA::excludeComponents(data, res, {1, 9}).isApprox(ICA::excludeComponents(data, res, {1})));
     }
 
     void reconstructionWithExclusion()
