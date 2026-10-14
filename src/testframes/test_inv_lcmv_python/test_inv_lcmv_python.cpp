@@ -53,6 +53,12 @@
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -293,6 +299,13 @@ void TestInvLcmvPython::timeCoursesMatch()
         const double sum = stc.data.cwiseAbs().sum();
         QVERIFY2(std::abs(sum - absSum) < 1e-6 * absSum, qPrintable(QStringLiteral("%1 abs sum %2").arg(i).arg(sum, 0, 'g', 12)));
     }
+
+    // Evoked channels are matched to the filter by name, as mne's apply_lcmv, whatever their order
+    QCOMPARE(filters.chNames.size(), m_evoked.data.rows());
+    FiffEvoked reordered = m_evoked;
+    reordered.data = m_evoked.data.colwise().reverse();
+    std::reverse(reordered.info.ch_names.begin(), reordered.info.ch_names.end());
+    QVERIFY(InvLCMV::applyLCMV(reordered, filters).data.isApprox(stcs[0].data));
 
     QTest::ignoreMessage(QtWarningMsg, "InvLCMV::applyLCMVEpochs - Invalid or non-LCMV filters!");
     QVERIFY(InvLCMV::applyLCMVEpochs({m_evoked.data}, 0.0f, tstep, dics).isEmpty());

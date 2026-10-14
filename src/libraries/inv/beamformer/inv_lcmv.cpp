@@ -226,11 +226,9 @@ InvSourceEstimate InvLCMV::applyLCMV(const FiffEvoked& evoked, const InvBeamform
         return InvSourceEstimate();
     }
 
-    // Pick channels from evoked to match filter channel order
+    // Pick the filter's channels from evoked by name, as mne's apply_lcmv (the order may differ)
     MatrixXd data;
-    if (filters.chNames.size() > 0 &&
-        static_cast<int>(filters.chNames.size()) != evoked.data.rows()) {
-        // Need to select and reorder channels
+    if (filters.chNames.size() > 0) {
         const int nFilterCh = static_cast<int>(filters.chNames.size());
         const int nTimes = static_cast<int>(evoked.data.cols());
         data.resize(nFilterCh, nTimes);
