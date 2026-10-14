@@ -387,6 +387,15 @@ void TestMriNiftiIo::rejectsBrokenFiles()
         QVERIFY2(!MriNiftiIO::read(writeTemp(dir, name, bytes), vol), qPrintable(name));
     }
     QVERIFY(!MriNiftiIO::read(dir.filePath("missing.nii"), vol));
+
+    // A gzip stream cut short ends in an error, not an endless wait for more input
+    const QString gz = dir.filePath("cut.nii.gz");
+    QVERIFY(writeGz(gz, good));
+    QFile cut(gz);
+    QVERIFY(cut.open(QIODevice::ReadWrite));
+    QVERIFY(cut.resize(cut.size() / 2));
+    cut.close();
+    QVERIFY(!MriNiftiIO::read(gz, vol));
 }
 
 QTEST_APPLESS_MAIN(TestMriNiftiIo)

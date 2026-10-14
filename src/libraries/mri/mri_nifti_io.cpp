@@ -136,9 +136,11 @@ bool MriNiftiIO::decompress(const QString& gzFile, QByteArray& rawData)
         strm.avail_out = chunkSize;
 
         ret = inflate(&strm, Z_NO_FLUSH);
-        if (ret == Z_STREAM_ERROR || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR) {
+        // With all input consumed and output room left, a stream that has not ended is cut short
+        const bool truncated = ret != Z_STREAM_END && strm.avail_in == 0 && strm.avail_out > 0;
+        if (ret == Z_STREAM_ERROR || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR || truncated) {
             qCritical() << "MriNiftiIO::decompress - inflate failed for" << gzFile
-                        << "- zlib error:" << ret;
+                        << "- zlib error:" << (truncated ? Z_BUF_ERROR : ret);
             inflateEnd(&strm);
             return false;
         }
