@@ -333,6 +333,17 @@ void TestFiffCovPython::regularize_matchesPython()
     QVERIFY2(close(at("MEG0111", "MEG0111"), grad11), qPrintable(QString("grad %1").arg(at("MEG0111", "MEG0111"), 0, 'g', 17)));
     QVERIFY2(close(at("EEG001", "EEG001"), eeg1), qPrintable(QString("eeg %1").arg(at("EEG001", "EEG001"), 0, 'g', 17)));
     QVERIFY2(close(at("MEG0112", "MEG0112"), mag12), qPrintable(QString("mag %1").arg(at("MEG0112", "MEG0112"), 0, 'g', 17)));
+
+    // A zero amount leaves that channel type alone; excluding every EEG channel leaves EEG untouched too
+    const FiffCov noEeg = cov.regularize(info, 0.1, 0.05, 0.0, proj);
+    QCOMPARE(noEeg.data(noEeg.names.indexOf("EEG001"), noEeg.names.indexOf("EEG001")), cov.data(cov.names.indexOf("EEG001"), cov.names.indexOf("EEG001")));
+    QStringList eegNames;
+    for (const FiffChInfo& ch : info.chs) {
+        if (ch.kind == FIFFV_EEG_CH)
+            eegNames << ch.ch_name;
+    }
+    const FiffCov excluded = cov.regularize(info, 0.1, 0.05, 0.2, proj, eegNames);
+    QCOMPARE(excluded.data(excluded.names.indexOf("EEG001"), excluded.names.indexOf("EEG001")), cov.data(cov.names.indexOf("EEG001"), cov.names.indexOf("EEG001")));
 }
 
 //=============================================================================================================
