@@ -223,6 +223,17 @@ private slots:
         for (int i = 0; i < idx.size(); ++i) {
             QCOMPARE(idx(i), 0);
         }
+
+        // No clusters or more clusters than points are refused; 'cluster' start and a one-iteration
+        // limit (batch phase stops early, online phase is skipped) still give a full assignment
+        QVERIFY(!kmeans.calculate(X, 0, idx, C, sumD, D));
+        QVERIFY(!kmeans.calculate(X, 21, idx, C, sumD, D));
+        for (const auto& [start, maxit] : {std::pair{KMeansStart::Cluster, 100}, std::pair{KMeansStart::Sample, 1}}) {
+            KMeans other(KMeansDistance::SquaredEuclidean, start, 2, KMeansEmptyAction::Singleton, true, maxit);
+            QVERIFY(other.calculate(X, 3, idx, C, sumD, D));
+            QCOMPARE(idx.size(), Index(20));
+            QVERIFY(idx.minCoeff() >= 0 && idx.maxCoeff() < 3);
+        }
     }
 
     void testHighDimensional()
