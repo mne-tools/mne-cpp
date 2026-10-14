@@ -25,6 +25,12 @@
 #include <mna/mna_verification.h>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <utility>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -288,7 +294,10 @@ void TestMnaGraphExecution::testAddRemoveNodes()
     QCOMPARE(graph.nodes().size(), 2);
 
     graph.removeNode("n1");
+    graph.removeNode("missing");
     QCOMPARE(graph.nodes().size(), 1);
+    QVERIFY(graph.node("missing").id.isEmpty());
+    QVERIFY(std::as_const(graph).node("missing").id.isEmpty());
     QVERIFY(!graph.hasNode("n1"));
     QVERIFY(graph.hasNode("n2"));
 }
@@ -319,6 +328,12 @@ void TestMnaGraphExecution::testConnectNodes()
     const MnaNode& midNode = graph.node("mid");
     QCOMPARE(midNode.inputs.first().sourceNodeId, QString("src"));
     QCOMPARE(midNode.inputs.first().sourcePortName, QString("out"));
+
+    // Unknown nodes or ports are not connected
+    QVERIFY(!graph.connect("nope", "out", "mid", "in"));
+    QVERIFY(!graph.connect("src", "out", "nope", "in"));
+    QVERIFY(!graph.connect("src", "nope", "mid", "in"));
+    QVERIFY(!graph.connect("src", "out", "mid", "nope"));
 }
 
 //=============================================================================================================
@@ -353,6 +368,23 @@ void TestMnaGraphExecution::testValidateDisconnectedInput()
     // A disconnected required port should cause validation to fail
     QVERIFY2(!valid, "Expected validation failure for disconnected required input");
     QVERIFY(!errors.isEmpty());
+
+    // A cycle, a source that does not exist and an unregistered op are each reported; without an
+    // error list the result is the same
+    MnaGraph broken;
+    broken.addNode(makeNode("a", "test_double"));
+    broken.addNode(makeNode("b", "test_double"));
+    broken.addNode(makeNode("c", "no_such_op"));
+    broken.connect("a", "out", "b", "in");
+    broken.connect("b", "out", "a", "in");
+    broken.node("c").inputs.first().sourceNodeId = "ghost";
+    errors.clear();
+    QVERIFY(!broken.validate(&errors));
+    QVERIFY(!broken.validate());
+    QCOMPARE(errors.filter("cycle").size(), 1);
+    QCOMPARE(errors.filter("ghost").size(), 1);
+    QCOMPARE(errors.filter("no_such_op").size(), 1);
+    QCOMPARE(broken.topologicalSort().size(), 1);
 }
 
 //=============================================================================================================
@@ -466,6 +498,10 @@ void TestMnaGraphExecution::testUpstreamDownstream()
 
     QStringList downstream = graph.downstreamNodes("A");
     QVERIFY(downstream.contains("B"));
+    QCOMPARE(graph.upstreamNodes("A"), QStringList());
+    QCOMPARE(graph.upstreamNodes("nope"), QStringList());
+    QCOMPARE(graph.downstreamNodes("nope"), QStringList());
+    QCOMPARE(graph.downstreamNodes("C"), QStringList());
 }
 
 //=============================================================================================================
