@@ -64,6 +64,12 @@ private slots:
         ConnectivitySettings settings;
         settings.setFFTSize(256);
         QCOMPARE(settings.getFFTSize(), 256);
+        settings.setFFTSize(0);
+        QCOMPARE(settings.getFFTSize(), 256);
+        // The frequency resolution (1000 Hz / 256) is kept when the sampling frequency changes
+        settings.setSamplingFrequency(1000);
+        settings.setSamplingFrequency(500);
+        QCOMPARE(settings.getFFTSize(), 128);
     }
 
     void testConnectivitySettingsWindowType()
