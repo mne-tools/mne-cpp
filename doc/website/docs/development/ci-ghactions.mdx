@@ -50,7 +50,7 @@ The PR cannot be merged until all matrix jobs pass. This ensures that every chan
 - Tests with **code coverage** on all platforms — enforcing a minimum threshold (50%) and detecting coverage regressions — plus tests against the minimum Qt version on all platforms
 - The **documentation gate** (API docs, screenshots, website build)
 
-GitHub-hosted runners are shared by every repository in the `mne-tools` organization, so the release part of the pipeline runs only where it can be affected: on pushes that change `CMakeLists.txt`, `cmake/`, `scripts/build/`, `scripts/ci/`, `scripts/deploy/` or `.github/workflows/`, nightly when `staging` has changed since the last nightly, and on manual dispatch (**Actions → Staging → Run workflow**). Once every test configuration compiles (failing tests do not block it), it:
+GitHub-hosted runners are shared by every repository in the `mne-tools` organization, so the release part of the pipeline runs only where it can be affected: nightly when `staging` has changed since the last nightly, on manual dispatch (**Actions → Staging → Run workflow**), and after a push that changed the build or packaging since the last dev build (a `CMakeLists.txt` or `cmake/` outside the tests, `scripts/build/`, `scripts/ci/`, `scripts/deploy/`, or the staging and release workflows). Such a push starts the release as a separate run, which later pushes do not cancel. Once every test configuration compiles (failing tests do not block it), it:
 
 - Creates or updates the **`dev_build`** pre-release on GitHub with the latest development binaries
 - Invokes the platform-specific release workflows (`release-linux.yml`, `release-macos.yml`, `release-windows.yml`, `release-installer.yml`) to produce development binaries tagged as `dev_build`

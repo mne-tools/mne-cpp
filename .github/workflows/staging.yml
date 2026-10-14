@@ -8,10 +8,12 @@
 #
 # Every push to `staging` runs the quality and docs gates and all tests (three
 # OSes, minimum and maximum Qt). The release builds, installers, WebAssembly
-# and deployments run on pushes that touch the build or packaging, nightly
-# (only when `staging` moved since the last nightly) and on manual dispatch,
-# and only once staging compiles. The mne-tools runner pool is shared by the
-# whole organization, so they are skipped where a push cannot affect them.
+# and deployments run nightly (only when `staging` moved since the last
+# nightly), on manual dispatch, and after a push that changed the build or
+# packaging since the last dev build, as a separate run that later pushes do
+# not cancel. They only start once staging compiles. The mne-tools runner pool
+# is shared by the whole organization, so they are skipped where a push cannot
+# affect them.
 # A failing nightly opens an issue, which closes when a nightly passes again.
 #
 # This is the DEVELOPMENT pipeline:
@@ -44,6 +46,11 @@ on:
     # tests take ~1.5 h, so the release-build burst lands around 02:45–04:15.
     - cron: '13 1 * * *'
   workflow_dispatch:
+    inputs:
+      release_only:
+        description: "Skip the tests (a push already compiled this commit) and only build and publish releases"
+        type: boolean
+        default: false
 
 # Cancel superseded push runs; a push never cancels a nightly or manual run.
 concurrency:
@@ -62,10 +69,11 @@ env:
 jobs:
 
   # ── Decide whether this run publishes dev builds ─────────────────────────
-  # Manual runs always do, pushes do when they touch the build or packaging,
-  # and a nightly does only when staging moved since the previous nightly (a
-  # failed nightly is not retried on the same commit; its issue stays open
-  # until a later nightly passes).
+  # Manual runs and a nightly with new commits do (a failed nightly is not
+  # retried on the same commit; its issue stays open until a later nightly
+  # passes). A push never does itself: if it changed the build or packaging
+  # since the last dev build, it hands the release to a manual run, because
+  # the next push would cancel the push run after dev_build was deleted.
   Changes:
     runs-on: ubuntu-24.04
     permissions:
@@ -73,6 +81,7 @@ jobs:
       contents: read
     outputs:
       release: ${{ steps.check.outputs.release }}
+      handoff: ${{ steps.check.outputs.handoff }}
 
     steps:
     - name: Decide whether to build releases
@@ -80,20 +89,23 @@ jobs:
       env:
         GH_TOKEN: ${{ github.token }}
         GH_REPO: ${{ github.repository }}
-        BEFORE: ${{ github.event.before }}
       run: |
+        handoff=false
         case "${{ github.event_name }}" in
           workflow_dispatch) release=true ;;
           push)
-            # Any doubt (new branch, force push, more files than the API lists) builds.
-            release=true
-            if [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] &&
-               files=$(gh api "repos/$GH_REPO/compare/$BEFORE...${{ github.sha }}" \
+            release=false
+            # Build and packaging files; tests and docs are not part of the release builds.
+            # Any doubt (no dev build yet, too many files to list) hands off.
+            handoff=true
+            if base=$(gh api "repos/$GH_REPO/git/ref/tags/dev_build" --jq .object.sha 2>/dev/null) &&
+               base=$(gh api "repos/$GH_REPO/git/tags/$base" --jq .object.sha 2>/dev/null || echo "$base") &&
+               files=$(gh api "repos/$GH_REPO/compare/$base...${{ github.sha }}" \
                          --jq 'if (.files | length) < 300 then .files[].filename else "too-many" end'); then
-              if ! printf '%s\n' "$files" |
-                   grep -qE '(^|/)CMakeLists\.txt$|^cmake/|^scripts/(build|ci|deploy)/|^\.github/workflows/|^too-many$'; then
-                echo "No build or packaging files changed"
-                release=false
+              if ! printf '%s\n' "$files" | grep -vE '^(src/testframes|doc)/' |
+                   grep -qE '(^|/)CMakeLists\.txt$|^cmake/|^scripts/(build|ci|deploy)/|^\.github/workflows/(staging\.yml|release-[^/]*|_reusable-release[^/]*)$|^too-many$'; then
+                echo "No build or packaging change since the last dev build ($base)"
+                handoff=false
               fi
             fi
             ;;
@@ -110,17 +122,17 @@ jobs:
           *) release=false ;;
         esac
         echo "release=$release" >> "$GITHUB_OUTPUT"
+        echo "handoff=$handoff" >> "$GITHUB_OUTPUT"
 
-  # ── Create / update dev_build pre-release ────────────────────────────────
-  # Gated on staging compiling on every test configuration, so a broken build
-  # never replaces the last good dev_build. Failing tests do not block it; they
-  # fail the run and open the nightly failure issue instead.
-  CreateDevRelease:
+  # ── Compile gate ──────────────────────────────────────────────────────────
+  # Releases start only once staging compiles on every test configuration, so a
+  # broken build never replaces the last good dev_build. Failing tests do not
+  # block it; they fail the run (and open the nightly failure issue).
+  Compiled:
     runs-on: ubuntu-24.04
     needs: [Changes, Tests, TestsMinQt]
-    if: ${{ !cancelled() && needs.Changes.outputs.release == 'true' }}
+    if: ${{ !cancelled() && !inputs.release_only && (needs.Changes.outputs.release == 'true' || needs.Changes.outputs.handoff == 'true') }}
     permissions:
-      contents: write
       actions: read
 
     steps:
@@ -140,6 +152,31 @@ jobs:
           exit 1
         fi
 
+  # ── Hand a push's release to a run that later pushes do not cancel ───────
+  Handoff:
+    runs-on: ubuntu-24.04
+    needs: [Changes, Compiled]
+    if: ${{ !cancelled() && github.event_name == 'push' && needs.Changes.outputs.handoff == 'true' && needs.Compiled.result == 'success' }}
+    permissions:
+      actions: write
+
+    steps:
+    - name: Start the release run
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: gh workflow run staging.yml --ref "${{ github.ref_name }}" -f release_only=true
+
+  # ── Create / update dev_build pre-release ────────────────────────────────
+  # A release-only run follows a push run that already passed the compile gate.
+  CreateDevRelease:
+    runs-on: ubuntu-24.04
+    needs: [Changes, Compiled]
+    if: ${{ !cancelled() && needs.Changes.outputs.release == 'true' && (inputs.release_only || needs.Compiled.result == 'success') }}
+    permissions:
+      contents: write
+
+    steps:
     - name: Clone repository
       uses: actions/checkout@v5
 
@@ -206,6 +243,7 @@ jobs:
   # Coverage is only collected on Ubuntu; macOS/Windows always run without it.
   # Floor and regression tolerance come from tools/quality/coverage_policy.json.
   Tests:
+    if: ${{ !inputs.release_only }}
     uses: ./.github/workflows/_reusable-tests.yml
     permissions:
       contents: read
@@ -221,6 +259,7 @@ jobs:
   # Min-Qt on all three OSes, so every push and the G1 evidence cover each
   # OS x Qt pair.
   TestsMinQt:
+    if: ${{ !inputs.release_only }}
     uses: ./.github/workflows/_reusable-tests.yml
     permissions:
       contents: read
@@ -542,7 +581,7 @@ jobs:
   # it when a later nightly passes.
   NightlyStatus:
     runs-on: ubuntu-24.04
-    needs: [Changes, Quality, Tests, TestsMinQt, CreateDevRelease, Linux, MacOS, Windows, Installer, Doxygen, Docs, Website, WebAssembly, ReleaseEvidence]
+    needs: [Changes, Quality, Tests, TestsMinQt, Compiled, CreateDevRelease, Linux, MacOS, Windows, Installer, Doxygen, Docs, Website, WebAssembly, ReleaseEvidence]
     if: always() && github.event_name == 'schedule' && needs.Changes.outputs.release == 'true'
     permissions:
       issues: write
