@@ -570,6 +570,13 @@ void TestStsCluster::testFtestMatchesScipy()
     compareValues(f.matPval, {0.0549768233267, 0.0151067767683, 0.0170157211473, 0.643788367021, 0.287451432677}, 1e-8);
     QCOMPARE(f.dfBetween, 2);
     QCOMPARE(f.dfWithin, 25);
+
+    // Far apart groups: scipy's p-value is the upper tail itself, not 1 - CDF rounded to zero
+    MatrixXd group(5, 1);
+    group << 0.0, 1.0, 2.0, 0.5, 1.5;
+    const StatsFtestResult far = StatsFtest::oneWay({group, group.array() + 30.0, group.array() + 60.0});
+    QVERIFY(std::abs(far.matFstat(0, 0) - 7200.0) < 1e-8);
+    QVERIFY2(std::abs(far.matPval(0, 0) / 3.3322836e-19 - 1.0) < 1e-6, qPrintable(QString::number(far.matPval(0, 0))));
 }
 
 //=============================================================================================================

@@ -85,10 +85,14 @@ StatsFtestResult StatsFtest::oneWay(const QVector<MatrixXd>& groups)
     // F-statistic
     RowVectorXd fstat = msBetween.array() / msWithin.array();
 
-    // p-values
+    // p-values: the upper tail P(F > f) = I_y(df2/2, df1/2) with y = df2 / (df2 + df1*f), as scipy's
+    // fdtrc; 1 - fCdf() would round tails below ~1e-16 to zero
     MatrixXd matPval(1, nVars);
     for (int j = 0; j < nVars; ++j) {
-        matPval(0, j) = 1.0 - fCdf(fstat(j), dfBetween, dfWithin);
+        const double f = fstat(j);
+        matPval(0, j) = f <= 0.0
+            ? 1.0
+            : StatsTtest::regularizedBeta(dfWithin / (dfWithin + dfBetween * f), dfWithin / 2.0, dfBetween / 2.0);
     }
 
     StatsFtestResult result;
