@@ -302,6 +302,23 @@ void TestMnaSerialization::testDataKindFromString()
 void TestMnaSerialization::testDataKindFromStringUnknown()
 {
     QCOMPARE(mnaDataKindFromString("NonExistentKind"), MnaDataKind::Custom);
+    for (const char* other : {"FiffInfo", "FilePath", "DirectoryPath"})
+        QCOMPARE(mnaDataKindFromString(other), MnaDataKind::Custom);
+
+    // Every role and kind survives its string form; kinds also read back from their snake_case spelling
+    for (int r = static_cast<int>(MnaFileRole::Raw); r <= static_cast<int>(MnaFileRole::Custom); ++r) {
+        const auto role = static_cast<MnaFileRole>(r);
+        QCOMPARE(mnaFileRoleFromString(mnaFileRoleToString(role)), role);
+    }
+    for (int k = static_cast<int>(MnaDataKind::FiffRaw); k <= static_cast<int>(MnaDataKind::Custom); ++k) {
+        const auto kind = static_cast<MnaDataKind>(k);
+        const QString name = mnaDataKindToString(kind);
+        QCOMPARE(mnaDataKindFromString(name), kind);
+        QString snake;
+        for (const QChar c : name)
+            snake += c.isUpper() && !snake.isEmpty() ? QStringLiteral("_") + c.toLower() : QString(c.toLower());
+        QCOMPARE(mnaDataKindFromString(snake), kind);
+    }
 }
 
 //=============================================================================================================
