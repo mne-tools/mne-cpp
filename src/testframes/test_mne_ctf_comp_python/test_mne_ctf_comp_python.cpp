@@ -200,6 +200,35 @@ void TestMneCtfCompPython::readsCompensationData()
     QCOMPARE(MNECTFCompDataSet::explain_comp(MNECTFCompDataSet::map_comp_kind(3)), QString("third order gradiometer"));
     // Both readers calibrate the stored matrix the same way.
     QVERIFY((set->comps[3]->data->data.cast<double>() - raw.info.comps[3].data->data).cwiseAbs().maxCoeff() <= 1e-6 * raw.info.comps[3].data->data.cwiseAbs().maxCoeff());
+
+    // Without a compensator set up applying changes nothing; staying at grade 3 needs none
+    VectorXf ones = VectorXf::Ones(kNChan);
+    QCOMPARE(set->apply(true, ones), 0);
+    QVERIFY(ones.isOnes());
+    QList<FiffChInfo> chs = set->chs;
+    QCOMPARE(set->set_compensation(3, chs, set->nch, {}, 0), 0);
+    QVERIFY(!set->current);
+    // Grade 3 -> 1: one sample at a time and the whole block agree, reverting restores the data,
+    // other channel counts are refused, and data without reference channels cannot be compensated
+    QCOMPARE(set->set_compensation(1, chs, set->nch, {}, 0), 0);
+    QVERIFY(set->current);
+    const MatrixXf block = m_reference[3].leftCols(4).cast<float>();
+    MatrixXf compensated = block;
+    QCOMPARE(set->apply_transpose(true, compensated), 0);
+    VectorXf sample = block.col(2);
+    QCOMPARE(set->apply(true, sample), 0);
+    QVERIFY(sample.isApprox(compensated.col(2)));
+    QCOMPARE(set->apply_transpose(false, compensated), 0);
+    QVERIFY(compensated.isApprox(block));
+    VectorXf shorter = VectorXf::Zero(kNChan - 1);
+    QVERIFY(set->apply(true, shorter) != 0);
+    VectorXf full = block.col(0);
+    QVERIFY(set->apply(true, full, shorter) != 0);
+    QVERIFY(set->apply(true, shorter, block.col(0)) != 0);
+    MatrixXf fewer = block.topRows(kNChan - 1);
+    QVERIFY(set->apply_transpose(true, fewer) != 0);
+    QList<FiffChInfo> megOnly = chs.mid(0, kNMeg);
+    QVERIFY(set->set_compensation(1, megOnly, kNMeg, {}, 0) != 0);
 }
 
 //=============================================================================================================
