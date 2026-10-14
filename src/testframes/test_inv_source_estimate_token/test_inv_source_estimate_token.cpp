@@ -175,6 +175,16 @@ void TestInvSourceEstimateToken::roundTripsAllLayers()
     QCOMPARE(c.tmin, f.tmin);
     QCOMPARE(c.tmax, f.tmax);
     QVERIFY((c.matrix - f.matrix).cwiseAbs().maxCoeff() < 1e-7);
+
+    // A stream that stops at any token (as a generating model may) still parses into a partial estimate,
+    // and so does one without its leading Bos
+    const std::vector<InvToken> tokens = tokenize(est);
+    for (size_t n = 0; n < tokens.size(); ++n) {
+        const InvSourceEstimate part = fromTokens(std::vector<InvToken>(tokens.begin(), tokens.begin() + static_cast<std::ptrdiff_t>(n)));
+        QVERIFY(part.data.rows() <= est.data.rows() && part.couplings.size() <= est.couplings.size());
+        QVERIFY(part.focalDipoles.size() <= 1 && part.connectivity.size() <= 1);
+    }
+    QCOMPARE(fromTokens(std::vector<InvToken>(tokens.begin() + 1, tokens.end())).data.rows(), est.data.rows());
 }
 
 //=============================================================================================================
