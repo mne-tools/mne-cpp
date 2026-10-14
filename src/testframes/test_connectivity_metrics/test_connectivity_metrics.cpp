@@ -12,6 +12,7 @@
 #include <connectivity/metrics/correlation.h>
 #include <connectivity/metrics/abstractmetric.h>
 #include <connectivity/metrics/debiasedsquaredweightedphaselagindex.h>
+#include <connectivity/metrics/mvar_model.h>
 
 #include <cmath>
 #include <random>
@@ -190,6 +191,38 @@ private slots:
         sums.removeFirst(1);
         sums.removeLast(1);
         QVERIFY(sums.isEmpty());
+    }
+
+    void testMvarModel()
+    {
+        // A two-channel AR(1) process where channel 0 drives channel 1
+        Matrix2d coeff;
+        coeff << 0.5, 0.0, 0.4, 0.3;
+        std::seed_seq seed{7};
+        std::mt19937 rng(seed);
+        std::normal_distribution<double> noise;
+        MatrixXd data = MatrixXd::Zero(2, 4000);
+        for (int t = 1; t < data.cols(); ++t)
+            data.col(t) = coeff * data.col(t - 1) + Vector2d(noise(rng), noise(rng));
+        MvarModel model;
+        model.fit(data);
+        QCOMPARE(model.order(), 1);
+        QVERIFY((model.coefficients()[0] - coeff).cwiseAbs().maxCoeff() < 0.05);
+        QVERIFY((model.noiseCov() - Matrix2d::Identity()).cwiseAbs().maxCoeff() < 0.1);
+
+        // Too few samples for the order leaves no model, whose transfer function is the identity
+        model.fit(data.leftCols(3), 5);
+        QCOMPARE(model.order(), 0);
+        QVERIFY(model.coefficients().isEmpty());
+        const QVector<MatrixXcd> h = model.transferFunction(Vector2d(0.1, 0.2));
+        QCOMPARE(h.size(), 2);
+        QVERIFY(h[1].isIdentity());
+
+        // Too short or flat data to compare orders falls back to order one
+        model.fit(data.leftCols(3));
+        QCOMPARE(model.order(), 1);
+        model.fit(MatrixXd::Ones(2, 50));
+        QCOMPARE(model.order(), 1);
     }
 
     void testCalculateCorrelation()

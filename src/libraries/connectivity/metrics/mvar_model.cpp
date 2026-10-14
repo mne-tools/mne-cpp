@@ -132,6 +132,7 @@ void MvarModel::fitLevinsonDurbin(const MatrixXd& data, int p)
 
     if (nObs <= 0) {
         qWarning() << "MvarModel::fitLevinsonDurbin - Not enough samples for model order" << p;
+        m_order = 0;
         m_coeffs.clear();
         m_noiseCov = MatrixXd::Identity(nCh, nCh);
         return;
