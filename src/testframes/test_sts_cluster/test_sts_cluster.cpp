@@ -556,6 +556,23 @@ void TestStsCluster::testTtestsMatchScipy()
         QCOMPARE(one.degreesOfFreedom, 8);
         QCOMPARE(ind.degreesOfFreedom, 19);
     }
+
+    // Tails far below 1e-16 are kept, not rounded to zero: these 11 samples have t = +-1000 against 0
+    // (scipy.stats.t.sf(1000, 10))
+    MatrixXd steep(11, 2);
+    for (int i = 0; i < 11; ++i) {
+        steep(i, 0) = 1.0 + 0.001 * (i - 5);
+        steep(i, 1) = -steep(i, 0);
+    }
+    const double tail = 1.2304123550866324e-26;
+    for (const auto& [which, expected] : {std::pair{StatsTailType::Right, Vector2d(tail, 1.0)},
+                                          std::pair{StatsTailType::Left, Vector2d(1.0, tail)},
+                                          std::pair{StatsTailType::Both, Vector2d(2 * tail, 2 * tail)}}) {
+        const StatsTtestResult r = StatsTtest::oneSample(steep, 0.0, which);
+        QVERIFY(std::abs(r.matTstat(0, 0) - 1000.0) < 1e-6);
+        for (int j = 0; j < 2; ++j)
+            QVERIFY2(std::abs(r.matPval(0, j) / expected(j) - 1.0) < 1e-6, qPrintable(QString::number(r.matPval(0, j))));
+    }
 }
 
 //=============================================================================================================

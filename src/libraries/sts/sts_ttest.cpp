@@ -135,15 +135,17 @@ double StatsTtest::tCdf(double t, int df)
 
 double StatsTtest::tToPval(double t, int df, StatsTailType tail)
 {
-    double cdf = tCdf(t, df);
+    // Each tail directly from I_x(df/2, 1/2) = P(|T| >= |t|), so p-values below 1e-16 are not lost to 1 - CDF
+    const double x = static_cast<double>(df) / (static_cast<double>(df) + t * t);
+    const double twoSided = regularizedBeta(x, static_cast<double>(df) / 2.0, 0.5);
     switch (tail) {
         case StatsTailType::Left:
-            return cdf;
+            return t < 0.0 ? 0.5 * twoSided : 1.0 - 0.5 * twoSided;
         case StatsTailType::Right:
-            return 1.0 - cdf;
+            return t >= 0.0 ? 0.5 * twoSided : 1.0 - 0.5 * twoSided;
         case StatsTailType::Both:
         default:
-            return 2.0 * std::min(cdf, 1.0 - cdf);
+            return twoSided;
     }
 }
 
