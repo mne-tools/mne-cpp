@@ -100,7 +100,8 @@ struct BIDSSHARED_EXPORT BidsElectrode
      * are skipped.
      *
      * If a coordinate transform is supplied, the positions are transformed from
-     * the BIDS coordinate frame into the FIFF head frame before insertion.
+     * the BIDS coordinate frame into the FIFF head frame before insertion, and the
+     * points are in its target frame; otherwise their frame is FIFFV_COORD_UNKNOWN.
      *
      * @param[in] electrodes    List of BIDS electrode records.
      * @param[in] trans         Optional coordinate transform (BIDS frame → head).

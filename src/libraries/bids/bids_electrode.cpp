@@ -113,7 +113,7 @@ FIFFLIB::FiffDigPointSet BidsElectrode::toFiffDigPoints(
     FiffDigPointSet digSet;
     int ident = 1;
 
-    const bool hasTransform = (trans.from != 0 || trans.to != 0);
+    const bool hasTransform = !trans.isEmpty();
 
     for (const BidsElectrode& elec : electrodes) {
         // Skip electrodes with "n/a" coordinates
@@ -129,6 +129,7 @@ FIFFLIB::FiffDigPointSet BidsElectrode::toFiffDigPoints(
         FiffDigPoint point;
         point.kind = FIFFV_POINT_EEG;
         point.ident = ident++;
+        point.coord_frame = hasTransform ? trans.to : FIFFV_COORD_UNKNOWN;
         point.r[0] = xVal;
         point.r[1] = yVal;
         point.r[2] = zVal;

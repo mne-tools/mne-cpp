@@ -259,6 +259,23 @@ void TestBids::testElectrodesReadTsv()
     // Check a known position
     float x = electrodes[0].x.toFloat();
     QVERIFY(std::abs(x - (-0.0254f)) < 0.001f);
+
+    // As digitizer points: n/a positions are skipped; without a transform the frame is unknown,
+    // with one the points are moved into its target frame
+    electrodes[1].y = QStringLiteral("n/a");
+    const FIFFLIB::FiffDigPointSet plain = BidsElectrode::toFiffDigPoints(electrodes);
+    QCOMPARE(plain.size(), 9);
+    QCOMPARE(plain[1].ident, 2);
+    QCOMPARE(plain[0].kind, FIFFV_POINT_EEG);
+    QCOMPARE(plain[0].coord_frame, FIFFV_COORD_UNKNOWN);
+    QCOMPARE(plain[0].r[0], x);
+    FIFFLIB::FiffCoordTrans shift;
+    shift.from = FIFFV_COORD_MRI;
+    shift.to = FIFFV_COORD_HEAD;
+    shift.trans(0, 3) = 0.5f;
+    const FIFFLIB::FiffDigPointSet moved = BidsElectrode::toFiffDigPoints(electrodes, shift);
+    QCOMPARE(moved[0].coord_frame, FIFFV_COORD_HEAD);
+    QCOMPARE(moved[0].r[0], x + 0.5f);
 }
 
 void TestBids::testElectrodesWriteRoundTrip()
