@@ -20,6 +20,8 @@
 #include <QCoreApplication>
 #include <QTextStream>
 
+#include <functional>
+
 #include <Eigen/Dense>
 
 #include <utils/generics/mne_logger.h>
@@ -521,6 +523,56 @@ void TestMneRawProjComp::projOp_readFromFile()
     auto proj = MNEProjOp::read(rawPath());
     QVERIFY(proj != nullptr);
     QVERIFY(proj->nitems > 0); // Neuromag data should have SSP projectors
+
+    // Hand-written projection blocks, read as MNE-C mne_read_proj_op: an item takes the global channel
+    // count unless it has its own, its description is the name plus the first description line, and
+    // a missing or inconsistent tag rejects the whole operator
+    QTemporaryDir dir;
+    const auto projFile = [&dir](const QString& name, fiff_int_t skip, fiff_int_t itemNchan, bool block = true) {
+        QFile file(dir.filePath(name));
+        if (!file.open(QIODevice::WriteOnly))
+            return QString();
+        FiffStream::SPtr stream = FiffStream::start_file(file);
+        if (block) {
+            stream->start_block(FIFFB_PROJ);
+            const fiff_int_t two = 2;
+            stream->write_int(FIFF_NCHAN, &two);
+            stream->start_block(FIFFB_PROJ_ITEM);
+            const fiff_int_t kind = FIFFV_PROJ_ITEM_FIELD;
+            const fiff_int_t one = 1;
+            const QList<std::pair<fiff_int_t, std::function<void()>>> tags{
+                {FIFF_NAME, [&] { stream->write_string(FIFF_NAME, "PCA"); }},
+                {FIFF_DESCRIPTION, [&] { stream->write_string(FIFF_DESCRIPTION, "v1\nmore"); }},
+                {FIFF_NCHAN, [&] { if (itemNchan >= 0) stream->write_int(FIFF_NCHAN, &itemNchan); }},
+                {FIFF_PROJ_ITEM_CH_NAME_LIST, [&] { stream->write_name_list(FIFF_PROJ_ITEM_CH_NAME_LIST, {"A", "B"}); }},
+                {FIFF_PROJ_ITEM_KIND, [&] { stream->write_int(FIFF_PROJ_ITEM_KIND, &kind); }},
+                {FIFF_PROJ_ITEM_NVEC, [&] { stream->write_int(FIFF_PROJ_ITEM_NVEC, &one); }},
+                {FIFF_PROJ_ITEM_VECTORS, [&] { stream->write_float_matrix(FIFF_PROJ_ITEM_VECTORS, Eigen::RowVector2f(0.6f, 0.8f)); }},
+                {FIFF_MNE_PROJ_ITEM_ACTIVE, [&] { stream->write_int(FIFF_MNE_PROJ_ITEM_ACTIVE, &one); }}};
+            for (const auto& [tag, write] : tags) {
+                if (tag != skip)
+                    write();
+            }
+            stream->end_block(FIFFB_PROJ_ITEM);
+            stream->end_block(FIFFB_PROJ);
+        }
+        stream->end_file();
+        return file.fileName();
+    };
+    const auto empty = MNEProjOp::read(projFile("none.fif", 0, -1, false));
+    QVERIFY(empty && empty->nitems == 0);
+    const auto item = MNEProjOp::read(projFile("item.fif", 0, -1));
+    QVERIFY(item && item->nitems == 1);
+    QCOMPARE(item->items[0].desc, QStringLiteral("PCA v1"));
+    QVERIFY(item->items[0].active);
+    const auto described = MNEProjOp::read(projFile("described.fif", FIFF_NAME, 2));
+    QVERIFY(described && described->items[0].desc == QStringLiteral("v1"));
+    const auto inactive = MNEProjOp::read(projFile("inactive.fif", FIFF_MNE_PROJ_ITEM_ACTIVE, -1));
+    QVERIFY(inactive && !inactive->items[0].active);
+    QVERIFY(!MNEProjOp::read(projFile("nchan0.fif", 0, 0)));
+    QVERIFY(!MNEProjOp::read(projFile("nchan3.fif", 0, 3)));
+    for (const fiff_int_t tag : {FIFF_PROJ_ITEM_CH_NAME_LIST, FIFF_PROJ_ITEM_KIND, FIFF_PROJ_ITEM_NVEC, FIFF_PROJ_ITEM_VECTORS})
+        QVERIFY2(!MNEProjOp::read(projFile(QStringLiteral("skip%1.fif").arg(tag), tag, -1)), qPrintable(QString::number(tag)));
 }
 
 void TestMneRawProjComp::projOp_assignChannelsAndMake()
