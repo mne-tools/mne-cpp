@@ -687,34 +687,7 @@ void RtFiffRawViewModel::updateProjection(const QList<FIFFLIB::FiffProj>& projs)
             m_matProj.col(m_vecBadIdcs[j]).setZero();
         }
 
-        //        std::cout << "Bads\n" << m_vecBadIdcs << std::endl;
-        //        std::cout << "Proj\n";
-        //        std::cout << m_matProj.block(0,0,10,10) << std::endl;
-
-        //
-        // Make proj sparse
-        //
-        qint32 nchan = this->m_pFiffInfo->nchan;
-        qint32 i, k;
-
-        typedef Eigen::Triplet<double> T;
-        std::vector<T> tripletList;
-        tripletList.reserve(nchan);
-
-        tripletList.clear();
-        tripletList.reserve(m_matProj.rows() * m_matProj.cols());
-        for (i = 0; i < m_matProj.rows(); ++i) {
-            for (k = 0; k < m_matProj.cols(); ++k) {
-                if (m_matProj(i, k) != 0) {
-                    tripletList.push_back(T(i, k, m_matProj(i, k)));
-                }
-            }
-        }
-
-        m_matSparseProjMult = SparseMatrix<double>(m_matProj.rows(), m_matProj.cols());
-        if (tripletList.size() > 0) {
-            m_matSparseProjMult.setFromTriplets(tripletList.begin(), tripletList.end());
-        }
+        m_matSparseProjMult = m_matProj.sparseView();
 
         //Create full multiplication matrix
         m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
@@ -745,30 +718,7 @@ void RtFiffRawViewModel::updateCompensator(int to)
         //Note that the data is written in raw form not in compensated form.
         m_matComp = newComp.data->data;
 
-        //
-        // Make proj sparse
-        //
-        qint32 nchan = this->m_pFiffInfo->nchan;
-        qint32 i, k;
-
-        typedef Eigen::Triplet<double> T;
-        std::vector<T> tripletList;
-        tripletList.reserve(nchan);
-
-        tripletList.clear();
-        tripletList.reserve(m_matComp.rows() * m_matComp.cols());
-        for (i = 0; i < m_matComp.rows(); ++i) {
-            for (k = 0; k < m_matComp.cols(); ++k) {
-                if (m_matComp(i, k) != 0) {
-                    tripletList.push_back(T(i, k, m_matComp(i, k)));
-                }
-            }
-        }
-
-        m_matSparseCompMult = SparseMatrix<double>(m_matComp.rows(), m_matComp.cols());
-        if (tripletList.size() > 0) {
-            m_matSparseCompMult.setFromTriplets(tripletList.begin(), tripletList.end());
-        }
+        m_matSparseCompMult = m_matComp.sparseView();
 
         //Create full multiplication matrix
         m_matSparseProjCompMult = m_matSparseProjMult * m_matSparseCompMult;
@@ -805,58 +755,10 @@ void RtFiffRawViewModel::updateSpharaOptions(const QString& sSytemType, int nBas
             matSpharaMultFirst = UTILSLIB::makeSpharaProjector(m_matSpharaEEGLoaded, m_vecIndicesFirstEEG, m_pFiffInfo->nchan, nBaseFctsFirst, 0); //InnerLayer
         }
 
-        //Write final operator matrices to file
-        //        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-        //        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
-        //        IOUtils::write_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/m_matSpharaEEGLoaded.txt"));
-
-        //
-        // Make operators sparse
-        //
-        qint32 nchan = this->m_pFiffInfo->nchan;
-        qint32 i, k;
-
-        typedef Eigen::Triplet<double> T;
-        std::vector<T> tripletList;
-        tripletList.reserve(nchan);
-
-        //First operator
-        tripletList.clear();
-        tripletList.reserve(matSpharaMultFirst.rows() * matSpharaMultFirst.cols());
-        for (i = 0; i < matSpharaMultFirst.rows(); ++i) {
-            for (k = 0; k < matSpharaMultFirst.cols(); ++k) {
-                if (matSpharaMultFirst(i, k) != 0) {
-                    tripletList.push_back(T(i, k, matSpharaMultFirst(i, k)));
-                }
-            }
-        }
-
-        Eigen::SparseMatrix<double> matSparseSpharaMultFirst = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-
-        matSparseSpharaMultFirst = SparseMatrix<double>(matSpharaMultFirst.rows(), matSpharaMultFirst.cols());
-        if (tripletList.size() > 0) {
-            matSparseSpharaMultFirst.setFromTriplets(tripletList.begin(), tripletList.end());
-        }
-
-        //Second operator
-        tripletList.clear();
-        tripletList.reserve(matSpharaMultSecond.rows() * matSpharaMultSecond.cols());
-
-        for (i = 0; i < matSpharaMultSecond.rows(); ++i) {
-            for (k = 0; k < matSpharaMultSecond.cols(); ++k) {
-                if (matSpharaMultSecond(i, k) != 0) {
-                    tripletList.push_back(T(i, k, matSpharaMultSecond(i, k)));
-                }
-            }
-        }
-
-        Eigen::SparseMatrix<double> matSparseSpharaMultSecond = SparseMatrix<double>(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-
-        if (tripletList.size() > 0) {
-            matSparseSpharaMultSecond.setFromTriplets(tripletList.begin(), tripletList.end());
-        }
 
         //Create full multiplication matrix
+        const SparseMatrix<double> matSparseSpharaMultFirst = matSpharaMultFirst.sparseView();
+        const SparseMatrix<double> matSparseSpharaMultSecond = matSpharaMultSecond.sparseView();
         m_matSparseSpharaMult = matSparseSpharaMultFirst * matSparseSpharaMultSecond;
     }
 }

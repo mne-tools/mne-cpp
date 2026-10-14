@@ -74,7 +74,7 @@
       "c_style_cast": 403,
       "raw_new": 169,
       "raw_delete": 275,
-      "console_io": 356,
+      "console_io": 354,
       "numeric_define": 847,
       "qt_new_unparented": 811,
       "oversized_unit": 8
