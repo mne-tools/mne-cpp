@@ -1035,6 +1035,25 @@ void TestBids::testPathSettersGetters()
              (QStringList{"01|01|motor||ieeg|ieeg|.vhdr", "01|01|rest|01|ieeg|ieeg|.vhdr"}));
     QCOMPARE(describe(BIDSPath(dir.path(), QString(), QString(), "rest", "ieeg", "ieeg", ".vhdr").match()),
              (QStringList{"01|01|rest|01|ieeg|ieeg|.vhdr", "02|01|rest||ieeg|ieeg|.vhdr"}));
+
+    // Every entity is parsed back; names without a subject, with a suffix before the last part or
+    // without an extension are no BIDS files, and a missing root has none
+    const QString entities = QStringLiteral("sub-03/meg/sub-03_task-x_acq-a_run-2_proc-sss_space-CTF_recording-r_split-01_desc-d_meg.fif");
+    for (const QString& file : {entities, QStringLiteral("sub-03/meg/task-x_meg.fif"), QStringLiteral("sub-03/meg/sub-03_meg_task-x.fif"),
+                                QStringLiteral("sub-03/meg/README"), QStringLiteral("sub-03/meg/.hidden")}) {
+        QVERIFY(QDir(dir.path()).mkpath(QFileInfo(file).path()));
+        QFile f(dir.filePath(file));
+        QVERIFY(f.open(QIODevice::WriteOnly));
+    }
+    BIDSPath third;
+    third.setRoot(dir.path());
+    third.setSubject("03");
+    const QList<BIDSPath> found = third.match();
+    QCOMPARE(found.size(), 1);
+    QCOMPARE(found[0].filePath(), QDir(dir.path()).filePath(entities));
+    third.setRoot(dir.filePath("missing"));
+    QVERIFY(third.match().isEmpty());
+    QCOMPARE(BIDSPath().basename(), QString());
 }
 
 //=============================================================================================================

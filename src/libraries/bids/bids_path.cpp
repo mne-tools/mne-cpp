@@ -398,7 +398,7 @@ QList<BIDSPath> BIDSPath::match() const
             else if (key == QStringLiteral("acq"))
                 p.setAcquisition(val);
             else if (key == QStringLiteral("run"))
-                p.setRun(val);
+                p.m_sRun = val; // as on disk, so the path names the file found (the setter pads)
             else if (key == QStringLiteral("proc"))
                 p.setProcessing(val);
             else if (key == QStringLiteral("space"))
@@ -406,7 +406,7 @@ QList<BIDSPath> BIDSPath::match() const
             else if (key == QStringLiteral("recording"))
                 p.setRecording(val);
             else if (key == QStringLiteral("split"))
-                p.setSplit(val);
+                p.m_sSplit = val;
             else if (key == QStringLiteral("desc"))
                 p.setDescription(val);
         }
