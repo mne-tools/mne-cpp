@@ -328,16 +328,12 @@ const QString& ConnectivitySettings::getWindowType() const
 void ConnectivitySettings::setNodePositions(const FiffInfo& fiffInfo,
                                             const RowVectorXi& picks)
 {
-    m_matNodePositions.resize(picks.cols(), 3);
+    m_matNodePositions = MatrixX3f::Zero(picks.cols(), 3);
 
-    qint32 kind;
     for (int i = 0; i < picks.cols(); ++i) {
-        kind = fiffInfo.chs.at(i).kind;
-        if (kind == FIFFV_EEG_CH ||
-            kind == FIFFV_MEG_CH) {
-            m_matNodePositions(i, 0) = fiffInfo.chs.at(picks(i)).chpos.r0(0);
-            m_matNodePositions(i, 1) = fiffInfo.chs.at(picks(i)).chpos.r0(1);
-            m_matNodePositions(i, 2) = fiffInfo.chs.at(picks(i)).chpos.r0(2);
+        const FiffChInfo& ch = fiffInfo.chs.at(picks(i));
+        if (ch.kind == FIFFV_EEG_CH || ch.kind == FIFFV_MEG_CH) {
+            m_matNodePositions.row(i) = ch.chpos.r0.transpose();
         }
     }
 }

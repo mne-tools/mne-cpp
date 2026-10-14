@@ -6,6 +6,8 @@
 #include <Eigen/Dense>
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
+#include <fiff/fiff_constants.h>
+#include <fiff/fiff_info.h>
 #include <connectivity/network/network.h>
 #include <connectivity/metrics/correlation.h>
 #include <connectivity/metrics/abstractmetric.h>
@@ -88,6 +90,20 @@ private slots:
         pos << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
         settings.setNodePositions(pos);
         QCOMPARE(settings.getNodePositions().rows(), 4);
+
+        // From the picked channels of a recording: EEG/MEG take their position, other channels sit at the origin
+        FIFFLIB::FiffInfo info;
+        const QList<int> kinds{FIFFV_STIM_CH, FIFFV_EEG_CH, FIFFV_MEG_CH};
+        for (int k = 0; k < kinds.size(); ++k) {
+            FIFFLIB::FiffChInfo ch;
+            ch.kind = kinds[k];
+            ch.chpos.r0 = Vector3f(k + 1.0f, 2.0f * k, -1.0f);
+            info.chs << ch;
+        }
+        settings.setNodePositions(info, RowVector3i(1, 0, 2));
+        MatrixX3f expected(3, 3);
+        expected << 2, 2, -1, 0, 0, 0, 3, 4, -1;
+        QCOMPARE(settings.getNodePositions(), expected);
     }
 
     void testConnectivitySettingsClearAll()
