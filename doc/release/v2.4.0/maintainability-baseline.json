@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1500,
-  "scanned_lines": 394188,
+  "scanned_lines": 394185,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -403,11 +403,11 @@
       }
     },
     "console_io": {
-      "total": 353,
-      "files": 52,
+      "total": 349,
+      "files": 51,
       "by_scope": {
         "applications": 7,
-        "libraries": 56,
+        "libraries": 52,
         "tools": 290
       },
       "suppressed": [],
@@ -442,7 +442,6 @@
         "src/libraries/fiff/fiff_info.cpp": 4,
         "src/libraries/fwd/fwd_bem_model.cpp": 3,
         "src/libraries/inv/hpi/inv_hpi_data_updater.cpp": 2,
-        "src/libraries/inv/hpi/inv_hpi_fit.cpp": 4,
         "src/libraries/inv/hpi/inv_signal_model.cpp": 2,
         "src/libraries/inv/minimum_norm/inv_minimum_norm.cpp": 1,
         "src/libraries/math/sphere.cpp": 2,

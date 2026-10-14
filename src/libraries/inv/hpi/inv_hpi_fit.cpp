@@ -37,7 +37,6 @@
 #define _USE_MATH_DEFINES
 #endif
 #include <cmath>
-#include <iostream>
 #include <vector>
 #include <numeric>
 #include <fiff/fiff_cov.h>
@@ -115,16 +114,16 @@ void InvHpiFit::fit(const MatrixXd& matProjectedData,
                     HpiFitResult& hpiFitResult)
 {
     if (matProjectedData.rows() != matProjectors.rows()) {
-        std::cout << "InvHpiFit::fit - Projector and data dimensions do not match. Returning." << std::endl;
+        qWarning("InvHpiFit::fit - Projector and data dimensions do not match. Returning.");
         return;
     } else if (hpiModelParameters.iNHpiCoils() != matCoilsHead.rows()) {
-        std::cout << "InvHpiFit::fit - Number of coils and hpi digitizers do not match. Returning." << std::endl;
+        qWarning("InvHpiFit::fit - Number of coils and hpi digitizers do not match. Returning.");
         return;
     } else if (matProjectedData.rows() == 0 || matProjectors.rows() == 0) {
-        std::cout << "InvHpiFit::fit - No data or Projectors passed. Returning." << std::endl;
+        qWarning("InvHpiFit::fit - No data or Projectors passed. Returning.");
         return;
     } else if (m_sensors.ncoils() != matProjectedData.rows()) {
-        std::cout << "InvHpiFit::fit - Number of channels in sensors and data do not match. Returning." << std::endl;
+        qWarning("InvHpiFit::fit - Number of channels in sensors and data do not match. Returning.");
         return;
     }
 
@@ -281,8 +280,6 @@ CoilParam InvHpiFit::dipfit(const MatrixXd matCoilsSeed,
             coil.mom = lCoilData.at(i).m_errorInfo.moment.transpose();
             coil.dpfiterror(i) = lCoilData.at(i).m_errorInfo.error;
             coil.dpfitnumitr(i) = lCoilData.at(i).m_errorInfo.numIterations;
-
-            //std::cout<<std::endl<< "InvHpiFit::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
         }
     }
     return coil;

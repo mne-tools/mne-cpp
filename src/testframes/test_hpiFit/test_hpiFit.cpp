@@ -16,7 +16,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <utils/generics/mne_logger.h>
 
 #include <iostream>
 #include <vector>
@@ -110,8 +109,6 @@ TestHpiFit::TestHpiFit()
 
 void TestHpiFit::initTestCase()
 {
-    qInstallMessageHandler(MNELogger::customLogWriter);
-
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     // Make sure test folder exists
@@ -172,6 +169,7 @@ void TestHpiFit::testFit_dimensions_dataAndProjectors()
 
     HpiFitResult hpiFitResult;
 
+    QTest::ignoreMessage(QtWarningMsg, "InvHpiFit::fit - Projector and data dimensions do not match. Returning.");
     HPI.fit(matProjectedData,
             matPreparedProjectors,
             hpiModelParameters,
@@ -196,6 +194,7 @@ void TestHpiFit::testFit_dimensions_nCoils()
 
     HpiFitResult hpiFitResult;
 
+    QTest::ignoreMessage(QtWarningMsg, "InvHpiFit::fit - Number of coils and hpi digitizers do not match. Returning.");
     HPI.fit(matProjectedData,
             matPreparedProjectors,
             hpiModelParameters,
@@ -223,6 +222,7 @@ void TestHpiFit::testFit_dimensions_emptyData()
 
     HpiFitResult hpiFitResult;
 
+    QTest::ignoreMessage(QtWarningMsg, "InvHpiFit::fit - No data or Projectors passed. Returning.");
     HPI.fit(MatrixXd(),
             MatrixXd(),
             hpiModelParameters,
@@ -258,6 +258,7 @@ void TestHpiFit::testFit_dimensions_dataAndSensors()
 
     HpiFitResult hpiFitResult;
 
+    QTest::ignoreMessage(QtWarningMsg, "InvHpiFit::fit - Number of channels in sensors and data do not match. Returning.");
     HPI.fit(matProjectedData,
             matPreparedProjectors,
             hpiModelParameters,
