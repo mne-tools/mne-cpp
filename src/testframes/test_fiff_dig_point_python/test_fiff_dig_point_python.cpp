@@ -43,6 +43,9 @@
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_file.h>
+#include <fiff/fiff_stream.h>
 
 #include <cmath>
 
@@ -95,6 +98,7 @@ private slots:
     void polhemusReaders_rejectBadInput();
     void montageReaders_matchPython_data();
     void montageReaders_matchPython();
+    void montageReaders_rejectBadInput();
 };
 
 //=============================================================================================================
@@ -268,6 +272,43 @@ void TestFiffDigPointPython::writeRoundTrip()
     QCOMPARE(error, QStringLiteral("Output path is empty."));
     QVERIFY(!m_dig.write(dir.filePath("missing/dig.fif"), &error));
     QVERIFY(error.startsWith(QStringLiteral("Destination directory")));
+    QVERIFY(!m_dig.write(dir.path(), &error));
+    QVERIFY(error.startsWith(QStringLiteral("Cannot open")));
+
+    // FIFF_MNE_COORD_FRAME in the isotrak block puts every point into that frame, as mne's _read_dig_fif
+    QFile framed(dir.filePath("framed.fif"));
+    QVERIFY(framed.open(QIODevice::WriteOnly));
+    FiffStream::SPtr stream = FiffStream::start_file(framed);
+    stream->start_block(FIFFB_MEAS);
+    stream->start_block(FIFFB_MEAS_INFO);
+    stream->start_block(FIFFB_ISOTRAK);
+    stream->write_dig_point(m_dig[0]);
+    const fiff_int_t mri = FIFFV_COORD_MRI;
+    stream->write_int(FIFF_MNE_COORD_FRAME, &mri);
+    stream->write_dig_point(m_dig[1]);
+    stream->end_block(FIFFB_ISOTRAK);
+    stream->end_block(FIFFB_MEAS_INFO);
+    stream->end_block(FIFFB_MEAS);
+    stream->end_file();
+    framed.close();
+    const FiffDigPointSet inMri(framed);
+    QCOMPARE(inMri.size(), 2);
+    QCOMPARE(inMri[0].coord_frame, FIFFV_COORD_MRI);
+    QCOMPARE(inMri[1].coord_frame, FIFFV_COORD_MRI);
+
+    // An index past the end falls back to the first point; a transform and its inverse cancel
+    QCOMPARE(inMri[2].ident, inMri[0].ident);
+    FiffDigPointSet moved = inMri;
+    QCOMPARE(moved[5].ident, inMri[0].ident);
+    FiffCoordTrans shift;
+    shift.trans = Eigen::Matrix4f::Identity();
+    shift.trans(0, 3) = 0.5f;
+    shift.invtrans = Eigen::Matrix4f::Identity();
+    shift.invtrans(0, 3) = -0.5f;
+    moved.applyTransform(shift);
+    QCOMPARE(moved[0].r[0], inMri[0].r[0] + 0.5f);
+    moved.applyTransform(shift, true);
+    QVERIFY(std::abs(moved[0].r[0] - inMri[0].r[0]) < 1e-6f);
 }
 
 //=============================================================================================================
@@ -526,6 +567,82 @@ void TestFiffDigPointPython::montageReaders_matchPython()
     const FiffDigPoint& end = dig[dig.size() - 1];
     compareRows({end.r[0], end.r[1], end.r[2]}, last, "last point");
     compareRows(total, sum, "sum");
+}
+
+//=============================================================================================================
+
+void TestFiffDigPointPython::montageReaders_rejectBadInput()
+{
+    QTemporaryDir dir;
+    const auto file = [&dir](const QString& name, const QByteArray& content) {
+        QFile out(dir.filePath(name));
+        if (out.open(QIODevice::WriteOnly))
+            out.write(content);
+        return out.fileName();
+    };
+    FiffDigPointSet dig;
+    QStringList names;
+    Eigen::MatrixX3d points;
+
+    // Isotrak .hsp: the three fiducials, then "<count> 3" and the points (in cm here)
+    const QByteArray fiducials = "% position of fiducials\n%F 1 0 0\n%F 0 1 0\n%F 0 -1 0\n% points\n";
+    QVERIFY(FiffDigPointSet::readPolhemusIsotrak(file("a.hsp", fiducials + "2 3\n1 2 3\n4 5 6\n"), dig, {}, "cm"));
+    QCOMPARE(dig.size(), 5);
+    QCOMPARE(dig[4].r[2], 0.06f);
+    QVERIFY(FiffDigPointSet::readPolhemusIsotrak(file("b.hsp", fiducials.left(fiducials.size() - 9)), dig));
+    QCOMPARE(dig.size(), 3);
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(file("c.hsp", fiducials + "2 4\n1 2 3 4\n"), dig));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(file("d.hsp", fiducials + "2 3\n1 2 3\n"), dig));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(file("e.hsp", fiducials + "x 3\n"), dig));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(file("f.hsp", "% position of fiducials\n%F 1 0\n"), dig));
+    QVERIFY(!FiffDigPointSet::readPolhemusIsotrak(file("g.hsp", "no fiducials\n"), dig));
+
+    // FastSCAN: a known unit, a .txt that exists, three numbers per row
+    QVERIFY(!FiffDigPointSet::readPolhemusFastscan(file("a.txt", "% FastSCAN\n1 2 3\n"), points, "inch"));
+    QVERIFY(!FiffDigPointSet::readPolhemusFastscan(dir.filePath("missing.txt"), points));
+    QVERIFY(!FiffDigPointSet::readPolhemusFastscan(file("b.txt", "% FastSCAN\n1 2\n"), points));
+    QVERIFY(!FiffDigPointSet::readPolhemusFastscan(file("c.txt", "% FastSCAN\n1 2 x\n"), points));
+
+    // CapTrak: every electrode has a position, and the three fiducials are there
+    const auto captrak = [](const QByteArray& electrodes) {
+        return "<?xml version=\"1.0\"?><CapTrak><CapTrakElectrodeList>" + electrodes + "</CapTrakElectrodeList></CapTrak>";
+    };
+    const QByteArray nasion = "<CapTrakElectrode><Name>Nasion</Name><X>0</X><Y>90</Y><Z>0</Z></CapTrakElectrode>"
+                              "<CapTrakElectrode><Name>LPA</Name><X>-80</X><Y>0</Y><Z>0</Z></CapTrakElectrode>";
+    QVERIFY(!FiffDigPointSet::readCaptrak(file("a.bvct", captrak(nasion)), dig, &names));
+    QVERIFY(!FiffDigPointSet::readCaptrak(file("b.bvct", captrak(nasion + "<CapTrakElectrode><Name>RPA</Name><X>80</X></CapTrakElectrode>")), dig, &names));
+    QVERIFY(!FiffDigPointSet::readCaptrak(file("c.bvct", captrak(nasion).chopped(4)), dig, &names));
+    QVERIFY(!FiffDigPointSet::readCaptrak(dir.filePath("missing.bvct"), dig, &names));
+
+    // EGI: sensors of an unknown type are skipped, a sensor needs a number, all fiducials must be present
+    const auto egi = [](const QByteArray& sensors) {
+        return "<?xml version=\"1.0\"?><coordinates><sensorLayout><sensors>" + sensors + "</sensors></sensorLayout></coordinates>";
+    };
+    const auto sensor = [](const QByteArray& name, const QByteArray& number, int type) {
+        return "<sensor><name>" + name + "</name><number>" + number + "</number><type>" + QByteArray::number(type) + "</type><x>1</x><y>2</y><z>3</z></sensor>";
+    };
+    const QByteArray egiFiducials = sensor("Nasion", "1", 2) + sensor("Left periauricular point", "2", 2) + sensor("Right periauricular point", "3", 2);
+    QVERIFY(FiffDigPointSet::readEgi(file("a.xml", egi(egiFiducials + sensor("", "4", 0) + sensor("", "5", 7) + sensor("", "6", 1))), dig, &names));
+    QCOMPARE(names, QStringList({"EEG 004", "EEG 002"}));
+    QVERIFY(!FiffDigPointSet::readEgi(file("b.xml", egi(egiFiducials + sensor("", "x", 0))), dig, &names));
+    QVERIFY(!FiffDigPointSet::readEgi(file("c.xml", egi(sensor("Nasion", "1", 2) + sensor("", "4", 0))), dig, &names));
+
+    // Localite: five comma-separated fields per row, fiducials that exist (or none asked for)
+    const QByteArray localite = "#,name,x,y,z\n0,Nasion,0,90,0\n1,ch01,10,20,30\n\n";
+    QVERIFY(FiffDigPointSet::readLocalite(file("a.csv", localite), dig, &names, "Nasion", QString(), QString()));
+    QCOMPARE(dig.size(), 2);
+    QCOMPARE(dig[0].ident, FIFFV_POINT_NASION);
+    QVERIFY(!FiffDigPointSet::readLocalite(file("b.csv", localite), dig, &names, "Nasion", "LPA", "RPA"));
+    QVERIFY(!FiffDigPointSet::readLocalite(file("c.csv", localite + "2,ch02,1,2\n"), dig, &names, "Nasion", QString(), QString()));
+    QVERIFY(!FiffDigPointSet::readLocalite(dir.filePath("missing.csv"), dig, &names, "Nasion", "LPA", "RPA"));
+
+    // Neuroscan .dat: "name number x y z" rows; without fiducials only the electrodes remain
+    QVERIFY(FiffDigPointSet::readNeuroscanDat(file("a.dat", "Fz 1 0 1 2\n"), dig, &names));
+    QCOMPARE(dig.size(), 1);
+    QCOMPARE(dig[0].kind, FIFFV_POINT_EEG);
+    QVERIFY(!FiffDigPointSet::readNeuroscanDat(file("b.dat", "Fz 1 0 1\n"), dig, &names));
+    QVERIFY(!FiffDigPointSet::readNeuroscanDat(file("c.dat", "Fz 1 0 x 2\n"), dig, &names));
+    QVERIFY(!FiffDigPointSet::readNeuroscanDat(dir.filePath("missing.dat"), dig, &names));
 }
 
 //=============================================================================================================
