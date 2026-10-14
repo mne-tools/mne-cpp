@@ -22,7 +22,7 @@ Pull requests cannot be merged until all platform jobs pass. Development builds 
 |----------------|----------|--------------|
 | Pull request → `staging` or `main` | `pull-request.yml` | Build + tests on all platforms (max Qt), min Qt on Linux |
 | Push to `staging` | `staging.yml` | Tests with coverage checks, quality gates |
-| Nightly (when `staging` changed) | `staging.yml` | Tests, then dev release binaries, dev website + Doxygen |
+| Nightly (when `staging` changed) | `staging.yml` | Tests (min Qt on all platforms), then dev release binaries, dev website + Doxygen |
 | Push to `main` | `main.yml` | Tests, stable website + Doxygen deployment |
 | Tag `v*` on `main` | `main.yml` | Full stable release: platform binaries, installers, WebAssembly |
 | Push to `wasm` | `wasmtest.yml` | WebAssembly build deployed to GitHub Pages |

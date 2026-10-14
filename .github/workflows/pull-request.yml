@@ -46,12 +46,12 @@ jobs:
       with_code_coverage: false
       upload_codecov: false
 
-  # The min-Qt endpoint is a compatibility check, so Linux is enough.
+  # Min-Qt on Linux; release PRs into main test it on all three OSes.
   TestsMinQt:
     uses: ./.github/workflows/_reusable-tests.yml
     with:
       qt_version: min
-      os_json: '["ubuntu-24.04"]'
+      os_json: ${{ github.base_ref == 'main' && '["ubuntu-24.04", "macos-26", "windows-2025-vs2026"]' || '["ubuntu-24.04"]' }}
 
   # ── Quality gates (static, no build) ────────────────────────────────────
   Quality:

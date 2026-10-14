@@ -200,7 +200,8 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-  # The min-Qt endpoint is a compatibility check, so Linux is enough.
+  # Min-Qt on Linux per push; on all three OSes nightly and on manual runs, so
+  # the published dev build and the G1 evidence still cover every OS x Qt pair.
   TestsMinQt:
     uses: ./.github/workflows/_reusable-tests.yml
     permissions:
@@ -208,7 +209,7 @@ jobs:
       actions: write  # prune superseded ccache entries
     with:
       qt_version: min
-      os_json: '["ubuntu-24.04"]'
+      os_json: ${{ github.event_name == 'push' && '["ubuntu-24.04"]' || '["ubuntu-24.04", "macos-26", "windows-2025-vs2026"]' }}
       save_ccache: true
 
   # ── Doxygen API documentation (dev) ──────────────────────────────────────
@@ -319,9 +320,9 @@ jobs:
         retention-days: 30
 
   # ── Documentation gate (T4.4): API docs, screenshots, site build ────────
+  # Runs on every push (Linux only, ~20 min): it is the docs/API gate. Only
+  # the Website deployment waits for the nightly.
   Docs:
-    needs: CreateDevRelease
-    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
     uses: ./.github/workflows/_reusable-docs.yml
     with:
       channel: dev
