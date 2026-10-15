@@ -120,7 +120,7 @@ QList<TrapMusicDipole> InvTrapMusic::compute(const MatrixXd& matLeadField,
         dipole.position = matSourcePos.row(bestIdx).transpose();
 
         // The orientation maximises the correlation of the projected topography P G_k o with the subspace.
-        const int colStart = static_cast<int>(bestIdx) * iNOrient;
+        const Index colStart = bestIdx * iNOrient;
         VectorXd orient = VectorXd::Ones(1);
         if (iNOrient > 1) {
             const MatrixXd projSrc = projLF.middleCols(colStart, iNOrient);
@@ -156,7 +156,7 @@ VectorXd InvTrapMusic::scanCorrelations(const MatrixXd& matLeadField,
     VectorXd correlations(nSrcTotal);
 
     for (int s = 0; s < nSrcTotal; ++s) {
-        const MatrixXd G_s = matLeadField.middleCols(s * iNOrient, iNOrient);
+        const MatrixXd G_s = matLeadField.middleCols(Index(s) * iNOrient, iNOrient);
         if (G_s.norm() <= 1e-15) {
             correlations[s] = 0.0;
             continue;
