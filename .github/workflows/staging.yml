@@ -188,7 +188,7 @@ jobs:
         set -x
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
-        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
+        git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}"
 
         # Delete existing dev_build release (if any)
         if gh release view dev_build > /dev/null 2>&1; then
@@ -444,6 +444,9 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [CreateDevRelease, WasmBuild]
     if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' && needs.WasmBuild.result == 'success' }}
+    env:
+      # No checkout in this job, so gh cannot infer the repository.
+      GH_REPO: ${{ github.repository }}
 
     steps:
     - name: Download WASM build
@@ -452,17 +455,11 @@ jobs:
         name: wasm-build
         path: out/wasm
 
-    - name: Package and upload WASM to dev_build release
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        tar cfz mne-cpp-wasm.tar.gz -C out/wasm .
-      
     - name: Upload WASM to dev_build release
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        cp mne-cpp-wasm.tar.gz mne-cpp-dev-wasm.tar.gz
+        tar cfz mne-cpp-dev-wasm.tar.gz -C out/wasm .
         gh release upload dev_build mne-cpp-dev-wasm.tar.gz --clobber
 
     - name: Deploy dev WASM to mne-cpp/wasm repository
