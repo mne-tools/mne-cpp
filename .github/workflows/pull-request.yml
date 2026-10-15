@@ -9,9 +9,9 @@
 # Triggered on pull requests targeting `staging` or `main`.
 #
 # This is the FEATURE BRANCH pipeline:
-#   • Verifies the project builds across all platforms
-#   • Tests min + max supported Qt versions
-#   • Runs the full test suite (without coverage — that's done on staging)
+#   • Runs the full test suite on all platforms with the maximum supported Qt
+#     (without coverage — that's done on staging)
+#   • Runs it with the minimum supported Qt on Linux
 #   • No deployments, no releases
 #
 # Branch model:  Feature → Staging → Main
@@ -34,17 +34,10 @@ env:
 
 jobs:
 
-  # ── Build compatibility: minimum supported Qt ────────────────────────────
-  BuildMinQt:
-    uses: ./.github/workflows/_reusable-build.yml
-    with:
-      qt_version: min
-
-  # ── Build compatibility: maximum supported Qt ────────────────────────────
-  BuildMaxQt:
-    uses: ./.github/workflows/_reusable-build.yml
-    with:
-      qt_version: max
+  # No separate min/max Qt build-only jobs: the test jobs compile the same tree
+  # with the same warnings-as-errors flags. The runner pool is shared by the
+  # whole mne-tools organization (and only 5 macOS jobs run at once), so
+  # duplicate builds delay every repository's CI.
 
   # ── Tests (no coverage collection) ──────────────────────────────────────
   Tests:
@@ -53,10 +46,12 @@ jobs:
       with_code_coverage: false
       upload_codecov: false
 
+  # Min-Qt on Linux; release PRs into main test it on all three OSes.
   TestsMinQt:
     uses: ./.github/workflows/_reusable-tests.yml
     with:
       qt_version: min
+      os_json: ${{ github.base_ref == 'main' && '["ubuntu-24.04", "macos-26", "windows-2025-vs2026"]' || '["ubuntu-24.04"]' }}
 
   # ── Quality gates (static, no build) ────────────────────────────────────
   Quality:
@@ -121,5 +116,10 @@ jobs:
     uses: ./.github/workflows/_reusable-docs.yml
     with:
       channel: stable
+    secrets: inherit
+
+  # ── WebAssembly build (Linux only, no deployment) ───────────────────────
+  WasmBuild:
+    uses: ./.github/workflows/_reusable-wasm.yml
     secrets: inherit
 

@@ -7,7 +7,7 @@ sidebar_label: Continuous Integration
 
 Every change to MNE-CPP is automatically built, tested, and — for releases — packaged across **Windows, Linux, and macOS** before it reaches users. The CI system runs on [GitHub Actions](https://docs.github.com/en/actions) and is organized around the [Main – Staging – Feature branch model](ci-releasecycle.mdx).
 
-Pull requests cannot be merged until all platform jobs pass. Development builds are published on every push to `staging`; stable release binaries are created when a version tag (`v*`) is pushed on `main`.
+Pull requests cannot be merged until all platform jobs pass. Development builds are published from `staging` on pushes that touch the build or packaging, and nightly; stable release binaries are created when a version tag (`v*`) is pushed on `main`.
 
 ## Guides
 
@@ -20,8 +20,9 @@ Pull requests cannot be merged until all platform jobs pass. Development builds 
 
 | Branch / Event | Workflow | What Happens |
 |----------------|----------|--------------|
-| Pull request → `staging` or `main` | `pull-request.yml` | Build matrix (Qt min + max) + tests on all platforms |
-| Push to `staging` | `staging.yml` | Dev release binaries, coverage checks, dev website + Doxygen, CodeQL |
+| Pull request → `staging` or `main` | `pull-request.yml` | Build + tests on all platforms (max Qt), min Qt on Linux, WebAssembly build |
+| Push to `staging` | `staging.yml` | Tests with coverage checks (min + max Qt, all platforms), quality and docs gates, WebAssembly build |
+| Push touching the build, nightly, manual | `staging.yml` | Also dev release binaries, dev website + Doxygen |
 | Push to `main` | `main.yml` | Tests, stable website + Doxygen deployment |
 | Tag `v*` on `main` | `main.yml` | Full stable release: platform binaries, installers, WebAssembly |
 | Push to `wasm` | `wasmtest.yml` | WebAssembly build deployed to GitHub Pages |

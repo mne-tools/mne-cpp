@@ -6,7 +6,15 @@
 # Staging Branch Pipeline
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Triggered on pushes to `staging`.
+# Every push to `staging` runs the quality and docs gates, all tests (three
+# OSes, minimum and maximum Qt) and the WebAssembly build. The release builds,
+# installers and deployments (including the WebAssembly one) run nightly (only when `staging` moved since the last
+# nightly), on manual dispatch, and after a push that changed the build or
+# packaging since the last dev build, as a separate run that later pushes do
+# not cancel. They only start once staging compiles. The mne-tools runner pool
+# is shared by the whole organization, so they are skipped where a push cannot
+# affect them.
+# A failing nightly opens an issue, which closes when a nightly passes again.
 #
 # This is the DEVELOPMENT pipeline:
 #   • Creates/updates a rolling "dev_build" pre-release on GitHub
@@ -31,11 +39,23 @@ on:
   push:
     branches:
       - staging
+  schedule:
+    # 01:13 UTC: over Sep–Oct 2026 the mne-tools runner pool was quietest from
+    # about 01:00 to 04:00 UTC (MNE-Python, MNE-BIDS and MNE-BIDS-Pipeline CI
+    # all near idle), and staging pushes usually start around 07:00 UTC. The
+    # tests take ~1.5 h, so the release-build burst lands around 02:45–04:15.
+    - cron: '13 1 * * *'
+  workflow_dispatch:
+    inputs:
+      release_only:
+        description: "Skip the tests (a push already compiled this commit) and only build and publish releases"
+        type: boolean
+        default: false
 
-# Cancel superseded runs
+# Cancel superseded push runs; a push never cancels a nightly or manual run.
 concurrency:
-  group: staging-${{ github.ref }}
-  cancel-in-progress: true
+  group: staging-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 permissions:
   contents: write
@@ -48,9 +68,113 @@ env:
 
 jobs:
 
+  # ── Decide whether this run publishes dev builds ─────────────────────────
+  # Manual runs and a nightly with new commits do (a failed nightly is not
+  # retried on the same commit; its issue stays open until a later nightly
+  # passes). A push never does itself: if it changed the build or packaging
+  # since the last dev build, it hands the release to a manual run, because
+  # the next push would cancel the push run after dev_build was deleted.
+  Changes:
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      release: ${{ steps.check.outputs.release }}
+      handoff: ${{ steps.check.outputs.handoff }}
+
+    steps:
+    - name: Decide whether to build releases
+      id: check
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        handoff=false
+        case "${{ github.event_name }}" in
+          workflow_dispatch) release=true ;;
+          push)
+            release=false
+            # Build and packaging files; tests and docs are not part of the release builds.
+            # Any doubt (no dev build yet, too many files to list) hands off.
+            handoff=true
+            if base=$(gh api "repos/$GH_REPO/git/ref/tags/dev_build" --jq .object.sha 2>/dev/null) &&
+               base=$(gh api "repos/$GH_REPO/git/tags/$base" --jq .object.sha 2>/dev/null || echo "$base") &&
+               files=$(gh api "repos/$GH_REPO/compare/$base...${{ github.sha }}" \
+                         --jq 'if (.files | length) < 300 then .files[].filename else "too-many" end'); then
+              if ! printf '%s\n' "$files" | grep -vE '^(src/testframes|doc)/' |
+                   grep -qE '(^|/)CMakeLists\.txt$|^cmake/|^scripts/(build|ci|deploy|wasm)/|^\.github/workflows/(staging\.yml|release-[^/]*|_reusable-release[^/]*)$|^too-many$'; then
+                echo "No build or packaging change since the last dev build ($base)"
+                handoff=false
+              fi
+            fi
+            ;;
+          schedule)
+            last_sha=$(gh api "repos/$GH_REPO/actions/workflows/staging.yml/runs?event=schedule&branch=${{ github.ref_name }}&status=completed&per_page=1" \
+              --jq '.workflow_runs[0].head_sha // ""')
+            if [ "$last_sha" = "${{ github.sha }}" ]; then
+              echo "No new commits since the last nightly ($last_sha)"
+              release=false
+            else
+              release=true
+            fi
+            ;;
+          *) release=false ;;
+        esac
+        echo "release=$release" >> "$GITHUB_OUTPUT"
+        echo "handoff=$handoff" >> "$GITHUB_OUTPUT"
+
+  # ── Compile gate ──────────────────────────────────────────────────────────
+  # Releases start only once staging compiles on every test configuration, so a
+  # broken build never replaces the last good dev_build. Failing tests do not
+  # block it; they fail the run (and open the nightly failure issue).
+  Compiled:
+    runs-on: ubuntu-24.04
+    needs: [Changes, Tests, TestsMinQt]
+    if: ${{ !cancelled() && !inputs.release_only && (needs.Changes.outputs.release == 'true' || needs.Changes.outputs.handoff == 'true') }}
+    permissions:
+      actions: read
+
+    steps:
+    - name: Check that every test configuration compiled
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        gh api --paginate "repos/$GH_REPO/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs?per_page=100" \
+          --jq '.jobs[] | select(.name | test("^Tests(MinQt)? / ")) |
+                [.name, ([.steps[] | select(.name | startswith("Configure and compile MNE-CPP")) | select(.conclusion != "skipped") | .conclusion] | first // "missing")] | @tsv' \
+          > compiled.tsv
+        cat compiled.tsv
+        test -s compiled.tsv
+        if awk -F'\t' '$2 != "success" { bad = 1 } END { exit !bad }' compiled.tsv; then
+          echo "::error::Not every test configuration compiled, so dev_build is left unchanged."
+          exit 1
+        fi
+
+  # ── Hand a push's release to a run that later pushes do not cancel ───────
+  Handoff:
+    runs-on: ubuntu-24.04
+    needs: [Changes, Compiled]
+    if: ${{ !cancelled() && github.event_name == 'push' && needs.Changes.outputs.handoff == 'true' && needs.Compiled.result == 'success' }}
+    permissions:
+      actions: write
+
+    steps:
+    - name: Start the release run
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: gh workflow run staging.yml --ref "${{ github.ref_name }}" -f release_only=true
+
   # ── Create / update dev_build pre-release ────────────────────────────────
+  # A release-only run follows a push run that already passed the compile gate.
   CreateDevRelease:
     runs-on: ubuntu-24.04
+    needs: [Changes, Compiled]
+    if: ${{ !cancelled() && needs.Changes.outputs.release == 'true' && (inputs.release_only || needs.Compiled.result == 'success') }}
+    permissions:
+      contents: write
 
     steps:
     - name: Clone repository
@@ -88,57 +212,67 @@ jobs:
   # ── Platform release builds (parallel) ───────────────────────────────────
   Linux:
     needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
     uses: ./.github/workflows/release-linux.yml
     secrets: inherit
 
   MacOS:
     needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
     uses: ./.github/workflows/release-macos.yml
     secrets: inherit
 
   Windows:
     needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
     uses: ./.github/workflows/release-windows.yml
     secrets: inherit
 
   # ── Installers (after all platform builds) ─────────────────────────────
   Installer:
     needs: [Linux, MacOS, Windows]
+    if: ${{ !cancelled() && needs.Linux.result == 'success' && needs.MacOS.result == 'success' && needs.Windows.result == 'success' }}
     uses: ./.github/workflows/release-installer.yml
     secrets: inherit
 
-  # ── Build compatibility matrix (min + max Qt) ───────────────────────────
-  BuildMinQt:
-    uses: ./.github/workflows/_reusable-build.yml
-    with:
-      qt_version: min
-
-  BuildMaxQt:
-    uses: ./.github/workflows/_reusable-build.yml
-    with:
-      qt_version: max
+  # No separate min/max Qt build-only jobs here: Tests and TestsMinQt compile
+  # the same tree with the same warnings-as-errors flags, and the release
+  # builds exercise deployment.
 
   # ── Tests with coverage threshold & regression checks ────────────────────
   # Coverage is only collected on Ubuntu; macOS/Windows always run without it.
   # Floor and regression tolerance come from tools/quality/coverage_policy.json.
   Tests:
+    if: ${{ !inputs.release_only }}
     uses: ./.github/workflows/_reusable-tests.yml
+    permissions:
+      contents: read
+      actions: write  # prune superseded ccache entries
     with:
       with_code_coverage: true
       upload_codecov: true
       enforce_coverage_gate: true
+      save_ccache: true
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
+  # Min-Qt on all three OSes, so every push and the G1 evidence cover each
+  # OS x Qt pair.
   TestsMinQt:
+    if: ${{ !inputs.release_only }}
     uses: ./.github/workflows/_reusable-tests.yml
+    permissions:
+      contents: read
+      actions: write  # prune superseded ccache entries
     with:
       qt_version: min
+      save_ccache: true
 
   # ── Doxygen API documentation (dev) ──────────────────────────────────────
   Doxygen:
     runs-on: ubuntu-24.04
     needs: CreateDevRelease
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
 
     steps:
     - name: Clone repository
@@ -242,6 +376,8 @@ jobs:
         retention-days: 30
 
   # ── Documentation gate (T4.4): API docs, screenshots, site build ────────
+  # Runs on every push (Linux only, ~20 min): it is the docs/API gate. Only
+  # the Website deployment waits for the nightly.
   Docs:
     uses: ./.github/workflows/_reusable-docs.yml
     with:
@@ -252,6 +388,7 @@ jobs:
   Website:
     runs-on: ubuntu-24.04
     needs: [CreateDevRelease, Quality, Docs]
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' && needs.Quality.result == 'success' && needs.Docs.result == 'success' }}
 
     steps:
     - name: Clone repository
@@ -295,89 +432,25 @@ jobs:
         git push origin main
 
   # ── WebAssembly (dev) ────────────────────────────────────────────────────
+  WasmBuild:
+    uses: ./.github/workflows/_reusable-wasm.yml
+    with:
+      upload_artifact: true
+    secrets: inherit
+
+  # Builds on every run (WebAssembly breaks in ways no other build sees), but
+  # publishes only in release runs.
   WebAssembly:
     runs-on: ubuntu-24.04
-    needs: CreateDevRelease
+    needs: [CreateDevRelease, WasmBuild]
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' && needs.WasmBuild.result == 'success' }}
 
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v5
-
-    - name: Install dependencies
-      run: |
-        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
-        sudo apt-get update -qq
-        sudo apt-get install -qq build-essential libgl1-mesa-dev ninja-build
-
-    - name: Setup Emscripten
-      run: |
-        cd ..
-        git clone https://github.com/emscripten-core/emsdk.git
-        cd emsdk
-        ./emsdk install 4.0.7
-        ./emsdk activate 4.0.7
-
-    - name: Load external dependency versions
-      shell: bash
-      run: ./scripts/ci/load_external_deps.sh
-
-    - name: Download pre-built WASM Qt binaries
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release download qt_binaries -p "qt6_${QT_VERSION_TOKEN}_static_binaries_wasm.tar.gz" -D /tmp
-        mkdir -p "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/wasm_multithread"
-        tar xf "/tmp/qt6_${QT_VERSION_TOKEN}_static_binaries_wasm.tar.gz" -C "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/wasm_multithread"
-        echo "Qt6_DIR=${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}" >> "$GITHUB_ENV"
-
-    - name: Download host Qt binaries for cross-compilation
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release download qt_binaries -p "qt6_${QT_VERSION_TOKEN}_static_binaries_linux.tar.gz" -D /tmp
-        mkdir -p "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/gcc_64"
-        tar xf "/tmp/qt6_${QT_VERSION_TOKEN}_static_binaries_linux.tar.gz" -C "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/gcc_64"
-
-    - name: Download Eigen package
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        ./scripts/ci/download_toolchain.sh \
-          --kind eigen \
-          --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
-
-    - name: Download ONNX Runtime (WASM)
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        ./scripts/ci/download_toolchain.sh \
-          --kind onnxruntime \
-          --version "$ONNXRUNTIME_VERSION" \
-          --platform wasm \
-          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
-
-    - name: Clone Skigen
-      run: ./scripts/ci/clone_skigen.sh
-
-    - name: Build WASM
-      run: |
-        source ../emsdk/emsdk_env.sh
-        ./scripts/wasm/wasm.sh --emsdk 4.0.7
-
-    - name: Prepare WASM artifacts
-      run: |
-        rm -rf out/wasm/bin/mne_analyze_plugins
-        rm -rf resources/data
-        cp resources/design/logos/qtlogo.svg out/wasm/bin/qtlogo.svg
-        if [ -d "out/wasm/examples" ]; then
-          cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
-        fi
-        # Replace bare Qt HTML with branded loading screens & inject COOP/COEP SW
-        ./scripts/wasm/wasm_postbuild.sh out/wasm/bin
-        if [ -d "out/wasm/examples" ]; then
-          ./scripts/wasm/wasm_postbuild.sh out/wasm/examples
-        fi
+    - name: Download WASM build
+      uses: actions/download-artifact@v8
+      with:
+        name: wasm-build
+        path: out/wasm
 
     - name: Package and upload WASM to dev_build release
       env:
@@ -432,7 +505,42 @@ jobs:
   # ── Checksums and signing evidence (after every asset upload) ─────────
   ReleaseEvidence:
     needs: [Installer, Doxygen, WebAssembly]
+    if: ${{ !cancelled() && needs.Installer.result == 'success' && needs.Doxygen.result == 'success' && needs.WebAssembly.result == 'success' }}
     uses: ./.github/workflows/_reusable-release-evidence.yml
     with:
       tag: dev_build
     secrets: inherit
+
+  # ── Nightly failure issue ────────────────────────────────────────────────
+  # Opens (or comments on) one tracking issue when a nightly fails, and closes
+  # it when a later nightly passes.
+  NightlyStatus:
+    runs-on: ubuntu-24.04
+    needs: [Changes, Quality, Tests, TestsMinQt, Compiled, WasmBuild, CreateDevRelease, Linux, MacOS, Windows, Installer, Doxygen, Docs, Website, WebAssembly, ReleaseEvidence]
+    if: always() && github.event_name == 'schedule' && needs.Changes.outputs.release == 'true'
+    permissions:
+      issues: write
+
+    steps:
+    - name: Open, update or close the nightly failure issue
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+        FAILED: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        title="Nightly staging build failed"
+        number=$(gh issue list --state open --search "\"$title\" in:title" --json number,title \
+          --jq "map(select(.title == \"$title\")) | .[0].number // empty")
+        if [ "$FAILED" = "true" ]; then
+          body="The nightly staging pipeline failed on ${{ github.sha }}: $RUN_URL"
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body
+
+        This issue closes automatically when a nightly run passes again."
+          fi
+        elif [ -n "$number" ]; then
+          gh issue close "$number" --comment "The nightly staging pipeline passed again on ${{ github.sha }}: $RUN_URL"
+        fi

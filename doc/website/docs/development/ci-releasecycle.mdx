@@ -45,11 +45,12 @@ The `main` branch always reflects a **production-ready** state. It is updated on
 The `staging` branch is the active development integration branch. Feature branches are merged here via pull requests.
 
 - Every push to `staging` triggers:
-  - Cross-platform builds (minimum and maximum supported Qt versions)
-  - Unit tests with **code coverage** — threshold checks (≥ 50%) and regression detection
+  - Cross-platform tests with **code coverage** — threshold checks (≥ 50%) and regression detection — plus tests against the minimum supported Qt version on all platforms
+  - The **WebAssembly** build
+- Pushes that touch the build or packaging, nightly runs (when `staging` has changed) and manual runs also produce:
   - A rolling **dev pre-release** (`dev_build`) with binaries for all platforms
   - Deployment of the **dev** version of the website (at `/dev/`) and Doxygen API docs (at `/dev/`)
-  - CodeQL security analysis
+- CodeQL security analysis runs weekly
 
 ### Feature Branches
 
@@ -79,7 +80,7 @@ The website and Doxygen API docs are deployed in two versions simultaneously:
 | Version | URL | Updated by |
 |---------|-----|-----------|
 | **Stable** | `mne-cpp.github.io` / `mne-cpp.github.io/doxygen-api` | Pushes to `main` |
-| **Dev** | `mne-cpp.github.io/dev/` / `mne-cpp.github.io/doxygen-api/dev/` | Pushes to `staging` |
+| **Dev** | `mne-cpp.github.io/dev/` / `mne-cpp.github.io/doxygen-api/dev/` | Nightly builds of `staging` |
 
 Both versions are served from the same repository and branch (`gh-pages`), using subdirectory isolation — stable at the root, dev under `/dev/`. A version dropdown in the website header lets users switch between stable and dev documentation.
 

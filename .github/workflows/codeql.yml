@@ -5,13 +5,17 @@
 
 name: "CodeQL"
 
+# Not run on pushes to staging: the shared mne-tools runner pool cannot absorb
+# an analysis per push, and the weekly schedule covers staging. The analysis
+# keeps a real build so moc/uic output and template instantiations are seen.
 on:
   push:
-    branches: [ "main", "staging" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   schedule:
     - cron: '28 15 * * 1'
+  workflow_dispatch:
 
 concurrency:
   group: codeql-${{ github.ref }}
@@ -83,6 +87,7 @@ jobs:
       uses: github/codeql-action/init@v4
       with:
         languages: ${{ matrix.language }}
+        build-mode: manual
         # Disable CodeQL TRAP caching: each cache entry is ~3.7 GB and two of
         # them (~7.4 GB) dominate the repo's 10 GB Actions cache budget, evicting
         # the Qt/sample-data caches via LRU and forcing unnecessary re-downloads.
@@ -100,7 +105,7 @@ jobs:
     - name: Configure and compile MNE-CPP
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        cmake --build build --parallel "$(nproc)"
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
