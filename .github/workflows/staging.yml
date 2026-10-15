@@ -6,9 +6,9 @@
 # Staging Branch Pipeline
 # ═══════════════════════════════════════════════════════════════════════════
 #
-# Every push to `staging` runs the quality and docs gates and all tests (three
-# OSes, minimum and maximum Qt). The release builds, installers, WebAssembly
-# and deployments run nightly (only when `staging` moved since the last
+# Every push to `staging` runs the quality and docs gates, all tests (three
+# OSes, minimum and maximum Qt) and the WebAssembly build. The release builds,
+# installers and deployments (including the WebAssembly one) run nightly (only when `staging` moved since the last
 # nightly), on manual dispatch, and after a push that changed the build or
 # packaging since the last dev build, as a separate run that later pushes do
 # not cancel. They only start once staging compiles. The mne-tools runner pool
@@ -103,7 +103,7 @@ jobs:
                files=$(gh api "repos/$GH_REPO/compare/$base...${{ github.sha }}" \
                          --jq 'if (.files | length) < 300 then .files[].filename else "too-many" end'); then
               if ! printf '%s\n' "$files" | grep -vE '^(src/testframes|doc)/' |
-                   grep -qE '(^|/)CMakeLists\.txt$|^cmake/|^scripts/(build|ci|deploy)/|^\.github/workflows/(staging\.yml|release-[^/]*|_reusable-release[^/]*)$|^too-many$'; then
+                   grep -qE '(^|/)CMakeLists\.txt$|^cmake/|^scripts/(build|ci|deploy|wasm)/|^\.github/workflows/(staging\.yml|release-[^/]*|_reusable-release[^/]*)$|^too-many$'; then
                 echo "No build or packaging change since the last dev build ($base)"
                 handoff=false
               fi
@@ -432,90 +432,25 @@ jobs:
         git push origin main
 
   # ── WebAssembly (dev) ────────────────────────────────────────────────────
+  WasmBuild:
+    uses: ./.github/workflows/_reusable-wasm.yml
+    with:
+      upload_artifact: true
+    secrets: inherit
+
+  # Builds on every run (WebAssembly breaks in ways no other build sees), but
+  # publishes only in release runs.
   WebAssembly:
     runs-on: ubuntu-24.04
-    needs: CreateDevRelease
-    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' }}
+    needs: [CreateDevRelease, WasmBuild]
+    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' && needs.WasmBuild.result == 'success' }}
 
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v5
-
-    - name: Install dependencies
-      run: |
-        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
-        sudo apt-get update -qq
-        sudo apt-get install -qq build-essential libgl1-mesa-dev ninja-build
-
-    - name: Setup Emscripten
-      run: |
-        cd ..
-        git clone https://github.com/emscripten-core/emsdk.git
-        cd emsdk
-        ./emsdk install 4.0.7
-        ./emsdk activate 4.0.7
-
-    - name: Load external dependency versions
-      shell: bash
-      run: ./scripts/ci/load_external_deps.sh
-
-    - name: Download pre-built WASM Qt binaries
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release download qt_binaries -p "qt6_${QT_VERSION_TOKEN}_static_binaries_wasm.tar.gz" -D /tmp
-        mkdir -p "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/wasm_multithread"
-        tar xf "/tmp/qt6_${QT_VERSION_TOKEN}_static_binaries_wasm.tar.gz" -C "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/wasm_multithread"
-        echo "Qt6_DIR=${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}" >> "$GITHUB_ENV"
-
-    - name: Download host Qt binaries for cross-compilation
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release download qt_binaries -p "qt6_${QT_VERSION_TOKEN}_static_binaries_linux.tar.gz" -D /tmp
-        mkdir -p "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/gcc_64"
-        tar xf "/tmp/qt6_${QT_VERSION_TOKEN}_static_binaries_linux.tar.gz" -C "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/gcc_64"
-
-    - name: Download Eigen package
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        ./scripts/ci/download_toolchain.sh \
-          --kind eigen \
-          --version "$EIGEN_VERSION" \
-          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
-
-    - name: Download ONNX Runtime (WASM)
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: |
-        ./scripts/ci/download_toolchain.sh \
-          --kind onnxruntime \
-          --version "$ONNXRUNTIME_VERSION" \
-          --platform wasm \
-          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
-
-    - name: Clone Skigen
-      run: ./scripts/ci/clone_skigen.sh
-
-    - name: Build WASM
-      run: |
-        source ../emsdk/emsdk_env.sh
-        ./scripts/wasm/wasm.sh --emsdk 4.0.7
-
-    - name: Prepare WASM artifacts
-      run: |
-        rm -rf out/wasm/bin/mne_analyze_plugins
-        rm -rf resources/data
-        cp resources/design/logos/qtlogo.svg out/wasm/bin/qtlogo.svg
-        if [ -d "out/wasm/examples" ]; then
-          cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
-        fi
-        # Replace bare Qt HTML with branded loading screens & inject COOP/COEP SW
-        ./scripts/wasm/wasm_postbuild.sh out/wasm/bin
-        if [ -d "out/wasm/examples" ]; then
-          ./scripts/wasm/wasm_postbuild.sh out/wasm/examples
-        fi
+    - name: Download WASM build
+      uses: actions/download-artifact@v8
+      with:
+        name: wasm-build
+        path: out/wasm
 
     - name: Package and upload WASM to dev_build release
       env:
@@ -581,7 +516,7 @@ jobs:
   # it when a later nightly passes.
   NightlyStatus:
     runs-on: ubuntu-24.04
-    needs: [Changes, Quality, Tests, TestsMinQt, Compiled, CreateDevRelease, Linux, MacOS, Windows, Installer, Doxygen, Docs, Website, WebAssembly, ReleaseEvidence]
+    needs: [Changes, Quality, Tests, TestsMinQt, Compiled, WasmBuild, CreateDevRelease, Linux, MacOS, Windows, Installer, Doxygen, Docs, Website, WebAssembly, ReleaseEvidence]
     if: always() && github.event_name == 'schedule' && needs.Changes.outputs.release == 'true'
     permissions:
       issues: write

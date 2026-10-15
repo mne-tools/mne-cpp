@@ -1,0 +1,112 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+# Builds the WebAssembly applications and examples (Linux only). Callers that
+# publish them pass upload_artifact and deploy the "wasm-build" artifact.
+
+name: Reusable WebAssembly build
+
+on:
+  workflow_call:
+    inputs:
+      upload_artifact:
+        description: "Upload out/wasm as the wasm-build artifact"
+        required: false
+        default: false
+        type: boolean
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  WasmBuild:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Install dependencies
+      run: |
+        sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources
+        sudo apt-get update -qq
+        sudo apt-get install -qq build-essential libgl1-mesa-dev ninja-build
+
+    - name: Setup Emscripten
+      run: |
+        cd ..
+        git clone https://github.com/emscripten-core/emsdk.git
+        cd emsdk
+        ./emsdk install 4.0.7
+        ./emsdk activate 4.0.7
+
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
+
+    - name: Download pre-built WASM Qt binaries
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release download qt_binaries -p "qt6_${QT_VERSION_TOKEN}_static_binaries_wasm.tar.gz" -D /tmp
+        mkdir -p "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/wasm_multithread"
+        tar xf "/tmp/qt6_${QT_VERSION_TOKEN}_static_binaries_wasm.tar.gz" -C "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/wasm_multithread"
+        echo "Qt6_DIR=${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}" >> "$GITHUB_ENV"
+
+    - name: Download host Qt binaries for cross-compilation
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release download qt_binaries -p "qt6_${QT_VERSION_TOKEN}_static_binaries_linux.tar.gz" -D /tmp
+        mkdir -p "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/gcc_64"
+        tar xf "/tmp/qt6_${QT_VERSION_TOKEN}_static_binaries_linux.tar.gz" -C "${RUNNER_TOOL_CACHE}/Qt/${QT_VERSION}/gcc_64"
+
+    - name: Download Eigen package
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind eigen \
+          --version "$EIGEN_VERSION" \
+          --output-dir "$GITHUB_WORKSPACE/src/external/eigen"
+
+    - name: Download ONNX Runtime (WASM)
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ./scripts/ci/download_toolchain.sh \
+          --kind onnxruntime \
+          --version "$ONNXRUNTIME_VERSION" \
+          --platform wasm \
+          --output-dir "$GITHUB_WORKSPACE/src/external/onnxruntime"
+
+    - name: Clone Skigen
+      run: ./scripts/ci/clone_skigen.sh
+
+    - name: Build WASM
+      run: |
+        source ../emsdk/emsdk_env.sh
+        ./scripts/wasm/wasm.sh --emsdk 4.0.7
+
+    - name: Prepare WASM artifacts
+      run: |
+        rm -rf out/wasm/bin/mne_analyze_plugins
+        rm -rf resources/data
+        cp resources/design/logos/qtlogo.svg out/wasm/bin/qtlogo.svg
+        if [ -d "out/wasm/examples" ]; then
+          cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
+        fi
+        # Replace bare Qt HTML with branded loading screens & inject COOP/COEP SW
+        ./scripts/wasm/wasm_postbuild.sh out/wasm/bin
+        if [ -d "out/wasm/examples" ]; then
+          ./scripts/wasm/wasm_postbuild.sh out/wasm/examples
+        fi
+
+    - name: Upload WASM build
+      if: inputs.upload_artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: wasm-build
+        path: out/wasm
+        retention-days: 1

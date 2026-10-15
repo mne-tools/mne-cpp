@@ -118,3 +118,8 @@ jobs:
       channel: stable
     secrets: inherit
 
+  # ── WebAssembly build (Linux only, no deployment) ───────────────────────
+  WasmBuild:
+    uses: ./.github/workflows/_reusable-wasm.yml
+    secrets: inherit
+

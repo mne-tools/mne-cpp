@@ -46,6 +46,7 @@ The `staging` branch is the active development integration branch. Feature branc
 
 - Every push to `staging` triggers:
   - Cross-platform tests with **code coverage** — threshold checks (≥ 50%) and regression detection — plus tests against the minimum supported Qt version on all platforms
+  - The **WebAssembly** build
 - Pushes that touch the build or packaging, nightly runs (when `staging` has changed) and manual runs also produce:
   - A rolling **dev pre-release** (`dev_build`) with binaries for all platforms
   - Deployment of the **dev** version of the website (at `/dev/`) and Doxygen API docs (at `/dev/`)
