@@ -12574,7 +12574,7 @@
         "status": "implemented",
         "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
         "note": "",
-        "test": "test_bids"
+        "test": "test_edf2fiff_rwr"
       },
       {
         "python": "mne.io.read_raw_eeglab",
@@ -12949,14 +12949,14 @@
         "status": "implemented",
         "mne_cpp": "FiffCov picking",
         "note": "",
-        "test": "test_fiff_cov"
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.pick_channels_forward",
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::pick_channels",
         "note": "",
-        "test": "test_mne_forward_solution"
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.pick_channels_regexp",
@@ -13425,7 +13425,7 @@
         "status": "implemented",
         "mne_cpp": "FiffCoordTrans::read",
         "note": "",
-        "test": "test_fiff_coord_trans"
+        "test": "test_fiff_fs_library"
       },
       {
         "python": "mne.read_tri",

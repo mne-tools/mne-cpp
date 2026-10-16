@@ -22,9 +22,9 @@
   "summary": {
     "claims": 360,
     "by_evidence": {
-      "cross-validated-static": 149,
+      "cross-validated-static": 153,
       "cross-validated-live": 4,
-      "tested": 203,
+      "tested": 199,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 125,
+        "cross-validated-static": 129,
         "cross-validated-live": 3,
-        "tested": 139,
+        "tested": 135,
         "unverified": 4
       }
     },
@@ -1721,8 +1721,8 @@
       "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
       "python": "mne.io.read_raw_edf",
       "claimed": "implemented",
-      "test": "test_bids",
-      "evidence": "tested"
+      "test": "test_edf2fiff_rwr",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1993,16 +1993,16 @@
       "mne_cpp": "FiffCov picking",
       "python": "mne.pick_channels_cov",
       "claimed": "implemented",
-      "test": "test_fiff_cov",
-      "evidence": "tested"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::pick_channels",
       "python": "mne.pick_channels_forward",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2345,8 +2345,8 @@
       "mne_cpp": "FiffCoordTrans::read",
       "python": "mne.read_trans",
       "claimed": "implemented",
-      "test": "test_fiff_coord_trans",
-      "evidence": "tested"
+      "test": "test_fiff_fs_library",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
