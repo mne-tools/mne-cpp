@@ -29,6 +29,7 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <cmath>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -118,6 +119,72 @@ FsLabel FsLabelUtils::growLabel(const FsLabel& label,
     }
 
     return result;
+}
+
+//=============================================================================================================
+
+FsLabel FsLabelUtils::growCircularLabel(const FsSurface& surface,
+                                        const QVector<int>& seeds,
+                                        double extentMm,
+                                        int hemi,
+                                        const QString& name)
+{
+    // Adapted from mne.label._verts_within_dist / _grow_labels (MNE-Python, BSD-3-Clause).
+    const MatrixX3f& rr = surface.rr();
+    const int nVerts = static_cast<int>(rr.rows());
+
+    // Neighbours in ascending order (the CSR order of mne.surface.mesh_dist) with edge lengths in mm
+    const QList<QSet<int>> adjacency = buildAdjacency(surface.tris(), nVerts);
+    QVector<QVector<QPair<int, double>>> graph(nVerts);
+    for (int v = 0; v < nVerts; ++v) {
+        QList<int> neighbours(adjacency[v].begin(), adjacency[v].end());
+        std::sort(neighbours.begin(), neighbours.end());
+        for (int n : neighbours)
+            graph[v].append({n, 1000.0 * (rr.row(n) - rr.row(v)).cast<double>().norm()});
+    }
+
+    QHash<int, double> distMap;
+    QVector<int> addedLast;
+    for (int seed : seeds) {
+        if (seed < 0 || seed >= nVerts)
+            continue;
+        distMap.insert(seed, 0.0);
+        addedLast.append(seed);
+    }
+    while (!addedLast.isEmpty()) {
+        QVector<int> added;
+        for (int i : std::as_const(addedLast)) {
+            const double vDist = distMap.value(i);
+            for (const auto& [j, d] : std::as_const(graph[i])) {
+                const double nDist = vDist + d;
+                const auto it = distMap.find(j);
+                if (it != distMap.end()) {
+                    if (nDist < it.value())
+                        it.value() = nDist;
+                } else if (nDist <= extentMm) {
+                    distMap.insert(j, nDist);
+                    added.append(j);
+                }
+            }
+        }
+        addedLast = added;
+    }
+
+    QList<int> verts = distMap.keys();
+    std::sort(verts.begin(), verts.end());
+    FsLabel label;
+    label.hemi = hemi;
+    const QString suffix = hemi == 0 ? QStringLiteral("lh") : QStringLiteral("rh");
+    label.name = name.endsWith(suffix) ? name : name + "-" + suffix;
+    label.vertices.resize(verts.size());
+    label.pos.resize(verts.size(), 3);
+    label.values.resize(verts.size());
+    for (int k = 0; k < verts.size(); ++k) {
+        label.vertices[k] = verts[k];
+        label.pos.row(k) = rr.row(verts[k]);
+        label.values[k] = std::trunc(distMap.value(verts[k]));
+    }
+    return label;
 }
 
 //=============================================================================================================

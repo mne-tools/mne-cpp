@@ -55,6 +55,35 @@ Starting from the seed vertices in the label, expands outward by nSteps along su
 
 ---
 
+### growCircularLabel(surface, seeds, extentMm, hemi, name)
+
+Grow a circular label around seed vertices, as mne.grow_labels does for one seed set.
+
+Vertices within `extentMm` geodesic distance along the mesh edges are included, following mne's label growing (a distance found later is lowered but not propagated again). The label values are the distances in whole millimetres, as in MNE-Python.
+
+**Parameters:**
+
+- **surface** : *const [FsSurface](/docs/api/fs/fs-surface) &*
+  Surface of the hemisphere.
+
+- **seeds** : *const QVector&lt; int &gt; &*
+  Seed vertices.
+
+- **extentMm** : *double*
+  Maximum geodesic distance in mm.
+
+- **hemi** : *int*
+  Hemisphere (0 = lh, 1 = rh).
+
+- **name** : *const QString &*
+  Label name; "-lh" / "-rh" is appended unless present.
+
+**Returns:**
+
+- *[FsLabel](/docs/api/fs/fs-label)* — The grown label, vertices ascending.
+
+---
+
 ### splitLabel(label, surface)
 
 Split a label into connected components.

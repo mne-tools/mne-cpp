@@ -12370,9 +12370,9 @@
       {
         "python": "mne.grow_labels",
         "status": "partial",
-        "mne_cpp": "FsLabelUtils::growLabel",
-        "note": "edge-hop count; no mm extent or multiple seeds",
-        "test": "test_label_utils"
+        "mne_cpp": "FsLabelUtils::growCircularLabel",
+        "note": "one seed set per call; no overlap=False or colors",
+        "test": "test_fs_annotation_labels"
       },
       {
         "python": "mne.head_to_mni",

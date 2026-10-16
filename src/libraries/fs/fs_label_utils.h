@@ -48,6 +48,7 @@
 
 #include <QList>
 #include <QSet>
+#include <QVector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FSLIB
@@ -86,6 +87,27 @@ public:
     static FsLabel growLabel(const FsLabel& label,
                              const FsSurface& surface,
                              int nSteps);
+
+    /**
+     * @brief Grow a circular label around seed vertices, as mne.grow_labels does for one seed set.
+     *
+     * Vertices within @p extentMm geodesic distance along the mesh edges are included, following
+     * mne's label growing (a distance found later is lowered but not propagated again). The label
+     * values are the distances in whole millimetres, as in MNE-Python.
+     *
+     * @param[in] surface   Surface of the hemisphere.
+     * @param[in] seeds     Seed vertices.
+     * @param[in] extentMm  Maximum geodesic distance in mm.
+     * @param[in] hemi      Hemisphere (0 = lh, 1 = rh).
+     * @param[in] name      Label name; "-lh" / "-rh" is appended unless present.
+     *
+     * @return The grown label, vertices ascending.
+     */
+    static FsLabel growCircularLabel(const FsSurface& surface,
+                                     const QVector<int>& seeds,
+                                     double extentMm,
+                                     int hemi,
+                                     const QString& name);
 
     //=========================================================================================================
     /**

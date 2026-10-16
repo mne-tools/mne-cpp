@@ -326,6 +326,48 @@ private slots:
             }
         }
     }
+
+    //=========================================================================
+    // FsLabelUtils::growCircularLabel vs mne.grow_labels
+    //=========================================================================
+    void labelUtils_growCircular_data()
+    {
+        // Reference values produced by mne.label._verts_within_dist(mesh_dist(tris, rr), seeds, extent) on this
+        // lh.white, the core of mne.grow_labels(..., surface="white") (mne 1.11): vertex count, first and last
+        // vertices, sum of the (int mm) label values.
+        QTest::addColumn<QVector<int>>("seeds");
+        QTest::addColumn<double>("extent");
+        QTest::addColumn<int>("count");
+        QTest::addColumn<QVector<int>>("head");
+        QTest::addColumn<QVector<int>>("tail");
+        QTest::addColumn<double>("valueSum");
+        QTest::newRow("one seed, 4.5 mm") << QVector<int>{1000} << 4.5 << 98 << QVector<int>{74, 83, 215, 216, 217}
+                                          << QVector<int>{2398, 2399, 2408} << 236.0;
+        QTest::newRow("two seeds, 2.5 mm") << QVector<int>{1000, 50000} << 2.5 << 62 << QVector<int>{242, 250, 251, 575, 589}
+                                           << QVector<int>{52795, 52796, 52818} << 62.0;
+    }
+
+    void labelUtils_growCircular()
+    {
+        QFETCH(QVector<int>, seeds);
+        QFETCH(double, extent);
+        QFETCH(int, count);
+        QFETCH(QVector<int>, head);
+        QFETCH(QVector<int>, tail);
+        QFETCH(double, valueSum);
+
+        const FsSurface surf(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white");
+        QVERIFY(!surf.isEmpty());
+        const FsLabel label = FsLabelUtils::growCircularLabel(surf, seeds, extent, 0, "seed");
+        QCOMPARE(static_cast<int>(label.vertices.size()), count);
+        for (int i = 0; i < head.size(); ++i)
+            QCOMPARE(label.vertices[i], head[i]);
+        for (int i = 0; i < tail.size(); ++i)
+            QCOMPARE(label.vertices[count - tail.size() + i], tail[i]);
+        QCOMPARE(label.values.sum(), valueSum);
+        QCOMPARE(label.name, QString("seed-lh"));
+        QCOMPARE(label.pos.row(0), surf.rr().row(head[0]));
+    }
 };
 
 QTEST_GUILESS_MAIN(TestFsAnnotationLabels)

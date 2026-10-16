@@ -91,7 +91,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.compute_proj_raw` | partial | FIFFLIB::FiffProj::compute_from_raw | event-locked epochs only; no continuous segmenting |
 | `mne.compute_rank` | partial | MATHLIB::Linalg::rank | matrix rank; no per-type/info/SSP handling |
 | `mne.get_volume_labels_from_aseg` | partial | FSLIB::FsAtlasLookup::load | loads aseg; no listing of present labels |
-| `mne.grow_labels` | partial | FsLabelUtils::growLabel | edge-hop count; no mm extent or multiple seeds |
+| `mne.grow_labels` | partial | FsLabelUtils::growCircularLabel | one seed set per call; no overlap=False or colors |
 | `mne.head_to_mni` | partial | FSLIB (partial) | MNI transform limited |
 | `mne.label_sign_flip` | partial | InvLabelTimeCourse::computeSignFlip | signs from data SVD, not source normals |
 | `mne.labels_to_stc` | partial | FsLabelUtils::labelsToStc | binary mask only; no per-label values |

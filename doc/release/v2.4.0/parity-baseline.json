@@ -22,9 +22,9 @@
   "summary": {
     "claims": 361,
     "by_evidence": {
-      "cross-validated-static": 179,
+      "cross-validated-static": 180,
       "cross-validated-live": 4,
-      "tested": 174,
+      "tested": 173,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 148,
+        "cross-validated-static": 149,
         "cross-validated-live": 3,
-        "tested": 117,
+        "tested": 116,
         "unverified": 4
       }
     },
@@ -1589,11 +1589,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FsLabelUtils::growLabel",
+      "mne_cpp": "FsLabelUtils::growCircularLabel",
       "python": "mne.grow_labels",
       "claimed": "partial",
-      "test": "test_label_utils",
-      "evidence": "tested"
+      "test": "test_fs_annotation_labels",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

@@ -1251,8 +1251,8 @@
       "kind": "function",
       "domain": "core",
       "status": "partial",
-      "mne_cpp": "FsLabelUtils::growLabel",
-      "note": "edge-hop count; no mm extent or multiple seeds",
+      "mne_cpp": "FsLabelUtils::growCircularLabel",
+      "note": "one seed set per call; no overlap=False or colors",
       "evidence": "parity-record"
     },
     {
