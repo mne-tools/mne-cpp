@@ -22,9 +22,9 @@
   "summary": {
     "claims": 361,
     "by_evidence": {
-      "cross-validated-static": 123,
+      "cross-validated-static": 129,
       "cross-validated-live": 4,
-      "tested": 230,
+      "tested": 224,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 99,
+        "cross-validated-static": 105,
         "cross-validated-live": 3,
-        "tested": 166,
+        "tested": 160,
         "unverified": 4
       }
     },
@@ -2514,7 +2514,7 @@
       "python": "mne.spatial_src_adjacency",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2538,7 +2538,7 @@
       "python": "mne.spatio_temporal_src_adjacency",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2618,7 +2618,7 @@
       "python": "mne.stats.spatio_temporal_cluster_1samp_test",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2626,7 +2626,7 @@
       "python": "mne.stats.spatio_temporal_cluster_test",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2634,7 +2634,7 @@
       "python": "mne.stats.ttest_1samp_no_p",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2642,7 +2642,7 @@
       "python": "mne.stats.ttest_ind_no_p",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

@@ -527,6 +527,7 @@ void TestStsCluster::testTtestsMatchScipy()
         }
     }
 
+    // mne.stats.ttest_1samp_no_p and ttest_ind_no_p (sigma=0) give the same t values without p.
     // scipy.stats.ttest_1samp(A, 0.25) / ttest_rel(A, P) / ttest_ind(A, B), alternative two-sided/less/greater
     const QVector<double> tOne = {1.72357449612, 1.56814718017, 1.94780768253, -1.06363101376, -0.984430170265};
     const QVector<double> tInd = {1.65862122237, 1.82881258626, 2.41803907298, -0.00604345427716, 0.0115994204498};
@@ -642,6 +643,7 @@ void TestStsCluster::testTrisAdjacencyMatchesMne()
 {
     MatrixX3i tris(4, 3);
     tris << 0, 1, 2, 1, 3, 2, 2, 3, 4, 3, 5, 4;
+    // spatial_src_adjacency and spatio_temporal_src_adjacency build these from a source space's triangles.
     // mne.spatial_tris_adjacency(tris)
     QCOMPARE(upperEdges(StatsAdjacency::fromSourceSpace(tris, 6)).join(' '), QStringLiteral("0-1 0-2 1-2 1-3 2-3 2-4 3-4 3-5 4-5"));
     // mne.spatio_temporal_tris_adjacency(tris, 4), re-indexed from t*nV+v to MNE-CPP's v*nT+t
@@ -728,7 +730,9 @@ void TestStsCluster::testClusterSumsMatchMne()
     for (int s = 0; s < 10; ++s) {
         x.append(oracleSubject(s, -1));
     }
-    // mne.stats.permutation_cluster_1samp_test(X, threshold=+-2, adjacency, tail): T_obs and sorted cluster sums
+    // With this spatio-temporal adjacency these are spatio_temporal_cluster_1samp_test and
+    // spatio_temporal_cluster_test. mne.stats.permutation_cluster_1samp_test(X, threshold=+-2, adjacency, tail):
+    // T_obs and sorted cluster sums
     const QVector<double> tObs = {0.771372356921, 9.09236914862, 9.12936151371, 0.881500872446, 0.754460971088,
                                   8.51877013753, 8.08572445253, -0.185388348512, -0.338456122904, 7.50688531999,
                                   7.61210535246, -0.916448350028, -0.778289560636, -0.653600837936, -0.444949805677,
