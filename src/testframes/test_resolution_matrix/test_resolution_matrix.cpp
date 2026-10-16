@@ -56,6 +56,7 @@ private slots:
     void testCtfsBatch();
     void testSpatialSpread();
     void testPeakLocalisationError();
+    void testMetricsMatchMnePython();
     void testDimensionMismatch();
     void testOutOfRange();
     void cleanupTestCase();
@@ -221,6 +222,37 @@ void TestResolutionMatrix::testPeakLocalisationError()
 
     for (int i = 0; i < n; ++i)
         QVERIFY2(ple[i] < 1e-10, "Identity resolution should have zero PLE.");
+}
+
+//=============================================================================================================
+
+void TestResolutionMatrix::testMetricsMatchMnePython()
+{
+    // Reference values produced by mne.minimum_norm.resolution_metrics (mne 1.11), via its _localisation_error and
+    // _spatial_extent with the source locations below in metres (mne reports cm):
+    //   R[i, j] = sin(1.3 i + 0.7 j) + 2 (i == j); R[4, 1] = 3.5
+    //   pos[k] = 0.05 * (cos(0.9 k), sin(0.9 k), 0.1 k)
+    // CTF metrics are the PSF metrics of R^T.
+    const int n = 6;
+    MatrixXd R(n, n);
+    MatrixX3d posCm(n, 3);
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j)
+            R(i, j) = std::sin(1.3 * i + 0.7 * j) + (i == j ? 2.0 : 0.0);
+        posCm.row(i) << 5.0 * std::cos(0.9 * i), 5.0 * std::sin(0.9 * i), 0.5 * i;
+    }
+    R(4, 1) = 3.5;
+
+    const VectorXd psfPeak = (VectorXd(n) << 0, 9.87185935378, 0, 0, 0, 0).finished();
+    const VectorXd psfSd = (VectorXd(n) << 4.97453964319, 7.63115913768, 6.34498537097, 4.8744455778, 3.33926452767, 6.10541101403).finished();
+    const VectorXd ctfPeak = (VectorXd(n) << 0, 0, 0, 0, 9.87185935378, 0).finished();
+    const VectorXd ctfSd = (VectorXd(n) << 5.02001029439, 4.08609119997, 4.70357224416, 5.35444309551, 7.47929357294, 6.7224570419).finished();
+
+    QVERIFY((InvResolutionMatrix::peakLocalisationError(R, posCm) - psfPeak).cwiseAbs().maxCoeff() < 1e-9);
+    QVERIFY((InvResolutionMatrix::peakLocalisationError(R.transpose(), posCm) - ctfPeak).cwiseAbs().maxCoeff() < 1e-9);
+    const VectorXd sd = InvResolutionMatrix::spatialSpread(R, posCm);
+    QVERIFY2((sd - psfSd).cwiseAbs().maxCoeff() < 1e-9, qPrintable(QString::number(sd[0], 'g', 12)));
+    QVERIFY((InvResolutionMatrix::spatialSpread(R.transpose(), posCm) - ctfSd).cwiseAbs().maxCoeff() < 1e-9);
 }
 
 //=============================================================================================================

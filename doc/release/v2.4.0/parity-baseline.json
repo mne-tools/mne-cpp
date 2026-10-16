@@ -22,22 +22,22 @@
   "summary": {
     "claims": 361,
     "by_evidence": {
-      "cross-validated-static": 175,
+      "cross-validated-static": 179,
       "cross-validated-live": 4,
-      "tested": 178,
+      "tested": 174,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 30,
+        "cross-validated-static": 31,
         "cross-validated-live": 1,
-        "tested": 58,
+        "tested": 57,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 145,
+        "cross-validated-static": 148,
         "cross-validated-live": 3,
-        "tested": 120,
+        "tested": 117,
         "unverified": 4
       }
     },
@@ -83,6 +83,7 @@
         "test_mne_raw_data_python",
         "test_mne_source_space_ops_python",
         "test_mne_source_space_python",
+        "test_resolution_matrix",
         "test_sensor_field_mapper",
         "test_source_estimate_io",
         "test_spectral_connectivity",
@@ -384,7 +385,7 @@
       "python": "mne.minimum_norm.make_inverse_resolution_matrix",
       "claimed": "implemented",
       "test": "test_resolution_matrix",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1928,7 +1929,7 @@
       "python": "mne.minimum_norm.get_cross_talk",
       "claimed": "partial",
       "test": "test_resolution_matrix",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1936,7 +1937,7 @@
       "python": "mne.minimum_norm.get_point_spread",
       "claimed": "partial",
       "test": "test_resolution_matrix",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1968,7 +1969,7 @@
       "python": "mne.minimum_norm.resolution_metrics",
       "claimed": "partial",
       "test": "test_resolution_matrix",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

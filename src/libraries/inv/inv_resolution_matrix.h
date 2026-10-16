@@ -123,8 +123,9 @@ public:
     /**
      * Compute spatial spread (peak-width) metric for each source.
      *
-     * For each source, the spatial spread is the standard deviation of the
-     * squared PSF weighted by distance from the peak.
+     * The spatial deviation "sd_ext" of mne.minimum_norm.resolution_metrics: the root-mean-square
+     * distance from the true source, weighted by the squared PSF. Pass the transposed resolution
+     * matrix for the CTF metric. Distances are in the units of @p matPositions (mne reports cm).
      *
      * @param[in] matResolution   Resolution matrix (n_sources × n_sources).
      * @param[in] matPositions    Source positions (n_sources × 3).
@@ -138,7 +139,8 @@ public:
      * Compute peak localisation error for each source.
      *
      * Distance between true source location and the location of the
-     * maximum of the PSF.
+     * maximum of the PSF ("peak_err" of mne.minimum_norm.resolution_metrics; pass the transposed
+     * resolution matrix for the CTF metric).
      *
      * @param[in] matResolution   Resolution matrix (n_sources × n_sources).
      * @param[in] matPositions    Source positions (n_sources × 3).

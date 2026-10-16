@@ -129,20 +129,10 @@ VectorXd InvResolutionMatrix::spatialSpread(const MatrixXd& matResolution,
             continue;
         }
 
-        // Normalise to distribution
-        psf /= psfSum;
-
-        // Compute weighted mean distance from source s
-        double meanDist = 0.0;
-        double meanDist2 = 0.0;
-        for (int j = 0; j < nSrc; ++j) {
-            double dist = (matPositions.row(j) - matPositions.row(s)).norm();
-            meanDist += psf[j] * dist;
-            meanDist2 += psf[j] * dist * dist;
-        }
-
-        // Standard deviation of the distance distribution
-        spread[s] = std::sqrt(std::max(0.0, meanDist2 - meanDist * meanDist));
+        double weighted = 0.0;
+        for (int j = 0; j < nSrc; ++j)
+            weighted += psf[j] * (matPositions.row(j) - matPositions.row(s)).squaredNorm();
+        spread[s] = std::sqrt(weighted / psfSum);
     }
 
     return spread;
