@@ -96,6 +96,26 @@ public:
                                        int stepSize = -1,
                                        double halfBandwidth = 4.0,
                                        int nTapers = -1);
+
+    //=========================================================================================================
+    /**
+     * Compute multitaper power at every sample with frequency-specific DPSS wavelets, as
+     * mne.time_frequency.tfr_array_multitaper(..., output="power") does for one epoch.
+     *
+     * @param[in] matData        Data matrix (n_channels × n_times).
+     * @param[in] sfreq          Sampling frequency in Hz.
+     * @param[in] vecFreqs       Frequencies of interest in Hz.
+     * @param[in] nCycles        Number of cycles in each wavelet (default 7).
+     * @param[in] timeBandwidth  Time-bandwidth product; floor(timeBandwidth - 1) tapers (default 4).
+     * @param[in] zeroMean       Make each wavelet zero mean (default true).
+     * @return                   MultitaperTfrResult: per channel n_freqs × n_times, vecTimes = sample times.
+     */
+    static MultitaperTfrResult computeArray(const Eigen::MatrixXd& matData,
+                                            double sfreq,
+                                            const Eigen::RowVectorXd& vecFreqs,
+                                            double nCycles = 7.0,
+                                            double timeBandwidth = 4.0,
+                                            bool zeroMean = true);
 };
 
 } // namespace UTILSLIB

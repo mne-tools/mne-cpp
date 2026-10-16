@@ -14036,8 +14036,8 @@
       {
         "python": "mne.time_frequency.tfr_array_multitaper",
         "status": "partial",
-        "mne_cpp": "UTILSLIB::MultitaperTfr::compute",
-        "note": "sliding-window multitaper spectrogram on FFT bins, not per-frequency multitaper wavelets",
+        "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
+        "note": "power for one epoch; no complex/ITC/decim",
         "test": "test_dsp_multitaper"
       },
       {
@@ -14056,8 +14056,8 @@
       {
         "python": "mne.time_frequency.tfr_multitaper",
         "status": "partial",
-        "mne_cpp": "UTILSLIB::MultitaperTfr::compute",
-        "note": "sliding-window multitaper spectrogram on FFT bins; no Epochs/Evoked input",
+        "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
+        "note": "matrix input; no Epochs/Evoked, averaging or ITC",
         "test": "test_dsp_multitaper"
       },
       {

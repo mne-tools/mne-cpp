@@ -2838,7 +2838,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "UTILSLIB::MultitaperTfr::compute",
+      "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
       "python": "mne.time_frequency.tfr_array_multitaper",
       "claimed": "partial",
       "test": "test_dsp_multitaper",
@@ -2854,7 +2854,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "UTILSLIB::MultitaperTfr::compute",
+      "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
       "python": "mne.time_frequency.tfr_multitaper",
       "claimed": "partial",
       "test": "test_dsp_multitaper",

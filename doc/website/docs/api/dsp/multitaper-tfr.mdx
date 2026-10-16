@@ -61,6 +61,36 @@ Compute sliding-window multitaper TFR for every channel of a data matrix.
 
 ---
 
+### computeArray(matData, sfreq, vecFreqs, nCycles, timeBandwidth, zeroMean)
+
+Compute multitaper power at every sample with frequency-specific DPSS wavelets, as mne.time_frequency.tfr_array_multitaper(..., output="power") does for one epoch.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data matrix (n_channels × n_times).
+
+- **sfreq** : *double*
+  Sampling frequency in Hz.
+
+- **vecFreqs** : *const Eigen::RowVectorXd &*
+  Frequencies of interest in Hz.
+
+- **nCycles** : *double*
+  Number of cycles in each wavelet (default 7).
+
+- **timeBandwidth** : *double*
+  Time-bandwidth product; floor(timeBandwidth - 1) tapers (default 4).
+
+- **zeroMean** : *bool*
+  Make each wavelet zero mean (default true).
+
+**Returns:**
+
+- *[MultitaperTfrResult](/docs/api/dsp/multitaper-tfr-result)* — [`MultitaperTfrResult`](/docs/api/dsp/multitaper-tfr-result): per channel n_freqs × n_times, vecTimes = sample times.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)

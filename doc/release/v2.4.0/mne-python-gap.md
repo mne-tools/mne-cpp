@@ -271,9 +271,9 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.time_frequency.read_spectrum` | partial | Spectral (partial) | spectrum I/O limited |
 | `mne.time_frequency.stft` | partial | Spectrogram::makeSpectrogram | Gaussian-window magnitude only; no complex output/istft |
 | `mne.time_frequency.tfr_array_morlet` | partial | MorletTfr::computeMultiChannel | power only; single epoch; no complex/ITC |
-| `mne.time_frequency.tfr_array_multitaper` | partial | UTILSLIB::MultitaperTfr::compute | sliding-window multitaper spectrogram on FFT bins, not per-frequency multitaper wavelets |
+| `mne.time_frequency.tfr_array_multitaper` | partial | UTILSLIB::MultitaperTfr::computeArray | power for one epoch; no complex/ITC/decim |
 | `mne.time_frequency.tfr_morlet` | partial | MorletTfr::compute | no Epochs input, averaging or ITC |
-| `mne.time_frequency.tfr_multitaper` | partial | UTILSLIB::MultitaperTfr::compute | sliding-window multitaper spectrogram on FFT bins; no Epochs/Evoked input |
+| `mne.time_frequency.tfr_multitaper` | partial | UTILSLIB::MultitaperTfr::computeArray | matrix input; no Epochs/Evoked, averaging or ITC |
 | `mne.time_frequency.EpochsTFR` | missing | — | no per-epoch TFR container |
 | `mne.time_frequency.EpochsTFRArray` | missing | — |  |
 | `mne.time_frequency.combine_tfr` | missing | — |  |

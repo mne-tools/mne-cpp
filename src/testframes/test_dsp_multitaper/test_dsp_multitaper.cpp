@@ -69,6 +69,7 @@ private slots:
     // MultitaperTfr tests
     void testTfrSinusoidal();
     void testTfrOutputDimensions();
+    void testTfrArrayMatchesMnePython();
 
     void cleanupTestCase();
 
@@ -179,6 +180,50 @@ void TestDspMultitaper::testDpssPeriodicMatchesScipy()
     const double got[] = {r.matTapers(0, 0), r.matTapers(0, 31), r.matTapers(1, 10), r.matTapers(3, 63)};
     for (int i = 0; i < 4; ++i)
         QVERIFY2(std::abs(std::abs(got[i]) - values[i]) < 1e-10, qPrintable(QString::number(got[i], 'g', 15)));
+}
+
+//=============================================================================================================
+
+void TestDspMultitaper::testTfrArrayMatchesMnePython()
+{
+    // Reference values produced by mne.time_frequency.tfr_array_multitaper (mne 1.11), samples 0, 60, 250, 499:
+    //   t = np.arange(500) / 250.0
+    //   x = np.sin(2 * np.pi * 10 * t) + 0.5 * np.sin(2 * np.pi * 23 * t + 0.3) + 0.2 * t
+    //   X = np.vstack([x, 0.5 * x[::-1]])[None]
+    //   p = tfr_array_multitaper(X, 250.0, [10.0, 23.0], n_cycles=7.0, output="power")[0]
+    //   p2 = tfr_array_multitaper(X, 250.0, [12.0], n_cycles=4.0, time_bandwidth=2.0, output="power")[0]  (one taper)
+    const double expected[][4] = {{25.99696018, 44.57379396, 55.89384535, 25.30231975},
+                                  {2.526671131, 5.75941098, 5.659913868, 2.363407711},
+                                  {6.299555182, 11.08129722, 13.96705792, 6.528146109},
+                                  {0.5866075026, 1.42166134, 1.417204589, 0.6387035949}};
+    const double oneTaper[] = {4.812554785, 11.73626228, 11.93555391, 5.32965808};
+    const int samples[] = {0, 60, 250, 499};
+
+    const double sfreq = 250.0;
+    MatrixXd data(2, 500);
+    for (int n = 0; n < 500; ++n) {
+        const double t = n / sfreq;
+        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.5 * std::sin(2.0 * M_PI * 23.0 * t + 0.3) + 0.2 * t;
+    }
+    data.row(1) = 0.5 * data.row(0).reverse();
+
+    RowVectorXd freqs(2);
+    freqs << 10.0, 23.0;
+    const MultitaperTfrResult r = MultitaperTfr::computeArray(data, sfreq, freqs);
+    RowVectorXd freq12(1);
+    freq12 << 12.0;
+    const MultitaperTfrResult r1 = MultitaperTfr::computeArray(data, sfreq, freq12, 4.0, 2.0);
+
+    for (int s = 0; s < 4; ++s) {
+        for (int row = 0; row < 4; ++row) {
+            const double got = r.tfrData[row / 2](row % 2, samples[s]);
+            QVERIFY2(std::abs(got - expected[row][s]) <= 1e-6 * expected[row][s],
+                     qPrintable(QString("ch %1 freq %2 sample %3: %4 vs mne %5").arg(row / 2).arg(row % 2).arg(samples[s]).arg(got, 0, 'g', 10).arg(expected[row][s], 0, 'g', 10)));
+        }
+        const double got = r1.tfrData[0](0, samples[s]);
+        QVERIFY2(std::abs(got - oneTaper[s]) <= 1e-6 * oneTaper[s],
+                 qPrintable(QString("one taper sample %1: %2 vs mne %3").arg(samples[s]).arg(got, 0, 'g', 10).arg(oneTaper[s], 0, 'g', 10)));
+    }
 }
 
 //=============================================================================================================

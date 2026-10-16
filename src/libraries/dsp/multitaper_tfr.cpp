@@ -32,6 +32,8 @@
 //=============================================================================================================
 
 #include <cmath>
+#include <complex>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -127,6 +129,68 @@ MultitaperTfrResult MultitaperTfr::compute(const MatrixXd& matData,
         }
 
         result.tfrData.append(tfr);
+    }
+
+    return result;
+}
+
+//=============================================================================================================
+
+MultitaperTfrResult MultitaperTfr::computeArray(const MatrixXd& matData,
+                                                double sfreq,
+                                                const RowVectorXd& vecFreqs,
+                                                double nCycles,
+                                                double timeBandwidth,
+                                                bool zeroMean)
+{
+    const int nChannels = static_cast<int>(matData.rows());
+    const int nTimes = static_cast<int>(matData.cols());
+    const int nFreqs = static_cast<int>(vecFreqs.size());
+    const int nTap = static_cast<int>(std::floor(timeBandwidth - 1.0));
+
+    MultitaperTfrResult result;
+    result.vecFreqs = vecFreqs;
+    result.vecTimes = RowVectorXd::LinSpaced(nTimes, 0.0, (nTimes - 1) / sfreq);
+    for (int ch = 0; ch < nChannels; ++ch)
+        result.tfrData.append(MatrixXd::Zero(nFreqs, nTimes));
+
+    for (int fi = 0; fi < nFreqs; ++fi) {
+        const double f = vecFreqs[fi];
+        const double tWin = nCycles / f;
+        // Length of np.arange(0.0, t_win, 1.0 / sfreq)
+        const int nWav = static_cast<int>(std::ceil(tWin / (1.0 / sfreq)));
+        const DpssResult dpss = Dpss::compute(nWav, timeBandwidth / 2.0, nTap, false);
+
+        double weightSum = 0.0;
+        for (int m = 0; m < nTap; ++m) {
+            // Oscillation centred on the window before tapering
+            VectorXcd wavelet(nWav);
+            for (int k = 0; k < nWav; ++k) {
+                const double phase = 2.0 * std::numbers::pi * f * (k * (1.0 / sfreq) - tWin / 2.0);
+                wavelet[k] = dpss.matTapers(m, k) * std::complex<double>(std::cos(phase), std::sin(phase));
+            }
+            if (zeroMean)
+                wavelet.array() -= wavelet.mean();
+            wavelet /= std::sqrt(0.5) * wavelet.norm();
+
+            const double weight = dpss.vecEigenvalues[m]; // squared sqrt(concentration)
+            weightSum += weight;
+
+            // 'same' convolution: centre of the full convolution
+            const int offset = (nWav - 1) / 2;
+            for (int ch = 0; ch < nChannels; ++ch) {
+                for (int t = 0; t < nTimes; ++t) {
+                    std::complex<double> sum(0.0, 0.0);
+                    const int n = t + offset;
+                    for (int k = std::max(0, n - nTimes + 1); k <= std::min(nWav - 1, n); ++k)
+                        sum += matData(ch, n - k) * wavelet[k];
+                    result.tfrData[ch](fi, t) += weight * std::norm(sum);
+                }
+            }
+        }
+        if (nTap > 1)
+            for (int ch = 0; ch < nChannels; ++ch)
+                result.tfrData[ch].row(fi) *= 2.0 / weightSum;
     }
 
     return result;
