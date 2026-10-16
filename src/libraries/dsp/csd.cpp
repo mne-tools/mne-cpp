@@ -16,6 +16,7 @@
 
 #include "csd.h"
 #include "dpss.h"
+#include "morlet_tfr.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -241,29 +242,11 @@ CsdResult Csd::computeMorlet(const MatrixXd& matData,
     MatrixXcd meanCsd = MatrixXcd::Zero(nChannels, nChannels);
 
     for (int fi = 0; fi < nFreqs; ++fi) {
-        const double f = frequencies[fi];
-        const double sigma = static_cast<double>(nCycles) / (2.0 * CSD_PI * f);
+        int halfLen = 0;
+        const VectorXcd wavelet = MorletTfr::buildWavelet(frequencies[fi], sfreq, nCycles, halfLen);
+        const int wavLen = static_cast<int>(wavelet.size());
 
-        // Determine wavelet length: ±3σ in samples
-        const int halfLen = static_cast<int>(std::ceil(3.0 * sigma * sfreq));
-        const int wavLen = 2 * halfLen + 1;
-
-        // Build Morlet wavelet
-        VectorXcd wavelet(wavLen);
-        double normFactor = 0.0;
-        for (int n = 0; n < wavLen; ++n) {
-            const double t = (static_cast<double>(n) - static_cast<double>(halfLen)) / sfreq;
-            const double gauss = std::exp(-t * t / (2.0 * sigma * sigma));
-            wavelet[n] = std::complex<double>(gauss * std::cos(2.0 * CSD_PI * f * t),
-                                              gauss * std::sin(2.0 * CSD_PI * f * t));
-            normFactor += gauss * gauss;
-        }
-        // Normalize wavelet for unit energy
-        normFactor = std::sqrt(normFactor);
-        if (normFactor > 0.0)
-            wavelet /= normFactor;
-
-        // Convolve each channel with the wavelet → complex analytic signal
+        // Same-length convolution; conj(w[k]) = w[wavLen - 1 - k] for a Morlet wavelet without offset
         MatrixXcd analytic(nChannels, nTimes);
 
         for (int ch = 0; ch < nChannels; ++ch) {
@@ -285,7 +268,8 @@ CsdResult Csd::computeMorlet(const MatrixXd& matData,
             VectorXcd col = analytic.col(t);
             csdAtFreq += col * col.adjoint();
         }
-        csdAtFreq /= static_cast<double>(nTimes);
+        // Scaled by the sampling frequency like mne.time_frequency.csd_array_morlet
+        csdAtFreq /= static_cast<double>(nTimes) * sfreq;
 
         result.csdByFreq[fi] = csdAtFreq;
         meanCsd += csdAtFreq;

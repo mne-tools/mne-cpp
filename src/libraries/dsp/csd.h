@@ -118,7 +118,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Compute CSD using Morlet wavelet convolution.
+     * Compute CSD using Morlet wavelet convolution, scaled like mne.time_frequency.csd_array_morlet.
      *
      * @param[in] matData       Data matrix (n_channels × n_samples).
      * @param[in] sfreq         Sampling frequency in Hz.

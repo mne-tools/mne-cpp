@@ -22,9 +22,9 @@
   "summary": {
     "claims": 360,
     "by_evidence": {
-      "cross-validated-static": 136,
+      "cross-validated-static": 143,
       "cross-validated-live": 4,
-      "tested": 216,
+      "tested": 209,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 114,
+        "cross-validated-static": 121,
         "cross-validated-live": 3,
-        "tested": 150,
+        "tested": 143,
         "unverified": 4
       }
     },
@@ -47,6 +47,7 @@
         "test_analyze_dipolefit",
         "test_anshared_models",
         "test_dsp_annotate_artifact",
+        "test_dsp_csd",
         "test_dsp_eog_regression",
         "test_dsp_morlet_tfr",
         "test_edf2fiff_rwr",
@@ -2664,7 +2665,7 @@
       "python": "mne.time_frequency.CrossSpectralDensity",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2728,7 +2729,7 @@
       "python": "mne.time_frequency.csd_array_fourier",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2736,7 +2737,7 @@
       "python": "mne.time_frequency.csd_array_morlet",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2744,7 +2745,7 @@
       "python": "mne.time_frequency.csd_array_multitaper",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2752,7 +2753,7 @@
       "python": "mne.time_frequency.csd_fourier",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2760,7 +2761,7 @@
       "python": "mne.time_frequency.csd_morlet",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2768,7 +2769,7 @@
       "python": "mne.time_frequency.csd_multitaper",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

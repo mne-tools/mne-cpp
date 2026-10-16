@@ -64,6 +64,8 @@ private slots:
     // computeMorlet
     void testMorletBasic();
     void testMorletDimensions();
+    void testMorletMatchesMnePython_data();
+    void testMorletMatchesMnePython();
 
     // Frequency range filtering
     void testFreqRangeFiltering();
@@ -242,6 +244,46 @@ void TestDspCsd::testMorletDimensions()
     QCOMPARE(static_cast<int>(result.matCsd.rows()), nChannels);
     QCOMPARE(static_cast<int>(result.matCsd.cols()), nChannels);
     QCOMPARE(static_cast<int>(result.vecFreqs.size()), 5);
+}
+
+//=============================================================================================================
+
+void TestDspCsd::testMorletMatchesMnePython_data()
+{
+    // Reference values produced by mne.time_frequency.csd_array_morlet (mne 1.11), csd.get_data(f):
+    //   sf = 250.0; t = np.arange(400) / sf
+    //   x0 = np.sin(2 * np.pi * 10 * t) + 0.3 * np.cos(2 * np.pi * 23 * t)
+    //   x1 = 0.5 * np.sin(2 * np.pi * 10 * t + 0.7) + 0.1 * t
+    //   csd_array_morlet(np.vstack([x0, x1])[None], sf, [10.0, 23.0], n_cycles=7)
+    // Columns: C[0,0].real, C[1,1].real, C[0,1].real, C[0,1].imag
+    QTest::addColumn<int>("freqIdx");
+    QTest::addColumn<QList<double>>("expected");
+    QTest::newRow("10 Hz") << 0 << QList<double>{0.1786966822, 0.04449223796, 0.0680768535, -0.05754203599};
+    QTest::newRow("23 Hz") << 1 << QList<double>{0.007336678287, 1.566930062e-05, -5.955983278e-05, 1.401813802e-07};
+}
+
+//=============================================================================================================
+
+void TestDspCsd::testMorletMatchesMnePython()
+{
+    QFETCH(int, freqIdx);
+    QFETCH(QList<double>, expected);
+
+    const double sfreq = 250.0;
+    MatrixXd data(2, 400);
+    for (int n = 0; n < data.cols(); ++n) {
+        const double t = n / sfreq;
+        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t);
+        data(1, n) = 0.5 * std::sin(2.0 * M_PI * 10.0 * t + 0.7) + 0.1 * t;
+    }
+    RowVectorXd frequencies(2);
+    frequencies << 10.0, 23.0;
+
+    const MatrixXcd c = Csd::computeMorlet(data, sfreq, frequencies).csdByFreq[freqIdx];
+    const double got[] = {c(0, 0).real(), c(1, 1).real(), c(0, 1).real(), c(0, 1).imag()};
+    for (int i = 0; i < 4; ++i)
+        QVERIFY2(std::abs(got[i] - expected[i]) <= 1e-6 * std::abs(expected[i]),
+                 qPrintable(QString("value %1: %2 vs mne %3").arg(i).arg(got[i], 0, 'g', 10).arg(expected[i], 0, 'g', 10)));
 }
 
 //=============================================================================================================
