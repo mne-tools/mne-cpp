@@ -94,6 +94,33 @@ Prominence is the vertical distance from a peak to the highest valley on either 
 
 ---
 
+### peakFinderMne(data, thresh, extrema)
+
+```cpp
+QList< QPair< int, double > > peakFinderMne(const Eigen::VectorXd & data, double thresh, int extrema);
+```
+
+Noise-tolerant extrema search of `mne.preprocessing.peak_finder`.
+
+A peak must rise at least `thresh` above the minimum to its left and fall at least `thresh` before the next one counts; the end points are candidates too.
+
+**Parameters:**
+
+- **data** : *const Eigen::VectorXd &*
+  Non-empty 1D signal.
+
+- **thresh** : *double*
+  Required rise/fall; NaN = (max - min) / 4.
+
+- **extrema** : *int*
+  1 for maxima, -1 for minima.
+
+**Returns:**
+
+- *QList&lt; QPair&lt; int, double &gt; &gt;* — List of (peak_index, peak_value) pairs, sorted by index.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)

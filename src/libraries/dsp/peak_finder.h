@@ -49,6 +49,8 @@
 #include <QList>
 #include <QPair>
 
+#include <limits>
+
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
@@ -98,6 +100,22 @@ DSPSHARED_EXPORT QList<QPair<int, double>> peakFinder(const Eigen::VectorXd& dat
  */
 DSPSHARED_EXPORT Eigen::VectorXd peakProminences(const Eigen::VectorXd& data,
                                                  const QList<int>& peakIndices);
+
+/**
+ * @brief Noise-tolerant extrema search of @c mne.preprocessing.peak_finder.
+ *
+ * A peak must rise at least @p thresh above the minimum to its left and fall at least @p thresh
+ * before the next one counts; the end points are candidates too.
+ *
+ * @param[in] data      Non-empty 1D signal.
+ * @param[in] thresh    Required rise/fall; NaN = (max - min) / 4.
+ * @param[in] extrema   1 for maxima, -1 for minima.
+ *
+ * @return List of (peak_index, peak_value) pairs, sorted by index.
+ */
+DSPSHARED_EXPORT QList<QPair<int, double>> peakFinderMne(const Eigen::VectorXd& data,
+                                                         double thresh = std::numeric_limits<double>::quiet_NaN(),
+                                                         int extrema = 1);
 
 } // namespace UTILSLIB
 

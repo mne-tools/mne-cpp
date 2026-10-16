@@ -13204,6 +13204,13 @@
         "note": "OTP not ported"
       },
       {
+        "python": "mne.preprocessing.peak_finder",
+        "status": "implemented",
+        "mne_cpp": "UTILSLIB::peakFinderMne",
+        "note": "",
+        "test": "test_dsp_artifact_detect"
+      },
+      {
         "python": "mne.preprocessing.read_eog_regression",
         "status": "missing",
         "mne_cpp": "",

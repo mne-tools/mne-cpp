@@ -22,6 +22,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -137,4 +139,103 @@ QList<QPair<int, double>> UTILSLIB::peakFinder(const VectorXd& data,
     }
 
     return peaks;
+}
+
+//=============================================================================================================
+
+QList<QPair<int, double>> UTILSLIB::peakFinderMne(const VectorXd& data, double thresh, int extrema)
+{
+    // Adapted from mne.preprocessing.peak_finder (MNE-Python, BSD-3-Clause).
+    QList<QPair<int, double>> result;
+    const Index s = data.size();
+    if (s == 0)
+        return result;
+    if (std::isnan(thresh))
+        thresh = (data.maxCoeff() - data.minCoeff()) / 4.0;
+    const VectorXd x0 = extrema < 0 ? VectorXd(-data) : data;
+
+    // Turning points (the first of repeated values) plus both end points
+    std::vector<Index> ind{0};
+    for (Index i = 1; i + 1 < s; ++i) {
+        double left = x0(i) - x0(i - 1);
+        double right = x0(i + 1) - x0(i);
+        if (left == 0.0)
+            left = -std::numeric_limits<double>::epsilon();
+        if (right == 0.0)
+            right = -std::numeric_limits<double>::epsilon();
+        if (left * right < 0.0)
+            ind.push_back(i);
+    }
+    ind.push_back(s - 1);
+    std::vector<double> x(ind.size());
+    for (std::size_t i = 0; i < ind.size(); ++i)
+        x[i] = x0(ind[i]);
+
+    const double minMag = *std::min_element(x.begin(), x.end());
+    std::vector<Index> peakInds;
+    std::vector<double> peakMags;
+    if (x.size() > 2) {
+        double tempMag = minMag;
+        double leftMin = minMag;
+        bool foundPeak = false;
+        Index tempLoc = 0;
+        const auto sign = [](double v) {
+            return (v > 0.0) - (v < 0.0);
+        };
+        const int sign0 = sign(x[1] - x[0]);
+        const int sign1 = sign(x[2] - x[1]);
+        long ii = 0;
+        if (sign0 <= 0) {
+            ii = -1;
+            if (sign0 == sign1) {
+                x.erase(x.begin() + 1);
+                ind.erase(ind.begin() + 1);
+            }
+        } else if (sign0 == sign1) {
+            x.erase(x.begin());
+            ind.erase(ind.begin());
+        }
+        const long length = static_cast<long>(x.size());
+        // mne compares with the last slot of its preallocated peak array, which stays 0 until it is filled
+        const std::size_t maxPeaks = static_cast<std::size_t>(std::ceil(length / 2.0));
+        const auto lastSlot = [&]() {
+            return peakMags.size() == maxPeaks ? peakMags.back() : 0.0;
+        };
+        while (ii < length - 1) {
+            ++ii;
+            if (foundPeak && (x[ii] > lastSlot() || leftMin < lastSlot() - thresh)) {
+                tempMag = minMag;
+                foundPeak = false;
+            }
+            if (ii == length - 1)
+                break;
+            if (x[ii] > tempMag && x[ii] > leftMin + thresh) {
+                tempLoc = ii;
+                tempMag = x[ii];
+            }
+            ++ii;
+            if (!foundPeak && tempMag > thresh + x[ii]) {
+                foundPeak = true;
+                leftMin = x[ii];
+                peakInds.push_back(tempLoc);
+                peakMags.push_back(tempMag);
+            } else if (x[ii] < leftMin) {
+                leftMin = x[ii];
+            }
+        }
+        if (x.back() > tempMag && x.back() > leftMin + thresh) {
+            peakInds.push_back(length - 1);
+            peakMags.push_back(x.back());
+        } else if (!foundPeak && tempMag > minMag) {
+            peakInds.push_back(tempLoc);
+            peakMags.push_back(tempMag);
+        }
+        for (std::size_t k = 0; k < peakInds.size(); ++k)
+            result.append(qMakePair(static_cast<int>(ind[peakInds[k]]), extrema < 0 ? -peakMags[k] : peakMags[k]));
+    } else {
+        const auto best = std::max_element(x.begin(), x.end());
+        if (*best > minMag + thresh)
+            result.append(qMakePair(static_cast<int>(ind[best - x.begin()]), extrema < 0 ? -*best : *best));
+    }
+    return result;
 }

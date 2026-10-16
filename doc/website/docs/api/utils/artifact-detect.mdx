@@ -18,10 +18,10 @@ class UTILSLIB::ArtifactDetect
 ECG and EOG physiological artifact event detection.
 
 ```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
-ArtifactDetect::EcgParams ecg;                                                  // 5-40 Hz band-pass, R peaks at least 0.35 s apart
-ArtifactDetect::EogParams eog;                                                  // 10 Hz low-pass, +-150 uV
+ArtifactDetect::EcgParams ecg;                                                  // mne find_ecg_events defaults: 5-35 Hz, automatic QRS threshold
+ArtifactDetect::EogParams eog;                                                  // mne find_eog_events defaults: 1-10 Hz, automatic peak threshold
 const QVector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq, ecg);  // R-peak samples on the ECG channel
-const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq, eog); // blink onsets on the EOG channel
+const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq, eog); // blink peaks on the EOG channel
 ```
 
 ---
@@ -30,9 +30,9 @@ const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq, eog); 
 
 ### detectEcg(matData, fiffInfo, dSFreq, params)
 
-Detect ECG R-peak events.
+Detect ECG R-peak events as mne.preprocessing.find_ecg_events does.
 
-The function searches [FiffInfo](/docs/api/fiff/fiff-info) for a channel with kind == FIFFV_ECG_CH. If none is found it synthesises an ECG proxy by averaging the absolute gradient-magnetometer data (MEG channels), which often shows a clear cardiac artefact.
+Uses the first good channel with kind == FIFFV_ECG_CH; without one, the mean of the good magnetometers (or, failing those, gradiometers) stands in for it.
 
 **Parameters:**
 
@@ -56,9 +56,9 @@ The function searches [FiffInfo](/docs/api/fiff/fiff-info) for a channel with ki
 
 ### detectEog(matData, fiffInfo, dSFreq, params)
 
-Detect EOG blink/saccade events.
+Detect EOG blink/saccade events as mne.preprocessing.find_eog_events does.
 
-The function searches [FiffInfo](/docs/api/fiff/fiff-info) for channels with kind == FIFFV_EOG_CH. If multiple EOG channels are present the channel with the largest peak-to-peak amplitude is used. Returns an empty vector if no EOG channel is found.
+Of the good channels with kind == FIFFV_EOG_CH, the one with the most 2-45 Hz energy is used. Returns an empty vector if no EOG channel is found.
 
 **Parameters:**
 
@@ -76,7 +76,7 @@ The function searches [FiffInfo](/docs/api/fiff/fiff-info) for channels with kin
 
 **Returns:**
 
-- *QVector&lt; int &gt;* — Sample indices (0-based) of detected EOG events (onset of supra-threshold excursion).
+- *QVector&lt; int &gt;* — Sample indices (0-based) of the detected EOG peaks.
 
 ---
 

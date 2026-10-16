@@ -20,11 +20,11 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 360,
+    "claims": 361,
     "by_evidence": {
-      "cross-validated-static": 158,
+      "cross-validated-static": 167,
       "cross-validated-live": 4,
-      "tested": 194,
+      "tested": 186,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 132,
+        "cross-validated-static": 141,
         "cross-validated-live": 3,
-        "tested": 132,
+        "tested": 124,
         "unverified": 4
       }
     },
@@ -47,6 +47,7 @@
         "test_analyze_dipolefit",
         "test_anshared_models",
         "test_dsp_annotate_artifact",
+        "test_dsp_artifact_detect",
         "test_dsp_csd",
         "test_dsp_eeg_reference",
         "test_dsp_eog_regression",
@@ -2100,7 +2101,7 @@
       "python": "mne.preprocessing.compute_proj_ecg",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2108,7 +2109,7 @@
       "python": "mne.preprocessing.compute_proj_eog",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2116,7 +2117,7 @@
       "python": "mne.preprocessing.create_ecg_epochs",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2124,7 +2125,7 @@
       "python": "mne.preprocessing.create_eog_epochs",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2148,7 +2149,7 @@
       "python": "mne.preprocessing.find_ecg_events",
       "claimed": "implemented",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2156,7 +2157,7 @@
       "python": "mne.preprocessing.find_eog_events",
       "claimed": "implemented",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2164,7 +2165,7 @@
       "python": "mne.preprocessing.ica_find_ecg_events",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2172,7 +2173,7 @@
       "python": "mne.preprocessing.ica_find_eog_events",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2189,6 +2190,14 @@
       "claimed": "partial",
       "test": "test_dsp_sss",
       "evidence": "tested"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "UTILSLIB::peakFinderMne",
+      "python": "mne.preprocessing.peak_finder",
+      "claimed": "implemented",
+      "test": "test_dsp_artifact_detect",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

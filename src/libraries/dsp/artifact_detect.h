@@ -9,12 +9,12 @@
  * @date     March 2026
  * @brief    Declaration of ArtifactDetect — ECG and EOG physiological artifact event detection.
  *
- * ECG detection finds cardiac R-peak events via bandpass filtering (5–40 Hz) followed by
- * an adaptive threshold and local maximum search.  If no dedicated ECG channel is present
- * the algorithm falls back to a synthetic ECG derived from the MEG gradiometer channels.
+ * ECG detection is mne.preprocessing.find_ecg_events: a 5–35 Hz zero-double firwin2 band-pass and the
+ * qrs_detector window search; without an ECG channel the mean of the magnetometers (or gradiometers)
+ * stands in for it.
  *
- * EOG detection finds blink/saccade events by low-pass filtering (1–10 Hz) and applying
- * an absolute amplitude threshold.
+ * EOG detection is mne.preprocessing.find_eog_events: the strongest EOG channel, band-passed 1–10 Hz,
+ * searched with mne.preprocessing.peak_finder.
  */
 
 #ifndef ARTIFACT_DETECT_DSP_H
@@ -55,11 +55,10 @@ namespace UTILSLIB
  */
 struct DSPSHARED_EXPORT ArtifactDetectEcgParams
 {
-    double dFilterLow = 5.0;    /**< Bandpass lower cutoff (Hz). */
-    double dFilterHigh = 40.0;  /**< Bandpass upper cutoff (Hz). */
-    int iFilterOrder = 4;       /**< Butterworth order for the bandpass pre-filter. */
-    double dThreshFactor = 0.5; /**< R-peak threshold = dThreshFactor * (max − min) + min of the filtered signal. */
-    double dMinRRSec = 0.35;    /**< Minimum R–R interval in seconds (caps detection rate at ~170 bpm). */
+    double dFilterLow = 5.0;     /**< Band-pass lower edge in Hz (l_freq). */
+    double dFilterHigh = 35.0;   /**< Band-pass upper edge in Hz (h_freq). */
+    double dQrsThreshold = -1.0; /**< QRS threshold in (0, 1]; negative = "auto" (0.3 ... 1.05, rate closest to the median plausible one). */
+    double dTStart = 0.0;        /**< Seconds to skip at the start (tstart). */
 };
 
 //=============================================================================================================
@@ -70,10 +69,10 @@ struct DSPSHARED_EXPORT ArtifactDetectEcgParams
  */
 struct DSPSHARED_EXPORT ArtifactDetectEogParams
 {
-    double dFilterHigh = 10.0;   /**< Low-pass cutoff (Hz). */
-    int iFilterOrder = 4;        /**< Butterworth order for the low-pass pre-filter. */
-    double dThresholdV = 150e-6; /**< Absolute voltage threshold (V). Events are detected when the signal exceeds ±threshold. */
-    double dMinGapSec = 0.3;     /**< Minimum gap between successive events in seconds. */
+    double dFilterLow = 1.0;                                      /**< Band-pass lower edge in Hz (l_freq). */
+    double dFilterHigh = 10.0;                                    /**< Band-pass upper edge in Hz (h_freq). */
+    double dThreshold = std::numeric_limits<double>::quiet_NaN(); /**< peak_finder threshold; NaN = (max - min) / 4. */
+    double dTStart = 0.0;                                         /**< Seconds to skip at the start (tstart). */
 };
 
 //=============================================================================================================
@@ -90,11 +89,10 @@ public:
 
     //=========================================================================================================
     /**
-     * Detect ECG R-peak events.
+     * Detect ECG R-peak events as mne.preprocessing.find_ecg_events does.
      *
-     * The function searches FiffInfo for a channel with kind == FIFFV_ECG_CH.  If none is found
-     * it synthesises an ECG proxy by averaging the absolute gradient-magnetometer data (MEG channels),
-     * which often shows a clear cardiac artefact.
+     * Uses the first good channel with kind == FIFFV_ECG_CH; without one, the mean of the good
+     * magnetometers (or, failing those, gradiometers) stands in for it.
      *
      * @param[in] matData   Raw data matrix (n_channels × n_samples), calibrated (SI units).
      * @param[in] fiffInfo  Measurement info (channel kinds, names).
@@ -110,10 +108,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Detect EOG blink/saccade events.
+     * Detect EOG blink/saccade events as mne.preprocessing.find_eog_events does.
      *
-     * The function searches FiffInfo for channels with kind == FIFFV_EOG_CH.  If multiple EOG
-     * channels are present the channel with the largest peak-to-peak amplitude is used.
+     * Of the good channels with kind == FIFFV_EOG_CH, the one with the most 2-45 Hz energy is used.
      * Returns an empty vector if no EOG channel is found.
      *
      * @param[in] matData   Raw data matrix (n_channels × n_samples), calibrated (SI units).
@@ -121,7 +118,7 @@ public:
      * @param[in] dSFreq    Sampling frequency in Hz.
      * @param[in] params    Detection parameters.
      *
-     * @return              Sample indices (0-based) of detected EOG events (onset of supra-threshold excursion).
+     * @return              Sample indices (0-based) of the detected EOG peaks.
      */
     static QVector<int> detectEog(const Eigen::MatrixXd& matData,
                                   const FIFFLIB::FiffInfo& fiffInfo,
@@ -129,37 +126,8 @@ public:
                                   const EogParams& params = EogParams());
 
 private:
-    //=========================================================================================================
-    /**
-     * Band-pass or low-pass filter a single channel row using a zero-phase Butterworth filter.
-     *
-     * @param[in] vecSignal   Input row vector.
-     * @param[in] dSFreq      Sampling frequency.
-     * @param[in] dLow        Lower cutoff (Hz). Pass 0 to use a low-pass filter.
-     * @param[in] dHigh       Upper cutoff (Hz).
-     * @param[in] iOrder      Butterworth filter order.
-     *
-     * @return Filtered row vector.
-     */
-    static Eigen::RowVectorXd bandpassFilter(const Eigen::RowVectorXd& vecSignal,
-                                             double dSFreq,
-                                             double dLow,
-                                             double dHigh,
-                                             int iOrder);
-
-    //=========================================================================================================
-    /**
-     * Local-maximum peak picking above a threshold with a minimum inter-peak distance.
-     *
-     * @param[in] vecSignal   1D signal.
-     * @param[in] dThreshold  Minimum peak height.
-     * @param[in] iMinDist    Minimum number of samples between successive peaks.
-     *
-     * @return Sample indices of detected peaks.
-     */
-    static QVector<int> findPeaks(const Eigen::RowVectorXd& vecSignal,
-                                  double dThreshold,
-                                  int iMinDist);
+    /** R-peak search of mne.preprocessing.qrs_detector on an already filtered ECG. */
+    static QVector<int> qrsDetector(const Eigen::RowVectorXd& filtered, double dSFreq, double dThreshold, double dTStart);
 };
 
 } // namespace UTILSLIB

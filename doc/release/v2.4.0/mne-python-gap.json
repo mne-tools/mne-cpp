@@ -1570,9 +1570,9 @@
       "kind": "function",
       "domain": "preprocessing",
       "status": "implemented",
-      "mne_cpp": "PeakFinder",
+      "mne_cpp": "UTILSLIB::peakFinderMne",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "parity-record"
     },
     {
       "python": "mne.preprocessing.read_fine_calibration",

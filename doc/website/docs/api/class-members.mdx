@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6279 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6278 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -1257,8 +1257,8 @@ Index of 6279 public class members (functions, variables, typedefs, enums) acros
 - **detach** `[fn]` in [Subject](/docs/api/utils/subject) — Detaches an observer of the subject.
 - **detect** `[fn]` in [BadChannelDetect](/docs/api/utils/bad-channel-detect) — Run all three detectors and return the union of bad channel row indices.
 - **detect_from_raw** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Detect trigger events from raw data using a stimulus channel.
-- **detectEcg** `[fn]` in [ArtifactDetect](/docs/api/utils/artifact-detect) — Detect ECG R-peak events.
-- **detectEog** `[fn]` in [ArtifactDetect](/docs/api/utils/artifact-detect) — Detect EOG blink/saccade events.
+- **detectEcg** `[fn]` in [ArtifactDetect](/docs/api/utils/artifact-detect) — Detect ECG R-peak events as mne.preprocessing.find_ecg_events does.
+- **detectEog** `[fn]` in [ArtifactDetect](/docs/api/utils/artifact-detect) — Detect EOG blink/saccade events as mne.preprocessing.find_eog_events does.
 - **detectFlat** `[fn]` in [BadChannelDetect](/docs/api/utils/bad-channel-detect) — Detect flat (dead) channels.
 - **detectHighVariance** `[fn]` in [BadChannelDetect](/docs/api/utils/bad-channel-detect) — Detect high-variance (noisy) channels.
 - **detectLowCorrelation** `[fn]` in [BadChannelDetect](/docs/api/utils/bad-channel-detect) — Detect low-correlation (isolated) channels.
@@ -1274,10 +1274,11 @@ Index of 6279 public class members (functions, variables, typedefs, enums) acros
 - **deviceToWorld** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **dfBetween** `[var]` in [StatsFtestResult](/docs/api/sts/stats-ftest-result) — Between-groups degrees of freedom.
 - **dFilterHigh** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Upper edge of the muscle band (Hz).
-- **dFilterHigh** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Bandpass upper cutoff (Hz).
-- **dFilterHigh** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Low-pass cutoff (Hz).
+- **dFilterHigh** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Band-pass upper edge in Hz (h_freq).
+- **dFilterHigh** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Band-pass upper edge in Hz (h_freq).
 - **dFilterLow** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Lower edge of the muscle band (Hz).
-- **dFilterLow** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Bandpass lower cutoff (Hz).
+- **dFilterLow** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Band-pass lower edge in Hz (l_freq).
+- **dFilterLow** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Band-pass lower edge in Hz (l_freq).
 - **dFlatThreshold** `[var]` in [BadChannelDetectParams](/docs/api/utils/bad-channel-detect-params) — Peak-to-peak below this -&gt; flat (SI units; ~0.1 fT for MEG).
 - **dFMax** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Maximum frequency (Hz) for Gabor atoms.
 - **dFMin** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Minimum frequency (Hz) for Gabor atoms.
@@ -1351,11 +1352,9 @@ Index of 6279 public class members (functions, variables, typedefs, enums) acros
 - **distanceTimeSpacerChanged** `[signal]` in [FiffRawViewSettings](/docs/api/disp/fiff-raw-view-settings) — Emit this signal whenever the user changed the time spacer distance.
 - **distanceTimeSpacerChanged** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — distanceTimeSpacerChanged changes the distance of the time spacers
 - **dMinDuration** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Runs of supra- or sub-threshold differences shorter than this (seconds) are ignored.
-- **dMinGapSec** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Minimum gap between successive events in seconds.
 - **dMinHeight** `[var]` in [PeakFinderParams](/docs/api/dsp/peak-finder-params) — Minimum peak height.
 - **dMinLengthGood** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Good stretches shorter than this (seconds) between annotations become bad.
 - **dMinRatio** `[var]` in [BadChannelsMaxwellParams](/docs/api/dsp/bad-channels-maxwell-params) — Minimum relative residual to consider (skip near-zero).
-- **dMinRRSec** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Minimum R–R interval in seconds (caps detection rate at ~170 bpm).
 - **dNotchWidth** `[var]` in [FilterChpiParams](/docs/api/dsp/filter-chpi-params) — Half-width of each notch filter in Hz (notch = freq +/- width).
 - **do_all** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings)
 - **do_baseline** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Are both baseline limits set?
@@ -1379,6 +1378,7 @@ Index of 6279 public class members (functions, variables, typedefs, enums) acros
 - **dpfiterror** `[var]` in [CoilParam](/docs/api/inv/coil-param)
 - **dpfitnumitr** `[var]` in [CoilParam](/docs/api/inv/coil-param)
 - **dProminence** `[var]` in [PeakFinderParams](/docs/api/dsp/peak-finder-params) — Minimum peak prominence.
+- **dQrsThreshold** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — QRS threshold in (0, 1]; negative = "auto" (0.3 ... 1.05, rate closest to the median plausible one).
 - **DraggableFramelessWidget** `[fn]` in [DraggableFramelessWidget](/docs/api/disp/draggable-frameless-widget) — Constructs a [`DraggableFramelessWidget`](/docs/api/disp/draggable-frameless-widget) which is a child of parent.
 - **dragSplitter** `[fn]` in [MultiViewLayout](/docs/api/disp3-d/multi-view-layout) — Update split fractions from a mouse drag position.
 - **drawable** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Boolean array indicating which surfaces could be drawn.
@@ -1388,16 +1388,17 @@ Index of 6279 public class members (functions, variables, typedefs, enums) acros
 - **dRegIn** `[var]` in [SSSParams](/docs/api/dsp/sss-params) — Tikhonov regularisation for the combined-basis pseudoinverse.
 - **dropRejected** `[fn]` in [MNEEpochDataList](/docs/api/mne/mne-epoch-data-list) — Drop/Remove all epochs tagged as rejected.
 - **dSFreq** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Sampling frequency (Hz).
-- **dThreshFactor** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — R-peak threshold = dThreshFactor * (max − min) + min of the filtered signal.
 - **dThreshold** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Z-score threshold for marking as muscle artifact.
+- **dThreshold** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — peak_finder threshold; NaN = (max - min) / 4.
 - **dThreshold** `[var]` in [ArtifactRejectionData](/docs/api/mne/artifact-rejection-data) — Peak-to-peak limit for the channel type.
 - **dThreshold** `[var]` in [EpochExtractorParams](/docs/api/utils/epoch-extractor-params) — Peak-to-peak amplitude rejection threshold (SI units, e.g.
 - **dThreshold** `[var]` in [LofBadChannelParams](/docs/api/dsp/lof-bad-channel-params) — LOF score threshold for marking a channel as bad.
-- **dThresholdV** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Absolute voltage threshold (V).
 - **dTime** `[var]` in [HeadPosEntry](/docs/api/dsp/head-pos-entry) — Time in seconds.
 - **dTmax** `[var]` in [EpochExtractorParams](/docs/api/utils/epoch-extractor-params) — Epoch end relative to event in seconds.
 - **dTmin** `[var]` in [EpochExtractorParams](/docs/api/utils/epoch-extractor-params) — Epoch start relative to event in seconds (negative = pre-stimulus).
 - **dTolerance** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Convergence tolerance.
+- **dTStart** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Seconds to skip at the start (tstart).
+- **dTStart** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Seconds to skip at the start (tstart).
 - **dup** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Create a deep copy of this covariance matrix including data, channel classes, bad channel list, projection, and SSS info.
 - **dup** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Create a deep copy of this projection operator.
 - **dup_coil_set** `[fn]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Make a coil set duplicate.
@@ -2478,8 +2479,6 @@ Index of 6279 public class members (functions, variables, typedefs, enums) acros
 - **idx** `[var]` in [HPISortStruct](/docs/api/inv/hpi-sort-struct)
 - **IdxIntValue** `[type]` in [Linalg](/docs/api/math/linalg) — Typedef of a pair of ints.
 - **ieegReference** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Reference electrode name (RECOMMENDED).
-- **iFilterOrder** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Butterworth order for the bandpass pre-filter.
-- **iFilterOrder** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Butterworth order for the low-pass pre-filter.
 - **iFilterOrder** `[var]` in [FilterChpiParams](/docs/api/dsp/filter-chpi-params) — Butterworth order for each notch filter.
 - **ignore** `[var]` in [AverageCategory](/docs/api/fiff/average-category) — Which trigger lines to ignore.
 - **ignore** `[var]` in [CovDefinition](/docs/api/mne/cov-definition) — Which trigger lines to ignore.

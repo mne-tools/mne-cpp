@@ -134,10 +134,10 @@ int main(int argc, char* argv[])
     data.row(7) = data.row(6) + 0.1e-6 * MatrixXd::NullaryExpr(1, n, [&]() { return noise(gen); }); // bridged pair
 
     //! [artifact_detect_usage]
-    ArtifactDetect::EcgParams ecg;                                                  // 5-40 Hz band-pass, R peaks at least 0.35 s apart
-    ArtifactDetect::EogParams eog;                                                  // 10 Hz low-pass, +-150 uV
+    ArtifactDetect::EcgParams ecg;                                                  // mne find_ecg_events defaults: 5-35 Hz, automatic QRS threshold
+    ArtifactDetect::EogParams eog;                                                  // mne find_eog_events defaults: 1-10 Hz, automatic peak threshold
     const QVector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq, ecg);  // R-peak samples on the ECG channel
-    const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq, eog); // blink onsets on the EOG channel
+    const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq, eog); // blink peaks on the EOG channel
     //! [artifact_detect_usage]
     ok &= expect(beats.size() == 12 && std::abs(beats[0] - 100) <= 2 && std::abs(beats[1] - beats[0] - 200) <= 2,
                  QString("ECG: %1 beats, first at sample %2 (12 beats every 200 samples from 100)").arg(beats.size()).arg(beats.value(0)));

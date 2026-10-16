@@ -15,7 +15,8 @@
 //=============================================================================================================
 
 #include "artifact_detect.h"
-#include "iirfilter.h"
+#include "firfilter.h"
+#include "peak_finder.h"
 
 //=============================================================================================================
 // FIFF INCLUDES
@@ -42,6 +43,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -55,57 +57,104 @@ using namespace Eigen;
 // PRIVATE HELPERS
 //=============================================================================================================
 
-RowVectorXd ArtifactDetect::bandpassFilter(const RowVectorXd& vecSignal,
-                                           double dSFreq,
-                                           double dLow,
-                                           double dHigh,
-                                           int iOrder)
+namespace
 {
-    QVector<IirBiquad> sos;
 
-    if (dLow < 1e-3) {
-        // Low-pass only
-        sos = IirFilter::designButterworth(iOrder, IirFilter::LowPass, dHigh, 0.0, dSFreq);
-    } else {
-        sos = IirFilter::designButterworth(iOrder, IirFilter::BandPass, dLow, dHigh, dSFreq);
+QVector<int> goodChannelsOfKind(const FiffInfo& info, int kind)
+{
+    QVector<int> idx;
+    for (int i = 0; i < info.nchan; ++i) {
+        if (info.chs[i].kind == kind && !info.bads.contains(info.ch_names.value(i, info.chs[i].ch_name)))
+            idx.append(i);
     }
-
-    return IirFilter::applyZeroPhase(vecSignal, sos);
+    return idx;
 }
+
+} // namespace
 
 //=============================================================================================================
 
-QVector<int> ArtifactDetect::findPeaks(const RowVectorXd& vecSignal,
-                                       double dThreshold,
-                                       int iMinDist)
+QVector<int> ArtifactDetect::qrsDetector(const RowVectorXd& filtered, double dSFreq, double dThreshold, double dTStart)
 {
-    QVector<int> peaks;
-    const int N = static_cast<int>(vecSignal.size());
-    if (N < 3)
-        return peaks;
+    // Adapted from mne.preprocessing.qrs_detector (MNE-Python, BSD-3-Clause), filtering done by the caller.
+    const int winSize = static_cast<int>(std::nearbyint(60.0 * dSFreq / 120.0));
+    const int init = static_cast<int>(dSFreq);
+    const int nStart = static_cast<int>(dSFreq * dTStart);
+    const RowVectorXd ecgAbs = filtered.tail(std::max<Index>(filtered.size() - nStart, 0)).cwiseAbs();
+    const int nPoints = static_cast<int>(ecgAbs.size());
+    if (nPoints < 3 * init || init < 1) {
+        qWarning() << "ArtifactDetect::detectEcg: need at least 3 s of data after tstart.";
+        return {};
+    }
+    const double initMax = (ecgAbs.segment(0, init).maxCoeff() + ecgAbs.segment(init, init).maxCoeff() + ecgAbs.segment(2 * init, init).maxCoeff()) / 3.0;
 
-    int lastPeak = -iMinDist - 1;
-
-    for (int i = 1; i < N - 1; ++i) {
-        double v = vecSignal(i);
-        if (v < dThreshold)
-            continue;
-
-        // Local maximum check
-        if (v > vecSignal(i - 1) && v >= vecSignal(i + 1)) {
-            // Enforce minimum distance
-            if (i - lastPeak >= iMinDist) {
-                peaks.append(i);
-                lastPeak = i;
-            } else if (!peaks.isEmpty() && vecSignal(peaks.last()) < v) {
-                // Replace last peak if this one is higher and within the distance window
-                peaks.last() = i;
-                lastPeak = i;
-            }
-        }
+    std::vector<double> threshRuns;
+    if (dThreshold < 0.0) {
+        for (int k = 0; k < 16; ++k)
+            threshRuns.push_back(0.3 + 0.05 * k);
+    } else {
+        threshRuns.push_back(dThreshold);
     }
 
-    return peaks;
+    QVector<QVector<int>> cleanEvents;
+    for (double threshValue : threshRuns) {
+        const double thresh1 = initMax * threshValue;
+        QVector<int> times;
+        std::vector<double> rms;
+        for (int ii = 0; ii < nPoints - winSize;) {
+            const auto window = ecgAbs.segment(ii, winSize);
+            if (window(0) > thresh1) {
+                Index maxTime = 0;
+                window.maxCoeff(&maxTime);
+                times.append(ii + static_cast<int>(maxTime));
+                rms.push_back(std::sqrt(window.squaredNorm() / winSize));
+                ii += winSize;
+            } else {
+                ++ii;
+            }
+        }
+        // mne's crossing count per window is always < n_thresh (the window starts above threshold), so it is omitted
+        if (rms.empty())
+            continue;
+        double mean = 0.0;
+        for (double r : rms)
+            mean += r;
+        mean /= static_cast<double>(rms.size());
+        double var = 0.0;
+        for (double r : rms)
+            var += (r - mean) * (r - mean);
+        const double rmsThresh = mean + std::sqrt(var / static_cast<double>(rms.size())) * 2.5;
+        QVector<int> events;
+        for (int k = 0; k < times.size(); ++k) {
+            if (rms[static_cast<std::size_t>(k)] < rmsThresh)
+                events.append(times[k] + nStart);
+        }
+        if (!events.isEmpty())
+            cleanEvents.append(events);
+    }
+    if (cleanEvents.isEmpty())
+        return {};
+
+    // Pick the threshold whose heart rate is closest to the median plausible (40-160 bpm) one, else 80 bpm
+    std::vector<double> rates;
+    std::vector<double> plausible;
+    for (const QVector<int>& events : std::as_const(cleanEvents)) {
+        rates.push_back(60.0 * events.size() / (filtered.size() / dSFreq));
+        if (rates.back() >= 40.0 && rates.back() <= 160.0)
+            plausible.push_back(rates.back());
+    }
+    double ideal = 80.0;
+    if (!plausible.empty()) {
+        std::sort(plausible.begin(), plausible.end());
+        const std::size_t m = plausible.size() / 2;
+        ideal = plausible.size() % 2 ? plausible[m] : 0.5 * (plausible[m - 1] + plausible[m]);
+    }
+    std::size_t best = 0;
+    for (std::size_t k = 1; k < rates.size(); ++k) {
+        if (std::abs(rates[k] - ideal) < std::abs(rates[best] - ideal))
+            best = k;
+    }
+    return cleanEvents[static_cast<int>(best)];
 }
 
 //=============================================================================================================
@@ -117,78 +166,31 @@ QVector<int> ArtifactDetect::detectEcg(const MatrixXd& matData,
                                        double dSFreq,
                                        const EcgParams& params)
 {
-    // ---- Find ECG channel ----
-    int ecgIdx = -1;
-    for (int i = 0; i < fiffInfo.nchan; ++i) {
-        if (fiffInfo.chs[i].kind == FIFFV_ECG_CH) {
-            ecgIdx = i;
-            break;
-        }
-    }
+    // Adapted from mne.preprocessing.find_ecg_events / _make_ecg (MNE-Python, BSD-3-Clause).
+    if (matData.cols() == 0)
+        return {};
 
-    RowVectorXd ecgSignal;
-
-    if (ecgIdx >= 0) {
-        // Use dedicated ECG channel (already calibrated)
-        ecgSignal = matData.row(ecgIdx).cast<double>();
+    RowVectorXd ecg;
+    const QVector<int> ecgIdx = goodChannelsOfKind(fiffInfo, FIFFV_ECG_CH);
+    if (!ecgIdx.isEmpty()) {
+        ecg = matData.row(ecgIdx.first());
     } else {
-        // ---- Synthetic ECG from MEG channels ----
-        // The cardiac artifact is visible on most MEG channels.  A robust synthetic ECG is
-        // obtained by summing the absolute values of all magnetometer channels (gradiometer
-        // baseline artefact reduces them; magnetometers show the global field pattern).
-        qWarning() << "ArtifactDetect::detectEcg: No ECG channel found. "
-                      "Synthesising ECG proxy from MEG magnetometers.";
-
-        QVector<int> magIdx;
-        for (int i = 0; i < fiffInfo.nchan; ++i) {
-            if (fiffInfo.chs[i].kind == FIFFV_MEG_CH) {
-                // Distinguish magnetometers from gradiometers by coil type:
-                // magnetometers have a single integration point — heuristically identified
-                // as FIFFV_COIL_MAG type; use channel unit as a proxy (T vs T/m).
-                // Use unit: FIFF_UNIT_T = 112, FIFF_UNIT_T_M = 201
-                if (fiffInfo.chs[i].unit == 112) { // Tesla — magnetometer
-                    magIdx.append(i);
-                }
-            }
-        }
-
-        if (magIdx.isEmpty()) {
-            // Fall back: any MEG channel
-            for (int i = 0; i < fiffInfo.nchan; ++i) {
-                if (fiffInfo.chs[i].kind == FIFFV_MEG_CH) {
-                    magIdx.append(i);
-                }
-            }
-        }
-
-        if (magIdx.isEmpty()) {
-            qWarning() << "ArtifactDetect::detectEcg: No MEG channels found. Cannot detect ECG.";
+        QVector<int> mags, grads;
+        for (int i : goodChannelsOfKind(fiffInfo, FIFFV_MEG_CH))
+            (fiffInfo.chs[i].unit == FIFF_UNIT_T ? mags : grads).append(i);
+        const QVector<int>& meg = mags.isEmpty() ? grads : mags;
+        if (meg.isEmpty()) {
+            qWarning() << "ArtifactDetect::detectEcg: no ECG channel and no MEG channels to synthesise one from.";
             return {};
         }
-
-        const int nSamp = static_cast<int>(matData.cols());
-        ecgSignal = RowVectorXd::Zero(nSamp);
-        for (int idx : magIdx) {
-            ecgSignal += matData.row(idx).cwiseAbs().cast<double>();
-        }
-        ecgSignal /= static_cast<double>(magIdx.size());
+        ecg = RowVectorXd::Zero(matData.cols());
+        for (int i : meg)
+            ecg += matData.row(i);
+        ecg /= static_cast<double>(meg.size());
     }
 
-    // ---- Band-pass filter to isolate QRS complex ----
-    RowVectorXd filtered = bandpassFilter(ecgSignal, dSFreq,
-                                          params.dFilterLow, params.dFilterHigh,
-                                          params.iFilterOrder);
-
-    // ---- Adaptive threshold: fraction of the peak-to-peak amplitude ----
-    double sigMin = filtered.minCoeff();
-    double sigMax = filtered.maxCoeff();
-    double threshold = params.dThreshFactor * (sigMax - sigMin) + sigMin;
-
-    // Minimum inter-peak distance in samples
-    int iMinDist = static_cast<int>(std::round(params.dMinRRSec * dSFreq));
-    iMinDist = std::max(iMinDist, 1);
-
-    return findPeaks(filtered, threshold, iMinDist);
+    const RowVectorXd filtered = FirFilter::filterDataZeroDouble(ecg, dSFreq, params.dFilterLow, params.dFilterHigh);
+    return qrsDetector(filtered, dSFreq, params.dQrsThreshold, params.dTStart);
 }
 
 //=============================================================================================================
@@ -198,45 +200,29 @@ QVector<int> ArtifactDetect::detectEog(const MatrixXd& matData,
                                        double dSFreq,
                                        const EogParams& params)
 {
-    // ---- Find EOG channel(s) ----
-    QVector<int> eogIdx;
-    for (int i = 0; i < fiffInfo.nchan; ++i) {
-        if (fiffInfo.chs[i].kind == FIFFV_EOG_CH) {
-            eogIdx.append(i);
-        }
-    }
-
-    if (eogIdx.isEmpty()) {
+    // Adapted from mne.preprocessing._find_eog_events (MNE-Python, BSD-3-Clause).
+    const QVector<int> eogIdx = goodChannelsOfKind(fiffInfo, FIFFV_EOG_CH);
+    if (eogIdx.isEmpty() || matData.cols() == 0) {
         qWarning() << "ArtifactDetect::detectEog: No EOG channel found.";
         return {};
     }
 
-    // Select the EOG channel with the largest peak-to-peak amplitude
-    int bestIdx = eogIdx[0];
-    double bestPtp = 0.0;
-    for (int idx : eogIdx) {
-        RowVectorXd row = matData.row(idx).cast<double>();
-        double ptp = row.maxCoeff() - row.minCoeff();
-        if (ptp > bestPtp) {
-            bestPtp = ptp;
-            bestIdx = idx;
-        }
-    }
+    // The channel with the most 2-45 Hz energy
+    MatrixXd eog(eogIdx.size(), matData.cols());
+    for (int k = 0; k < eogIdx.size(); ++k)
+        eog.row(k) = matData.row(eogIdx[k]);
+    const MatrixXd broad = FirFilter::filterDataZeroDouble(eog, dSFreq, 2.0, std::min(45.0, dSFreq / 2.0 - 0.75));
+    Index best = 0;
+    broad.rowwise().squaredNorm().maxCoeff(&best);
 
-    RowVectorXd eogSignal = matData.row(bestIdx).cast<double>();
+    const RowVectorXd filtered = FirFilter::filterDataZeroDouble(eog.row(best), dSFreq, params.dFilterLow, params.dFilterHigh);
+    const double mean = filtered.mean();
+    const int extrema = std::abs(filtered.maxCoeff() - mean) > std::abs(filtered.minCoeff() - mean) ? 1 : -1;
+    const int nStart = static_cast<int>(dSFreq * params.dTStart);
 
-    // ---- Low-pass filter ----
-    RowVectorXd filtered = bandpassFilter(eogSignal, dSFreq,
-                                          0.0, params.dFilterHigh,
-                                          params.iFilterOrder);
-
-    // ---- Detect excursions above ±threshold ----
-    // Work on the absolute value so both positive (downward blinks, depending on EOG polarity)
-    // and negative deflections are detected.
-    RowVectorXd absFiltered = filtered.cwiseAbs();
-
-    int iMinDist = static_cast<int>(std::round(params.dMinGapSec * dSFreq));
-    iMinDist = std::max(iMinDist, 1);
-
-    return findPeaks(absFiltered, params.dThresholdV, iMinDist);
+    QVector<int> events;
+    const VectorXd tail = filtered.tail(std::max<Index>(filtered.size() - nStart, 0)).transpose();
+    for (const auto& peak : peakFinderMne(tail, params.dThreshold, extrema))
+        events.append(peak.first + nStart);
+    return events;
 }
