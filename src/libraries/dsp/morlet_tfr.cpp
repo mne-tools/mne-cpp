@@ -60,27 +60,26 @@ int MorletTfr::nextPow2(int n)
 
 //=============================================================================================================
 
-VectorXcd MorletTfr::buildWavelet(double dFreq, double dSFreq, double dNCycles, int& halfLen)
+VectorXcd MorletTfr::buildWavelet(double dFreq, double dSFreq, double dNCycles, int& halfLen, bool bZeroMean)
 {
-    // Time-domain standard deviation: σ_t = nCycles / (2π·f)
     const double sigma_t = dNCycles / (2.0 * MORLET_PI * dFreq);
 
-    // Truncate at ±4σ — captures > 99.99 % of energy
-    halfLen = static_cast<int>(std::round(4.0 * sigma_t * dSFreq));
+    // Same grid as np.arange(0.0, 5.0 * sigma_t, 1.0 / sfreq), mirrored around t = 0.
+    const double step = 1.0 / dSFreq;
+    halfLen = static_cast<int>(std::ceil(5.0 * sigma_t / step)) - 1;
 
     const int nWav = 2 * halfLen + 1;
     VectorXcd wavelet(nWav);
-
-    // L2-energy normalisation: A = (σ_t · √(2π))^(-0.5)
-    const double A = std::pow(sigma_t * std::sqrt(2.0 * MORLET_PI), -0.5);
+    const double realOffset = bZeroMean ? std::exp(-2.0 * std::pow(MORLET_PI * dFreq * sigma_t, 2)) : 0.0;
 
     for (int i = 0; i < nWav; ++i) {
-        const double t = static_cast<double>(i - halfLen) / dSFreq;
+        const double t = (i - halfLen) * step;
         const double gauss = std::exp(-t * t / (2.0 * sigma_t * sigma_t));
         const double phase = 2.0 * MORLET_PI * dFreq * t;
-        wavelet[i] = std::complex<double>(A * gauss * std::cos(phase),
-                                          A * gauss * std::sin(phase));
+        wavelet[i] = gauss * std::complex<double>(std::cos(phase) - realOffset, std::sin(phase));
     }
+    // Norm sqrt(2) for the complex wavelet, i.e. norm 1 for its real part.
+    wavelet /= std::sqrt(0.5) * wavelet.norm();
     return wavelet;
 }
 
@@ -104,7 +103,7 @@ MorletTfrResult MorletTfr::compute(const RowVectorXd& vecData,
 
     for (int fi = 0; fi < nFreqs; ++fi) {
         int halfLen = 0;
-        const VectorXcd wavelet = buildWavelet(vecFreqs[fi], dSFreq, dNCycles, halfLen);
+        const VectorXcd wavelet = buildWavelet(vecFreqs[fi], dSFreq, dNCycles, halfLen, true);
 
         const int nWav = static_cast<int>(wavelet.size());
         const int nConv = nextPow2(nTimes + nWav - 1);

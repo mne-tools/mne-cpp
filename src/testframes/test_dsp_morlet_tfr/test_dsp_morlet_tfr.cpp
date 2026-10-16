@@ -63,6 +63,12 @@ private slots:
     void testMultiChannelCount();
     void testMultiChannelPicks();
     void testMultiChannelMatchesSingle();
+
+    // MNE-Python
+    void testPowerMatchesMnePython_data();
+    void testPowerMatchesMnePython();
+    void testWaveletMatchesMnePython_data();
+    void testWaveletMatchesMnePython();
 };
 
 //=============================================================================================================
@@ -274,6 +280,81 @@ void TestMorletTfr::testMultiChannelMatchesSingle()
         auto single = MorletTfr::compute(mat.row(ch), sfreq, freqs);
         QVERIFY((multi[ch].matPower - single.matPower).norm() < 1e-8);
     }
+}
+
+//=============================================================================================================
+
+void TestMorletTfr::testPowerMatchesMnePython_data()
+{
+    // Reference values produced by mne.time_frequency.tfr_array_morlet (mne 1.11), samples 0, 60, 250, 499:
+    //   sf = 250.0; t = np.arange(500) / sf
+    //   x = np.sin(2 * np.pi * 10 * t) + 0.5 * np.sin(2 * np.pi * 23 * t + 0.3) + 0.2 * t
+    //   p = tfr_array_morlet(x[None, None], sf, [10.0, 15.0, 23.0], output="power")[0, 0]
+    QTest::addColumn<int>("row");
+    QTest::addColumn<QList<double>>("expected");
+    QTest::newRow("10 Hz") << 0 << QList<double>{12.3097798, 47.80353016, 49.36653766, 11.20795857};
+    QTest::newRow("15 Hz") << 1 << QList<double>{0.4503071859, 0.1422200775, 0.1441309193, 0.4004831822};
+    QTest::newRow("23 Hz") << 2 << QList<double>{1.273866911, 5.370161733, 5.374111133, 1.190624655};
+}
+
+//=============================================================================================================
+
+void TestMorletTfr::testPowerMatchesMnePython()
+{
+    QFETCH(int, row);
+    QFETCH(QList<double>, expected);
+
+    const double sfreq = 250.0;
+    RowVectorXd x(500);
+    for (int n = 0; n < x.size(); ++n) {
+        const double t = n / sfreq;
+        x[n] = std::sin(2.0 * M_PI * 10.0 * t) + 0.5 * std::sin(2.0 * M_PI * 23.0 * t + 0.3) + 0.2 * t;
+    }
+    RowVectorXd freqs(3);
+    freqs << 10.0, 15.0, 23.0;
+
+    const MorletTfrResult r = MorletTfr::compute(x, sfreq, freqs);
+    const int samples[] = {0, 60, 250, 499};
+    for (int i = 0; i < 4; ++i) {
+        const double got = r.matPower(row, samples[i]);
+        QVERIFY2(std::abs(got - expected[i]) <= 1e-6 * expected[i],
+                 qPrintable(QString("sample %1: %2 vs mne %3").arg(samples[i]).arg(got, 0, 'g', 10).arg(expected[i], 0, 'g', 10)));
+    }
+}
+
+//=============================================================================================================
+
+void TestMorletTfr::testWaveletMatchesMnePython_data()
+{
+    // Reference values produced by mne.time_frequency.morlet(250.0, [freq], n_cycles) (mne 1.11), h = len(w) // 2:
+    //   len(w), w[h].real, w[h + 5].real, w[h + 5].imag, w[0].real
+    QTest::addColumn<double>("freq");
+    QTest::addColumn<double>("nCycles");
+    QTest::addColumn<int>("length");
+    QTest::addColumn<QList<double>>("expected");
+    QTest::newRow("10 Hz, 7 cycles") << 10.0 << 7.0 << 279
+                                     << QList<double>{0.2012789877, 0.06120441323, 0.188367815, -7.307899189e-07};
+    QTest::newRow("40 Hz, 3 cycles") << 40.0 << 3.0 << 29
+                                     << QList<double>{0.6149174645, 0.04668635691, -0.1436858321, 6.417630799e-07};
+}
+
+//=============================================================================================================
+
+void TestMorletTfr::testWaveletMatchesMnePython()
+{
+    QFETCH(double, freq);
+    QFETCH(double, nCycles);
+    QFETCH(int, length);
+    QFETCH(QList<double>, expected);
+
+    int halfLen = 0;
+    const VectorXcd w = MorletTfr::buildWavelet(freq, 250.0, nCycles, halfLen);
+    QCOMPARE(w.size(), length);
+    QCOMPARE(halfLen, length / 2);
+    const double got[] = {w[halfLen].real(), w[halfLen + 5].real(), w[halfLen + 5].imag(), w[0].real()};
+    for (int i = 0; i < 4; ++i)
+        QVERIFY2(std::abs(got[i] - expected[i]) <= 1e-9 * std::abs(expected[i]) + 1e-15,
+                 qPrintable(QString("value %1: %2 vs mne %3").arg(i).arg(got[i], 0, 'g', 10).arg(expected[i], 0, 'g', 10)));
 }
 
 //=============================================================================================================

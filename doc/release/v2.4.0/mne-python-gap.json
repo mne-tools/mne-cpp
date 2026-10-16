@@ -4211,7 +4211,7 @@
       "domain": "time_frequency",
       "status": "partial",
       "mne_cpp": "MorletTfr::buildWavelet",
-      "note": "wavelet builder is private",
+      "note": "one frequency per call; no sigma",
       "evidence": "parity-record"
     },
     {

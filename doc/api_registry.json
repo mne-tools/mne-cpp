@@ -13970,7 +13970,8 @@
         "python": "mne.time_frequency.morlet",
         "status": "partial",
         "mne_cpp": "MorletTfr::buildWavelet",
-        "note": "wavelet builder is private"
+        "note": "one frequency per call; no sigma",
+        "test": "test_dsp_morlet_tfr"
       },
       {
         "python": "mne.time_frequency.pick_channels_csd",

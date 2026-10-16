@@ -113,19 +113,21 @@ public:
         double dNCycles = 7.0,
         const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
 
-private:
     //=========================================================================================================
     /**
-     * Build a complex Morlet wavelet for a given frequency.
+     * Build a complex Morlet wavelet for a given frequency, as mne.time_frequency.morlet does:
+     * sampled out to 5 σ_t on either side of a sample at t = 0 and scaled to norm √2.
      *
-     * @param[in]  dFreq    Centre frequency in Hz.
-     * @param[in]  dSFreq   Sampling frequency in Hz.
-     * @param[in]  dNCycles Number of cycles.
-     * @param[out] halfLen  Half-length of the returned wavelet in samples.
-     * @return              Complex wavelet column vector of length 2·halfLen+1.
+     * @param[in]  dFreq     Centre frequency in Hz.
+     * @param[in]  dSFreq    Sampling frequency in Hz.
+     * @param[in]  dNCycles  Number of cycles.
+     * @param[out] halfLen   Half-length of the returned wavelet in samples.
+     * @param[in]  bZeroMean Subtract the admissibility offset (zero_mean in MNE-Python).
+     * @return               Complex wavelet column vector of length 2·halfLen+1.
      */
-    static Eigen::VectorXcd buildWavelet(double dFreq, double dSFreq, double dNCycles, int& halfLen);
+    static Eigen::VectorXcd buildWavelet(double dFreq, double dSFreq, double dNCycles, int& halfLen, bool bZeroMean = false);
 
+private:
     /** Return the smallest power of 2 ≥ n. */
     static int nextPow2(int n);
 };

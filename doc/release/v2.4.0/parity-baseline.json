@@ -22,23 +22,23 @@
   "summary": {
     "claims": 360,
     "by_evidence": {
-      "cross-validated-static": 127,
+      "cross-validated-static": 136,
       "cross-validated-live": 4,
-      "tested": 224,
-      "unverified": 5
+      "tested": 216,
+      "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 21,
+        "cross-validated-static": 22,
         "cross-validated-live": 1,
-        "tested": 67,
+        "tested": 66,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 106,
+        "cross-validated-static": 114,
         "cross-validated-live": 3,
-        "tested": 157,
-        "unverified": 5
+        "tested": 150,
+        "unverified": 4
       }
     },
     "tests_by_relation": {
@@ -48,6 +48,7 @@
         "test_anshared_models",
         "test_dsp_annotate_artifact",
         "test_dsp_eog_regression",
+        "test_dsp_morlet_tfr",
         "test_edf2fiff_rwr",
         "test_fiff_core_python",
         "test_fiff_cov_python",
@@ -567,7 +568,7 @@
       "python": "mne.time_frequency.tfr_morlet",
       "claimed": "implemented",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1391,7 +1392,7 @@
       "python": "mne.decoding.TimeFrequency",
       "claimed": "partial",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2639,7 +2640,7 @@
       "python": "mne.time_frequency.AverageTFR",
       "claimed": "partial",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2647,7 +2648,7 @@
       "python": "mne.time_frequency.AverageTFRArray",
       "claimed": "partial",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2687,7 +2688,7 @@
       "python": "mne.time_frequency.RawTFR",
       "claimed": "partial",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2695,7 +2696,7 @@
       "python": "mne.time_frequency.RawTFRArray",
       "claimed": "partial",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2782,8 +2783,8 @@
       "mne_cpp": "MorletTfr::buildWavelet",
       "python": "mne.time_frequency.morlet",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "test": "test_dsp_morlet_tfr",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2831,7 +2832,7 @@
       "python": "mne.time_frequency.tfr_array_morlet",
       "claimed": "partial",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2847,7 +2848,7 @@
       "python": "mne.time_frequency.tfr_morlet",
       "claimed": "partial",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

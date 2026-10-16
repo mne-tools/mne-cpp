@@ -91,10 +91,10 @@
       },
       "claims": 360,
       "claims_by_evidence": {
-        "cross-validated-static": 127,
+        "cross-validated-static": 136,
         "cross-validated-live": 4,
-        "tested": 224,
-        "unverified": 5
+        "tested": 216,
+        "unverified": 4
       }
     }
   }

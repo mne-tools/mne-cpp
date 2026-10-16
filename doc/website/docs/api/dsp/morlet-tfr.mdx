@@ -84,6 +84,33 @@ Compute Morlet TFR for every (selected) channel of a data matrix.
 
 ---
 
+### buildWavelet(dFreq, dSFreq, dNCycles, halfLen, bZeroMean)
+
+Build a complex Morlet wavelet for a given frequency, as mne.time_frequency.morlet does: sampled out to 5 σ_t on either side of a sample at t = 0 and scaled to norm √2.
+
+**Parameters:**
+
+- **dFreq** : *double*
+  Centre frequency in Hz.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **dNCycles** : *double*
+  Number of cycles.
+
+- **halfLen** : *int &*
+  Half-length of the returned wavelet in samples.
+
+- **bZeroMean** : *bool*
+  Subtract the admissibility offset (zero_mean in MNE-Python).
+
+**Returns:**
+
+- *Eigen::VectorXcd* — Complex wavelet column vector of length 2·halfLen+1.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)

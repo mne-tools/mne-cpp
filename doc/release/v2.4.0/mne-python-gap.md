@@ -267,7 +267,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.time_frequency.csd_fourier` | partial | Csd::computeFourier | matrix input; no Epochs object |
 | `mne.time_frequency.csd_morlet` | partial | Csd::computeMorlet | matrix input; no Epochs object |
 | `mne.time_frequency.csd_multitaper` | partial | Csd::computeMultitaper | matrix input; no Epochs object |
-| `mne.time_frequency.morlet` | partial | MorletTfr::buildWavelet | wavelet builder is private |
+| `mne.time_frequency.morlet` | partial | MorletTfr::buildWavelet | one frequency per call; no sigma |
 | `mne.time_frequency.read_spectrum` | partial | Spectral (partial) | spectrum I/O limited |
 | `mne.time_frequency.stft` | partial | Spectrogram::makeSpectrogram | Gaussian-window magnitude only; no complex output/istft |
 | `mne.time_frequency.tfr_array_morlet` | partial | MorletTfr::computeMultiChannel | power only; single epoch; no complex/ITC |
