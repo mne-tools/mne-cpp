@@ -1364,9 +1364,7 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": [
-        "InvDipoleFit"
-      ]
+      "registry_classes": []
     },
     {
       "name": "test_disp3d_brainsurface",
@@ -3154,9 +3152,7 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": [
-        "FiffCov"
-      ]
+      "registry_classes": []
     },
     {
       "name": "test_fiff_cov_python",
@@ -3192,7 +3188,9 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "FiffCov"
+      ]
     },
     {
       "name": "test_fiff_coverage",
@@ -3585,7 +3583,9 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "FiffProj"
+      ]
     },
     {
       "name": "test_fiff_raw_formats_python",
@@ -4385,7 +4385,10 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "ComputeFwd",
+        "FwdEegSphereModel"
+      ]
     },
     {
       "name": "test_fwd_sphere_settings",
@@ -4417,9 +4420,7 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": [
-        "FwdEegSphereModel"
-      ]
+      "registry_classes": []
     },
     {
       "name": "test_geometryinfo",
@@ -4699,10 +4700,7 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": [
-        "InvDICS",
-        "InvLCMV"
-      ]
+      "registry_classes": []
     },
     {
       "name": "test_inv_beamformer_python",
@@ -4839,7 +4837,9 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "InvDipoleFit"
+      ]
     },
     {
       "name": "test_inv_dipole_rap_mne",
@@ -4952,7 +4952,10 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "InvDICS",
+        "InvLCMV"
+      ]
     },
     {
       "name": "test_inv_loreta",
@@ -6301,7 +6304,9 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": []
+      "registry_classes": [
+        "MNEForwardSolution"
+      ]
     },
     {
       "name": "test_mne_forward_solution",
@@ -6337,9 +6342,7 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": [
-        "MNEForwardSolution"
-      ]
+      "registry_classes": []
     },
     {
       "name": "test_mne_hemisphere_epoch",
@@ -6689,9 +6692,7 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": [
-        "FiffProj"
-      ]
+      "registry_classes": []
     },
     {
       "name": "test_mne_raw_data_python",
@@ -8683,9 +8684,7 @@
         "windows-2025-vs2026": "run",
         "windows-2025-vs2026-qt-min": "run"
       },
-      "registry_classes": [
-        "ComputeFwd"
-      ]
+      "registry_classes": []
     },
     {
       "name": "test_tool_info_helpers",

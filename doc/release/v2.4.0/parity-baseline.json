@@ -22,22 +22,22 @@
   "summary": {
     "claims": 360,
     "by_evidence": {
-      "cross-validated-static": 114,
+      "cross-validated-static": 127,
       "cross-validated-live": 4,
-      "tested": 237,
+      "tested": 224,
       "unverified": 5
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 13,
+        "cross-validated-static": 21,
         "cross-validated-live": 1,
-        "tested": 75,
+        "tested": 67,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 101,
+        "cross-validated-static": 106,
         "cross-validated-live": 3,
-        "tested": 162,
+        "tested": 157,
         "unverified": 5
       }
     },
@@ -150,16 +150,16 @@
       "mne_cpp": "FiffCov",
       "python": "mne.Covariance",
       "claimed": "implemented",
-      "test": "test_fiff_cov",
-      "evidence": "tested"
+      "test": "test_fiff_cov_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
       "mne_cpp": "FiffProj",
       "python": "mne.Projection",
       "claimed": "implemented",
-      "test": "test_mne_projections",
-      "evidence": "tested"
+      "test": "test_fiff_proj_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -190,8 +190,8 @@
       "mne_cpp": "MNEForwardSolution",
       "python": "mne.Forward",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -230,8 +230,8 @@
       "mne_cpp": "ComputeFwd",
       "python": "mne.make_forward_solution",
       "claimed": "implemented",
-      "test": "test_tool_forward_generation",
-      "evidence": "tested"
+      "test": "test_fwd_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -246,8 +246,8 @@
       "mne_cpp": "FwdEegSphereModel",
       "python": "mne.make_sphere_model",
       "claimed": "implemented",
-      "test": "test_fwd_sphere_settings",
-      "evidence": "tested"
+      "test": "test_fwd_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -262,16 +262,16 @@
       "mne_cpp": "InvLCMV",
       "python": "mne.beamformer.make_lcmv / apply_lcmv",
       "claimed": "implemented",
-      "test": "test_inv_beamformer",
-      "evidence": "tested"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
       "mne_cpp": "InvDICS",
       "python": "mne.beamformer.make_dics / apply_dics",
       "claimed": "implemented",
-      "test": "test_inv_beamformer",
-      "evidence": "tested"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -294,8 +294,8 @@
       "mne_cpp": "InvDipoleFit",
       "python": "mne.fit_dipole",
       "claimed": "implemented",
-      "test": "test_dipole_fit",
-      "evidence": "tested"
+      "test": "test_inv_dipole_fit_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -910,8 +910,8 @@
       "mne_cpp": "INVLIB::InvBeamformer",
       "python": "mne.beamformer.Beamformer",
       "claimed": "partial",
-      "test": "test_inv_beamformer",
-      "evidence": "tested"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -926,8 +926,8 @@
       "mne_cpp": "InvDICS::applyDICSCsd",
       "python": "mne.beamformer.apply_dics_csd",
       "claimed": "implemented",
-      "test": "test_inv_beamformer",
-      "evidence": "tested"
+      "test": "test_inv_lcmv_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1526,8 +1526,8 @@
       "mne_cpp": "MNEForwardSolution::write",
       "python": "mne.forward.write_forward_solution",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2038,8 +2038,8 @@
       "mne_cpp": "MNEForwardSolution::pick_types",
       "python": "mne.pick_types_forward",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2934,8 +2934,8 @@
       "mne_cpp": "MNEForwardSolution::write",
       "python": "mne.write_forward_solution",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

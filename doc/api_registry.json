@@ -315,7 +315,7 @@
       "mne_c_tool": "libmne (mne_cov_matrix.c)",
       "mne_python": "mne.Covariance",
       "sklearn": null,
-      "test": "test_fiff_cov",
+      "test": "test_fiff_cov_python",
       "example": "ex_fiff_api",
       "example_snippet": [
         "ex_fiff_api/main.cpp#fiff_cov_usage"
@@ -340,7 +340,7 @@
       "mne_c_tool": "libmne",
       "mne_python": "mne.Projection",
       "sklearn": null,
-      "test": "test_mne_projections",
+      "test": "test_fiff_proj_python",
       "example": "ex_fiff_api",
       "example_snippet": [
         "ex_fiff_api/main.cpp#fiff_proj_usage"
@@ -441,7 +441,7 @@
       "mne_c_tool": "mne_forward_solution",
       "mne_python": "mne.Forward",
       "sklearn": null,
-      "test": "test_mne_forward_solution",
+      "test": "test_mne_forward_ops",
       "example": "ex_inv_api",
       "example_snippet": [
         "ex_inv_api/main.cpp#inv_minimum_norm_usage"
@@ -562,7 +562,7 @@
       "mne_c_tool": "mne_forward_solution",
       "mne_python": "mne.make_forward_solution",
       "sklearn": null,
-      "test": "test_tool_forward_generation",
+      "test": "test_fwd_python",
       "example": "ex_fwd_api",
       "example_snippet": [
         "ex_fwd_api/main.cpp#compute_fwd_usage"
@@ -612,7 +612,7 @@
       "mne_c_tool": "mne_make_sphere_bem",
       "mne_python": "mne.make_sphere_model",
       "sklearn": null,
-      "test": "test_fwd_sphere_settings",
+      "test": "test_fwd_python",
       "example": "ex_fwd_api",
       "example_snippet": [
         "ex_fwd_api/main.cpp#fwd_eeg_sphere_model_usage"
@@ -688,7 +688,7 @@
       "mne_c_tool": null,
       "mne_python": "mne.beamformer.make_lcmv / apply_lcmv",
       "sklearn": null,
-      "test": "test_inv_beamformer",
+      "test": "test_inv_lcmv_python",
       "example": "ex_inv_beamformer",
       "example_snippet": [
         "ex_inv_beamformer/main.cpp#inv_lcmv_usage"
@@ -713,7 +713,7 @@
       "mne_c_tool": null,
       "mne_python": "mne.beamformer.make_dics / apply_dics",
       "sklearn": null,
-      "test": "test_inv_beamformer",
+      "test": "test_inv_lcmv_python",
       "example": "ex_inv_beamformer",
       "example_snippet": [
         "ex_inv_beamformer/main.cpp#inv_dics_usage"
@@ -788,7 +788,7 @@
       "mne_c_tool": "mne_dipole_fit",
       "mne_python": "mne.fit_dipole",
       "sklearn": null,
-      "test": "test_dipole_fit",
+      "test": "test_inv_dipole_fit_python",
       "example": "ex_inv_dipole_fit",
       "example_snippet": [
         "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_usage"
@@ -11569,7 +11569,7 @@
         "status": "partial",
         "mne_cpp": "INVLIB::InvBeamformer",
         "note": "no save/read",
-        "test": "test_inv_beamformer"
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.apply_dics",
@@ -11583,7 +11583,7 @@
         "status": "implemented",
         "mne_cpp": "InvDICS::applyDICSCsd",
         "note": "",
-        "test": "test_inv_beamformer"
+        "test": "test_inv_lcmv_python"
       },
       {
         "python": "mne.beamformer.apply_dics_epochs",
@@ -12317,7 +12317,7 @@
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::write",
         "note": "",
-        "test": "test_mne_forward_solution"
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.get_head_surf",
@@ -12991,7 +12991,7 @@
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::pick_types",
         "note": "",
-        "test": "test_mne_forward_solution"
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.preprocessing.EOGRegression",
@@ -14145,7 +14145,7 @@
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::write",
         "note": "FIFF forward I/O",
-        "test": "test_mne_forward_solution"
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.write_head_bem",
