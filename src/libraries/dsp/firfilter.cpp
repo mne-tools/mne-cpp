@@ -271,9 +271,17 @@ MatrixXd FirFilter::filterDataZeroDouble(const MatrixXd& matData, double dSFreq,
 
     // Forward and backward pass = one pass with h convolved with its reverse; padding follows the single h.
     const Index nH = h.size();
-    RowVectorXd hh = RowVectorXd::Zero(2 * nH - 1);
-    for (Index i = 0; i < nH; ++i)
-        hh.segment(i, nH) += h(i) * h.reverse();
+    FFT<double> fft;
+    RowVectorXd padded = RowVectorXd::Zero(2 * nH);
+    padded.head(nH) = h;
+    RowVectorXcd spec;
+    fft.fwd(spec, padded);
+    spec = spec.cwiseAbs2().cast<std::complex<double>>();
+    RowVectorXd autocorr;
+    fft.inv(autocorr, spec);
+    // Lags -(nH - 1) .. nH - 1
+    RowVectorXd hh(2 * nH - 1);
+    hh << autocorr.tail(nH - 1), autocorr.head(nH);
     return overlapAddZeroPhase(matData, hh, std::min<Index>(nH, matData.cols()) - 1);
 }
 
@@ -288,7 +296,10 @@ MatrixXd FirFilter::overlapAddZeroPhase(const MatrixXd& matData, const RowVector
         return matData * (nH == 1 ? h(0) : 1.0);
     }
     const Index nExt = nTimes + 2 * nEdge;
-    const Index nFft = nExt + nH - 1;
+    // A power of two keeps kissfft fast; any length >= nExt + nH - 1 gives the same linear convolution
+    Index nFft = 1;
+    while (nFft < nExt + nH - 1)
+        nFft <<= 1;
 
     FFT<double> fft;
     RowVectorXd hPadded = RowVectorXd::Zero(nFft);
