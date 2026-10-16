@@ -12045,10 +12045,9 @@
       },
       {
         "python": "mne.decoding.PSDEstimator",
-        "status": "partial",
-        "mne_cpp": "Spectral (partial)",
-        "note": "no sklearn wrapper",
-        "test": "test_utils_spectral"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no transformer wrapper"
       },
       {
         "python": "mne.decoding.ReceptiveField",
@@ -13831,17 +13830,15 @@
       },
       {
         "python": "mne.time_frequency.EpochsSpectrum",
-        "status": "partial",
-        "mne_cpp": "Spectral (partial)",
-        "note": "epochs spectrum container",
-        "test": "test_utils_spectral"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no per-epoch spectrum container"
       },
       {
         "python": "mne.time_frequency.EpochsSpectrumArray",
-        "status": "partial",
-        "mne_cpp": "Spectral (partial)",
-        "note": "",
-        "test": "test_utils_spectral"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no per-epoch spectrum container"
       },
       {
         "python": "mne.time_frequency.EpochsTFR",
@@ -13871,24 +13868,23 @@
       },
       {
         "python": "mne.time_frequency.Spectrum",
-        "status": "implemented",
-        "mne_cpp": "Spectral (DSPLIB)",
-        "note": "",
-        "test": "test_utils_spectral"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
+        "note": "PSD and frequencies only; no Info, plotting or I/O",
+        "test": "test_dsp_welch_psd"
       },
       {
         "python": "mne.time_frequency.SpectrumArray",
-        "status": "implemented",
-        "mne_cpp": "Spectral (DSPLIB)",
-        "note": "",
-        "test": "test_utils_spectral"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
+        "note": "PSD and frequencies only; no Info, plotting or I/O",
+        "test": "test_dsp_welch_psd"
       },
       {
         "python": "mne.time_frequency.combine_spectrum",
-        "status": "partial",
-        "mne_cpp": "Spectral (partial)",
-        "note": "",
-        "test": "test_utils_spectral"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no spectrum combination"
       },
       {
         "python": "mne.time_frequency.combine_tfr",
@@ -13984,17 +13980,17 @@
       },
       {
         "python": "mne.time_frequency.psd_array_multitaper",
-        "status": "implemented",
-        "mne_cpp": "Spectral multitaper",
-        "note": "",
-        "test": "test_utils_spectral"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::MultitaperPsd::compute",
+        "note": "normalization='full' only, no adaptive weights or fmin/fmax",
+        "test": "test_dsp_multitaper"
       },
       {
         "python": "mne.time_frequency.psd_array_welch",
-        "status": "implemented",
-        "mne_cpp": "Spectral::psdWelch",
-        "note": "",
-        "test": "test_utils_spectral"
+        "status": "partial",
+        "mne_cpp": "UTILSLIB::WelchPsd::compute",
+        "note": "overlap as a fraction, n_per_seg = n_fft, mean average only, no fmin/fmax",
+        "test": "test_dsp_welch_psd"
       },
       {
         "python": "mne.time_frequency.read_csd",
@@ -14004,10 +14000,9 @@
       },
       {
         "python": "mne.time_frequency.read_spectrum",
-        "status": "partial",
-        "mne_cpp": "Spectral (partial)",
-        "note": "spectrum I/O limited",
-        "test": "test_utils_spectral"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no spectrum file I/O"
       },
       {
         "python": "mne.time_frequency.read_tfrs",

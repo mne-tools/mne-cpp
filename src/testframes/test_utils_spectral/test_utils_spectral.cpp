@@ -78,6 +78,17 @@ private slots:
         QVERIFY(std::abs(freqs(0)) < 1e-10);
     }
 
+    void testCalculateFFTFreqsMatchesMnePython()
+    {
+        // Reference values produced by mne.time_frequency.stftfreq(10, 250.0) and stftfreq(9, 250.0) (mne 1.11)
+        const VectorXd even = Spectral::calculateFFTFreqs(10, 250.0);
+        QVERIFY((even - (VectorXd(6) << 0.0, 25.0, 50.0, 75.0, 100.0, 125.0).finished()).cwiseAbs().maxCoeff() < 1e-12);
+        const VectorXd odd = Spectral::calculateFFTFreqs(9, 250.0);
+        QVERIFY((odd - (VectorXd(5) << 0.0, 27.777777777777775, 55.55555555555555, 83.33333333333333, 111.1111111111111).finished())
+                    .cwiseAbs()
+                    .maxCoeff() < 1e-12);
+    }
+
     void testComputeTaperedSpectraRow()
     {
         int N = 64;

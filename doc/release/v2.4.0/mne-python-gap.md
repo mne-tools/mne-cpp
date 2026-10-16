@@ -8,11 +8,11 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **200**
-- Partial: **95**
-- Missing: **140**
+- Implemented: **196**
+- Partial: **94**
+- Missing: **145**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **56.9%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **55.9%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -29,8 +29,8 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Forward Modelling | 27 | 7 | 1 | 0 | 35 |
 | Inverse & Source Estimation | 31 | 13 | 16 | 0 | 60 |
 | Source Space & Morphing | 15 | 5 | 7 | 0 | 27 |
-| Time-Frequency | 6 | 22 | 13 | 0 | 41 |
-| Decoding & Machine Learning | 4 | 6 | 12 | 2 | 24 |
+| Time-Frequency | 2 | 22 | 17 | 0 | 41 |
+| Decoding & Machine Learning | 4 | 5 | 13 | 2 | 24 |
 | Statistics | 11 | 0 | 6 | 0 | 17 |
 | Simulation | 0 | 3 | 7 | 0 | 10 |
 | Visualisation | 0 | 0 | 0 | 1 | 1 |
@@ -257,11 +257,10 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.time_frequency.AverageTFRArray` | partial | MorletTfrResult | result struct only |
 | `mne.time_frequency.BaseTFR` | partial | MultitaperTfrResult | no common TFR base class |
 | `mne.time_frequency.CrossSpectralDensity` | partial | UTILSLIB::CsdResult | no channel names/pick/IO |
-| `mne.time_frequency.EpochsSpectrum` | partial | Spectral (partial) | epochs spectrum container |
-| `mne.time_frequency.EpochsSpectrumArray` | partial | Spectral (partial) |  |
 | `mne.time_frequency.RawTFR` | partial | MorletTfr::computeMultiChannel | result struct only |
 | `mne.time_frequency.RawTFRArray` | partial | MorletTfrResult | result struct only |
-| `mne.time_frequency.combine_spectrum` | partial | Spectral (partial) |  |
+| `mne.time_frequency.Spectrum` | partial | UTILSLIB::WelchPsdResult, MultitaperPsdResult | PSD and frequencies only; no Info, plotting or I/O |
+| `mne.time_frequency.SpectrumArray` | partial | UTILSLIB::WelchPsdResult, MultitaperPsdResult | PSD and frequencies only; no Info, plotting or I/O |
 | `mne.time_frequency.csd_array_fourier` | partial | Csd::computeFourier | 2-D input; no averaging over epochs |
 | `mne.time_frequency.csd_array_morlet` | partial | Csd::computeMorlet | 2-D input; no averaging over epochs |
 | `mne.time_frequency.csd_array_multitaper` | partial | Csd::computeMultitaper | 2-D input; no averaging over epochs |
@@ -269,14 +268,18 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.time_frequency.csd_morlet` | partial | Csd::computeMorlet | matrix input; no Epochs object |
 | `mne.time_frequency.csd_multitaper` | partial | Csd::computeMultitaper | matrix input; no Epochs object |
 | `mne.time_frequency.morlet` | partial | MorletTfr::buildWavelet | one frequency per call; no sigma |
-| `mne.time_frequency.read_spectrum` | partial | Spectral (partial) | spectrum I/O limited |
+| `mne.time_frequency.psd_array_multitaper` | partial | UTILSLIB::MultitaperPsd::compute | normalization='full' only, no adaptive weights or fmin/fmax |
+| `mne.time_frequency.psd_array_welch` | partial | UTILSLIB::WelchPsd::compute | overlap as a fraction, n_per_seg = n_fft, mean average only, no fmin/fmax |
 | `mne.time_frequency.stft` | partial | Spectrogram::makeSpectrogram | Gaussian-window magnitude only; no complex output/istft |
 | `mne.time_frequency.tfr_array_morlet` | partial | MorletTfr::computeMultiChannel | power only; single epoch; no complex/ITC |
 | `mne.time_frequency.tfr_array_multitaper` | partial | UTILSLIB::MultitaperTfr::computeArray | power for one epoch; no complex/ITC/decim |
 | `mne.time_frequency.tfr_morlet` | partial | MorletTfr::compute | no Epochs input, averaging or ITC |
 | `mne.time_frequency.tfr_multitaper` | partial | UTILSLIB::MultitaperTfr::computeArray | matrix input; no Epochs/Evoked, averaging or ITC |
+| `mne.time_frequency.EpochsSpectrum` | missing | — | no per-epoch spectrum container |
+| `mne.time_frequency.EpochsSpectrumArray` | missing | — | no per-epoch spectrum container |
 | `mne.time_frequency.EpochsTFR` | missing | — | no per-epoch TFR container |
 | `mne.time_frequency.EpochsTFRArray` | missing | — |  |
+| `mne.time_frequency.combine_spectrum` | missing | — | no spectrum combination |
 | `mne.time_frequency.combine_tfr` | missing | — |  |
 | `mne.time_frequency.csd_tfr` | missing | — |  |
 | `mne.time_frequency.fit_iir_model_raw` | missing | — | AR/IIR model PSD not ported |
@@ -284,6 +287,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.time_frequency.istft` | missing | — | inverse STFT not ported |
 | `mne.time_frequency.pick_channels_csd` | missing | — |  |
 | `mne.time_frequency.read_csd` | missing | — |  |
+| `mne.time_frequency.read_spectrum` | missing | — | no spectrum file I/O |
 | `mne.time_frequency.read_tfrs` | missing | — |  |
 | `mne.time_frequency.tfr_array_stockwell` | missing | — | Stockwell TFR not ported |
 | `mne.time_frequency.tfr_stockwell` | missing | — | Stockwell TFR not ported |
@@ -294,7 +298,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
 | `mne.decoding.FilterEstimator` | partial | FirFilter::filterData | filters exist; no transformer wrapper |
-| `mne.decoding.PSDEstimator` | partial | Spectral (partial) | no sklearn wrapper |
 | `mne.decoding.Scaler` | partial | StandardScaler | generic external scaler; no per-channel-type scalings |
 | `mne.decoding.SpatialFilter` | partial | DecodingCsp::filters/patterns | no shared base class; each decoder has its own filters/patterns |
 | `mne.decoding.TemporalFilter` | partial | FirFilter::filterData | no transformer wrapper |
@@ -302,6 +305,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.decoding.EMS` | missing | — | eigenvector method |
 | `mne.decoding.GeneralizingEstimator` | missing | — | temporal generalization wrapper |
 | `mne.decoding.LinearModel` | missing | — | no coef→patterns (Haufe) wrapper |
+| `mne.decoding.PSDEstimator` | missing | — | no transformer wrapper |
 | `mne.decoding.ReceptiveField` | missing | — | encoding/decoding TRF |
 | `mne.decoding.SlidingEstimator` | missing | — | time-resolved decoding wrapper |
 | `mne.decoding.TimeDelayingRidge` | missing | — | time-delaying ridge (TRF) not ported |
@@ -340,5 +344,5 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 ## Already implemented (do not re-implement)
 
-200 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
+196 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
 

@@ -20,11 +20,11 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 357,
+    "claims": 352,
     "by_evidence": {
-      "cross-validated-static": 132,
+      "cross-validated-static": 135,
       "cross-validated-live": 4,
-      "tested": 217,
+      "tested": 209,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 107,
+        "cross-validated-static": 110,
         "cross-validated-live": 3,
-        "tested": 154,
+        "tested": 146,
         "unverified": 4
       }
     },
@@ -55,6 +55,7 @@
         "test_dsp_morlet_tfr",
         "test_dsp_multitaper",
         "test_dsp_simulate",
+        "test_dsp_welch_psd",
         "test_edf2fiff_rwr",
         "test_fiff_core_python",
         "test_fiff_cov_python",
@@ -91,7 +92,8 @@
         "test_standard_montage",
         "test_sts_cluster",
         "test_surface_laplacian",
-        "test_tool_list_source_space"
+        "test_tool_list_source_space",
+        "test_utils_spectral"
       ],
       "cross-validated-live": [
         "test_compute_raw_inverse",
@@ -111,7 +113,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **56.9%",
+      "text": "parity: **55.9%",
       "status": "generated-with-denominator"
     }
   ],
@@ -1338,14 +1340,6 @@
       "python": "mne.decoding.FilterEstimator",
       "claimed": "partial",
       "test": "test_dsp_annotate_artifact",
-      "evidence": "tested"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "Spectral (partial)",
-      "python": "mne.decoding.PSDEstimator",
-      "claimed": "partial",
-      "test": "test_utils_spectral",
       "evidence": "tested"
     },
     {
@@ -2654,22 +2648,6 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "Spectral (partial)",
-      "python": "mne.time_frequency.EpochsSpectrum",
-      "claimed": "partial",
-      "test": "test_utils_spectral",
-      "evidence": "tested"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "Spectral (partial)",
-      "python": "mne.time_frequency.EpochsSpectrumArray",
-      "claimed": "partial",
-      "test": "test_utils_spectral",
-      "evidence": "tested"
-    },
-    {
-      "source": "parity",
       "mne_cpp": "MorletTfr::computeMultiChannel",
       "python": "mne.time_frequency.RawTFR",
       "claimed": "partial",
@@ -2686,26 +2664,18 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "Spectral (DSPLIB)",
+      "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
       "python": "mne.time_frequency.Spectrum",
-      "claimed": "implemented",
-      "test": "test_utils_spectral",
-      "evidence": "tested"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "Spectral (DSPLIB)",
-      "python": "mne.time_frequency.SpectrumArray",
-      "claimed": "implemented",
-      "test": "test_utils_spectral",
-      "evidence": "tested"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "Spectral (partial)",
-      "python": "mne.time_frequency.combine_spectrum",
       "claimed": "partial",
-      "test": "test_utils_spectral",
+      "test": "test_dsp_welch_psd",
+      "evidence": "tested"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
+      "python": "mne.time_frequency.SpectrumArray",
+      "claimed": "partial",
+      "test": "test_dsp_welch_psd",
       "evidence": "tested"
     },
     {
@@ -2774,27 +2744,19 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "Spectral multitaper",
+      "mne_cpp": "UTILSLIB::MultitaperPsd::compute",
       "python": "mne.time_frequency.psd_array_multitaper",
-      "claimed": "implemented",
-      "test": "test_utils_spectral",
-      "evidence": "tested"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "Spectral::psdWelch",
-      "python": "mne.time_frequency.psd_array_welch",
-      "claimed": "implemented",
-      "test": "test_utils_spectral",
-      "evidence": "tested"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "Spectral (partial)",
-      "python": "mne.time_frequency.read_spectrum",
       "claimed": "partial",
-      "test": "test_utils_spectral",
-      "evidence": "tested"
+      "test": "test_dsp_multitaper",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "UTILSLIB::WelchPsd::compute",
+      "python": "mne.time_frequency.psd_array_welch",
+      "claimed": "partial",
+      "test": "test_dsp_welch_psd",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2810,7 +2772,7 @@
       "python": "mne.time_frequency.stftfreq",
       "claimed": "implemented",
       "test": "test_utils_spectral",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

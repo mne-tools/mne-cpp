@@ -9,9 +9,9 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 200,
-      "partial": 95,
-      "missing": 140,
+      "implemented": 196,
+      "partial": 94,
+      "missing": 145,
       "not-applicable": 8
     },
     "by_domain": {
@@ -76,9 +76,9 @@
         "not-applicable": 0
       },
       "time_frequency": {
-        "implemented": 6,
+        "implemented": 2,
         "partial": 22,
-        "missing": 13,
+        "missing": 17,
         "not-applicable": 0
       },
       "connectivity": {
@@ -89,8 +89,8 @@
       },
       "decoding": {
         "implemented": 4,
-        "partial": 6,
-        "missing": 12,
+        "partial": 5,
+        "missing": 13,
         "not-applicable": 2
       },
       "stats": {
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 56.9
+    "parity_percent": 55.9
   },
   "apis": [
     {
@@ -3973,28 +3973,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.Spectrum",
-      "name": "Spectrum",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "Spectral (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.SpectrumArray",
-      "name": "SpectrumArray",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "Spectral (DSPLIB)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.time_frequency.dpss_windows",
       "name": "dpss_windows",
       "submodule": "time_frequency",
@@ -4002,28 +3980,6 @@
       "domain": "time_frequency",
       "status": "implemented",
       "mne_cpp": "UTILSLIB::Dpss::compute",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.psd_array_multitaper",
-      "name": "psd_array_multitaper",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "Spectral multitaper",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.psd_array_welch",
-      "name": "psd_array_welch",
-      "submodule": "time_frequency",
-      "kind": "function",
-      "domain": "time_frequency",
-      "status": "implemented",
-      "mne_cpp": "Spectral::psdWelch",
       "note": "",
       "evidence": "parity-record"
     },
@@ -4083,28 +4039,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.EpochsSpectrum",
-      "name": "EpochsSpectrum",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "partial",
-      "mne_cpp": "Spectral (partial)",
-      "note": "epochs spectrum container",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.time_frequency.EpochsSpectrumArray",
-      "name": "EpochsSpectrumArray",
-      "submodule": "time_frequency",
-      "kind": "class",
-      "domain": "time_frequency",
-      "status": "partial",
-      "mne_cpp": "Spectral (partial)",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.time_frequency.RawTFR",
       "name": "RawTFR",
       "submodule": "time_frequency",
@@ -4127,14 +4061,25 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.combine_spectrum",
-      "name": "combine_spectrum",
+      "python": "mne.time_frequency.Spectrum",
+      "name": "Spectrum",
       "submodule": "time_frequency",
-      "kind": "function",
+      "kind": "class",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "Spectral (partial)",
-      "note": "",
+      "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
+      "note": "PSD and frequencies only; no Info, plotting or I/O",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.SpectrumArray",
+      "name": "SpectrumArray",
+      "submodule": "time_frequency",
+      "kind": "class",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
+      "note": "PSD and frequencies only; no Info, plotting or I/O",
       "evidence": "parity-record"
     },
     {
@@ -4215,14 +4160,25 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.time_frequency.read_spectrum",
-      "name": "read_spectrum",
+      "python": "mne.time_frequency.psd_array_multitaper",
+      "name": "psd_array_multitaper",
       "submodule": "time_frequency",
       "kind": "function",
       "domain": "time_frequency",
       "status": "partial",
-      "mne_cpp": "Spectral (partial)",
-      "note": "spectrum I/O limited",
+      "mne_cpp": "UTILSLIB::MultitaperPsd::compute",
+      "note": "normalization='full' only, no adaptive weights or fmin/fmax",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.psd_array_welch",
+      "name": "psd_array_welch",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "partial",
+      "mne_cpp": "UTILSLIB::WelchPsd::compute",
+      "note": "overlap as a fraction, n_per_seg = n_fft, mean average only, no fmin/fmax",
       "evidence": "parity-record"
     },
     {
@@ -4281,6 +4237,28 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.time_frequency.EpochsSpectrum",
+      "name": "EpochsSpectrum",
+      "submodule": "time_frequency",
+      "kind": "class",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no per-epoch spectrum container",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.EpochsSpectrumArray",
+      "name": "EpochsSpectrumArray",
+      "submodule": "time_frequency",
+      "kind": "class",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no per-epoch spectrum container",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.time_frequency.EpochsTFR",
       "name": "EpochsTFR",
       "submodule": "time_frequency",
@@ -4300,6 +4278,17 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.combine_spectrum",
+      "name": "combine_spectrum",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no spectrum combination",
       "evidence": "parity-record"
     },
     {
@@ -4377,6 +4366,17 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.time_frequency.read_spectrum",
+      "name": "read_spectrum",
+      "submodule": "time_frequency",
+      "kind": "function",
+      "domain": "time_frequency",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no spectrum file I/O",
       "evidence": "parity-record"
     },
     {
@@ -4479,17 +4479,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.decoding.PSDEstimator",
-      "name": "PSDEstimator",
-      "submodule": "decoding",
-      "kind": "class",
-      "domain": "decoding",
-      "status": "partial",
-      "mne_cpp": "Spectral (partial)",
-      "note": "no sklearn wrapper",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.decoding.Scaler",
       "name": "Scaler",
       "submodule": "decoding",
@@ -4564,6 +4553,17 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no coef→patterns (Haufe) wrapper",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.decoding.PSDEstimator",
+      "name": "PSDEstimator",
+      "submodule": "decoding",
+      "kind": "class",
+      "domain": "decoding",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no transformer wrapper",
       "evidence": "parity-record"
     },
     {
