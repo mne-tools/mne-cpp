@@ -4,7 +4,7 @@
   "policy": "tools/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 462,
-    "exported_free_functions": 115,
+    "exported_free_functions": 116,
     "registered_classes": 510,
     "exported_not_registered": 0,
     "registered_function_modules": 13,
@@ -581,6 +581,11 @@
     },
     {
       "name": "applyInverseRaw",
+      "header": "inv/inv_convenience.h",
+      "library": "inv"
+    },
+    {
+      "name": "applyForward",
       "header": "inv/inv_convenience.h",
       "library": "inv"
     },

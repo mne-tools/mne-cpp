@@ -8,11 +8,11 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **196**
-- Partial: **94**
+- Implemented: **194**
+- Partial: **96**
 - Missing: **145**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **55.9%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **55.6%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -26,7 +26,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Channels & Montages | 15 | 10 | 16 | 1 | 42 |
 | Epochs & Evoked | 13 | 2 | 1 | 0 | 16 |
 | Covariance & Whitening | 6 | 1 | 0 | 0 | 7 |
-| Forward Modelling | 27 | 7 | 1 | 0 | 35 |
+| Forward Modelling | 25 | 9 | 1 | 0 | 35 |
 | Inverse & Source Estimation | 31 | 13 | 16 | 0 | 60 |
 | Source Space & Morphing | 15 | 5 | 7 | 0 | 27 |
 | Time-Frequency | 2 | 22 | 17 | 0 | 41 |
@@ -189,6 +189,8 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
+| `mne.apply_forward_raw` | partial | INVLIB::applyForward | returns evoked-shaped data, no Raw object |
+| `mne.forward.apply_forward_raw` | partial | INVLIB::applyForward | returns evoked-shaped data, no Raw object |
 | `mne.forward.make_field_map` | partial | FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping | mapping matrices; no evoked/trans/subject wrapper |
 | `mne.forward.make_forward_dipole` | partial | ComputeFwd (partial) | dipole forward limited |
 | `mne.forward.restrict_forward_to_label` | partial | MNEForwardSolution (partial) | label restriction limited |
@@ -344,5 +346,5 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 ## Already implemented (do not re-implement)
 
-196 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
+194 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
 

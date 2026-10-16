@@ -120,6 +120,33 @@ Reads the requested range and applies the inverse operator with nave = 1. Equiva
 
 ---
 
+### applyForward(fwd, stc, info)
+
+```cpp
+[FiffEvoked](/docs/api/fiff/fiff-evoked) applyForward(const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) & fwd, const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) & stc, const [FiffInfo](/docs/api/fiff/fiff-info) & info);
+```
+
+Project a source estimate to the sensors, as mne.apply_forward.
+
+A free-orientation forward is first converted to fixed orientation along the (patch-averaged) cortical normals. The source estimate rows are matched to forward columns by vertex number per hemisphere (`stc.nVerticesLh` splits lh and rh); a vertex the forward lacks is an error. A forward without source spaces is used column by column. The evoked carries the forward's channels taken from `info`.
+
+**Parameters:**
+
+- **fwd** : *const [MNEForwardSolution](/docs/api/mne/mne-forward-solution) &*
+  Forward solution; its channels must all be in `info`.
+
+- **stc** : *const [InvSourceEstimate](/docs/api/inv/inv-source-estimate) &*
+  Source estimate with one row per source.
+
+- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
+  Measurement info supplying the channel descriptions.
+
+**Returns:**
+
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — Simulated evoked data, empty on error.
+
+---
+
 ### estimateSnr(evoked, inverse)
 
 ```cpp

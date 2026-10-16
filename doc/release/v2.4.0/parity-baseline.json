@@ -22,9 +22,9 @@
   "summary": {
     "claims": 352,
     "by_evidence": {
-      "cross-validated-static": 135,
+      "cross-validated-static": 140,
       "cross-validated-live": 4,
-      "tested": 209,
+      "tested": 204,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 110,
+        "cross-validated-static": 115,
         "cross-validated-live": 3,
-        "tested": 146,
+        "tested": 141,
         "unverified": 4
       }
     },
@@ -113,7 +113,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **55.9%",
+      "text": "parity: **55.6%",
       "status": "generated-with-denominator"
     }
   ],
@@ -896,18 +896,18 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNEForwardSolution apply",
+      "mne_cpp": "INVLIB::applyForward",
       "python": "mne.apply_forward",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
-      "mne_cpp": "MNEForwardSolution apply",
+      "mne_cpp": "INVLIB::applyForward",
       "python": "mne.apply_forward_raw",
-      "claimed": "implemented",
-      "test": "test_mne_forward_solution",
+      "claimed": "partial",
+      "test": "test_mne_forward_ops",
       "evidence": "tested"
     },
     {
@@ -1424,18 +1424,18 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNEForwardSolution apply",
+      "mne_cpp": "INVLIB::applyForward",
       "python": "mne.forward.apply_forward",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
-      "mne_cpp": "MNEForwardSolution apply",
+      "mne_cpp": "INVLIB::applyForward",
       "python": "mne.forward.apply_forward_raw",
-      "claimed": "implemented",
-      "test": "test_mne_forward_solution",
+      "claimed": "partial",
+      "test": "test_mne_forward_ops",
       "evidence": "tested"
     },
     {
@@ -1472,11 +1472,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNEForwardSolution",
+      "mne_cpp": "MNEForwardSolution::isFixedOrient",
       "python": "mne.forward.is_fixed_orient",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1499,8 +1499,8 @@
       "mne_cpp": "MNEForwardSolution::read",
       "python": "mne.forward.read_forward_solution",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2275,8 +2275,8 @@
       "mne_cpp": "MNEForwardSolution::read",
       "python": "mne.read_forward_solution",
       "claimed": "implemented",
-      "test": "test_mne_forward_solution",
-      "evidence": "tested"
+      "test": "test_mne_forward_ops",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

@@ -24,6 +24,8 @@
 #include "minimum_norm/inv_minimum_norm.h"
 
 #include <mne/mne_inverse_operator.h>
+#include <mne/mne_forward_solution.h>
+#include <mne/mne_source_spaces.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_cov.h>
@@ -48,8 +50,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
+#include <numeric>
 #include <vector>
 
 //=============================================================================================================
@@ -184,6 +188,78 @@ InvSourceEstimate INVLIB::applyInverseRaw(
     mn.doInverseSetup(1, pickNormal);
 
     return mn.calculateInverse(data, tmin, tstep, pickNormal);
+}
+
+//=============================================================================================================
+
+FiffEvoked INVLIB::applyForward(const MNEForwardSolution& fwd, const InvSourceEstimate& stc, const FiffInfo& info)
+{
+    // Adapted from mne.forward.forward.apply_forward / _apply_forward (MNE-Python, BSD-3-Clause).
+    if (!fwd.sol || fwd.sol->data.size() == 0 || stc.isEmpty()) {
+        qWarning() << "[applyForward] Empty forward solution or source estimate.";
+        return FiffEvoked();
+    }
+    MNEForwardSolution fixed = fwd;
+    const int nHemi = fixed.src.size();
+    if (nHemi > 0 && !fixed.isFixedOrient()) {
+        fixed.convert_to_surf_ori();
+        fixed.to_fixed_ori();
+    }
+    const MatrixXd& gain = fixed.sol->data;
+
+    QVector<int> columns(static_cast<int>(stc.data.rows()));
+    if (nHemi == 0) {
+        if (gain.cols() != stc.data.rows()) {
+            qWarning() << "[applyForward] Forward columns" << gain.cols() << "!= source estimate rows" << stc.data.rows();
+            return FiffEvoked();
+        }
+        std::iota(columns.begin(), columns.end(), 0);
+    } else {
+        const int nLh = stc.nVerticesLh >= 0 ? stc.nVerticesLh : static_cast<int>(stc.vertices.size());
+        for (int r = 0; r < columns.size(); ++r) {
+            const int hemi = (r < nLh || nHemi == 1) ? 0 : 1;
+            const VectorXi& vertno = fixed.src.hemisphereAt(hemi)->vertno;
+            int offset = 0;
+            for (int h = 0; h < hemi; ++h)
+                offset += static_cast<int>(fixed.src.hemisphereAt(h)->vertno.size());
+            const auto* hit = std::find(vertno.data(), vertno.data() + vertno.size(), stc.vertices(r));
+            if (hit == vertno.data() + vertno.size()) {
+                qWarning() << "[applyForward] Vertex" << stc.vertices(r) << "is not in the forward solution.";
+                return FiffEvoked();
+            }
+            columns[r] = offset + static_cast<int>(hit - vertno.data());
+        }
+    }
+
+    // A gain matrix without channel names is taken to have the info's channels in order
+    RowVectorXi sel(fixed.sol->row_names.isEmpty() ? gain.rows() : fixed.sol->row_names.size());
+    if (fixed.sol->row_names.isEmpty()) {
+        if (info.nchan != gain.rows()) {
+            qWarning() << "[applyForward] Unnamed forward rows" << gain.rows() << "!= info channels" << info.nchan;
+            return FiffEvoked();
+        }
+        std::iota(sel.begin(), sel.end(), 0);
+    }
+    for (int c = 0; c < fixed.sol->row_names.size(); ++c) {
+        sel(c) = static_cast<int>(info.ch_names.indexOf(fixed.sol->row_names[c]));
+        if (sel(c) < 0) {
+            qWarning() << "[applyForward] Channel" << fixed.sol->row_names[c] << "of the forward is not in the info.";
+            return FiffEvoked();
+        }
+    }
+
+    FiffEvoked evoked;
+    MatrixXd selected(gain.rows(), columns.size());
+    for (int r = 0; r < columns.size(); ++r)
+        selected.col(r) = gain.col(columns[r]);
+    evoked.data = selected * stc.data;
+    evoked.info = info.pick_info(sel);
+    evoked.times = RowVectorXf::LinSpaced(stc.data.cols(), stc.tmin, stc.tmin + (stc.data.cols() - 1) * stc.tstep);
+    evoked.first = static_cast<int>(std::lround(stc.tmin * info.sfreq));
+    evoked.last = evoked.first + static_cast<int>(stc.data.cols()) - 1;
+    evoked.nave = 1;
+    evoked.comment = QStringLiteral("Simulated");
+    return evoked;
 }
 
 //=============================================================================================================

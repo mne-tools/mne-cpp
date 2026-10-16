@@ -9,8 +9,8 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 196,
-      "partial": 94,
+      "implemented": 194,
+      "partial": 96,
       "missing": 145,
       "not-applicable": 8
     },
@@ -58,8 +58,8 @@
         "not-applicable": 0
       },
       "forward": {
-        "implemented": 27,
-        "partial": 7,
+        "implemented": 25,
+        "partial": 9,
         "missing": 1,
         "not-applicable": 0
       },
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 55.9
+    "parity_percent": 55.6
   },
   "apis": [
     {
@@ -2648,18 +2648,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "MNEForwardSolution apply",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.apply_forward_raw",
-      "name": "apply_forward_raw",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "forward",
-      "status": "implemented",
-      "mne_cpp": "MNEForwardSolution apply",
+      "mne_cpp": "INVLIB::applyForward",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2703,18 +2692,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "MNEForwardSolution apply",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.forward.apply_forward_raw",
-      "name": "apply_forward_raw",
-      "submodule": "forward",
-      "kind": "function",
-      "domain": "forward",
-      "status": "implemented",
-      "mne_cpp": "MNEForwardSolution apply",
+      "mne_cpp": "INVLIB::applyForward",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2769,7 +2747,7 @@
       "kind": "function",
       "domain": "forward",
       "status": "implemented",
-      "mne_cpp": "MNEForwardSolution",
+      "mne_cpp": "MNEForwardSolution::isFixedOrient",
       "note": "",
       "evidence": "parity-record"
     },
@@ -2925,6 +2903,28 @@
       "status": "implemented",
       "mne_cpp": "MNEBem::write, --id 4",
       "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.apply_forward_raw",
+      "name": "apply_forward_raw",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "forward",
+      "status": "partial",
+      "mne_cpp": "INVLIB::applyForward",
+      "note": "returns evoked-shaped data, no Raw object",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.forward.apply_forward_raw",
+      "name": "apply_forward_raw",
+      "submodule": "forward",
+      "kind": "function",
+      "domain": "forward",
+      "status": "partial",
+      "mne_cpp": "INVLIB::applyForward",
+      "note": "returns evoked-shaped data, no Raw object",
       "evidence": "parity-record"
     },
     {

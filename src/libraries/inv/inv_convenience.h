@@ -56,12 +56,14 @@
 namespace MNELIB
 {
 class MNEInverseOperator;
+class MNEForwardSolution;
 }
 namespace FIFFLIB
 {
 class FiffEvoked;
 class FiffRawData;
 class FiffCov;
+class FiffInfo;
 }
 
 //=============================================================================================================
@@ -125,6 +127,26 @@ INVSHARED_EXPORT InvSourceEstimate applyInverseRaw(
     int from = -1,
     int to = -1,
     bool pickNormal = false);
+
+//=============================================================================================================
+/**
+ * @brief Project a source estimate to the sensors, as mne.apply_forward.
+ *
+ * A free-orientation forward is first converted to fixed orientation along the (patch-averaged) cortical
+ * normals. The source estimate rows are matched to forward columns by vertex number per hemisphere
+ * (@c stc.nVerticesLh splits lh and rh); a vertex the forward lacks is an error. A forward without
+ * source spaces is used column by column. The evoked carries the forward's channels taken from @p info.
+ *
+ * @param[in] fwd    Forward solution; its channels must all be in @p info.
+ * @param[in] stc    Source estimate with one row per source.
+ * @param[in] info   Measurement info supplying the channel descriptions.
+ *
+ * @return Simulated evoked data, empty on error.
+ */
+INVSHARED_EXPORT FIFFLIB::FiffEvoked applyForward(
+    const MNELIB::MNEForwardSolution& fwd,
+    const InvSourceEstimate& stc,
+    const FIFFLIB::FiffInfo& info);
 
 //=============================================================================================================
 /**

@@ -27,11 +27,16 @@
 #include <mne/mne_forward_solution.h>
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_source_spaces.h>
+#include <fiff/fiff_evoked.h>
+#include <inv/inv_convenience.h>
+#include <inv/inv_source_estimate.h>
 
 using namespace FIFFLIB;
 using namespace MNELIB;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+using Eigen::VectorXi;
+using INVLIB::InvSourceEstimate;
 
 //=============================================================================================================
 
@@ -180,6 +185,76 @@ private slots:
         // After fixed orientation: sols should still be valid
         QVERIFY(fwdCopy.sol->data.cols() > 0);
         QVERIFY(fwdCopy.sol->data.rows() > 0);
+    }
+
+    // ── read_forward_solution ───────────────────────────────────────────────
+
+    void testReadMatchesMnePython()
+    {
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
+
+        // Reference values produced by mne.read_forward_solution(fwd file) (mne 1.11): gain shape (366, 23784),
+        // G[0, 0], G[200, 1000], G[365, 23783], sum |G|; nuse 3956 / 3972; mne.forward.is_fixed_orient(fwd) False
+        const MatrixXd& g = m_fwd.sol->data;
+        QCOMPARE(g.rows(), Eigen::Index(366));
+        QCOMPARE(g.cols(), Eigen::Index(23784));
+        QVERIFY(std::abs(g(0, 0) + 1.788588e-06) < 1e-12);
+        QVERIFY(std::abs(g(200, 1000) - 5.1578004e-06) < 1e-12);
+        QVERIFY(std::abs(g(365, 23783) - 33.151615) < 1e-5);
+        QVERIFY(std::abs(g.cwiseAbs().sum() - 6.6901876e+07) < 1e-6 * 6.6901876e+07);
+        QCOMPARE(m_fwd.src.hemisphereAt(0)->nuse, 3956);
+        QCOMPARE(m_fwd.src.hemisphereAt(1)->nuse, 3972);
+        QVERIFY(!m_fwd.isFixedOrient());
+    }
+
+    // ── apply_forward ───────────────────────────────────────────────────────
+
+    void testApplyForwardMatchesMnePython()
+    {
+        if (!m_bFwdLoaded)
+            QSKIP("Forward solution not loaded");
+
+        // Reference values produced by mne.apply_forward(fwd, stc, info) (mne 1.11) on this free-orientation forward
+        // (converted to fixed with cortical patch statistics), info of sample_audvis-ave.fif with space-free names:
+        //   stc vertices lh [841, 3046], rh [713], data = vstack([sin(t + 1), cos(0.5 t), 0.3 t - 0.4]) * 1e-8,
+        //   t = 0..4, tmin 0.1, tstep 0.002. Rows: channel, samples 0, 2, 4.
+        QFile aveFile(m_sDataPath + "/MEG/sample/sample_audvis-ave.fif");
+        const FiffEvoked ave(aveFile, 0);
+        MatrixXd data(3, 5);
+        for (int t = 0; t < 5; ++t) {
+            data(0, t) = std::sin(t + 1.0) * 1e-8;
+            data(1, t) = std::cos(0.5 * t) * 1e-8;
+            data(2, t) = (0.3 * t - 0.4) * 1e-8;
+        }
+        InvSourceEstimate stc(data, (VectorXi(3) << 841, 3046, 713).finished(), 0.1f, 0.002f);
+        stc.nVerticesLh = 2;
+
+        const FiffEvoked evoked = INVLIB::applyForward(m_fwd, stc, ave.info);
+        QCOMPARE(evoked.info.ch_names.size(), 366);
+        QCOMPARE(evoked.info.ch_names.first(), QString("MEG0113"));
+        QVERIFY(std::abs(evoked.times(0) - 0.1f) < 1e-7f);
+        const QList<QPair<QString, QList<double>>> expected = {
+            {"MEG0113", {2.29908704899e-13, 5.78211973512e-14, -2.13557499523e-13}},
+            {"MEG2443", {-1.04706535856e-12, -1.61720466574e-13, 1.11124408652e-12}},
+            {"EEG001", {-3.50052778352e-07, 1.34513634827e-08, 4.92685045566e-07}},
+            {"EEG060", {5.92750625114e-09, -2.18851835027e-07, -4.00659174832e-07}}};
+        for (const auto& [name, values] : expected) {
+            const int row = static_cast<int>(evoked.info.ch_names.indexOf(name));
+            QVERIFY2(row >= 0, qPrintable(name));
+            for (int k = 0; k < 3; ++k) {
+                const double got = evoked.data(row, 2 * k);
+                QVERIFY2(std::abs(got - values[k]) <= 1e-5 * std::abs(values[k]),
+                         qPrintable(QString("%1 sample %2: %3 vs mne %4").arg(name).arg(2 * k).arg(got, 0, 'g', 12).arg(values[k], 0, 'g', 12)));
+            }
+        }
+        QVERIFY(std::abs(evoked.data.cwiseAbs().sum() - 0.000162240427669) <= 1e-5 * 0.000162240427669);
+
+        // A vertex the forward does not have is refused, as with mne's on_missing="raise"
+        InvSourceEstimate missing(data.topRows(1), (VectorXi(1) << 842).finished(), 0.1f, 0.002f);
+        missing.nVerticesLh = 1;
+        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("applyForward.*842"));
+        QCOMPARE(INVLIB::applyForward(m_fwd, missing, ave.info).data.size(), Eigen::Index(0));
     }
 
     // ── compute_orient_prior ────────────────────────────────────────────────

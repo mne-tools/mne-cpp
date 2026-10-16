@@ -11546,16 +11546,16 @@
       {
         "python": "mne.apply_forward",
         "status": "implemented",
-        "mne_cpp": "MNEForwardSolution apply",
+        "mne_cpp": "INVLIB::applyForward",
         "note": "",
-        "test": "test_mne_forward_solution"
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.apply_forward_raw",
-        "status": "implemented",
-        "mne_cpp": "MNEForwardSolution apply",
-        "note": "",
-        "test": "test_mne_forward_solution"
+        "status": "partial",
+        "mne_cpp": "INVLIB::applyForward",
+        "note": "returns evoked-shaped data, no Raw object",
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.average_forward_solutions",
@@ -12223,16 +12223,16 @@
       {
         "python": "mne.forward.apply_forward",
         "status": "implemented",
-        "mne_cpp": "MNEForwardSolution apply",
+        "mne_cpp": "INVLIB::applyForward",
         "note": "",
-        "test": "test_mne_forward_solution"
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.forward.apply_forward_raw",
-        "status": "implemented",
-        "mne_cpp": "MNEForwardSolution apply",
-        "note": "",
-        "test": "test_mne_forward_solution"
+        "status": "partial",
+        "mne_cpp": "INVLIB::applyForward",
+        "note": "returns evoked-shaped data, no Raw object",
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.forward.average_forward_solutions",
@@ -12265,9 +12265,9 @@
       {
         "python": "mne.forward.is_fixed_orient",
         "status": "implemented",
-        "mne_cpp": "MNEForwardSolution",
+        "mne_cpp": "MNEForwardSolution::isFixedOrient",
         "note": "",
-        "test": "test_mne_forward_solution"
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.forward.make_field_map",
@@ -12288,7 +12288,7 @@
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::read",
         "note": "",
-        "test": "test_mne_forward_solution"
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.forward.restrict_forward_to_label",
@@ -13349,7 +13349,7 @@
         "status": "implemented",
         "mne_cpp": "MNEForwardSolution::read",
         "note": "FIFF forward I/O",
-        "test": "test_mne_forward_solution"
+        "test": "test_mne_forward_ops"
       },
       {
         "python": "mne.read_freesurfer_lut",

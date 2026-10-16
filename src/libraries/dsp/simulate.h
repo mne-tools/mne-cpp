@@ -119,10 +119,9 @@ DSPSHARED_EXPORT INVLIB::InvSourceEstimate simulateStcFromWaveforms(
 /**
  * @brief Simulate evoked data from a source estimate and forward model.
  *
- * Projects the source estimate through the forward model to generate
- * sensor-space data, optionally adding noise from a noise covariance. As in MNE-Python the
- * noise follows the prepared covariance (SSP applied, MEG and EEG decomposed separately),
- * so MEG and EEG noise are independent. The forward rows must be the info channels.
+ * Projects the source estimate with INVLIB::applyForward and optionally adds noise from a noise
+ * covariance. As in MNE-Python the noise follows the prepared covariance (SSP applied, MEG and EEG
+ * decomposed separately), so MEG and EEG noise are independent.
  *
  * Equivalent to MNE-Python's mne.simulation.simulate_evoked().
  *
@@ -147,7 +146,7 @@ DSPSHARED_EXPORT FIFFLIB::FiffEvoked simulateEvoked(
 /**
  * @brief Simulate evoked data without noise.
  *
- * Projects source estimate through forward model (no noise added).
+ * Projects the source estimate through the forward model (no noise added); INVLIB::applyForward.
  *
  * @param[in] fwd         Forward solution.
  * @param[in] stc         Source time course.

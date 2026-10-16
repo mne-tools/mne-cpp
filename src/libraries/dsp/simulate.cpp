@@ -17,6 +17,7 @@
 #include "simulate.h"
 
 #include <inv/inv_source_estimate.h>
+#include <inv/inv_convenience.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_cov.h>
@@ -160,12 +161,12 @@ FiffEvoked UTILSLIB::simulateEvoked(
     const int nTimes = static_cast<int>(evoked.data.cols());
 
     // Add noise from covariance
-    if (noiseCov.data.size() > 0 && noiseCov.data.rows() == nChan) {
+    if (noiseCov.data.size() > 0) {
         // Coloured like mne.simulation.simulate_evoked: the colourer of the prepared covariance (SSP applied,
         // MEG and EEG decomposed separately), so the noise has no MEG-EEG covariance; divided by sqrt(nave).
-        const FiffCov prepared = noiseCov.prepare_noise_cov(info, info.ch_names);
+        const FiffCov prepared = noiseCov.prepare_noise_cov(evoked.info, evoked.info.ch_names);
         if (prepared.eig.size() != nChan) {
-            qWarning() << "[simulateEvoked] Noise covariance does not cover the info channels.";
+            qWarning() << "[simulateEvoked] Noise covariance does not cover the forward channels.";
             return evoked;
         }
         const MatrixXd sqrtCov = prepared.eigvec.transpose() * prepared.eig.cwiseMax(0.0).cwiseSqrt().asDiagonal();
@@ -195,43 +196,5 @@ FiffEvoked UTILSLIB::simulateEvokedNoiseless(
     const InvSourceEstimate& stc,
     const FiffInfo& info)
 {
-    FiffEvoked evoked;
-
-    if (!fwd.sol || fwd.sol->data.size() == 0) {
-        qWarning() << "[simulateEvokedNoiseless] Forward solution has no gain matrix.";
-        return evoked;
-    }
-
-    if (stc.isEmpty()) {
-        qWarning() << "[simulateEvokedNoiseless] Source estimate is empty.";
-        return evoked;
-    }
-
-    MatrixXd G = fwd.sol->data; // (n_channels x n_dipoles)
-    const int nDipoles = static_cast<int>(G.cols());
-    const int nSrc = static_cast<int>(stc.data.rows());
-    const int nTimes = static_cast<int>(stc.data.cols());
-
-    if (nDipoles != nSrc) {
-        qWarning() << "[simulateEvokedNoiseless] Leadfield columns" << nDipoles
-                   << "!= source estimate rows" << nSrc;
-        return evoked;
-    }
-
-    // Sensor data = G * stc.data
-    evoked.data = G * stc.data;
-
-    // Set times
-    evoked.times.resize(nTimes);
-    for (int t = 0; t < nTimes; ++t) {
-        evoked.times(t) = stc.tmin + t * stc.tstep;
-    }
-
-    evoked.first = 0;
-    evoked.last = nTimes - 1;
-    evoked.nave = 1;
-    evoked.comment = "Simulated";
-    evoked.info = info;
-
-    return evoked;
+    return INVLIB::applyForward(fwd, stc, info);
 }
