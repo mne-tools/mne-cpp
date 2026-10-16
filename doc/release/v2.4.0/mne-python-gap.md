@@ -9,10 +9,10 @@
 
 - **Total public MNE-Python APIs inventoried:** 443
 - Implemented: **200**
-- Partial: **99**
-- Missing: **136**
+- Partial: **95**
+- Missing: **140**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **57.4%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **56.9%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -23,15 +23,15 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | I/O & Readers | 18 | 2 | 39 | 0 | 59 |
 | Core Data Containers | 40 | 13 | 5 | 3 | 61 |
 | Preprocessing & Artifacts | 14 | 11 | 17 | 1 | 43 |
-| Channels & Montages | 16 | 10 | 15 | 1 | 42 |
+| Channels & Montages | 15 | 10 | 16 | 1 | 42 |
 | Epochs & Evoked | 13 | 2 | 1 | 0 | 16 |
 | Covariance & Whitening | 6 | 1 | 0 | 0 | 7 |
 | Forward Modelling | 27 | 7 | 1 | 0 | 35 |
-| Inverse & Source Estimation | 31 | 16 | 13 | 0 | 60 |
+| Inverse & Source Estimation | 31 | 13 | 16 | 0 | 60 |
 | Source Space & Morphing | 15 | 5 | 7 | 0 | 27 |
 | Time-Frequency | 6 | 22 | 13 | 0 | 41 |
 | Decoding & Machine Learning | 4 | 6 | 12 | 2 | 24 |
-| Statistics | 10 | 1 | 6 | 0 | 17 |
+| Statistics | 11 | 0 | 6 | 0 | 17 |
 | Simulation | 0 | 3 | 7 | 0 | 10 |
 | Visualisation | 0 | 0 | 0 | 1 | 1 |
 
@@ -147,10 +147,10 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.channels.DigMontage` | partial | FIFFLIB::FiffDigPointSet | no channel-name→position montage API |
 | `mne.channels.combine_channels` | partial | UTILSLIB::ChannelDerivation::apply | weighted sums only; no median/std |
 | `mne.channels.compute_dev_head_t` | partial | MNELIB::fitMatchedPoints | rigid point fit; no montage-HPI extraction |
+| `mne.channels.find_ch_adjacency` | partial | STSLIB::StatsAdjacency::fromChannelPositions | distance threshold (3x median nearest neighbour), not mne's Delaunay or system templates |
 | `mne.channels.generate_2d_layout` | partial | UTILSLIB::LayoutMaker::makeLayout | projects 3-D points; no direct 2-D input |
 | `mne.channels.make_dig_montage` | partial | FiffDigPointSet(QList<FiffDigPoint>) | no name→position mapping |
 | `mne.channels.make_standard_montage` | partial | UTILSLIB::StandardMontage::getMontage | standard_1005 (and its 10-20/10-10 subsets) from mne's bundled table; the other kinds (biosemi, easycap, GSN-HydroCel, ...) and fiducials are not bundled |
-| `mne.channels.read_ch_adjacency` | partial | StatsAdjacency (partial) |  |
 | `mne.channels.read_custom_montage` | partial | UTILSLIB::LayoutLoader::readAsaElcFile | .elc only; no .sfp/.loc/.bvef |
 | `mne.channels.read_vectorview_selection` | partial | UTILSLIB::SelectionIO::readMNESelFile | reads .sel; no name filter or space fixing |
 | `mne.read_vectorview_selection` | partial | SelectionIO::readMNESelFile | reads .sel; no name filter or space fixing |
@@ -161,6 +161,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.channels.get_builtin_montages` | missing | — | builtin montage database not ported |
 | `mne.channels.make_1020_channel_selections` | missing | — | 10-20 channel selection groups not ported |
 | `mne.channels.make_grid_layout` | missing | — |  |
+| `mne.channels.read_ch_adjacency` | missing | — | no reader for FieldTrip neighbour templates |
 | `mne.channels.read_dig_curry` | missing | — | Curry dig reader not ported |
 | `mne.channels.unify_bad_channels` | missing | — |  |
 | `mne.equalize_channels` | missing | — |  |
@@ -214,9 +215,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.minimum_norm.resolution_metrics` | partial | INVLIB::InvResolutionMatrix::peakLocalisationError/spatialSpread | peak_err and PSF spread only; no cog_err, maxrad_ext, sum_amp, peak_amp or CTF mode |
 | `mne.read_dipole` | partial | InvEcdSet::read_dipoles_dip | .dip only; .bdip is write-only |
 | `mne.read_source_estimate` | partial | InvSourceEstimate::read, read_w | .stc/.w only; no .h5 |
-| `mne.spatial_dist_adjacency` | partial | StatsAdjacency (partial) | distance-based adjacency limited |
-| `mne.spatial_inter_hemi_adjacency` | partial | StatsAdjacency (partial) | inter-hemi adjacency limited |
-| `mne.spatio_temporal_dist_adjacency` | partial | StatsAdjacency (partial) | distance adjacency limited |
 | `mne.DipoleFixed` | missing | — |  |
 | `mne.MixedSourceEstimate` | missing | — | mixed STC not ported |
 | `mne.MixedVectorSourceEstimate` | missing | — | mixed vector STC not ported |
@@ -229,6 +227,9 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.minimum_norm.compute_source_psd_epochs` | missing | — | epochs source PSD convenience |
 | `mne.minimum_norm.source_band_induced_power` | missing | — | banded source power convenience |
 | `mne.minimum_norm.source_induced_power` | missing | — | source induced power convenience |
+| `mne.spatial_dist_adjacency` | missing | — | no distance-based source adjacency |
+| `mne.spatial_inter_hemi_adjacency` | missing | — | no inter-hemisphere adjacency |
+| `mne.spatio_temporal_dist_adjacency` | missing | — | no distance-based source adjacency |
 | `mne.stc_near_sensors` | missing | — | sensor-space stc projection not ported |
 
 ### Source Space & Morphing
@@ -315,7 +316,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
-| `mne.stats.combine_adjacency` | partial | StatsAdjacency (partial) |  |
 | `mne.stats.bootstrap_confidence_interval` | missing | — | bootstrap CI not ported |
 | `mne.stats.f_mway_rm` | missing | — | RM-ANOVA not ported |
 | `mne.stats.f_threshold_mway_rm` | missing | — | RM-ANOVA threshold not ported |

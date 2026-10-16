@@ -20,24 +20,24 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 361,
+    "claims": 357,
     "by_evidence": {
-      "cross-validated-static": 130,
+      "cross-validated-static": 132,
       "cross-validated-live": 4,
-      "tested": 223,
+      "tested": 217,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 24,
+        "cross-validated-static": 25,
         "cross-validated-live": 1,
-        "tested": 64,
+        "tested": 63,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 106,
+        "cross-validated-static": 107,
         "cross-validated-live": 3,
-        "tested": 159,
+        "tested": 154,
         "unverified": 4
       }
     },
@@ -111,7 +111,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **57.4%",
+      "text": "parity: **56.9%",
       "status": "generated-with-denominator"
     }
   ],
@@ -730,7 +730,7 @@
       "python": "mne.stats.combine_adjacency",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1054,9 +1054,9 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "StatsAdjacency",
+      "mne_cpp": "STSLIB::StatsAdjacency::fromChannelPositions",
       "python": "mne.channels.find_ch_adjacency",
-      "claimed": "implemented",
+      "claimed": "partial",
       "test": "test_sts_cluster",
       "evidence": "tested"
     },
@@ -1099,14 +1099,6 @@
       "claimed": "partial",
       "test": "test_standard_montage",
       "evidence": "cross-validated-static"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "StatsAdjacency (partial)",
-      "python": "mne.channels.read_ch_adjacency",
-      "claimed": "partial",
-      "test": "test_sts_cluster",
-      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2494,22 +2486,6 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "StatsAdjacency (partial)",
-      "python": "mne.spatial_dist_adjacency",
-      "claimed": "partial",
-      "test": "test_sts_cluster",
-      "evidence": "tested"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "StatsAdjacency (partial)",
-      "python": "mne.spatial_inter_hemi_adjacency",
-      "claimed": "partial",
-      "test": "test_sts_cluster",
-      "evidence": "tested"
-    },
-    {
-      "source": "parity",
       "mne_cpp": "StatsAdjacency::fromSourceSpace",
       "python": "mne.spatial_src_adjacency",
       "claimed": "implemented",
@@ -2523,14 +2499,6 @@
       "claimed": "implemented",
       "test": "test_sts_cluster",
       "evidence": "cross-validated-static"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "StatsAdjacency (partial)",
-      "python": "mne.spatio_temporal_dist_adjacency",
-      "claimed": "partial",
-      "test": "test_sts_cluster",
-      "evidence": "tested"
     },
     {
       "source": "parity",
@@ -2566,11 +2534,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "StatsAdjacency (partial)",
+      "mne_cpp": "STSLIB::StatsAdjacency::combine",
       "python": "mne.stats.combine_adjacency",
-      "claimed": "partial",
+      "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

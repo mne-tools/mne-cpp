@@ -122,6 +122,29 @@ public:
         const Eigen::MatrixX3i& tris,
         int nVertices,
         int nTimes);
+
+    //=========================================================================================================
+    /**
+     * Adjacency of a regular 1-D grid of @p n points (each linked to its two neighbours), the meaning of an
+     * integer dimension in mne.stats.combine_adjacency.
+     *
+     * @param[in] n   Number of points.
+     *
+     * @return Sparse adjacency matrix (n x n), no diagonal.
+     */
+    static Eigen::SparseMatrix<int> chain(int n);
+
+    //=========================================================================================================
+    /**
+     * Combine the adjacency of several dimensions, as mne.stats.combine_adjacency: points are flattened in C
+     * order (the last dimension varies fastest), two points are adjacent when they differ in one dimension
+     * and are adjacent there, and every point is adjacent to itself.
+     *
+     * @param[in] dims   Square 0/1 adjacency per dimension (diagonals are ignored).
+     *
+     * @return Sparse adjacency matrix over the product of the dimensions.
+     */
+    static Eigen::SparseMatrix<int> combine(const QList<Eigen::SparseMatrix<int>>& dims);
 };
 
 } // namespace STSLIB

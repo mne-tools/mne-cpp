@@ -43,6 +43,58 @@ using namespace FIFFLIB;
 using namespace Eigen;
 
 //=============================================================================================================
+
+SparseMatrix<int> StatsAdjacency::chain(int n)
+{
+    std::vector<Triplet<int>> triplets;
+    triplets.reserve(2 * static_cast<std::size_t>(std::max(n - 1, 0)));
+    for (int i = 0; i + 1 < n; ++i) {
+        triplets.emplace_back(i, i + 1, 1);
+        triplets.emplace_back(i + 1, i, 1);
+    }
+    SparseMatrix<int> adjacency(std::max(n, 0), std::max(n, 0));
+    adjacency.setFromTriplets(triplets.begin(), triplets.end());
+    return adjacency;
+}
+
+//=============================================================================================================
+
+SparseMatrix<int> StatsAdjacency::combine(const QList<SparseMatrix<int>>& dims)
+{
+    // Adapted from mne.stats.combine_adjacency (MNE-Python, BSD-3-Clause).
+    Index total = 1;
+    for (const SparseMatrix<int>& dim : dims)
+        total *= dim.rows();
+    std::vector<Triplet<int>> triplets;
+    triplets.reserve(static_cast<std::size_t>(total));
+    for (Index k = 0; k < total; ++k)
+        triplets.emplace_back(static_cast<int>(k), static_cast<int>(k), 1);
+
+    // stride of dimension d = product of the sizes after it
+    Index stride = total;
+    for (const SparseMatrix<int>& dim : dims) {
+        const Index n = dim.rows();
+        stride /= n;
+        const Index outer = total / (n * stride);
+        for (int c = 0; c < dim.outerSize(); ++c) {
+            for (SparseMatrix<int>::InnerIterator it(dim, c); it; ++it) {
+                if (it.row() == it.col() || it.value() == 0)
+                    continue;
+                for (Index o = 0; o < outer; ++o) {
+                    for (Index s = 0; s < stride; ++s) {
+                        const Index base = o * n * stride + s;
+                        triplets.emplace_back(static_cast<int>(base + it.row() * stride), static_cast<int>(base + it.col() * stride), 1);
+                    }
+                }
+            }
+        }
+    }
+    SparseMatrix<int> combined(total, total);
+    combined.setFromTriplets(triplets.begin(), triplets.end(), [](int a, int) { return a; });
+    return combined;
+}
+
+//=============================================================================================================
 // DEFINE METHODS
 //=============================================================================================================
 

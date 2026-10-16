@@ -88,6 +88,7 @@ private slots:
     void testFtestMatchesScipy();
     void testCorrectionsMatchMne();
     void testTrisAdjacencyMatchesMne();
+    void testCombineAdjacencyMatchesMne();
     void testClusterThresholdMatchesMne();
     void testTfceMatchesMne();
     void testClusterSumsMatchMne();
@@ -666,6 +667,28 @@ void TestStsCluster::testCorrectionsMatchMne()
     stepUp << 0.03, 0.021, 0.02;
     StatsMcCorrection::fdr(stepUp, 0.05, StatsMcCorrection::FdrMethod::Independent, &reject);
     QCOMPARE(mask(reject), QStringLiteral("111"));
+}
+
+//=============================================================================================================
+
+void TestStsCluster::testCombineAdjacencyMatchesMne()
+{
+    // Reference values produced by mne.stats.combine_adjacency(3, A, 2) (mne 1.11), A with edges 0-1, 1-2, 1-3:
+    // 24 x 24, diagonal set, these upper off-diagonal edges.
+    SparseMatrix<int> a(4, 4);
+    for (const auto& [i, j] : {std::pair{0, 1}, std::pair{1, 2}, std::pair{1, 3}}) {
+        a.insert(i, j) = 1;
+        a.insert(j, i) = 1;
+    }
+    const SparseMatrix<int> g = StatsAdjacency::combine({StatsAdjacency::chain(3), a, StatsAdjacency::chain(2)});
+    QCOMPARE(g.rows(), Eigen::Index(24));
+    QCOMPARE(g.nonZeros(), Eigen::Index(116));
+    for (int k = 0; k < 24; ++k)
+        QCOMPARE(g.coeff(k, k), 1);
+    QCOMPARE(upperEdges(g).join(' '),
+             QStringLiteral("0-1 0-2 0-8 1-3 1-9 10-11 10-12 10-14 10-18 11-13 11-15 11-19 12-13 12-20 13-21 14-15 "
+                            "14-22 15-23 16-17 16-18 17-19 18-19 18-20 18-22 19-21 19-23 2-10 2-3 2-4 2-6 20-21 22-23 "
+                            "3-11 3-5 3-7 4-12 4-5 5-13 6-14 6-7 7-15 8-10 8-16 8-9 9-11 9-17"));
 }
 
 //=============================================================================================================

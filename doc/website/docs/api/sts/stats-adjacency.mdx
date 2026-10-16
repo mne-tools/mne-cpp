@@ -96,6 +96,36 @@ Constructs a (nVertices*nTimes) x (nVertices*nTimes) adjacency matrix where spat
 
 ---
 
+### chain(n)
+
+Adjacency of a regular 1-D grid of `n` points (each linked to its two neighbours), the meaning of an integer dimension in mne.stats.combine_adjacency.
+
+**Parameters:**
+
+- **n** : *int*
+  Number of points.
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; int &gt;* — Sparse adjacency matrix (n x n), no diagonal.
+
+---
+
+### combine(dims)
+
+Combine the adjacency of several dimensions, as mne.stats.combine_adjacency: points are flattened in C order (the last dimension varies fastest), two points are adjacent when they differ in one dimension and are adjacent there, and every point is adjacent to itself.
+
+**Parameters:**
+
+- **dims** : *const QList&lt; Eigen::SparseMatrix&lt; int &gt; &gt; &*
+  Square 0/1 adjacency per dimension (diagonals are ignored).
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; int &gt;* — Sparse adjacency matrix over the product of the dimensions.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)

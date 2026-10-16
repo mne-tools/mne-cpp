@@ -11709,9 +11709,9 @@
       },
       {
         "python": "mne.channels.find_ch_adjacency",
-        "status": "implemented",
-        "mne_cpp": "StatsAdjacency",
-        "note": "",
+        "status": "partial",
+        "mne_cpp": "STSLIB::StatsAdjacency::fromChannelPositions",
+        "note": "distance threshold (3x median nearest neighbour), not mne's Delaunay or system templates",
         "test": "test_sts_cluster"
       },
       {
@@ -11781,10 +11781,9 @@
       },
       {
         "python": "mne.channels.read_ch_adjacency",
-        "status": "partial",
-        "mne_cpp": "StatsAdjacency (partial)",
-        "note": "",
-        "test": "test_sts_cluster"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no reader for FieldTrip neighbour templates"
       },
       {
         "python": "mne.channels.read_custom_montage",
@@ -13625,17 +13624,15 @@
       },
       {
         "python": "mne.spatial_dist_adjacency",
-        "status": "partial",
-        "mne_cpp": "StatsAdjacency (partial)",
-        "note": "distance-based adjacency limited",
-        "test": "test_sts_cluster"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no distance-based source adjacency"
       },
       {
         "python": "mne.spatial_inter_hemi_adjacency",
-        "status": "partial",
-        "mne_cpp": "StatsAdjacency (partial)",
-        "note": "inter-hemi adjacency limited",
-        "test": "test_sts_cluster"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no inter-hemisphere adjacency"
       },
       {
         "python": "mne.spatial_src_adjacency",
@@ -13653,10 +13650,9 @@
       },
       {
         "python": "mne.spatio_temporal_dist_adjacency",
-        "status": "partial",
-        "mne_cpp": "StatsAdjacency (partial)",
-        "note": "distance adjacency limited",
-        "test": "test_sts_cluster"
+        "status": "missing",
+        "mne_cpp": "",
+        "note": "no distance-based source adjacency"
       },
       {
         "python": "mne.spatio_temporal_src_adjacency",
@@ -13694,9 +13690,9 @@
       },
       {
         "python": "mne.stats.combine_adjacency",
-        "status": "partial",
-        "mne_cpp": "StatsAdjacency (partial)",
-        "note": "",
+        "status": "implemented",
+        "mne_cpp": "STSLIB::StatsAdjacency::combine",
+        "note": "integer dimensions via StatsAdjacency::chain",
         "test": "test_sts_cluster"
       },
       {
