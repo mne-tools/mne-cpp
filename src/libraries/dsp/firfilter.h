@@ -40,6 +40,8 @@
 
 #include <Eigen/Core>
 
+#include <vector>
+
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
@@ -185,6 +187,38 @@ public:
      * @return The filtered data.
      */
     static Eigen::MatrixXd filterData(const Eigen::MatrixXd& matData, double dSFreq, double dLFreq, double dHFreq);
+
+    //=========================================================================================================
+    /**
+     * Frequency-sampling FIR design with a Hann window, as @c scipy.signal.firwin2(nTaps, freq, gain,
+     * window="hann").
+     *
+     * @param[in] nTaps   Number of taps; an even count needs zero gain at Nyquist.
+     * @param[in] freq    Increasing frequencies from 0 to 1 (Nyquist).
+     * @param[in] gain    Gain at each frequency.
+     *
+     * @return The impulse response.
+     */
+    static Eigen::RowVectorXd firwin2(int nTaps, const std::vector<double>& freq, const std::vector<double>& gain);
+
+    //=========================================================================================================
+    /**
+     * Band-pass every row like @c mne.filter.filter_data(x, sfreq, l_freq, h_freq, None, "10s", 0.5, 0.5,
+     * phase="zero-double", fir_window="hann", fir_design="firwin2"), the filter MNE-Python's ECG and
+     * EOG event detection uses.
+     *
+     * @param[in] matData   Data, one row per channel.
+     * @param[in] dSFreq    Sampling frequency in Hz.
+     * @param[in] dLFreq    High-pass edge in Hz.
+     * @param[in] dHFreq    Low-pass edge in Hz.
+     *
+     * @return The filtered data.
+     */
+    static Eigen::MatrixXd filterDataZeroDouble(const Eigen::MatrixXd& matData, double dSFreq, double dLFreq, double dHFreq);
+
+private:
+    /** Zero-phase overlap-add of an odd-length (centred) h with nEdge samples of reflect_limited padding. */
+    static Eigen::MatrixXd overlapAddZeroPhase(const Eigen::MatrixXd& matData, const Eigen::RowVectorXd& h, Eigen::Index nEdge);
 };
 
 } // namespace UTILSLIB

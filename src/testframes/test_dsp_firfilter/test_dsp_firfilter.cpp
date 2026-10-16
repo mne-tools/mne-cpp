@@ -136,11 +136,60 @@ private slots:
     /** Each Parks-McClellan pass type meets its bands; tap counts outside 9..256 are clamped. */
     void parksMcClellan_passTypes_data();
     void parksMcClellan_passTypes();
+
+    /** firwin2 and filterDataZeroDouble equal scipy.signal.firwin2 and mne.filter.filter_data. */
+    void firwin2_matchesScipy();
+    void filterDataZeroDouble_matchesMnePython_data();
+    void filterDataZeroDouble_matchesMnePython();
 };
 
 //=============================================================================================================
 // TEST IMPLEMENTATIONS
 //=============================================================================================================
+
+void TestDspFirFilter::firwin2_matchesScipy()
+{
+    // Reference values produced by scipy.signal.firwin2(16, [0, 0.2, 0.3, 1.0], [1, 1, 0, 0], window="hann")[[0, 3, 7, 8, 15]]
+    const double expected[] = {0.0, -0.00873571094037, 0.240768387452, 0.240768387452, 0.0};
+    const int taps[] = {0, 3, 7, 8, 15};
+    const RowVectorXd h = FirFilter::firwin2(16, {0.0, 0.2, 0.3, 1.0}, {1.0, 1.0, 0.0, 0.0});
+    QCOMPARE(h.size(), 16);
+    for (int i = 0; i < 5; ++i)
+        QVERIFY2(std::abs(h(taps[i]) - expected[i]) < 1e-12, qPrintable(QString::number(h(taps[i]), 'g', 12)));
+}
+
+//=============================================================================================================
+
+void TestDspFirFilter::filterDataZeroDouble_matchesMnePython_data()
+{
+    // Reference values produced by mne.filter.filter_data(x, 100.0, 5, 20, None, "10s", 0.5, 0.5,
+    // phase="zero-double", fir_window="hann", fir_design="firwin2") (mne 1.11), with t = np.arange(n) / 100 and
+    // x = np.sin(2 pi 8 t) + 0.5 np.sin(2 pi 30 t) + 0.3 t + 0.2 np.cos(2 pi 1.5 t):
+    // sum |y|, then y[3], y[113], y[n // 2 + 7], y[n - 2]. The 1024-tap filter is shorter / longer than the data.
+    QTest::addColumn<int>("n");
+    QTest::addColumn<QList<double>>("expected");
+    QTest::newRow("1200 samples") << 1200 << QList<double>{760.416254023, 1.00313539474, 0.24845613157, -0.368126558459, -0.119258490373};
+    QTest::newRow("700 samples") << 700 << QList<double>{442.540025113, 1.00313543814, 0.248460245928, -0.36768758107, -0.12477357814};
+}
+
+//=============================================================================================================
+
+void TestDspFirFilter::filterDataZeroDouble_matchesMnePython()
+{
+    QFETCH(int, n);
+    QFETCH(QList<double>, expected);
+
+    MatrixXd x(1, n);
+    for (int i = 0; i < n; ++i) {
+        const double t = i / 100.0;
+        x(0, i) = std::sin(2.0 * M_PI * 8.0 * t) + 0.5 * std::sin(2.0 * M_PI * 30.0 * t) + 0.3 * t + 0.2 * std::cos(2.0 * M_PI * 1.5 * t);
+    }
+    const MatrixXd y = FirFilter::filterDataZeroDouble(x, 100.0, 5.0, 20.0);
+    const double got[] = {y.cwiseAbs().sum(), y(0, 3), y(0, 113), y(0, n / 2 + 7), y(0, n - 2)};
+    for (int i = 0; i < 5; ++i)
+        QVERIFY2(std::abs(got[i] - expected[i]) <= 1e-8 * std::max(1.0, std::abs(expected[i])),
+                 qPrintable(QString("value %1: %2 vs mne %3").arg(i).arg(got[i], 0, 'g', 12).arg(expected[i], 0, 'g', 12)));
+}
 
 void TestDspFirFilter::filterOrder_isPreserved()
 {

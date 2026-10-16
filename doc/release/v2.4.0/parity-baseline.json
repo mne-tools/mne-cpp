@@ -22,16 +22,16 @@
   "summary": {
     "claims": 360,
     "by_evidence": {
-      "cross-validated-static": 157,
+      "cross-validated-static": 158,
       "cross-validated-live": 4,
-      "tested": 195,
+      "tested": 194,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 25,
+        "cross-validated-static": 26,
         "cross-validated-live": 1,
-        "tested": 63,
+        "tested": 62,
         "unverified": 0
       },
       "parity": {
@@ -50,6 +50,7 @@
         "test_dsp_csd",
         "test_dsp_eeg_reference",
         "test_dsp_eog_regression",
+        "test_dsp_firfilter",
         "test_dsp_morlet_tfr",
         "test_dsp_multitaper",
         "test_edf2fiff_rwr",
@@ -411,7 +412,7 @@
       "python": "mne.filter.filter_data",
       "claimed": "implemented",
       "test": "test_dsp_firfilter",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",

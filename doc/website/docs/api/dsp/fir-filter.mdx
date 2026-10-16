@@ -180,6 +180,51 @@ Filters every row like `mne.filter.filter_data` with its FIR defaults: the desig
 
 ---
 
+### firwin2(nTaps, freq, gain)
+
+Frequency-sampling FIR design with a Hann window, as `scipy.signal.firwin2`(nTaps, freq, gain, window="hann").
+
+**Parameters:**
+
+- **nTaps** : *int*
+  Number of taps; an even count needs zero gain at Nyquist.
+
+- **freq** : *const std::vector&lt; double &gt; &*
+  Increasing frequencies from 0 to 1 (Nyquist).
+
+- **gain** : *const std::vector&lt; double &gt; &*
+  Gain at each frequency.
+
+**Returns:**
+
+- *Eigen::RowVectorXd* — The impulse response.
+
+---
+
+### filterDataZeroDouble(matData, dSFreq, dLFreq, dHFreq)
+
+Band-pass every row like `mne.filter.filter_data`(x, sfreq, l_freq, h_freq, None, "10s", 0.5, 0.5, phase="zero-double", fir_window="hann", fir_design="firwin2"), the filter MNE-Python's ECG and EOG event detection uses.
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Data, one row per channel.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **dLFreq** : *double*
+  High-pass edge in Hz.
+
+- **dHFreq** : *double*
+  Low-pass edge in Hz.
+
+**Returns:**
+
+- *Eigen::MatrixXd* — The filtered data.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)

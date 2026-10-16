@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6277 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6279 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -1719,6 +1719,7 @@ Index of 6277 public class members (functions, variables, typedefs, enums) acros
 - **filterChanged** `[signal]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Emitted when the filter changes.
 - **filterChannelTypeChanged** `[signal]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Emitted when the filter channel type changed.
 - **filterData** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Filters every row like `mne.filter.filter_data` with its FIR defaults: the designMne kernel applied by overlap-add with zero phase, each row padded by reflecting it about its end samples ("reflect_limited").
+- **filterDataZeroDouble** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Band-pass every row like `mne.filter.filter_data`(x, sfreq, l_freq, h_freq, None, "10s", 0.5, 0.5, phase="zero-double", fir_window="hann", fir_design="firwin2"), the filter MNE-Python's ECG and EOG event detection uses.
 - **FilterDesignView** `[fn]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Constructs a [`FilterDesignView`](/docs/api/disp/filter-design-view) dialog which is a child of parent.
 - **filtered** `[var]` in [FilterThreadArg](/docs/api/mne/filter-thread-arg) — Optional stream to log omitted point locations (may be NULL).
 - **FilterIO** `[fn]` in [FilterIO](/docs/api/utils/filter-io) — Constructs a [`FilterIO`](/docs/api/utils/filter-io) object.
@@ -1778,6 +1779,7 @@ Index of 6277 public class members (functions, variables, typedefs, enums) acros
 - **firstSample** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model)
 - **firstVisibleChannel** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **firstVisibleSample** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Returns the first currently visible sample.
+- **firwin2** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Frequency-sampling FIR design with a Hann window, as `scipy.signal.firwin2`(nTaps, freq, gain, window="hann").
 - **fit** `[fn]` in [DecodingCsp](/docs/api/decoding/decoding-csp) — Fit CSP from labelled epoch data (binary classification).
 - **fit** `[fn]` in [DecodingSpoc](/docs/api/decoding/decoding-spoc) — Fit SPoC from epoch data and a continuous target variable.
 - **fit** `[fn]` in [DecodingSsd](/docs/api/decoding/decoding-ssd) — Fit SSD from continuous data.
