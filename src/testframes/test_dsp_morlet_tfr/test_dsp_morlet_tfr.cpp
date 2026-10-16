@@ -286,6 +286,7 @@ void TestMorletTfr::testMultiChannelMatchesSingle()
 
 void TestMorletTfr::testPowerMatchesMnePython_data()
 {
+    // tfr_morlet computes the same per-epoch power on an Epochs object.
     // Reference values produced by mne.time_frequency.tfr_array_morlet (mne 1.11), samples 0, 60, 250, 499:
     //   sf = 250.0; t = np.arange(500) / sf
     //   x = np.sin(2 * np.pi * 10 * t) + 0.5 * np.sin(2 * np.pi * 23 * t + 0.3) + 0.2 * t

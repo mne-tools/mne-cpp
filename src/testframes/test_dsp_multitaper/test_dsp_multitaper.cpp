@@ -186,6 +186,7 @@ void TestDspMultitaper::testDpssPeriodicMatchesScipy()
 
 void TestDspMultitaper::testTfrArrayMatchesMnePython()
 {
+    // tfr_multitaper computes the same per-epoch power on an Epochs object.
     // Reference values produced by mne.time_frequency.tfr_array_multitaper (mne 1.11), samples 0, 60, 250, 499:
     //   t = np.arange(500) / 250.0
     //   x = np.sin(2 * np.pi * 10 * t) + 0.5 * np.sin(2 * np.pi * 23 * t + 0.3) + 0.2 * t

@@ -132,6 +132,7 @@ void TestInvSparse::deterministicProblem(MatrixXd& gain, MatrixXd& data)
 
 void TestInvSparse::testMxneMatchesMnePython()
 {
+    // The solver mne.inverse_sparse.mixed_norm runs on the whitened gain and data.
     // Reference values produced by mne.inverse_sparse.mxne_optim.mixed_norm_solver(M, G, alpha, n_orient=1, debias=False) at
     // alpha = 0.2 * max_i ||G_i^T M||: only sources 5 and 22, row norms 5.48248 and 3.00622.
     MatrixXd gain, data;
@@ -151,6 +152,7 @@ void TestInvSparse::testMxneMatchesMnePython()
 
 void TestInvSparse::testGammaMapMatchesMnePython()
 {
+    // The solver mne.inverse_sparse.gamma_map runs on the whitened gain and data.
     // Reference values produced by mne.inverse_sparse._gamma_map._gamma_map_opt(M, G, alpha=0.05**2, update_mode=1):
     // sources 5, 7, 22, 35.
     MatrixXd gain, data;

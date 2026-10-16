@@ -219,6 +219,7 @@ void TestDspCsd::testFourierHermitian()
 
 void TestDspCsd::testMultitaperMatchesMnePython_data()
 {
+    // csd_multitaper runs the same per-epoch computation on an Epochs object.
     // Reference values produced by mne.time_frequency.csd_array_multitaper(X[None], 250.0) (mne 1.11):
     //   t = np.arange(256) / 250.0
     //   x0 = np.sin(2 * np.pi * 10 * t) + 0.3 * np.cos(2 * np.pi * 23 * t) + 0.5
@@ -261,6 +262,7 @@ void TestDspCsd::testMultitaperMatchesMnePython()
 
 void TestDspCsd::testFourierMatchesMnePython_data()
 {
+    // csd_fourier runs the same per-epoch computation on an Epochs object.
     // Reference values produced by mne.time_frequency.csd_array_fourier (mne 1.11) on the Welch segments as epochs:
     //   sf = 250.0; t = np.arange(512) / sf
     //   x0 = np.sin(2 * np.pi * 10 * t) + 0.3 * np.cos(2 * np.pi * 23 * t) + 0.5
@@ -339,6 +341,7 @@ void TestDspCsd::testMorletDimensions()
 
 void TestDspCsd::testMorletMatchesMnePython_data()
 {
+    // csd_morlet runs the same per-epoch computation on an Epochs object.
     // Reference values produced by mne.time_frequency.csd_array_morlet (mne 1.11), csd.get_data(f):
     //   sf = 250.0; t = np.arange(400) / sf
     //   x0 = np.sin(2 * np.pi * 10 * t) + 0.3 * np.cos(2 * np.pi * 23 * t)

@@ -1325,7 +1325,7 @@
       "header": "dsp/eog_regression.h",
       "origin": "mne-python",
       "mne_c_tool": null,
-      "mne_python": "mne.preprocessing.regress_artifact",
+      "mne_python": "mne.preprocessing.EOGRegression",
       "sklearn": null,
       "test": "test_dsp_eog_regression",
       "example": "ex_dsp_artifacts",
@@ -1338,7 +1338,7 @@
       "documented": true,
       "sidebar_position": 10,
       "guide": null,
-      "python_equiv": "mne.preprocessing.regress_artifact",
+      "python_equiv": "mne.preprocessing.EOGRegression",
       "python_url": null
     },
     {
@@ -1583,7 +1583,7 @@
       "header": "dsp/multitaper_psd.h",
       "origin": "mne-python",
       "mne_c_tool": null,
-      "mne_python": "mne.time_frequency.psd_multitaper",
+      "mne_python": "mne.time_frequency.psd_array_multitaper",
       "sklearn": null,
       "test": "test_dsp_multitaper",
       "example": "ex_dsp_spectral",
@@ -1596,7 +1596,7 @@
       "documented": true,
       "sidebar_position": 21,
       "guide": null,
-      "python_equiv": "mne.time_frequency.psd_multitaper",
+      "python_equiv": "mne.time_frequency.psd_array_multitaper",
       "python_url": null
     },
     {

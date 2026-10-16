@@ -4912,7 +4912,7 @@
         "ex_dsp_artifacts/main.cpp#eog_regression_usage"
       ],
       "api_page": "doc/website/docs/api/dsp/eog-regression.mdx",
-      "python_equiv": "mne.preprocessing.regress_artifact",
+      "python_equiv": "mne.preprocessing.EOGRegression",
       "example_eligible": true,
       "exempt_reason": null
     },
@@ -5446,7 +5446,7 @@
         "ex_dsp_spectral/main.cpp#multitaper_psd_compute"
       ],
       "api_page": "doc/website/docs/api/dsp/multitaper-psd.mdx",
-      "python_equiv": "mne.time_frequency.psd_multitaper",
+      "python_equiv": "mne.time_frequency.psd_array_multitaper",
       "example_eligible": true,
       "exempt_reason": null
     },

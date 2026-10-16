@@ -22,22 +22,22 @@
   "summary": {
     "claims": 361,
     "by_evidence": {
-      "cross-validated-static": 110,
+      "cross-validated-static": 123,
       "cross-validated-live": 4,
-      "tested": 243,
+      "tested": 230,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 18,
+        "cross-validated-static": 24,
         "cross-validated-live": 1,
-        "tested": 70,
+        "tested": 64,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 92,
+        "cross-validated-static": 99,
         "cross-validated-live": 3,
-        "tested": 173,
+        "tested": 166,
         "unverified": 4
       }
     },
@@ -314,7 +314,7 @@
       "python": "mne.inverse_sparse.mixed_norm",
       "claimed": "implemented",
       "test": "test_inv_sparse",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -322,7 +322,7 @@
       "python": "mne.inverse_sparse.gamma_map",
       "claimed": "implemented",
       "test": "test_inv_sparse",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -479,10 +479,10 @@
     {
       "source": "classes",
       "mne_cpp": "EogRegression",
-      "python": "mne.preprocessing.regress_artifact",
+      "python": "mne.preprocessing.EOGRegression",
       "claimed": "implemented",
       "test": "test_dsp_eog_regression",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -567,10 +567,10 @@
     {
       "source": "classes",
       "mne_cpp": "MultitaperPsd",
-      "python": "mne.time_frequency.psd_multitaper",
+      "python": "mne.time_frequency.psd_array_multitaper",
       "claimed": "implemented",
       "test": "test_dsp_multitaper",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -578,7 +578,7 @@
       "python": "mne.time_frequency.tfr_morlet",
       "claimed": "implemented",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -586,7 +586,7 @@
       "python": "mne.time_frequency.tfr_multitaper",
       "claimed": "implemented",
       "test": "test_dsp_multitaper",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1618,7 +1618,7 @@
       "python": "mne.inverse_sparse.gamma_map",
       "claimed": "partial",
       "test": "test_inv_sparse",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1626,7 +1626,7 @@
       "python": "mne.inverse_sparse.mixed_norm",
       "claimed": "partial",
       "test": "test_inv_sparse",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2770,7 +2770,7 @@
       "python": "mne.time_frequency.csd_fourier",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2778,7 +2778,7 @@
       "python": "mne.time_frequency.csd_morlet",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2786,7 +2786,7 @@
       "python": "mne.time_frequency.csd_multitaper",
       "claimed": "partial",
       "test": "test_dsp_csd",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2866,7 +2866,7 @@
       "python": "mne.time_frequency.tfr_morlet",
       "claimed": "partial",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2874,7 +2874,7 @@
       "python": "mne.time_frequency.tfr_multitaper",
       "claimed": "partial",
       "test": "test_dsp_multitaper",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
