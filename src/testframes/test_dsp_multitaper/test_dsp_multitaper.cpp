@@ -57,8 +57,10 @@ private slots:
     void testDpssTaperCount();
     void testDpssOrthogonality();
     void testDpssEigenvaluesNearOne();
+    void testDpssPeriodicMatchesScipy();
 
     // MultitaperPsd tests
+    void testPsdMatchesMnePython();
     void testPsdSinusoidal();
     void testPsdOutputDimensions();
     void testPsdFrequencyRange();
@@ -159,6 +161,56 @@ void TestDspMultitaper::testDpssEigenvaluesNearOne()
     for (int i = 0; i < result.vecEigenvalues.size(); ++i) {
         QVERIFY2(std::fabs(result.vecEigenvalues(i) - expected[i]) < 1e-10, qPrintable(QString::number(result.vecEigenvalues(i), 'g', 17)));
     }
+}
+
+//=============================================================================================================
+
+void TestDspMultitaper::testDpssPeriodicMatchesScipy()
+{
+    // Reference values produced by scipy.signal.windows.dpss(64, 2.5, 4, sym=False, return_ratios=True), as
+    // mne.time_frequency.dpss_windows uses them: ratios, then |w[0, 0]|, |w[0, 31]|, |w[1, 10]|, |w[3, 63]|
+    const double ratios[] = {0.999997274616, 0.999846440863, 0.996265292814, 0.952416752379};
+    const double values[] = {0.00121212706954, 0.216767222399, 0.101811363563, 0.119848232192};
+
+    const DpssResult r = Dpss::compute(64, 2.5, 4, false);
+    QCOMPARE(r.matTapers.cols(), 64);
+    for (int k = 0; k < 4; ++k)
+        QVERIFY2(std::abs(r.vecEigenvalues[k] - ratios[k]) < 1e-10, qPrintable(QString::number(r.vecEigenvalues[k], 'g', 15)));
+    const double got[] = {r.matTapers(0, 0), r.matTapers(0, 31), r.matTapers(1, 10), r.matTapers(3, 63)};
+    for (int i = 0; i < 4; ++i)
+        QVERIFY2(std::abs(std::abs(got[i]) - values[i]) < 1e-10, qPrintable(QString::number(got[i], 'g', 15)));
+}
+
+//=============================================================================================================
+
+void TestDspMultitaper::testPsdMatchesMnePython()
+{
+    // Reference values produced by mne.time_frequency.psd_array_multitaper(X, 250.0, normalization="full") (mne 1.11):
+    //   t = np.arange(256) / 250.0
+    //   x0 = np.sin(2 * np.pi * 10 * t) + 0.3 * np.cos(2 * np.pi * 23 * t) + 0.5
+    //   x1 = 0.5 * np.sin(2 * np.pi * 10 * t + 0.7) + 0.1 * t
+    // Rows: frequency bin, then x0, x1
+    const int bins[] = {0, 1, 10, 24, 128};
+    const double expected[][2] = {{3.977295001e-05, 0.0001130743836},
+                                  {8.109891216e-05, 0.0002244708389},
+                                  {0.07014372543, 0.01770142371},
+                                  {0.006175187056, 6.249414777e-06},
+                                  {2.321390722e-07, 9.35205691e-08}};
+
+    const double sfreq = 250.0;
+    MatrixXd data(2, 256);
+    for (int n = 0; n < data.cols(); ++n) {
+        const double t = n / sfreq;
+        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t) + 0.5;
+        data(1, n) = 0.5 * std::sin(2.0 * M_PI * 10.0 * t + 0.7) + 0.1 * t;
+    }
+
+    const MultitaperPsdResult r = MultitaperPsd::compute(data, sfreq);
+    QCOMPARE(r.matPsd.cols(), 129);
+    for (int i = 0; i < 5; ++i)
+        for (int ch = 0; ch < 2; ++ch)
+            QVERIFY2(std::abs(r.matPsd(ch, bins[i]) - expected[i][ch]) <= 1e-6 * expected[i][ch],
+                     qPrintable(QString("bin %1 ch %2: %3 vs mne %4").arg(bins[i]).arg(ch).arg(r.matPsd(ch, bins[i]), 0, 'g', 10).arg(expected[i][ch], 0, 'g', 10)));
 }
 
 //=============================================================================================================

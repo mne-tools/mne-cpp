@@ -27,20 +27,26 @@ const DpssResult dpss = Dpss::compute(64, 2.5, 4); // N = 64 samples, NW = 2.5, 
 
 ## Static Methods
 
-### compute(N, halfBandwidth, nTapers)
+### compute(nSamples, halfBandwidth, nTapers, sym, lowBias)
 
 Compute DPSS tapers for a given window length and half-bandwidth.
 
 **Parameters:**
 
-- **N** : *int*
-  Window length in samples.
+- **nSamples** : *int*
+  Window length N in samples.
 
 - **halfBandwidth** : *double*
   Half-bandwidth parameter (NW); typical values: 2, 3, 4.
 
 - **nTapers** : *int*
   Number of tapers to return; -1 → floor(2*halfBandwidth - 1).
+
+- **sym** : *bool*
+  false: periodic tapers for spectral analysis, i.e. the first N samples of the length N + 1 tapers (scipy dpss sym=False, used by MNE-Python).
+
+- **lowBias** : *bool*
+  Keep only tapers with concentration &gt; 0.9, at least the first (MNE-Python low_bias).
 
 **Returns:**
 

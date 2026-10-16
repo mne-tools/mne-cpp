@@ -87,7 +87,8 @@ public:
      * @param[in] fmin           Minimum frequency of interest in Hz (default 0).
      * @param[in] fmax           Maximum frequency in Hz; -1 → Nyquist (default -1).
      * @param[in] halfBandwidth  Half-bandwidth parameter (NW) for DPSS tapers (default 4).
-     * @param[in] nTapers        Number of tapers; -1 → floor(2*halfBandwidth - 1) (default -1).
+     * @param[in] nTapers        Number of tapers; -1 → as MNE-Python: those of the first floor(2*halfBandwidth)
+     *                           with concentration > 0.9 (default -1).
      * @return                   CsdResult with per-frequency and mean CSD matrices.
      */
     static CsdResult computeMultitaper(const Eigen::MatrixXd& matData,

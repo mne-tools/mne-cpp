@@ -67,8 +67,9 @@ CsdResult Csd::computeMultitaper(const MatrixXd& matData,
     if (fmax < 0.0)
         fmax = sfreq / 2.0;
 
-    // 1. Compute DPSS tapers
-    DpssResult dpss = Dpss::compute(nTimes, halfBandwidth, nTapers);
+    // 1. Compute DPSS tapers; by default those mne.time_frequency.csd_array_multitaper uses
+    const bool lowBias = nTapers < 0;
+    DpssResult dpss = Dpss::compute(nTimes, halfBandwidth, lowBias ? static_cast<int>(2.0 * halfBandwidth) : nTapers, false, lowBias);
     const int nTap = static_cast<int>(dpss.matTapers.rows());
 
     // Compute eigenvalue weight sum
@@ -79,10 +80,10 @@ CsdResult Csd::computeMultitaper(const MatrixXd& matData,
     // Build full frequency axis
     const double freqRes = sfreq / static_cast<double>(nTimes);
 
-    // Determine frequency bin range
-    const int iBinMin = std::max(0, static_cast<int>(std::ceil(fmin / freqRes)));
+    // Determine frequency bin range (DC excluded, as in MNE-Python)
+    const int iBinMin = std::max(1, static_cast<int>(std::ceil(fmin / freqRes)));
     const int iBinMax = std::min(nFreqsFull - 1, static_cast<int>(std::floor(fmax / freqRes)));
-    const int nFreqsSel = iBinMax - iBinMin + 1;
+    const int nFreqsSel = std::max(0, iBinMax - iBinMin + 1);
 
     // Initialize per-frequency CSD accumulators
     std::vector<MatrixXcd> csdAccum(static_cast<std::size_t>(nFreqsSel),
@@ -98,13 +99,15 @@ CsdResult Csd::computeMultitaper(const MatrixXd& matData,
         MatrixXcd spectra(nChannels, nFreqsFull);
 
         for (int ch = 0; ch < nChannels; ++ch) {
-            VectorXd tapered = matData.row(ch).transpose().array() * dpss.matTapers.row(t).transpose().array();
+            VectorXd tapered = (matData.row(ch).array() - matData.row(ch).mean()).transpose() * dpss.matTapers.row(t).transpose().array();
 
             VectorXcd spec;
             fft.fwd(spec, tapered);
 
             spectra.row(ch) = spec.head(nFreqsFull).transpose();
         }
+        if (nTimes % 2 == 0)
+            spectra.col(nFreqsFull - 1) /= std::sqrt(2.0);
 
         // Accumulate weighted CSD: X(:,f) * X(:,f)^H for selected frequency bins
         for (int fi = 0; fi < nFreqsSel; ++fi) {
@@ -122,7 +125,8 @@ CsdResult Csd::computeMultitaper(const MatrixXd& matData,
     MatrixXcd meanCsd = MatrixXcd::Zero(nChannels, nChannels);
 
     for (int fi = 0; fi < nFreqsSel; ++fi) {
-        csdAccum[static_cast<std::size_t>(fi)] /= weightSum;
+        // One-sided and per Hz, as mne.time_frequency.csd_array_multitaper
+        csdAccum[static_cast<std::size_t>(fi)] *= 2.0 / (weightSum * sfreq);
         result.csdByFreq[fi] = csdAccum[static_cast<std::size_t>(fi)];
         result.vecFreqs[fi] = (iBinMin + fi) * freqRes;
         meanCsd += result.csdByFreq[fi];

@@ -55,6 +55,8 @@ private slots:
     void testMultitaperDimensions();
     void testMultitaperHermitian();
     void testMultitaperDiagonalPositive();
+    void testMultitaperMatchesMnePython_data();
+    void testMultitaperMatchesMnePython();
 
     // computeFourier
     void testFourierBasic();
@@ -211,6 +213,48 @@ void TestDspCsd::testFourierHermitian()
             QVERIFY(std::abs(cij - std::conj(cji)) < 1e-10);
         }
     }
+}
+
+//=============================================================================================================
+
+void TestDspCsd::testMultitaperMatchesMnePython_data()
+{
+    // Reference values produced by mne.time_frequency.csd_array_multitaper(X[None], 250.0) (mne 1.11):
+    //   t = np.arange(256) / 250.0
+    //   x0 = np.sin(2 * np.pi * 10 * t) + 0.3 * np.cos(2 * np.pi * 23 * t) + 0.5
+    //   x1 = 0.5 * np.sin(2 * np.pi * 10 * t + 0.7) + 0.1 * t
+    //   -> 128 frequencies from 0.9765625 Hz
+    // Columns: C[0,0].real, C[1,1].real, C[0,1].real, C[0,1].imag
+    QTest::addColumn<int>("freqIdx");
+    QTest::addColumn<QList<double>>("expected");
+    QTest::newRow("0.98 Hz") << 0 << QList<double>{8.109891216e-05, 0.0002244708389, -1.497689432e-06, -1.636377999e-05};
+    QTest::newRow("9.77 Hz") << 9 << QList<double>{0.07014372543, 0.01770142371, 0.02696192086, -0.02268217081};
+    QTest::newRow("23.4 Hz") << 23 << QList<double>{0.006175187056, 6.249414777e-06, 8.582335693e-06, 3.45020985e-05};
+}
+
+//=============================================================================================================
+
+void TestDspCsd::testMultitaperMatchesMnePython()
+{
+    QFETCH(int, freqIdx);
+    QFETCH(QList<double>, expected);
+
+    const double sfreq = 250.0;
+    MatrixXd data(2, 256);
+    for (int n = 0; n < data.cols(); ++n) {
+        const double t = n / sfreq;
+        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t) + 0.5;
+        data(1, n) = 0.5 * std::sin(2.0 * M_PI * 10.0 * t + 0.7) + 0.1 * t;
+    }
+
+    const CsdResult r = Csd::computeMultitaper(data, sfreq);
+    QCOMPARE(r.vecFreqs.size(), 128);
+    QCOMPARE(r.vecFreqs[0], 0.9765625);
+    const MatrixXcd& c = r.csdByFreq[freqIdx];
+    const double got[] = {c(0, 0).real(), c(1, 1).real(), c(0, 1).real(), c(0, 1).imag()};
+    for (int i = 0; i < 4; ++i)
+        QVERIFY2(std::abs(got[i] - expected[i]) <= 1e-6 * std::abs(expected[i]),
+                 qPrintable(QString("value %1: %2 vs mne %3").arg(i).arg(got[i], 0, 'g', 10).arg(expected[i], 0, 'g', 10)));
 }
 
 //=============================================================================================================

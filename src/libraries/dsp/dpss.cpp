@@ -45,10 +45,12 @@ constexpr double DPSS_PI = 3.14159265358979323846;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DpssResult Dpss::compute(int N, double halfBandwidth, int nTapers)
+DpssResult Dpss::compute(int nSamples, double halfBandwidth, int nTapers, bool sym, bool lowBias)
 {
     if (nTapers < 0)
         nTapers = static_cast<int>(std::floor(2.0 * halfBandwidth - 1.0));
+
+    const int N = sym ? nSamples : nSamples + 1;
 
     const double W = halfBandwidth / static_cast<double>(N);
 
@@ -114,6 +116,16 @@ DpssResult Dpss::compute(int N, double halfBandwidth, int nTapers)
             ratio += 2.0 * kernel[m] * taper.head(N - m).dot(taper.tail(N - m));
         result.vecEigenvalues[k] = ratio;
     }
+
+    if (lowBias) {
+        int nKeep = 1;
+        while (nKeep < nTapers && result.vecEigenvalues[nKeep] > 0.9)
+            ++nKeep;
+        result.matTapers.conservativeResize(nKeep, Eigen::NoChange);
+        result.vecEigenvalues.conservativeResize(nKeep);
+    }
+    if (!sym)
+        result.matTapers.conservativeResize(Eigen::NoChange, nSamples);
 
     return result;
 }

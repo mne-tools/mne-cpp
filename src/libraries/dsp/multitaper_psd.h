@@ -81,7 +81,8 @@ public:
      * @param[in] matData         Data matrix (n_channels × n_times).
      * @param[in] sfreq           Sampling frequency in Hz.
      * @param[in] halfBandwidth   Half-bandwidth parameter (NW); default 4.0.
-     * @param[in] nTapers         Number of DPSS tapers; -1 → floor(2*halfBandwidth - 1).
+     * @param[in] nTapers         Number of DPSS tapers; -1 → as MNE-Python: those of the first floor(2*halfBandwidth)
+     *                            with concentration > 0.9.
      * @param[in] nFft            FFT length; -1 → n_times.
      * @return                    MultitaperPsdResult with matPsd and vecFreqs.
      */

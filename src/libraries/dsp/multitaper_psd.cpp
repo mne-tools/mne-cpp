@@ -58,8 +58,9 @@ MultitaperPsdResult MultitaperPsd::compute(const MatrixXd& matData,
 
     const int nFreqs = nFft / 2 + 1;
 
-    // 1. Compute DPSS tapers
-    DpssResult dpss = Dpss::compute(nTimes, halfBandwidth, nTapers);
+    // 1. Compute DPSS tapers; by default those mne.time_frequency.psd_array_multitaper uses
+    const bool lowBias = nTapers < 0;
+    DpssResult dpss = Dpss::compute(nTimes, halfBandwidth, lowBias ? static_cast<int>(2.0 * halfBandwidth) : nTapers, false, lowBias);
     const int nTap = static_cast<int>(dpss.matTapers.rows());
 
     // Compute eigenvalue weights for weighted averaging
@@ -83,7 +84,7 @@ MultitaperPsdResult MultitaperPsd::compute(const MatrixXd& matData,
 
         for (int t = 0; t < nTap; ++t) {
             // Apply taper element-wise
-            VectorXd tapered = matData.row(ch).transpose().array() * dpss.matTapers.row(t).transpose().array();
+            VectorXd tapered = (matData.row(ch).array() - matData.row(ch).mean()).transpose() * dpss.matTapers.row(t).transpose().array();
 
             // Zero-pad to nFft if needed
             VectorXd padded = VectorXd::Zero(nFft);
@@ -104,8 +105,9 @@ MultitaperPsdResult MultitaperPsd::compute(const MatrixXd& matData,
         const double dNorm = 1.0 / (weightSum * sfreq);
         psd *= dNorm;
 
-        // One-sided: double all non-DC, non-Nyquist bins
-        for (int k = 1; k < nFreqs - 1; ++k)
+        // One-sided: double all bins that have a mirror image (not DC, not an even-length Nyquist)
+        const int kLast = (nFft % 2 == 0) ? nFreqs - 1 : nFreqs;
+        for (int k = 1; k < kLast; ++k)
             psd[k] *= 2.0;
 
         result.matPsd.row(ch) = psd;

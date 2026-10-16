@@ -75,12 +75,15 @@ public:
     /**
      * Compute DPSS tapers for a given window length and half-bandwidth.
      *
-     * @param[in] N               Window length in samples.
+     * @param[in] nSamples        Window length N in samples.
      * @param[in] halfBandwidth   Half-bandwidth parameter (NW); typical values: 2, 3, 4.
      * @param[in] nTapers         Number of tapers to return; -1 → floor(2*halfBandwidth - 1).
+     * @param[in] sym             false: periodic tapers for spectral analysis, i.e. the first N samples of the
+     *                            length N + 1 tapers (scipy dpss sym=False, used by MNE-Python).
+     * @param[in] lowBias         Keep only tapers with concentration > 0.9, at least the first (MNE-Python low_bias).
      * @return                    DpssResult with matTapers (nTapers × N) and vecEigenvalues.
      */
-    static DpssResult compute(int N, double halfBandwidth, int nTapers = -1);
+    static DpssResult compute(int nSamples, double halfBandwidth, int nTapers = -1, bool sym = true, bool lowBias = false);
 };
 
 } // namespace UTILSLIB

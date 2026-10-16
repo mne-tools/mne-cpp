@@ -55,7 +55,7 @@ Compute CSD using multitaper (DPSS) spectral estimation.
   Half-bandwidth parameter (NW) for DPSS tapers (default 4).
 
 - **nTapers** : *int*
-  Number of tapers; -1 → floor(2*halfBandwidth - 1) (default -1).
+  Number of tapers; -1 → as MNE-Python: those of the first floor(2*halfBandwidth) with concentration &gt; 0.9 (default -1).
 
 **Returns:**
 

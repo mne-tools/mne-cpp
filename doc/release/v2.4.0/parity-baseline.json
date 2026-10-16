@@ -22,22 +22,22 @@
   "summary": {
     "claims": 360,
     "by_evidence": {
-      "cross-validated-static": 143,
+      "cross-validated-static": 149,
       "cross-validated-live": 4,
-      "tested": 209,
+      "tested": 203,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 22,
+        "cross-validated-static": 24,
         "cross-validated-live": 1,
-        "tested": 66,
+        "tested": 64,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 121,
+        "cross-validated-static": 125,
         "cross-validated-live": 3,
-        "tested": 143,
+        "tested": 139,
         "unverified": 4
       }
     },
@@ -50,6 +50,7 @@
         "test_dsp_csd",
         "test_dsp_eog_regression",
         "test_dsp_morlet_tfr",
+        "test_dsp_multitaper",
         "test_edf2fiff_rwr",
         "test_fiff_core_python",
         "test_fiff_cov_python",
@@ -561,7 +562,7 @@
       "python": "mne.time_frequency.psd_multitaper",
       "claimed": "implemented",
       "test": "test_dsp_multitaper",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -577,7 +578,7 @@
       "python": "mne.time_frequency.tfr_multitaper",
       "claimed": "implemented",
       "test": "test_dsp_multitaper",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -2657,7 +2658,7 @@
       "python": "mne.time_frequency.BaseTFR",
       "claimed": "partial",
       "test": "test_dsp_multitaper",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2777,7 +2778,7 @@
       "python": "mne.time_frequency.dpss_windows",
       "claimed": "implemented",
       "test": "test_dsp_multitaper",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2841,7 +2842,7 @@
       "python": "mne.time_frequency.tfr_array_multitaper",
       "claimed": "partial",
       "test": "test_dsp_multitaper",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2857,7 +2858,7 @@
       "python": "mne.time_frequency.tfr_multitaper",
       "claimed": "partial",
       "test": "test_dsp_multitaper",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
