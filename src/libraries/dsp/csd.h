@@ -99,7 +99,8 @@ public:
 
     //=========================================================================================================
     /**
-     * Compute CSD using Welch-style Fourier segmented estimation.
+     * Compute CSD using Welch-style Fourier segmented estimation. Each segment is treated like an epoch of
+     * mne.time_frequency.csd_array_fourier (demeaned, Hann window, same scaling); DC is never returned.
      *
      * @param[in] matData   Data matrix (n_channels × n_samples).
      * @param[in] sfreq     Sampling frequency in Hz.

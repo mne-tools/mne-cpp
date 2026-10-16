@@ -67,6 +67,8 @@ Compute CSD using multitaper (DPSS) spectral estimation.
 
 Compute CSD using Welch-style Fourier segmented estimation.
 
+Each segment is treated like an epoch of mne.time_frequency.csd_array_fourier (demeaned, Hann window, same scaling); DC is never returned.
+
 **Parameters:**
 
 - **matData** : *const Eigen::MatrixXd &*

@@ -156,9 +156,9 @@ CsdResult Csd::computeFourier(const MatrixXd& matData,
         fmax = sfreq / 2.0;
 
     const double freqRes = sfreq / static_cast<double>(nFft);
-    const int iBinMin = std::max(0, static_cast<int>(std::ceil(fmin / freqRes)));
+    const int iBinMin = std::max(1, static_cast<int>(std::ceil(fmin / freqRes)));
     const int iBinMax = std::min(nFreqsFull - 1, static_cast<int>(std::floor(fmax / freqRes)));
-    const int nFreqsSel = iBinMax - iBinMin + 1;
+    const int nFreqsSel = std::max(0, iBinMax - iBinMin + 1);
 
     // Build Hann window
     VectorXd hannWin(nFft);
@@ -166,7 +166,6 @@ CsdResult Csd::computeFourier(const MatrixXd& matData,
         const double t = static_cast<double>(n) / static_cast<double>(nFft - 1);
         hannWin[n] = 0.5 * (1.0 - std::cos(2.0 * CSD_PI * t));
     }
-    const double winPow = hannWin.squaredNorm();
 
     const int iStep = std::max(1, static_cast<int>(std::round(static_cast<double>(nFft) * (1.0 - overlap))));
 
@@ -183,13 +182,18 @@ CsdResult Csd::computeFourier(const MatrixXd& matData,
         MatrixXcd spectra(nChannels, nFreqsFull);
 
         for (int ch = 0; ch < nChannels; ++ch) {
-            VectorXd seg = matData.row(ch).segment(start, nFft).transpose().array() * hannWin.array();
+            VectorXd seg = matData.row(ch).segment(start, nFft).transpose();
+            seg = (seg.array() - seg.mean()) * hannWin.array();
 
             VectorXcd spec;
             fft.fwd(spec, seg);
 
             spectra.row(ch) = spec.head(nFreqsFull).transpose();
         }
+        // One-sided spectrum: DC and an even-length Nyquist bin have no mirror image
+        spectra.col(0) /= std::sqrt(2.0);
+        if (nFft % 2 == 0)
+            spectra.col(nFreqsFull - 1) /= std::sqrt(2.0);
 
         // Accumulate CSD for selected frequency bins
         for (int fi = 0; fi < nFreqsSel; ++fi) {
@@ -208,7 +212,8 @@ CsdResult Csd::computeFourier(const MatrixXd& matData,
 
     MatrixXcd meanCsd = MatrixXcd::Zero(nChannels, nChannels);
 
-    const double dNorm = (nSeg > 0) ? 1.0 / (static_cast<double>(nSeg) * winPow) : 0.0;
+    // As mne.time_frequency.csd_array_fourier: 2 for one-sided, 8/3 for the Hann power loss, per Hz
+    const double dNorm = (nSeg > 0) ? 2.0 * 8.0 / 3.0 / (static_cast<double>(nSeg) * nFft * sfreq) : 0.0;
 
     for (int fi = 0; fi < nFreqsSel; ++fi) {
         csdAccum[static_cast<std::size_t>(fi)] *= dNorm;

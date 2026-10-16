@@ -60,6 +60,8 @@ private slots:
     void testFourierBasic();
     void testFourierDimensions();
     void testFourierHermitian();
+    void testFourierMatchesMnePython_data();
+    void testFourierMatchesMnePython();
 
     // computeMorlet
     void testMorletBasic();
@@ -209,6 +211,49 @@ void TestDspCsd::testFourierHermitian()
             QVERIFY(std::abs(cij - std::conj(cji)) < 1e-10);
         }
     }
+}
+
+//=============================================================================================================
+
+void TestDspCsd::testFourierMatchesMnePython_data()
+{
+    // Reference values produced by mne.time_frequency.csd_array_fourier (mne 1.11) on the Welch segments as epochs:
+    //   sf = 250.0; t = np.arange(512) / sf
+    //   x0 = np.sin(2 * np.pi * 10 * t) + 0.3 * np.cos(2 * np.pi * 23 * t) + 0.5
+    //   x1 = 0.5 * np.sin(2 * np.pi * 10 * t + 0.7) + 0.1 * t
+    //   segs = np.stack([X[:, s:s + 128] for s in range(0, 385, 64)])
+    //   csd_array_fourier(segs, sf, fmax=50.0)   -> 25 frequencies, 1.953125 ... 48.828125 Hz
+    // Columns: C[0,0].real, C[1,1].real, C[0,1].real, C[0,1].imag
+    QTest::addColumn<int>("freqIdx");
+    QTest::addColumn<QList<double>>("expected");
+    QTest::newRow("1.95 Hz") << 0 << QList<double>{4.629427274e-05, 3.543397771e-05, 1.807127146e-05, -3.177853984e-06};
+    QTest::newRow("9.77 Hz") << 4 << QList<double>{0.1649685119, 0.0412394438, 0.0630856513, -0.05313576463};
+    QTest::newRow("23.4 Hz") << 11 << QList<double>{0.01419135922, 1.17881121e-08, 1.556699547e-06, -9.239563099e-07};
+}
+
+//=============================================================================================================
+
+void TestDspCsd::testFourierMatchesMnePython()
+{
+    QFETCH(int, freqIdx);
+    QFETCH(QList<double>, expected);
+
+    const double sfreq = 250.0;
+    MatrixXd data(2, 512);
+    for (int n = 0; n < data.cols(); ++n) {
+        const double t = n / sfreq;
+        data(0, n) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t) + 0.5;
+        data(1, n) = 0.5 * std::sin(2.0 * M_PI * 10.0 * t + 0.7) + 0.1 * t;
+    }
+
+    const CsdResult r = Csd::computeFourier(data, sfreq, 0.0, 50.0, 128, 0.5);
+    QCOMPARE(r.vecFreqs.size(), 25);
+    QCOMPARE(r.vecFreqs[0], 1.953125);
+    const MatrixXcd& c = r.csdByFreq[freqIdx];
+    const double got[] = {c(0, 0).real(), c(1, 1).real(), c(0, 1).real(), c(0, 1).imag()};
+    for (int i = 0; i < 4; ++i)
+        QVERIFY2(std::abs(got[i] - expected[i]) <= 1e-6 * std::abs(expected[i]),
+                 qPrintable(QString("value %1: %2 vs mne %3").arg(i).arg(got[i], 0, 'g', 10).arg(expected[i], 0, 'g', 10)));
 }
 
 //=============================================================================================================
