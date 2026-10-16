@@ -107,9 +107,9 @@ int main(int argc, char* argv[])
     const WelchPsdResult welch = WelchPsd::compute(tones, sFreq, 250, 0.5, WelchPsd::Hann); // 1 Hz bins, 50 % overlap
     // welch.matPsd: n_channels x 126 one-sided PSD (unit^2/Hz); welch.vecFreqs: 0 ... 125 Hz
     //! [welch_psd_compute]
-    // scipy.signal.welch(x, 250, window=get_window("hann", 250, fftbins=False), nperseg=250, noverlap=125, detrend=False)
-    ok &= expect(welch.vecFreqs.size() == 126 && std::fabs(welch.matPsd(0, 10) - 0.331993789047378) < 1e-9 && std::fabs(welch.matPsd(0, 40) - 0.08300028717365324) < 1e-9 && std::fabs(welch.matPsd.sum() - 0.6250000465680238) < 1e-9,
-                 QString("WelchPsd: P(10 Hz) = %1, P(40 Hz) = %2 match scipy").arg(welch.matPsd(0, 10)).arg(welch.matPsd(0, 40)));
+    // mne.time_frequency.psd_array_welch(x, 250, n_fft=250, n_overlap=125, window="hann")
+    ok &= expect(welch.vecFreqs.size() == 126 && std::fabs(welch.matPsd(0, 10) - 0.3333333333333334) < 1e-9 && std::fabs(welch.matPsd(0, 40) - 0.08333333333333323) < 1e-9 && std::fabs(welch.matPsd.sum() - 0.6250000000000001) < 1e-9,
+                 QString("WelchPsd: P(10 Hz) = %1, P(40 Hz) = %2 match mne psd_array_welch").arg(welch.matPsd(0, 10)).arg(welch.matPsd(0, 40)));
 
     //! [fir_filter_usage]
     FilterKernel lowPass = FirFilter::design(256, FirFilter::LowPass, 20.0, 0.0, sFreq, 5.0); // order, type, cutoff(s), Hz, transition

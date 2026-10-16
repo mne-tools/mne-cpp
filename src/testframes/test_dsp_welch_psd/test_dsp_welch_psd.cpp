@@ -64,6 +64,10 @@ private slots:
     // Multi-channel
     void testMultiChannel();
     void testChannelPicks();
+
+    // MNE-Python
+    void testMatchesMnePython_data();
+    void testMatchesMnePython();
 };
 
 //=============================================================================================================
@@ -114,10 +118,10 @@ void TestWelchPsd::testFreqAxisValues()
 
 void TestWelchPsd::testDCSine()
 {
-    // A constant offset → all power in DC bin (k=0)
+    // A constant offset → all power in DC bin (k=0) when the DC is kept
     const int nSamples = 4096;
     RowVectorXd sig = RowVectorXd::Constant(nSamples, 1.0);
-    RowVectorXd psd = WelchPsd::computeVector(sig, 500.0, 256, 0.5);
+    RowVectorXd psd = WelchPsd::computeVector(sig, 500.0, 256, 0.5, WelchPsd::Hann, false);
 
     // DC bin must be the maximum
     int peakBin = 0;
@@ -250,6 +254,63 @@ void TestWelchPsd::testChannelPicks()
     picks << 0, 4, 9;
     auto r = WelchPsd::compute(mat, 500.0, nfft, 0.5, WelchPsd::Hann, picks);
     QCOMPARE(r.matPsd.rows(), 3);
+}
+
+//=============================================================================================================
+
+void TestWelchPsd::testMatchesMnePython_data()
+{
+    // Reference values produced by mne.time_frequency.psd_array_welch(x, 250.0, n_fft, n_overlap, window,
+    // remove_dc) (mne 1.11) at bins 0, 1, 10, 24 and the last one, channels x0 then x1:
+    //   t = np.arange(1000) / 250.0
+    //   x0 = np.sin(2 pi 10 t) + 0.3 np.cos(2 pi 23 t) + 0.5 + 0.2 t, x1 = 0.5 np.sin(2 pi 40 t + 0.7) - 0.1 t
+    QTest::addColumn<int>("nfft");
+    QTest::addColumn<double>("overlap");
+    QTest::addColumn<int>("window");
+    QTest::addColumn<bool>("removeDc");
+    QTest::addColumn<QList<double>>("expected");
+    QTest::newRow("hann, 256, overlap 128") << 256 << 0.5 << int(WelchPsd::Hann) << true
+                                            << QList<double>{0.00018283535121, 3.61734797521e-08, 0.000900780662577, 0.000204004574454,
+                                                             0.316790270176, 3.70288157762e-10, 0.0236334812474, 7.59634972257e-12,
+                                                             2.62350962604e-15, 4.99857893909e-17};
+    QTest::newRow("hamming, odd 255, no overlap") << 255 << 0.0 << int(WelchPsd::Hamming) << true
+                                                  << QList<double>{6.61039503348e-05, 1.54419093012e-06, 0.00103816438256, 0.000245680289208,
+                                                                   0.350874383167, 1.72374808472e-07, 0.0209306129309, 2.61512677902e-07,
+                                                                   1.05076548145e-07, 3.43270088045e-08};
+    QTest::newRow("hann, DC kept") << 256 << 0.5 << int(WelchPsd::Hann) << false
+                                   << QList<double>{0.523893900234, 0.0271418054475, 0.262773709564, 0.0137748918611,
+                                                    0.316790270176, 3.70288157762e-10, 0.0236334812474, 7.59634972261e-12,
+                                                    2.62350962604e-15, 4.99857893954e-17};
+}
+
+//=============================================================================================================
+
+void TestWelchPsd::testMatchesMnePython()
+{
+    QFETCH(int, nfft);
+    QFETCH(double, overlap);
+    QFETCH(int, window);
+    QFETCH(bool, removeDc);
+    QFETCH(QList<double>, expected);
+
+    MatrixXd x(2, 1000);
+    for (int i = 0; i < 1000; ++i) {
+        const double t = i / 250.0;
+        x(0, i) = std::sin(2.0 * M_PI * 10.0 * t) + 0.3 * std::cos(2.0 * M_PI * 23.0 * t) + 0.5 + 0.2 * t;
+        x(1, i) = 0.5 * std::sin(2.0 * M_PI * 40.0 * t + 0.7) - 0.1 * t;
+    }
+    const WelchPsdResult r = WelchPsd::compute(x, 250.0, nfft, overlap, static_cast<WelchPsd::WindowType>(window),
+                                               RowVectorXi(), removeDc);
+    QCOMPARE(r.matPsd.cols(), Eigen::Index(nfft / 2 + 1));
+    const int bins[] = {0, 1, 10, 24, nfft / 2};
+    for (int k = 0; k < 5; ++k) {
+        for (int ch = 0; ch < 2; ++ch) {
+            const double got = r.matPsd(ch, bins[k]);
+            const double want = expected[2 * k + ch];
+            QVERIFY2(std::abs(got - want) <= 1e-8 * r.matPsd.row(ch).maxCoeff() + 1e-9 * std::abs(want),
+                     qPrintable(QString("bin %1 ch %2: %3 vs mne %4").arg(bins[k]).arg(ch).arg(got, 0, 'g', 12).arg(want, 0, 'g', 12)));
+        }
+    }
 }
 
 //=============================================================================================================

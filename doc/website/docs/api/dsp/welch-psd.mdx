@@ -32,7 +32,7 @@ const WelchPsdResult welch = WelchPsd::compute(tones, sFreq, 250, 0.5, WelchPsd:
 
 ## Static Methods
 
-### compute(matData, dSFreq, iNfft, dOverlap, window, vecPicks)
+### compute(matData, dSFreq, iNfft, dOverlap, window, vecPicks, bRemoveDc)
 
 Compute Welch PSD for every (selected) channel of a data matrix.
 
@@ -56,13 +56,16 @@ Compute Welch PSD for every (selected) channel of a data matrix.
 - **vecPicks** : *const Eigen::RowVectorXi &*
   Channel row indices to process; empty = all channels.
 
+- **bRemoveDc** : *bool*
+  Subtract each segment's mean first (remove_dc of mne.time_frequency.psd_array_welch).
+
 **Returns:**
 
 - *[WelchPsdResult](/docs/api/dsp/welch-psd-result)* — [`WelchPsdResult`](/docs/api/dsp/welch-psd-result) with matPsd (n_picks × iNfft/2+1) and vecFreqs.
 
 ---
 
-### computeVector(vecData, dSFreq, iNfft, dOverlap, window)
+### computeVector(vecData, dSFreq, iNfft, dOverlap, window, bRemoveDc)
 
 Compute Welch PSD for a single channel row vector.
 
@@ -81,7 +84,10 @@ Compute Welch PSD for a single channel row vector.
   Fractional segment overlap in [0, 1).
 
 - **window** : *WindowType*
-  Window function.
+  Window function (periodic, as scipy's get_window).
+
+- **bRemoveDc** : *bool*
+  Subtract each segment's mean first (remove_dc of mne.time_frequency.psd_array_welch).
 
 **Returns:**
 

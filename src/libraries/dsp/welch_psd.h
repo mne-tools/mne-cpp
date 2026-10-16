@@ -93,6 +93,7 @@ public:
      * @param[in] dOverlap  Fractional overlap between adjacent segments, in [0, 1) (default 0.5).
      * @param[in] window    Window function (default Hann).
      * @param[in] vecPicks  Channel row indices to process; empty = all channels.
+     * @param[in] bRemoveDc Subtract each segment's mean first (remove_dc of mne.time_frequency.psd_array_welch).
      * @return              WelchPsdResult with matPsd (n_picks × iNfft/2+1) and vecFreqs.
      */
     static WelchPsdResult compute(const Eigen::MatrixXd& matData,
@@ -100,7 +101,8 @@ public:
                                   int iNfft = 256,
                                   double dOverlap = 0.5,
                                   WindowType window = Hann,
-                                  const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi());
+                                  const Eigen::RowVectorXi& vecPicks = Eigen::RowVectorXi(),
+                                  bool bRemoveDc = true);
 
     //=========================================================================================================
     /**
@@ -110,14 +112,16 @@ public:
      * @param[in] dSFreq    Sampling frequency in Hz.
      * @param[in] iNfft     FFT / segment length in samples.
      * @param[in] dOverlap  Fractional segment overlap in [0, 1).
-     * @param[in] window    Window function.
+     * @param[in] window    Window function (periodic, as scipy's get_window).
+     * @param[in] bRemoveDc Subtract each segment's mean first (remove_dc of mne.time_frequency.psd_array_welch).
      * @return              One-sided PSD row vector of length iNfft/2+1.
      */
     static Eigen::RowVectorXd computeVector(const Eigen::RowVectorXd& vecData,
                                             double dSFreq,
                                             int iNfft = 256,
                                             double dOverlap = 0.5,
-                                            WindowType window = Hann);
+                                            WindowType window = Hann,
+                                            bool bRemoveDc = true);
 
     //=========================================================================================================
     /**

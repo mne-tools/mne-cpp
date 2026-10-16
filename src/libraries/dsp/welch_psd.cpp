@@ -55,7 +55,7 @@ VectorXd WelchPsd::buildWindow(int iN, WindowType window)
     const double pi2 = 2.0 * WELCH_PI;
 
     for (int n = 0; n < iN; ++n) {
-        const double t = static_cast<double>(n) / static_cast<double>(iN - 1);
+        const double t = static_cast<double>(n) / static_cast<double>(iN);
         switch (window) {
             case Hann:
                 w[n] = 0.5 * (1.0 - std::cos(pi2 * t));
@@ -91,7 +91,8 @@ RowVectorXd WelchPsd::computeVector(const RowVectorXd& vecData,
                                     double dSFreq,
                                     int iNfft,
                                     double dOverlap,
-                                    WindowType window)
+                                    WindowType window,
+                                    bool bRemoveDc)
 {
     const int nIn = static_cast<int>(vecData.cols());
     if (iNfft > nIn)
@@ -109,7 +110,10 @@ RowVectorXd WelchPsd::computeVector(const RowVectorXd& vecData,
 
     for (int start = 0; start + iNfft <= nIn; start += iStep) {
         // Apply window and forward FFT
-        VectorXd seg = vecData.segment(start, iNfft).transpose().array() * w.array();
+        VectorXd seg = vecData.segment(start, iNfft).transpose();
+        if (bRemoveDc)
+            seg.array() -= seg.mean();
+        seg.array() *= w.array();
         VectorXcd spec;
         fft.fwd(spec, seg);
 
@@ -125,8 +129,9 @@ RowVectorXd WelchPsd::computeVector(const RowVectorXd& vecData,
     const double dNorm = 1.0 / (static_cast<double>(nSeg) * dWinPow * dSFreq);
     psd *= dNorm;
 
-    // One-sided: double all non-DC, non-Nyquist bins
-    for (int k = 1; k < iNFreqs - 1; ++k)
+    // One-sided: double every bin with a mirror image (not DC, not an even-length Nyquist)
+    const int kLast = (iNfft % 2 == 0) ? iNFreqs - 1 : iNFreqs;
+    for (int k = 1; k < kLast; ++k)
         psd[k] *= 2.0;
 
     return psd;
@@ -139,7 +144,8 @@ WelchPsdResult WelchPsd::compute(const MatrixXd& matData,
                                  int iNfft,
                                  double dOverlap,
                                  WindowType window,
-                                 const RowVectorXi& vecPicks)
+                                 const RowVectorXi& vecPicks,
+                                 bool bRemoveDc)
 {
     std::vector<int> picks;
     if (vecPicks.size() > 0) {
@@ -159,6 +165,6 @@ WelchPsdResult WelchPsd::compute(const MatrixXd& matData,
 
     for (int ci = 0; ci < static_cast<int>(picks.size()); ++ci)
         result.matPsd.row(ci) = computeVector(matData.row(picks[ci]),
-                                              dSFreq, iNfft, dOverlap, window);
+                                              dSFreq, iNfft, dOverlap, window, bRemoveDc);
     return result;
 }
