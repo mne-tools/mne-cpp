@@ -292,6 +292,7 @@ FiffInfo FiffInfo::pick_info(const RowVectorXi& sel) const
         res.ch_names.append(this->ch_names[idx]);
     }
     res.nchan = static_cast<int>(sel.size());
+    res.bads.removeIf([&res](const QString& bad) { return !res.ch_names.contains(bad); });
 
     return res;
 }

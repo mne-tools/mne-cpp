@@ -168,6 +168,43 @@ private slots:
         QCOMPARE(FiffInfoBase().pick_types(QString("mag"), true, true).size(), Index(0));
     }
 
+    void info_picksMatchMnePython()
+    {
+        if (!hasData())
+            QSKIP("No test data");
+        // Reference values produced by mne 1.11 on sample_audvis_trunc_raw.fif (bads MEG 2443, EEG 053, 376 channels):
+        //   mne.pick_types(info, meg, eeg, stim) (exclude="bads"), pick_types(..., exclude=[]),
+        //   mne.pick_channels(ch_names, include=["EEG 001", "MEG 0113", "STI 014"]), pick_channels(exclude=bads),
+        //   mne.pick_info(info, [3, 10, 316]) -> MEG 0122, MEG 0142, EEG 002 and no bads
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        const FiffRawData raw(file);
+        const FiffInfo& info = raw.info;
+        QCOMPARE(info.nchan, 376);
+        QCOMPARE(info.bads, QStringList({"MEG2443", "EEG053"}));
+
+        const RowVectorXi meg = info.pick_types(true, false, false, QStringList(), info.bads);
+        QCOMPARE(meg.size(), Index(305));
+        QCOMPARE(meg(304), 305);
+        const RowVectorXi eeg = info.pick_types(false, true, false, QStringList(), info.bads);
+        QCOMPARE(eeg.size(), Index(59));
+        QCOMPARE(eeg(0), 315);
+        QCOMPARE(eeg(58), 374);
+        const RowVectorXi stim = info.pick_types(false, false, true, QStringList(), info.bads);
+        QCOMPARE(stim.size(), Index(9));
+        QCOMPARE(stim(0), 306);
+        QCOMPARE(stim(8), 314);
+        QCOMPARE(info.pick_types(true, true, false).size(), Index(366));
+
+        QCOMPARE(FiffInfoBase::pick_channels(info.ch_names, {"EEG001", "MEG0113", "STI014"}), RowVectorXi((RowVectorXi(3) << 0, 312, 315).finished()));
+        QCOMPARE(FiffInfoBase::pick_channels(info.ch_names, QStringList(), info.bads).size(), Index(374));
+
+        const RowVectorXi sel = (RowVectorXi(3) << 3, 10, 316).finished();
+        const FiffInfo sub = info.pick_info(sel);
+        QCOMPARE(sub.ch_names, QStringList({"MEG0122", "MEG0142", "EEG002"}));
+        QCOMPARE(sub.nchan, 3);
+        QVERIFY(sub.bads.isEmpty());
+    }
+
     //=========================================================================
     // FiffProj
     //=========================================================================

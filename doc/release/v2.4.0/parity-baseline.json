@@ -22,9 +22,9 @@
   "summary": {
     "claims": 352,
     "by_evidence": {
-      "cross-validated-static": 140,
+      "cross-validated-static": 143,
       "cross-validated-live": 4,
-      "tested": 204,
+      "tested": 201,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 115,
+        "cross-validated-static": 118,
         "cross-validated-live": 3,
-        "tested": 141,
+        "tested": 138,
         "unverified": 4
       }
     },
@@ -62,6 +62,7 @@
         "test_fiff_dig_point_python",
         "test_fiff_evoked_python",
         "test_fiff_fs_library",
+        "test_fiff_info",
         "test_fiff_proj_python",
         "test_fiff_raw_formats_python",
         "test_fiff_raw_io",
@@ -1980,7 +1981,7 @@
       "python": "mne.pick_channels",
       "claimed": "implemented",
       "test": "test_fiff_info",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2020,7 +2021,7 @@
       "python": "mne.pick_info",
       "claimed": "implemented",
       "test": "test_fiff_info",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2028,7 +2029,7 @@
       "python": "mne.pick_types",
       "claimed": "partial",
       "test": "test_fiff_info",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

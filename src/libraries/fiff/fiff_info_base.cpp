@@ -280,6 +280,7 @@ FiffInfoBase FiffInfoBase::pick_info(const RowVectorXi* sel) const
         res.ch_names.append(this->ch_names[idx]);
     }
     res.nchan = sel->size();
+    res.bads.removeIf([&res](const QString& bad) { return !res.ch_names.contains(bad); });
 
     return res;
 }
