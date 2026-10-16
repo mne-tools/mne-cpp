@@ -60,6 +60,10 @@ These scripts download the MNE-CPP-maintained prerelease dependency bundles into
 
 That keeps local development aligned with the dependency artifacts used in CI and release workflows. Qt downloads from the public `qt_binaries` prerelease tag. Eigen downloads from the public `eigen_artifacts` prerelease tag. No bundled Eigen copy is shipped in the repository.
 
+:::info What onboarding CI verifies
+The commands above run unchanged on clean Ubuntu, macOS and Windows runners every week and whenever the init scripts, dependency versions or this page change. The alternatives below (a Qt Online Installer Qt, the `build_project` scripts, direct CMake calls, Qt Creator, static linkage) are not run by onboarding CI; only the existence of the scripts they call is checked.
+:::
+
 ### CMake
 
 [CMake](https://cmake.org/download/) **3.15 or higher** is required.
