@@ -70,7 +70,7 @@ MNE-CPP requires a compiler with **C++20 support**. The following compilers are 
 
 | Windows | Linux | macOS |
 |---------|-------|-------|
-| [MSVC 2022](https://visualstudio.microsoft.com/vs/community/) (Visual Studio 2022 Community or higher. During installation select the **Desktop development with C++** workload.) | GCC 13+ (ships with Ubuntu 24.04) | Apple Clang via [Xcode](https://developer.apple.com/xcode/) (ships with macOS) |
+| [MSVC](https://visualstudio.microsoft.com/vs/community/) (Visual Studio 2026 in CI. During installation select the **Desktop development with C++** workload.) | GCC 13+ (ships with Ubuntu 24.04) | Apple Clang via [Xcode](https://developer.apple.com/xcode/) (ships with macOS) |
 
 ### Qt 6
 
@@ -117,10 +117,10 @@ Navigate to the `mne-cpp` root folder. We provide a cross-platform build script 
 
 ```bash
 # Linux / macOS
-./scripts/build_project.sh
+./scripts/build/build_project.sh
 
 # Windows
-.\scripts\build_project.bat
+.\scripts\build\build_project.bat
 ```
 
 If you ran `./init.sh` or `.\init.bat` first, the build script will also auto-detect the downloaded Qt bundle from `src/external/qt/`.
@@ -134,15 +134,15 @@ Common options:
 | `static` | Build with static linking |
 | `Debug` | Build in Debug mode (default is Release) |
 | `clean` | Remove previous build before building |
-| `qt <path>` | Use a custom Qt installation path |
+| `qt=<path>` | Use a custom Qt installation path (Windows: `qt <path>`) |
 
 Example — build everything in Release mode:
 ```bash
 # Linux / macOS
-./scripts/build_project.sh all
+./scripts/build/build_project.sh all
 
 # Windows
-.\scripts\build_project.bat all
+.\scripts\build\build_project.bat all
 ```
 
 Alternatively, you can invoke CMake directly:
@@ -185,7 +185,7 @@ cmake --build build --config Release --parallel %NUMBER_OF_PROCESSORS%
 
 ### Running Applications
 
-From **Qt Creator**, use the Run button in the lower-left toolbar. From the **command line**, navigate to `out/Release/apps` and run the desired application, e.g.:
+From **Qt Creator**, use the Run button in the lower-left toolbar. From the **command line**, navigate to `out/Release/bin` and run the desired application, e.g.:
 
 ```bash
 ./mne_scan
@@ -199,10 +199,10 @@ To build and run the unit tests:
 
 ```bash
 # Linux / macOS
-./scripts/build_project.sh all
+./scripts/build/build_project.sh all
 
 # Windows
-.\scripts\build_project.bat all
+.\scripts\build\build_project.bat all
 
 cd build/Release
 ctest --output-on-failure

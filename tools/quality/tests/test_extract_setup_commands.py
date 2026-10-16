@@ -76,6 +76,12 @@ class ExtractSetupCommandsTest(unittest.TestCase):
                 if "cmake --build" in line and "--parallel" in line:
                     self.assertRegex(line, r"--parallel\s+\S", line)
 
+    def test_documented_script_paths_exist(self) -> None:
+        # The guide pointed at ./scripts/build_project.sh long after it moved to scripts/build/
+        self.assertEqual(extractor.missing_scripts(_REPO_ROOT), [])
+        self.assertEqual(extractor.missing_scripts_in(DOC, _REPO_ROOT, "doc.mdx"),
+                         ["doc.mdx:14: ./scripts/build_project.sh"])
+
     def test_edited_doc_command_is_drift(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             for doc in extractor.DOCS:

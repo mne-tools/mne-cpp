@@ -35,6 +35,8 @@ COMMANDS_JSON = Path(__file__).with_name("setup_commands.json")
 
 _MARKER = re.compile(r"^\{/\*\s*onboarding:\s*([a-z-]+)\s*\*/\}\s*$")
 _FENCE = re.compile(r"^```")
+# A repository script a documented command runs, e.g. ./scripts/build/build_project.sh or .\init.bat
+_SCRIPT = re.compile(r"(?<![\w/\\])\.?[/\\]?((?:[\w-]+[/\\])*[\w-]+\.(?:sh|bat|py))\b")
 
 
 def extract(text: str, source: str) -> dict[str, list[str]]:
@@ -58,6 +60,29 @@ def extract(text: str, source: str) -> dict[str, list[str]]:
             i += 1
         i += 1
     return commands
+
+
+def missing_scripts_in(text: str, root: Path, source: str) -> list[str]:
+    """Return 'source:line: path' for each script a code block runs that does not exist under @p root."""
+    missing: list[str] = []
+    in_block = False
+    for number, line in enumerate(text.splitlines(), 1):
+        if _FENCE.match(line.strip()):
+            in_block = not in_block
+            continue
+        if not in_block or line.strip().startswith(("#", "REM ", "::")):
+            continue
+        for match in _SCRIPT.finditer(line):
+            relative = match.group(1).replace("\\", "/")
+            # Only paths into the repository; system tools such as vcvars64.bat live elsewhere
+            if (root / relative.split("/")[0]).exists() and not (root / relative).is_file():
+                missing.append(f"{source}:{number}: {match.group(0)}")
+    return missing
+
+
+def missing_scripts(root: Path) -> list[str]:
+    """Scripts the onboarding docs tell a contributor to run that are not in the repository."""
+    return [entry for doc in DOCS for entry in missing_scripts_in((root / doc).read_text(encoding="utf-8"), root, doc)]
 
 
 def extract_docs(root: Path) -> dict[str, list[str]]:
@@ -86,6 +111,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Wrote tools/onboarding/{COMMANDS_JSON.name}")
         return 0
     if args.check:
+        missing = missing_scripts(REPO_ROOT)
+        if missing:
+            print("ERROR: the build guide runs scripts that do not exist:\n  " + "\n  ".join(missing), file=sys.stderr)
+            return 1
         committed = COMMANDS_JSON.read_text(encoding="utf-8") if COMMANDS_JSON.exists() else ""
         if committed != rendered:
             print(f"ERROR: the documented onboarding commands differ from tools/onboarding/{COMMANDS_JSON.name}; "
