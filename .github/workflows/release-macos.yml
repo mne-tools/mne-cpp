@@ -27,22 +27,19 @@ jobs:
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
           TAG="${GITHUB_REF#refs/tags/}"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-${TAG#v}" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          PREFIX="mne-cpp-${TAG#v}" UPLOAD=true
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "tag=latest" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          TAG=latest PREFIX=mne-cpp-latest UPLOAD=true
         elif [[ "$GITHUB_REF" == "refs/heads/staging" ]]; then
-          echo "tag=dev_build" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          TAG=dev_build PREFIX=mne-cpp-dev UPLOAD=true
         else
-          echo "tag=none" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-local" >> "$GITHUB_OUTPUT"
-          echo "should_upload=false" >> "$GITHUB_OUTPUT"
+          TAG=none PREFIX=mne-cpp-local UPLOAD=false
         fi
+        {
+          echo "tag=${TAG}"
+          echo "prefix=${PREFIX}"
+          echo "should_upload=${UPLOAD}"
+        } >> "$GITHUB_OUTPUT"
     - name: Clear stale pip cache
       run: rm -rf ~/Library/Caches/pip
     - name: Install Python 3.10 version
@@ -162,22 +159,19 @@ jobs:
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
           TAG="${GITHUB_REF#refs/tags/}"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-${TAG#v}" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          PREFIX="mne-cpp-${TAG#v}" UPLOAD=true
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "tag=latest" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          TAG=latest PREFIX=mne-cpp-latest UPLOAD=true
         elif [[ "$GITHUB_REF" == "refs/heads/staging" ]]; then
-          echo "tag=dev_build" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          TAG=dev_build PREFIX=mne-cpp-dev UPLOAD=true
         else
-          echo "tag=none" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-local" >> "$GITHUB_OUTPUT"
-          echo "should_upload=false" >> "$GITHUB_OUTPUT"
+          TAG=none PREFIX=mne-cpp-local UPLOAD=false
         fi
+        {
+          echo "tag=${TAG}"
+          echo "prefix=${PREFIX}"
+          echo "should_upload=${UPLOAD}"
+        } >> "$GITHUB_OUTPUT"
     - name: Clear stale pip cache
       run: rm -rf ~/Library/Caches/pip
     - name: Install Python 3.10 version
@@ -237,7 +231,7 @@ jobs:
         mkdir qt6_shadow
         cd qt6_shadow
         ../qt5/configure -static -release -prefix "$GITHUB_WORKSPACE/Qt6_static" -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel $(sysctl -n hw.ncpu)
+        cmake --build . --parallel "$(sysctl -n hw.ncpu)"
         cmake --install .
     - name: Configure and compile MNE-CPP (static)
       run: |

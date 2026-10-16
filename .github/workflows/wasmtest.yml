@@ -124,7 +124,7 @@ jobs:
         git checkout --track origin/gh-pages
         # Clean and remove all files first
         git clean -f -d
-        git rm * -r
+        git rm -r -- *
         git commit --amend -a -m 'Update wasm' --allow-empty
         # Add the saved wasm files
         cp -RT ../bin .

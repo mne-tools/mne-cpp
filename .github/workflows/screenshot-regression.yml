@@ -109,7 +109,7 @@ jobs:
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release \
           -DBUILD_MNE_SCREENSHOT_REGRESSION=ON
-        cmake --build build --target mne_screenshot_regression -j $(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
+        cmake --build build --target mne_screenshot_regression -j "$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)"
 
     - name: Run screenshot regression (Linux)
       if: matrix.os == 'ubuntu-24.04'

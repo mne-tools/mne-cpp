@@ -74,7 +74,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
-      run: cmake --build build --parallel $(nproc)
+      run: cmake --build build --parallel "$(nproc)"
 
     - name: Install SDK
       run: cmake --install build --component sdk
@@ -140,7 +140,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
-      run: cmake --build build --parallel $(sysctl -n hw.ncpu)
+      run: cmake --build build --parallel "$(sysctl -n hw.ncpu)"
 
     - name: Install SDK
       run: cmake --install build --component sdk

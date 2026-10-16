@@ -78,7 +78,7 @@ jobs:
         # Add -opengl desktop to ensure OpenGL/WrapOpenGL CMake config is generated
         # Add -xcb to explicitly enable the xcb QPA platform plugin
         ../qt5/configure -release -prefix "../Qt6_binaries" -skip webengine -nomake tests -nomake examples -no-dbus -no-openssl -no-pch -opengl desktop -xcb -opensource -confirm-license -qt-libpng -qt-pcre -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel $(nproc)
+        cmake --build . --parallel "$(nproc)"
         cmake --install .
     - name: Package binaries
       shell: bash
@@ -135,7 +135,7 @@ jobs:
         mkdir qt6_shadow
         cd qt6_shadow
         ../qt5/configure -release -prefix "../Qt6_binaries" -skip webengine -nomake tests -nomake examples -no-dbus -no-openssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel $(sysctl -n hw.ncpu)
+        cmake --build . --parallel "$(sysctl -n hw.ncpu)"
         cmake --install .
     - name: Package binaries
       shell: bash
@@ -581,7 +581,7 @@ jobs:
         cd qt6_shadow
         # Add -opengl desktop to ensure OpenGL/WrapOpenGL CMake config is generated
         ../qt5/configure -static -release -prefix "../Qt6_binaries" -skip webengine -nomake tests -nomake examples -no-dbus -no-openssl -no-pch -opengl desktop -opensource -confirm-license -qt-libpng -qt-pcre -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel $(nproc)
+        cmake --build . --parallel "$(nproc)"
         cmake --install .
     - name: Package binaries
       run: |
@@ -621,7 +621,7 @@ jobs:
         cd qt6_shadow
         # Configure Qt6
         ../qt5/configure -static -release -prefix "../Qt6_binaries" -skip webengine -nomake tests -nomake examples -no-dbus -no-openssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel $(sysctl -n hw.ncpu)
+        cmake --build . --parallel "$(sysctl -n hw.ncpu)"
         cmake --install .
     - name: Package binaries
       run: |
@@ -719,7 +719,7 @@ jobs:
         mkdir qt6_host_build
         cd qt6_host_build
         ../qt5/configure -release -prefix "$PWD/../Qt6_host" -skip webengine -nomake tests -nomake examples -no-dbus -no-openssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel $(nproc)
+        cmake --build . --parallel "$(nproc)"
         cmake --install .
     - name: Compile wasm Qt version
       run: |
@@ -730,7 +730,7 @@ jobs:
         cd qt6_shadow
         # Configure Qt6 for wasm (use the host Qt we just built)
         ../qt5/configure -qt-host-path "$PWD/../Qt6_host" -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-openssl -no-pch -opensource -confirm-license -prefix "$PWD/../Qt6_binaries" -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel $(nproc)
+        cmake --build . --parallel "$(nproc)"
         cmake --install .
     - name: Package binaries
       run: |

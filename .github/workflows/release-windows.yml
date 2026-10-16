@@ -28,22 +28,19 @@ jobs:
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
           TAG="${GITHUB_REF#refs/tags/}"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-${TAG#v}" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          PREFIX="mne-cpp-${TAG#v}" UPLOAD=true
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "tag=latest" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          TAG=latest PREFIX=mne-cpp-latest UPLOAD=true
         elif [[ "$GITHUB_REF" == "refs/heads/staging" ]]; then
-          echo "tag=dev_build" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          TAG=dev_build PREFIX=mne-cpp-dev UPLOAD=true
         else
-          echo "tag=none" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-local" >> "$GITHUB_OUTPUT"
-          echo "should_upload=false" >> "$GITHUB_OUTPUT"
+          TAG=none PREFIX=mne-cpp-local UPLOAD=false
         fi
+        {
+          echo "tag=${TAG}"
+          echo "prefix=${PREFIX}"
+          echo "should_upload=${UPLOAD}"
+        } >> "$GITHUB_OUTPUT"
     - name: Install Python 3.10 version
       uses: actions/setup-python@v6
       with:
@@ -127,22 +124,19 @@ jobs:
       run: |
         if [[ "$GITHUB_REF" == refs/tags/* ]]; then
           TAG="${GITHUB_REF#refs/tags/}"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-${TAG#v}" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          PREFIX="mne-cpp-${TAG#v}" UPLOAD=true
         elif [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-          echo "tag=latest" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-latest" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          TAG=latest PREFIX=mne-cpp-latest UPLOAD=true
         elif [[ "$GITHUB_REF" == "refs/heads/staging" ]]; then
-          echo "tag=dev_build" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-dev" >> "$GITHUB_OUTPUT"
-          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          TAG=dev_build PREFIX=mne-cpp-dev UPLOAD=true
         else
-          echo "tag=none" >> "$GITHUB_OUTPUT"
-          echo "prefix=mne-cpp-local" >> "$GITHUB_OUTPUT"
-          echo "should_upload=false" >> "$GITHUB_OUTPUT"
+          TAG=none PREFIX=mne-cpp-local UPLOAD=false
         fi
+        {
+          echo "tag=${TAG}"
+          echo "prefix=${PREFIX}"
+          echo "should_upload=${UPLOAD}"
+        } >> "$GITHUB_OUTPUT"
     - name: Install Python 3.10 version
       uses: actions/setup-python@v6
       with:
