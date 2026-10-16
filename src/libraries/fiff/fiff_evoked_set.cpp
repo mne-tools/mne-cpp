@@ -270,22 +270,44 @@ FiffEvokedSet FiffEvokedSet::computeGrandAverage(const QList<FiffEvokedSet>& evo
         return grandAvg;
     }
 
-    grandAvg = evokedSets[0];
-
-    for (int f = 1; f < evokedSets.size(); ++f) {
-        const FiffEvokedSet& eset = evokedSets[f];
-        int nCat = qMin(grandAvg.evoked.size(), eset.evoked.size());
-        for (int j = 0; j < nCat; ++j) {
-            if (grandAvg.evoked[j].data.cols() == eset.evoked[j].data.cols() &&
-                grandAvg.evoked[j].data.rows() == eset.evoked[j].data.rows()) {
-                grandAvg.evoked[j].data += eset.evoked[j].data;
-                grandAvg.evoked[j].nave += eset.evoked[j].nave;
-            }
-        }
+    int nCat = evokedSets.first().evoked.size();
+    for (const FiffEvokedSet& eset : evokedSets) {
+        nCat = qMin(nCat, static_cast<int>(eset.evoked.size()));
     }
 
-    for (int j = 0; j < grandAvg.evoked.size(); ++j) {
-        grandAvg.evoked[j].data /= static_cast<double>(evokedSets.size());
+    for (int j = 0; j < nCat; ++j) {
+        // Drop every channel marked bad in any data set, then keep the common channels.
+        QStringList bads;
+        for (const FiffEvokedSet& eset : evokedSets) {
+            for (const QString& bad : eset.evoked[j].info.bads) {
+                if (!bads.contains(bad)) {
+                    bads.append(bad);
+                }
+            }
+        }
+        QStringList common;
+        for (const QString& name : evokedSets.first().evoked[j].info.ch_names) {
+            bool inAll = !bads.contains(name);
+            for (const FiffEvokedSet& eset : evokedSets) {
+                inAll = inAll && eset.evoked[j].info.ch_names.contains(name);
+            }
+            if (inAll) {
+                common.append(name);
+            }
+        }
+
+        QList<FiffEvoked> picked;
+        for (const FiffEvokedSet& eset : evokedSets) {
+            picked.append(eset.evoked[j].pick_channels(common));
+        }
+        FiffEvoked avg = FiffEvoked::combine(picked, FiffEvoked::CombineWeights::Equal);
+        if (avg.isEmpty()) {
+            continue;
+        }
+        avg.nave = static_cast<fiff_int_t>(evokedSets.size());
+        avg.comment = QString("Grand average (n = %1)").arg(avg.nave);
+        grandAvg.info = avg.info;
+        grandAvg.evoked.append(avg);
     }
 
     return grandAvg;

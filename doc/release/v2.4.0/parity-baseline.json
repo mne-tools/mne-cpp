@@ -22,22 +22,22 @@
   "summary": {
     "claims": 352,
     "by_evidence": {
-      "cross-validated-static": 146,
+      "cross-validated-static": 149,
       "cross-validated-live": 4,
-      "tested": 198,
+      "tested": 195,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 26,
+        "cross-validated-static": 27,
         "cross-validated-live": 1,
-        "tested": 62,
+        "tested": 61,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 120,
+        "cross-validated-static": 122,
         "cross-validated-live": 3,
-        "tested": 136,
+        "tested": 134,
         "unverified": 4
       }
     },
@@ -64,6 +64,7 @@
         "test_fiff_evoked_python",
         "test_fiff_fs_library",
         "test_fiff_info",
+        "test_fiff_io_evoked_info",
         "test_fiff_proj_python",
         "test_fiff_raw_formats_python",
         "test_fiff_raw_io",
@@ -115,7 +116,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **55.6%",
+      "text": "parity: **55.5%",
       "status": "generated-with-denominator"
     }
   ],
@@ -150,7 +151,7 @@
       "python": "mne.Evoked",
       "claimed": "implemented",
       "test": "test_fiff_io_evoked_info",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1210,11 +1211,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FiffEvoked arithmetic",
+      "mne_cpp": "FiffEvoked::combine",
       "python": "mne.combine_evoked",
       "claimed": "implemented",
       "test": "test_fiff_io_evoked_info",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1570,11 +1571,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FiffEvoked averaging",
+      "mne_cpp": "FiffEvokedSet::computeGrandAverage",
       "python": "mne.grand_average",
-      "claimed": "implemented",
+      "claimed": "partial",
       "test": "test_fiff_io_evoked_info",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

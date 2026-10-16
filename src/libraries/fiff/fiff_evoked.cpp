@@ -28,6 +28,7 @@
 #include <math/numerics.h>
 #include <QDebug>
 
+#include <cmath>
 #include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
@@ -501,6 +502,71 @@ FiffEvoked& FiffEvoked::operator+=(const MatrixXd& newData)
     }
 
     return *this;
+}
+
+//=============================================================================================================
+
+FiffEvoked FiffEvoked::combine(const QList<FiffEvoked>& evokeds, CombineWeights weights)
+{
+    VectorXd w(evokeds.size());
+    double naveSum = 0.0;
+    for (const FiffEvoked& e : evokeds) {
+        naveSum += e.nave;
+    }
+    for (int i = 0; i < evokeds.size(); ++i) {
+        w(i) = weights == CombineWeights::Nave ? evokeds[i].nave / naveSum
+                                               : 1.0 / static_cast<double>(evokeds.size());
+    }
+    return combine(evokeds, w);
+}
+
+//=============================================================================================================
+
+FiffEvoked FiffEvoked::combine(const QList<FiffEvoked>& evokeds, const VectorXd& weights)
+{
+    if (evokeds.isEmpty() || weights.size() != evokeds.size()) {
+        qWarning() << "[FiffEvoked::combine] weights must be the same size as the evoked list.";
+        return FiffEvoked();
+    }
+    const FiffEvoked& ref = evokeds.first();
+    for (const FiffEvoked& e : evokeds) {
+        if (e.info.ch_names != ref.info.ch_names || e.times.size() != ref.times.size() || (e.times - ref.times).cwiseAbs().maxCoeff() > 1e-6f) {
+            qWarning() << "[FiffEvoked::combine] All evoked data must have the same channels and times.";
+            return FiffEvoked();
+        }
+    }
+
+    FiffEvoked res(ref);
+    res.data = MatrixXd::Zero(ref.data.rows(), ref.data.cols());
+    double invNave = 0.0;
+    QString comment;
+    for (int i = 0; i < evokeds.size(); ++i) {
+        const FiffEvoked& e = evokeds[i];
+        const double w = weights(i);
+        res.data += w * e.data;
+        invNave += w * w / e.nave;
+        for (const QString& bad : e.info.bads) {
+            if (!res.info.bads.contains(bad)) {
+                res.info.bads.append(bad);
+            }
+        }
+
+        const QString sign = w >= 0.0 ? QString() : QString("-");
+        const QString weight = qAbs(qAbs(w) - 1.0) <= 1e-8 + 1e-5 ? QString()
+                                                                  : QString::number(qAbs(w), 'f', 3);
+        const QString multiplier = weight.isEmpty() ? QString() : QString::fromUtf8(" × ");
+        const QString thisComment = e.comment.contains(" + ") ? QString("(%1)").arg(e.comment)
+            : e.comment.isEmpty()                             ? QString("unknown")
+                                                              : e.comment;
+        if (i == 0) {
+            comment += sign + weight + multiplier + thisComment;
+        } else {
+            comment += QString(" %1 ").arg(sign.isEmpty() ? QString("+") : sign) + weight + multiplier + thisComment;
+        }
+    }
+    res.comment = comment.replace(" - - ", " + ");
+    res.nave = static_cast<fiff_int_t>(std::lround(1.0 / invNave));
+    return res;
 }
 
 //=============================================================================================================

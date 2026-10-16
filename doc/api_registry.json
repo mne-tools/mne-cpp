@@ -11891,8 +11891,8 @@
       {
         "python": "mne.combine_evoked",
         "status": "implemented",
-        "mne_cpp": "FiffEvoked arithmetic",
-        "note": "",
+        "mne_cpp": "FiffEvoked::combine",
+        "note": "weights=\"nave\", \"equal\" or explicit weights; nave rounded to an integer as written to FIFF.",
         "test": "test_fiff_io_evoked_info"
       },
       {
@@ -12360,9 +12360,9 @@
       },
       {
         "python": "mne.grand_average",
-        "status": "implemented",
-        "mne_cpp": "FiffEvoked averaging",
-        "note": "",
+        "status": "partial",
+        "mne_cpp": "FiffEvokedSet::computeGrandAverage",
+        "note": "Evoked only, drop_bads=True path; interpolate_bads and AverageTFR/Spectrum inputs are not supported.",
         "test": "test_fiff_io_evoked_info"
       },
       {

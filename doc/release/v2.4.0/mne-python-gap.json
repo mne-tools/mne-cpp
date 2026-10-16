@@ -9,8 +9,8 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 194,
-      "partial": 96,
+      "implemented": 193,
+      "partial": 97,
       "missing": 145,
       "not-applicable": 8
     },
@@ -22,8 +22,8 @@
         "not-applicable": 0
       },
       "core": {
-        "implemented": 40,
-        "partial": 13,
+        "implemented": 39,
+        "partial": 14,
         "missing": 5,
         "not-applicable": 3
       },
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 55.6
+    "parity_percent": 55.5
   },
   "apis": [
     {
@@ -899,8 +899,8 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "FiffEvoked arithmetic",
-      "note": "",
+      "mne_cpp": "FiffEvoked::combine",
+      "note": "weights=\"nave\", \"equal\" or explicit weights; nave rounded to an integer as written to FIFF.",
       "evidence": "parity-record"
     },
     {
@@ -944,17 +944,6 @@
       "domain": "core",
       "status": "implemented",
       "mne_cpp": "FiffAnnotationEventUtils",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.grand_average",
-      "name": "grand_average",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "FiffEvoked averaging",
       "note": "",
       "evidence": "parity-record"
     },
@@ -1242,6 +1231,17 @@
       "status": "partial",
       "mne_cpp": "FSLIB::FsAtlasLookup::load",
       "note": "loads aseg; no listing of present labels",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.grand_average",
+      "name": "grand_average",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "partial",
+      "mne_cpp": "FiffEvokedSet::computeGrandAverage",
+      "note": "Evoked only, drop_bads=True path; interpolate_bads and AverageTFR/Spectrum inputs are not supported.",
       "evidence": "parity-record"
     },
     {

@@ -297,9 +297,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Compute a grand average across multiple evoked data sets.
-     * Corresponding categories are averaged by summing data and dividing by the
-     * number of sets. The nave field accumulates the total count.
+     * Compute a grand average across multiple evoked data sets (mne.grand_average with
+     * interpolate_bads=False, drop_bads=True).
+     * For each category, channels marked bad in any set are dropped, the common channels
+     * are kept and the sets are combined with equal weights. nave is set to the number
+     * of sets and the comment to "Grand average (n = N)".
      *
      * @param[in] evokedSets    List of evoked data sets to combine.
      * @return The grand-average evoked set, or an empty set if input is empty.

@@ -8,11 +8,11 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **194**
-- Partial: **96**
+- Implemented: **193**
+- Partial: **97**
 - Missing: **145**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **55.6%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **55.5%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -21,7 +21,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Domain | Implemented | Partial | Missing | N/A | Total |
 |---|---:|---:|---:|---:|---:|
 | I/O & Readers | 18 | 2 | 39 | 0 | 59 |
-| Core Data Containers | 40 | 13 | 5 | 3 | 61 |
+| Core Data Containers | 39 | 14 | 5 | 3 | 61 |
 | Preprocessing & Artifacts | 14 | 11 | 17 | 1 | 43 |
 | Channels & Montages | 15 | 10 | 16 | 1 | 42 |
 | Epochs & Evoked | 13 | 2 | 1 | 0 | 16 |
@@ -91,6 +91,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.compute_proj_raw` | partial | FIFFLIB::FiffProj::compute_from_raw | event-locked epochs only; no continuous segmenting |
 | `mne.compute_rank` | partial | MATHLIB::Linalg::rank | matrix rank; no per-type/info/SSP handling |
 | `mne.get_volume_labels_from_aseg` | partial | FSLIB::FsAtlasLookup::load | loads aseg; no listing of present labels |
+| `mne.grand_average` | partial | FiffEvokedSet::computeGrandAverage | Evoked only, drop_bads=True path; interpolate_bads and AverageTFR/Spectrum inputs are not supported. |
 | `mne.grow_labels` | partial | FsLabelUtils::growCircularLabel | one seed set per call; no overlap=False or colors |
 | `mne.head_to_mni` | partial | FSLIB (partial) | MNI transform limited |
 | `mne.label_sign_flip` | partial | InvLabelTimeCourse::computeSignFlip | signs from data SVD, not source normals |
@@ -346,5 +347,5 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 ## Already implemented (do not re-implement)
 
-194 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
+193 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
 

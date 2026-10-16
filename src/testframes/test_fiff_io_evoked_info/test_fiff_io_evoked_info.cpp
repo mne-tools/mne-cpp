@@ -82,6 +82,7 @@ private slots:
     void evokedSet_saveAndReload();
     void evokedSet_subtractBaseline();
     void evokedSet_grandAverage();
+    void evoked_combineMatchesMnePython();
     void evokedSet_checkArtifacts();
 
     // ── FiffInfo extended ──
@@ -319,22 +320,74 @@ void TestFiffIoEvokedInfo::evokedSet_subtractBaseline()
 
 void TestFiffIoEvokedInfo::evokedSet_grandAverage()
 {
-    QFile file(avePath());
-    FiffEvokedSet set;
-    FiffEvokedSet::read(file, set);
-    QVERIFY2(!set.evoked.isEmpty(), "No evoked data loaded");
+    // Reference values produced by mne.grand_average([e0, e1], interpolate_bads=False,
+    // drop_bads=True) with MNE-Python 1.11, where e0/e1 are conditions 0 and 1 of
+    // sample_audvis-ave.fif read with proj=False.
+    QFile file0(avePath());
+    QFile file1(avePath());
+    FiffEvokedSet set0;
+    FiffEvokedSet set1;
+    set0.evoked.append(FiffEvoked(file0, 0, defaultFloatPair, false));
+    set1.evoked.append(FiffEvoked(file1, 1, defaultFloatPair, false));
+    set0.info = set0.evoked.first().info;
+    set1.info = set1.evoked.first().info;
 
-    // Compute grand average of the same set twice (simulating multiple subjects)
-    QList<FiffEvokedSet> setList;
-    setList << set << set;
+    const FiffEvokedSet grandAvg = FiffEvokedSet::computeGrandAverage({set0, set1});
+    QCOMPARE(grandAvg.evoked.size(), 1);
+    const FiffEvoked& g = grandAvg.evoked.first();
+    QCOMPARE(g.nave, 2);
+    QCOMPARE(g.comment, QString("Grand average (n = 2)"));
+    QCOMPARE(g.info.nchan, 374);
+    QCOMPARE(grandAvg.info.nchan, 374);
+    QVERIFY(g.info.bads.isEmpty());
+    QVERIFY(!g.info.ch_names.contains("MEG2443"));
+    QVERIFY(qAbs(g.data(0, 100) / -9.523296577431598e-12 - 1.0) < 1e-6);
+    QVERIFY(qAbs(g.data.norm() / 11.161421411316139 - 1.0) < 1e-6);
+}
 
-    FiffEvokedSet grandAvg = FiffEvokedSet::computeGrandAverage(setList);
-    QVERIFY(!grandAvg.evoked.isEmpty());
-    QCOMPARE(grandAvg.info.nchan, set.info.nchan);
+void TestFiffIoEvokedInfo::evoked_combineMatchesMnePython()
+{
+    // Reference values produced by mne.combine_evoked([e0, e1], weights) with
+    // MNE-Python 1.11, where e0/e1 are conditions 0 and 1 of sample_audvis-ave.fif
+    // read with proj=False (nave 55 and 61, bads MEG 2443 and EEG 053 in both).
+    QFile file0(avePath());
+    QFile file1(avePath());
+    const FiffEvoked e0(file0, 0, defaultFloatPair, false);
+    const FiffEvoked e1(file1, 1, defaultFloatPair, false);
+    QCOMPARE(e0.nave, 55);
+    QCOMPARE(e1.nave, 61);
 
-    // Grand average of same data should equal original data
-    double diff = (grandAvg.evoked.first().data - set.evoked.first().data).norm();
-    QVERIFY2(diff < 1e-6, qPrintable(QString("Grand avg differs by %1").arg(diff)));
+    struct Case
+    {
+        FiffEvoked combined;
+        int nave;
+        QString comment;
+        double d0, d1, norm;
+    };
+    const QList<Case> cases = {
+        {FiffEvoked::combine({e0, e1}, FiffEvoked::CombineWeights::Nave), 116,
+         QString::fromUtf8("0.474 × Left Auditory + 0.526 × Right Auditory"),
+         -9.4794355164812276e-12, -9.2243206818032336e-06, 11.208676396587776},
+        {FiffEvoked::combine({e0, e1}, FiffEvoked::CombineWeights::Equal), 116,
+         QString::fromUtf8("0.500 × Left Auditory + 0.500 × Right Auditory"),
+         -9.523296577431598e-12, -9.3156511854427821e-06, 11.161421413674288},
+        {FiffEvoked::combine({e0, e1}, Vector2d(1.0, -1.0)), 29,
+         QString("Left Auditory - Right Auditory"),
+         -1.6959610234143224e-12, -3.5314461407291546e-06, 20.796793758029278},
+    };
+    for (const Case& c : cases) {
+        QCOMPARE(c.combined.nave, c.nave);
+        QCOMPARE(c.combined.comment, c.comment);
+        QCOMPARE(c.combined.info.bads.size(), 2);
+        QVERIFY(c.combined.info.bads.contains("MEG2443"));
+        QVERIFY(c.combined.info.bads.contains("EEG053"));
+        QVERIFY(qAbs(c.combined.data(0, 100) / c.d0 - 1.0) < 1e-6);
+        QVERIFY(qAbs(c.combined.data(315, 200) / c.d1 - 1.0) < 1e-6);
+        QVERIFY(qAbs(c.combined.data.norm() / c.norm - 1.0) < 1e-6);
+    }
+
+    // Mismatched weights are rejected.
+    QVERIFY(FiffEvoked::combine({e0, e1}, VectorXd::Ones(3)).isEmpty());
 }
 
 void TestFiffIoEvokedInfo::evokedSet_checkArtifacts()

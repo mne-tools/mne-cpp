@@ -391,8 +391,10 @@ void TestFiffFsLibrary::fiff_evokedSetGrandAverage()
     FiffEvokedSet grand = FiffEvokedSet::computeGrandAverage(sets);
     QVERIFY(grand.evoked.size() > 0);
     QCOMPARE(grand.evoked.size(), set1.evoked.size());
-    QCOMPARE(grand.evoked[0].data.rows(), set1.evoked[0].data.rows());
+    // Bad channels are dropped and nave is the number of data sets (mne.grand_average).
+    QCOMPARE(grand.evoked[0].data.rows(), set1.evoked[0].data.rows() - set1.evoked[0].info.bads.size());
     QCOMPARE(grand.evoked[0].data.cols(), set1.evoked[0].data.cols());
+    QCOMPARE(grand.evoked[0].nave, 2);
 }
 
 void TestFiffFsLibrary::fiff_evokedSetCompensate()

@@ -230,6 +230,44 @@ Read one evoked data set
 
 ---
 
+### combine(evokeds, weights)
+
+Merges evoked data by weighted addition or subtraction (mne.combine_evoked).
+
+All data sets must have the same channels and time instants. The result carries the union of the bad channels, the weighted sum of the data, a comment such as "0.474 × A + 0.526 × B" and nave = 1 / sum(w_i^2 / nave_i), rounded to an integer as required by the FIFF format.
+
+**Parameters:**
+
+- **evokeds** : *const QList&lt; [FiffEvoked](/docs/api/fiff/fiff-evoked) &gt; &*
+  The evoked data sets.
+
+- **weights** : *const Eigen::VectorXd &*
+  One weight per data set.
+
+**Returns:**
+
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — The combined evoked data, or an empty [`FiffEvoked`](/docs/api/fiff/fiff-evoked) if the inputs are inconsistent.
+
+---
+
+### combine(evokeds, weights)
+
+Merges evoked data with a predefined weighting strategy (weights="nave" or "equal").
+
+**Parameters:**
+
+- **evokeds** : *const QList&lt; [FiffEvoked](/docs/api/fiff/fiff-evoked) &gt; &*
+  The evoked data sets.
+
+- **weights** : *CombineWeights*
+  The weighting strategy.
+
+**Returns:**
+
+- *[FiffEvoked](/docs/api/fiff/fiff-evoked)* — The combined evoked data, or an empty [`FiffEvoked`](/docs/api/fiff/fiff-evoked) if the inputs are inconsistent.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)

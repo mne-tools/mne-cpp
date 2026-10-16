@@ -412,7 +412,25 @@ int BatchProcessor::run(const ProcessingSettings& settings)
     if (settings.rawFiles.size() > 1) {
         if (!settings.grandAveFile.isEmpty() && !allAverages.isEmpty()) {
             qInfo() << "\n--- Computing grand average ---";
-            FiffEvokedSet grandAvg = FiffEvokedSet::computeGrandAverage(allAverages);
+            // As in MNE-C (mne_browse_raw/grand_average.c), every run is weighted by its
+            // nave and the category keeps its comment.
+            FiffEvokedSet grandAvg;
+            grandAvg.info = allAverages.first().info;
+            for (int j = 0; j < allAverages.first().evoked.size(); ++j) {
+                QList<FiffEvoked> runs;
+                for (const FiffEvokedSet& run : allAverages) {
+                    if (j < run.evoked.size()) {
+                        runs.append(run.evoked[j]);
+                    }
+                }
+                FiffEvoked avg = FiffEvoked::combine(runs, FiffEvoked::CombineWeights::Nave);
+                if (avg.isEmpty()) {
+                    qCritical() << "Grand average: incompatible data sets for" << runs.first().comment;
+                    return 1;
+                }
+                avg.comment = runs.first().comment;
+                grandAvg.evoked.append(avg);
+            }
             if (!grandAvg.evoked.isEmpty()) {
                 grandAvg.save(settings.grandAveFile);
             }

@@ -84,16 +84,16 @@
       "unpinned_ci_packages": [],
       "inventoried_apis": 443,
       "by_status": {
-        "implemented": 194,
-        "partial": 96,
+        "implemented": 193,
+        "partial": 97,
         "missing": 145,
         "not-applicable": 8
       },
       "claims": 352,
       "claims_by_evidence": {
-        "cross-validated-static": 146,
+        "cross-validated-static": 149,
         "cross-validated-live": 4,
-        "tested": 198,
+        "tested": 195,
         "unverified": 4
       }
     }

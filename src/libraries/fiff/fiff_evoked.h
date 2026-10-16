@@ -226,6 +226,40 @@ public:
      */
     FiffEvoked& operator+=(const Eigen::MatrixXd& newData);
 
+    /** Predefined weighting strategies of combine(). */
+    enum class CombineWeights
+    {
+        Nave, /**< Sum-to-one weights proportional to each nave. */
+        Equal /**< Every data set is weighted by 1 / number of data sets. */
+    };
+
+    //=========================================================================================================
+    /**
+     * Merges evoked data by weighted addition or subtraction (mne.combine_evoked).
+     *
+     * All data sets must have the same channels and time instants. The result carries
+     * the union of the bad channels, the weighted sum of the data, a comment such as
+     * "0.474 × A + 0.526 × B" and nave = 1 / sum(w_i^2 / nave_i), rounded to an
+     * integer as required by the FIFF format.
+     *
+     * @param[in] evokeds    The evoked data sets.
+     * @param[in] weights    One weight per data set.
+     *
+     * @return The combined evoked data, or an empty FiffEvoked if the inputs are inconsistent.
+     */
+    static FiffEvoked combine(const QList<FiffEvoked>& evokeds, const Eigen::VectorXd& weights);
+
+    //=========================================================================================================
+    /**
+     * Merges evoked data with a predefined weighting strategy (weights="nave" or "equal").
+     *
+     * @param[in] evokeds    The evoked data sets.
+     * @param[in] weights    The weighting strategy.
+     *
+     * @return The combined evoked data, or an empty FiffEvoked if the inputs are inconsistent.
+     */
+    static FiffEvoked combine(const QList<FiffEvoked>& evokeds, CombineWeights weights);
+
     //=========================================================================================================
     /**
      * Applies baseline correction to the evoked data.

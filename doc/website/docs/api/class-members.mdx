@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6282 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6285 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -692,10 +692,13 @@ Index of 6282 public class members (functions, variables, typedefs, enums) acros
 - **columnCount** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns the number of columns for the children of the given parent.
 - **columnCount** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Returns the number of columns for the children of the given parent.
 - **combine** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Combines two coordinate transformations to yield a transform from `from` to `to`.
+- **combine** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Merges evoked data by weighted addition or subtraction (mne.combine_evoked).
+- **combine** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Merges evoked data with a predefined weighting strategy (weights="nave" or "equal").
 - **combine** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Append all projection items from another operator.
 - **combine** `[fn]` in [StatsAdjacency](/docs/api/sts/stats-adjacency) — Combine the adjacency of several dimensions, as mne.stats.combine_adjacency: points are flattened in C order (the last dimension varies fastest), two points are adjacent when they differ in one dimension and are adjacent there, and every point is adjacent to itself.
 - **combine_xyz** `[fn]` in [Linalg](/docs/api/math/linalg) — Compute the three Cartesian components of a vector together.
 - **combine_xyz** `[fn]` in [MNE](/docs/api/mne/mne-class) — mne_combine_xyz
+- **CombineWeights** `[enum]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Predefined weighting strategies of `combine()`.
 - **Command** `[fn]` in [Command](/docs/api/com/command) — Constructs a [`Command`](/docs/api/com/command).
 - **Command** `[fn]` in [Command](/docs/api/com/command) — Constructor which parses a command stored in a json object.
 - **Command** `[fn]` in [Command](/docs/api/com/command) — Constructs a command without parameters.
@@ -794,7 +797,7 @@ Index of 6282 public class members (functions, variables, typedefs, enums) acros
 - **ComputeFwd** `[fn]` in [ComputeFwd](/docs/api/fwd/compute-fwd) — Constructs a [`ComputeFwd`](/docs/api/fwd/compute-fwd) and initialises all data structures needed for the forward computation according to *pSettings*.
 - **ComputeFwdSettings** `[fn]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — Default Constructor.
 - **computeGrandAverage** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Compute a weighted grand-average covariance from multiple covariance matrices, weighting each by its degrees of freedom (nfree).
-- **computeGrandAverage** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Compute a grand average across multiple evoked data sets.
+- **computeGrandAverage** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Compute a grand average across multiple evoked data sets (mne.grand_average with interpolate_bads=False, drop_bads=True).
 - **computeInterpolationMatrix** `[slot]` in [RtSourceInterpolationMatWorker](/docs/api/disp3-d/rt-source-interpolation-mat-worker) — Compute the interpolation matrices for both hemispheres.
 - **computeInterpolationMatrix** `[fn]` in [SourceEstimateOverlay](/docs/api/disp3-d/source-estimate-overlay) — Compute interpolation matrix for a surface.
 - **computeMapping** `[slot]` in [RtSensorInterpolationMatWorker](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker) — Compute the sensor-to-surface mapping matrices.

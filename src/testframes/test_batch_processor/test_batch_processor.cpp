@@ -19,6 +19,8 @@
 #include <mne/mne_process_description.h>
 
 #include <fiff/fiff_events.h>
+#include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_raw_data.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,6 +71,7 @@ private slots:
     void testRunInvalidAverageDescription();
     void testRunInvalidCovarianceDescription();
     void testRunDetectsEventsWithoutMask();
+    void testRunGrandAverageWeightsByNave();
 
     void cleanupTestCase();
 
@@ -299,6 +302,39 @@ void TestBatchProcessor::testRunDetectsEventsWithoutMask()
     FIFFLIB::FiffEvents events;
     QVERIFY(FIFFLIB::FiffEvents::read_from_fif(eveFile, events));
     QVERIFY2(events.num_events() > 0, "No events detected on STI 014");
+}
+
+void TestBatchProcessor::testRunGrandAverageWeightsByNave()
+{
+    // MNE-C mne_process_raw (mne_browse_raw/grand_average.c) weights every run by its
+    // nave, sums the naves, keeps all channels and the category comments.
+    QString rawPath = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(rawPath))
+        QSKIP("Sample raw data not available");
+
+    const QString aveDesc = m_tempDir.path() + "/grand.ave";
+    {
+        QFile f(aveDesc);
+        QVERIFY(f.open(QIODevice::WriteOnly | QIODevice::Text));
+        f.write("average {\n    category {\n        name \"Auditory Left\"\n        event 1\n"
+                "        tmin -0.1\n        tmax 0.3\n    }\n}\n");
+    }
+
+    ProcessingSettings settings;
+    settings.rawFiles << rawPath << rawPath;
+    settings.aveFiles << aveDesc;
+    settings.grandAveFile = m_tempDir.path() + "/grand-ave.fif";
+    QCOMPARE(BatchProcessor::run(settings), 0);
+
+    QFile rawFile(rawPath);
+    const FIFFLIB::FiffRawData raw(rawFile);
+    QFile grandFile(settings.grandAveFile);
+    const FIFFLIB::FiffEvokedSet grand(grandFile);
+    QCOMPARE(grand.evoked.size(), 1);
+    const FIFFLIB::FiffEvoked& g = grand.evoked.first();
+    QCOMPARE(g.comment, QString("Auditory Left"));
+    QCOMPARE(g.info.nchan, raw.info.nchan);
+    QVERIFY2(g.nave > 2 && g.nave % 2 == 0, qPrintable(QString("nave %1").arg(g.nave)));
 }
 
 //=============================================================================================================

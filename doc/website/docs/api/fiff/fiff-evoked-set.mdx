@@ -204,9 +204,9 @@ Read one evoked data set
 
 ### computeGrandAverage(evokedSets)
 
-Compute a grand average across multiple evoked data sets.
+Compute a grand average across multiple evoked data sets (mne.grand_average with interpolate_bads=False, drop_bads=True).
 
-Corresponding categories are averaged by summing data and dividing by the number of sets. The nave field accumulates the total count.
+For each category, channels marked bad in any set are dropped, the common channels are kept and the sets are combined with equal weights. nave is set to the number of sets and the comment to "Grand average (n = N)".
 
 **Parameters:**
 
