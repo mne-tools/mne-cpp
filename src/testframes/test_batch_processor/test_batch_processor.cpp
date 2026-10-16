@@ -18,6 +18,8 @@
 
 #include <mne/mne_process_description.h>
 
+#include <fiff/fiff_events.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -66,6 +68,7 @@ private slots:
     void testRunSaveFilteredData();
     void testRunInvalidAverageDescription();
     void testRunInvalidCovarianceDescription();
+    void testRunDetectsEventsWithoutMask();
 
     void cleanupTestCase();
 
@@ -278,6 +281,24 @@ void TestBatchProcessor::testRunInvalidCovarianceDescription()
     settings.covFiles << m_tempDir.path() + "/missing-covariance-description.txt";
 
     QVERIFY(BatchProcessor::run(settings) != 0);
+}
+
+void TestBatchProcessor::testRunDetectsEventsWithoutMask()
+{
+    // As in MNE-C (mne_raw_scan_triggers), a trigger mask of 0 means "no masking".
+    QString rawPath = m_sResourcePath + "MEG/sample/sample_audvis_trunc_raw.fif";
+    if (!QFile::exists(rawPath))
+        QSKIP("Sample raw data not available");
+
+    ProcessingSettings settings;
+    settings.rawFiles << rawPath;
+    settings.eventsOutFiles << m_tempDir.path() + "/detected-eve.fif";
+    QCOMPARE(BatchProcessor::run(settings), 0);
+
+    QFile eveFile(settings.eventsOutFiles.first());
+    FIFFLIB::FiffEvents events;
+    QVERIFY(FIFFLIB::FiffEvents::read_from_fif(eveFile, events));
+    QVERIFY2(events.num_events() > 0, "No events detected on STI 014");
 }
 
 //=============================================================================================================

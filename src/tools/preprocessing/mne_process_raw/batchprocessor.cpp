@@ -167,10 +167,11 @@ int BatchProcessor::run(const ProcessingSettings& settings)
         if (fiffEvents.is_empty()) {
             // Detect from trigger channel
             qInfo() << "Detecting events from trigger channel" << settings.digTrigger;
+            // As in MNE-C (mne_raw_scan_triggers), a mask of 0 means no masking.
             FiffEvents::detect_from_raw(raw,
                                         fiffEvents,
                                         settings.digTrigger,
-                                        settings.digTriggerMask,
+                                        settings.digTriggerMask == 0 ? 0xFFFFFFFFu : settings.digTriggerMask,
                                         true);
         }
 
