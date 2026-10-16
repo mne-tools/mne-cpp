@@ -56,6 +56,8 @@ private slots:
     void testTimestamps();
     void testEmptyInput();
     void testInvalidParams();
+    void testFixedLengthMatchesMnePython_data();
+    void testFixedLengthMatchesMnePython();
     void cleanupTestCase();
 
 private:
@@ -77,6 +79,50 @@ void TestEpochs::initTestCase()
     m_data = MatrixXd(m_nCh, m_nTimes);
     for (int ch = 0; ch < m_nCh; ++ch)
         m_data.row(ch) = RowVectorXd::LinSpaced(m_nTimes, 0.0, 9.99);
+}
+
+//=============================================================================================================
+
+void TestEpochs::testFixedLengthMatchesMnePython_data()
+{
+    // Reference values produced by mne.make_fixed_length_epochs(RawArray(x), duration, overlap) (mne 1.11) with
+    // x = [arange(n), -arange(n)]: epoch count, samples per epoch and each epoch's first sample;
+    // mne.concatenate_epochs([epochs, epochs]) keeps the order.
+    QTest::addColumn<double>("sfreq");
+    QTest::addColumn<int>("n");
+    QTest::addColumn<double>("duration");
+    QTest::addColumn<double>("overlap");
+    QTest::addColumn<int>("samples");
+    QTest::addColumn<QVector<int>>("starts");
+    QTest::newRow("1 s, 0.3 s overlap") << 100.0 << 450 << 1.0 << 0.3 << 100 << QVector<int>{0, 70, 140, 210, 280, 350};
+    QTest::newRow("0.5 s at 250 Hz") << 250.0 << 1000 << 0.5 << 0.0 << 125 << QVector<int>{0, 125, 250, 375, 500, 625, 750, 875};
+    QTest::newRow("0.73 s, 0.25 s overlap") << 100.0 << 333 << 0.73 << 0.25 << 73 << QVector<int>{0, 48, 96, 144, 192, 240};
+}
+
+//=============================================================================================================
+
+void TestEpochs::testFixedLengthMatchesMnePython()
+{
+    QFETCH(double, sfreq);
+    QFETCH(int, n);
+    QFETCH(double, duration);
+    QFETCH(double, overlap);
+    QFETCH(int, samples);
+    QFETCH(QVector<int>, starts);
+
+    MatrixXd x(2, n);
+    x.row(0) = RowVectorXd::LinSpaced(n, 0.0, n - 1.0);
+    x.row(1) = -x.row(0);
+    const QList<FiffEpochData> epochs = FiffEpochs::makeFixedLengthEpochs(x, sfreq, duration, overlap);
+    QCOMPARE(epochs.size(), starts.size());
+    for (int e = 0; e < epochs.size(); ++e) {
+        QCOMPARE(epochs[e].data.cols(), Eigen::Index(samples));
+        QCOMPARE(epochs[e].data(0, 0), double(starts[e]));
+        QCOMPARE(epochs[e].data(1, samples - 1), -double(starts[e] + samples - 1));
+    }
+    const QList<FiffEpochData> both = FiffEpochs::concatenateEpochs({epochs, epochs});
+    QCOMPARE(both.size(), 2 * starts.size());
+    QCOMPARE(both[starts.size()].data, epochs[0].data);
 }
 
 //=============================================================================================================

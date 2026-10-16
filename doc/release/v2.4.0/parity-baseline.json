@@ -22,22 +22,22 @@
   "summary": {
     "claims": 352,
     "by_evidence": {
-      "cross-validated-static": 143,
+      "cross-validated-static": 146,
       "cross-validated-live": 4,
-      "tested": 201,
+      "tested": 198,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 25,
+        "cross-validated-static": 26,
         "cross-validated-live": 1,
-        "tested": 63,
+        "tested": 62,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 118,
+        "cross-validated-static": 120,
         "cross-validated-live": 3,
-        "tested": 138,
+        "tested": 136,
         "unverified": 4
       }
     },
@@ -57,6 +57,7 @@
         "test_dsp_simulate",
         "test_dsp_welch_psd",
         "test_edf2fiff_rwr",
+        "test_epochs",
         "test_fiff_core_python",
         "test_fiff_cov_python",
         "test_fiff_dig_point_python",
@@ -157,7 +158,7 @@
       "python": "mne.Epochs",
       "claimed": "implemented",
       "test": "test_epochs",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1269,7 +1270,7 @@
       "python": "mne.concatenate_epochs",
       "claimed": "implemented",
       "test": "test_epochs",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1821,7 +1822,7 @@
       "python": "mne.make_fixed_length_epochs",
       "claimed": "implemented",
       "test": "test_epochs",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
