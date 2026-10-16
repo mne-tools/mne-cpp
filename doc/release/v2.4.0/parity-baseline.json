@@ -22,22 +22,22 @@
   "summary": {
     "claims": 360,
     "by_evidence": {
-      "cross-validated-static": 153,
+      "cross-validated-static": 157,
       "cross-validated-live": 4,
-      "tested": 199,
+      "tested": 195,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 24,
+        "cross-validated-static": 25,
         "cross-validated-live": 1,
-        "tested": 64,
+        "tested": 63,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 129,
+        "cross-validated-static": 132,
         "cross-validated-live": 3,
-        "tested": 135,
+        "tested": 132,
         "unverified": 4
       }
     },
@@ -48,6 +48,7 @@
         "test_anshared_models",
         "test_dsp_annotate_artifact",
         "test_dsp_csd",
+        "test_dsp_eeg_reference",
         "test_dsp_eog_regression",
         "test_dsp_morlet_tfr",
         "test_dsp_multitaper",
@@ -482,7 +483,7 @@
       "python": "mne.set_eeg_reference",
       "claimed": "implemented",
       "test": "test_dsp_eeg_reference",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -874,7 +875,7 @@
       "python": "mne.add_reference_channels",
       "claimed": "implemented",
       "test": "test_dsp_eeg_reference",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2386,7 +2387,7 @@
       "python": "mne.set_bipolar_reference",
       "claimed": "implemented",
       "test": "test_dsp_eeg_reference",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2394,7 +2395,7 @@
       "python": "mne.set_eeg_reference",
       "claimed": "implemented",
       "test": "test_dsp_eeg_reference",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

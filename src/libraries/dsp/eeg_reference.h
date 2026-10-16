@@ -67,8 +67,8 @@ namespace UTILSLIB
 /**
  * @brief Re-reference EEG channels to average, specific channel(s), or REST.
  *
- * Only modifies rows corresponding to EEG channels (kind == FIFFV_EEG_CH).
- * Non-EEG channels are left untouched.
+ * Only modifies rows of good EEG channels (kind == FIFFV_EEG_CH, not in info.bads), as
+ * mne.set_eeg_reference does. Bad and non-EEG channels are left untouched.
  *
  * @param[in,out] data          Data matrix (n_channels x n_times). Modified in-place.
  * @param[in]     info          Measurement info (used to identify EEG channels).

@@ -92,9 +92,9 @@ void UTILSLIB::setEegReference(MatrixXd& data,
         return;
     }
 
-    // Determine which EEG channels to subtract from
-    const QVector<int> allEegIdx = findAllEegIndices(info);
-    if (allEegIdx.isEmpty()) {
+    // As mne.set_eeg_reference, bad EEG channels are neither reference nor re-referenced
+    const QVector<int> goodEegIdx = findGoodEegIndices(info);
+    if (findAllEegIndices(info).isEmpty()) {
         qWarning("setEegReference: no EEG channels found in info.");
         return;
     }
@@ -106,7 +106,6 @@ void UTILSLIB::setEegReference(MatrixXd& data,
 
     if (useAverage) {
         // Average reference: mean of all good EEG channels
-        const QVector<int> goodEegIdx = findGoodEegIndices(info);
         if (goodEegIdx.isEmpty()) {
             qWarning("setEegReference: all EEG channels are marked as bad.");
             return;
@@ -134,8 +133,7 @@ void UTILSLIB::setEegReference(MatrixXd& data,
         refSignal /= static_cast<double>(refIdx.size());
     }
 
-    // Subtract reference from all EEG channels
-    for (int idx : allEegIdx) {
+    for (int idx : goodEegIdx) {
         data.row(idx) -= refSignal;
     }
 }

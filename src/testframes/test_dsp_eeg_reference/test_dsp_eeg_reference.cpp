@@ -323,10 +323,79 @@ private slots:
         QVERIFY(data.row(0).isApprox(RowVectorXd::Constant(10, -5.0), 1e-10));
         // EEG2: 20 - 15 = 5
         QVERIFY(data.row(1).isApprox(RowVectorXd::Constant(10, 5.0), 1e-10));
-        // EEG3 is bad but still gets re-referenced: 30 - 15 = 15
-        QVERIFY(data.row(2).isApprox(RowVectorXd::Constant(10, 15.0), 1e-10));
+        // EEG3 is bad and, as in mne.set_eeg_reference, left alone
+        QVERIFY(data.row(2).isApprox(RowVectorXd::Constant(10, 30.0), 1e-10));
         // MEG unchanged
         QVERIFY(data.row(3).isApprox(RowVectorXd::Constant(10, 100.0), 1e-10));
+    }
+
+    //=========================================================================================================
+    /**
+     * @brief Re-referenced data equals MNE-Python's.
+     *
+     * Reference values produced by mne 1.11, column 2 of raw.get_data():
+     *   X = np.vstack([np.sin(np.arange(6) + k) * (k + 1) for k in range(5)])
+     *   info = mne.create_info(["E1", "E2", "E3", "E4", "M1"], 100.0, ["eeg"] * 4 + ["mag"]); info["bads"] = ["E3"]
+     *   raw.set_eeg_reference(ref), mne.add_reference_channels(raw, ["REF"]),
+     *   mne.set_bipolar_reference(raw, ["E1", "E2"], ["E2", "E4"]) and (..., ["E1"], ["E4"], drop_refs=False)
+     */
+    void testMatchesMnePython_data()
+    {
+        QTest::addColumn<QString>("op");
+        QTest::addColumn<QStringList>("names");
+        QTest::addColumn<QList<double>>("expected");
+        QTest::newRow("average") << "average" << QStringList{"E1", "E2", "E3", "E4", "M1"}
+                                 << QList<double>{1.790683979, 1.163626568, -2.270407486, -2.954310547, -1.397077491};
+        QTest::newRow("E2") << "E2" << QStringList{"E1", "E2", "E3", "E4", "M1"}
+                            << QList<double>{0.6270574107, 0.0, -2.270407486, -4.117937115, -1.397077491};
+        QTest::newRow("E1+E4") << "E1,E4" << QStringList{"E1", "E2", "E3", "E4", "M1"}
+                               << QList<double>{2.372497263, 1.745439852, -2.270407486, -2.372497263, -1.397077491};
+        QTest::newRow("add REF") << "addref" << QStringList{"E1", "E2", "E3", "E4", "M1", "REF"}
+                                 << QList<double>{0.9092974268, 0.2822400161, -2.270407486, -3.835697099, -1.397077491, 0.0};
+        QTest::newRow("bipolar") << "bipolar" << QStringList{"E3", "M1", "E1-E2", "E2-E4"}
+                                 << QList<double>{-2.270407486, -1.397077491, 0.6270574107, 4.117937115};
+        QTest::newRow("bipolar keep") << "bipolarkeep" << QStringList{"E1", "E2", "E3", "E4", "M1", "E1-E4"}
+                                      << QList<double>{0.9092974268, 0.2822400161, -2.270407486, -3.835697099, -1.397077491, 4.744994525};
+    }
+
+    void testMatchesMnePython()
+    {
+        QFETCH(QString, op);
+        QFETCH(QStringList, names);
+        QFETCH(QList<double>, expected);
+
+        FiffInfo info;
+        info.sfreq = 100.0;
+        const QStringList chNames = {"E1", "E2", "E3", "E4", "M1"};
+        for (int i = 0; i < chNames.size(); ++i) {
+            FiffChInfo ch;
+            ch.scanNo = ch.logNo = i + 1;
+            ch.kind = i < 4 ? FIFFV_EEG_CH : FIFFV_MEG_CH;
+            ch.ch_name = chNames[i];
+            info.chs.append(ch);
+            info.ch_names.append(chNames[i]);
+        }
+        info.nchan = chNames.size();
+        info.bads = {"E3"};
+        MatrixXd data(5, 6);
+        for (int k = 0; k < 5; ++k)
+            for (int t = 0; t < 6; ++t)
+                data(k, t) = std::sin(t + k) * (k + 1);
+
+        if (op == "addref")
+            addReferenceChannels(data, info, {"REF"});
+        else if (op == "bipolar")
+            setBipolarReference(data, info, {"E1", "E2"}, {"E2", "E4"});
+        else if (op == "bipolarkeep")
+            setBipolarReference(data, info, {"E1"}, {"E4"}, false);
+        else
+            setEegReference(data, info, op.split(','));
+
+        QCOMPARE(info.ch_names, names);
+        QCOMPARE(data.rows(), static_cast<Eigen::Index>(expected.size()));
+        for (int i = 0; i < expected.size(); ++i)
+            QVERIFY2(std::abs(data(i, 2) - expected[i]) <= 1e-9,
+                     qPrintable(QString("%1: %2 vs mne %3").arg(names[i]).arg(data(i, 2), 0, 'g', 10).arg(expected[i], 0, 'g', 10)));
     }
 
     //=========================================================================================================
