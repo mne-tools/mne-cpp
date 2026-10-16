@@ -165,7 +165,7 @@ private slots:
 
     void testMnePythonStcAndW()
     {
-        // make_stc_fixtures.py: mne-python SourceEstimate.save, ftype "stc" and "w".
+        // Reference values produced by mne-python SourceEstimate.save (make_stc_fixtures.py), ftype "stc" and "w".
         MatrixXd ref(7, 4);
         ref << 1.764052391052246, 0.40015721321105957, 0.978738009929657, 2.2408931255340576,
             1.8675580024719238, -0.9772778749465942, 0.9500884413719177, -0.15135720372200012,

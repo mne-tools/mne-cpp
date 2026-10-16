@@ -22,22 +22,22 @@
   "summary": {
     "claims": 361,
     "by_evidence": {
-      "cross-validated-static": 167,
+      "cross-validated-static": 175,
       "cross-validated-live": 4,
-      "tested": 186,
+      "tested": 178,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 26,
+        "cross-validated-static": 30,
         "cross-validated-live": 1,
-        "tested": 62,
+        "tested": 58,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 141,
+        "cross-validated-static": 145,
         "cross-validated-live": 3,
-        "tested": 124,
+        "tested": 120,
         "unverified": 4
       }
     },
@@ -74,6 +74,7 @@
         "test_inv_dipole_fit_python",
         "test_inv_eloreta_python",
         "test_inv_lcmv_python",
+        "test_inv_sparse",
         "test_mne_browse_app",
         "test_mne_cov_python",
         "test_mne_ctf_comp_python",
@@ -83,9 +84,11 @@
         "test_mne_source_space_ops_python",
         "test_mne_source_space_python",
         "test_sensor_field_mapper",
+        "test_source_estimate_io",
         "test_spectral_connectivity",
         "test_standard_montage",
         "test_sts_cluster",
+        "test_surface_laplacian",
         "test_tool_list_source_space"
       ],
       "cross-validated-live": [
@@ -309,7 +312,7 @@
       "python": "mne.inverse_sparse.mixed_norm",
       "claimed": "implemented",
       "test": "test_inv_sparse",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -317,7 +320,7 @@
       "python": "mne.inverse_sparse.gamma_map",
       "claimed": "implemented",
       "test": "test_inv_sparse",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -365,7 +368,7 @@
       "python": "mne.SourceEstimate.save / read",
       "claimed": "implemented",
       "test": "test_source_estimate_io",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -541,7 +544,7 @@
       "python": "mne.preprocessing.compute_current_source_density",
       "claimed": "implemented",
       "test": "test_surface_laplacian",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1613,7 +1616,7 @@
       "python": "mne.inverse_sparse.gamma_map",
       "claimed": "partial",
       "test": "test_inv_sparse",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1621,7 +1624,7 @@
       "python": "mne.inverse_sparse.mixed_norm",
       "claimed": "partial",
       "test": "test_inv_sparse",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2085,7 +2088,7 @@
       "python": "mne.preprocessing.compute_current_source_density",
       "claimed": "implemented",
       "test": "test_surface_laplacian",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2333,7 +2336,7 @@
       "python": "mne.read_source_estimate",
       "claimed": "partial",
       "test": "test_source_estimate_io",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

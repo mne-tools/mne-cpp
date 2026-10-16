@@ -196,7 +196,8 @@ void TestSurfaceLaplacian::testComputeTransformOnly()
     double diff = (manual - result.matData).norm();
     QVERIFY2(diff < 1e-10, "Transform-only and compute() differ.");
 
-    // Columns 0 and 5 of mne.preprocessing.compute_current_source_density(sphere=(0, 0, 0, 0.085)) applied to eye(16)
+    // Reference values produced by mne.preprocessing.compute_current_source_density(sphere=(0, 0, 0, 0.085))
+    // applied to eye(16): columns 0 and 5
     VectorXd mne0(16), mne5(16);
     mne0 << 1195.489394839371, 139.00489485396352, -18.795985079259097, -120.87455872800145, -184.10587675514523,
         -212.99306941783036, -197.46563926756053, -161.4576919332149, -224.49090908665696, -112.72006787790981,
