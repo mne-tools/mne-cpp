@@ -65,7 +65,7 @@ struct STSSHARED_EXPORT StatsTtestResult
 {
     Eigen::MatrixXd matTstat; /**< t-statistics (same shape as input columns). */
     Eigen::MatrixXd matPval;  /**< p-values. */
-    int degreesOfFreedom;     /**< Degrees of freedom. */
+    int degreesOfFreedom = 0; /**< Degrees of freedom. */
 };
 
 //=============================================================================================================
@@ -120,6 +120,25 @@ public:
     static StatsTtestResult independent(const Eigen::MatrixXd& dataA,
                                         const Eigen::MatrixXd& dataB,
                                         StatsTailType tail = StatsTailType::Both);
+
+    //=========================================================================================================
+    /**
+     * One-sample sign-flip permutation t-test with max-statistic correction, as
+     * mne.stats.permutation_t_test. Every column is tested against 0; the p-values compare each t
+     * with the distribution of the maximum |t| over all columns.
+     *
+     * @param[in] data           Observations (rows = samples, cols = tests).
+     * @param[in] nPermutations  Number of permutations including the observed data; when it exceeds the
+     *                           number of distinct sign flips, all of them are used (exact test).
+     * @param[in] tail           Tail type for the test.
+     * @param[in] seed           Seed for the random subset of sign flips.
+     *
+     * @return StatsTtestResult with t-statistics (1 x n_tests), corrected p-values and n - 1 degrees of freedom.
+     */
+    static StatsTtestResult permutation(const Eigen::MatrixXd& data,
+                                        int nPermutations = 10000,
+                                        StatsTailType tail = StatsTailType::Both,
+                                        unsigned int seed = 0);
 
     //=========================================================================================================
     /**

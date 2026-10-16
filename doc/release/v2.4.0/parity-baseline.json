@@ -22,9 +22,9 @@
   "summary": {
     "claims": 361,
     "by_evidence": {
-      "cross-validated-static": 129,
+      "cross-validated-static": 130,
       "cross-validated-live": 4,
-      "tested": 224,
+      "tested": 223,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 105,
+        "cross-validated-static": 106,
         "cross-validated-live": 3,
-        "tested": 160,
+        "tested": 159,
         "unverified": 4
       }
     },
@@ -2606,11 +2606,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "StatsCluster::permutationTest",
+      "mne_cpp": "STSLIB::StatsTtest::permutation",
       "python": "mne.stats.permutation_t_test",
       "claimed": "implemented",
       "test": "test_sts_cluster",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

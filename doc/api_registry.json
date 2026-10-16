@@ -13754,7 +13754,7 @@
       {
         "python": "mne.stats.permutation_t_test",
         "status": "implemented",
-        "mne_cpp": "StatsCluster::permutationTest",
+        "mne_cpp": "STSLIB::StatsTtest::permutation",
         "note": "",
         "test": "test_sts_cluster"
       },

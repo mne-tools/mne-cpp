@@ -4749,7 +4749,7 @@
       "kind": "function",
       "domain": "stats",
       "status": "implemented",
-      "mne_cpp": "StatsCluster::permutationTest",
+      "mne_cpp": "STSLIB::StatsTtest::permutation",
       "note": "",
       "evidence": "parity-record"
     },

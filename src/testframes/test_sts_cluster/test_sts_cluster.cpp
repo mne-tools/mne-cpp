@@ -84,6 +84,7 @@ private slots:
     // Reference values were produced with scipy 1.16 / mne 1.11 (scipy.stats.ttest_*, f_oneway,
     // mne.stats.*_correction, spatio_temporal_tris_adjacency, permutation_cluster_*_test) on the same data.
     void testTtestsMatchScipy();
+    void testPermutationTtestMatchesMne();
     void testFtestMatchesScipy();
     void testCorrectionsMatchMne();
     void testTrisAdjacencyMatchesMne();
@@ -512,6 +513,36 @@ QStringList TestStsCluster::upperEdges(const SparseMatrix<int>& adjacency)
     }
     edges.sort();
     return edges;
+}
+
+//=============================================================================================================
+
+void TestStsCluster::testPermutationTtestMatchesMne()
+{
+    // Reference values produced by mne.stats.permutation_t_test(X, n_permutations=10000, tail) (mne 1.11): with
+    // 8 samples that is the exact test. X[i, j] = sin(1.1 i + 0.7 j) + 0.4 (j == 1) + 0.9 (j == 3).
+    MatrixXd x(8, 5);
+    for (int i = 0; i < 8; ++i)
+        for (int j = 0; j < 5; ++j)
+            x(i, j) = std::sin(1.1 * i + 0.7 * j) + (j == 1 ? 0.4 : 0.0) + (j == 3 ? 0.9 : 0.0);
+    const QVector<double> tObs = {0.570336573217, 2.36446106969, 0.74546251532, 3.7920759658, -0.317399308059};
+    const QVector<std::pair<StatsTailType, QVector<double>>> cases = {
+        {StatsTailType::Both, {0.9140625, 0.1875, 0.8359375, 0.0703125, 0.984375}},
+        {StatsTailType::Right, {0.9140625, 0.1875, 0.8359375, 0.0703125, 1.0}},
+        {StatsTailType::Left, {1.0, 1.0, 1.0, 1.0, 0.984375}}};
+    for (const auto& [tail, pvals] : cases) {
+        const StatsTtestResult r = StatsTtest::permutation(x, 10000, tail);
+        compareValues(r.matTstat, tObs, 1e-9);
+        compareValues(r.matPval, pvals, 1e-12);
+        QCOMPARE(r.degreesOfFreedom, 7);
+    }
+
+    // Fewer permutations than sign flips: 49 random distinct flips plus the observed data, as in mne
+    const StatsTtestResult sampled = StatsTtest::permutation(x, 50, StatsTailType::Both, 3);
+    for (int j = 0; j < 5; ++j) {
+        const double count = sampled.matPval(j) * 50.0;
+        QVERIFY(count >= 1.0 && count <= 50.0 && std::fabs(count - std::round(count)) < 1e-9);
+    }
 }
 
 //=============================================================================================================

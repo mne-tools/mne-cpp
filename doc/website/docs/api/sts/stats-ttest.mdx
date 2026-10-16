@@ -97,6 +97,32 @@ Independent two-sample t-test.
 
 ---
 
+### permutation(data, nPermutations, tail, seed)
+
+One-sample sign-flip permutation t-test with max-statistic correction, as mne.stats.permutation_t_test.
+
+Every column is tested against 0; the p-values compare each t with the distribution of the maximum |t| over all columns.
+
+**Parameters:**
+
+- **data** : *const Eigen::MatrixXd &*
+  Observations (rows = samples, cols = tests).
+
+- **nPermutations** : *int*
+  Number of permutations including the observed data; when it exceeds the number of distinct sign flips, all of them are used (exact test).
+
+- **tail** : *StatsTailType*
+  Tail type for the test.
+
+- **seed** : *unsigned int*
+  Seed for the random subset of sign flips.
+
+**Returns:**
+
+- *[StatsTtestResult](/docs/api/sts/stats-ttest-result)* — [`StatsTtestResult`](/docs/api/sts/stats-ttest-result) with t-statistics (1 x n_tests), corrected p-values and n - 1 degrees of freedom.
+
+---
+
 ### tCdf(t, df)
 
 Compute the CDF of the t-distribution using the regularized incomplete beta function.

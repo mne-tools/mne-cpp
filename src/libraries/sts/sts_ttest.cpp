@@ -30,6 +30,10 @@
 
 #include <cmath>
 #include <algorithm>
+#include <QtGlobal>
+#include <random>
+#include <set>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -77,6 +81,69 @@ StatsTtestResult StatsTtest::oneSample(const MatrixXd& data, double mu, StatsTai
 StatsTtestResult StatsTtest::paired(const MatrixXd& dataA, const MatrixXd& dataB, StatsTailType tail)
 {
     return oneSample(dataA - dataB, 0.0, tail);
+}
+
+//=============================================================================================================
+
+StatsTtestResult StatsTtest::permutation(const MatrixXd& data, int nPermutations, StatsTailType tail, unsigned int seed)
+{
+    // Adapted from mne.stats.permutation_t_test / _get_1samp_orders / _max_stat (MNE-Python, BSD-3-Clause).
+    const int n = static_cast<int>(data.rows());
+    const RowVectorXd x2 = data.array().square().colwise().mean();
+    const double dofScaling = std::sqrt(n / (n - 1.0));
+    const double sqrtN = std::sqrt(static_cast<double>(n));
+    const auto tValues = [&](const RowVectorXd& mu) -> RowVectorXd {
+        return mu.array() / ((x2.array() - mu.array().square()).sqrt() * dofScaling / sqrtN);
+    };
+    const RowVectorXd tObs = tValues(data.colwise().mean());
+
+    // Sign flips as n-bit numbers, sample 0 in the most significant bit; a two-sided test never flips sample 0
+    const int bits = n - (tail == StatsTailType::Both ? 1 : 0);
+    if (n < 2 || bits > 63) {
+        qWarning("StatsTtest::permutation: needs 2 to 63 samples, got %d.", n);
+        return StatsTtestResult();
+    }
+    const quint64 maxPerms = (quint64(1) << bits) - 1;
+    std::vector<quint64> orders;
+    if (static_cast<quint64>(std::max(nPermutations, 0)) > maxPerms) {
+        for (quint64 s = 1; s <= maxPerms; ++s)
+            orders.push_back(s);
+    } else {
+        std::mt19937_64 gen(seed);
+        std::uniform_int_distribution<quint64> pick(1, maxPerms);
+        std::set<quint64> seen;
+        while (static_cast<int>(orders.size()) < nPermutations - 1) {
+            const quint64 s = pick(gen);
+            if (seen.insert(s).second)
+                orders.push_back(s);
+        }
+    }
+
+    std::vector<double> h0;
+    h0.reserve(orders.size() + 1);
+    for (quint64 s : orders) {
+        VectorXd signs(n);
+        for (int i = 0; i < n; ++i)
+            signs(i) = ((s >> (n - 1 - i)) & 1) ? -1.0 : 1.0;
+        h0.push_back(tValues(signs.transpose() * data / n).cwiseAbs().maxCoeff());
+    }
+    h0.push_back(tObs.cwiseAbs().maxCoeff());
+
+    MatrixXd pvals(1, tObs.size());
+    for (int j = 0; j < tObs.size(); ++j) {
+        const double t = tObs(j);
+        const auto count = std::count_if(h0.begin(), h0.end(), [&](double h) {
+            return tail == StatsTailType::Both ? h >= std::abs(t) : tail == StatsTailType::Right ? h >= t
+                                                                                                 : -h <= t;
+        });
+        pvals(0, j) = static_cast<double>(count) / static_cast<double>(h0.size());
+    }
+
+    StatsTtestResult result;
+    result.matTstat = tObs;
+    result.matPval = pvals;
+    result.degreesOfFreedom = n - 1;
+    return result;
 }
 
 //=============================================================================================================
