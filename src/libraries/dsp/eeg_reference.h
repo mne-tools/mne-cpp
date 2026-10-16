@@ -71,16 +71,17 @@ namespace UTILSLIB
  * mne.set_eeg_reference does. Bad and non-EEG channels are left untouched.
  *
  * @param[in,out] data          Data matrix (n_channels x n_times). Modified in-place.
- * @param[in]     info          Measurement info (used to identify EEG channels).
+ * @param[in,out] info          Measurement info (identifies EEG channels; receives the projector).
  * @param[in]     refChannels   Reference channel name(s).
  *                              - Empty or "average" -> average reference (mean of all good EEG channels).
  *                              - Single channel name -> re-reference to that channel.
  *                              - Multiple channel names -> re-reference to mean of those channels.
- * @param[in]     projection    If true, add an SSP projector for average reference instead of modifying data.
- *                              (default: false — modify data directly)
+ * @param[in]     projection    Average reference only: append an inactive average-reference projector over
+ *                              the good EEG channels to info.projs (mne make_eeg_average_ref_proj) and leave
+ *                              the data unchanged. Nothing is added if one is already present.
  */
 DSPSHARED_EXPORT void setEegReference(Eigen::MatrixXd& data,
-                                      const FIFFLIB::FiffInfo& info,
+                                      FIFFLIB::FiffInfo& info,
                                       const QStringList& refChannels = QStringList(),
                                       bool projection = false);
 

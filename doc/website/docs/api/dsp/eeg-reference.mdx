@@ -39,7 +39,7 @@ setEegReference(averageRef, info); // average of the EEG channels; EOG/ECG rows 
 ### setEegReference(data, info, refChannels, projection)
 
 ```cpp
-void setEegReference(Eigen::MatrixXd & data, const [FiffInfo](/docs/api/fiff/fiff-info) & info, const QStringList & refChannels, bool projection);
+void setEegReference(Eigen::MatrixXd & data, [FiffInfo](/docs/api/fiff/fiff-info) & info, const QStringList & refChannels, bool projection);
 ```
 
 Re-reference EEG channels to average, specific channel(s), or REST.
@@ -51,14 +51,14 @@ Only modifies rows of good EEG channels (kind == FIFFV_EEG_CH, not in info.bads)
 - **data** : *Eigen::MatrixXd &*
   Data matrix (n_channels x n_times). Modified in-place.
 
-- **info** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
-  Measurement info (used to identify EEG channels).
+- **info** : *[FiffInfo](/docs/api/fiff/fiff-info) &*
+  Measurement info (identifies EEG channels; receives the projector).
 
 - **refChannels** : *const QStringList &*
   Reference channel name(s).- Empty or "average" -&gt; average reference (mean of all good EEG channels). - Single channel name -&gt; re-reference to that channel. - Multiple channel names -&gt; re-reference to mean of those channels.
 
 - **projection** : *bool*
-  If true, add an SSP projector for average reference instead of modifying data. (default: false — modify data directly)
+  Average reference only: append an inactive average-reference projector over the good EEG channels to info.projs (mne make_eeg_average_ref_proj) and leave the data unchanged. Nothing is added if one is already present.
 
 ---
 

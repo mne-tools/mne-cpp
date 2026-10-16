@@ -18,6 +18,7 @@
 
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_file.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -73,13 +74,32 @@ static QVector<int> findAllEegIndices(const FiffInfo& info)
 //=============================================================================================================
 
 void UTILSLIB::setEegReference(MatrixXd& data,
-                               const FiffInfo& info,
+                               FiffInfo& info,
                                const QStringList& refChannels,
                                bool projection)
 {
+    const bool useAverage = refChannels.isEmpty() || (refChannels.size() == 1 && refChannels.first().compare(QLatin1String("average"), Qt::CaseInsensitive) == 0);
+
     if (projection) {
-        qWarning("setEegReference: projection mode is not yet implemented. "
-                 "Falling back to direct data modification.");
+        if (!useAverage) {
+            qWarning("setEegReference: projection is only supported for the average reference.");
+            return;
+        }
+        for (const FiffProj& proj : std::as_const(info.projs)) {
+            if (proj.kind == FIFFV_PROJ_ITEM_EEG_AVREF)
+                return;
+        }
+        QStringList names;
+        for (int idx : findGoodEegIndices(info))
+            names << info.ch_names[idx];
+        if (names.isEmpty()) {
+            qWarning("setEegReference: no good EEG channels for an average reference projector.");
+            return;
+        }
+        FiffNamedMatrix vec(1, static_cast<int>(names.size()), QStringList(), names,
+                            MatrixXd::Constant(1, names.size(), 1.0 / std::sqrt(static_cast<double>(names.size()))));
+        info.projs.append(FiffProj(FIFFV_PROJ_ITEM_EEG_AVREF, false, QStringLiteral("Average EEG reference"), vec));
+        return;
     }
 
     if (data.rows() != info.nchan) {
@@ -101,8 +121,6 @@ void UTILSLIB::setEegReference(MatrixXd& data,
 
     // Compute reference signal
     RowVectorXd refSignal;
-
-    const bool useAverage = refChannels.isEmpty() || (refChannels.size() == 1 && refChannels.first().compare(QLatin1String("average"), Qt::CaseInsensitive) == 0);
 
     if (useAverage) {
         // Average reference: mean of all good EEG channels

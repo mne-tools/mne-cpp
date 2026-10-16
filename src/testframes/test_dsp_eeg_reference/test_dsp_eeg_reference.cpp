@@ -18,6 +18,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_file.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -396,6 +397,33 @@ private slots:
         for (int i = 0; i < expected.size(); ++i)
             QVERIFY2(std::abs(data(i, 2) - expected[i]) <= 1e-9,
                      qPrintable(QString("%1: %2 vs mne %3").arg(names[i]).arg(data(i, 2), 0, 'g', 10).arg(expected[i], 0, 'g', 10)));
+    }
+
+    //=========================================================================================================
+    /**
+     * @brief projection=true adds the projector mne.set_eeg_reference("average", projection=True) adds:
+     * desc "Average EEG reference", kind 10, inactive, good EEG columns at 1/sqrt(n). The data is unchanged,
+     * a second call adds nothing and a channel reference is refused.
+     */
+    void testAverageProjector()
+    {
+        FiffInfo info = makeTestInfo();
+        info.bads.append("EEG3");
+        MatrixXd data = makeTestData();
+        const MatrixXd orig = data;
+
+        setEegReference(data, info, QStringList(), true);
+        setEegReference(data, info, QStringList(), true);
+        setEegReference(data, info, {"EEG1"}, true);
+
+        QCOMPARE(data, orig);
+        QCOMPARE(info.projs.size(), 1);
+        const FiffProj& proj = info.projs.first();
+        QCOMPARE(proj.desc, QString("Average EEG reference"));
+        QCOMPARE(proj.kind, static_cast<fiff_int_t>(FIFFV_PROJ_ITEM_EEG_AVREF));
+        QVERIFY(!proj.active);
+        QCOMPARE(proj.data->col_names, QStringList({"EEG1", "EEG2"}));
+        QVERIFY(proj.data->data.isApprox(MatrixXd::Constant(1, 2, 1.0 / std::sqrt(2.0))));
     }
 
     //=========================================================================================================
