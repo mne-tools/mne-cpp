@@ -22,9 +22,9 @@
   "summary": {
     "claims": 352,
     "by_evidence": {
-      "cross-validated-static": 149,
+      "cross-validated-static": 153,
       "cross-validated-live": 4,
-      "tested": 195,
+      "tested": 191,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 122,
+        "cross-validated-static": 126,
         "cross-validated-live": 3,
-        "tested": 134,
+        "tested": 130,
         "unverified": 4
       }
     },
@@ -2111,7 +2111,7 @@
       "python": "mne.preprocessing.create_ecg_epochs",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2119,7 +2119,7 @@
       "python": "mne.preprocessing.create_eog_epochs",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2159,7 +2159,7 @@
       "python": "mne.preprocessing.ica_find_ecg_events",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2167,7 +2167,7 @@
       "python": "mne.preprocessing.ica_find_eog_events",
       "claimed": "partial",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

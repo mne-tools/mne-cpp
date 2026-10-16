@@ -16,7 +16,9 @@
 #include <cmath>
 
 #include <dsp/artifact_detect.h>
+#include <dsp/epoch_extractor.h>
 #include <dsp/peak_finder.h>
+#include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
@@ -276,6 +278,11 @@ private slots:
         QTest::newRow("find_ecg_events, no ECG channel") << "ecg-mag" << beats;
         QTest::newRow("find_ecg_events(qrs_threshold=0.6, tstart=1)") << "ecg-0.6-t1" << beats.mid(1);
         QTest::newRow("find_eog_events") << "eog" << QVector<int>{214, 425, 632, 1300, 1508, 2475, 2683};
+        // mne.preprocessing.ica_find_ecg_events(raw, 3 * ecg / ecg.std()) and
+        // ica_find_eog_events(raw, eog2 / eog2.std()): the same detectors run on a single
+        // ICA source time course.
+        QTest::newRow("ica_find_ecg_events") << "ica-ecg" << beats;
+        QTest::newRow("ica_find_eog_events") << "ica-eog" << QVector<int>{209, 426, 625, 1299, 2291, 2473, 2960};
     }
 
     void eventsMatchMnePython()
@@ -316,7 +323,22 @@ private slots:
         info.nchan = 6;
 
         QVector<int> got;
-        if (call == "eog") {
+        if (call.startsWith("ica-")) {
+            // One ICA source, unit-free, carried as the only ECG / EOG channel.
+            const bool ecg = call == "ica-ecg";
+            const RowVectorXd row = data.row(ecg ? 3 : 5);
+            const double mean = row.mean();
+            const double std = std::sqrt((row.array() - mean).square().mean());
+            const MatrixXd source = (ecg ? 3.0 : 1.0) * row / std;
+            FiffInfo srcInfo;
+            FiffChInfo ch;
+            ch.kind = ecg ? FIFFV_ECG_CH : FIFFV_EOG_CH;
+            ch.ch_name = "ICA000";
+            srcInfo.chs.append(ch);
+            srcInfo.ch_names.append(ch.ch_name);
+            srcInfo.nchan = 1;
+            got = ecg ? ArtifactDetect::detectEcg(source, srcInfo, sf) : ArtifactDetect::detectEog(source, srcInfo, sf);
+        } else if (call == "eog") {
             got = ArtifactDetect::detectEog(data, info, sf);
         } else {
             ArtifactDetect::EcgParams params;
@@ -329,6 +351,72 @@ private slots:
             got = ArtifactDetect::detectEcg(data, info, sf, params);
         }
         QCOMPARE(got, expected);
+    }
+
+    /**
+     * Reference values produced by mne.preprocessing.create_ecg_epochs(raw) and
+     * create_eog_epochs(raw) (mne 1.11) on sample_audvis_trunc_raw.fif: events found with
+     * the 8-16 Hz (ECG) / 1-10 Hz (EOG) band, unfiltered epochs -0.5 ... 0.5 s, no baseline,
+     * proj=False, all channels. Values: events - first_samp, d[0,0,0], d[-1,315,10] and the
+     * norm of the 306 MEG channels over all epochs.
+     */
+    void createEpochsMatchesMnePython_data()
+    {
+        QTest::addColumn<bool>("ecg");
+        QTest::addColumn<QVector<int>>("events");
+        QTest::addColumn<double>("first");
+        QTest::addColumn<double>("last");
+        QTest::addColumn<double>("norm");
+        QTest::newRow("create_ecg_epochs")
+            << true
+            << QVector<int>{241, 565, 876, 1173, 1464, 1754, 2060, 2379, 2697, 2976,
+                            3237, 3531, 3845, 4162, 4465, 4745, 5033, 5333, 5644}
+            << -4.216080203896694e-15 << -3.9512457299874155e-09 << 5.1752236221310362e-12;
+        QTest::newRow("create_eog_epochs")
+            << false << QVector<int>{150, 693, 1101, 4341}
+            << -7.8953024303960885e-16 << -4.1027486890738421e-09 << 2.3859462017389855e-12;
+    }
+
+    void createEpochsMatchesMnePython()
+    {
+        QFETCH(bool, ecg);
+        QFETCH(QVector<int>, events);
+        QFETCH(double, first);
+        QFETCH(double, last);
+        QFETCH(double, norm);
+
+        QFile file(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+        const FiffRawData raw(file);
+        MatrixXd data;
+        MatrixXd times;
+        QVERIFY(raw.read_raw_segment(data, times));
+        const double sf = raw.info.sfreq;
+
+        QVector<int> found;
+        if (ecg) {
+            ArtifactDetect::EcgParams params;
+            params.dFilterLow = 8.0;
+            params.dFilterHigh = 16.0;
+            found = ArtifactDetect::detectEcg(data, raw.info, sf, params);
+        } else {
+            found = ArtifactDetect::detectEog(data, raw.info, sf);
+        }
+        QCOMPARE(found, events);
+
+        EpochExtractor::Params params;
+        params.dTmin = -0.5;
+        params.dTmax = 0.5;
+        params.bApplyBaseline = false;
+        const QVector<MNELIB::MNEEpochData> epochs = EpochExtractor::extract(data, found, sf, params);
+        QCOMPARE(epochs.size(), events.size());
+        QCOMPARE(epochs.first().epoch.cols(), 301);
+        double sumSq = 0.0;
+        for (const MNELIB::MNEEpochData& e : epochs) {
+            sumSq += e.epoch.topRows(306).squaredNorm();
+        }
+        QVERIFY(qAbs(epochs.first().epoch(0, 0) / first - 1.0) < 1e-5);
+        QVERIFY(qAbs(epochs.last().epoch(315, 10) / last - 1.0) < 1e-5);
+        QVERIFY(qAbs(std::sqrt(sumSq) / norm - 1.0) < 1e-5);
     }
 
     /** Reference values produced by mne.preprocessing.peak_finder (mne 1.11) on x below, default and (1.5, -1). */
