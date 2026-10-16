@@ -33,7 +33,6 @@
 //=============================================================================================================
 
 #include <Eigen/Dense>
-#include <Eigen/Eigenvalues>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -162,19 +161,14 @@ FiffEvoked UTILSLIB::simulateEvoked(
 
     // Add noise from covariance
     if (noiseCov.data.size() > 0 && noiseCov.data.rows() == nChan) {
-        // Decompose noise covariance: Cov = V * D * V^T
-        // Noise samples: V * sqrt(D) * randn / sqrt(nave)
-        SelfAdjointEigenSolver<MatrixXd> solver(noiseCov.data);
-        VectorXd eigvals = solver.eigenvalues();
-        MatrixXd eigvecs = solver.eigenvectors();
-
-        // Clamp negative eigenvalues
-        for (int i = 0; i < eigvals.size(); ++i) {
-            if (eigvals(i) < 0)
-                eigvals(i) = 0;
+        // Coloured like mne.simulation.simulate_evoked: the colourer of the prepared covariance (SSP applied,
+        // MEG and EEG decomposed separately), so the noise has no MEG-EEG covariance; divided by sqrt(nave).
+        const FiffCov prepared = noiseCov.prepare_noise_cov(info, info.ch_names);
+        if (prepared.eig.size() != nChan) {
+            qWarning() << "[simulateEvoked] Noise covariance does not cover the info channels.";
+            return evoked;
         }
-
-        MatrixXd sqrtCov = eigvecs * eigvals.cwiseSqrt().asDiagonal();
+        const MatrixXd sqrtCov = prepared.eigvec.transpose() * prepared.eig.cwiseMax(0.0).cwiseSqrt().asDiagonal();
 
         std::mt19937 gen(seed);
         std::normal_distribution<double> dist(0.0, 1.0);

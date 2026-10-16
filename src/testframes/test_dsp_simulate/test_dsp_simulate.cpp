@@ -20,6 +20,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_named_matrix.h>
+#include <fiff/fiff_constants.h>
 #include <mne/mne_forward_solution.h>
 
 //=============================================================================================================
@@ -282,6 +283,7 @@ private slots:
         for (int i = 0; i < nChan; ++i) {
             FiffChInfo ch;
             ch.ch_name = QString("CH%1").arg(i);
+            ch.kind = FIFFV_EEG_CH;
             info.chs.append(ch);
             info.ch_names.append(ch.ch_name);
         }
@@ -289,6 +291,7 @@ private slots:
         // Identity noise covariance
         FiffCov noiseCov;
         noiseCov.dim = nChan;
+        noiseCov.names = info.ch_names;
         noiseCov.data = MatrixXd::Identity(nChan, nChan) * 1e-24;
         noiseCov.kind = 1;
 
@@ -297,6 +300,54 @@ private slots:
         // Source is zero, so evoked should be purely noise
         QVERIFY(evoked.data.norm() > 0.0); // noise should be non-zero
         QCOMPARE(evoked.nave, 1);
+    }
+
+    /**
+     * Reference values produced by mne.cov.compute_whitener(cov, info, pca=True, return_colorer=True) (mne 1.11),
+     * the colourer mne.simulation.simulate_evoked draws its noise with: colorer @ colorer.T / outer(scale, scale)
+     * for channels M1-M3 (mag) and E1-E2 (eeg), C = (A^T A) * outer(scale, scale), scale 1e-13 / 1e-6.
+     * MEG and EEG noise are independent; the noise is divided by sqrt(nave).
+     */
+    void testSimulateEvokedNoiseMatchesMnePython()
+    {
+        const int nChan = 5;
+        const int nTimes = 40000;
+        const int nave = 4;
+        MatrixXd a(5, 5);
+        a << 1.0, 0.3, 0.1, 0.5, 0.2, 0.0, 1.0, 0.2, 0.1, 0.4, 0.0, 0.0, 1.0, 0.3, 0.1, 0.0, 0.0, 0.0, 1.0, 0.6, 0.0, 0.0, 0.0, 0.0, 1.0;
+        MatrixXd expected(5, 5);
+        expected << 1.0, 0.3, 0.1, 0.0, 0.0, 0.3, 1.09, 0.23, 0.0, 0.0, 0.1, 0.23, 1.05, 0.0, 0.0, 0.0, 0.0, 0.0, 1.35, 0.77, 0.0, 0.0, 0.0, 0.77, 1.57;
+        const VectorXd scale = (VectorXd(5) << 1e-13, 1e-13, 1e-13, 1e-6, 1e-6).finished();
+
+        FiffInfo info;
+        info.sfreq = 1000.0;
+        const QStringList names{"M1", "M2", "M3", "E1", "E2"};
+        for (int i = 0; i < nChan; ++i) {
+            FiffChInfo ch;
+            ch.ch_name = names[i];
+            ch.kind = i < 3 ? FIFFV_MEG_CH : FIFFV_EEG_CH;
+            ch.unit = i < 3 ? FIFF_UNIT_T : FIFF_UNIT_V;
+            info.chs.append(ch);
+            info.ch_names.append(names[i]);
+        }
+        info.nchan = nChan;
+
+        FiffCov cov;
+        cov.kind = FIFFV_MNE_NOISE_COV;
+        cov.dim = nChan;
+        cov.names = names;
+        cov.data = (a.transpose() * a).cwiseProduct(scale * scale.transpose());
+
+        MNEForwardSolution fwd;
+        fwd.sol = new FiffNamedMatrix();
+        fwd.sol->data = MatrixXd::Zero(nChan, 1);
+        const InvSourceEstimate stc(MatrixXd::Zero(1, nTimes), VectorXi::Zero(1), 0.0f, 0.001f);
+
+        const FiffEvoked evoked = simulateEvoked(fwd, stc, info, cov, nave, 7);
+        QCOMPARE(evoked.data.rows(), Eigen::Index(nChan));
+        const MatrixXd empirical = (evoked.data * evoked.data.transpose() / nTimes * nave).cwiseQuotient(scale * scale.transpose());
+        QVERIFY2((empirical - expected).cwiseAbs().maxCoeff() < 0.05,
+                 qPrintable(QString("max deviation %1, M1-E1 %2").arg((empirical - expected).cwiseAbs().maxCoeff()).arg(empirical(0, 3))));
     }
 
     void testSimulateEvokedEmptyForward()
