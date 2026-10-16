@@ -76,7 +76,11 @@ class ParityRecordTests(unittest.TestCase):
                                                    encoding="utf-8")
             (root / "doc").mkdir()
             records = [
-                {"python": "mne.a", "status": "implemented", "mne_cpp": "A", "test": "test_oracle"},
+                {"python": "mne.read_events", "status": "implemented", "mne_cpp": "A", "test": "test_oracle"},
+                # The oracle test never names write_events, so it cannot be evidence for it
+                {"python": "mne.write_events", "status": "implemented", "mne_cpp": "W", "test": "test_oracle"},
+                {"python": "mne.find_events / mne.read_events (stim)", "status": "partial", "mne_cpp": "F",
+                 "test": "test_oracle"},
                 {"python": "mne.b", "status": "partial", "mne_cpp": "B", "test": "test_plain"},
                 {"python": "mne.c", "status": "implemented", "mne_cpp": "C", "test": "test_orphan"},
                 {"python": "mne.d", "status": "implemented", "mne_cpp": "D"},
@@ -85,7 +89,9 @@ class ParityRecordTests(unittest.TestCase):
                 json.dumps({"classes": [], "parity": {"records": records}}), encoding="utf-8")
             report = audit.build_report(root)
         self.assertEqual({c["python"]: c["evidence"] for c in report["claims"]}, {
-            "mne.a": "cross-validated-static", "mne.b": "tested", "mne.c": "unverified", "mne.d": "unverified",
+            "mne.read_events": "cross-validated-static", "mne.write_events": "tested",
+            "mne.find_events / mne.read_events (stim)": "cross-validated-static",
+            "mne.b": "tested", "mne.c": "unverified", "mne.d": "unverified",
         })
 
 

@@ -92,6 +92,23 @@ def test_evidence(testframes: Path) -> dict[str, str]:
     return evidence
 
 
+def test_text(testframes: Path, name: str) -> str:
+    directory = testframes / name
+    if not directory.is_dir():
+        return ""
+    return "\n".join(path.read_text(encoding="utf-8", errors="replace")
+                     for path in sorted(directory.rglob("*")) if path.suffix in {".cpp", ".h", ".py"})
+
+
+def names_api(text: str, python: str) -> bool:
+    """Whether @p text names one of the APIs of a registry ``python`` field ("mne.a.b / c (note)")."""
+    for part in re.sub(r"\([^)]*\)", " ", python).split("/"):
+        tokens = part.split()
+        if tokens and re.search(r"\b" + re.escape(tokens[0].split(".")[-1]) + r"\b", text):
+            return True
+    return False
+
+
 def registered_tests(testframes: Path) -> set[str]:
     cmake = (testframes / "CMakeLists.txt").read_text(encoding="utf-8")
     return set(re.findall(r"^\s*add_subdirectory\s*\(\s*(test_\w+)", cmake, re.MULTILINE))
@@ -138,20 +155,33 @@ def build_report(repo_root: Path = REPO_ROOT) -> dict[str, Any]:
     evidence_by_test = test_evidence(testframes)
     registered = registered_tests(testframes)
 
+    texts: dict[str, str] = {}
+
+    def level_of(test: str | None, python: str) -> str:
+        if test not in registered:
+            return "unverified"
+        level = evidence_by_test.get(test, "unverified")
+        # A test that compares with MNE-Python is evidence only for the APIs it names
+        if level.startswith("cross-validated"):
+            text = texts.setdefault(test, test_text(testframes, test))
+            if not names_api(text, python):
+                return "tested"
+        return level
+
     claims: list[dict[str, Any]] = []
     for record in registry.get("classes", []):
         python = record.get("python_equiv") or record.get("mne_python")
         if not python:
             continue
         test = record.get("test")
-        level = evidence_by_test.get(test, "unverified") if test in registered else "unverified"
+        level = level_of(test, python)
         claims.append({"source": "classes", "mne_cpp": record["name"], "python": python,
                        "claimed": "implemented", "test": test, "evidence": level})
     for record in registry.get("parity", {}).get("records", []):
         if record.get("status") not in {"implemented", "partial"}:
             continue
         test = record.get("test")
-        level = evidence_by_test.get(test, "unverified") if test in registered else "unverified"
+        level = level_of(test, record["python"])
         claims.append({"source": "parity", "mne_cpp": record.get("mne_cpp") or None, "python": record["python"],
                        "claimed": record["status"], "test": test, "evidence": level})
 
