@@ -388,7 +388,8 @@ int read_next_tag(QFile& fp, int& tagp, long long& lenp, unsigned char*& datap)
     int ilen = 0, tag = 0;
     long long len;
 
-    if (read_int(fp, tag) == FAIL) {
+    // Tags are optional; the end of the file ends the list.
+    if (fp.atEnd() || read_int(fp, tag) == FAIL) {
         tagp = 0;
         return OK;
     }
