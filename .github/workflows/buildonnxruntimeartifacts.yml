@@ -181,7 +181,8 @@ jobs:
         git clone --depth 1 --branch v${{ env.ONNXRUNTIME_VERSION }} \
           --recurse-submodules --shallow-submodules \
           https://github.com/microsoft/onnxruntime.git ../onnxruntime
-        # build.py installs --emsdk_version into this submodule; its pinned checkout may predate that release.
+        # build.py installs --emsdk_version into this submodule; its pinned checkout may predate that
+        # release, so move it to emsdk main and keep it there with --skip_submodule_sync below.
         git -C ../onnxruntime/cmake/external/emsdk fetch --depth 1 origin main
         git -C ../onnxruntime/cmake/external/emsdk checkout -q FETCH_HEAD
 
@@ -216,6 +217,7 @@ jobs:
           if ./build.sh \
             --build_wasm_static_lib \
             --emsdk_version "${EMSDK_VERSION}" \
+            --skip_submodule_sync \
             --skip_tests \
             --disable_wasm_exception_catching \
             --disable_rtti \
