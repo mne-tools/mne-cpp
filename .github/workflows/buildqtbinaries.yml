@@ -33,6 +33,7 @@ jobs:
       dynamic_matrix: ${{ steps.versions.outputs.QT_VERSION_MATRIX }}
       max_version: ${{ steps.versions.outputs.QT_VERSION }}
       max_version_token: ${{ steps.versions.outputs.QT_VERSION_TOKEN }}
+      emsdk_version: ${{ steps.versions.outputs.EMSDK_VERSION }}
     steps:
     - name: Clone repository
       uses: actions/checkout@v5
@@ -176,9 +177,9 @@ jobs:
       run: |
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v${{ matrix.qt_version }}
-        $useRecursiveSubmoduleInit = '${{ matrix.qt_version }}' -like '6.11.*'
+        $useRecursiveSubmoduleInit = [version]'${{ matrix.qt_version }}' -ge [version]'6.11'
         if ($useRecursiveSubmoduleInit) {
-          # Qt 6.11 Windows: qttools/assistant pulls in a nested qlitehtml
+          # Qt >= 6.11 Windows: qttools/assistant pulls in a nested qlitehtml
           # submodule that configure's -init-submodules does not fetch, so
           # initialise the required modules recursively up front. (The
           # Qt::Concurrent Help-target link fix that 6.11.0 needed is upstream
@@ -700,8 +701,8 @@ jobs:
         git clone https://github.com/emscripten-core/emsdk.git
         cd emsdk
         git pull
-        ./emsdk install 4.0.7
-        ./emsdk activate 4.0.7
+        ./emsdk install "${{ needs.PrepareQtVersions.outputs.emsdk_version }}"
+        ./emsdk activate "${{ needs.PrepareQtVersions.outputs.emsdk_version }}"
     - name: Install dependencies
       run: |
         sudo rm -f /etc/apt/sources.list.d/microsoft-*.list /etc/apt/sources.list.d/azure-*.list /etc/apt/sources.list.d/microsoft-*.sources /etc/apt/sources.list.d/azure-*.sources

@@ -376,17 +376,17 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install -qq build-essential libgl1-mesa-dev ninja-build
 
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
+
     - name: Setup Emscripten
       run: |
         cd ..
         git clone https://github.com/emscripten-core/emsdk.git
         cd emsdk
-        ./emsdk install 4.0.7
-        ./emsdk activate 4.0.7
-
-    - name: Load external dependency versions
-      shell: bash
-      run: ./scripts/ci/load_external_deps.sh
+        ./emsdk install "$EMSDK_VERSION"
+        ./emsdk activate "$EMSDK_VERSION"
 
     - name: Download pre-built WASM Qt binaries
       env:
@@ -420,7 +420,7 @@ jobs:
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh
-        ./scripts/wasm/wasm.sh --emsdk 4.0.7
+        ./scripts/wasm/wasm.sh --emsdk "$EMSDK_VERSION"
 
     - name: Prepare WASM artifacts
       run: |

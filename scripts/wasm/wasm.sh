@@ -18,7 +18,7 @@ function cleanAbsPath()
 }
 
 ECHO_FLAG=""
-EMSDK_VERSION="4.0.7"
+EMSDK_VERSION="$(sed -n 's/^EMSDK_VERSION=//p' "$(dirname "$0")/../../src/external/external_deps.env")"
 SAVE_LOG="true"
 SHOW_HELP="false"
 
@@ -68,12 +68,8 @@ if [ ${SHOW_HELP} == "true" ]; then
 	echo ""
 	echo "Options:"
 	echo "    --emsdk, -e  Set what version of emscripten to use."
-	echo "                 Qt recommends the following versions depending on what version"
-	echo "                 of Qt you use:"
-	echo "                    Qt 6.2 -> emsdk 2.0.14"
-	echo "                    Qt 6.3 -> emsdk 3.0.0"
-	echo "                    Qt 6.4 -> emsdk 3.1.14"
-	echo "                    Qt 6.5 -> emsdk 3.1.25"
+	echo "                 Default: EMSDK_VERSION from src/external/external_deps.env"
+	echo "                 (${EMSDK_VERSION}), matching the default Qt version."
 	echo ""
 	echo "    --qt, -q     Set path to qt installation manually."
 	echo "                 This path should be the directory that contains the wasm and"
