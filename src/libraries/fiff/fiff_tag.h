@@ -661,7 +661,7 @@ inline qint16* FiffTag::toDauPack16() const
 inline FiffId FiffTag::toFiffID() const
 {
     FiffId p_fiffID;
-    if (this->isMatrix() || this->getType() != FIFFT_ID_STRUCT || this->data() == nullptr)
+    if (this->isMatrix() || this->getType() != FIFFT_ID_STRUCT || this->size() < FiffId::storageSize())
         return p_fiffID;
     else {
         const qint32* t_pInt32 = (qint32*)this->data();
@@ -681,7 +681,7 @@ inline FiffId FiffTag::toFiffID() const
 inline FiffDigPoint FiffTag::toDigPoint() const
 {
     FiffDigPoint t_fiffDigPoint;
-    if (this->isMatrix() || this->getType() != FIFFT_DIG_POINT_STRUCT || this->data() == nullptr)
+    if (this->isMatrix() || this->getType() != FIFFT_DIG_POINT_STRUCT || this->size() < FiffDigPoint::storageSize())
         return t_fiffDigPoint;
     else {
         auto* t_pInt32 = reinterpret_cast<const qint32*>(this->data());
@@ -704,7 +704,7 @@ inline FiffDigPoint FiffTag::toDigPoint() const
 inline FiffCoordTrans FiffTag::toCoordTrans() const
 {
     FiffCoordTrans p_FiffCoordTrans;
-    if (this->isMatrix() || this->getType() != FIFFT_COORD_TRANS_STRUCT || this->data() == nullptr)
+    if (this->isMatrix() || this->getType() != FIFFT_COORD_TRANS_STRUCT || this->size() < FiffCoordTrans::storageSize())
         return p_FiffCoordTrans;
     else {
         auto* t_pInt32 = reinterpret_cast<const qint32*>(this->data());
@@ -745,7 +745,7 @@ inline FiffChInfo FiffTag::toChInfo() const
 {
     FiffChInfo p_FiffChInfo;
 
-    if (this->isMatrix() || this->getType() != FIFFT_CH_INFO_STRUCT || this->data() == nullptr)
+    if (this->isMatrix() || this->getType() != FIFFT_CH_INFO_STRUCT || this->size() < FiffChInfo::storageSize())
         return p_FiffChInfo;
     else {
         auto* t_pInt32 = reinterpret_cast<const qint32*>(this->data());
@@ -815,7 +815,7 @@ inline FiffChInfo FiffTag::toChInfo() const
         //   Handle the channel name
         //
         const char* orig = static_cast<const char*>(this->data());
-        p_FiffChInfo.ch_name = QString::fromUtf8(orig + 80).replace(" ", "");
+        p_FiffChInfo.ch_name = QString::fromUtf8(orig + 80, static_cast<qsizetype>(qstrnlen(orig + 80, 16))).replace(" ", "");
 
         return p_FiffChInfo;
     }

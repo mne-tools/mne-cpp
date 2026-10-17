@@ -254,6 +254,18 @@ void TestFiffStreamPython::coordTrans()
     QVERIFY((t.trans.block<3, 1>(0, 3) - m_move).cwiseAbs().maxCoeff() < 1e-7f);
     // The stored inverse must undo the transform.
     QVERIFY((t.trans * t.invtrans - Matrix4f::Identity()).cwiseAbs().maxCoeff() < 1e-6f);
+
+    // A truncated struct payload must yield the default value, not read past the tag data.
+    FiffTag truncated;
+    truncated.append(tag->left(8));
+    truncated.type = FIFFT_COORD_TRANS_STRUCT;
+    QCOMPARE(truncated.toCoordTrans().from, FiffCoordTrans().from);
+    truncated.type = FIFFT_DIG_POINT_STRUCT;
+    QCOMPARE(truncated.toDigPoint().kind, FiffDigPoint().kind);
+    truncated.type = FIFFT_ID_STRUCT;
+    QCOMPARE(truncated.toFiffID().version, FiffId().version);
+    truncated.type = FIFFT_CH_INFO_STRUCT;
+    QCOMPARE(truncated.toChInfo().ch_name, FiffChInfo().ch_name);
 }
 
 //=============================================================================================================
