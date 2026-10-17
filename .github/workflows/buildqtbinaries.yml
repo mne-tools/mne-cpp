@@ -38,7 +38,7 @@ jobs:
       dynamic_matrix: ${{ steps.versions.outputs.QT_VERSION_MATRIX }}
       max_version: ${{ steps.versions.outputs.QT_VERSION }}
       max_version_token: ${{ steps.versions.outputs.QT_VERSION_TOKEN }}
-      emsdk_version: ${{ steps.versions.outputs.EMSDK_VERSION }}
+      emsdk_version: ${{ steps.versions.outputs.EMSCRIPTEN_VERSION }}
     steps:
     - name: Clone repository
       uses: actions/checkout@v5

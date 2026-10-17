@@ -42,8 +42,8 @@ jobs:
         cd ..
         git clone https://github.com/emscripten-core/emsdk.git
         cd emsdk
-        ./emsdk install "$EMSDK_VERSION"
-        ./emsdk activate "$EMSDK_VERSION"
+        ./emsdk install "$EMSCRIPTEN_VERSION"
+        ./emsdk activate "$EMSCRIPTEN_VERSION"
 
     - name: Download pre-built WASM Qt binaries
       env:
@@ -87,7 +87,7 @@ jobs:
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh
-        ./scripts/wasm/wasm.sh --emsdk "$EMSDK_VERSION"
+        ./scripts/wasm/wasm.sh --emsdk "$EMSCRIPTEN_VERSION"
 
     - name: Prepare WASM artifacts
       run: |

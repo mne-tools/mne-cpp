@@ -18,7 +18,7 @@ function cleanAbsPath()
 }
 
 ECHO_FLAG=""
-EMSDK_VERSION="$(sed -n 's/^EMSDK_VERSION=//p' "$(dirname "$0")/../../src/external/external_deps.env")"
+EMSCRIPTEN_VERSION="$(sed -n 's/^EMSCRIPTEN_VERSION=//p' "$(dirname "$0")/../../src/external/external_deps.env")"
 SAVE_LOG="true"
 SHOW_HELP="false"
 
@@ -40,7 +40,7 @@ set -e
 
 for (( j=0; j<argc; j++)); do
     if [ "${argv[j]}" == "--emsdk" ] || [ "${argv[j]}" == "-e" ]; then
-        EMSDK_VERSION="${argv[j+1]}" 
+        EMSCRIPTEN_VERSION="${argv[j+1]}" 
 		j=$j+1
 	elif [ "${argv[j]}" == "--no-log" ]; then
 		SAVE_LOG="false"
@@ -68,8 +68,8 @@ if [ ${SHOW_HELP} == "true" ]; then
 	echo ""
 	echo "Options:"
 	echo "    --emsdk, -e  Set what version of emscripten to use."
-	echo "                 Default: EMSDK_VERSION from src/external/external_deps.env"
-	echo "                 (${EMSDK_VERSION}), matching the default Qt version."
+	echo "                 Default: EMSCRIPTEN_VERSION from src/external/external_deps.env"
+	echo "                 (${EMSCRIPTEN_VERSION}), matching the default Qt version."
 	echo ""
 	echo "    --qt, -q     Set path to qt installation manually."
 	echo "                 This path should be the directory that contains the wasm and"
@@ -93,7 +93,7 @@ if [ -z "$Qt6_DIR" ]; then
 fi
 
 ## Emscripten
-echo "Setting up emsdk ${EMSDK_VERSION}..."
+echo "Setting up emsdk ${EMSCRIPTEN_VERSION}..."
 if [ -d "emsdk" ]; then
 	echo "Found emsdk folder."
 else
@@ -103,8 +103,8 @@ fi
 
 cd emsdk
 git pull
-./emsdk install ${EMSDK_VERSION}
-./emsdk activate ${EMSDK_VERSION}
+./emsdk install ${EMSCRIPTEN_VERSION}
+./emsdk activate ${EMSCRIPTEN_VERSION}
 source ./emsdk_env.sh
 cd ..
 echo "emsdk set up."
@@ -171,7 +171,7 @@ if [ ${SAVE_LOG} == "true" ]; then
 	echo "Saving build and system parameters..."
 	touch build_info.txt
 	echo "System Info: $(uname -rvop)" >> build_info.txt
-	echo "emsdk version: ${EMSDK_VERSION}" >> build_info.txt
+	echo "emsdk version: ${EMSCRIPTEN_VERSION}" >> build_info.txt
 	echo "Qt version: ${QT_VERSION}" >> build_info.txt
 	echo "Build time: $(date)" >> build_info.txt
 	echo "Build git hash: ${GIT_HASH}" >> build_info.txt

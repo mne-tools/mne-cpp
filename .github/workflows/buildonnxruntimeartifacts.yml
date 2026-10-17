@@ -216,7 +216,7 @@ jobs:
           echo "Build attempt ${attempt}/3..."
           if ./build.sh \
             --build_wasm_static_lib \
-            --emsdk_version "${EMSDK_VERSION}" \
+            --emsdk_version "${EMSCRIPTEN_VERSION}" \
             --skip_submodule_sync \
             --compile_no_warning_as_error \
             --skip_tests \
