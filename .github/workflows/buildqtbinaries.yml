@@ -732,6 +732,10 @@ jobs:
         # Temporary fix for Qt 6.12 (unfixed upstream as of 2026-10): wasm/qwasmjs.cpp uses QMap without including it.
         grep -q '<QtCore/qmap.h>' qtmultimedia/src/multimedia/wasm/qwasmjs.cpp || \
           perl -0pi -e 's|#include "qwasmjs_p.h"\n|#include "qwasmjs_p.h"\n#include <QtCore/qmap.h>\n|' qtmultimedia/src/multimedia/wasm/qwasmjs.cpp
+        # Backport of the qtbase dev fix: emsdk >= 6.0.4 writes EMSCRIPTEN_ROOT = '$CFGDIR/...' into .emscripten.
+        grep -q 'CFGDIR' qtbase/cmake/QtPublicWasmToolchainHelpers.cmake || \
+          perl -0pi -e 's|(    string\(REPLACE "\x27" "" EMROOT_PATH "\$\{EMROOT2\}"\)\n)|$1    string(REGEX REPLACE "^\\\\\$[{]?CFGDIR[}]?" "" EMROOT_PATH "\${EMROOT_PATH}")\n|' qtbase/cmake/QtPublicWasmToolchainHelpers.cmake
+        grep -q 'CFGDIR' qtbase/cmake/QtPublicWasmToolchainHelpers.cmake
         # Build minimal host Qt
         cd ..
         mkdir qt6_host_build
