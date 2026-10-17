@@ -8,6 +8,11 @@ name: BuildQtBinaries
 
 on:
   workflow_dispatch:
+    inputs:
+      wasm_only:
+        description: Rebuild only the WASM Qt binaries
+        type: boolean
+        default: false
   push:
     branches:
     # Change this to the branch name which you are developing on to trigger the workflow
@@ -43,6 +48,7 @@ jobs:
       run: ./scripts/ci/load_external_deps.sh
 
   GenerateLinuxDynamicBinaries:
+    if: ${{ !inputs.wasm_only }}
     needs: PrepareQtVersions
     runs-on: ubuntu-24.04
 
@@ -98,6 +104,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz" --clobber
 
   GenerateMacOSDynamicBinaries:
+    if: ${{ !inputs.wasm_only }}
     needs: PrepareQtVersions
     runs-on: macos-26
 
@@ -155,6 +162,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz" --clobber
 
   GenerateWinDynamicBinaries:
+    if: ${{ !inputs.wasm_only }}
     needs: PrepareQtVersions
     runs-on: windows-2025-vs2026
 
@@ -235,6 +243,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt6_${{ matrix.version_token }}_dynamic_binaries_win.zip" --clobber
 
   GenerateLinuxInstallerFramework:
+    if: ${{ !inputs.wasm_only }}
     runs-on: ubuntu-24.04
 
     steps:
@@ -328,6 +337,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_linux.tar.gz" --clobber
 
   GenerateMacOSInstallerFramework:
+    if: ${{ !inputs.wasm_only }}
     runs-on: macos-26
 
     steps:
@@ -425,6 +435,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_macos.tar.gz" --clobber
 
   GenerateWinInstallerFramework:
+    if: ${{ !inputs.wasm_only }}
     runs-on: windows-2025-vs2026
 
     steps:
@@ -558,6 +569,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" "qt_ifw_${{ env.QIF_VERSION_TOKEN }}_win.zip" --clobber
 
   GenerateLinuxStaticBinaries:
+    if: ${{ !inputs.wasm_only }}
     needs: PrepareQtVersions
     runs-on: ubuntu-24.04
     
@@ -600,6 +612,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_linux.tar.gz --clobber
 
   GenerateMacOSStaticBinaries:
+    if: ${{ !inputs.wasm_only }}
     needs: PrepareQtVersions
     runs-on: macos-26
     
@@ -640,6 +653,7 @@ jobs:
         gh release upload "${{ env.QT_BINARY_RELEASE_TAG }}" qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_macos.tar.gz --clobber
 
   GenerateWinStaticBinaries:
+    if: ${{ !inputs.wasm_only }}
     needs: PrepareQtVersions
     runs-on: windows-2025-vs2026
 
