@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1500,
-  "scanned_lines": 394927,
+  "scanned_lines": 394980,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -154,11 +154,11 @@
       }
     },
     "raw_new": {
-      "total": 169,
+      "total": 168,
       "files": 90,
       "by_scope": {
         "applications": 100,
-        "libraries": 63,
+        "libraries": 62,
         "tools": 6
       },
       "suppressed": [],
@@ -250,7 +250,7 @@
         "src/libraries/dsp/rt/rt_inv_op.cpp": 2,
         "src/libraries/dsp/rt/rt_noise.cpp": 1,
         "src/libraries/fiff/fiff_ctf_comp.cpp": 2,
-        "src/libraries/fiff/fiff_proj.cpp": 2,
+        "src/libraries/fiff/fiff_proj.cpp": 1,
         "src/libraries/fiff/fiff_stream.cpp": 1,
         "src/libraries/fwd/fwd_comp_data.cpp": 2,
         "src/libraries/fwd/fwd_eeg_sphere_model.cpp": 1,

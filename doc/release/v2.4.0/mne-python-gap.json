@@ -9,9 +9,9 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 193,
+      "implemented": 194,
       "partial": 97,
-      "missing": 145,
+      "missing": 144,
       "not-applicable": 8
     },
     "by_domain": {
@@ -22,9 +22,9 @@
         "not-applicable": 0
       },
       "core": {
-        "implemented": 39,
+        "implemented": 40,
         "partial": 14,
-        "missing": 5,
+        "missing": 4,
         "not-applicable": 3
       },
       "preprocessing": {
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 55.5
+    "parity_percent": 55.7
   },
   "apis": [
     {
@@ -910,8 +910,19 @@
       "kind": "function",
       "domain": "core",
       "status": "implemented",
-      "mne_cpp": "DSPLIB SSP",
+      "mne_cpp": "FiffProj::compute_from_raw",
       "note": "",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.compute_proj_evoked",
+      "name": "compute_proj_evoked",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "implemented",
+      "mne_cpp": "FiffProj::compute_from_evoked",
+      "note": "meg='separate' only; explained_var is not stored.",
       "evidence": "parity-record"
     },
     {
@@ -1363,17 +1374,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FsLabel is deliberately single-hemisphere (src/libraries/fs/fs_label.h:170)",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.compute_proj_evoked",
-      "name": "compute_proj_evoked",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "mne_cov2proj works on covariance, not evoked",
       "evidence": "parity-record"
     },
     {

@@ -72,7 +72,7 @@
       "null_macro": 43,
       "typedef_struct": 12,
       "c_style_cast": 402,
-      "raw_new": 169,
+      "raw_new": 168,
       "raw_delete": 275,
       "console_io": 349,
       "numeric_define": 847,
@@ -84,14 +84,14 @@
       "unpinned_ci_packages": [],
       "inventoried_apis": 443,
       "by_status": {
-        "implemented": 193,
+        "implemented": 194,
         "partial": 97,
-        "missing": 145,
+        "missing": 144,
         "not-applicable": 8
       },
-      "claims": 352,
+      "claims": 353,
       "claims_by_evidence": {
-        "cross-validated-static": 153,
+        "cross-validated-static": 154,
         "cross-validated-live": 4,
         "tested": 191,
         "unverified": 4

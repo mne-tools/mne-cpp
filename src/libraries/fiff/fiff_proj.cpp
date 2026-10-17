@@ -24,6 +24,7 @@
 
 #include "fiff_proj.h"
 #include "fiff_raw_data.h"
+#include "fiff_evoked.h"
 #include "fiff_constants.h"
 #include "fiff_file.h"
 #include <stdio.h>
@@ -37,6 +38,7 @@
 #include <Eigen/SVD>
 #include <QDebug>
 
+#include <array>
 #include <stdexcept>
 //=============================================================================================================
 // USED NAMESPACES
@@ -45,6 +47,66 @@
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE STATIC FUNCTIONS
+//=============================================================================================================
+
+namespace
+{
+
+/** Good gradiometer, magnetometer and EEG channel indices, in that order (mne "grad", "mag", "eeg"). */
+std::array<QList<int>, 3> pcaChannelGroups(const FiffInfo& info)
+{
+    std::array<QList<int>, 3> groups;
+    for (int k = 0; k < info.chs.size(); ++k) {
+        if (info.bads.contains(info.ch_names[k])) {
+            continue;
+        }
+        if (info.chs[k].kind == FIFFV_MEG_CH) {
+            groups[info.chs[k].unit == FIFF_UNIT_T ? 1 : 0].append(k);
+        } else if (info.chs[k].kind == FIFFV_EEG_CH) {
+            groups[2].append(k);
+        }
+    }
+    return groups;
+}
+
+/**
+ * Unprojected PCA projectors of data (channels x samples) restricted to chIdx: the first nVec left
+ * singular vectors, i.e. eigenvectors of the uncentred second moment, padded to all channels.
+ */
+QList<FiffProj> pcaProjectors(const MatrixXd& data, const QList<int>& chIdx, const QStringList& chNames,
+                              int nVec, const QStringList& descs)
+{
+    QList<FiffProj> projs;
+    if (nVec <= 0 || chIdx.isEmpty()) {
+        return projs;
+    }
+    MatrixXd sub(chIdx.size(), data.cols());
+    for (int c = 0; c < chIdx.size(); ++c) {
+        sub.row(c) = data.row(chIdx[c]);
+    }
+    const JacobiSVD<MatrixXd> svd(sub, ComputeThinU);
+    const int nComp = qMin(nVec, static_cast<int>(svd.matrixU().cols()));
+    for (int v = 0; v < nComp; ++v) {
+        FiffProj proj;
+        proj.kind = FIFFV_PROJ_ITEM_FIELD;
+        proj.active = false;
+        proj.desc = descs.value(v);
+        proj.data->nrow = 1;
+        proj.data->ncol = static_cast<int>(chNames.size());
+        proj.data->col_names = chNames;
+        proj.data->data = MatrixXd::Zero(1, chNames.size());
+        for (int c = 0; c < chIdx.size(); ++c) {
+            proj.data->data(0, chIdx[c]) = svd.matrixU()(c, v);
+        }
+        projs.append(proj);
+    }
+    return projs;
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -257,7 +319,6 @@ QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData& raw,
                                            int nEeg,
                                            const QMap<QString, double>& mapReject)
 {
-    QList<FiffProj> projs;
     float sfreq = raw.info.sfreq;
     int nchan = raw.info.nchan;
 
@@ -267,22 +328,7 @@ QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData& raw,
 
     if (ns <= 0) {
         qWarning() << "[FiffProj::compute_from_raw] Invalid time window.";
-        return projs;
-    }
-
-    // Classify channels
-    QList<int> gradIdx, magIdx, eegIdx;
-    for (int k = 0; k < nchan; ++k) {
-        if (raw.info.bads.contains(raw.info.ch_names[k]))
-            continue;
-        if (raw.info.chs[k].kind == FIFFV_MEG_CH) {
-            if (raw.info.chs[k].unit == FIFF_UNIT_T)
-                magIdx.append(k);
-            else
-                gradIdx.append(k);
-        } else if (raw.info.chs[k].kind == FIFFV_EEG_CH) {
-            eegIdx.append(k);
-        }
+        return {};
     }
 
     // Collect matching epochs
@@ -329,61 +375,50 @@ QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData& raw,
 
     if (epochs.isEmpty()) {
         qWarning() << "[FiffProj::compute_from_raw] No valid epochs found for event" << eventCode;
-        return projs;
+        return {};
     }
 
     qInfo() << "[FiffProj::compute_from_raw]" << epochs.size() << "epochs collected for event" << eventCode;
 
-    // Lambda: compute SVD-based projectors for a channel subset
-    auto computeProjForChannels = [&](const QList<int>& chIdx, int nVec, const QString& desc) {
-        if (nVec <= 0 || chIdx.isEmpty())
-            return;
-
-        int nRows = epochs.size() * ns;
-        MatrixXd dataMat(nRows, chIdx.size());
-
-        for (int e = 0; e < epochs.size(); ++e) {
-            for (int c = 0; c < chIdx.size(); ++c) {
-                dataMat.block(e * ns, c, ns, 1) = epochs[e].row(chIdx[c]).transpose();
-            }
+    // SVD of the uncentred data (MNE-C compute_cov_raw_epoch with remove_sample_mean = FALSE,
+    // mne.compute_proj_epochs); removing the mean first yields a different subspace.
+    MatrixXd data(nchan, epochs.size() * ns);
+    for (int e = 0; e < epochs.size(); ++e) {
+        data.middleCols(e * ns, ns) = epochs[e];
+    }
+    const std::array<QList<int>, 3> groups = pcaChannelGroups(raw.info);
+    const int nVec[3] = {nGrad, nMag, nEeg};
+    const char* kinds[3] = {"grad", "mag", "eeg"};
+    QList<FiffProj> projs;
+    for (int g = 0; g < 3; ++g) {
+        QStringList descs;
+        for (int v = 0; v < nVec[g]; ++v) {
+            descs << QString("PCA-%1-v%2").arg(kinds[g]).arg(v + 1);
         }
+        projs += pcaProjectors(data, groups[g], raw.info.ch_names, nVec[g], descs);
+    }
 
-        // SVD of the uncentred data, i.e. the eigenvectors of the second-moment
-        // matrix. MNE-C (compute_cov_raw_epoch with remove_sample_mean = FALSE)
-        // and mne.compute_proj_epochs both do this; removing the mean first
-        // yields a different, non-matching subspace.
-        Eigen::JacobiSVD<MatrixXd> svd(dataMat, Eigen::ComputeThinV);
-        MatrixXd V = svd.matrixV();
+    return projs;
+}
 
-        int nComp = qMin(nVec, static_cast<int>(V.cols()));
+//=============================================================================================================
 
-        for (int v = 0; v < nComp; ++v) {
-            FiffProj proj;
-            proj.kind = FIFFV_PROJ_ITEM_FIELD;
-            proj.active = false;
-            proj.desc = QString("%1-v%2").arg(desc).arg(v + 1);
-
-            FiffNamedMatrix::SDPtr namedMatrix(new FiffNamedMatrix());
-            namedMatrix->nrow = 1;
-            namedMatrix->ncol = nchan;
-            namedMatrix->row_names.clear();
-            namedMatrix->col_names = raw.info.ch_names;
-            namedMatrix->data = MatrixXd::Zero(1, nchan);
-
-            for (int c = 0; c < chIdx.size(); ++c) {
-                namedMatrix->data(0, chIdx[c]) = V(c, v);
-            }
-
-            proj.data = namedMatrix;
-            projs.append(proj);
+QList<FiffProj> FiffProj::compute_from_evoked(const FiffEvoked& evoked, int nGrad, int nMag, int nEeg)
+{
+    if (evoked.data.cols() == 0 || evoked.times.size() == 0) {
+        return {};
+    }
+    const QString prefix = QString("%1-%2").arg(evoked.times(0), 0, 'f', 3).arg(evoked.times(evoked.times.size() - 1), 0, 'f', 3);
+    const std::array<QList<int>, 3> groups = pcaChannelGroups(evoked.info);
+    const int nVec[3] = {nGrad, nMag, nEeg};
+    const char* kinds[3] = {"planar", "axial", "eeg"};
+    QList<FiffProj> projs;
+    for (int g = 0; g < 3; ++g) {
+        QStringList descs;
+        for (int v = 0; v < nVec[g]; ++v) {
+            descs << QString("%1-%2-PCA-%3").arg(kinds[g], prefix).arg(v + 1, 2, 10, QChar('0'));
         }
-
-        qInfo() << "[FiffProj::compute_from_raw] Created" << nComp << desc << "projection vector(s)";
-    };
-
-    computeProjForChannels(gradIdx, nGrad, "PCA-grad");
-    computeProjForChannels(magIdx, nMag, "PCA-mag");
-    computeProjForChannels(eegIdx, nEeg, "PCA-eeg");
-
+        projs += pcaProjectors(evoked.data, groups[g], evoked.info.ch_names, nVec[g], descs);
+    }
     return projs;
 }

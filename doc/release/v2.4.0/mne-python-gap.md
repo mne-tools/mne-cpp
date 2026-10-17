@@ -8,11 +8,11 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **193**
+- Implemented: **194**
 - Partial: **97**
-- Missing: **145**
+- Missing: **144**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **55.5%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **55.7%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -21,7 +21,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Domain | Implemented | Partial | Missing | N/A | Total |
 |---|---:|---:|---:|---:|---:|
 | I/O & Readers | 18 | 2 | 39 | 0 | 59 |
-| Core Data Containers | 39 | 14 | 5 | 3 | 61 |
+| Core Data Containers | 40 | 14 | 4 | 3 | 61 |
 | Preprocessing & Artifacts | 14 | 11 | 17 | 1 | 43 |
 | Channels & Montages | 15 | 10 | 16 | 1 | 42 |
 | Epochs & Evoked | 13 | 2 | 1 | 0 | 16 |
@@ -103,7 +103,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.vertex_to_mni` | partial | FiffCoordTransSet::headToMni | head points only; no vertex/surface-RAS input |
 | `mne.write_label` | partial | writeLabel | tool-private writer; FsLabel has no write |
 | `mne.BiHemiLabel` | missing | — | FsLabel is deliberately single-hemisphere (src/libraries/fs/fs_label.h:170) |
-| `mne.compute_proj_evoked` | missing | — | mne_cov2proj works on covariance, not evoked |
 | `mne.random_parcellation` | missing | — | random parcellation not ported |
 | `mne.read_lta` | missing | — | FreeSurfer LTA transform reader not ported |
 | `mne.write_labels_to_annot` | missing | — | no .annot writer |
@@ -347,5 +346,5 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 ## Already implemented (do not re-implement)
 
-193 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
+194 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
 

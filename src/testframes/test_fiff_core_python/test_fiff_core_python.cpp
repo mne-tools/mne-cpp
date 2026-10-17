@@ -211,6 +211,7 @@ private slots:
     void computeFromRaw_matchesPython();
     void computeFromRaw_withRejection();
     void computeFromRaw_invalidInput();
+    void computeFromEvoked_matchesPython();
 
     void makeCompensator_matchesPython_data();
     void makeCompensator_matchesPython();
@@ -597,6 +598,50 @@ void TestFiffCorePython::computeFromRaw_invalidInput()
     QVERIFY(FiffProj::compute_from_raw(*m_raw, events(false), 1, -0.1f, 0.2f, 1, 1, 1, {{"mag", 1e-18}}).isEmpty());
     // Nothing requested.
     QVERIFY(FiffProj::compute_from_raw(*m_raw, events(false), 1, -0.1f, 0.2f, 0, 0, 0).isEmpty());
+}
+
+//=============================================================================================================
+
+void TestFiffCorePython::computeFromEvoked_matchesPython()
+{
+    // Reference values produced by mne.compute_proj_evoked(ev, n_grad=2, n_mag=1, n_eeg=2) on
+    // condition 0 of sample_audvis-ave.fif read with proj=False: peak channel, |peak| and |first
+    // good channel of the type|; signs are arbitrary for an SVD.
+    QFile file(dataPath("sample_audvis-ave.fif"));
+    const FiffEvoked evoked(file, 0, defaultFloatPair, false);
+    const QList<FiffProj> projs = FiffProj::compute_from_evoked(evoked, 2, 1, 2);
+    QCOMPARE(projs.size(), 5);
+
+    struct Expected
+    {
+        const char* desc;
+        const char* peakName;
+        double peak;
+        const char* firstName;
+        double first;
+    };
+    const Expected expected[] = {
+        {"planar--0.200-0.499-PCA-01", "MEG1823", 0.247146315570, "MEG0113", 0.115274939637},
+        {"planar--0.200-0.499-PCA-02", "MEG1332", 0.288624288516, "MEG0113", 0.052683115472},
+        {"axial--0.200-0.499-PCA-01", "MEG0321", 0.238183090399, "MEG0111", 0.143120360319},
+        {"eeg--0.200-0.499-PCA-01", "EEG008", 0.405921365810, "EEG001", 0.152191442197},
+        {"eeg--0.200-0.499-PCA-02", "EEG060", 0.255398662153, "EEG001", 0.061448154221},
+    };
+    for (int i = 0; i < 5; ++i) {
+        const FiffProj& p = projs.at(i);
+        QCOMPARE(p.desc, QString(expected[i].desc));
+        QVERIFY(!p.active);
+        const RowVectorXd v = p.data->data.row(0);
+        Index peakIdx = 0;
+        const double peak = v.cwiseAbs().maxCoeff(&peakIdx);
+        QCOMPARE(evoked.info.ch_names.at(static_cast<int>(peakIdx)), QString(expected[i].peakName));
+        QVERIFY2(relClose(peak, expected[i].peak, 1e-6), qPrintable(mismatch(p.desc + " peak", peak, expected[i].peak)));
+        const double first = std::fabs(v(evoked.info.ch_names.indexOf(expected[i].firstName)));
+        QVERIFY2(relClose(first, expected[i].first, 1e-6), qPrintable(mismatch(p.desc + " first", first, expected[i].first)));
+        for (const QString& bad : evoked.info.bads) {
+            QCOMPARE(v(evoked.info.ch_names.indexOf(bad)), 0.0);
+        }
+    }
 }
 
 //=============================================================================================================

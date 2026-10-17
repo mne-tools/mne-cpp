@@ -20,9 +20,9 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 352,
+    "claims": 353,
     "by_evidence": {
-      "cross-validated-static": 153,
+      "cross-validated-static": 154,
       "cross-validated-live": 4,
       "tested": 191,
       "unverified": 4
@@ -35,7 +35,7 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 126,
+        "cross-validated-static": 127,
         "cross-validated-live": 3,
         "tested": 130,
         "unverified": 4
@@ -116,7 +116,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **55.5%",
+      "text": "parity: **55.7%",
       "status": "generated-with-denominator"
     }
   ],
@@ -1227,8 +1227,16 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB SSP",
+      "mne_cpp": "FiffProj::compute_from_raw",
       "python": "mne.compute_proj_epochs",
+      "claimed": "implemented",
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "FiffProj::compute_from_evoked",
+      "python": "mne.compute_proj_evoked",
       "claimed": "implemented",
       "test": "test_fiff_core_python",
       "evidence": "cross-validated-static"

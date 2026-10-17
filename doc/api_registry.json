@@ -11905,15 +11905,16 @@
       {
         "python": "mne.compute_proj_epochs",
         "status": "implemented",
-        "mne_cpp": "DSPLIB SSP",
+        "mne_cpp": "FiffProj::compute_from_raw",
         "note": "",
         "test": "test_fiff_core_python"
       },
       {
         "python": "mne.compute_proj_evoked",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "mne_cov2proj works on covariance, not evoked"
+        "status": "implemented",
+        "mne_cpp": "FiffProj::compute_from_evoked",
+        "note": "meg='separate' only; explained_var is not stored.",
+        "test": "test_fiff_core_python"
       },
       {
         "python": "mne.compute_proj_raw",

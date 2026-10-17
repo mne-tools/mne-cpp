@@ -64,6 +64,7 @@ namespace FIFFLIB
 //=============================================================================================================
 
 class FiffRawData;
+class FiffEvoked;
 
 //=============================================================================================================
 /**
@@ -190,6 +191,23 @@ public:
                                             int nMag,
                                             int nEeg,
                                             const QMap<QString, double>& mapReject = QMap<QString, double>());
+
+    //=========================================================================================================
+    /**
+     * Create SSP operators from averaged artifact data (mne.compute_proj_evoked).
+     *
+     * For each of gradiometers, magnetometers and EEG (bad channels excluded) the leading
+     * left singular vectors of the evoked data become inactive projectors named like
+     * "planar-<tmin>-<tmax>-PCA-01", "axial-..." and "eeg-...".
+     *
+     * @param[in] evoked    The averaged artifact.
+     * @param[in] nGrad     Number of gradiometer projection vectors.
+     * @param[in] nMag      Number of magnetometer projection vectors.
+     * @param[in] nEeg      Number of EEG projection vectors.
+     *
+     * @return List of FiffProj items (all channels as columns), or empty list for empty data.
+     */
+    static QList<FiffProj> compute_from_evoked(const FiffEvoked& evoked, int nGrad = 2, int nMag = 2, int nEeg = 2);
 
     //=========================================================================================================
     /**

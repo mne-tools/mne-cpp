@@ -178,6 +178,32 @@ Create SSP (Signal-Space Projection) operators from raw data via SVD. Ported fro
 
 ---
 
+### compute_from_evoked(evoked, nGrad, nMag, nEeg)
+
+Create SSP operators from averaged artifact data (mne.compute_proj_evoked).
+
+For each of gradiometers, magnetometers and EEG (bad channels excluded) the leading left singular vectors of the evoked data become inactive projectors named like "planar-&lt;tmin&gt;-&lt;tmax&gt;-PCA-01", "axial-..." and "eeg-...".
+
+**Parameters:**
+
+- **evoked** : *const [FiffEvoked](/docs/api/fiff/fiff-evoked) &*
+  The averaged artifact.
+
+- **nGrad** : *int*
+  Number of gradiometer projection vectors.
+
+- **nMag** : *int*
+  Number of magnetometer projection vectors.
+
+- **nEeg** : *int*
+  Number of EEG projection vectors.
+
+**Returns:**
+
+- *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt;* — List of [`FiffProj`](/docs/api/fiff/fiff-proj) items (all channels as columns), or empty list for empty data.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
