@@ -373,6 +373,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Move every point that shares the frame of the LPA, nasion and RPA points into the Neuromag head
+     * frame defined by these fiducials (mne.channels.transform_to_head).
+     *
+     * @return false if a fiducial is missing or the fiducials are in different frames.
+     */
+    bool transformToHead();
+
+    //=========================================================================================================
+    /**
      * Returns list of digitizer point the set contains
      *
      * @return list of digitizer points

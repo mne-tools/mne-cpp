@@ -738,6 +738,35 @@ void FiffDigPointSet::applyTransform(const FiffCoordTrans& coordTrans, bool bApp
 
 //=============================================================================================================
 
+bool FiffDigPointSet::transformToHead()
+{
+    const FiffDigPoint* fid[3] = {nullptr, nullptr, nullptr};
+    for (const FiffDigPoint& p : m_qListDigPoint) {
+        if (p.kind == FIFFV_POINT_CARDINAL && p.ident >= FIFFV_POINT_LPA && p.ident <= FIFFV_POINT_RPA) {
+            fid[p.ident - FIFFV_POINT_LPA] = &p;
+        }
+    }
+    if (!fid[0] || !fid[1] || !fid[2] || fid[0]->coord_frame != fid[1]->coord_frame || fid[0]->coord_frame != fid[2]->coord_frame) {
+        qWarning() << "[FiffDigPointSet::transformToHead] LPA, nasion and RPA in one frame are required.";
+        return false;
+    }
+    const int frame = fid[0]->coord_frame;
+    if (frame == FIFFV_COORD_HEAD) {
+        return true;
+    }
+    // head -> native, built from the fiducials given in the native frame
+    const FiffCoordTrans headNative = FiffCoordTrans::fromCardinalPoints(FIFFV_COORD_HEAD, frame, fid[0]->r, fid[1]->r, fid[2]->r);
+    for (FiffDigPoint& p : m_qListDigPoint) {
+        if (p.coord_frame == frame) {
+            FiffCoordTrans::apply_inverse_trans(p.r, headNative, true);
+            p.coord_frame = FIFFV_COORD_HEAD;
+        }
+    }
+    return true;
+}
+
+//=============================================================================================================
+
 QList<FiffDigPoint> FiffDigPointSet::getList()
 {
     return m_qListDigPoint;

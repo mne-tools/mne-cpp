@@ -22,9 +22,9 @@
   "summary": {
     "claims": 354,
     "by_evidence": {
-      "cross-validated-static": 157,
+      "cross-validated-static": 160,
       "cross-validated-live": 4,
-      "tested": 189,
+      "tested": 186,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 129,
+        "cross-validated-static": 132,
         "cross-validated-live": 3,
-        "tested": 128,
+        "tested": 125,
         "unverified": 4
       }
     },
@@ -58,6 +58,7 @@
         "test_dsp_welch_psd",
         "test_edf2fiff_rwr",
         "test_epochs",
+        "test_fiff_coord_trans",
         "test_fiff_core_python",
         "test_fiff_cov_python",
         "test_fiff_dig_point_python",
@@ -116,7 +117,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **56.0%",
+      "text": "parity: **55.9%",
       "status": "generated-with-denominator"
     }
   ],
@@ -1211,11 +1212,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FiffCoordTrans",
+      "mne_cpp": "FiffDigPointSet::transformToHead",
       "python": "mne.channels.transform_to_head",
       "claimed": "implemented",
       "test": "test_fiff_coord_trans",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1611,11 +1612,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FiffCoordTrans head->MRI",
+      "mne_cpp": "FiffCoordTrans::apply_inverse_trans (head -> MRI) x 1000",
       "python": "mne.head_to_mri",
-      "claimed": "implemented",
+      "claimed": "partial",
       "test": "test_fiff_coord_trans",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -2951,7 +2952,7 @@
       "python": "mne.write_trans",
       "claimed": "implemented",
       "test": "test_fiff_coord_trans",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     }
   ]
 }

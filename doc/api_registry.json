@@ -11900,8 +11900,8 @@
       {
         "python": "mne.channels.transform_to_head",
         "status": "implemented",
-        "mne_cpp": "FiffCoordTrans",
-        "note": "",
+        "mne_cpp": "FiffDigPointSet::transformToHead",
+        "note": "Fiducials must be present (no sphere-projected fallback).",
         "test": "test_fiff_coord_trans"
       },
       {
@@ -12404,9 +12404,9 @@
       },
       {
         "python": "mne.head_to_mri",
-        "status": "implemented",
-        "mne_cpp": "FiffCoordTrans head->MRI",
-        "note": "",
+        "status": "partial",
+        "mne_cpp": "FiffCoordTrans::apply_inverse_trans (head -> MRI) x 1000",
+        "note": "kind='mri' only; kind='ras' and unscale are not ported.",
         "test": "test_fiff_coord_trans"
       },
       {

@@ -9,8 +9,8 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 196,
-      "partial": 95,
+      "implemented": 195,
+      "partial": 96,
       "missing": 144,
       "not-applicable": 8
     },
@@ -22,8 +22,8 @@
         "not-applicable": 0
       },
       "core": {
-        "implemented": 40,
-        "partial": 14,
+        "implemented": 39,
+        "partial": 15,
         "missing": 4,
         "not-applicable": 3
       },
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 56.0
+    "parity_percent": 55.9
   },
   "apis": [
     {
@@ -959,17 +959,6 @@
       "evidence": "parity-record"
     },
     {
-      "python": "mne.head_to_mri",
-      "name": "head_to_mri",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "core",
-      "status": "implemented",
-      "mne_cpp": "FiffCoordTrans head->MRI",
-      "note": "",
-      "evidence": "parity-record"
-    },
-    {
       "python": "mne.morph_labels",
       "name": "morph_labels",
       "submodule": "(top-level)",
@@ -1275,6 +1264,17 @@
       "status": "partial",
       "mne_cpp": "FSLIB (partial)",
       "note": "MNI transform limited",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.head_to_mri",
+      "name": "head_to_mri",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "core",
+      "status": "partial",
+      "mne_cpp": "FiffCoordTrans::apply_inverse_trans (head -> MRI) x 1000",
+      "note": "kind='mri' only; kind='ras' and unscale are not ported.",
       "evidence": "parity-record"
     },
     {
@@ -2065,8 +2065,8 @@
       "kind": "function",
       "domain": "channels",
       "status": "implemented",
-      "mne_cpp": "FiffCoordTrans",
-      "note": "",
+      "mne_cpp": "FiffDigPointSet::transformToHead",
+      "note": "Fiducials must be present (no sphere-projected fallback).",
       "evidence": "parity-record"
     },
     {
