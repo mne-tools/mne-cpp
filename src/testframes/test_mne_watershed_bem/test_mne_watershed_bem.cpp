@@ -96,7 +96,7 @@ QString TestMneWatershedBem::findApplication()
 #ifdef Q_OS_WIN
     candidates << appDir + "/../apps/mne_watershed_bem.exe"
                << appDir + "/mne_watershed_bem.exe";
-#elif defined(Q_OS_MAC)
+#elif defined(Q_OS_MACOS)
     candidates << appDir + "/../apps/mne_watershed_bem"
                << appDir + "/mne_watershed_bem"
                << appDir + "/../bin/mne_watershed_bem";
