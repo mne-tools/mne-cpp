@@ -17,12 +17,6 @@ concurrency:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-  # Canonical ONNX Runtime version lives in src/external/external_deps.env
-  # (ONNXRUNTIME_VERSION). This producer runs only on manual dispatch / the
-  # generateonnxruntime branch; keep ONNXRUNTIME_VERSION below in sync with
-  # external_deps.env when bumping ONNX Runtime.
-  ONNXRUNTIME_VERSION: '1.21.0'
-  ONNXRUNTIME_VERSION_TOKEN: '1210'
   ONNXRUNTIME_ARTIFACT_RELEASE_TAG: onnxruntime_artifacts
   TOOLCHAIN_RELEASE_TITLE: ONNX Runtime Artifacts
   TOOLCHAIN_RELEASE_NOTES: Reusable ONNX Runtime shared library packages for CI and local development.
@@ -34,6 +28,10 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v5
+
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
 
     - name: Download official ONNX Runtime release (linux-x64)
       run: |
@@ -75,12 +73,14 @@ jobs:
         include:
           - arch: arm64
             ort_arch: arm64
-          - arch: x86_64
-            ort_arch: x86_64
 
     steps:
     - name: Clone repository
       uses: actions/checkout@v5
+
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
 
     - name: Download official ONNX Runtime release (macos-${{ matrix.arch }})
       run: |
@@ -118,6 +118,10 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v5
+
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
 
     - name: Download official ONNX Runtime release (win-x64)
       shell: bash
@@ -166,27 +170,26 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install -qq build-essential ninja-build
 
-    - name: Setup Emscripten SDK
-      run: |
-        git clone https://github.com/emscripten-core/emsdk.git ../emsdk
-        cd ../emsdk
-        ./emsdk install 4.0.7
-        ./emsdk activate 4.0.7
+    - name: Load external dependency versions
+      shell: bash
+      run: ./scripts/ci/load_external_deps.sh
 
     - name: Clone ONNX Runtime source
       run: |
         git clone --depth 1 --branch v${{ env.ONNXRUNTIME_VERSION }} \
           --recurse-submodules --shallow-submodules \
           https://github.com/microsoft/onnxruntime.git ../onnxruntime
+        # build.py installs --emsdk_version into this submodule; its pinned checkout may predate that release.
+        git -C ../onnxruntime/cmake/external/emsdk fetch --depth 1 origin main
+        git -C ../onnxruntime/cmake/external/emsdk checkout -q FETCH_HEAD
 
     - name: Build ONNX Runtime static library for WASM
       run: |
-        source ../emsdk/emsdk_env.sh
         cd ../onnxruntime
 
         # Pre-download Eigen to avoid FetchContent failures (GitLab
         # blocks downloads from GitHub Actions runners).
-        # ORT 1.21.0 needs Eigen commit 1d8b82b0740839c0de7f1242a3585e3390ff5f33
+        # Must match the eigen entry in ONNX Runtime's cmake/deps.txt.
         EIGEN_COMMIT="1d8b82b0740839c0de7f1242a3585e3390ff5f33"
         EIGEN_DIR="$(pwd)/build/_deps/eigen-src"
         mkdir -p "${EIGEN_DIR}"
@@ -210,6 +213,7 @@ jobs:
           echo "Build attempt ${attempt}/3..."
           if ./build.sh \
             --build_wasm_static_lib \
+            --emsdk_version "${EMSDK_VERSION}" \
             --skip_tests \
             --disable_wasm_exception_catching \
             --disable_rtti \
