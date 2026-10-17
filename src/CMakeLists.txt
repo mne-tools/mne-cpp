@@ -344,7 +344,7 @@ endif()
 ## ONNX Runtime dependency (optional)
 
 if(USE_ONNXRUNTIME)
-    set(MNE_CPP_ONNXRUNTIME_VERSION "1.21.0" CACHE STRING "Preferred ONNX Runtime version for MNE-CPP.")
+    set(MNE_CPP_ONNXRUNTIME_VERSION "1.31.0" CACHE STRING "Preferred ONNX Runtime version for MNE-CPP.")
     set(MNE_CPP_PREBUILT_ONNXRUNTIME_DIR "${PROJECT_SOURCE_DIR}/external/onnxruntime"
         CACHE PATH "Location of the extracted ONNX Runtime package.")
 

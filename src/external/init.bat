@@ -25,7 +25,7 @@ rem flag so loading the env file never auto-enables it.
 if defined ONNXRUNTIME_VERSION (
     set "ONNXRUNTIME_DEFAULT_VERSION=!ONNXRUNTIME_VERSION!"
 ) else (
-    set "ONNXRUNTIME_DEFAULT_VERSION=1.21.0"
+    set "ONNXRUNTIME_DEFAULT_VERSION=1.31.0"
 )
 
 if not defined QT_VERSION (
