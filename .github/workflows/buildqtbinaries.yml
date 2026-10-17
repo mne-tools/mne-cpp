@@ -96,6 +96,7 @@ jobs:
         name: qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz
         path: qt6_${{ matrix.version_token }}_dynamic_binaries_linux.tar.gz
     - name: Create toolchain release and upload
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
@@ -154,6 +155,7 @@ jobs:
         name: qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz
         path: qt6_${{ matrix.version_token }}_dynamic_binaries_macos.tar.gz
     - name: Create toolchain release and upload
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
@@ -235,6 +237,7 @@ jobs:
         name: qt6_${{ matrix.version_token }}_dynamic_binaries_win.zip
         path: qt6_${{ matrix.version_token }}_dynamic_binaries_win.zip
     - name: Upload to toolchain release
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
@@ -329,6 +332,7 @@ jobs:
         name: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_linux.tar.gz
         path: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_linux.tar.gz
     - name: Upload to toolchain release
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
@@ -427,6 +431,7 @@ jobs:
         name: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_macos.tar.gz
         path: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_macos.tar.gz
     - name: Upload to toolchain release
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
@@ -561,6 +566,7 @@ jobs:
         name: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_win.zip
         path: qt_ifw_${{ env.QIF_VERSION_TOKEN }}_win.zip
     - name: Upload to toolchain release
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
@@ -604,6 +610,7 @@ jobs:
         name: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_linux.tar.gz
         path: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_linux.tar.gz
     - name: Create qt_binaries release and upload
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
@@ -645,6 +652,7 @@ jobs:
         name: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_macos.tar.gz
         path: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_macos.tar.gz
     - name: Upload to qt_binaries release
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
@@ -695,6 +703,7 @@ jobs:
         name: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_win.zip
         path: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_win.zip
     - name: Upload to qt_binaries release
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
@@ -762,6 +771,7 @@ jobs:
         name: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_wasm.tar.gz
         path: qt6_${{ needs.PrepareQtVersions.outputs.max_version_token }}_static_binaries_wasm.tar.gz
     - name: Upload to qt_binaries release
+      if: false
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
