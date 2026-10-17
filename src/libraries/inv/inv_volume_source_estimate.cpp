@@ -82,8 +82,8 @@ Vector3d InvVolumeSourceEstimate::centreOfMass(int timeIdx) const
     if (!hasShape() || timeIdx < 0 || timeIdx >= static_cast<int>(data.cols()))
         return Vector3d::Zero();
 
-    int ny = m_shape[1];
-    int nz = m_shape[2];
+    const int nx = m_shape[0];
+    const int ny = m_shape[1];
 
     double totalWeight = 0.0;
     Vector3d com = Vector3d::Zero();
@@ -94,9 +94,9 @@ Vector3d InvVolumeSourceEstimate::centreOfMass(int timeIdx) const
             continue;
 
         int vIdx = vertices[i];
-        int ix = vIdx / (ny * nz);
-        int iy = (vIdx % (ny * nz)) / nz;
-        int iz = vIdx % nz;
+        const int ix = vIdx % nx;
+        const int iy = (vIdx / nx) % ny;
+        const int iz = vIdx / (nx * ny);
 
         com += w * Vector3d(ix, iy, iz);
         totalWeight += w;

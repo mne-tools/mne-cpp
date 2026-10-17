@@ -247,11 +247,13 @@ void TestSourceEstimateTypes::testVolumeToVolume()
 
 void TestSourceEstimateTypes::testVolumeCentreOfMass()
 {
-    int nx = 4, ny = 4, nz = 4;
+    // Volume source-space vertices run x fastest, as in mne.setup_volume_source_space (rr[1] - rr[0] is
+    // one step in x, rr[nx] - rr[0] one step in y) and VolSourceEstimate.as_volume (order="F").
+    int nx = 4, ny = 5, nz = 6;
 
-    // Single active voxel at (2, 1, 3) → index = 2*4*4 + 1*4 + 3 = 39
+    // Single active voxel at (2, 1, 3) → index = 2 + 1*4 + 3*4*5 = 66
     VectorXi verts(1);
-    verts << 39;
+    verts << 66;
     MatrixXd data(1, 1);
     data(0, 0) = 1.0;
 

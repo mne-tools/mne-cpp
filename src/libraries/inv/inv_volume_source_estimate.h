@@ -109,7 +109,8 @@ public:
      *
      * @param[in] timeIdx  Time sample index.
      *
-     * @return Flattened volume (nx*ny*nz) with values at active voxels.
+     * @return Flattened volume (nx*ny*nz, x fastest like volume source-space vertex numbers) with values at
+     *         active voxels.
      */
     Eigen::VectorXd toVolume(int timeIdx) const;
 
