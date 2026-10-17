@@ -736,6 +736,8 @@ jobs:
         grep -q 'CFGDIR' qtbase/cmake/QtPublicWasmToolchainHelpers.cmake || \
           perl -0pi -e 's|(    string\(REPLACE "\x27" "" EMROOT_PATH "\$\{EMROOT2\}"\)\n)|$1    string(REGEX REPLACE "^\\\\\$[{]?CFGDIR[}]?" "" EMROOT_PATH "\${EMROOT_PATH}")\n|' qtbase/cmake/QtPublicWasmToolchainHelpers.cmake
         grep -q 'CFGDIR' qtbase/cmake/QtPublicWasmToolchainHelpers.cmake
+        # Backport of the qtbase dev change dropping -s WASM_BIGINT=1 (default since emsdk 4, deprecated in 6).
+        perl -ni -e 'print unless /WASM_BIGINT=1/' qtbase/cmake/QtWasmHelpers.cmake qtbase/mkspecs/common/wasm/wasm.conf
         # Build minimal host Qt
         cd ..
         mkdir qt6_host_build
