@@ -22,22 +22,22 @@
   "summary": {
     "claims": 354,
     "by_evidence": {
-      "cross-validated-static": 163,
+      "cross-validated-static": 168,
       "cross-validated-live": 4,
-      "tested": 183,
+      "tested": 178,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 29,
+        "cross-validated-static": 31,
         "cross-validated-live": 1,
-        "tested": 60,
+        "tested": 58,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 134,
+        "cross-validated-static": 137,
         "cross-validated-live": 3,
-        "tested": 123,
+        "tested": 120,
         "unverified": 4
       }
     },
@@ -46,6 +46,7 @@
         "test_analyze_averaging",
         "test_analyze_dipolefit",
         "test_anshared_models",
+        "test_bids",
         "test_dsp_annotate_artifact",
         "test_dsp_artifact_detect",
         "test_dsp_csd",
@@ -801,7 +802,7 @@
       "python": "mne_bids.BIDSPath",
       "claimed": "implemented",
       "test": "test_bids",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -809,7 +810,7 @@
       "python": "mne_bids.read_raw_bids",
       "claimed": "implemented",
       "test": "test_bids",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -1705,7 +1706,7 @@
       "python": "mne.io.read_raw",
       "claimed": "partial",
       "test": "test_bids",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1713,7 +1714,7 @@
       "python": "mne.io.read_raw_bdf",
       "claimed": "implemented",
       "test": "test_bids",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
@@ -1721,7 +1722,7 @@
       "python": "mne.io.read_raw_brainvision",
       "claimed": "implemented",
       "test": "test_bids",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

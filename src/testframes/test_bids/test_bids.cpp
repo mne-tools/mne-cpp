@@ -422,9 +422,13 @@ void TestBids::testReadBrainVision()
     QVERIFY(data.raw.info.bads.contains(QStringLiteral("P4")));
     QCOMPARE(data.raw.info.bads.size(), 1);
 
-    // Events
+    // Reference values produced by mne_bids.read_raw_bids(BIDSPath(...)) (mne-bids 0.17, mne 1.11): 32 channels,
+    // 1000 Hz, bads ['P4'], annotations stimulus, response, stimulus, feedback.
     QCOMPARE(data.events.size(), 4);
-    QCOMPARE(data.events[0].trialType, QStringLiteral("stimulus"));
+    const QStringList trialTypes{"stimulus", "response", "stimulus", "feedback"};
+    for (int k = 0; k < 4; ++k) {
+        QCOMPARE(data.events[k].trialType, trialTypes[k]);
+    }
 
     // Event ID map
     QVERIFY(data.eventIdMap.contains(QStringLiteral("stimulus")));
@@ -473,13 +477,16 @@ void TestBids::testReadEdf()
     // Bad channels: EEG O1 marked bad in channels.tsv (EDF uses full label)
     QVERIFY(data.raw.info.bads.contains(QStringLiteral("EEG O1")));
 
-    // Events
+    // As mne_bids.read_raw_bids: 25 channels, 128 Hz, bads ['EEG O1'], annotations start, stimulus, response
     QCOMPARE(data.events.size(), 3);
+    QCOMPARE(data.events[0].trialType, QStringLiteral("start"));
+    QCOMPARE(data.events[1].trialType, QStringLiteral("stimulus"));
 
     // Reader should be alive
     QVERIFY(data.reader != nullptr);
 
-    // Samples in volts, as mne.io.read_raw_edf(...).get_data()
+    // Reference values produced by mne.io.read_raw_edf(...).get_data() (mne 1.11); mne.io.read_raw dispatches
+    // to the same reader and returns identical samples, as BidsRawData::createReader does by extension.
     QCOMPARE(data.reader->getSampleCount(), 1228L);
     QCOMPARE(data.raw.first_samp, 0);
     QCOMPARE(data.raw.last_samp, 1227); // mne raw.last_samp is inclusive
@@ -544,7 +551,8 @@ void TestBids::testReadEdf()
     QCOMPARE(reducedData(status, 0), 4352.0f);
     QCOMPARE(reducedData(status, 1), 0.0f);
 
-    // BDF stores 24-bit samples; the Status channel keeps the low 17 bits of the raw value (mne read_raw_bdf)
+    // BDF stores 24-bit samples; the Status channel keeps the low 17 bits of the raw value. Reference values
+    // produced by mne.io.read_raw_bdf(synth.bdf).get_data() (mne 1.11) on the same bytes.
     QByteArray bdfBytes = header(QByteArray("\xff") + field("BIOSEMI", 7), QStringLiteral("24BIT"), {"EEG Cz", "EXG1", "Status"},
                                  {"uV", "mV", "Boolean"}, {"-262144", "-262", "-8388608"}, {"262143", "262", "8388607"}, "-8388608", "8388607");
     for (const qint32 value : {-8388608, -1000, 0, 8388607, 100, -200, 300, -400, 0, -65531, 65539, 8388607}) {
@@ -733,7 +741,8 @@ void TestBids::testBrainVisionReaderMatchesPython()
     write(QStringLiteral("mux16"), QStringLiteral("INT_16"), QStringLiteral("MULTIPLEXED"));
     write(QStringLiteral("vec32"), QStringLiteral("IEEE_FLOAT_32"), QStringLiteral("VECTORIZED"));
 
-    // mne.io.read_raw_brainvision(...).get_data() for mux16; vec32 is the same times 1.5
+    // Reference values produced by mne.io.read_raw_brainvision(mux16.vhdr).get_data() (mne 1.11); vec32 is the
+    // same times 1.5
     Eigen::MatrixXd expected(6, 4);
     expected << -7e-7, -6e-7, -5e-7, -4e-7,
         -1.5e-3, -1e-3, -5e-4, 0.0,
@@ -1007,7 +1016,8 @@ void TestBids::testPathSettersGetters()
     QCOMPARE(path.suffix(), QStringLiteral("meg"));
     QCOMPARE(path.extension(), QStringLiteral(".fif"));
 
-    // mne_bids.BIDSPath(...).basename with the same entities (space CTF, check=False)
+    // Reference values produced by mne_bids.BIDSPath(...).basename (mne-bids 0.17) with the same entities
+    // (space CTF, check=False)
     path.setSpace("CTF");
     QCOMPARE(path.basename(), QStringLiteral("sub-02_ses-03_task-motor_acq-acq01_run-01_proc-sss_space-CTF_recording-ecog_split-01_desc-filtered_meg.fif"));
 
