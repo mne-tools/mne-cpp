@@ -163,13 +163,15 @@ void TestDspFirFilter::firwin2_matchesScipy()
 void TestDspFirFilter::filterDataZeroDouble_matchesMnePython_data()
 {
     // Reference values produced by mne.filter.filter_data(x, 100.0, 5, 20, None, "10s", 0.5, 0.5,
-    // phase="zero-double", fir_window="hann", fir_design="firwin2") (mne 1.11), with t = np.arange(n) / 100 and
-    // x = np.sin(2 pi 8 t) + 0.5 np.sin(2 pi 30 t) + 0.3 t + 0.2 np.cos(2 pi 1.5 t):
+    // phase="zero-double", fir_window="hann" | "hamming", fir_design="firwin2") (mne 1.11), with t = np.arange(n) / 100
+    // and x = np.sin(2 pi 8 t) + 0.5 np.sin(2 pi 30 t) + 0.3 t + 0.2 np.cos(2 pi 1.5 t):
     // sum |y|, then y[3], y[113], y[n // 2 + 7], y[n - 2]. The 1024-tap filter is shorter / longer than the data.
     QTest::addColumn<int>("n");
+    QTest::addColumn<bool>("hamming");
     QTest::addColumn<QList<double>>("expected");
-    QTest::newRow("1200 samples") << 1200 << QList<double>{760.416254023, 1.00313539474, 0.24845613157, -0.368126558459, -0.119258490373};
-    QTest::newRow("700 samples") << 700 << QList<double>{442.540025113, 1.00313543814, 0.248460245928, -0.36768758107, -0.12477357814};
+    QTest::newRow("1200 samples") << 1200 << false << QList<double>{760.416254023, 1.00313539474, 0.24845613157, -0.368126558459, -0.119258490373};
+    QTest::newRow("700 samples") << 700 << false << QList<double>{442.540025113, 1.00313543814, 0.248460245928, -0.36768758107, -0.12477357814};
+    QTest::newRow("1200 samples, hamming") << 1200 << true << QList<double>{760.43763656, 1.00317665173, 0.248464568063, -0.368144974104, -0.11921357396};
 }
 
 //=============================================================================================================
@@ -177,6 +179,7 @@ void TestDspFirFilter::filterDataZeroDouble_matchesMnePython_data()
 void TestDspFirFilter::filterDataZeroDouble_matchesMnePython()
 {
     QFETCH(int, n);
+    QFETCH(bool, hamming);
     QFETCH(QList<double>, expected);
 
     MatrixXd x(1, n);
@@ -184,7 +187,7 @@ void TestDspFirFilter::filterDataZeroDouble_matchesMnePython()
         const double t = i / 100.0;
         x(0, i) = std::sin(2.0 * M_PI * 8.0 * t) + 0.5 * std::sin(2.0 * M_PI * 30.0 * t) + 0.3 * t + 0.2 * std::cos(2.0 * M_PI * 1.5 * t);
     }
-    const MatrixXd y = FirFilter::filterDataZeroDouble(x, 100.0, 5.0, 20.0);
+    const MatrixXd y = FirFilter::filterDataZeroDouble(x, 100.0, 5.0, 20.0, hamming ? FirFilter::FirWindow::Hamming : FirFilter::FirWindow::Hann);
     const double got[] = {y.cwiseAbs().sum(), y(0, 3), y(0, 113), y(0, n / 2 + 7), y(0, n - 2)};
     for (int i = 0; i < 5; ++i)
         QVERIFY2(std::abs(got[i] - expected[i]) <= 1e-8 * std::max(1.0, std::abs(expected[i])),

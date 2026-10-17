@@ -80,6 +80,62 @@ Of the good channels with kind == FIFFV_EOG_CH, the one with the most 2-45 Hz en
 
 ---
 
+### computeProjEcg(matData, fiffInfo, dSFreq, proj, detect)
+
+SSP projectors for heartbeat artifacts as mne.preprocessing.compute_proj_ecg does: ECG events, band-passed data with the info projectors applied, peak-to-peak rejection, average, then [FiffProj](/docs/api/fiff/fiff-proj)::compute_from_evoked.
+
+Returns the info projectors followed by the new ones ("ECG-...").
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Raw data (n_channels × n_samples), calibrated (SI units).
+
+- **fiffInfo** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
+  Measurement info including its projectors.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **proj** : *const ProjParams &*
+  Epoching, filtering, rejection and vector counts.
+
+- **detect** : *const EcgParams &*
+  ECG event detection parameters.
+
+**Returns:**
+
+- *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt;* — The projectors, or only the info projectors if no event or epoch survives.
+
+---
+
+### computeProjEog(matData, fiffInfo, dSFreq, proj, detect)
+
+SSP projectors for blink artifacts as mne.preprocessing.compute_proj_eog does (see computeProjEcg).
+
+**Parameters:**
+
+- **matData** : *const Eigen::MatrixXd &*
+  Raw data (n_channels × n_samples), calibrated (SI units).
+
+- **fiffInfo** : *const [FiffInfo](/docs/api/fiff/fiff-info) &*
+  Measurement info including its projectors.
+
+- **dSFreq** : *double*
+  Sampling frequency in Hz.
+
+- **proj** : *const ProjParams &*
+  Epoching, filtering, rejection and vector counts.
+
+- **detect** : *const EogParams &*
+  EOG event detection parameters.
+
+**Returns:**
+
+- *QList&lt; [FiffProj](/docs/api/fiff/fiff-proj) &gt;* — The projectors, or only the info projectors if no event or epoch survives.
+
+---
+
 ## Example
 
 - Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)

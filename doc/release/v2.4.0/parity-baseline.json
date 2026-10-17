@@ -20,24 +20,24 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 353,
+    "claims": 354,
     "by_evidence": {
-      "cross-validated-static": 154,
+      "cross-validated-static": 157,
       "cross-validated-live": 4,
-      "tested": 191,
+      "tested": 189,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 27,
+        "cross-validated-static": 28,
         "cross-validated-live": 1,
         "tested": 61,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 127,
+        "cross-validated-static": 129,
         "cross-validated-live": 3,
-        "tested": 130,
+        "tested": 128,
         "unverified": 4
       }
     },
@@ -116,7 +116,7 @@
     {
       "path": "doc/dev-notes/gap-analysis.md",
       "line": 17,
-      "text": "parity: **55.7%",
+      "text": "parity: **56.0%",
       "status": "generated-with-denominator"
     }
   ],
@@ -831,6 +831,14 @@
       "python": "mne.minimum_norm.estimate_snr",
       "claimed": "implemented",
       "test": "test_inv_eloreta_python",
+      "evidence": "cross-validated-static"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "ArtifactDetectProjParams",
+      "python": "mne.preprocessing.compute_proj_ecg",
+      "claimed": "implemented",
+      "test": "test_dsp_artifact_detect",
       "evidence": "cross-validated-static"
     },
     {
@@ -2099,19 +2107,19 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "ArtifactDetect::detectEcg, FiffProj::compute_from_raw",
+      "mne_cpp": "ArtifactDetect::computeProjEcg",
       "python": "mne.preprocessing.compute_proj_ecg",
-      "claimed": "partial",
+      "claimed": "implemented",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",
-      "mne_cpp": "ArtifactDetect::detectEog, compute_from_raw",
+      "mne_cpp": "ArtifactDetect::computeProjEog",
       "python": "mne.preprocessing.compute_proj_eog",
-      "claimed": "partial",
+      "claimed": "implemented",
       "test": "test_dsp_artifact_detect",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

@@ -9,8 +9,8 @@
   "summary": {
     "total": 443,
     "by_status": {
-      "implemented": 194,
-      "partial": 97,
+      "implemented": 196,
+      "partial": 95,
       "missing": 144,
       "not-applicable": 8
     },
@@ -28,8 +28,8 @@
         "not-applicable": 3
       },
       "preprocessing": {
-        "implemented": 14,
-        "partial": 11,
+        "implemented": 16,
+        "partial": 9,
         "missing": 17,
         "not-applicable": 1
       },
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 55.7
+    "parity_percent": 56.0
   },
   "apis": [
     {
@@ -1509,6 +1509,28 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.preprocessing.compute_proj_ecg",
+      "name": "compute_proj_ecg",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "implemented",
+      "mne_cpp": "ArtifactDetect::computeProjEcg",
+      "note": "average=True, meg='separate', FIR filter; raw_event, avg_ref and IIR options are not ported.",
+      "evidence": "parity-record"
+    },
+    {
+      "python": "mne.preprocessing.compute_proj_eog",
+      "name": "compute_proj_eog",
+      "submodule": "preprocessing",
+      "kind": "function",
+      "domain": "preprocessing",
+      "status": "implemented",
+      "mne_cpp": "ArtifactDetect::computeProjEog",
+      "note": "average=True, meg='separate', FIR filter; raw_event, avg_ref and IIR options are not ported.",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.preprocessing.find_bad_channels_lof",
       "name": "find_bad_channels_lof",
       "submodule": "preprocessing",
@@ -1616,28 +1638,6 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax",
       "note": "stateless functions; no info-aware object or save",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.compute_proj_ecg",
-      "name": "compute_proj_ecg",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "partial",
-      "mne_cpp": "ArtifactDetect::detectEcg, FiffProj::compute_from_raw",
-      "note": "detection plus SSP exist; no combined helper",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.preprocessing.compute_proj_eog",
-      "name": "compute_proj_eog",
-      "submodule": "preprocessing",
-      "kind": "function",
-      "domain": "preprocessing",
-      "status": "partial",
-      "mne_cpp": "ArtifactDetect::detectEog, compute_from_raw",
-      "note": "detection plus SSP exist; no combined helper",
       "evidence": "parity-record"
     },
     {

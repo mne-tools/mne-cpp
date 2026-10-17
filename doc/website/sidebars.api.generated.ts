@@ -502,7 +502,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/utils/python-runner-result',
         'api/utils/report-section',
         'api/utils/spectogram-input-data',
-        'api/utils/tapered-spectra-input-data'
+        'api/utils/tapered-spectra-input-data',
+        'api/utils/artifact-detect-proj-params'
       ],
     },
     {

@@ -419,6 +419,68 @@ private slots:
         QVERIFY(qAbs(std::sqrt(sumSq) / norm - 1.0) < 1e-5);
     }
 
+    /**
+     * Reference values produced by mne.preprocessing.compute_proj_ecg(raw) and compute_proj_eog(raw)
+     * (mne 1.11, defaults) on sample_audvis_trunc_raw.fif: the 4 raw projectors, then 6 new ones;
+     * per new vector its peak channel, |peak| and |value on the first good channel of its type|.
+     */
+    void computeProjMatchesMnePython_data()
+    {
+        QTest::addColumn<bool>("ecg");
+        QTest::addColumn<QStringList>("descs");
+        QTest::addColumn<QStringList>("peakNames");
+        QTest::addColumn<QVector<double>>("peaks");
+        QTest::addColumn<QVector<double>>("firsts");
+        QTest::newRow("compute_proj_ecg")
+            << true
+            << QStringList{"ECG-planar--0.200-0.400-PCA-01", "ECG-planar--0.200-0.400-PCA-02", "ECG-axial--0.200-0.400-PCA-01",
+                           "ECG-axial--0.200-0.400-PCA-02", "ECG-eeg--0.200-0.400-PCA-01", "ECG-eeg--0.200-0.400-PCA-02"}
+            << QStringList{"MEG1543", "MEG2633", "MEG1421", "MEG0141", "EEG060", "EEG059"}
+            << QVector<double>{0.282213853228, 0.269008958671, 0.231366001317, 0.294255338038, 0.369071434733, 0.398007900296}
+            << QVector<double>{0.205034308579, 0.031577771758, 0.209726161362, 0.233790624710, 0.170489633875, 0.112625917097};
+        QTest::newRow("compute_proj_eog")
+            << false
+            << QStringList{"EOG-planar--0.200-0.200-PCA-01", "EOG-planar--0.200-0.200-PCA-02", "EOG-axial--0.200-0.200-PCA-01",
+                           "EOG-axial--0.200-0.200-PCA-02", "EOG-eeg--0.200-0.200-PCA-01", "EOG-eeg--0.200-0.200-PCA-02"}
+            << QStringList{"MEG1213", "MEG1343", "MEG1411", "MEG0131", "EEG003", "EEG008"}
+            << QVector<double>{0.251003998071, 0.253609714403, 0.445297024774, 0.221558125316, 0.407336078089, 0.316956161377}
+            << QVector<double>{0.057684354300, 0.064471629014, 0.134466543273, 0.147941636199, 0.365897453455, 0.034841135380};
+    }
+
+    void computeProjMatchesMnePython()
+    {
+        QFETCH(bool, ecg);
+        QFETCH(QStringList, descs);
+        QFETCH(QStringList, peakNames);
+        QFETCH(QVector<double>, peaks);
+        QFETCH(QVector<double>, firsts);
+
+        QFile file(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+        const FiffRawData raw(file);
+        MatrixXd data;
+        MatrixXd times;
+        QVERIFY(raw.read_raw_segment(data, times));
+
+        const QList<FiffProj> projs = ecg ? ArtifactDetect::computeProjEcg(data, raw.info, raw.info.sfreq)
+                                          : ArtifactDetect::computeProjEog(data, raw.info, raw.info.sfreq);
+        QCOMPARE(projs.size(), 10);
+        for (int i = 0; i < 4; ++i) {
+            QCOMPARE(projs[i].desc, raw.info.projs[i].desc);
+        }
+        const QStringList firstNames{"MEG0113", "MEG0113", "MEG0111", "MEG0111", "EEG001", "EEG001"};
+        for (int i = 0; i < 6; ++i) {
+            const FiffProj& p = projs[4 + i];
+            QCOMPARE(p.desc, descs[i]);
+            const RowVectorXd v = p.data->data.row(0);
+            Index peakIdx = 0;
+            const double peak = v.cwiseAbs().maxCoeff(&peakIdx);
+            QCOMPARE(p.data->col_names.at(static_cast<int>(peakIdx)), peakNames[i]);
+            QVERIFY2(qAbs(peak / peaks[i] - 1.0) < 1e-5, qPrintable(QString("%1 peak %2").arg(p.desc).arg(peak, 0, 'g', 12)));
+            const double first = std::fabs(v(p.data->col_names.indexOf(firstNames[i])));
+            QVERIFY2(qAbs(first / firsts[i] - 1.0) < 1e-4, qPrintable(QString("%1 first %2").arg(p.desc).arg(first, 0, 'g', 12)));
+        }
+    }
+
     /** Reference values produced by mne.preprocessing.peak_finder (mne 1.11) on x below, default and (1.5, -1). */
     void peakFinderMatchesMnePython()
     {

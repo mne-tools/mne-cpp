@@ -9868,6 +9868,28 @@
       "python_url": null
     },
     {
+      "name": "ArtifactDetectProjParams",
+      "module": "utils",
+      "header": "dsp/artifact_detect.h",
+      "origin": "mne-python",
+      "mne_c_tool": null,
+      "mne_python": "mne.preprocessing.compute_proj_ecg",
+      "sklearn": null,
+      "test": "test_dsp_artifact_detect",
+      "example": "ex_dsp_artifacts",
+      "example_snippet": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 66,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
       "name": "BadChannelDetectParams",
       "module": "utils",
       "header": "dsp/bad_channel_detect.h",
@@ -13072,16 +13094,16 @@
       },
       {
         "python": "mne.preprocessing.compute_proj_ecg",
-        "status": "partial",
-        "mne_cpp": "ArtifactDetect::detectEcg, FiffProj::compute_from_raw",
-        "note": "detection plus SSP exist; no combined helper",
+        "status": "implemented",
+        "mne_cpp": "ArtifactDetect::computeProjEcg",
+        "note": "average=True, meg='separate', FIR filter; raw_event, avg_ref and IIR options are not ported.",
         "test": "test_dsp_artifact_detect"
       },
       {
         "python": "mne.preprocessing.compute_proj_eog",
-        "status": "partial",
-        "mne_cpp": "ArtifactDetect::detectEog, compute_from_raw",
-        "note": "detection plus SSP exist; no combined helper",
+        "status": "implemented",
+        "mne_cpp": "ArtifactDetect::computeProjEog",
+        "note": "average=True, meg='separate', FIR filter; raw_event, avg_ref and IIR options are not ported.",
         "test": "test_dsp_artifact_detect"
       },
       {

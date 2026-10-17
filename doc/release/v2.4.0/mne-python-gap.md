@@ -8,11 +8,11 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **194**
-- Partial: **97**
+- Implemented: **196**
+- Partial: **95**
 - Missing: **144**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **55.7%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **56.0%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -22,7 +22,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 |---|---:|---:|---:|---:|---:|
 | I/O & Readers | 18 | 2 | 39 | 0 | 59 |
 | Core Data Containers | 40 | 14 | 4 | 3 | 61 |
-| Preprocessing & Artifacts | 14 | 11 | 17 | 1 | 43 |
+| Preprocessing & Artifacts | 16 | 9 | 17 | 1 | 43 |
 | Channels & Montages | 15 | 10 | 16 | 1 | 42 |
 | Epochs & Evoked | 13 | 2 | 1 | 0 | 16 |
 | Covariance & Whitening | 6 | 1 | 0 | 0 | 7 |
@@ -113,8 +113,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 |---|---|---|---|
 | `mne.preprocessing.EOGRegression` | partial | UTILSLIB::EogRegression | matrix input; no Epochs/Evoked, picks argument, proj handling or saving |
 | `mne.preprocessing.ICA` | partial | UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax | stateless functions; no info-aware object or save |
-| `mne.preprocessing.compute_proj_ecg` | partial | ArtifactDetect::detectEcg, FiffProj::compute_from_raw | detection plus SSP exist; no combined helper |
-| `mne.preprocessing.compute_proj_eog` | partial | ArtifactDetect::detectEog, compute_from_raw | detection plus SSP exist; no combined helper |
 | `mne.preprocessing.create_ecg_epochs` | partial | detectEcg, EpochExtractor::extract | no combined detect+epoch helper |
 | `mne.preprocessing.create_eog_epochs` | partial | detectEog, EpochExtractor::extract | no combined detect+epoch helper |
 | `mne.preprocessing.find_bad_channels_maxwell` | partial | UTILSLIB::findBadChannelsMaxwell | robust z-score of the whole-recording SSS residual, not mne's chunk-wise limit/min_count; no flat channels |
@@ -346,5 +344,5 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 
 ## Already implemented (do not re-implement)
 
-194 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
+196 MNE-Python APIs already have an MNE-CPP equivalent. See `mne-python-gap.json` (`status == "implemented"`) for the full mapping. TASK 8 candidates must not target any API listed there (AC-T8.0-3).
 

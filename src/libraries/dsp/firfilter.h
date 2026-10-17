@@ -188,33 +188,43 @@ public:
      */
     static Eigen::MatrixXd filterData(const Eigen::MatrixXd& matData, double dSFreq, double dLFreq, double dHFreq);
 
+    /** Window of firwin2 / filterDataZeroDouble (scipy / MNE-Python fir_window). */
+    enum class FirWindow
+    {
+        Hann,   /**< "hann" (MNE-Python ECG/EOG event detection). */
+        Hamming /**< "hamming" (MNE-Python filter default). */
+    };
+
     //=========================================================================================================
     /**
-     * Frequency-sampling FIR design with a Hann window, as @c scipy.signal.firwin2(nTaps, freq, gain,
-     * window="hann").
+     * Frequency-sampling FIR design, as @c scipy.signal.firwin2(nTaps, freq, gain, window=...).
      *
      * @param[in] nTaps   Number of taps; an even count needs zero gain at Nyquist.
      * @param[in] freq    Increasing frequencies from 0 to 1 (Nyquist).
      * @param[in] gain    Gain at each frequency.
+     * @param[in] window  The window.
      *
      * @return The impulse response.
      */
-    static Eigen::RowVectorXd firwin2(int nTaps, const std::vector<double>& freq, const std::vector<double>& gain);
+    static Eigen::RowVectorXd firwin2(int nTaps, const std::vector<double>& freq, const std::vector<double>& gain,
+                                      FirWindow window = FirWindow::Hann);
 
     //=========================================================================================================
     /**
      * Band-pass every row like @c mne.filter.filter_data(x, sfreq, l_freq, h_freq, None, "10s", 0.5, 0.5,
-     * phase="zero-double", fir_window="hann", fir_design="firwin2"), the filter MNE-Python's ECG and
-     * EOG event detection uses.
+     * phase="zero-double", fir_window=..., fir_design="firwin2"): Hann for MNE-Python's ECG and EOG
+     * event detection, Hamming for the data filter of compute_proj_ecg / compute_proj_eog.
      *
      * @param[in] matData   Data, one row per channel.
      * @param[in] dSFreq    Sampling frequency in Hz.
      * @param[in] dLFreq    High-pass edge in Hz.
      * @param[in] dHFreq    Low-pass edge in Hz.
+     * @param[in] window    The FIR window.
      *
      * @return The filtered data.
      */
-    static Eigen::MatrixXd filterDataZeroDouble(const Eigen::MatrixXd& matData, double dSFreq, double dLFreq, double dHFreq);
+    static Eigen::MatrixXd filterDataZeroDouble(const Eigen::MatrixXd& matData, double dSFreq, double dLFreq, double dHFreq,
+                                                FirWindow window = FirWindow::Hann);
 
 private:
     /** Zero-phase overlap-add of an odd-length (centred) h with nEdge samples of reflect_limited padding. */

@@ -3,25 +3,25 @@
   "generated_by": "tools/quality/audit_api_evidence.py",
   "policy": "tools/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 462,
+    "exported_classes": 463,
     "exported_free_functions": 116,
-    "registered_classes": 510,
+    "registered_classes": 511,
     "exported_not_registered": 0,
     "registered_function_modules": 13,
     "registered_header_only": 35,
     "registered_stale": 0,
-    "registered_with_test": 151,
+    "registered_with_test": 152,
     "registered_test_unresolved": 0,
-    "registered_with_example": 367,
+    "registered_with_example": 368,
     "registered_example_not_built": 0,
-    "registered_with_python_equiv": 89,
+    "registered_with_python_equiv": 90,
     "registered_without_api_page": 0,
-    "with_snippet": 388,
-    "public_api_units": 510,
-    "example_eligible": 367,
+    "with_snippet": 389,
+    "public_api_units": 511,
+    "example_eligible": 368,
     "example_exempt": 143,
-    "eligible_backed_by_registry_example": 367,
-    "eligible_used_by_some_example": 345,
+    "eligible_backed_by_registry_example": 368,
+    "eligible_used_by_some_example": 346,
     "examples_on_disk": 68,
     "examples_built": 68
   },
@@ -81,13 +81,13 @@
       "with_snippet": 20
     },
     "dsp": {
-      "public": 84,
-      "registered": 84,
-      "with_test": 28,
-      "eligible": 80,
-      "eligible_with_registry_example": 80,
-      "eligible_used_by_example": 80,
-      "with_snippet": 84
+      "public": 85,
+      "registered": 85,
+      "with_test": 29,
+      "eligible": 81,
+      "eligible_with_registry_example": 81,
+      "eligible_used_by_example": 81,
+      "with_snippet": 85
     },
     "fiff": {
       "public": 38,
@@ -4409,6 +4409,7 @@
       "snippets": [
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
       ],
       "api_page": "doc/website/docs/api/utils/artifact-detect.mdx",
@@ -4432,6 +4433,7 @@
         "ex_dsp_artifacts"
       ],
       "snippets": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
@@ -4459,10 +4461,37 @@
       "snippets": [
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
         "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
       ],
       "api_page": "doc/website/docs/api/utils/artifact-detect-eog-params.mdx",
       "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ArtifactDetectProjParams",
+      "header": "dsp/artifact_detect.h",
+      "library": "dsp",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_dsp_artifact_detect",
+      "test_resolves": true,
+      "example": "ex_dsp_artifacts",
+      "example_state": "built",
+      "including_examples": [
+        "ex_dsp_artifacts"
+      ],
+      "snippets": [
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage",
+        "ex_dsp_artifacts/main.cpp#artifact_detect_usage"
+      ],
+      "api_page": "doc/website/docs/api/utils/artifact-detect-proj-params.mdx",
+      "python_equiv": "mne.preprocessing.compute_proj_ecg",
       "example_eligible": true,
       "exempt_reason": null
     },

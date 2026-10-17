@@ -1,0 +1,54 @@
+---
+id: artifact-detect-proj-params
+title: "UTILSLIB::ArtifactDetectProjParams"
+sidebar_label: ArtifactDetectProjParams
+sidebar_position: 66
+---
+
+# ArtifactDetectProjParams
+
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library
+
+`#include <utils/artifact_detect.h>`
+
+```cpp
+struct UTILSLIB::ArtifactDetectProjParams
+```
+
+SSP parameters of compute_proj_ecg / compute_proj_eog; `ecg()` and `eog()` give the MNE-Python defaults.
+
+```cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+ArtifactDetect::EcgParams ecg;                                                  // mne find_ecg_events defaults: 5-35 Hz, automatic QRS threshold
+ArtifactDetect::EogParams eog;                                                  // mne find_eog_events defaults: 1-10 Hz, automatic peak threshold
+const QVector<int> beats = ArtifactDetect::detectEcg(data, info, kSFreq, ecg);  // R-peak samples on the ECG channel
+const QVector<int> blinks = ArtifactDetect::detectEog(data, info, kSFreq, eog); // blink peaks on the EOG channel
+```
+
+---
+
+## Static Methods
+
+### ecg()
+
+**Returns:**
+
+- *[ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params)* — The compute_proj_ecg defaults.
+
+---
+
+### eog()
+
+**Returns:**
+
+- *[ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params)* — The compute_proj_eog defaults (tmax 0.2, eeg 500 µV, no EOG rejection).
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
+- Build target: `ex_dsp_artifacts` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

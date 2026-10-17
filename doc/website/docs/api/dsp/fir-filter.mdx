@@ -180,9 +180,9 @@ Filters every row like `mne.filter.filter_data` with its FIR defaults: the desig
 
 ---
 
-### firwin2(nTaps, freq, gain)
+### firwin2(nTaps, freq, gain, window)
 
-Frequency-sampling FIR design with a Hann window, as `scipy.signal.firwin2`(nTaps, freq, gain, window="hann").
+Frequency-sampling FIR design, as `scipy.signal.firwin2`(nTaps, freq, gain, window=...).
 
 **Parameters:**
 
@@ -195,15 +195,18 @@ Frequency-sampling FIR design with a Hann window, as `scipy.signal.firwin2`(nTap
 - **gain** : *const std::vector&lt; double &gt; &*
   Gain at each frequency.
 
+- **window** : *FirWindow*
+  The window.
+
 **Returns:**
 
 - *Eigen::RowVectorXd* — The impulse response.
 
 ---
 
-### filterDataZeroDouble(matData, dSFreq, dLFreq, dHFreq)
+### filterDataZeroDouble(matData, dSFreq, dLFreq, dHFreq, window)
 
-Band-pass every row like `mne.filter.filter_data`(x, sfreq, l_freq, h_freq, None, "10s", 0.5, 0.5, phase="zero-double", fir_window="hann", fir_design="firwin2"), the filter MNE-Python's ECG and EOG event detection uses.
+Band-pass every row like `mne.filter.filter_data`(x, sfreq, l_freq, h_freq, None, "10s", 0.5, 0.5, phase="zero-double", fir_window=..., fir_design="firwin2"): Hann for MNE-Python's ECG and EOG event detection, Hamming for the data filter of compute_proj_ecg / compute_proj_eog.
 
 **Parameters:**
 
@@ -218,6 +221,9 @@ Band-pass every row like `mne.filter.filter_data`(x, sfreq, l_freq, h_freq, None
 
 - **dHFreq** : *double*
   Low-pass edge in Hz.
+
+- **window** : *FirWindow*
+  The FIR window.
 
 **Returns:**
 

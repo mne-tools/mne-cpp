@@ -229,9 +229,9 @@ MatrixXd FirFilter::filterData(const MatrixXd& matData, double dSFreq, double dL
 
 //=============================================================================================================
 
-RowVectorXd FirFilter::firwin2(int nTaps, const std::vector<double>& freq, const std::vector<double>& gain)
+RowVectorXd FirFilter::firwin2(int nTaps, const std::vector<double>& freq, const std::vector<double>& gain, FirWindow window)
 {
-    // Adapted from scipy.signal.firwin2 (SciPy, BSD-3-Clause) for nyq = 1, window="hann", no antisymmetry.
+    // Adapted from scipy.signal.firwin2 (SciPy, BSD-3-Clause) for nyq = 1, no antisymmetry.
     const int nFreqs = 1 + (1 << static_cast<int>(std::ceil(std::log2(nTaps))));
     RowVectorXcd fx(nFreqs);
     std::size_t k = 0;
@@ -249,17 +249,18 @@ RowVectorXd FirFilter::firwin2(int nTaps, const std::vector<double>& freq, const
     RowVectorXd full;
     fft.inv(full, fx, 2 * (nFreqs - 1));
 
+    const double a0 = window == FirWindow::Hamming ? 0.54 : 0.5;
     RowVectorXd h(nTaps);
     for (int n = 0; n < nTaps; ++n) {
-        const double window = nTaps > 1 ? 0.5 - 0.5 * std::cos(2.0 * M_PI * n / (nTaps - 1)) : 1.0;
-        h(n) = full(n) * window;
+        const double w = nTaps > 1 ? a0 - (1.0 - a0) * std::cos(2.0 * M_PI * n / (nTaps - 1)) : 1.0;
+        h(n) = full(n) * w;
     }
     return h;
 }
 
 //=============================================================================================================
 
-MatrixXd FirFilter::filterDataZeroDouble(const MatrixXd& matData, double dSFreq, double dLFreq, double dHFreq)
+MatrixXd FirFilter::filterDataZeroDouble(const MatrixXd& matData, double dSFreq, double dLFreq, double dHFreq, FirWindow window)
 {
     // Adapted from mne.filter._triage_filter_params / _construct_fir_filter (MNE-Python, BSD-3-Clause):
     // filter_length "10s" rounded up to a power of two for zero-double, 0.5 Hz transition bands.
@@ -267,7 +268,8 @@ MatrixXd FirFilter::filterDataZeroDouble(const MatrixXd& matData, double dSFreq,
     const double nyquist = dSFreq / 2.0;
     const RowVectorXd h = firwin2(nTaps,
                                   {0.0, (dLFreq - 0.5) / nyquist, dLFreq / nyquist, dHFreq / nyquist, (dHFreq + 0.5) / nyquist, 1.0},
-                                  {0.0, 0.0, 1.0, 1.0, 0.0, 0.0});
+                                  {0.0, 0.0, 1.0, 1.0, 0.0, 0.0},
+                                  window);
 
     // Forward and backward pass = one pass with h convolved with its reverse; padding follows the single h.
     const Index nH = h.size();

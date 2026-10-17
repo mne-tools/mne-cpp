@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6286 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6303 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -813,6 +813,8 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **computeOrthogonalized** `[fn]` in [ConnectivityAec](/docs/api/dsp/connectivity-aec) — Compute orthogonalized AEC (corrected for volume conduction / source leakage).
 - **computePower** `[fn]` in [InvBeamformerCompute](/docs/api/inv/inv-beamformer-compute) — Compute source power from spatial filter weights and a data covariance / CSD matrix.
 - **computePredicted** `[fn]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Computes the data the minimum-norm estimate predicts with the selected lambda2, colored back to the sensors (MNE-C `compute_predicted_data`; the data part of `mne.minimum_norm.apply_inverse's` residual).
+- **computeProjEcg** `[fn]` in [ArtifactDetect](/docs/api/utils/artifact-detect) — SSP projectors for heartbeat artifacts as mne.preprocessing.compute_proj_ecg does: ECG events, band-passed data with the info projectors applied, peak-to-peak rejection, average, then FiffProj::compute_from_evoked.
+- **computeProjEog** `[fn]` in [ArtifactDetect](/docs/api/utils/artifact-detect) — SSP projectors for blink artifacts as mne.preprocessing.compute_proj_eog does (see computeProjEcg).
 - **computeRegistration** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration) — Compute the head→device rigid transform from the three captured fiducials (NAS, LPA, RPA).
 - **computeRegularization** `[fn]` in [MNEMneData](/docs/api/mne/mne-mne-data) — Projects the whitened data on the eigenfields (MNE-C `mne_project_to_eigen_fields`) and estimates SNR and lambda2_est per time point (MNE-C `compute_regularization`, noise method).
 - **computeSignFlip** `[fn]` in [InvLabelTimeCourse](/docs/api/inv/inv-label-time-course) — Compute sign-flip vector for a label based on vertex normals.
@@ -1218,6 +1220,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **decompose_eigen** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Convenience wrapper for `decompose_eigen_small()` with default threshold and no rank override.
 - **decompose_eigen_small** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Perform eigenvalue decomposition of the covariance matrix, zero sub-threshold eigenvalues, classify eigenvectors by channel type, and compute inverse square-roots for whitening.
 - **decompress** `[fn]` in [MriNiftiIO](/docs/api/mri/mri-nifti-io) — Decompresses a ``.nii.gz file into `rawData`.
+- **dEegReject** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Peak-to-peak rejection in V; 0 = off.
 - **defaultForIndex** `[fn]` in [SubView](/docs/api/disp3-d/sub-view) — Return default [`SubView`](/docs/api/disp3-d/sub-view) configuration for viewport `index`.
 - **defaultValue** `[var]` in [MnaOpSchemaAttr](/docs/api/mna/mna-op-schema-attr) — Default when not set.
 - **Definition** `[type]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Derived channel name and the weight of every input channel.
@@ -1229,6 +1232,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **dElectricalDistanceThreshold** `[var]` in [BridgedElectrodeParams](/docs/api/dsp/bridged-electrode-params) — Max electrical distance to flag as bridged.
 - **denoise** `[fn]` in [Xdawn](/docs/api/dsp/xdawn) — Reconstruct one epoch from the first `nComponents` xDAWN components.
 - **denoiseEpochs** `[fn]` in [Xdawn](/docs/api/dsp/xdawn) — Apply `denoise()` to all epochs in the vector, preserving metadata.
+- **dEogReject** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Peak-to-peak rejection in V; 0 = off.
 - **dependencies** `[var]` in [MnaParamBinding](/docs/api/mna/mna-param-binding) — Paths this binding reads from.
 - **depth** `[var]` in [MNEVolGeom](/docs/api/mne/mne-vol-geom) — Dimensions of the volume stack (in voxels).
 - **depth** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Third dimension (slowest).
@@ -1282,14 +1286,17 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **dFilterHigh** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Upper edge of the muscle band (Hz).
 - **dFilterHigh** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Band-pass upper edge in Hz (h_freq).
 - **dFilterHigh** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Band-pass upper edge in Hz (h_freq).
+- **dFilterHigh** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Band-pass upper edge of the data in Hz (h_freq).
 - **dFilterLow** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Lower edge of the muscle band (Hz).
 - **dFilterLow** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Band-pass lower edge in Hz (l_freq).
 - **dFilterLow** `[var]` in [ArtifactDetectEogParams](/docs/api/utils/artifact-detect-eog-params) — Band-pass lower edge in Hz (l_freq).
+- **dFilterLow** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Band-pass lower edge of the data in Hz (l_freq).
 - **dFlatThreshold** `[var]` in [BadChannelDetectParams](/docs/api/utils/bad-channel-detect-params) — Peak-to-peak below this -&gt; flat (SI units; ~0.1 fT for MEG).
 - **dFMax** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Maximum frequency (Hz) for Gabor atoms.
 - **dFMin** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Minimum frequency (Hz) for Gabor atoms.
 - **dfWithin** `[var]` in [StatsFtestResult](/docs/api/sts/stats-ftest-result) — Within-groups degrees of freedom.
 - **dGof** `[var]` in [HeadPosEntry](/docs/api/dsp/head-pos-entry) — Goodness of fit for this head position.
+- **dGradReject** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Peak-to-peak rejection in T/m; 0 = off.
 - **diag** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — If the covariance is stored in a diagonal order.
 - **diagnoise** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Use only the diagonals of the noise-covariance matrix.
 - **diagonalFixed** `[fn]` in [StsCovEstimators](/docs/api/sts/sts-cov-estimators) — Fixed diagonal regularisation.
@@ -1357,6 +1364,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **distance** `[var]` in [RayHit](/docs/api/disp3-d/ray-hit) — Distance along ray to hit point.
 - **distanceTimeSpacerChanged** `[signal]` in [FiffRawViewSettings](/docs/api/disp/fiff-raw-view-settings) — Emit this signal whenever the user changed the time spacer distance.
 - **distanceTimeSpacerChanged** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — distanceTimeSpacerChanged changes the distance of the time spacers
+- **dMagReject** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Peak-to-peak rejection in T; 0 = off.
 - **dMinDuration** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — Runs of supra- or sub-threshold differences shorter than this (seconds) are ignored.
 - **dMinHeight** `[var]` in [PeakFinderParams](/docs/api/dsp/peak-finder-params) — Minimum peak height.
 - **dMinLengthGood** `[var]` in [AnnotateMusclParams](/docs/api/dsp/annotate-muscl-params) — Good stretches shorter than this (seconds) between annotations become bad.
@@ -1400,7 +1408,9 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **dThreshold** `[var]` in [EpochExtractorParams](/docs/api/utils/epoch-extractor-params) — Peak-to-peak amplitude rejection threshold (SI units, e.g.
 - **dThreshold** `[var]` in [LofBadChannelParams](/docs/api/dsp/lof-bad-channel-params) — LOF score threshold for marking a channel as bad.
 - **dTime** `[var]` in [HeadPosEntry](/docs/api/dsp/head-pos-entry) — Time in seconds.
+- **dTmax** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Epoch end relative to the event in seconds.
 - **dTmax** `[var]` in [EpochExtractorParams](/docs/api/utils/epoch-extractor-params) — Epoch end relative to event in seconds.
+- **dTmin** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Epoch start relative to the event in seconds.
 - **dTmin** `[var]` in [EpochExtractorParams](/docs/api/utils/epoch-extractor-params) — Epoch start relative to event in seconds (negative = pre-stimulus).
 - **dTolerance** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Convergence tolerance.
 - **dTStart** `[var]` in [ArtifactDetectEcgParams](/docs/api/utils/artifact-detect-ecg-params) — Seconds to skip at the start (tstart).
@@ -1419,6 +1429,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 ## E {#e}
 
 - **ecdSet** `[fn]` in [DipoleTreeItem](/docs/api/disp3-d/dipole-tree-item)
+- **ecg** `[fn]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params)
 - **ecgFlat** `[var]` in [RejectionParams](/docs/api/fiff/rejection-params) — ECG flatness (V).
 - **EcgParams** `[type]` in [ArtifactDetect](/docs/api/utils/artifact-detect) — Convenience alias so callers can still write `ArtifactDetect::EcgParams`.
 - **ecgReject** `[var]` in [RejectionParams](/docs/api/fiff/rejection-params) — ECG rejection (V).
@@ -1482,6 +1493,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **ent** `[var]` in [FiffRawDir](/docs/api/fiff/fiff-raw-dir) — Directory entry description.
 - **ent** `[var]` in [MNERawBufDef](/docs/api/mne/mne-raw-buf-def) — Directory entry locating this buffer in the FIFF file (file buffers only).
 - **entries** `[fn]` in [FineCalibration](/docs/api/dsp/fine-calibration) — Get the calibration entries.
+- **eog** `[fn]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params)
 - **eog_highpass** `[var]` in [MNEFilterDef](/docs/api/mne/mne-filter-def) — EOG highpass in Hz.
 - **eog_highpass_width** `[var]` in [MNEFilterDef](/docs/api/mne/mne-filter-def) — EOG highpass transition width in Hz.
 - **eog_lowpass** `[var]` in [MNEFilterDef](/docs/api/mne/mne-filter-def) — EOG lowpass in Hz.
@@ -1726,7 +1738,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **filterChanged** `[signal]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Emitted when the filter changes.
 - **filterChannelTypeChanged** `[signal]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Emitted when the filter channel type changed.
 - **filterData** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Filters every row like `mne.filter.filter_data` with its FIR defaults: the designMne kernel applied by overlap-add with zero phase, each row padded by reflecting it about its end samples ("reflect_limited").
-- **filterDataZeroDouble** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Band-pass every row like `mne.filter.filter_data`(x, sfreq, l_freq, h_freq, None, "10s", 0.5, 0.5, phase="zero-double", fir_window="hann", fir_design="firwin2"), the filter MNE-Python's ECG and EOG event detection uses.
+- **filterDataZeroDouble** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Band-pass every row like `mne.filter.filter_data`(x, sfreq, l_freq, h_freq, None, "10s", 0.5, 0.5, phase="zero-double", fir_window=..., fir_design="firwin2"): Hann for MNE-Python's ECG and EOG event detection, Hamming for the data filter of compute_proj_ecg / compute_proj_eog.
 - **FilterDesignView** `[fn]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Constructs a [`FilterDesignView`](/docs/api/disp/filter-design-view) dialog which is a child of parent.
 - **filtered** `[var]` in [FilterThreadArg](/docs/api/mne/filter-thread-arg) — Optional stream to log omitted point locations (may be NULL).
 - **FilterIO** `[fn]` in [FilterIO](/docs/api/utils/filter-io) — Constructs a [`FilterIO`](/docs/api/utils/filter-io) object.
@@ -1786,7 +1798,8 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **firstSample** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model)
 - **firstVisibleChannel** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **firstVisibleSample** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Returns the first currently visible sample.
-- **firwin2** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Frequency-sampling FIR design with a Hann window, as `scipy.signal.firwin2`(nTaps, freq, gain, window="hann").
+- **firwin2** `[fn]` in [FirFilter](/docs/api/dsp/fir-filter) — Frequency-sampling FIR design, as `scipy.signal.firwin2`(nTaps, freq, gain, window=...).
+- **FirWindow** `[enum]` in [FirFilter](/docs/api/dsp/fir-filter) — Window of firwin2 / filterDataZeroDouble (scipy / MNE-Python fir_window).
 - **fit** `[fn]` in [DecodingCsp](/docs/api/decoding/decoding-csp) — Fit CSP from labelled epoch data (binary classification).
 - **fit** `[fn]` in [DecodingSpoc](/docs/api/decoding/decoding-spoc) — Fit SPoC from epoch data and a continuous target variable.
 - **fit** `[fn]` in [DecodingSsd](/docs/api/decoding/decoding-ssd) — Fit SSD from continuous data.
@@ -3448,6 +3461,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **nearestDistVec** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Extract the nearest distances from the nearest vector as doubles.
 - **nearestVertIdx** `[fn]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Extract the nearest in-use vertex indices from the nearest vector.
 - **neeg** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — How many EEG.
+- **nEeg** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Number of EEG vectors.
 - **neighbor_tri** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Neighboring triangles for each vertex (np entries, variable length).
 - **neighbor_vert** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Vertices neighboring each vertex (np entries, variable length).
 - **nent** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Returns the number of entries in this node.
@@ -3509,6 +3523,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **nfree** `[var]` in [InvFocalDipole](/docs/api/inv/inv-focal-dipole) — Degrees of freedom.
 - **nfree** `[var]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Number of degrees of freedom used in estimation.
 - **nFreqs** `[fn]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Returns the number of frequency bins (1 for LCMV, &gt;= 1 for DICS).
+- **nGrad** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Number of gradiometer vectors.
 - **nguess** `[var]` in [InvGuessData](/docs/api/inv/inv-guess-data) — How many sources.
 - **nitems** `[var]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Number of items.
 - **nIterations** `[var]` in [InfomaxResult](/docs/api/dsp/infomax-result) — Number of iterations performed.
@@ -3518,6 +3533,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **nlabel** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings)
 - **nlayer** `[fn]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model)
 - **nlight** `[fn]` in [MNEMshLightSet](/docs/api/mne/mne-msh-light-set) — Returns the number of lights in the set.
+- **nMag** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Number of magnetometer vectors.
 - **nmarker_colors** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Number of color components per marker vertex.
 - **nmarker_tri** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Number of marker triangles.
 - **nmeg** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — How many MEG.
@@ -4059,6 +4075,7 @@ Index of 6286 public class members (functions, variables, typedefs, enums) acros
 - **projNGrad** `[var]` in [ProcessingSettings](/docs/api/mne/processing-settings) — Number of grad components.
 - **projNMag** `[var]` in [ProcessingSettings](/docs/api/mne/processing-settings) — Number of mag components.
 - **projOn** `[var]` in [ProcessingSettings](/docs/api/mne/processing-settings) — -1=unspecified, 0=off, 1=on.
+- **ProjParams** `[type]` in [ArtifactDetect](/docs/api/utils/artifact-detect) — Convenience alias.
 - **projs** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — List of available ssp projectors.
 - **projs** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — List of available SSP projectors.
 - **projs** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — SSP projectors read from the file.

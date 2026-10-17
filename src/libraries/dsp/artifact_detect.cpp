@@ -24,6 +24,7 @@
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_ch_info.h>
+#include <fiff/fiff_evoked.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -68,6 +69,85 @@ QVector<int> goodChannelsOfKind(const FiffInfo& info, int kind)
             idx.append(i);
     }
     return idx;
+}
+
+// Adapted from mne.preprocessing.ssp._compute_exg_proj (MNE-Python, BSD-3-Clause).
+QList<FiffProj> exgProjectors(const MatrixXd& data, const FiffInfo& info, double sf, const QVector<int>& events,
+                              const ArtifactDetectProjParams& p, const QString& mode)
+{
+    QList<FiffProj> projs = info.projs;
+    if (events.isEmpty()) {
+        qWarning() << "[ArtifactDetect] No" << mode << "events found";
+        return projs;
+    }
+
+    QVector<int> picks;
+    for (int kind : {FIFFV_MEG_CH, FIFFV_EEG_CH, FIFFV_EOG_CH, FIFFV_ECG_CH}) {
+        picks += goodChannelsOfKind(info, kind);
+    }
+    std::sort(picks.begin(), picks.end());
+    RowVectorXi sel(picks.size());
+    MatrixXd picked(picks.size(), data.cols());
+    for (int c = 0; c < picks.size(); ++c) {
+        sel(c) = picks[c];
+        picked.row(c) = data.row(picks[c]);
+    }
+    const FiffInfo pickedInfo = info.pick_info(sel);
+    const MatrixXd filtered = FirFilter::filterDataZeroDouble(picked, sf, p.dFilterLow, p.dFilterHigh, FirFilter::FirWindow::Hamming);
+
+    // Epochs(proj=True) applies every info projector before rejection.
+    QList<FiffProj> active = info.projs;
+    for (FiffProj& proj : active) {
+        proj.active = true;
+    }
+    MatrixXd projector;
+    FiffProj::make_projector(active, pickedInfo.ch_names, projector, pickedInfo.bads);
+
+    QVector<double> limits(picks.size(), 0.0);
+    for (int c = 0; c < picks.size(); ++c) {
+        const FiffChInfo& ch = pickedInfo.chs[c];
+        if (ch.kind == FIFFV_MEG_CH) {
+            limits[c] = ch.unit == FIFF_UNIT_T ? p.dMagReject : p.dGradReject;
+        } else if (ch.kind == FIFFV_EEG_CH) {
+            limits[c] = p.dEegReject;
+        } else if (ch.kind == FIFFV_EOG_CH) {
+            limits[c] = p.dEogReject;
+        }
+    }
+
+    const int first = static_cast<int>(std::round(p.dTmin * sf));
+    const int last = static_cast<int>(std::round(p.dTmax * sf));
+    MatrixXd sum = MatrixXd::Zero(picks.size(), last - first + 1);
+    int nave = 0;
+    for (int ev : events) {
+        if (ev + first < 0 || ev + last >= filtered.cols()) {
+            continue;
+        }
+        const MatrixXd epoch = projector * filtered.middleCols(ev + first, last - first + 1);
+        bool good = true;
+        for (int c = 0; c < picks.size() && good; ++c) {
+            good = limits[c] <= 0.0 || epoch.row(c).maxCoeff() - epoch.row(c).minCoeff() <= limits[c];
+        }
+        if (good) {
+            sum += epoch;
+            ++nave;
+        }
+    }
+    if (nave == 0) {
+        qWarning() << "[ArtifactDetect] No good" << mode << "epochs found";
+        return projs;
+    }
+
+    FiffEvoked evoked;
+    evoked.info = pickedInfo;
+    evoked.nave = nave;
+    evoked.data = sum / nave;
+    evoked.times = RowVectorXf::LinSpaced(last - first + 1, static_cast<float>(first / sf), static_cast<float>(last / sf));
+    QList<FiffProj> exg = FiffProj::compute_from_evoked(evoked, p.nGrad, p.nMag, p.nEeg);
+    for (FiffProj& proj : exg) {
+        proj.desc = mode + "-" + proj.desc;
+    }
+    return projs + exg;
 }
 
 } // namespace
@@ -225,4 +305,20 @@ QVector<int> ArtifactDetect::detectEog(const MatrixXd& matData,
     for (const auto& peak : peakFinderMne(tail, params.dThreshold, extrema))
         events.append(peak.first + nStart);
     return events;
+}
+
+//=============================================================================================================
+
+QList<FiffProj> ArtifactDetect::computeProjEcg(const MatrixXd& matData, const FiffInfo& fiffInfo, double dSFreq,
+                                               const ProjParams& proj, const EcgParams& detect)
+{
+    return exgProjectors(matData, fiffInfo, dSFreq, detectEcg(matData, fiffInfo, dSFreq, detect), proj, "ECG");
+}
+
+//=============================================================================================================
+
+QList<FiffProj> ArtifactDetect::computeProjEog(const MatrixXd& matData, const FiffInfo& fiffInfo, double dSFreq,
+                                               const ProjParams& proj, const EogParams& detect)
+{
+    return exgProjectors(matData, fiffInfo, dSFreq, detectEog(matData, fiffInfo, dSFreq, detect), proj, "EOG");
 }
