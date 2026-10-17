@@ -42,7 +42,7 @@ fi
 # Capture the central ONNX version as the default used *when* ONNX is opted
 # into (via --onnxruntime / --onnxruntime-version); the empty ONNXRUNTIME_VERSION
 # below remains the "ONNX disabled locally" flag so sourcing never auto-enables it.
-ONNXRUNTIME_DEFAULT_VERSION="${ONNXRUNTIME_VERSION:-1.21.0}"
+ONNXRUNTIME_DEFAULT_VERSION="${ONNXRUNTIME_VERSION:-1.31.0}"
 
 : "${QT_VERSION:?QT_VERSION must be set in external_deps.env}"
 EIGEN_VERSION="${EIGEN_VERSION:-5.0.1}"
