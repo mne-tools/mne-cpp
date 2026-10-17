@@ -12377,9 +12377,9 @@
       {
         "python": "mne.grade_to_vertices",
         "status": "implemented",
-        "mne_cpp": "MNESourceSpace decimation",
-        "note": "",
-        "test": "test_mne_source_data"
+        "mne_cpp": "MNESourceSpace::gradeToVertices",
+        "note": "Integer grade; grade=None and vertex lists need no computation.",
+        "test": "test_mne_source_space_ops_python"
       },
       {
         "python": "mne.grand_average",

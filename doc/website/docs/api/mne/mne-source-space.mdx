@@ -281,6 +281,27 @@ For each vertex of the icosahedron at the requested grade, the nearest vertex in
 
 ---
 
+### gradeToVertices(subjectsDir, subject, grade)
+
+Vertices of a subject's surfaces nearest to an icosahedron of the given grade (mne.grade_to_vertices), found on `surf/lh.sphere.reg` and `surf/rh.sphere.reg`.
+
+**Parameters:**
+
+- **subjectsDir** : *const QString &*
+  The FreeSurfer subjects directory.
+
+- **subject** : *const QString &*
+  The subject.
+
+- **grade** : *int*
+  Icosahedral subdivision grade.
+
+**Returns:**
+
+- *QList&lt; Eigen::VectorXi &gt;* — Sorted vertex numbers for lh and rh, or an empty list if a sphere cannot be read or the grade maps two icosahedron vertices onto the same surface vertex.
+
+---
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

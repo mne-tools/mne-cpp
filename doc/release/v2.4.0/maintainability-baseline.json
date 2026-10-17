@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1500,
-  "scanned_lines": 395204,
+  "scanned_lines": 395246,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -666,7 +666,7 @@
         "src/libraries/fwd/fwd_bem_model.cpp": 3404,
         "src/libraries/fiff/fiff_stream.cpp": 3362,
         "src/libraries/disp/viewers/helpers/channelrhiview.cpp": 2681,
-        "src/libraries/mne/mne_source_space.cpp": 2424
+        "src/libraries/mne/mne_source_space.cpp": 2452
       },
       "all_files": {
         "src/applications/mne_analyze_studio/workbench/mainwindow.cpp": 9112,
@@ -676,7 +676,7 @@
         "src/libraries/disp3D/view/brainview.cpp": 3843,
         "src/libraries/fiff/fiff_stream.cpp": 3362,
         "src/libraries/fwd/fwd_bem_model.cpp": 3404,
-        "src/libraries/mne/mne_source_space.cpp": 2424
+        "src/libraries/mne/mne_source_space.cpp": 2452
       }
     }
   }

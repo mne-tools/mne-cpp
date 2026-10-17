@@ -262,6 +262,20 @@ public:
      */
     static MNEHemisphere icoDownsample(const MNEHemisphere& hemi, int icoGrade);
 
+    //=========================================================================================================
+    /**
+     * Vertices of a subject's surfaces nearest to an icosahedron of the given grade (mne.grade_to_vertices),
+     * found on @c surf/lh.sphere.reg and @c surf/rh.sphere.reg.
+     *
+     * @param[in] subjectsDir   The FreeSurfer subjects directory.
+     * @param[in] subject       The subject.
+     * @param[in] grade         Icosahedral subdivision grade.
+     *
+     * @return Sorted vertex numbers for lh and rh, or an empty list if a sphere cannot be read or the grade
+     *         maps two icosahedron vertices onto the same surface vertex.
+     */
+    static QList<Eigen::VectorXi> gradeToVertices(const QString& subjectsDir, const QString& subject, int grade);
+
 private:
     /**
      * Write volume source space information (neighbors, voxel transforms, interpolator) to a FIFF stream.

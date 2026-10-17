@@ -3715,8 +3715,8 @@
       "kind": "function",
       "domain": "source_space",
       "status": "implemented",
-      "mne_cpp": "MNESourceSpace decimation",
-      "note": "",
+      "mne_cpp": "MNESourceSpace::gradeToVertices",
+      "note": "Integer grade; grade=None and vertex lists need no computation.",
       "evidence": "parity-record"
     },
     {

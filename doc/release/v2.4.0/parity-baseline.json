@@ -22,9 +22,9 @@
   "summary": {
     "claims": 354,
     "by_evidence": {
-      "cross-validated-static": 160,
+      "cross-validated-static": 161,
       "cross-validated-live": 4,
-      "tested": 186,
+      "tested": 185,
       "unverified": 4
     },
     "by_source": {
@@ -35,9 +35,9 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 132,
+        "cross-validated-static": 133,
         "cross-validated-live": 3,
-        "tested": 125,
+        "tested": 124,
         "unverified": 4
       }
     },
@@ -1580,11 +1580,11 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNESourceSpace decimation",
+      "mne_cpp": "MNESourceSpace::gradeToVertices",
       "python": "mne.grade_to_vertices",
       "claimed": "implemented",
-      "test": "test_mne_source_data",
-      "evidence": "tested"
+      "test": "test_mne_source_space_ops_python",
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

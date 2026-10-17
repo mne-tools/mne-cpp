@@ -2368,6 +2368,33 @@ static Eigen::MatrixX3f generateIcoVertices(int grade)
 
 //=============================================================================================================
 
+QList<Eigen::VectorXi> MNESourceSpace::gradeToVertices(const QString& subjectsDir, const QString& subject, int grade)
+{
+    QList<Eigen::VectorXi> vertices;
+    const int nIco = 10 * (1 << (2 * grade)) + 2;
+    for (const char* hemi : {"lh", "rh"}) {
+        const QString path = QString("%1/%2/surf/%3.sphere.reg").arg(subjectsDir, subject, hemi);
+        const std::unique_ptr<MNESourceSpace> sphere = load_surface_geom(path, QString(), false, false);
+        if (!sphere) {
+            qWarning() << "[MNESourceSpace::gradeToVertices] Cannot read" << path;
+            return {};
+        }
+        MNEHemisphere h;
+        h.np = sphere->np;
+        h.rr = sphere->rr;
+        const MNEHemisphere down = icoDownsample(h, grade);
+        if (down.nuse != nIco) {
+            qWarning() << "[MNESourceSpace::gradeToVertices] Cannot use icosahedral grade" << grade << "with subject"
+                       << subject << "(repeated vertices); use a lower grade.";
+            return {};
+        }
+        vertices.append(down.vertno);
+    }
+    return vertices;
+}
+
+//=============================================================================================================
+
 MNEHemisphere MNESourceSpace::icoDownsample(const MNEHemisphere& hemi, int icoGrade)
 {
     MNEHemisphere result(hemi);
