@@ -22,22 +22,22 @@
   "summary": {
     "claims": 354,
     "by_evidence": {
-      "cross-validated-static": 161,
+      "cross-validated-static": 163,
       "cross-validated-live": 4,
-      "tested": 185,
+      "tested": 183,
       "unverified": 4
     },
     "by_source": {
       "classes": {
-        "cross-validated-static": 28,
+        "cross-validated-static": 29,
         "cross-validated-live": 1,
-        "tested": 61,
+        "tested": 60,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 133,
+        "cross-validated-static": 134,
         "cross-validated-live": 3,
-        "tested": 124,
+        "tested": 123,
         "unverified": 4
       }
     },
@@ -92,6 +92,7 @@
         "test_resolution_matrix",
         "test_sensor_field_mapper",
         "test_source_estimate_io",
+        "test_source_estimate_types",
         "test_spectral_connectivity",
         "test_standard_montage",
         "test_sts_cluster",
@@ -360,7 +361,7 @@
       "python": "mne.VectorSourceEstimate",
       "claimed": "implemented",
       "test": "test_source_estimate_types",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "classes",
@@ -888,7 +889,7 @@
       "python": "mne.VolSourceEstimate",
       "claimed": "partial",
       "test": "test_source_estimate_types",
-      "evidence": "tested"
+      "evidence": "cross-validated-static"
     },
     {
       "source": "parity",

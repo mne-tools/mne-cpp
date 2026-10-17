@@ -58,6 +58,7 @@ private slots:
     void testVectorVertexData();
     void testVectorProjectNormals();
     void testVectorOrientation();
+    void testVectorMatchesMnePython();
     // Volume source estimate tests
     void testVolumeConstruct();
     void testVolumeShape();
@@ -186,6 +187,35 @@ void TestSourceEstimateTypes::testVectorOrientation()
 {
     InvVectorSourceEstimate vstc;
     QCOMPARE(vstc.orientationType, InvOrientationType::Free);
+}
+
+//=============================================================================================================
+
+void TestSourceEstimateTypes::testVectorMatchesMnePython()
+{
+    // Reference values produced by mne.VectorSourceEstimate(data, [[10], [20]], 0, 0.001) (mne 1.11) with
+    // data = np.sin(np.arange(18).reshape(2, 3, 3) * 0.7 + 0.2): .magnitude().data and .project(nn)[0].data.
+    MatrixXd data(6, 3);
+    for (int k = 0; k < 18; ++k) {
+        data(k / 3, k % 3) = std::sin(k * 0.7 + 0.2);
+    }
+    VectorXi verts(2);
+    verts << 10, 20;
+    const InvVectorSourceEstimate vstc(data, verts, 0.0f, 0.001f);
+    MatrixX3f nn(2, 3);
+    nn << 0.6f, 0.0f, 0.8f, 0.0f, 1.0f, 0.0f;
+
+    const double magnitude[6] = {1.2251907090314196, 1.2209212628318669, 1.222999962888877,
+                                 1.2250576561921835, 1.2208859568928381, 1.2231212596845595};
+    const double project[6] = {-0.6420800606345759, -0.27065560008569606, 0.22806241829389717,
+                               0.73439709787411456, 0.12445442350706347, -0.54402111088936833};
+    const InvSourceEstimate mag = vstc.magnitude();
+    const InvSourceEstimate proj = vstc.projectToNormals(nn);
+    for (int k = 0; k < 6; ++k) {
+        QVERIFY(std::abs(mag.data(k / 3, k % 3) - magnitude[k]) < 1e-12);
+        QVERIFY(std::abs(proj.data(k / 3, k % 3) - project[k]) < 1e-7);
+    }
+    QVERIFY(mag.vertices == verts);
 }
 
 //=============================================================================================================
