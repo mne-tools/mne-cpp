@@ -729,6 +729,9 @@ jobs:
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 git clone https://code.qt.io/qt/qt5.git -b v${{ needs.PrepareQtVersions.outputs.max_version }}
         cd qt5
         "$GITHUB_WORKSPACE/scripts/ci/retry_command.sh" 3 15 ./init-repository -f --module-subset=qtbase,qtmultimedia,qtsvg,qtshadertools,qtserialport
+        # Temporary fix for Qt 6.12 (unfixed upstream as of 2026-10): wasm/qwasmjs.cpp uses QMap without including it.
+        grep -q '<QtCore/qmap.h>' qtmultimedia/src/multimedia/wasm/qwasmjs.cpp || \
+          perl -0pi -e 's|#include "qwasmjs_p.h"\n|#include "qwasmjs_p.h"\n#include <QtCore/qmap.h>\n|' qtmultimedia/src/multimedia/wasm/qwasmjs.cpp
         # Build minimal host Qt
         cd ..
         mkdir qt6_host_build
