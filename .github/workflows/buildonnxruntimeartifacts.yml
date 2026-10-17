@@ -90,8 +90,10 @@ jobs:
 
     - name: Verify and extract
       run: |
-        mkdir onnxruntime-extracted
-        tar xzf onnxruntime-osx.tgz -C onnxruntime-extracted --strip-components=1
+        mkdir onnxruntime-extracted onnxruntime-temp
+        # The macOS tarball prefixes entries with "./", so strip via a temp dir instead of --strip-components.
+        tar xzf onnxruntime-osx.tgz -C onnxruntime-temp
+        mv onnxruntime-temp/onnxruntime-osx-${{ matrix.ort_arch }}-${{ env.ONNXRUNTIME_VERSION }}/* onnxruntime-extracted/
         test -f onnxruntime-extracted/include/onnxruntime_cxx_api.h
         test -f onnxruntime-extracted/lib/libonnxruntime.dylib
 
