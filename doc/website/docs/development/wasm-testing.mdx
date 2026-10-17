@@ -48,9 +48,9 @@ git push origin wasm
 
 This will start a GitHub Actions run that:
 
-1. Sets up **Emscripten 5.0.5** and downloads pre-built **Qt 6.12.0** static Wasm binaries (or triggers a build of those binaries if they don't yet exist).
+1. Sets up **Emscripten 6.0.12** and downloads pre-built **Qt 6.12.0** static Wasm binaries (or triggers a build of those binaries if they don't yet exist).
 2. Downloads host Qt binaries (Linux) needed for cross-compilation.
-3. Builds MNE-CPP for WebAssembly using `./scripts/wasm/wasm.sh --emsdk 5.0.5`.
+3. Builds MNE-CPP for WebAssembly using `./scripts/wasm/wasm.sh --emsdk 6.0.12`.
 4. Injects a **COI service worker** (`coi-serviceworker.js`) into every HTML file to provide the `Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers required for `SharedArrayBuffer` on GitHub Pages.
 5. Pushes the resulting Wasm artifacts to both the `gh-pages` and `main` branches of your fork.
 

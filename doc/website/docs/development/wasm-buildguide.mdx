@@ -17,7 +17,7 @@ A desktop (host) Qt is required alongside the Wasm Qt because Qt's cross-compila
 
 ### Emscripten SDK
 
-The build script can automatically download and set up the Emscripten SDK for you. If you prefer to install it manually, see [emscripten.org](https://emscripten.org/docs/getting_started/downloads.html). CI currently uses **emsdk 5.0.5**.
+The build script can automatically download and set up the Emscripten SDK for you. If you prefer to install it manually, see [emscripten.org](https://emscripten.org/docs/getting_started/downloads.html). CI currently uses **emsdk 6.0.12**. Qt only accepts the Emscripten version its Wasm binaries were built with, so with a Qt from the Online Installer pass that version instead (Qt 6.12: `--emsdk 5.0.5`).
 
 ### System Dependencies
 
@@ -49,7 +49,7 @@ export Qt6_DIR=$HOME/Qt/6.12.0
 ```
 
 The script will:
-1. Clone and activate the Emscripten SDK (version 5.0.5 by default)
+1. Clone and activate the Emscripten SDK (version 6.0.12 by default)
 2. Auto-detect the host Qt path from `Qt6_DIR`
 3. Run `qt-cmake` with `-DWASM=ON`
 4. Build MNE-CPP for WebAssembly
@@ -60,7 +60,7 @@ Build output is placed in `out/wasm/`.
 
 | Option | Description |
 |--------|-------------|
-| `--emsdk <version>`, `-e` | Set the Emscripten version (default: 5.0.5) |
+| `--emsdk <version>`, `-e` | Set the Emscripten version (default: 6.0.12) |
 | `--qt <path>`, `-q` | Set the Qt installation path manually |
 | `--qt-host <path>` | Set the host Qt path for cross-compilation |
 | `--no-log` | Skip writing `build_info.txt` |
@@ -69,7 +69,7 @@ Build output is placed in `out/wasm/`.
 Example with explicit paths:
 
 ```bash
-./scripts/wasm/wasm.sh --emsdk 5.0.5 --qt $HOME/Qt/6.12.0 --qt-host $HOME/Qt/6.12.0/gcc_64
+./scripts/wasm/wasm.sh --emsdk 6.0.12 --qt $HOME/Qt/6.12.0 --qt-host $HOME/Qt/6.12.0/gcc_64
 ```
 
 ## Build Manually
@@ -80,8 +80,8 @@ If you prefer to run the steps yourself:
 # 1. Set up Emscripten
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
-./emsdk install 5.0.5
-./emsdk activate 5.0.5
+./emsdk install 6.0.12
+./emsdk activate 6.0.12
 source ./emsdk_env.sh
 cd ..
 
