@@ -67,7 +67,6 @@ namespace UTILSLIB
 class DSPSHARED_EXPORT ParksMcClellan : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(TPassType) //makes enum available to the class' Qt meta object
 
 public:
     enum TPassType
@@ -77,6 +76,7 @@ public:
         BPF,
         NOTCH
     };
+    Q_ENUM(TPassType)
 
     ParksMcClellan();
 
