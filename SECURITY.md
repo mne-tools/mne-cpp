@@ -5,11 +5,11 @@
 Security fixes are made on the `staging` branch and shipped with the next release.
 Only the latest release line receives fixes; older releases are not patched.
 
-| Version             | Supported          |
-| ------------------- | ------------------ |
-| 2.3.x (latest)      | :white_check_mark: |
-| `staging` (dev)     | :white_check_mark: |
-| < 2.3               | :x:                |
+| Version                                                               | Supported          |
+| --------------------------------------------------------------------- | ------------------ |
+| [Latest release](https://github.com/mne-tools/mne-cpp/releases/latest) | :white_check_mark: |
+| `staging` (dev)                                                       | :white_check_mark: |
+| Older releases                                                        | :x:                |
 
 ## Reporting a Vulnerability
 
