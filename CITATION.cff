@@ -20,7 +20,14 @@ keywords:
   - magnetoencephalography
   - EEG
   - electroencephalography
+  - iEEG
+  - "intracranial EEG"
+  - sEEG
+  - "stereo-electroencephalography"
+  - ECoG
+  - electrocorticography
   - electrophysiology
+  - "functional brain imaging"
   - neuroimaging
   - "source imaging"
   - "real-time processing"

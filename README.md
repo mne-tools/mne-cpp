@@ -14,7 +14,7 @@
 
 -----------------
 
-MNE-CPP is an open-source, cross-platform C++ framework for real-time and offline processing of MEG, EEG, and related neurophysiological data. It provides modular libraries and ready-to-use applications — from data browsing and 3D visualization to real-time acquisition and source localization. For documentation please visit [mne-cpp.github.io](https://mne-cpp.github.io/).
+MNE-CPP is an open-source, cross-platform C++ framework for real-time and offline processing of electrophysiological and functional brain imaging data: non-invasive MEG and EEG as well as invasive intracranial recordings (sEEG and ECoG). It provides modular libraries and ready-to-use applications — from data browsing and 3D visualization to real-time acquisition and source localization. For documentation please visit [mne-cpp.github.io](https://mne-cpp.github.io/).
 
 Try it now
 ----------
@@ -24,7 +24,7 @@ No install required — runs entirely in your browser via WebAssembly. **Your da
 | | Application | Description | Release | Nightly |
 |---|---|---|---|---|
 | <a href="https://mne-cpp.github.io/wasm/mne_browse.html"><img src="/src/applications/mne_browse/Resources/Images/ApplicationIcons/icon_browse_64x64.png" width="32" height="32" alt="MNE Browse"></a> | **MNE Browse** | Browse raw MEG/EEG data with filtering, events, averaging, ICA | [**Open**](https://mne-cpp.github.io/wasm/mne_browse.html) | [**Open**](https://mne-cpp.github.io/wasm/dev/mne_browse.html) |
-| <a href="https://mne-cpp.github.io/wasm/mne_inspect.html"><img src="/src/applications/mne_inspect/resources/images/appIcons/icon_mne_inspect_64x64.png" width="32" height="32" alt="MNE Inspect"></a> | **MNE Inspect** | 3D visualization of brain surfaces, source estimates, and forward models | [**Open**](https://mne-cpp.github.io/wasm/mne_inspect.html) | [**Open**](https://mne-cpp.github.io/wasm/dev/mne_inspect.html) |
+| <a href="https://mne-cpp.github.io/wasm/mne_inspect.html"><img src="/src/applications/mne_inspect/resources/images/appIcons/icon_mne_inspect_64x64.png" width="32" height="32" alt="MNE Inspect"></a> | **MNE Inspect** | 3D visualization of brain surfaces, source estimates, forward models, and sEEG/ECoG electrodes | [**Open**](https://mne-cpp.github.io/wasm/mne_inspect.html) | [**Open**](https://mne-cpp.github.io/wasm/dev/mne_inspect.html) |
 
 Applications
 ------------
@@ -32,7 +32,7 @@ Applications
 | Application | Description |
 |---|---|
 | **MNE Browse** | Raw data browsing, filtering, event detection, averaging, ICA, and covariance computation |
-| **MNE Inspect** | Interactive 3D visualization of brain surfaces, source estimates, and forward models |
+| **MNE Inspect** | Interactive 3D visualization of brain surfaces, source estimates, forward models, and sEEG/ECoG implantations |
 | **MNE Scan** | Real-time acquisition and processing pipeline — MEGIN, BabyMEG, BrainAmp, eegosports, gUSBAmp, TMSI, Natus, LSL, FieldTrip Buffer |
 | **MNE Analyze** | Sensor- and source-level analysis: browsing, filtering, averaging, co-registration, dipole fitting, source localization |
 | **MNE Analyze Studio** | Agent-oriented analysis workbench with LLM-driven skill host, neuro kernel, and extension SDK |
@@ -51,6 +51,7 @@ Libraries
 | **Inv** | Inverse estimation — MNE, dSPM, sLORETA, eLORETA, LCMV/DICS beamformers, RAP MUSIC, dipole fit, HPI |
 | **Dsp** | Signal processing — FIR/IIR filtering, ICA, xDAWN, SSS/tSSS, Welch PSD, Morlet TFR, resampling, SPHARA |
 | **Connectivity** | Connectivity — coherence, PLV, PLI, WPLI, cross-correlation, network analysis |
+| **Ieeg** | Intracranial EEG — sEEG/ECoG implantations from BIDS, bipolar re-referencing, contact values painted onto the cortex |
 | **Disp3D** | 3D brain visualization (Metal / Vulkan / D3D / OpenGL via Qt RHI) |
 
 All libraries depend on [Qt](https://www.qt.io/), [Eigen](http://eigen.tuxfamily.org/), and [skigen](https://github.com/skigen-project/skigen) (header-only scikit-learn-equivalent algorithms backing ML/decoding). See the [API documentation](https://mne-cpp.github.io/docs/development/api).

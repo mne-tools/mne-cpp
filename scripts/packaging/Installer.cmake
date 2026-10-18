@@ -54,7 +54,7 @@ include(CPackIFW)
 # --- Parent group: Applications ---
 cpack_add_component_group(applications
     DISPLAY_NAME "Applications"
-    DESCRIPTION "MNE-CPP applications for MEG/EEG data processing"
+    DESCRIPTION "MNE-CPP applications for MEG, EEG, sEEG and ECoG data processing"
 )
 
 # --- 1a. CLI Tools (QCoreApplication-based, no display) ---
