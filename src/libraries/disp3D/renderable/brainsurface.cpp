@@ -16,7 +16,9 @@
 
 #include "brainsurface.h"
 
-#include <rhi/qrhi.h>
+#include <QHash>
+#include <QMatrix3x3>
+#include <QMatrix4x4>
 
 #include <set>
 
@@ -51,37 +53,10 @@ uint32_t overCortex(uint32_t overlay, uint32_t gray)
 } // namespace
 
 //=============================================================================================================
-// PIMPL
-//=============================================================================================================
-
-struct BrainSurface::GpuBuffers
-{
-    std::unique_ptr<QRhiBuffer> vertexBuffer;
-    std::unique_ptr<QRhiBuffer> indexBuffer;
-    bool dirty = true;
-    bool indexDirty = true; // IBO needs (re-)upload (topology change)
-};
-
-//=============================================================================================================
-
-void BrainSurface::markVertexDirty()
-{
-    m_gpu->dirty = true;
-    ++m_vertexGeneration;
-}
-
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-
-BrainSurface::BrainSurface()
-: m_gpu(std::make_unique<GpuBuffers>())
-{
-}
+BrainSurface::BrainSurface() = default;
 
 //=============================================================================================================
 
@@ -89,22 +64,59 @@ BrainSurface::~BrainSurface() = default;
 
 //=============================================================================================================
 
-QRhiBuffer* BrainSurface::vertexBuffer() const
+void BrainSurface::markGeometryDirty()
 {
-    return m_gpu->vertexBuffer.get();
+    ++m_geometryGeneration;
+    m_bAABBDirty = true;
 }
-QRhiBuffer* BrainSurface::indexBuffer() const
+
+//=============================================================================================================
+
+GpuStream BrainSurface::geometryStream() const
 {
-    return m_gpu->indexBuffer.get();
+    return {m_vertexData.constData(), quint32(m_vertexData.size() * sizeof(VertexData)), m_geometryGeneration};
+}
+
+GpuStream BrainSurface::colorStream() const
+{
+    return {m_colors.constData(), quint32(m_colors.size() * sizeof(uint32_t)), m_colorGeneration};
+}
+
+GpuStream BrainSurface::annotationStream() const
+{
+    return {m_annotationColors.constData(), quint32(m_annotationColors.size() * sizeof(uint32_t)), m_annotationGeneration};
+}
+
+GpuStream BrainSurface::indexStream() const
+{
+    return {m_indexData.constData(), quint32(m_indexData.size() * sizeof(uint32_t)), m_indexGeneration};
+}
+
+//=============================================================================================================
+
+void BrainSurface::setGeometry(QVector<VertexData> vertices, QVector<uint32_t> indices, const QColor& color)
+{
+    m_vertexData = std::move(vertices);
+    m_originalVertexData = m_vertexData;
+    m_indexData = std::move(indices);
+    m_indexCount = m_indexData.size();
+    ++m_indexGeneration;
+    markGeometryDirty();
+    m_defaultColor = color;
+    m_baseColor = color;
+    m_colors.resize(m_vertexData.size());
+    m_annotationColors.fill(0u, m_vertexData.size());
+    m_vertexLabelIds.fill(-1, m_vertexData.size());
+    ++m_annotationGeneration;
+    if (m_hasAnnotation)
+        addAnnotation(m_annotation);
+    updateVertexColors();
 }
 
 //=============================================================================================================
 
 void BrainSurface::fromSurface(const FSLIB::FsSurface& surf)
 {
-    m_vertexData.clear();
-    m_indexData.clear();
-
     const Eigen::MatrixXf& rr = surf.rr();
     const Eigen::MatrixXf& nn = surf.nn();
     const Eigen::MatrixXi& tris = surf.tris();
@@ -113,78 +125,35 @@ void BrainSurface::fromSurface(const FSLIB::FsSurface& surf)
     for (int i = 0; i < curv.size(); ++i)
         m_curvature[i] = curv[i];
 
-    // Populate vertex data
-    m_vertexData.reserve(rr.rows());
-
-    for (int i = 0; i < rr.rows(); ++i) {
-        VertexData v;
-        v.pos = QVector3D(rr(i, 0), rr(i, 1), rr(i, 2));
-        v.norm = QVector3D(nn(i, 0), nn(i, 1), nn(i, 2));
-        v.color = 0xFFFFFFFF;           // Default white (overwritten by updateVertexColors)
-        v.colorAnnotation = 0x00000000; // No annotation yet
-        m_vertexData.append(v);
-    }
-
-    m_indexData.reserve(tris.rows() * 3);
-    for (int i = 0; i < tris.rows(); ++i) {
-        m_indexData.append(tris(i, 0));
-        m_indexData.append(tris(i, 1));
-        m_indexData.append(tris(i, 2));
-    }
-    m_indexCount = m_indexData.size();
-
-    markVertexDirty();
-    m_bAABBDirty = true;
-
-    // Initial coloring based on current visualization mode
-    updateVertexColors();
-
-    m_originalVertexData = m_vertexData;
+    QVector<VertexData> vertices(rr.rows());
+    for (int i = 0; i < rr.rows(); ++i)
+        vertices[i] = {QVector3D(rr(i, 0), rr(i, 1), rr(i, 2)), QVector3D(nn(i, 0), nn(i, 1), nn(i, 2))};
+    QVector<uint32_t> indices(tris.rows() * 3);
+    for (int i = 0; i < tris.rows(); ++i)
+        for (int j = 0; j < 3; ++j)
+            indices[3 * i + j] = tris(i, j);
+    setGeometry(std::move(vertices), std::move(indices), Qt::white);
 }
-
-//=============================================================================================================
 
 //=============================================================================================================
 
 void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface& surf, const QColor& color)
 {
-    m_vertexData.clear();
-    m_indexData.clear();
-    m_curvature.clear(); // BEM has no curvature info usually
+    m_curvature.clear();
 
-    int nVerts = surf.rr.rows();
-    m_vertexData.reserve(nVerts);
-
-    // Compute normals if missing
+    const int nVerts = surf.rr.rows();
     Eigen::MatrixX3f nn = surf.nn;
     if (nn.rows() != nVerts) {
         nn = FSLIB::FsSurface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
     }
-
-    m_defaultColor = color;
-    m_baseColor = color;
-    uint32_t colorVal = packABGR(color.red(), color.green(), color.blue(), color.alpha());
-
-    for (int i = 0; i < nVerts; ++i) {
-        VertexData v;
-        v.pos = QVector3D(surf.rr(i, 0), surf.rr(i, 1), surf.rr(i, 2));
-        v.norm = QVector3D(nn(i, 0), nn(i, 1), nn(i, 2));
-        v.color = colorVal;
-        v.colorAnnotation = 0x00000000;
-        m_vertexData.append(v);
-    }
-
-    int nTris = surf.itris.rows();
-    m_indexData.reserve(nTris * 3);
-    for (int i = 0; i < nTris; ++i) {
-        m_indexData.append(surf.itris(i, 0));
-        m_indexData.append(surf.itris(i, 1));
-        m_indexData.append(surf.itris(i, 2));
-    }
-    m_indexCount = m_indexData.size();
-
-    m_originalVertexData = m_vertexData;
-    markVertexDirty();
+    QVector<VertexData> vertices(nVerts);
+    for (int i = 0; i < nVerts; ++i)
+        vertices[i] = {QVector3D(surf.rr(i, 0), surf.rr(i, 1), surf.rr(i, 2)), QVector3D(nn(i, 0), nn(i, 1), nn(i, 2))};
+    QVector<uint32_t> indices(surf.itris.rows() * 3);
+    for (int i = 0; i < surf.itris.rows(); ++i)
+        for (int j = 0; j < 3; ++j)
+            indices[3 * i + j] = surf.itris(i, j);
+    setGeometry(std::move(vertices), std::move(indices), color);
 }
 
 void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3i& triangles, const QColor& color)
@@ -194,37 +163,16 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen:
 
 void BrainSurface::createFromData(const Eigen::MatrixX3f& vertices, const Eigen::MatrixX3f& normals, const Eigen::MatrixX3i& triangles, const QColor& color)
 {
-    m_vertexData.clear();
-    m_indexData.clear();
     m_curvature.clear();
 
-    int nVerts = vertices.rows();
-    m_vertexData.reserve(nVerts);
-
-    m_defaultColor = color;
-    m_baseColor = color;
-    uint32_t colorVal = packABGR(color.red(), color.green(), color.blue(), color.alpha());
-
-    for (int i = 0; i < nVerts; ++i) {
-        VertexData v;
-        v.pos = QVector3D(vertices(i, 0), vertices(i, 1), vertices(i, 2));
-        v.norm = QVector3D(normals(i, 0), normals(i, 1), normals(i, 2));
-        v.color = colorVal;
-        v.colorAnnotation = 0x00000000;
-        m_vertexData.append(v);
-    }
-
-    int nTris = triangles.rows();
-    m_indexData.reserve(nTris * 3);
-    for (int i = 0; i < nTris; ++i) {
-        m_indexData.append(triangles(i, 0));
-        m_indexData.append(triangles(i, 1));
-        m_indexData.append(triangles(i, 2));
-    }
-    m_indexCount = m_indexData.size();
-
-    m_originalVertexData = m_vertexData;
-    markVertexDirty();
+    QVector<VertexData> verts(vertices.rows());
+    for (int i = 0; i < vertices.rows(); ++i)
+        verts[i] = {QVector3D(vertices(i, 0), vertices(i, 1), vertices(i, 2)), QVector3D(normals(i, 0), normals(i, 1), normals(i, 2))};
+    QVector<uint32_t> indices(triangles.rows() * 3);
+    for (int i = 0; i < triangles.rows(); ++i)
+        for (int j = 0; j < 3; ++j)
+            indices[3 * i + j] = triangles(i, j);
+    setGeometry(std::move(verts), std::move(indices), color);
 }
 
 //=============================================================================================================
@@ -257,13 +205,12 @@ Eigen::MatrixX3f BrainSurface::vertexNormals() const
 
 bool BrainSurface::loadAnnotation(const QString& path)
 {
-    if (!FSLIB::FsAnnotation::read(path, m_annotation)) {
+    FSLIB::FsAnnotation annotation;
+    if (!FSLIB::FsAnnotation::read(path, annotation)) {
         qWarning() << "BrainSurface: Failed to load annotation from" << path;
         return false;
     }
-    m_hasAnnotation = true;
-    updateVertexColors();
-    markVertexDirty();
+    addAnnotation(annotation);
     return true;
 }
 
@@ -271,10 +218,39 @@ void BrainSurface::addAnnotation(const FSLIB::FsAnnotation& annotation)
 {
     m_annotation = annotation;
     m_hasAnnotation = true;
-    updateVertexColors();
-    markVertexDirty();
+
+    // Per-vertex label ids and colours, so hover lookups and drawing need no search
+    const Eigen::VectorXi& vertices = m_annotation.getVertices();
+    const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
+    const FSLIB::FsColortable& ct = m_annotation.getColortable();
+    QHash<int, uint32_t> labelColors;
+    for (int c = 0; c < ct.numEntries; ++c)
+        labelColors.insert(ct.table(c, 4), packABGR(ct.table(c, 0), ct.table(c, 1), ct.table(c, 2)));
+    m_vertexLabelIds.fill(-1, m_vertexData.size());
+    m_annotationColors.fill(0u, m_vertexData.size());
+    for (int i = 0; i < labelIds.rows(); ++i) {
+        const int v = vertices(i);
+        if (v < 0 || v >= m_vertexData.size())
+            continue;
+        m_vertexLabelIds[v] = labelIds(i);
+        m_annotationColors[v] = labelColors.value(labelIds(i), 0u);
+    }
+    ++m_annotationGeneration;
 }
 
+//=============================================================================================================
+
+void BrainSurface::labelElements(int verticesPerElement)
+{
+    if (verticesPerElement <= 0)
+        return;
+    // Alpha 0 keeps element keys apart from atlas colours, which are opaque
+    for (int v = 0; v < m_annotationColors.size(); ++v) {
+        const uint32_t key = uint32_t(v / verticesPerElement + 1);
+        m_annotationColors[v] = packABGR(key & 0xFFu, (key >> 8) & 0xFFu, (key >> 16) & 0xFFu, 0u);
+    }
+    ++m_annotationGeneration;
+}
 
 //=============================================================================================================
 
@@ -287,17 +263,8 @@ void BrainSurface::setVisible(bool visible)
 
 void BrainSurface::setVisualizationMode(VisualizationMode mode)
 {
-    if (m_visMode == mode)
-        return;
-
+    // The colour stream holds the same data in every mode; each view picks the channel by uniform
     m_visMode = mode;
-
-    // Scientific and SourceEstimate both read from the primary colour
-    // channel (v_color).  When switching between them the vertex buffer
-    // must be refreshed so the channel holds curvature grays (Scientific)
-    // or STC colours (SourceEstimate).
-    updateVertexColors();
-    markVertexDirty();
 }
 
 //=============================================================================================================
@@ -307,14 +274,13 @@ void BrainSurface::applySourceEstimateColors(const QVector<uint32_t>& colors)
     m_visMode = ModeSourceEstimate;
     m_stcColors = colors;
 
-    // Write STC colours into the primary color channel. Preserve neutral
-    // curvature grey in alpha so Surface mode can still render the classic
-    // light/dark cortex while RGB is occupied by source-estimate colours.
-    for (int i = 0; i < qMin(colors.size(), m_vertexData.size()); ++i) {
-        m_vertexData[i].color = overCortex(colors[i], curvatureGray(m_curvature, i));
+    // Preserve the neutral curvature grey in alpha so Surface mode can still render the light/dark
+    // cortex while RGB carries the source-estimate colours.
+    const int n = qMin(colors.size(), m_colors.size());
+    for (int i = 0; i < n; ++i) {
+        m_colors[i] = overCortex(colors[i], curvatureGray(m_curvature, i));
     }
-
-    markVertexDirty();
+    ++m_colorGeneration;
 }
 
 //=============================================================================================================
@@ -324,7 +290,6 @@ void BrainSurface::clearSourceEstimateColors()
     m_stcColors.clear();
     m_visMode = ModeSurface;
     updateVertexColors();
-    markVertexDirty();
 }
 
 //=============================================================================================================
@@ -346,100 +311,22 @@ void BrainSurface::setColor(const QColor& color)
 
 void BrainSurface::updateVertexColors()
 {
-    // ── 1. Populate the primary "color" channel.
-    //       Brain surfaces (with curvature): curvature-based gray.
-    //       Non-brain surfaces (BEM, sensors, etc.): use m_baseColor.
-    //       The shader uses this for Scientific mode and as a lighting base;
-    //       in FsSurface mode the shader overrides with white for brain tissue.
-    if (!m_curvature.isEmpty() && m_curvature.size() == m_vertexData.size()) {
-        for (int i = 0; i < m_vertexData.size(); ++i) {
+    // Cortex: curvature grey; other surfaces (BEM, sensors, ...): the base colour
+    if (!m_curvature.isEmpty() && m_curvature.size() == m_colors.size()) {
+        for (int i = 0; i < m_colors.size(); ++i) {
             const uint32_t val = curvatureGray(m_curvature, i);
-            m_vertexData[i].color = packABGR(val, val, val, val);
+            m_colors[i] = packABGR(val, val, val, val);
         }
     } else {
-        // Use the base colour (set via setUseDefaultColor / fromBemSurface).
-        // This preserves BEM Red/Green/Blue colours and sensor colours.
-        const uint32_t baseVal = packABGR(m_baseColor.red(), m_baseColor.green(),
-                                          m_baseColor.blue(), m_baseColor.alpha());
-        for (int i = 0; i < m_vertexData.size(); ++i) {
-            m_vertexData[i].color = baseVal;
-        }
+        m_colors.fill(packABGR(m_baseColor.red(), m_baseColor.green(), m_baseColor.blue(), m_baseColor.alpha()));
     }
 
-    // Always keep STC colours in the primary colour channel when available.
-    // Each viewport selects the overlay mode via a per-draw shader uniform
-    // (overlayMode), so the vertex buffer must hold STC data for any
-    // viewport that shows Source Estimate, regardless of this surface's
-    // m_visMode.  FsAnnotation data lives in a separate vertex attribute
-    // (colorAnnotation) and is unaffected.
-    if (!m_stcColors.isEmpty()) {
-        for (int i = 0; i < qMin(m_stcColors.size(), m_vertexData.size()); ++i) {
-            m_vertexData[i].color = overCortex(m_stcColors[i], curvatureGray(m_curvature, i));
-        }
+    // Source-estimate colours stay in the colour stream: each view selects its overlay by uniform
+    const int n = qMin(m_stcColors.size(), m_colors.size());
+    for (int i = 0; i < n; ++i) {
+        m_colors[i] = overCortex(m_stcColors[i], curvatureGray(m_curvature, i));
     }
-
-    // ── 2. Populate colorAnnotation from loaded annotation data.
-    for (auto& v : m_vertexData) {
-        v.colorAnnotation = 0x00000000;
-    }
-
-    if (m_hasAnnotation && !m_vertexData.isEmpty()) {
-        const Eigen::VectorXi& vertices = m_annotation.getVertices();
-        const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
-        const FSLIB::FsColortable& ct = m_annotation.getColortable();
-
-        for (int i = 0; i < labelIds.rows(); ++i) {
-            int vertexIdx = vertices(i);
-            if (vertexIdx >= 0 && vertexIdx < m_vertexData.size()) {
-                int colorIdx = -1;
-                for (int c = 0; c < ct.numEntries; ++c) {
-                    if (ct.table(c, 4) == labelIds(i)) {
-                        colorIdx = c;
-                        break;
-                    }
-                }
-                if (colorIdx >= 0) {
-                    uint32_t r = ct.table(colorIdx, 0);
-                    uint32_t g = ct.table(colorIdx, 1);
-                    uint32_t b = ct.table(colorIdx, 2);
-                    m_vertexData[vertexIdx].colorAnnotation =
-                        packABGR(r, g, b);
-                }
-            }
-        }
-    }
-
-    // ── 3. Selection highlighting.
-    //       Tint the selected region / vertex range gold in the vertex
-    //       buffer so the user gets precise per-region feedback.
-    if (m_selected) {
-        const uint32_t gold = packABGR(255, 200, 60);
-        if (m_selectedRegionId != -1 && m_hasAnnotation) {
-            // Highlight a specific annotation region
-            const Eigen::VectorXi& vertices = m_annotation.getVertices();
-            const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
-            for (int i = 0; i < labelIds.rows(); ++i) {
-                if (labelIds(i) == m_selectedRegionId) {
-                    int idx = vertices(i);
-                    if (idx >= 0 && idx < m_vertexData.size()) {
-                        m_vertexData[idx].color = gold;
-                        m_vertexData[idx].colorAnnotation = gold;
-                    }
-                }
-            }
-        } else if (m_selectedVertexStart >= 0 && m_selectedVertexCount > 0) {
-            // Highlight a vertex range (e.g. single digitizer sphere)
-            const int end = qMin(m_selectedVertexStart + m_selectedVertexCount,
-                                 m_vertexData.size());
-            for (int i = m_selectedVertexStart; i < end; ++i) {
-                m_vertexData[i].color = gold;
-            }
-        }
-        // Whole-surface selection (no region / vertex range) is handled
-        // by the shader gold glow via the isSelected uniform.
-    }
-
-    markVertexDirty();
+    ++m_colorGeneration;
 }
 
 float BrainSurface::minX() const
@@ -467,8 +354,7 @@ void BrainSurface::translateX(float offset)
     for (auto& v : m_vertexData) {
         v.pos.setX(v.pos.x() + offset);
     }
-    markVertexDirty();
-    m_bAABBDirty = true;
+    markGeometryDirty();
 }
 
 //=============================================================================================================
@@ -500,73 +386,19 @@ void BrainSurface::transform(const QMatrix4x4& m)
         float nz = d[2] * v.norm.x() + d[5] * v.norm.y() + d[8] * v.norm.z();
         v.norm = QVector3D(nx, ny, nz).normalized();
     }
-    markVertexDirty();
-    m_bAABBDirty = true;
+    markGeometryDirty();
 }
 
 //=============================================================================================================
 
 void BrainSurface::applyTransform(const QMatrix4x4& m)
 {
-    // Only the geometry is reset; colours and overlays set since loading stay
-    for (int i = 0; i < qMin(m_vertexData.size(), m_originalVertexData.size()); ++i) {
-        m_vertexData[i].pos = m_originalVertexData[i].pos;
-        m_vertexData[i].norm = m_originalVertexData[i].norm;
-    }
+    m_vertexData = m_originalVertexData;
     if (!m.isIdentity()) {
         transform(m);
     } else {
-        markVertexDirty();
-        m_bAABBDirty = true;
+        markGeometryDirty();
     }
-}
-
-//=============================================================================================================
-
-void BrainSurface::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
-{
-    const bool needsCreate = !m_gpu->vertexBuffer || !m_gpu->indexBuffer;
-
-    // The VBO is Immutable.  Nothing to do unless the data has
-    // actually changed (markVertexDirty()) or the buffer hasn't been
-    // created yet.  When dirty we recreate the VBO below to swap in the
-    // new vertex data — this is intentional: an Immutable buffer cannot
-    // be partially updated, and STC colour animation modifies the colour
-    // channel of every vertex anyway.
-    if (!m_gpu->dirty && !needsCreate)
-        return;
-
-    const quint32 vbufSize = static_cast<quint32>(m_vertexData.size() * sizeof(VertexData));
-    const quint32 ibufSize = static_cast<quint32>(m_indexData.size() * sizeof(uint32_t));
-
-    // Recreate the Immutable VBO whenever data is dirty so the
-    // new vertex contents take effect.  Using Immutable (re-created on
-    // change) instead of QRhiBuffer::Dynamic avoids two issues with
-    // Dynamic buffers on Metal/Vulkan for multi-MB vertex data:
-    //   1) Dynamic is documented as intended for small, frequently-updated
-    //      payloads (UBOs); large Dynamic buffers exhibit unstable
-    //      behaviour across in-flight slot rotation, including stale-slot
-    //      reads (frozen STC frames) and out-of-range geometry artefacts
-    //      ("stretched triangle" glitches).
-    //   2) Each in-flight frame slot allocates its own physical buffer,
-    //      multiplying memory pressure ~3x for every visible surface.
-    if (!m_gpu->vertexBuffer || m_gpu->dirty) {
-        m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
-        m_gpu->vertexBuffer->create();
-        m_gpu->indexDirty = true; // new VBO implies IBO also needs upload
-    }
-    if (!m_gpu->indexBuffer) {
-        m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, ibufSize));
-        m_gpu->indexBuffer->create();
-        m_gpu->indexDirty = true;
-    }
-
-    u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
-    if (m_gpu->indexDirty) {
-        u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
-        m_gpu->indexDirty = false;
-    }
-    m_gpu->dirty = false;
 }
 
 //=============================================================================================================
@@ -652,6 +484,8 @@ void BrainSurface::boundingBox(QVector3D& min, QVector3D& max) const
     m_aabbMax = max;
     m_bAABBDirty = false;
 }
+
+//=============================================================================================================
 
 bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist, int& vertexIdx) const
 {
@@ -789,29 +623,14 @@ bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDi
 
 QString BrainSurface::getAnnotationLabel(int vertexIdx) const
 {
-    if (!m_hasAnnotation || vertexIdx < 0 || vertexIdx >= m_vertexData.size()) {
+    if (!m_hasAnnotation || vertexIdx < 0 || vertexIdx >= m_vertexLabelIds.size()) {
         return "";
     }
-
-    const Eigen::VectorXi& vertices = m_annotation.getVertices();
-    const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
-    const FSLIB::FsColortable& ct = m_annotation.getColortable();
-
-    // The .annot file might not contain all vertices if it's sparse,
-    // but usually it contains a mapping for all.
-    // Let's find the labelId for this vertex.
-    int labelId = -1;
-    for (int i = 0; i < vertices.rows(); ++i) {
-        if (vertices(i) == vertexIdx) {
-            labelId = labelIds(i);
-            break;
-        }
-    }
-
+    const int labelId = m_vertexLabelIds[vertexIdx];
     if (labelId == -1)
         return "Unknown";
 
-    // Find the name in colortable
+    const FSLIB::FsColortable& ct = m_annotation.getColortable();
     for (int i = 0; i < ct.numEntries; ++i) {
         if (ct.table(i, 4) == labelId) {
             QString name = ct.struct_names[i];
@@ -828,38 +647,39 @@ QString BrainSurface::getAnnotationLabel(int vertexIdx) const
 
 int BrainSurface::getAnnotationLabelId(int vertexIdx) const
 {
-    if (!m_hasAnnotation || vertexIdx < 0)
+    if (!m_hasAnnotation || vertexIdx < 0 || vertexIdx >= m_vertexLabelIds.size())
         return -1;
-
-    const Eigen::VectorXi& vertices = m_annotation.getVertices();
-    const Eigen::VectorXi& labelIds = m_annotation.getLabelIds();
-
-    for (int i = 0; i < vertices.rows(); ++i) {
-        if (vertices(i) == vertexIdx) {
-            return labelIds(i);
-        }
-    }
-
-    return -1;
+    return m_vertexLabelIds[vertexIdx];
 }
 
 void BrainSurface::setSelectedRegion(int regionId)
 {
     m_selectedRegionId = regionId;
-    updateVertexColors();
 }
 
 void BrainSurface::setSelected(bool selected)
 {
     m_selected = selected;
-    updateVertexColors();
 }
 
 void BrainSurface::setSelectedVertexRange(int start, int count)
 {
     m_selectedVertexStart = start;
     m_selectedVertexCount = count;
-    updateVertexColors();
+}
+
+std::optional<uint32_t> BrainSurface::selectedLabel() const
+{
+    if (m_selectedVertexStart >= 0 && m_selectedVertexCount > 0 && m_selectedVertexStart < m_annotationColors.size())
+        return m_annotationColors[m_selectedVertexStart];
+    if (m_selected && m_selectedRegionId != -1 && m_hasAnnotation) {
+        const FSLIB::FsColortable& ct = m_annotation.getColortable();
+        for (int c = 0; c < ct.numEntries; ++c) {
+            if (ct.table(c, 4) == m_selectedRegionId)
+                return packABGR(ct.table(c, 0), ct.table(c, 1), ct.table(c, 2));
+        }
+    }
+    return std::nullopt;
 }
 
 } // namespace DISP3DLIB

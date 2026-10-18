@@ -6,6 +6,7 @@ layout(location = 2) in vec3 v_color;
 layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
 layout(location = 5) in vec3 v_annotColor;
+layout(location = 6) in float v_highlight;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -17,7 +18,9 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
+    float selectedLabelActive;
     float _pad2;
+    vec4 selectedLabel; // annotation key of the highlighted region or element
 };
 
 void main() {
@@ -36,6 +39,8 @@ void main() {
     } else {
         effectiveColor = v_color; // Scientific / STC
     }
+    if (v_highlight > 0.5)
+        effectiveColor = vec3(1.0, 0.784, 0.235); // Highlighted region or element
 
     // === DATA DETECTION (Saturation) ===
     float gray_val = dot(effectiveColor, vec3(0.299, 0.587, 0.114));

@@ -32,7 +32,10 @@
 
 #include "../disp3D_global.h"
 
+#include <QtGlobal>
+
 #include <cstdint>
+#include <memory>
 
 namespace DISP3DLIB
 {
@@ -83,6 +86,72 @@ enum VisualizationMode
     ModeAnnotation,    /**< Atlas / parcellation annotation colours. */
     ModeScientific,    /**< Scientific colourmap (curvature). */
     ModeSourceEstimate /**< Source-estimate overlay colours. */
+};
+
+//=============================================================================================================
+/**
+ * @brief CPU-side contents of one GPU buffer of a renderable.
+ *
+ * Renderables own only CPU data; the renderer keeps the GPU copies and uploads a stream again
+ * when its generation changes. The data must stay valid until the next change of the renderable.
+ */
+struct GpuStream
+{
+    const void* data = nullptr; /**< First byte, or nullptr when the stream is empty. */
+    quint32 bytes = 0;          /**< Size in bytes. */
+    quint64 generation = 0;     /**< Bumped by the owner on every change of the data. */
+};
+
+//=============================================================================================================
+/**
+ * @brief CPU streams of an instanced mesh: one shape (vertices, indices) drawn once per instance.
+ */
+struct InstancedStreams
+{
+    GpuStream vertices;    /**< Shape vertices. */
+    GpuStream indices;     /**< Shape triangle indices (uint32). */
+    GpuStream instances;   /**< Per-instance data. */
+    int indexCount = 0;    /**< Number of indices of the shape. */
+    int instanceCount = 0; /**< Number of instances. */
+};
+
+//=============================================================================================================
+/**
+ * @brief Identity of a renderable in the renderer's GPU resource cache.
+ *
+ * The renderer drops the GPU copies of a renderable once its key is destroyed. A copied
+ * renderable gets a key of its own, so it never shares GPU buffers with the original.
+ */
+class RenderKey
+{
+public:
+    RenderKey()
+    : m_token(std::make_shared<char>())
+    {
+    }
+    RenderKey(const RenderKey&)
+    : RenderKey()
+    {
+    }
+    RenderKey& operator=(const RenderKey&)
+    {
+        return *this;
+    }
+
+    /** @return Address that identifies the renderable while it lives. */
+    const void* id() const
+    {
+        return m_token.get();
+    }
+
+    /** @return Token that expires when the renderable is destroyed. */
+    std::weak_ptr<const void> token() const
+    {
+        return m_token;
+    }
+
+private:
+    std::shared_ptr<char> m_token;
 };
 
 } // namespace DISP3DLIB

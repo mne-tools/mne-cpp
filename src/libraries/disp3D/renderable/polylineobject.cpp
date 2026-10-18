@@ -24,7 +24,6 @@
 #include <QQuaternion>
 #include <QVector3D>
 #include <QtMath>
-#include <rhi/qrhi.h>
 
 namespace DISP3DLIB
 {
@@ -32,13 +31,6 @@ namespace DISP3DLIB
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
-
-struct PolylineObject::GpuResources
-{
-    std::unique_ptr<QRhiBuffer> vertexBuffer;
-    std::unique_ptr<QRhiBuffer> indexBuffer;
-    std::unique_ptr<QRhiBuffer> instanceBuffer;
-};
 
 //=============================================================================================================
 
@@ -49,9 +41,6 @@ PolylineObject::PolylineObject()
 , m_startColor(QColor(60, 120, 255))
 , m_endColor(QColor(255, 80, 40))
 , m_bVisible(true)
-, m_bGeometryDirty(true)
-, m_bInstancesDirty(false)
-, m_gpu(std::make_unique<GpuResources>())
 {
     createSegmentGeometry();
 }
@@ -82,7 +71,7 @@ void PolylineObject::clear()
     m_vecPoints.clear();
     m_instanceData.clear();
     m_iInstanceCount = 0;
-    m_bInstancesDirty = false;
+    ++m_instanceGeneration;
 }
 
 //=============================================================================================================
@@ -152,7 +141,7 @@ void PolylineObject::createSegmentGeometry()
     m_indexData = QByteArray(reinterpret_cast<const char*>(indices.data()),
                              static_cast<qsizetype>(indices.size() * sizeof(quint32)));
     m_iIndexCount = static_cast<int>(indices.size());
-    m_bGeometryDirty = true;
+    ++m_geometryGeneration;
 }
 
 //=============================================================================================================
@@ -220,66 +209,18 @@ void PolylineObject::buildInstances()
     m_instanceData = QByteArray(reinterpret_cast<const char*>(instances.data()),
                                 static_cast<qsizetype>(instances.size() * sizeof(InstanceData)));
     m_iInstanceCount = static_cast<int>(instances.size());
-    m_bInstancesDirty = m_iInstanceCount > 0;
+    ++m_instanceGeneration;
 }
 
 //=============================================================================================================
 
-void PolylineObject::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
+InstancedStreams PolylineObject::streams() const
 {
-    if (m_bGeometryDirty) {
-        if (!m_gpu->vertexBuffer) {
-            m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable,
-                                                     QRhiBuffer::VertexBuffer,
-                                                     m_vertexData.size()));
-            m_gpu->vertexBuffer->create();
-        }
-        if (!m_gpu->indexBuffer) {
-            m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable,
-                                                    QRhiBuffer::IndexBuffer,
-                                                    m_indexData.size()));
-            m_gpu->indexBuffer->create();
-        }
-
-        u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
-        u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
-        m_bGeometryDirty = false;
-    }
-
-    if (m_bInstancesDirty && m_iInstanceCount > 0) {
-        const int iRequiredSize = m_instanceData.size();
-
-        if (!m_gpu->instanceBuffer || m_gpu->instanceBuffer->size() < static_cast<quint32>(iRequiredSize)) {
-            m_gpu->instanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
-                                                       QRhiBuffer::VertexBuffer,
-                                                       iRequiredSize));
-            m_gpu->instanceBuffer->create();
-        }
-
-        u->updateDynamicBuffer(m_gpu->instanceBuffer.get(), 0, iRequiredSize, m_instanceData.constData());
-        m_bInstancesDirty = false;
-    }
-}
-
-//=============================================================================================================
-
-QRhiBuffer* PolylineObject::vertexBuffer() const
-{
-    return m_gpu->vertexBuffer.get();
-}
-
-//=============================================================================================================
-
-QRhiBuffer* PolylineObject::indexBuffer() const
-{
-    return m_gpu->indexBuffer.get();
-}
-
-//=============================================================================================================
-
-QRhiBuffer* PolylineObject::instanceBuffer() const
-{
-    return m_gpu->instanceBuffer.get();
+    return {{m_vertexData.constData(), quint32(m_vertexData.size()), m_geometryGeneration},
+            {m_indexData.constData(), quint32(m_indexData.size()), m_geometryGeneration},
+            {m_instanceData.constData(), quint32(m_iInstanceCount * sizeof(InstanceData)), m_instanceGeneration},
+            m_iIndexCount,
+            m_iInstanceCount};
 }
 
 } // namespace DISP3DLIB

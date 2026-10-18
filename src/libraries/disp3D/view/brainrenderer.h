@@ -158,8 +158,17 @@ public:
      * uploads into resource update batches. Then beginFrame() commits them, and the issue*()
      * calls only bind and draw: QRhi forbids resource updates inside a render pass, and prepare
      * calls made inside one are rejected with a warning.
+     *
+     * The renderer owns the GPU copies of the renderables' streams. They are created on the first
+     * draw, updated when a stream's generation changes, and freed once the renderable is
+     * destroyed or has not been drawn for a while.
      */
     void newFrame();
+
+    /**
+     * @return Number of renderables whose GPU copies the renderer currently holds.
+     */
+    int cachedMeshCount() const;
 
     //=========================================================================================================
     /**
@@ -182,7 +191,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Write the uniforms of one surface draw into a resource update batch.
+     * Upload the surface's streams if they changed and write the uniforms of one surface draw.
      *
      * @param[in] u          Resource update batch, committed before the pass.
      * @param[in] data       Scene uniforms (MVP, light, etc).
@@ -203,40 +212,59 @@ public:
 
     //=========================================================================================================
     /**
-     * Write the uniforms shared by the instanced draws (dipoles, network, polylines) of one view.
-     *
-     * Their geometry is uploaded by the objects' own updateBuffers() calls.
+     * Upload the dipoles' streams if they changed and write the uniforms of their draw.
      *
      * @param[in] u          Resource update batch, committed before the pass.
      * @param[in] data       Scene uniforms.
-     * @return Uniform buffer offset, or -1 on failure.
+     * @param[in] dipoles    Pointer to DipoleObject.
+     * @return Uniform buffer offset, or -1 when nothing is drawn.
      */
-    int prepareInstancedDraw(QRhiResourceUpdateBatch* u, const SceneData& data);
+    int prepareDipoleDraw(QRhiResourceUpdateBatch* u, const SceneData& data, DipoleObject* dipoles);
 
     /**
      * Draw dipoles as instanced cones. Call inside a pass.
      *
      * @param[in] cb             Command buffer.
      * @param[in] dipoles        Pointer to DipoleObject.
-     * @param[in] uniformOffset  Offset returned by prepareInstancedDraw().
+     * @param[in] uniformOffset  Offset returned by prepareDipoleDraw().
      */
     void issueDipoleDraw(QRhiCommandBuffer* cb, DipoleObject* dipoles, int uniformOffset);
+
+    /**
+     * Upload the network's streams if they changed and write the uniforms of its draws.
+     *
+     * @param[in] u          Resource update batch, committed before the pass.
+     * @param[in] data       Scene uniforms.
+     * @param[in] network    Pointer to NetworkObject.
+     * @return Uniform buffer offset, or -1 when nothing is drawn.
+     */
+    int prepareNetworkDraw(QRhiResourceUpdateBatch* u, const SceneData& data, NetworkObject* network);
 
     /**
      * Draw a connectivity network: instanced node spheres and edge cylinders. Call inside a pass.
      *
      * @param[in] cb             Command buffer.
      * @param[in] network        Pointer to NetworkObject.
-     * @param[in] uniformOffset  Offset returned by prepareInstancedDraw().
+     * @param[in] uniformOffset  Offset returned by prepareNetworkDraw().
      */
     void issueNetworkDraw(QRhiCommandBuffer* cb, NetworkObject* network, int uniformOffset);
+
+    /**
+     * Upload the polyline's streams if they changed and write the uniforms of its draw.
+     *
+     * @param[in] u          Resource update batch, committed before the pass.
+     * @param[in] data       Scene uniforms.
+     * @param[in] polyline   Pointer to PolylineObject.
+     * @return Uniform buffer offset, or -1 when nothing is drawn.
+     */
+    int preparePolylineDraw(QRhiResourceUpdateBatch* u, const SceneData& data, PolylineObject* polyline);
 
     /**
      * Draw a polyline as connected segments. Call inside a pass.
      *
      * @param[in] cb             Command buffer.
      * @param[in] polyline       Pointer to PolylineObject.
-     * @param[in] uniformOffset  Offset returned by prepareInstancedDraw().
+     * @param[in] uniformOffset  Offset returned by preparePolylineDraw().
      */
     void issuePolylineDraw(QRhiCommandBuffer* cb, PolylineObject* polyline, int uniformOffset);
 

@@ -10,6 +10,7 @@ layout(location = 1) out vec3 v_color;
 layout(location = 2) out vec3 v_worldPos;
 layout(location = 3) out vec3 v_annotColor;
 layout(location = 4) out float v_curvatureGray;
+layout(location = 5) out float v_highlight;
 
 layout(std140, binding = 0) uniform UniformBlock {
     mat4 mvp;
@@ -19,7 +20,9 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
+    float selectedLabelActive;
     float _pad2;
+    vec4 selectedLabel; // annotation key of the highlighted region or element
 };
 
 void main() {
@@ -28,5 +31,7 @@ void main() {
     v_color = color.rgb;
     v_annotColor = annotColor.rgb;
     v_curvatureGray = color.a;
+    v_highlight = (selectedLabelActive > 0.5
+                   && all(lessThan(abs(annotColor - selectedLabel), vec4(0.5 / 255.0)))) ? 1.0 : 0.0;
     gl_Position = mvp * vec4(position, 1.0);
 }

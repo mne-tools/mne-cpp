@@ -6,6 +6,7 @@ layout(location = 2) in vec3 v_color;
 layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
 layout(location = 5) in vec3 v_annotColor;
+layout(location = 6) in float v_highlight;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -17,7 +18,9 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
+    float selectedLabelActive;
     float _pad2;
+    vec4 selectedLabel; // annotation key of the highlighted region or element
 };
 
 // Anatomically realistic tissue colors
@@ -45,25 +48,6 @@ vec3 getSkullColor(float isInner) {
     return mix(outerSkull, innerSkull, isInner);
 }
 
-// Detect if a vertex color indicates selection (gold-tinted, not grayscale)
-// Only valid for brain tissue where base colors are grayscale
-float detectBrainSelection(vec3 color, float curvatureVal) {
-    // Brain vertices start as grayscale (R ≈ G ≈ B from curvature)
-    // Selected vertices are blended towards gold (R > G > B)
-    
-    // Check if there's a warm tint added to grayscale
-    float warmth = color.r - color.b;  // Positive for warm (gold) colors
-    
-    // For grayscale, R-B should be near 0. Gold blend adds warmth.
-    // Threshold tuned for 40% gold blend from brainsurface.cpp
-    // Gold = (255, 200, 80) normalized ≈ (1.0, 0.78, 0.31)
-    // Blended: R increases, B stays lower
-    
-    float selectionStrength = smoothstep(0.08, 0.20, warmth);
-    
-    return selectionStrength;
-}
-
 void main() {
     // Normalize interpolated vectors
     vec3 N = normalize(v_normal);
@@ -73,15 +57,8 @@ void main() {
     
     int tissue = int(tissueType + 0.5);  // Round to nearest int
     
-    // Detect per-vertex selection ONLY for brain tissue
-    // (Skin/skull have inherent warm colors that would false-positive)
-    float vertexSelected = 0.0;
-    if (tissue == 1) {
-        vertexSelected = detectBrainSelection(v_color, v_curvature);
-    }
-    
-    // Combine with uniform selection (whole surface selected)
-    float effectiveSelection = max(isSelected, vertexSelected);
+    // Whole surface selected, or a highlighted region or element
+    float effectiveSelection = max(isSelected, v_highlight);
     
     // Determine base color based on tissue type
     vec3 baseColor;
@@ -128,6 +105,9 @@ void main() {
         }
     } else if (overlayMode > 2.5) {
         baseColor = v_color;        // Source Estimate
+    }
+    if (v_highlight > 0.5 && ((overlayMode > 0.5 && overlayMode < 1.5) || overlayMode > 2.5)) {
+        baseColor = vec3(1.0, 0.784, 0.235); // Highlighted region in a colour overlay
     }
 
     // === LIGHTING ===

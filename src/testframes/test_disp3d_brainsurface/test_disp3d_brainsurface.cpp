@@ -19,6 +19,7 @@
 #include <disp3D/renderable/brainsurface.h>
 #include <disp3D/geometry/meshfactory.h>
 #include <disp3D/core/rendertypes.h>
+#include <fs/fs_annotation.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -36,6 +37,8 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+#include <cmath>
 
 using namespace DISP3DLIB;
 
@@ -69,6 +72,10 @@ private slots:
 
     // ── Source estimate colors ────────────────────────────────────────
     void testApplySourceEstimateColors();
+
+    // Selection highlight
+    void testHighlightTouchesNoStream();
+    void testElementLabels();
 
     // ── MeshFactory ───────────────────────────────────────────────────
     void testMeshFactorySphere();
@@ -336,15 +343,74 @@ void TestDisp3dBrainSurface::testApplySourceEstimateColors()
     colors.append(packABGR(0, 0, 255)); // Blue
 
     surf.applySourceEstimateColors(colors);
-    QCOMPARE(surf.vertexDataRef()[0].color & 0x00FFFFFFu, packABGR(255, 0, 0) & 0x00FFFFFFu);
+    QCOMPARE(surf.colorsRef()[0] & 0x00FFFFFFu, packABGR(255, 0, 0) & 0x00FFFFFFu);
 
     // The shader draws only RGB, so overlay alpha must be blended over the cortex grey (0xAA without curvature).
     surf.applySourceEstimateColors({packABGR(255, 0, 0, 0), packABGR(255, 0, 0, 51), packABGR(0, 0, 255)});
-    QCOMPARE(surf.vertexDataRef()[0].color & 0x00FFFFFFu, packABGR(0xAA, 0xAA, 0xAA) & 0x00FFFFFFu);
-    QCOMPARE(surf.vertexDataRef()[1].color & 0x00FFFFFFu, packABGR(187, 136, 136) & 0x00FFFFFFu);
-    QCOMPARE(surf.vertexDataRef()[2].color & 0x00FFFFFFu, packABGR(0, 0, 255) & 0x00FFFFFFu);
+    QCOMPARE(surf.colorsRef()[0] & 0x00FFFFFFu, packABGR(0xAA, 0xAA, 0xAA) & 0x00FFFFFFu);
+    QCOMPARE(surf.colorsRef()[1] & 0x00FFFFFFu, packABGR(187, 136, 136) & 0x00FFFFFFu);
+    QCOMPARE(surf.colorsRef()[2] & 0x00FFFFFFu, packABGR(0, 0, 255) & 0x00FFFFFFu);
     surf.setUseDefaultColor(true); // rebuilds the vertex colours from the stored overlay
-    QCOMPARE(surf.vertexDataRef()[1].color & 0x00FFFFFFu, packABGR(187, 136, 136) & 0x00FFFFFFu);
+    QCOMPARE(surf.colorsRef()[1] & 0x00FFFFFFu, packABGR(187, 136, 136) & 0x00FFFFFFu);
+}
+
+//=============================================================================================================
+// Selection highlight
+//=============================================================================================================
+
+void TestDisp3dBrainSurface::testHighlightTouchesNoStream()
+{
+    BrainSurface surf;
+    createQuadSurface(surf);
+
+    // Two regions: vertices 0, 1 in "a" (red), 2, 3 in "b" (green); FreeSurfer ids are R + G*256 + B*65536
+    FSLIB::FsAnnotation annotation;
+    annotation.getVertices() = (Eigen::VectorXi(4) << 0, 1, 2, 3).finished();
+    const int idA = 200;
+    const int idB = 100 * 256;
+    annotation.getLabelIds() = (Eigen::VectorXi(4) << idA, idA, idB, idB).finished();
+    FSLIB::FsColortable& ct = annotation.getColortable();
+    ct.numEntries = 2;
+    ct.struct_names = {QStringLiteral("a"), QStringLiteral("b")};
+    ct.table = (Eigen::MatrixXi(2, 5) << 200, 0, 0, 0, idA, 0, 100, 0, 0, idB).finished();
+    surf.addAnnotation(annotation);
+    QCOMPARE(surf.getAnnotationLabelId(3), idB);
+    QCOMPARE(surf.getAnnotationLabel(0), QStringLiteral("a"));
+    QCOMPARE(surf.annotationColorsRef()[2], packABGR(0, 100, 0));
+    QVERIFY(!surf.selectedLabel());
+
+    // Hovering only sets uniforms: no stream is touched, so nothing is re-uploaded
+    const quint64 geometry = surf.geometryStream().generation;
+    const quint64 colors = surf.colorStream().generation;
+    const quint64 annotations = surf.annotationStream().generation;
+    surf.setSelected(true);
+    QVERIFY(!surf.selectedLabel());
+    surf.setSelectedRegion(idB);
+    QCOMPARE(surf.selectedLabel(), std::optional<uint32_t>(packABGR(0, 100, 0)));
+    surf.setSelectedRegion(-1);
+    surf.setSelected(false);
+    QVERIFY(!surf.selectedLabel());
+    QCOMPARE(surf.geometryStream().generation, geometry);
+    QCOMPARE(surf.colorStream().generation, colors);
+    QCOMPARE(surf.annotationStream().generation, annotations);
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainSurface::testElementLabels()
+{
+    // Two batched elements of two vertices each; a vertex range highlights one without selecting the surface
+    BrainSurface surf;
+    createQuadSurface(surf);
+    surf.labelElements(2);
+    const QVector<uint32_t>& keys = surf.annotationColorsRef();
+    QCOMPARE(keys[0], keys[1]);
+    QVERIFY(keys[1] != keys[2]);
+    QCOMPARE(keys[2] >> 24, 0u); // transparent, so never equal to an opaque atlas colour
+    surf.setSelectedVertexRange(2, 2);
+    QCOMPARE(surf.selectedLabel(), std::optional<uint32_t>(keys[2]));
+    surf.setSelectedVertexRange(-1, 0);
+    QVERIFY(!surf.selectedLabel());
 }
 
 //=============================================================================================================

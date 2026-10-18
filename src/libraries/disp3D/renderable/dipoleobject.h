@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Instanced-arrow renderable for fitted equivalent current dipoles, driven by QRhi instancing.
+ * @brief    Instanced-arrow renderable for fitted equivalent current dipoles.
  *
  * DipoleObject converts an @ref INVLIB::InvEcdSet into a single
  * arrow mesh (cone + shaft) plus a per-dipole @c DipoleObject::InstanceData
@@ -31,6 +31,8 @@
 
 #include "../disp3D_global.h"
 
+#include "../core/rendertypes.h"
+
 #include <QMatrix4x4>
 #include <QVector>
 #include <QVector3D>
@@ -38,20 +40,15 @@
 #include <memory>
 #include <inv/dipole_fit/inv_ecd_set.h>
 
-// Forward-declare QRhi types so that this header stays QRhi-free
-class QRhi;
-class QRhiBuffer;
-class QRhiResourceUpdateBatch;
-
 namespace DISP3DLIB
 {
 
 //=============================================================================================================
 /**
  * Renderable dipole object that builds instanced arrow geometry from an InvEcdSet
- * and manages GPU buffers for QRhi-based rendering.
+ * and provides its CPU streams for instanced rendering.
  *
- * @brief Renderable dipole arrow set with instanced GPU rendering for QRhi.
+ * @brief Renderable dipole arrow set with instanced GPU rendering.
  *
  * @snippet ex_disp3d_scene/main.cpp dipole_object_usage
  */
@@ -66,11 +63,14 @@ public:
     // Place all loaded dipoles with this transform (replaces any previous one)
     void applyTransform(const QMatrix4x4& trans);
 
-    void updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
+    /** @return CPU streams of the arrow shape and of one instance per dipole. */
+    InstancedStreams streams() const;
 
-    QRhiBuffer* vertexBuffer() const;
-    QRhiBuffer* indexBuffer() const;
-    QRhiBuffer* instanceBuffer() const;
+    /** @return Identity of this object in the renderer's GPU cache. */
+    const RenderKey& renderKey() const
+    {
+        return m_renderKey;
+    }
 
     int indexCount() const
     {
@@ -116,9 +116,7 @@ public:
 private:
     void createGeometry();
 
-    /** @brief QRhi vertex, index, and instance buffers for dipole arrow GPU rendering. */
-    struct GpuBuffers;
-    std::unique_ptr<GpuBuffers> m_gpu;
+    RenderKey m_renderKey;
 
     int m_indexCount = 0;
     int m_instanceCount = 0;
@@ -149,8 +147,8 @@ private:
     QByteArray m_instanceData;
     QVector<QMatrix4x4> m_loadedModels; /**< Instance model matrices as loaded, before applyTransform(). */
 
-    bool m_geometryDirty = false;
-    bool m_instancesDirty = false;
+    quint64 m_geometryGeneration = 0;
+    quint64 m_instanceGeneration = 0;
 
     std::vector<QVector4D> m_originalColors;
 };

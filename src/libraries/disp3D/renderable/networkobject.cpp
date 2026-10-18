@@ -16,8 +16,6 @@
 
 #include "networkobject.h"
 
-#include <rhi/qrhi.h>
-
 #include <connectivity/network/networknode.h>
 #include <connectivity/network/networkedge.h>
 #include <disp/plots/helpers/colormap.h>
@@ -34,29 +32,10 @@ namespace DISP3DLIB
 {
 
 //=============================================================================================================
-// PIMPL
-//=============================================================================================================
-
-struct NetworkObject::GpuBuffers
-{
-    // Node buffers
-    std::unique_ptr<QRhiBuffer> nodeVertexBuffer;
-    std::unique_ptr<QRhiBuffer> nodeIndexBuffer;
-    std::unique_ptr<QRhiBuffer> nodeInstanceBuffer;
-    // Edge buffers
-    std::unique_ptr<QRhiBuffer> edgeVertexBuffer;
-    std::unique_ptr<QRhiBuffer> edgeIndexBuffer;
-    std::unique_ptr<QRhiBuffer> edgeInstanceBuffer;
-};
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NetworkObject::NetworkObject()
-: m_gpu(std::make_unique<GpuBuffers>())
-{
-}
+NetworkObject::NetworkObject() = default;
 
 //=============================================================================================================
 
@@ -64,29 +43,22 @@ NetworkObject::~NetworkObject() = default;
 
 //=============================================================================================================
 
-QRhiBuffer* NetworkObject::nodeVertexBuffer() const
+InstancedStreams NetworkObject::nodeStreams() const
 {
-    return m_gpu->nodeVertexBuffer.get();
+    return {{m_nodeVertexData.constData(), quint32(m_nodeVertexData.size()), m_nodeGeometryGeneration},
+            {m_nodeIndexData.constData(), quint32(m_nodeIndexData.size()), m_nodeGeometryGeneration},
+            {m_nodeInstanceData.constData(), quint32(m_nodeInstanceCount * sizeof(InstanceData)), m_nodeInstanceGeneration},
+            m_nodeIndexCount,
+            m_nodeInstanceCount};
 }
-QRhiBuffer* NetworkObject::nodeIndexBuffer() const
+
+InstancedStreams NetworkObject::edgeStreams() const
 {
-    return m_gpu->nodeIndexBuffer.get();
-}
-QRhiBuffer* NetworkObject::nodeInstanceBuffer() const
-{
-    return m_gpu->nodeInstanceBuffer.get();
-}
-QRhiBuffer* NetworkObject::edgeVertexBuffer() const
-{
-    return m_gpu->edgeVertexBuffer.get();
-}
-QRhiBuffer* NetworkObject::edgeIndexBuffer() const
-{
-    return m_gpu->edgeIndexBuffer.get();
-}
-QRhiBuffer* NetworkObject::edgeInstanceBuffer() const
-{
-    return m_gpu->edgeInstanceBuffer.get();
+    return {{m_edgeVertexData.constData(), quint32(m_edgeVertexData.size()), m_edgeGeometryGeneration},
+            {m_edgeIndexData.constData(), quint32(m_edgeIndexData.size()), m_edgeGeometryGeneration},
+            {m_edgeInstanceData.constData(), quint32(m_edgeInstanceCount * sizeof(InstanceData)), m_edgeInstanceGeneration},
+            m_edgeIndexCount,
+            m_edgeInstanceCount};
 }
 
 //=============================================================================================================
@@ -261,7 +233,7 @@ void NetworkObject::createNodeGeometry()
     m_nodeIndexData.resize(indices.size() * sizeof(uint32_t));
     memcpy(m_nodeIndexData.data(), indices.data(), m_nodeIndexData.size());
 
-    m_nodeGeometryDirty = true;
+    ++m_nodeGeometryGeneration;
 }
 
 //=============================================================================================================
@@ -354,7 +326,7 @@ void NetworkObject::createEdgeGeometry()
     m_edgeIndexData.resize(indices.size() * sizeof(uint32_t));
     memcpy(m_edgeIndexData.data(), indices.data(), m_edgeIndexData.size());
 
-    m_edgeGeometryDirty = true;
+    ++m_edgeGeometryGeneration;
 }
 
 //=============================================================================================================
@@ -363,7 +335,7 @@ void NetworkObject::buildNodeInstances()
 {
     if (m_network.isEmpty()) {
         m_nodeInstanceCount = 0;
-        m_nodeInstancesDirty = true;
+        ++m_nodeInstanceGeneration;
         return;
     }
 
@@ -424,7 +396,7 @@ void NetworkObject::buildNodeInstances()
     if (m_nodeInstanceCount > 0) {
         memcpy(m_nodeInstanceData.data(), instances.data(), m_nodeInstanceData.size());
     }
-    m_nodeInstancesDirty = true;
+    ++m_nodeInstanceGeneration;
 
     qDebug() << "NetworkObject: Built" << m_nodeInstanceCount << "node instances";
 }
@@ -435,7 +407,7 @@ void NetworkObject::buildEdgeInstances()
 {
     if (m_network.isEmpty()) {
         m_edgeInstanceCount = 0;
-        m_edgeInstancesDirty = true;
+        ++m_edgeInstanceGeneration;
         return;
     }
 
@@ -523,67 +495,11 @@ void NetworkObject::buildEdgeInstances()
     if (m_edgeInstanceCount > 0) {
         memcpy(m_edgeInstanceData.data(), instances.data(), m_edgeInstanceData.size());
     }
-    m_edgeInstancesDirty = true;
+    ++m_edgeInstanceGeneration;
 
     qDebug() << "NetworkObject: Built" << m_edgeInstanceCount << "edge instances";
 }
 
 //=============================================================================================================
-
-void NetworkObject::updateNodeBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
-{
-    if (m_nodeGeometryDirty) {
-        if (!m_gpu->nodeVertexBuffer) {
-            m_gpu->nodeVertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_nodeVertexData.size()));
-            m_gpu->nodeVertexBuffer->create();
-        }
-        if (!m_gpu->nodeIndexBuffer) {
-            m_gpu->nodeIndexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_nodeIndexData.size()));
-            m_gpu->nodeIndexBuffer->create();
-        }
-        u->uploadStaticBuffer(m_gpu->nodeVertexBuffer.get(), m_nodeVertexData.constData());
-        u->uploadStaticBuffer(m_gpu->nodeIndexBuffer.get(), m_nodeIndexData.constData());
-        m_nodeGeometryDirty = false;
-    }
-
-    if (m_nodeInstancesDirty && m_nodeInstanceCount > 0) {
-        int requiredSize = m_nodeInstanceData.size();
-        if (!m_gpu->nodeInstanceBuffer || m_gpu->nodeInstanceBuffer->size() < static_cast<quint32>(requiredSize)) {
-            m_gpu->nodeInstanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, requiredSize));
-            m_gpu->nodeInstanceBuffer->create();
-        }
-        u->updateDynamicBuffer(m_gpu->nodeInstanceBuffer.get(), 0, requiredSize, m_nodeInstanceData.constData());
-        m_nodeInstancesDirty = false;
-    }
-}
-
-//=============================================================================================================
-
-void NetworkObject::updateEdgeBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
-{
-    if (m_edgeGeometryDirty) {
-        if (!m_gpu->edgeVertexBuffer) {
-            m_gpu->edgeVertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_edgeVertexData.size()));
-            m_gpu->edgeVertexBuffer->create();
-        }
-        if (!m_gpu->edgeIndexBuffer) {
-            m_gpu->edgeIndexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_edgeIndexData.size()));
-            m_gpu->edgeIndexBuffer->create();
-        }
-        u->uploadStaticBuffer(m_gpu->edgeVertexBuffer.get(), m_edgeVertexData.constData());
-        u->uploadStaticBuffer(m_gpu->edgeIndexBuffer.get(), m_edgeIndexData.constData());
-        m_edgeGeometryDirty = false;
-    }
-
-    if (m_edgeInstancesDirty && m_edgeInstanceCount > 0) {
-        int requiredSize = m_edgeInstanceData.size();
-        if (!m_gpu->edgeInstanceBuffer || m_gpu->edgeInstanceBuffer->size() < static_cast<quint32>(requiredSize)) {
-            m_gpu->edgeInstanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, requiredSize));
-            m_gpu->edgeInstanceBuffer->create();
-        }
-        u->updateDynamicBuffer(m_gpu->edgeInstanceBuffer.get(), 0, requiredSize, m_edgeInstanceData.constData());
-        m_edgeInstancesDirty = false;
-    }
-}
 
 } // namespace DISP3DLIB

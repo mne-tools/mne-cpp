@@ -15,7 +15,9 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;
     float lightingEnabled;
     float overlayMode;
+    float selectedLabelActive;
     float _pad2;
+    vec4 selectedLabel;
 };
 
 void main() {

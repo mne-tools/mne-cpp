@@ -7,13 +7,13 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Renderable cortical / BEM mesh with interleaved vertex attributes and Qt-RHI buffer management.
+ * @brief    Renderable cortical / BEM mesh: CPU geometry, colour and annotation streams for the renderer.
  *
- * BrainSurface is the core 3-D primitive of disp3D. It owns the
- * interleaved @ref DISP3DLIB::VertexData stream (position, normal, packed-ABGR
- * base / annotation colour, surface-id) and the matching index
- * buffer, plus the QRhi vertex / index buffer pair that the renderer
- * binds for every draw.
+ * BrainSurface is the core 3-D primitive of disp3D. It owns the CPU
+ * streams the renderer uploads: geometry (@ref DISP3DLIB::VertexData,
+ * position and normal), packed-ABGR colour, packed-ABGR annotation
+ * colour and the triangle indices. Each stream has its own generation,
+ * so a source-estimate frame re-uploads only the 4-byte colour stream.
  *
  * Per-vertex colour is computed once on the CPU from one of four
  * sources selected by @ref DISP3DLIB::VisualizationMode &mdash; flat base colour,
@@ -44,17 +44,13 @@
 #include <QVector3D>
 #include <QColor>
 #include <memory>
+#include <optional>
 #include <vector>
 #include <fs/fs_surface.h>
 #include <fs/fs_annotation.h>
 #include <mne/mne_bem.h>
 
 #include <Eigen/Core>
-
-// Forward-declare QRhi types so that this header stays QRhi-free
-class QRhi;
-class QRhiBuffer;
-class QRhiResourceUpdateBatch;
 
 //=============================================================================================================
 // STRUCTS
@@ -64,7 +60,7 @@ namespace DISP3DLIB
 {
 
 /**
- * @brief Interleaved vertex attributes (position, normal, color, curvature) for brain surface GPU upload.
+ * @brief Geometry of one brain surface vertex: position and normal.
  *
  * @snippet ex_disp3d_scene/main.cpp brain_surface_usage
  */
@@ -72,8 +68,6 @@ struct VertexData
 {
     QVector3D pos;
     QVector3D norm;
-    uint32_t color;           // curvature / base / STC color  (ABGR packed)
-    uint32_t colorAnnotation; // annotation region color       (ABGR packed)
 };
 
 //=============================================================================================================
@@ -236,6 +230,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Give each run of vertices its own label key, so one element of a batched mesh (e.g. one
+     * digitizer sphere) can be highlighted on its own.
+     *
+     * @param[in] verticesPerElement Number of consecutive vertices per element.
+     */
+    void labelElements(int verticesPerElement);
+
+    //=========================================================================================================
+    /**
      * Set the visualization mode (FsSurface, FsAnnotation, Scientific).
      *
      * @param[in] mode       VisualizationMode enum.
@@ -257,15 +260,33 @@ public:
 
     //=========================================================================================================
     /**
-     * Update graphics buffers (vertex/index) on the GPU.
-     *
-     * @param[in] rhi        Pointer to QRhi instance.
-     * @param[in] u          Resource update batch.
+     * @return Geometry stream (@ref DISP3DLIB::VertexData per vertex).
      */
-    void updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
+    GpuStream geometryStream() const;
 
-    QRhiBuffer* vertexBuffer() const;
-    QRhiBuffer* indexBuffer() const;
+    /**
+     * @return Colour stream (packed ABGR per vertex; alpha carries the curvature grey on cortex).
+     */
+    GpuStream colorStream() const;
+
+    /**
+     * @return Annotation colour stream (packed ABGR per vertex, 0 where unlabelled).
+     */
+    GpuStream annotationStream() const;
+
+    /**
+     * @return Triangle index stream (three uint32 per triangle).
+     */
+    GpuStream indexStream() const;
+
+    /**
+     * @return Identity of this surface in the renderer's GPU cache.
+     */
+    const RenderKey& renderKey() const
+    {
+        return m_renderKey;
+    }
+
     uint32_t indexCount() const
     {
         return m_indexCount;
@@ -303,32 +324,27 @@ public:
     }
 
     /**
-     * @brief Const-ref access to CPU-side vertex data (used by merged rendering).
-     *
-     * @return Reference to the internal vertex array, valid while this surface lives.
+     * @return Current vertex geometry, valid while this surface lives.
      */
     const QVector<VertexData>& vertexDataRef() const
     {
         return m_vertexData;
     }
+
     /**
-     * @brief Const-ref access to CPU-side index data (used by merged rendering).
-     *
-     * @return Reference to the internal triangle index array, valid while this surface lives.
+     * @return Per-vertex packed ABGR colours, valid while this surface lives.
      */
-    const QVector<uint32_t>& indexDataRef() const
+    const QVector<uint32_t>& colorsRef() const
     {
-        return m_indexData;
+        return m_colors;
     }
 
     /**
-     * @brief Monotonically increasing counter bumped whenever vertex data changes.
-     *
-     * @return Current vertex data generation counter.
+     * @return Per-vertex packed ABGR annotation colours, valid while this surface lives.
      */
-    quint64 vertexGeneration() const
+    const QVector<uint32_t>& annotationColorsRef() const
     {
-        return m_vertexGeneration;
+        return m_annotationColors;
     }
 
     //=========================================================================================================
@@ -468,14 +484,30 @@ public:
      */
     void setSelectedVertexRange(int start, int count);
 
+    /**
+     * @return Annotation-stream value of the highlighted vertices (selected region or vertex
+     *         range), or nothing when no part of the surface is highlighted.
+     */
+    std::optional<uint32_t> selectedLabel() const;
+
 private:
     void updateVertexColors();
-    void markVertexDirty();
+    void setGeometry(QVector<VertexData> vertices, QVector<uint32_t> indices, const QColor& color);
+    void markGeometryDirty();
 
     QVector<VertexData> m_vertexData;
     QVector<VertexData> m_originalVertexData;
+    QVector<uint32_t> m_colors;
+    QVector<uint32_t> m_annotationColors;
+    QVector<int> m_vertexLabelIds;
     QVector<uint32_t> m_indexData;
     uint32_t m_indexCount = 0;
+
+    RenderKey m_renderKey;
+    quint64 m_geometryGeneration = 0;
+    quint64 m_colorGeneration = 0;
+    quint64 m_annotationGeneration = 0;
+    quint64 m_indexGeneration = 0;
 
     QColor m_defaultColor = Qt::white;
     QColor m_baseColor = Qt::white;
@@ -493,12 +525,6 @@ private:
     int m_selectedVertexCount = 0;
     int m_hemi = -1; // 0=lh, 1=rh
     TissueType m_tissueType = TissueUnknown;
-
-    /** @brief QRhi vertex, index, and uniform buffers for brain surface GPU rendering. */
-    struct GpuBuffers;
-    std::unique_ptr<GpuBuffers> m_gpu;
-
-    quint64 m_vertexGeneration = 0;
 
     mutable QVector3D m_aabbMin;
     mutable QVector3D m_aabbMax;

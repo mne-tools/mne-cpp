@@ -247,9 +247,9 @@ int main(int argc, char* argv[])
     sourceOverlay.applyToSurface(&patch, 0); // no interpolation matrix: values land on their own vertices
     //! [source_estimate_overlay_usage]
     const uint32_t grey = packABGR(0xAA, 0xAA, 0xAA) & 0x00FFFFFFu;
-    const uint32_t peak = patch.vertexDataRef().at(0).color & 0x00FFFFFFu;
-    ok &= expect(sourceOverlay.numTimePoints() == 1 && peak == (packABGR(255, 255, 255) & 0x00FFFFFFu) && (patch.vertexDataRef().at(2).color & 0x00FFFFFFu) == grey &&
-                     (patch.vertexDataRef().at(1).color & 0x00FFFFFFu) == grey,
+    const uint32_t peak = patch.colorsRef().at(0) & 0x00FFFFFFu;
+    ok &= expect(sourceOverlay.numTimePoints() == 1 && peak == (packABGR(255, 255, 255) & 0x00FFFFFFu) && (patch.colorsRef().at(2) & 0x00FFFFFFu) == grey &&
+                     (patch.colorsRef().at(1) & 0x00FFFFFFu) == grey,
                  "SourceEstimateOverlay: the peak is white on Hot, sub-threshold vertices keep the cortex grey");
 
     //! [dipole_object_usage]

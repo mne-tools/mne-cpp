@@ -31,6 +31,8 @@
 
 #include "../disp3D_global.h"
 
+#include "../core/rendertypes.h"
+
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <QColor>
@@ -39,10 +41,6 @@
 
 #include <connectivity/network/network.h>
 
-// Forward-declare QRhi types so that this header stays QRhi-free
-class QRhi;
-class QRhiBuffer;
-class QRhiResourceUpdateBatch;
 
 namespace DISP3DLIB
 {
@@ -50,9 +48,9 @@ namespace DISP3DLIB
 //=============================================================================================================
 /**
  * NetworkObject renders connectivity network nodes (instanced spheres) and edges (instanced cylinders)
- * using the same instanced rendering pipeline as DipoleObject for the QRhi backend.
+ * using the same instanced rendering pipeline as DipoleObject.
  *
- * @brief Renderable network visualization for QRhi.
+ * @brief Renderable connectivity network visualization.
  *
  * @snippet ex_disp3d_scene/main.cpp network_object_usage
  */
@@ -98,46 +96,37 @@ public:
 
     //=========================================================================================================
     /**
-     * Upload or update GPU buffers for node geometry.
-     *
-     * @param[in] rhi         QRhi instance.
-     * @param[in] u           Resource update batch.
+     * @return CPU streams of the node sphere and of one instance per node.
      */
-    void updateNodeBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
+    InstancedStreams nodeStreams() const;
 
-    //=========================================================================================================
     /**
-     * Upload or update GPU buffers for edge geometry.
-     *
-     * @param[in] rhi         QRhi instance.
-     * @param[in] u           Resource update batch.
+     * @return CPU streams of the edge cylinder and of one instance per edge.
      */
-    void updateEdgeBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
+    InstancedStreams edgeStreams() const;
 
-    // ── Node accessors ──────────────────────────────────────────────────
-    QRhiBuffer* nodeVertexBuffer() const;
-    QRhiBuffer* nodeIndexBuffer() const;
-    QRhiBuffer* nodeInstanceBuffer() const;
-    int nodeIndexCount() const
-    {
-        return m_nodeIndexCount;
-    }
+    /** @return Number of nodes drawn, i.e. those touching an edge above the threshold. */
     int nodeInstanceCount() const
     {
         return m_nodeInstanceCount;
     }
 
-    // ── Edge accessors ──────────────────────────────────────────────────
-    QRhiBuffer* edgeVertexBuffer() const;
-    QRhiBuffer* edgeIndexBuffer() const;
-    QRhiBuffer* edgeInstanceBuffer() const;
-    int edgeIndexCount() const
-    {
-        return m_edgeIndexCount;
-    }
+    /** @return Number of edges drawn above the threshold. */
     int edgeInstanceCount() const
     {
         return m_edgeInstanceCount;
+    }
+
+    /**
+     * @return Identities of the node and edge meshes in the renderer's GPU cache.
+     */
+    const RenderKey& nodeRenderKey() const
+    {
+        return m_nodeRenderKey;
+    }
+    const RenderKey& edgeRenderKey() const
+    {
+        return m_edgeRenderKey;
     }
 
     // ── Visibility ──────────────────────────────────────────────────────
@@ -187,17 +176,16 @@ private:
     QString m_colormap = "Viridis";
 
     // ── Node GPU resources ──────────────────────────────────────────────
-    /** @brief QRhi vertex, index, and instance buffers for network node and edge GPU rendering. */
-    struct GpuBuffers;
-    std::unique_ptr<GpuBuffers> m_gpu;
+    RenderKey m_nodeRenderKey;
+    RenderKey m_edgeRenderKey;
 
     QByteArray m_nodeVertexData;
     QByteArray m_nodeIndexData;
     QByteArray m_nodeInstanceData;
     int m_nodeIndexCount = 0;
     int m_nodeInstanceCount = 0;
-    bool m_nodeGeometryDirty = false;
-    bool m_nodeInstancesDirty = false;
+    quint64 m_nodeGeometryGeneration = 0;
+    quint64 m_nodeInstanceGeneration = 0;
 
     // ── Edge GPU resources ──────────────────────────────────────────────
     QByteArray m_edgeVertexData;
@@ -205,8 +193,8 @@ private:
     QByteArray m_edgeInstanceData;
     int m_edgeIndexCount = 0;
     int m_edgeInstanceCount = 0;
-    bool m_edgeGeometryDirty = false;
-    bool m_edgeInstancesDirty = false;
+    quint64 m_edgeGeometryGeneration = 0;
+    quint64 m_edgeInstanceGeneration = 0;
 
     bool m_visible = true;
 };

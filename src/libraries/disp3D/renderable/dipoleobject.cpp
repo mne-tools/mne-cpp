@@ -16,7 +16,6 @@
 
 #include "dipoleobject.h"
 
-#include <rhi/qrhi.h>
 #include <cmath>
 #include <QQuaternion>
 #include <QRandomGenerator>
@@ -28,31 +27,17 @@ namespace DISP3DLIB
 // PIMPL
 //=============================================================================================================
 
-struct DipoleObject::GpuBuffers
-{
-    std::unique_ptr<QRhiBuffer> vertexBuffer;
-    std::unique_ptr<QRhiBuffer> indexBuffer;
-    std::unique_ptr<QRhiBuffer> instanceBuffer;
-};
-
-DipoleObject::DipoleObject()
-: m_gpu(std::make_unique<GpuBuffers>())
-{
-}
+DipoleObject::DipoleObject() = default;
 
 DipoleObject::~DipoleObject() = default;
 
-QRhiBuffer* DipoleObject::vertexBuffer() const
+InstancedStreams DipoleObject::streams() const
 {
-    return m_gpu->vertexBuffer.get();
-}
-QRhiBuffer* DipoleObject::indexBuffer() const
-{
-    return m_gpu->indexBuffer.get();
-}
-QRhiBuffer* DipoleObject::instanceBuffer() const
-{
-    return m_gpu->instanceBuffer.get();
+    return {{m_vertexData.constData(), quint32(m_vertexData.size()), m_geometryGeneration},
+            {m_indexData.constData(), quint32(m_indexData.size()), m_geometryGeneration},
+            {m_instanceData.constData(), quint32(m_instanceCount * sizeof(InstanceData)), m_instanceGeneration},
+            m_indexCount,
+            m_instanceCount};
 }
 
 void DipoleObject::load(const INVLIB::InvEcdSet& ecdSet)
@@ -114,7 +99,7 @@ void DipoleObject::load(const INVLIB::InvEcdSet& ecdSet)
         data[i].isSelected = 0.0f;
     }
 
-    m_instancesDirty = true;
+    ++m_instanceGeneration;
 }
 
 void DipoleObject::applyTransform(const QMatrix4x4& trans)
@@ -132,7 +117,7 @@ void DipoleObject::applyTransform(const QMatrix4x4& trans)
         }
     }
 
-    m_instancesDirty = true;
+    ++m_instanceGeneration;
 }
 
 bool DipoleObject::boundingBox(QVector3D& min, QVector3D& max) const
@@ -257,33 +242,7 @@ void DipoleObject::createGeometry()
     m_indexData.resize(indices.size() * sizeof(uint32_t));
     memcpy(m_indexData.data(), indices.data(), m_indexData.size());
 
-    m_geometryDirty = true;
-}
-
-void DipoleObject::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
-{
-    if (m_geometryDirty) {
-        if (!m_gpu->vertexBuffer) {
-            m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_vertexData.size()));
-            m_gpu->vertexBuffer->create();
-        }
-        if (!m_gpu->indexBuffer) {
-            m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_indexData.size()));
-            m_gpu->indexBuffer->create();
-        }
-        u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
-        u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
-        m_geometryDirty = false;
-    }
-
-    if (m_instancesDirty && m_instanceCount > 0) {
-        if (!m_gpu->instanceBuffer || static_cast<qsizetype>(m_gpu->instanceBuffer->size()) < m_instanceData.size()) {
-            m_gpu->instanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, m_instanceData.size()));
-            m_gpu->instanceBuffer->create();
-        }
-        u->updateDynamicBuffer(m_gpu->instanceBuffer.get(), 0, m_instanceData.size(), m_instanceData.constData());
-        m_instancesDirty = false;
-    }
+    ++m_geometryGeneration;
 }
 
 int DipoleObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist) const
@@ -354,7 +313,7 @@ void DipoleObject::setSelected(int index, bool selected)
 
     data[index].isSelected = selected ? 1.0f : 0.0f;
 
-    m_instancesDirty = true;
+    ++m_instanceGeneration;
 }
 
 } // namespace DISP3DLIB

@@ -987,14 +987,14 @@ void TestDisp3dBrainView::sourceEstimateManager_basics()
 
     // Stepping to a time point colours the active surface type and reports the time
     QSignalSpy timeSpy(&manager, &SourceEstimateManager::timePointChanged);
-    const uint32_t before = lh->vertexDataRef()[3].color;
+    const uint32_t before = lh->colorsRef()[3];
     SubView view;
     view.surfaceType = QStringLiteral("pial");
     manager.setTimePoint(5, surfaces, view, {});
     QCOMPARE(manager.currentTimePoint(), 2);
     QCOMPARE(timeSpy.size(), 1);
     QVERIFY(std::fabs(timeSpy.at(0).at(1).toFloat() - 0.0f) < 1e-6f);
-    QVERIFY(lh->vertexDataRef()[3].color != before);
+    QVERIFY(lh->colorsRef()[3] != before);
 
     // A finished load leaves the manager safe to reload, cancel and destroy (the worker used to be
     // freed behind its back; this faults under DYLD_INSERT_LIBRARIES=libgmalloc / glibc heap checks)
@@ -1527,7 +1527,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     scene.lightDir = QVector3D(0.0f, 0.0f, -1.0f);
     scene.lightingEnabled = true;
 
-    // The uniform buffer holds one slot per draw (8192); a whole frame must stay usable when it overflows
+    // The uniform buffer grows to one slot per draw (at most 16384); a whole frame must stay usable when it overflows
     QTest::failOnWarning(QRegularExpression(QStringLiteral("exhausted|uniform buffer|inside a render pass")));
     const auto modes = {BrainRenderer::Standard, BrainRenderer::Holographic, BrainRenderer::Anatomical, BrainRenderer::XRay, BrainRenderer::ShowNormals};
     for (int frameIndex = 0; frameIndex < 2; ++frameIndex) {
@@ -1538,16 +1538,13 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.newFrame();
         QRhiResourceUpdateBatch* updates = rhi->nextResourceUpdateBatch();
         QVERIFY(updates);
-        surface.updateBuffers(rhi.get(), updates);
-        dipoles.updateBuffers(rhi.get(), updates);
-        networkObject.updateNodeBuffers(rhi.get(), updates);
-        networkObject.updateEdgeBuffers(rhi.get(), updates);
-        path.updateBuffers(rhi.get(), updates);
         renderer.prepareVideoOverlay(rhi.get(), updates, &video);
         renderer.prepareSlice(rhi.get(), updates, &slice, 0);
         renderer.prepareSlice(rhi.get(), updates, nullptr, 1);
         const int surfaceOffset = renderer.prepareSurfaceDraw(updates, scene, &surface);
-        const int instancedOffset = renderer.prepareInstancedDraw(updates, scene);
+        const int dipoleOffset = renderer.prepareDipoleDraw(updates, scene, &dipoles);
+        const int networkOffset = renderer.prepareNetworkDraw(updates, scene, &networkObject);
+        const int pathOffset = renderer.preparePolylineDraw(updates, scene, &path);
         const int quadOffset = renderer.prepareVideoOverlayDraw(updates, scene, &video, nullptr);
         const int decalOffset = renderer.prepareVideoOverlayDraw(updates, scene, &video, &surface);
         const int sliceOffset = renderer.prepareSliceDraw(updates, scene, 0);
@@ -1556,10 +1553,13 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         QVERIFY(decalOffset > quadOffset);
         QCOMPARE(sliceOffset, 0);
         QCOMPARE(renderer.prepareSliceDraw(updates, scene, 1), -1);
+        QVERIFY(dipoleOffset > surfaceOffset && networkOffset > dipoleOffset && pathOffset > networkOffset);
+        // Surface, dipoles, network nodes, network edges and path
+        QCOMPARE(renderer.cachedMeshCount(), 5);
 
         // Slots are aligned and every slot of the buffer is usable
-        int used = 2;
-        int last = instancedOffset;
+        int used = 4;
+        int last = pathOffset;
         // One warning per frame, however many draws are skipped
         QTest::ignoreMessage(QtWarningMsg, "BrainRenderer: uniform buffer full at prepareSurfaceDraw; further draws this frame are skipped");
         for (int offset = renderer.prepareSurfaceDraw(updates, scene, &surface); offset >= 0; offset = renderer.prepareSurfaceDraw(updates, scene, &surface)) {
@@ -1568,8 +1568,8 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
             last = offset;
             ++used;
         }
-        QCOMPARE(used, 8192);
-        QCOMPARE(renderer.prepareInstancedDraw(updates, scene), -1);
+        QCOMPARE(used, 16384);
+        QCOMPARE(renderer.prepareDipoleDraw(updates, scene, &dipoles), -1);
 
         // Draw phase: bind and draw only
         renderer.beginFrame(cb, updates);
@@ -1577,9 +1577,9 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
             renderer.issueSurfaceDraw(cb, &surface, mode, surfaceOffset);
         }
         renderer.issueSliceDraw(cb, 0, sliceOffset);
-        renderer.issueDipoleDraw(cb, &dipoles, instancedOffset);
-        renderer.issueNetworkDraw(cb, &networkObject, instancedOffset);
-        renderer.issuePolylineDraw(cb, &path, instancedOffset);
+        renderer.issueDipoleDraw(cb, &dipoles, dipoleOffset);
+        renderer.issueNetworkDraw(cb, &networkObject, networkOffset);
+        renderer.issuePolylineDraw(cb, &path, pathOffset);
         renderer.issueVideoOverlayDraw(cb, &video, nullptr, quadOffset);
         renderer.issueVideoOverlayDraw(cb, &video, &surface, decalOffset);
         renderer.issueSurfaceDraw(cb, &surface, BrainRenderer::Standard, last);
@@ -1587,11 +1587,11 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
 
         // QRhi forbids resource updates inside a pass, so preparing one there is refused
         QRhiResourceUpdateBatch* late = rhi->nextResourceUpdateBatch();
-        for (const char* caller : {"prepareSurfaceDraw", "prepareInstancedDraw", "prepareVideoOverlayDraw", "prepareSliceDraw", "prepareSlice", "prepareVideoOverlay"}) {
+        for (const char* caller : {"prepareSurfaceDraw", "prepareDipoleDraw", "prepareVideoOverlayDraw", "prepareSliceDraw", "prepareSlice", "prepareVideoOverlay"}) {
             QTest::ignoreMessage(QtWarningMsg, qPrintable(QStringLiteral("BrainRenderer: %1 called inside a render pass; resource updates must precede beginFrame()").arg(QLatin1String(caller))));
         }
         QCOMPARE(renderer.prepareSurfaceDraw(late, scene, &surface), -1);
-        QCOMPARE(renderer.prepareInstancedDraw(late, scene), -1);
+        QCOMPARE(renderer.prepareDipoleDraw(late, scene, &dipoles), -1);
         QCOMPARE(renderer.prepareVideoOverlayDraw(late, scene, &video, nullptr), -1);
         QCOMPARE(renderer.prepareSliceDraw(late, scene, 0), -1);
         renderer.prepareSlice(rhi.get(), late, &slice, 0);
@@ -1604,6 +1604,23 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.endPass(cb);
         QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
     }
+
+    // GPU copies of destroyed renderables are freed at the next frame
+    {
+        BrainSurface transient;
+        transient.createFromData(rr, tris, Qt::gray);
+        QRhiCommandBuffer* cb = nullptr;
+        QCOMPARE(rhi->beginOffscreenFrame(&cb), QRhi::FrameOpSuccess);
+        renderer.newFrame();
+        QRhiResourceUpdateBatch* updates = rhi->nextResourceUpdateBatch();
+        QVERIFY(renderer.prepareSurfaceDraw(updates, scene, &transient) >= 0);
+        QCOMPARE(renderer.cachedMeshCount(), 6);
+        renderer.beginFrame(cb, updates);
+        renderer.endPass(cb);
+        QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
+    }
+    renderer.newFrame();
+    QCOMPARE(renderer.cachedMeshCount(), 5);
 
     // A new colour texture rebuilds the targets
     std::unique_ptr<QRhiTexture> smaller(rhi->newTexture(QRhiTexture::RGBA8, QSize(32, 24), 1, QRhiTexture::RenderTarget));
@@ -1643,7 +1660,6 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
             continue;
         QVERIFY(rhi);
         ++tested;
-        // GPU buffers belong to one QRhi, so each backend gets its own surfaces
         BrainSurface left;
         left.createFromData(rrLeft, tris, Qt::red);
         BrainSurface right;
@@ -1660,8 +1676,6 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
         QCOMPARE(rhi->beginOffscreenFrame(&cb), QRhi::FrameOpSuccess);
         renderer.newFrame();
         QRhiResourceUpdateBatch* updates = rhi->nextResourceUpdateBatch();
-        left.updateBuffers(rhi.get(), updates);
-        right.updateBuffers(rhi.get(), updates);
         const int first = renderer.prepareSurfaceDraw(updates, scene, &left);
         const int second = renderer.prepareSurfaceDraw(updates, scene, &right);
         QCOMPARE(first, 0);
@@ -1959,8 +1973,8 @@ void TestDisp3dBrainView::brainSurface_advanced()
     // Default state — no vertices
     QVERIFY(surf.vertexPositions().rows() == 0);
     QVERIFY(surf.vertexNormals().rows() == 0);
-    QVERIFY(surf.vertexBuffer() == nullptr);
-    QVERIFY(surf.indexBuffer() == nullptr);
+    QCOMPARE(surf.geometryStream().bytes, 0u);
+    QCOMPARE(surf.indexStream().bytes, 0u);
 
     // createFromData with a single triangle (3 vertices)
     Eigen::MatrixX3f verts(3, 3);
@@ -1983,20 +1997,20 @@ void TestDisp3dBrainView::brainSurface_advanced()
     surf.setSelectedRegion(-1);
     surf.setUseDefaultColor(true);
     surf.setUseDefaultColor(false);
-    QCOMPARE(surf.vertexDataRef()[1].color, packABGR(255, 255, 255, 255));
+    QCOMPARE(surf.colorsRef()[1], packABGR(255, 255, 255, 255));
     surf.setColor(QColor(10, 20, 30, 128));
-    QCOMPARE(surf.vertexDataRef()[1].color, packABGR(10, 20, 30, 128));
+    QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
     surf.setUseDefaultColor(true);
-    QCOMPARE(surf.vertexDataRef()[1].color, packABGR(10, 20, 30, 128));
+    QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
     // Placing the surface keeps its colours
     QMatrix4x4 shift;
     shift.translate(0.0f, 0.0f, 0.01f);
     surf.applyTransform(shift);
     QCOMPARE(surf.vertexDataRef()[1].pos, QVector3D(0.01f, 0.0f, 0.01f));
-    QCOMPARE(surf.vertexDataRef()[1].color, packABGR(10, 20, 30, 128));
+    QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
     surf.applyTransform(QMatrix4x4());
     QCOMPARE(surf.vertexDataRef()[1].pos, QVector3D(0.01f, 0.0f, 0.0f));
-    QCOMPARE(surf.vertexDataRef()[1].color, packABGR(10, 20, 30, 128));
+    QCOMPARE(surf.colorsRef()[1], packABGR(10, 20, 30, 128));
     surf.setVisualizationMode(BrainSurface::ModeSurface);
     surf.setVisualizationMode(BrainSurface::ModeScientific);
     surf.setVisualizationMode(BrainSurface::ModeSourceEstimate);
@@ -2042,10 +2056,9 @@ void TestDisp3dBrainView::dipoleObject_basics()
 {
     DipoleObject obj;
 
-    // Buffer accessors return nullptr before GPU upload
-    QVERIFY(obj.vertexBuffer() == nullptr);
-    QVERIFY(obj.indexBuffer() == nullptr);
-    QVERIFY(obj.instanceBuffer() == nullptr);
+    // No instances before load
+    QCOMPARE(obj.streams().instanceCount, 0);
+    QCOMPARE(obj.streams().instances.bytes, 0u);
 
     // intersect on empty instance data — returns -1 immediately
     float dist = 0.0f;
@@ -2420,8 +2433,8 @@ void TestDisp3dBrainView::networkObject_thresholdAndInstances()
 
     obj.load(network, QStringLiteral("Jet"));
     QVERIFY(obj.hasData());
-    QVERIFY(obj.nodeIndexCount() > 0 && obj.nodeIndexCount() % 3 == 0);
-    QVERIFY(obj.edgeIndexCount() > 0 && obj.edgeIndexCount() % 3 == 0);
+    QVERIFY(obj.nodeStreams().indexCount > 0 && obj.nodeStreams().indexCount % 3 == 0);
+    QVERIFY(obj.edgeStreams().indexCount > 0 && obj.edgeStreams().indexCount % 3 == 0);
 
     // Only connected nodes and kept edges are instanced; the threshold drops weak edges
     obj.setThreshold(0.0);
@@ -2481,17 +2494,17 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     // Time 0: vertex 2 is at the maximum (opaque, top of the map); vertex 0 at the minimum is transparent
     overlay.setColormap(QStringLiteral("Hot"));
     overlay.applyToSurface(&surface, 0);
-    const auto& vertexData = surface.vertexDataRef();
+    const auto& colors = surface.colorsRef();
     const QRgb top = DISPLIB::ColorMap::valueToColor(1.0, QStringLiteral("Hot"));
-    const uint32_t vertex2 = vertexData[2].color;
+    const uint32_t vertex2 = colors[2];
     QCOMPARE(static_cast<int>(vertex2 & 0xFFu), qRed(top));
     QCOMPARE(static_cast<int>((vertex2 >> 8) & 0xFFu), qGreen(top));
     QCOMPARE(static_cast<int>((vertex2 >> 16) & 0xFFu), qBlue(top));
-    QCOMPARE(vertexData[0].color & 0xFFFFFFu, vertexData[1].color & 0xFFFFFFu);
+    QCOMPARE(colors[0] & 0xFFFFFFu, colors[1] & 0xFFFFFFu);
 
     // Time 1 uses |-4| = 4 for vertex 0; out-of-range indices are clamped to the last time
     overlay.applyToSurface(&surface, 99);
-    QCOMPARE(surface.vertexDataRef()[0].color & 0xFFFFFFu, vertex2 & 0xFFFFFFu);
+    QCOMPARE(surface.colorsRef()[0] & 0xFFFFFFu, vertex2 & 0xFFFFFFu);
 
     // The data column concatenates both hemispheres
     Eigen::MatrixXd rhData(1, 2);
@@ -2512,9 +2525,9 @@ void TestDisp3dBrainView::sourceEstimateOverlay_colorsSurface()
     BrainSurface other;
     other.createFromData(rr, tris, Qt::gray);
     other.setHemi(2);
-    const uint32_t before = other.vertexDataRef()[0].color;
+    const uint32_t before = other.colorsRef()[0];
     overlay.applyToSurface(&other, 0);
-    QCOMPARE(other.vertexDataRef()[0].color, before);
+    QCOMPARE(other.colorsRef()[0], before);
     overlay.applyToSurface(nullptr, 0);
 }
 

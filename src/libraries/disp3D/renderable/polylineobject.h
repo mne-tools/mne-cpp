@@ -29,6 +29,8 @@
 
 #include "../disp3D_global.h"
 
+#include "../core/rendertypes.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -50,9 +52,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QRhi;
-class QRhiBuffer;
-class QRhiResourceUpdateBatch;
 
 //=============================================================================================================
 // DEFINE CLASS
@@ -130,30 +129,17 @@ public:
 
     //=========================================================================================================
     /**
-     * Uploads or refreshes the GPU buffers.
-     *
-     * @param[in] rhi   The RHI to allocate through.
-     * @param[in] u     Batch collecting the resource updates.
+     * @return CPU streams of the unit segment mesh and of one instance per segment.
      */
-    void updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
+    InstancedStreams streams() const;
 
-    //=========================================================================================================
     /**
-     * @return Vertex buffer of the unit segment mesh.
+     * @return Identity of this object in the renderer's GPU cache.
      */
-    QRhiBuffer* vertexBuffer() const;
-
-    //=========================================================================================================
-    /**
-     * @return Index buffer of the unit segment mesh.
-     */
-    QRhiBuffer* indexBuffer() const;
-
-    //=========================================================================================================
-    /**
-     * @return Per-segment instance buffer.
-     */
-    QRhiBuffer* instanceBuffer() const;
+    const RenderKey& renderKey() const
+    {
+        return m_renderKey;
+    }
 
     //=========================================================================================================
     /**
@@ -243,12 +229,11 @@ private:
     QColor m_startColor; /**< Colour of the first segment. */
     QColor m_endColor;   /**< Colour of the last segment. */
 
-    bool m_bVisible;        /**< Whether the polyline is drawn. */
-    bool m_bGeometryDirty;  /**< Unit segment needs uploading. */
-    bool m_bInstancesDirty; /**< Instance buffer needs refreshing. */
+    bool m_bVisible;                  /**< Whether the polyline is drawn. */
+    quint64 m_geometryGeneration = 0; /**< Bumped when the unit segment changes. */
+    quint64 m_instanceGeneration = 0; /**< Bumped when the segments change. */
 
-    struct GpuResources;
-    std::unique_ptr<GpuResources> m_gpu; /**< RHI buffers, hidden to keep QRhi out of this header. */
+    RenderKey m_renderKey;
 };
 
 } // namespace DISP3DLIB

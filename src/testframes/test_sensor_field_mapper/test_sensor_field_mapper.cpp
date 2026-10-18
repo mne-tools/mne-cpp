@@ -228,13 +228,13 @@ void TestSensorFieldMapper::fieldMapsMatchPython()
              qPrintable(QStringLiteral("max diff %1").arg((mapped - expected).cwiseAbs().maxCoeff())));
 
     // Applying it colours the surface and shows the EEG contour lines; hiding the map hides them again
-    const uint32_t plain = head->vertexDataRef()[5].color;
+    const uint32_t plain = head->colorsRef()[5];
     SubView view;
     view.visibility.eegFieldMap = true;
     view.visibility.eegFieldContours = true;
     mapper.setTimePoint(t);
     mapper.apply(surfaces, view, {});
-    QVERIFY(head->vertexDataRef()[5].color != plain);
+    QVERIFY(head->colorsRef()[5] != plain);
     QVERIFY(surfaces.contains(QStringLiteral("sens_contour_eeg_neg")));
     QVERIFY(surfaces.value(QStringLiteral("sens_contour_eeg_neg"))->isVisible());
     view.visibility.eegFieldMap = false;

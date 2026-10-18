@@ -460,6 +460,7 @@ std::shared_ptr<BrainSurface> MeshFactory::createBatchedSpheres(const QVector<QV
 
     auto surf = std::make_shared<BrainSurface>();
     surf->createFromData(allVerts, allNorms, allTris, color);
+    surf->labelElements(nVPerPt);
     return surf;
 }
 

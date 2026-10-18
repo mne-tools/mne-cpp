@@ -1606,6 +1606,14 @@ void BrainView::initialize(QRhiCommandBuffer* cb)
 
 //=============================================================================================================
 
+void BrainView::releaseResources()
+{
+    // The renderer owns every GPU resource of the scene, so dropping it frees them all
+    m_renderer.reset();
+}
+
+//=============================================================================================================
+
 void BrainView::render(QRhiCommandBuffer* cb)
 {
     // Check if there is anything to render
@@ -1691,29 +1699,11 @@ void BrainView::render(QRhiCommandBuffer* cb)
     // ── Prepare phase ──────────────────────────────────────────────────
     // Every upload and uniform of the frame goes into one batch that
     // beginFrame() commits: QRhi forbids resource updates inside a pass.
-    // Overlay modes are per-draw uniforms, so panes with different overlays
-    // share the same vertex buffers.
+    // The prepare calls upload only the streams that changed, and only for
+    // objects that are drawn. Overlay modes and highlights are per-draw
+    // uniforms, so panes with different overlays share the same buffers.
     m_renderer->newFrame();
     QRhiResourceUpdateBatch* updates = rhi()->nextResourceUpdateBatch();
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        it.value()->updateBuffers(rhi(), updates);
-    }
-    if (m_debugPointerSurface) {
-        m_debugPointerSurface->updateBuffers(rhi(), updates);
-    }
-    for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-        it.value()->updateBuffers(rhi(), updates);
-    }
-    if (m_dipoles) {
-        m_dipoles->updateBuffers(rhi(), updates);
-    }
-    if (m_network && m_network->hasData()) {
-        m_network->updateNodeBuffers(rhi(), updates);
-        m_network->updateEdgeBuffers(rhi(), updates);
-    }
-    if (m_headPath && m_headPath->hasData()) {
-        m_headPath->updateBuffers(rhi(), updates);
-    }
     if (m_videoOverlay && m_videoOverlay->isEnabled()) {
         m_renderer->prepareVideoOverlay(rhi(), updates, m_videoOverlay.get());
     }
@@ -1755,9 +1745,9 @@ void BrainView::render(QRhiCommandBuffer* cb)
         QVector<DrawItem> transparentDraws;
         int sliceOffsets[kMaxSliceSlots] = {-1, -1, -1};
         int videoOverlayOffset = -1;
-        int instancedOffset = -1;
-        bool drawDipoles = false;
-        bool drawNetwork = false;
+        QVector<QPair<DipoleObject*, int>> dipoleDraws;
+        int networkOffset = -1;
+        int headPathOffset = -1;
         int pointerOffset = -1;
     };
     std::vector<PaneDraws> panes(static_cast<size_t>(numEnabled));
@@ -1848,16 +1838,6 @@ void BrainView::render(QRhiCommandBuffer* cb)
         // Collect matched brain surface keys for this pane's info panel
         QStringList drawnKeys;
 
-        if (m_viewMode == MultiView && m_viewportInfoLabels[vp]) {
-            m_viewportInfoLabels[vp]->setText(
-                QString("Shader: %1\nSurface: %2\nOverlay: %3")
-                    .arg(shaderModeName(currentShader), sv.surfaceType, overlayName));
-        } else if (m_viewMode == SingleView && m_singleViewInfoLabel) {
-            m_singleViewInfoLabel->setText(
-                QString("Shader: %1\nSurface: %2\nOverlay: %3")
-                    .arg(shaderModeName(currentShader), sv.surfaceType, overlayName));
-        }
-
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
             if (!sv.matchesSurfaceType(it.key()))
                 continue;
@@ -1869,14 +1849,14 @@ void BrainView::render(QRhiCommandBuffer* cb)
                                      m_renderer->prepareSurfaceDraw(updates, sceneData, surf)});
         }
 
-        // Update info panel with drawn brain surface keys after rendering
-        {
-            const QString drawnInfo = drawnKeys.isEmpty() ? QStringLiteral("none") : drawnKeys.join(QStringLiteral(", "));
-            if (m_viewMode == MultiView && m_viewportInfoLabels[vp]) {
-                m_viewportInfoLabels[vp]->setText(m_viewportInfoLabels[vp]->text() + QStringLiteral("\nDrawn: ") + drawnInfo);
-            } else if (m_viewMode == SingleView && m_singleViewInfoLabel) {
-                m_singleViewInfoLabel->setText(m_singleViewInfoLabel->text() + QStringLiteral("\nDrawn: ") + drawnInfo);
-            }
+        // Info panel; set only on change, since setText() relayouts the label
+        QLabel* infoLabel = (m_viewMode == MultiView) ? m_viewportInfoLabels[vp] : m_singleViewInfoLabel;
+        if (infoLabel) {
+            const QString info = QStringLiteral("Shader: %1\nSurface: %2\nOverlay: %3\nDrawn: %4")
+                                     .arg(shaderModeName(currentShader), sv.surfaceType, overlayName,
+                                          drawnKeys.isEmpty() ? QStringLiteral("none") : drawnKeys.join(QStringLiteral(", ")));
+            if (infoLabel->text() != info)
+                infoLabel->setText(info);
         }
 
         // Single pass over m_surfaces categorises non-brain items into opaque
@@ -1972,13 +1952,22 @@ void BrainView::render(QRhiCommandBuffer* cb)
             pane.videoOverlayOffset = m_renderer->prepareVideoOverlayDraw(updates, sceneData, m_videoOverlay.get(), videoOverlayTargetSurface);
         }
 
-        // Dipoles, network and the head movement path share one instanced uniform slot. The path
-        // is not connectivity data, so it is not tied to the network visibility flag.
-        pane.drawDipoles = sv.visibility.dipoles && (m_dipoles || !m_itemDipoleMap.isEmpty());
-        pane.drawNetwork = sv.visibility.network && m_network;
-        if (pane.drawDipoles || pane.drawNetwork || m_headPath) {
-            pane.instancedOffset = m_renderer->prepareInstancedDraw(updates, sceneData);
+        // The head movement path is not connectivity data, so it is not tied to the network
+        // visibility flag.
+        if (sv.visibility.dipoles) {
+            for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
+                const int offset = m_renderer->prepareDipoleDraw(updates, sceneData, it.value().get());
+                if (offset >= 0)
+                    pane.dipoleDraws.append({it.value().get(), offset});
+            }
+            const int offset = m_renderer->prepareDipoleDraw(updates, sceneData, m_dipoles.get());
+            if (offset >= 0)
+                pane.dipoleDraws.append({m_dipoles.get(), offset});
         }
+        if (sv.visibility.network) {
+            pane.networkOffset = m_renderer->prepareNetworkDraw(updates, sceneData, m_network.get());
+        }
+        pane.headPathOffset = m_renderer->preparePolylineDraw(updates, sceneData, m_headPath.get());
 
         // Intersection Pointer
         if (m_hasIntersection && m_debugPointerSurface) {
@@ -2026,16 +2015,10 @@ void BrainView::render(QRhiCommandBuffer* cb)
             m_renderer->issueVideoOverlayDraw(cb, m_videoOverlay.get(), videoOverlayTargetSurface, pane.videoOverlayOffset);
         }
 
-        if (pane.drawDipoles) {
-            for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-                m_renderer->issueDipoleDraw(cb, it.value().get(), pane.instancedOffset);
-            }
-            m_renderer->issueDipoleDraw(cb, m_dipoles.get(), pane.instancedOffset);
-        }
-        if (pane.drawNetwork) {
-            m_renderer->issueNetworkDraw(cb, m_network.get(), pane.instancedOffset);
-        }
-        m_renderer->issuePolylineDraw(cb, m_headPath.get(), pane.instancedOffset);
+        for (const auto& [dipoles, offset] : pane.dipoleDraws)
+            m_renderer->issueDipoleDraw(cb, dipoles, offset);
+        m_renderer->issueNetworkDraw(cb, m_network.get(), pane.networkOffset);
+        m_renderer->issuePolylineDraw(cb, m_headPath.get(), pane.headPathOffset);
 
         m_renderer->issueSurfaceDraw(cb, m_debugPointerSurface.get(), BrainRenderer::Holographic, pane.pointerOffset);
     }
