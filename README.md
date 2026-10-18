@@ -14,7 +14,7 @@
 
 -----------------
 
-MNE-CPP is an open-source, cross-platform C++ framework for real-time and offline processing of electrophysiological and functional brain imaging data: non-invasive MEG and EEG as well as invasive intracranial recordings (sEEG and ECoG). It provides modular libraries and ready-to-use applications — from data browsing and 3D visualization to real-time acquisition and source localization. For documentation please visit [mne-cpp.github.io](https://mne-cpp.github.io/).
+MNE-CPP is an open-source, cross-platform C++ framework for real-time and offline processing of functional brain imaging data: non-invasive MEG and EEG as well as invasive intracranial recordings (sEEG and ECoG). It provides modular libraries and ready-to-use applications — from data browsing and 3D visualization to real-time acquisition and source localization. For documentation please visit [mne-cpp.github.io](https://mne-cpp.github.io/).
 
 Try it now
 ----------
