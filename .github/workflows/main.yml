@@ -187,6 +187,9 @@ jobs:
     - name: Validate SPDX license headers
       run: python3 -m tools.license_headers.validate
 
+    - name: Check committed quality reports are current
+      run: python3 tools/quality/generate_quality_report.py --check
+
     - name: Generate quality dashboard
       run: python3 tools/quality/generate_quality_report.py --out-dir "$RUNNER_TEMP/quality"
 
