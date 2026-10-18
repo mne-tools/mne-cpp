@@ -229,6 +229,11 @@ bool FsSurface::read(const QString& p_sFile, FsSurface& p_Surface, bool p_bLoadC
     if (magic == QUAD_FILE_MAGIC_NUMBER || magic == NEW_QUAD_FILE_MAGIC_NUMBER) {
         nvert = FsSurface::fread3(t_DataStream);
         nquad = FsSurface::fread3(t_DataStream);
+        // New-format curvature files start with the same magic number
+        if (nvert <= 0 || qint64(nvert) * (magic == QUAD_FILE_MAGIC_NUMBER ? 6 : 12) + qint64(nquad) * 12 > t_File.bytesAvailable()) {
+            qWarning("Invalid or truncated surface file %s", p_sFile.toUtf8().constData());
+            return false;
+        }
         if (magic == QUAD_FILE_MAGIC_NUMBER)
             qInfo("\t%s is a quad file (nvert = %d nquad = %d)\n", p_sFile.toUtf8().constData(), nvert, nquad);
         else
@@ -296,6 +301,10 @@ bool FsSurface::read(const QString& p_sFile, FsSurface& p_Surface, bool p_bLoadC
         t_DataStream >> nvert;
         t_DataStream >> nface;
 
+        if (nvert <= 0 || nface < 0 || (qint64(nvert) + nface) * 12 > t_File.bytesAvailable()) {
+            qWarning("Invalid or truncated surface file %s", p_sFile.toUtf8().constData());
+            return false;
+        }
         qInfo("\t%s is a triangle file (nvert = %d ntri = %d)\n", p_sFile.toUtf8().constData(), nvert, nface);
         qInfo("\t%s", s.toUtf8().constData());
 
@@ -317,6 +326,10 @@ bool FsSurface::read(const QString& p_sFile, FsSurface& p_Surface, bool p_bLoadC
         }
     } else {
         qWarning("Bad magic number (%d) in surface file %s", magic, p_sFile.toUtf8().constData());
+        return false;
+    }
+    if (faces.size() > 0 && (faces.minCoeff() < 0 || faces.maxCoeff() >= nvert)) {
+        qWarning("Invalid or truncated surface file %s", p_sFile.toUtf8().constData());
         return false;
     }
 

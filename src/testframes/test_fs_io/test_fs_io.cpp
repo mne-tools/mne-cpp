@@ -303,6 +303,31 @@ private slots:
         const std::unique_ptr<MNELIB::MNESourceSpace> withCurv = MNELIB::MNESourceSpace::load_surface(tmpDir.filePath("lh.newquad"), curvFile.fileName());
         QVERIFY(withCurv);
         QVERIFY(withCurv->curv.isApprox(values, 1e-6f));
+
+        // A new-format curvature file starts with the quad magic number, and a triangle header may
+        // promise more data than follows: both are refused instead of read out of bounds
+        QByteArray newCurv;
+        QDataStream newCurvOut(&newCurv, QIODevice::WriteOnly);
+        newCurvOut.setFloatingPointPrecision(QDataStream::SinglePrecision);
+        put3(newCurvOut, 16777215);
+        newCurvOut << qint32(5) << qint32(2) << qint32(1);
+        for (const float v : {0.25f, -1.5f, 3.0f, 0.0f, -0.01f}) {
+            newCurvOut << v;
+        }
+        QByteArray truncated;
+        QDataStream truncatedOut(&truncated, QIODevice::WriteOnly);
+        put3(truncatedOut, 16777214);
+        truncatedOut.writeRawData("created by test\n\n", 17);
+        truncatedOut << qint32(1000) << qint32(1000);
+        for (const auto& [name, data] : {std::pair{"lh.thickness", newCurv}, std::pair{"lh.truncated", truncated}}) {
+            QFile file(tmpDir.filePath(QLatin1String(name)));
+            QVERIFY(file.open(QIODevice::WriteOnly));
+            file.write(data);
+            file.close();
+            QTest::ignoreMessage(QtWarningMsg, QRegularExpression(QStringLiteral("Invalid or truncated surface file")));
+            FsSurface notASurface;
+            QVERIFY(!FsSurface::read(file.fileName(), notASurface, false));
+        }
     }
 
     //=========================================================================
