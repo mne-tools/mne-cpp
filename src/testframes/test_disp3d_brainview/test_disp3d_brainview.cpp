@@ -648,17 +648,22 @@ void TestDisp3dBrainView::brainView_appearanceSetters()
     view.setLightingEnabled(true);
     view.setLightingEnabled(false);
 
-    // Without a rendered frame (no QRhi offscreen) a screenshot is refused and nothing is written
+    // Without a rendered frame (no QRhi offscreen) a screenshot is refused and nothing is written;
+    // a platform that renders writes it, creating missing folders
     QTemporaryDir shots;
     const QString shot = shots.filePath(QStringLiteral("sub/view.png"));
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No rendered frame"));
-    QVERIFY(!view.takeScreenshot(shot));
-    QVERIFY(QDir(shots.path()).isEmpty());
+    const bool renders = QGuiApplication::platformName() != QLatin1String("offscreen");
+    if (!renders)
+        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No rendered frame"));
+    QCOMPARE(view.takeScreenshot(shot), renders);
+    QCOMPARE(QFileInfo::exists(shot), renders);
+    QDir(shots.filePath(QStringLiteral("sub"))).removeRecursively();
     const QString cwd = QDir::currentPath();
     QDir::setCurrent(shots.path());
-    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No rendered frame"));
-    QVERIFY(!view.saveSnapshot());
-    QVERIFY(QDir(shots.path()).isEmpty());
+    if (!renders)
+        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No rendered frame"));
+    QCOMPARE(view.saveSnapshot(), renders);
+    QCOMPARE(QDir(shots.path()).isEmpty(), !renders);
     QDir::setCurrent(cwd);
 
     QApplication::processEvents();
