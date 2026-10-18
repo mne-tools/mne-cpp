@@ -77,6 +77,9 @@ private slots:
     void testHighlightTouchesNoStream();
     void testElementLabels();
 
+    // Ray picking
+    void testIntersectsSphere();
+
     // ── MeshFactory ───────────────────────────────────────────────────
     void testMeshFactorySphere();
     void testMeshFactoryPlate();
@@ -411,6 +414,45 @@ void TestDisp3dBrainSurface::testElementLabels()
     QCOMPARE(surf.selectedLabel(), std::optional<uint32_t>(keys[2]));
     surf.setSelectedVertexRange(-1, 0);
     QVERIFY(!surf.selectedLabel());
+}
+
+//=============================================================================================================
+// Ray picking
+//=============================================================================================================
+
+void TestDisp3dBrainSurface::testIntersectsSphere()
+{
+    // 5120 triangles, radius 1 cm: every ray from above hits the near cap within the facet error
+    auto sphere = MeshFactory::createSphere(QVector3D(0, 0, 0), 0.01f, Qt::red, 4);
+    const QVector3D down(0.0f, 0.0f, -1.0f);
+    float dist = 0.0f;
+    int vertex = -1;
+    for (int ix = -9; ix <= 9; ++ix) {
+        for (int iy = -9; iy <= 9; ++iy) {
+            const float x = 0.001f * float(ix);
+            const float y = 0.001f * float(iy);
+            const float r2 = x * x + y * y;
+            const bool hit = sphere->intersects(QVector3D(x, y, 1.0f), down, dist, vertex);
+            if (r2 > 0.0099f * 0.0099f) {
+                QVERIFY(!hit || r2 < 0.0101f * 0.0101f);
+                continue;
+            }
+            QVERIFY2(hit, qPrintable(QStringLiteral("missed at %1, %2").arg(x).arg(y)));
+            QVERIFY(qAbs(dist - (1.0f - std::sqrt(0.0001f - r2))) < 3e-4f);
+            // The picked vertex is a corner of the hit facet, so it lies near the hit point
+            QVERIFY((sphere->vertexDataRef()[vertex].pos - QVector3D(x, y, 1.0f - dist)).length() < 1.5e-3f);
+        }
+    }
+
+    // Moving the mesh rebuilds the hierarchy; a ray pointing away never hits
+    QMatrix4x4 shift;
+    shift.translate(0.05f, 0.0f, 0.0f);
+    sphere->applyTransform(shift);
+    QVERIFY(!sphere->intersects(QVector3D(0.0f, 0.0f, 1.0f), down, dist, vertex));
+    QVERIFY(sphere->intersects(QVector3D(0.05f, 0.0f, 1.0f), down, dist, vertex));
+    QVERIFY(qAbs(dist - 0.99f) < 3e-4f);
+    QVERIFY(!sphere->intersects(QVector3D(0.05f, 0.0f, 1.0f), -down, dist, vertex));
+    QCOMPARE(vertex, -1);
 }
 
 //=============================================================================================================

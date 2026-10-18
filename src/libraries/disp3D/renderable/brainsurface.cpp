@@ -20,6 +20,8 @@
 #include <QMatrix3x3>
 #include <QMatrix4x4>
 
+#include <algorithm>
+#include <limits>
 #include <set>
 
 namespace DISP3DLIB
@@ -485,138 +487,254 @@ void BrainSurface::boundingBox(QVector3D& min, QVector3D& max) const
     m_bAABBDirty = false;
 }
 
+struct BrainSurface::Bvh
+{
+    struct Node
+    {
+        float min[3];
+        float max[3];
+        int first; // first triangle (leaf) or left child (inner node)
+        int count; // triangles in a leaf, 0 for an inner node
+        int right; // right child of an inner node
+    };
+    std::vector<Node> nodes;
+    std::vector<int> triangles; // triangle indices, grouped by leaf
+    quint64 geometryGeneration = 0;
+    quint64 indexGeneration = 0;
+};
+
+namespace
+{
+constexpr int kBvhLeafSize = 4;
+// Pads node bounds so a ray grazing a flat, axis-aligned box still enters it
+constexpr float kBvhPad = 1e-6f;
+
+void growBox(float* lo, float* hi, const QVector3D& p)
+{
+    for (int a = 0; a < 3; ++a) {
+        lo[a] = std::min(lo[a], p[a]);
+        hi[a] = std::max(hi[a], p[a]);
+    }
+}
+
+// Ray parameter where the ray enters the box, or +inf when it misses it before maxT
+float enterBox(const float* lo, const float* hi, const float* origin, const float* invDir, float maxT)
+{
+    float tNear = 0.0f;
+    float tFar = maxT;
+    for (int a = 0; a < 3; ++a) {
+        float t0 = (lo[a] - origin[a]) * invDir[a];
+        float t1 = (hi[a] - origin[a]) * invDir[a];
+        if (t0 > t1)
+            std::swap(t0, t1);
+        // NaN (origin on a slab plane of a ray parallel to it) keeps the previous bound
+        tNear = t0 > tNear ? t0 : tNear;
+        tFar = t1 < tFar ? t1 : tFar;
+        if (tNear > tFar)
+            return std::numeric_limits<float>::infinity();
+    }
+    return tNear;
+}
+} // namespace
+
+//=============================================================================================================
+
+const BrainSurface::Bvh& BrainSurface::bvh() const
+{
+    if (m_bvh && m_bvh->geometryGeneration == m_geometryGeneration && m_bvh->indexGeneration == m_indexGeneration)
+        return *m_bvh;
+
+    auto tree = std::make_shared<Bvh>();
+    tree->geometryGeneration = m_geometryGeneration;
+    tree->indexGeneration = m_indexGeneration;
+    const int triangleCount = int(m_indexData.size() / 3);
+
+    // Triangle boxes in one contiguous array that the build partitions in place
+    struct Item
+    {
+        float lo[3];
+        int triangle;
+        float hi[3];
+        float pad;
+    };
+    std::vector<Item> items(static_cast<size_t>(triangleCount));
+    for (int t = 0; t < triangleCount; ++t) {
+        Item& item = items[size_t(t)];
+        item.triangle = t;
+        for (int a = 0; a < 3; ++a) {
+            item.lo[a] = std::numeric_limits<float>::max();
+            item.hi[a] = std::numeric_limits<float>::lowest();
+        }
+        for (int k = 0; k < 3; ++k)
+            growBox(item.lo, item.hi, m_vertexData[m_indexData[3 * t + k]].pos);
+    }
+    tree->nodes.reserve(size_t(std::max(1, 2 * triangleCount / kBvhLeafSize + 1)));
+
+    // Top-down build: split each node at the median box centre along its widest centre axis
+    struct Task
+    {
+        int node;
+        int begin;
+        int end;
+    };
+    std::vector<Task> tasks;
+    tree->nodes.push_back({});
+    tasks.push_back({0, 0, triangleCount});
+    while (!tasks.empty()) {
+        const Task task = tasks.back();
+        tasks.pop_back();
+        Bvh::Node node{};
+        float cLo[3];
+        float cHi[3];
+        for (int a = 0; a < 3; ++a) {
+            node.min[a] = cLo[a] = std::numeric_limits<float>::max();
+            node.max[a] = cHi[a] = std::numeric_limits<float>::lowest();
+        }
+        for (int i = task.begin; i < task.end; ++i) {
+            const Item& item = items[size_t(i)];
+            for (int a = 0; a < 3; ++a) {
+                node.min[a] = std::min(node.min[a], item.lo[a]);
+                node.max[a] = std::max(node.max[a], item.hi[a]);
+                const float c = item.lo[a] + item.hi[a];
+                cLo[a] = std::min(cLo[a], c);
+                cHi[a] = std::max(cHi[a], c);
+            }
+        }
+        for (int a = 0; a < 3; ++a) {
+            node.min[a] -= kBvhPad;
+            node.max[a] += kBvhPad;
+        }
+
+        const int axis = (cHi[1] - cLo[1] > cHi[0] - cLo[0]) ? ((cHi[2] - cLo[2] > cHi[1] - cLo[1]) ? 2 : 1)
+                                                             : ((cHi[2] - cLo[2] > cHi[0] - cLo[0]) ? 2 : 0);
+        if (task.end - task.begin <= kBvhLeafSize || cHi[axis] <= cLo[axis]) {
+            node.first = task.begin;
+            node.count = task.end - task.begin;
+            tree->nodes[size_t(task.node)] = node;
+            continue;
+        }
+        const int mid = (task.begin + task.end) / 2;
+        std::nth_element(items.begin() + task.begin, items.begin() + mid, items.begin() + task.end,
+                         [axis](const Item& l, const Item& r) { return l.lo[axis] + l.hi[axis] < r.lo[axis] + r.hi[axis]; });
+        const int left = int(tree->nodes.size());
+        const int right = left + 1;
+        tree->nodes.resize(tree->nodes.size() + 2);
+        node.first = left;
+        node.count = 0;
+        node.right = right;
+        tree->nodes[size_t(task.node)] = node;
+        tasks.push_back({right, mid, task.end});
+        tasks.push_back({left, task.begin, mid});
+    }
+
+    tree->triangles.resize(size_t(triangleCount));
+    for (int i = 0; i < triangleCount; ++i)
+        tree->triangles[size_t(i)] = items[size_t(i)].triangle;
+
+    m_bvh = std::move(tree);
+    return *m_bvh;
+}
+
 //=============================================================================================================
 
 bool BrainSurface::intersects(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist, int& vertexIdx) const
 {
     vertexIdx = -1;
-    if (m_vertexData.isEmpty())
+    if (m_vertexData.isEmpty() || m_indexData.size() < 3)
         return false;
 
-    // 1. AABB Check (Cached)
-    QVector3D min, max;
-    boundingBox(min, max);
+    const Bvh& tree = bvh();
+    const float origin[3] = {rayOrigin.x(), rayOrigin.y(), rayOrigin.z()};
+    const float invDir[3] = {1.0f / rayDir.x(), 1.0f / rayDir.y(), 1.0f / rayDir.z()};
+    const double originX = rayOrigin.x(), originY = rayOrigin.y(), originZ = rayOrigin.z();
+    const double dirX = rayDir.x(), dirY = rayDir.y(), dirZ = rayDir.z();
 
-    // Ray-AABB slab method (Double Precision for stability)
-    double eps = 1e-4;
-    double origin[3] = {rayOrigin.x(), rayOrigin.y(), rayOrigin.z()};
-    double dir[3] = {rayDir.x(), rayDir.y(), rayDir.z()};
-    double minB[3] = {min.x() - eps, min.y() - eps, min.z() - eps};
-    double maxB[3] = {max.x() + eps, max.y() + eps, max.z() + eps};
-
-    // Extract individual components for triangle intersection (Möller–Trumbore)
-    double originX = origin[0], originY = origin[1], originZ = origin[2];
-    double dirX = dir[0], dirY = dir[1], dirZ = dir[2];
-
-    double tmin = -std::numeric_limits<double>::max();
-    double tmax = std::numeric_limits<double>::max();
-
-    for (int i = 0; i < 3; ++i) {
-        if (std::abs(dir[i]) < 1e-15) {
-            if (origin[i] < minB[i] || origin[i] > maxB[i])
-                return false;
-        } else {
-            double t1 = (minB[i] - origin[i]) / dir[i];
-            double t2 = (maxB[i] - origin[i]) / dir[i];
-            if (t1 > t2)
-                std::swap(t1, t2);
-            if (t1 > tmin)
-                tmin = t1;
-            if (t2 < tmax)
-                tmax = t2;
-            if (tmin > tmax)
-                return false;
-        }
-    }
-
-    if (tmax < 1e-7)
-        return false;
-
-    // 2. Triangle intersection
     double closestDist = std::numeric_limits<double>::max();
-    bool hit = false;
-    int closestVert = -1;
+    int closestTriangle = -1;
 
-    // Brute-force triangle intersection using Double Precision Möller–Trumbore
-    // Note: For 100k+ vertices this is slow, ideally we'd use an Octree/BVH.
-    // However, since we only do this on mouse-over, results are usually acceptable if not too many surfaces are active.
-    for (int i = 0; i < m_indexData.size(); i += 3) {
-        int i0 = m_indexData[i];
-        int i1 = m_indexData[i + 1];
-        int i2 = m_indexData[i + 2];
-        const QVector3D& v0q = m_vertexData[i0].pos;
-        const QVector3D& v1q = m_vertexData[i1].pos;
-        const QVector3D& v2q = m_vertexData[i2].pos;
-
-        double v0x = v0q.x(), v0y = v0q.y(), v0z = v0q.z();
-        double v1x = v1q.x(), v1y = v1q.y(), v1z = v1q.z();
-        double v2x = v2q.x(), v2y = v2q.y(), v2z = v2q.z();
-
-        double edge1x = v1x - v0x, edge1y = v1y - v0y, edge1z = v1z - v0z;
-        double edge2x = v2x - v0x, edge2y = v2y - v0y, edge2z = v2z - v0z;
-
-        double hx = dirY * edge2z - dirZ * edge2y;
-        double hy = dirZ * edge2x - dirX * edge2z;
-        double hz = dirX * edge2y - dirY * edge2x;
-
-        double a = edge1x * hx + edge1y * hy + edge1z * hz;
-        if (std::abs(a) < 1e-18)
-            continue; // Purely parallel
-
-        double f = 1.0 / a;
-        double sx = originX - v0x, sy = originY - v0y, sz = originZ - v0z;
-        double u = f * (sx * hx + sy * hy + sz * hz);
-        if (u < -1e-7 || u > 1.0000001)
+    // Möller–Trumbore in double precision on the triangles of the leaves the ray enters, nearest
+    // first. Median splits keep the depth near log2(triangles / leaf size), far below the stack size.
+    int stack[64];
+    int top = 0;
+    stack[top++] = 0;
+    while (top > 0) {
+        const Bvh::Node& node = tree.nodes[size_t(stack[--top])];
+        const float limit = closestDist < double(std::numeric_limits<float>::max()) ? float(closestDist) : std::numeric_limits<float>::max();
+        if (enterBox(node.min, node.max, origin, invDir, limit) == std::numeric_limits<float>::infinity())
             continue;
-
-        double qx = sy * edge1z - sz * edge1y;
-        double qy = sz * edge1x - sx * edge1z;
-        double qz = sx * edge1y - sy * edge1x;
-
-        double v = f * (dirX * qx + dirY * qy + dirZ * qz);
-        if (v < -1e-7 || u + v > 1.0000001)
+        if (node.count == 0) {
+            const Bvh::Node& l = tree.nodes[size_t(node.first)];
+            const Bvh::Node& r = tree.nodes[size_t(node.right)];
+            const float tl = enterBox(l.min, l.max, origin, invDir, limit);
+            const float tr = enterBox(r.min, r.max, origin, invDir, limit);
+            constexpr float miss = std::numeric_limits<float>::infinity();
+            // Push the farther child first so the nearer one is visited next
+            const bool leftFirst = tl <= tr;
+            const int nearChild = leftFirst ? node.first : node.right;
+            const int farChild = leftFirst ? node.right : node.first;
+            if ((leftFirst ? tr : tl) != miss)
+                stack[top++] = farChild;
+            if ((leftFirst ? tl : tr) != miss)
+                stack[top++] = nearChild;
             continue;
+        }
 
-        double t = f * (edge2x * qx + edge2y * qy + edge2z * qz);
-        if (t > 1e-7 && t < closestDist) {
-            // Check barycentric coordinates with Fixed Relative Tolerance (25%)
-            // Relative tolerance scales with triangle size:
-            // - Large triangles (Helmet): Tolerates large gaps (~cm scale)
-            // - Small triangles (Brain): Tolerates small errors (~mm scale)
-            // This prevents clicking 'through' sparse meshes while staying precise on dense ones.
-            constexpr double tol = 0.25;
+        for (int i = node.first; i < node.first + node.count; ++i) {
+            const int t = tree.triangles[size_t(i)];
+            const QVector3D& v0q = m_vertexData[m_indexData[3 * t]].pos;
+            const QVector3D& v1q = m_vertexData[m_indexData[3 * t + 1]].pos;
+            const QVector3D& v2q = m_vertexData[m_indexData[3 * t + 2]].pos;
 
-            if (u >= -tol && v >= -tol && u + v <= 1.0 + tol) {
-                closestDist = t;
-                hit = true;
+            const double v0x = v0q.x(), v0y = v0q.y(), v0z = v0q.z();
+            const double edge1x = v1q.x() - v0x, edge1y = v1q.y() - v0y, edge1z = v1q.z() - v0z;
+            const double edge2x = v2q.x() - v0x, edge2y = v2q.y() - v0y, edge2z = v2q.z() - v0z;
 
-                // Find closest vertex of the hit triangle to the hit point
-                // (Used for region lookup)
-                double hitX = originX + t * dirX;
-                double hitY = originY + t * dirY;
-                double hitZ = originZ + t * dirZ;
+            const double hx = dirY * edge2z - dirZ * edge2y;
+            const double hy = dirZ * edge2x - dirX * edge2z;
+            const double hz = dirX * edge2y - dirY * edge2x;
 
-                double d0 = (v0x - hitX) * (v0x - hitX) + (v0y - hitY) * (v0y - hitY) + (v0z - hitZ) * (v0z - hitZ);
-                double d1 = (v1x - hitX) * (v1x - hitX) + (v1y - hitY) * (v1y - hitY) + (v1z - hitZ) * (v1z - hitZ);
-                double d2 = (v2x - hitX) * (v2x - hitX) + (v2y - hitY) * (v2y - hitY) + (v2z - hitZ) * (v2z - hitZ);
+            const double a = edge1x * hx + edge1y * hy + edge1z * hz;
+            if (std::abs(a) < 1e-18)
+                continue; // Parallel to the triangle
 
-                if (d0 < d1 && d0 < d2)
-                    closestVert = i0;
-                else if (d1 < d2)
-                    closestVert = i1;
-                else
-                    closestVert = i2;
+            const double f = 1.0 / a;
+            const double sx = originX - v0x, sy = originY - v0y, sz = originZ - v0z;
+            const double u = f * (sx * hx + sy * hy + sz * hz);
+            if (u < -1e-7 || u > 1.0000001)
+                continue;
+
+            const double qx = sy * edge1z - sz * edge1y;
+            const double qy = sz * edge1x - sx * edge1z;
+            const double qz = sx * edge1y - sy * edge1x;
+
+            const double v = f * (dirX * qx + dirY * qy + dirZ * qz);
+            if (v < -1e-7 || u + v > 1.0000001)
+                continue;
+
+            const double hitT = f * (edge2x * qx + edge2y * qy + edge2z * qz);
+            if (hitT > 1e-7 && hitT < closestDist) {
+                closestDist = hitT;
+                closestTriangle = t;
             }
         }
     }
 
-    if (hit) {
-        dist = static_cast<float>(closestDist);
-        vertexIdx = closestVert;
-        return true;
-    }
+    if (closestTriangle < 0)
+        return false;
 
-    return false;
+    // The vertex of the hit triangle nearest to the hit point, used for region lookup
+    const QVector3D hit = rayOrigin + float(closestDist) * rayDir;
+    float best = std::numeric_limits<float>::max();
+    for (int k = 0; k < 3; ++k) {
+        const int v = int(m_indexData[3 * closestTriangle + k]);
+        const float d = (m_vertexData[v].pos - hit).lengthSquared();
+        if (d < best) {
+            best = d;
+            vertexIdx = v;
+        }
+    }
+    dist = float(closestDist);
+    return true;
 }
 
 //=============================================================================================================

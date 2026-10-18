@@ -529,6 +529,11 @@ private:
     mutable QVector3D m_aabbMin;
     mutable QVector3D m_aabbMax;
     mutable bool m_bAABBDirty = true;
+
+    // Bounding volume hierarchy over the triangles, built on the first pick after a geometry change
+    struct Bvh;
+    const Bvh& bvh() const;
+    mutable std::shared_ptr<const Bvh> m_bvh;
 };
 
 } // namespace DISP3DLIB
