@@ -64,7 +64,7 @@ These classes are designed for streaming data and run in background threads:
 
 | Class | Description | MNE-Python | MNE-C |
 |---|---|---|---|
-| `RtFilter` | Real-time FIR filtering via FFT overlap-add convolution | `mne.io.Raw.filter` (batch) | `mne_process_raw` |
+| `FilterOverlapAdd` | Real-time FIR filtering via FFT overlap-add convolution | `mne.io.Raw.filter` (batch) | `mne_process_raw` |
 | `RtAveraging` | Real-time epoch averaging with baseline correction | `mne.Evoked` (offline) | `mne_process_raw --ave` |
 | `RtCov` | Background covariance matrix estimation | `mne.compute_raw_covariance` | `mne_process_raw --cov` |
 | `RtNoise` | Real-time noise PSD estimation | `mne.time_frequency.psd_array_welch` | — |

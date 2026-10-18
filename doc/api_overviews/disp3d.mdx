@@ -105,16 +105,16 @@ The view layer implements the **Mediator pattern** — `BrainView` sits between 
 The render engine is where the **Strategy pattern** is most visible. `BrainRenderer` holds a map of pre-compiled `QRhiGraphicsPipeline` objects — one per `ShaderMode` — and selects the appropriate pipeline at draw time.
 
 - **`BrainRenderer`** — The low-level workhorse. It creates and caches `QRhiGraphicsPipeline` objects, manages shared uniform buffers (for the scene-wide MVP and lighting data), and iterates over all visible renderables to issue draw calls. Each renderable provides its own vertex/index/instance buffers; `BrainRenderer` simply binds them and calls `drawIndexed()` or `draw()`. The renderer is stateless between frames — all per-frame data arrives via the `SceneData` struct, making it easy to render the same scene from multiple camera angles (multi-view).
-- **GLSL Shaders** — Six shader programs, each consisting of a `.vert` and `.frag` file. Qt's RHI layer compiles these at load time into the native shading language of the active backend (Metal Shading Language, SPIR-V for Vulkan, HLSL for D3D, or GLSL for OpenGL). The shaders receive per-vertex attributes (position, normal, packed ABGR color, packed ABGR annotation color) and a uniform block with the scene data. The `overlayMode` uniform controls which color channel the fragment shader samples — surface, annotation, scientific colormap, or source estimate.
+- **GLSL Shaders** — One shader program per `ShaderMode`, plus programs for electrodes, MRI slices and video overlays, each consisting of a `.vert` and `.frag` file. Qt's RHI layer compiles these at load time into the native shading language of the active backend (Metal Shading Language, SPIR-V for Vulkan, HLSL for D3D, or GLSL for OpenGL). The shaders receive per-vertex attributes (position, normal, packed ABGR color, packed ABGR annotation color) and a uniform block with the scene data. The `overlayMode` uniform controls which color channel the fragment shader samples — surface, annotation, scientific colormap, or source estimate.
 
-| Shader | Visual Style |
-|--------|-------------|
-| `standard` | Phong lighting (default) |
-| `holographic` | Two-sided holographic effect |
-| `anatomical` | Curvature-based coloring |
-| `dipole` | Dipole cone rendering |
-| `xray` | Semi-transparent x-ray |
-| `shownormals` | Surface-normal visualization |
+| `ShaderMode` | Shader | Visual Style |
+|--------|--------|-------------|
+| `Standard` | `standard` | Phong lighting (default) |
+| `Holographic` | `holographic` | Two-sided holographic effect |
+| `Anatomical` | `anatomical` | Curvature-based coloring |
+| `Dipole` | `dipole` | Dipole cone rendering |
+| `XRay` | `holographic` | Semi-transparent x-ray (additive front faces) |
+| `ShowNormals` | `shownormals` | Surface-normal visualization |
 
 ### Renderable Objects
 

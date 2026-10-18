@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Implementation of the ICP rigid alignment in @ref MNELIB::MNEIcp.
+ * @brief    Implementation of the ICP rigid alignment in @ref MNELIB::performIcp and @ref MNELIB::fitMatchedPoints.
  *
  * Implements the per-iteration nearest-triangle search, the Horn / SVD
  * rigid solve, the convergence criterion (mean / max residual) and the

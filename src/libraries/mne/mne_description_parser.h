@@ -11,7 +11,7 @@
  *
  * @ref MNELIB::MNEDescriptionParser tokenises the @c "average { ... }"
  * / @c "cov { ... }" stanzas used by @c mne_process_raw and turns them
- * into @c MNELIB::MneProcessDescription records that the epoch /
+ * into @c FIFFLIB::AverageDescription / @c MNELIB::CovDescription records that the epoch /
  * covariance machinery downstream can act on.
  */
 

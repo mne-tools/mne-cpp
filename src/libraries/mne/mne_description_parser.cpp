@@ -11,7 +11,7 @@
  *
  * Implements the tokeniser, the @c { ... } stanza state machine and the
  * per-keyword field assignment used to populate one
- * @ref MNELIB::MneProcessDescription per stanza.
+ * @c FIFFLIB::AverageDescription or @c MNELIB::CovDescription per stanza.
  */
 
 //=============================================================================================================

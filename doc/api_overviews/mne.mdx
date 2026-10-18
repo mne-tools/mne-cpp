@@ -101,7 +101,7 @@ flowchart TD
 | `MNEMorphMap` | Vertex-to-vertex mapping between two FreeSurfer surfaces for morphing source estimates | `mne.read_morph_map()` | `morphMapRec` |
 | `MNESurfacePatch` | Patch linking vertices to a source point on cortical surface | Embedded in `SourceSpaces` | Part of `mnePatchInfo` |
 | `MNEProjectToSurface` | Projection of arbitrary 3D points onto a triangulated surface mesh | `_project_onto_surface()` | `mne_project_to_surface` |
-| `MNEIcp` | Iterative Closest Point algorithm for point-cloud-to-surface registration (co-registration) | ICP via `mne.coreg` | — |
+| `performIcp` / `fitMatchedPoints` | Iterative Closest Point and matched-point rigid registration (co-registration, `mne_icp.h`) | ICP via `mne.coreg` | — |
 
 ### Projection & Compensation
 
@@ -155,7 +155,7 @@ flowchart TD
 | Class | Description | MNE-Python | MNE-C |
 |---|---|---|---|
 | `MNEDescriptionParser` | Parser for MNE-C style `.ave` and `.cov` description files | — | `interpret.c` |
-| `MNEProcessDescription` | Parsed averaging/covariance process description data | — | — |
+| `CovDescription` / `ProcessingSettings` | Parsed covariance description and processing settings (`mne_process_description.h`) | — | — |
 | `MNEFilterDef` | Filter definition (highpass, lowpass, notch parameters) | Filter specs | `mneFilterDef` |
 
 ### Clustering

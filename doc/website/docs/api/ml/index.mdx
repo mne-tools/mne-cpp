@@ -8,7 +8,7 @@ sidebar_position: 0
 # Machine Learning Library
 
 **Namespace:** `MLLIB` &nbsp;·&nbsp; **Source:** `src/libraries/ml`
-The `mne_ml` library (`MLLIB` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, built-in linear models, feature scaling, tensor data structures, and a processing pipeline. The primary use case is [CMNE](/docs/manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
+The `mne_ml` library (`MLLIB` namespace) provides machine learning infrastructure for MNE-CPP: ONNX Runtime inference for pre-trained neural networks, tensor data structures, and a launcher for Python training scripts. Classical estimators (scalers, linear models, covariance shrinkage) come from the external skigen library. The primary use case is [CMNE](/docs/manual/glossary#general-concepts) (Contextual Minimum-Norm Estimate) inference, where an LSTM network trained in Python is deployed via ONNX Runtime in C++.
 
 ```cmake
 target_link_libraries(my_app PRIVATE mne_ml)
@@ -22,9 +22,6 @@ Dependencies: `mne_utils`, `mne_math`, Qt6::Core, Eigen3. Optional: ONNX Runtime
 |---|---|---|
 | `MlModel` | `ml/ml_model.h` | Abstract base class for all ML models |
 | `MlOnnxModel` | `ml/ml_onnx_model.h` | ONNX Runtime backed model for neural network inference |
-| `MlLinearModel` | `ml/ml_linear_model.h` | Ridge regression / logistic regression built-in model |
-| `MlPipeline` | `ml/ml_pipeline.h` | Scaler → model processing pipeline |
-| `MlScaler` | `ml/ml_scaler.h` | Feature scaler (StandardScaler or MinMaxScaler) |
 | `MlTensor` | `ml/ml_tensor.h` | N-dimensional row-major float32 tensor with zero-copy semantics |
 | `MLTrainer` | `ml/ml_trainer.h` | Python training script launcher (not available in WASM builds) |
 
@@ -62,7 +59,7 @@ public:
 | `predict(input)` | Run inference on the input tensor |
 | `save(path)` | Save model to file |
 | `load(path)` | Load model from file |
-| `modelType()` | Return model type string (e.g., `"onnx"`, `"linear"`) |
+| `modelType()` | Return model type string (e.g., `"onnx"`) |
 | `taskType()` | Return the task type (Classification, Regression, FeatureExtraction) |
 
 ---
@@ -100,113 +97,6 @@ if (model.load("cmne_lstm.onnx")) {
 :::note
 When built without `USE_ONNXRUNTIME`, all methods throw `std::runtime_error`. The ONNX Runtime shared library is automatically copied alongside `mne_ml` during the build for runtime discovery.
 :::
-
----
-
-## MlLinearModel
-
-Built-in ridge regression and logistic regression:
-
-```cpp
-#include <ml/ml_linear_model.h>
-
-// Ridge regression
-MLLIB::MlLinearModel regressor(MLLIB::MlTaskType::Regression, 1.0);
-
-// After training (weights/bias set externally or loaded)
-MLLIB::MlTensor prediction = regressor.predict(features);
-
-// Access weights
-const Eigen::MatrixXf& W = regressor.weights();  // n_features x n_outputs
-const Eigen::VectorXf& b = regressor.bias();      // n_outputs
-```
-
-| Method | Description |
-|---|---|
-| `predict(input)` | Compute `X * W + b` (regression) or sigmoid/softmax (classification) |
-| `load(path)` / `save(path)` | Serialize weights, bias, and configuration |
-| `weights()` | Access the weight matrix (n_features × n_outputs) |
-| `bias()` | Access the bias vector (n_outputs) |
-| `modelType()` | Returns `"linear"` |
-| `taskType()` | Returns the configured task type |
-
-Constructor parameters:
-
-| Parameter | Type | Default | Description |
-|---|---|---|---|
-| `type` | `MlTaskType` | `Regression` | Task type |
-| `regularization` | `double` | `1.0` | L2 regularization strength (λ) |
-
----
-
-## MlPipeline
-
-Simple scaler → model processing pipeline:
-
-```cpp
-#include <ml/ml_pipeline.h>
-
-MLLIB::MlPipeline pipeline;
-
-// Set up scaler
-MLLIB::MlScaler scaler(MLLIB::MlScaler::StandardScaler);
-pipeline.setScaler(scaler);
-
-// Set up model
-auto model = QSharedPointer<MLLIB::MlOnnxModel>::create();
-model->load("cmne_lstm.onnx");
-pipeline.setModel(model);
-
-// Fit scaler on training data
-pipeline.fitScaler(trainingFeatures);
-
-// Predict (scales input, then runs model)
-MLLIB::MlTensor result = pipeline.predict(testFeatures);
-```
-
-| Method | Description |
-|---|---|
-| `setScaler(scaler)` | Set the feature scaler |
-| `setModel(model)` | Set the model (as `MlModel::SPtr`) |
-| `fitScaler(X)` | Fit the scaler on the given feature matrix |
-| `predict(X)` | Scale (if scaler set) and run model prediction |
-
----
-
-## MlScaler
-
-Feature scaling with two strategies:
-
-```cpp
-#include <ml/ml_scaler.h>
-
-// StandardScaler: (x - mean) / std
-MLLIB::MlScaler scaler(MLLIB::MlScaler::StandardScaler);
-
-// MinMaxScaler: (x - min) / (max - min)
-MLLIB::MlScaler minmax(MLLIB::MlScaler::MinMaxScaler);
-
-// Fit and transform
-MLLIB::MlTensor scaled = scaler.fitTransform(data);
-
-// Transform new data with learned statistics
-MLLIB::MlTensor newScaled = scaler.transform(newData);
-
-// Undo scaling
-MLLIB::MlTensor original = scaler.inverseTransform(scaled);
-```
-
-| Method | Description |
-|---|---|
-| `fit(data)` | Compute statistics from the data |
-| `transform(data)` | Apply the learned transform |
-| `fitTransform(data)` | Convenience: fit then transform |
-| `inverseTransform(data)` | Undo the scaling |
-
-| Scaler Type | Formula |
-|---|---|
-| `StandardScaler` | $(x - \mu) / \sigma$ |
-| `MinMaxScaler` | $(x - x_{\min}) / (x_{\max} - x_{\min})$ |
 
 ---
 
@@ -283,47 +173,15 @@ if (trainer.checkPackages({"torch", "mne", "numpy"})) {
 
 ---
 
-## CMNE Workflow Example
+## CMNE Workflow
 
-A complete CMNE (Contextual Minimum-Norm Estimate) workflow:
-
-```cpp
-#include <ml/ml_onnx_model.h>
-#include <ml/ml_scaler.h>
-#include <ml/ml_pipeline.h>
-#include <ml/ml_tensor.h>
-
-// 1. Set up pipeline
-MLLIB::MlPipeline pipeline;
-
-MLLIB::MlScaler scaler(MLLIB::MlScaler::StandardScaler);
-pipeline.setScaler(scaler);
-
-auto model = QSharedPointer<MLLIB::MlOnnxModel>::create();
-model->load("models/cmne_lstm_audvis.onnx");
-pipeline.setModel(model);
-
-// 2. Prepare input: sensor data as tensor [batch, time_steps, channels]
-//    e.g., 20 preceding time samples × 204 gradiometer channels
-Eigen::MatrixXf sensorData(20, 204);
-// ... fill with MEG data ...
-
-MLLIB::MlTensor input(sensorData);
-pipeline.fitScaler(input);
-
-// 3. Predict source estimates
-MLLIB::MlTensor sourceEstimate = pipeline.predict(input);
-// Output shape: [1, n_sources] — source amplitudes at the current time point
-```
+CMNE is implemented by `INVLIB::InvCMNE` in the inverse library: it z-scores the dSPM estimate and re-weights each time point with the prediction of an LSTM run in ONNX Runtime from the previous contextual estimates (Dinh et al. 2021); see the [Inverse Estimation API](/docs/api/inv/). Use `MlOnnxModel` directly for other ONNX networks.
 
 ## MNE-Python Cross-Reference
 
 | MNE-CPP (MLLIB) | Python Equivalent |
 |---|---|
 | `MlOnnxModel` | `onnxruntime.InferenceSession` |
-| `MlLinearModel` | `sklearn.linear_model.Ridge` / `LogisticRegression` |
-| `MlScaler` | `sklearn.preprocessing.StandardScaler` / `MinMaxScaler` |
-| `MlPipeline` | `sklearn.pipeline.Pipeline` |
 | `MlTensor` | `numpy.ndarray` / `torch.Tensor` |
 | `MLTrainer` | Direct Python execution (no equivalent needed) |
 

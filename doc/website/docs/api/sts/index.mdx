@@ -192,7 +192,7 @@ auto chAdj = STSLIB::StatsAdjacency::fromChannelPositions(info);
 auto chAdj2 = STSLIB::StatsAdjacency::fromChannelPositions(info, {"MEG 0111", "MEG 0121"});
 
 // From a triangulated source space
-auto srcAdj = STSLIB::StatsAdjacency::fromTriangulation(tris, nVertices);
+auto srcAdj = STSLIB::StatsAdjacency::fromSourceSpace(tris, nVertices);
 ```
 
 ### Methods
@@ -200,7 +200,7 @@ auto srcAdj = STSLIB::StatsAdjacency::fromTriangulation(tris, nVertices);
 | Method | Description |
 |---|---|
 | `fromChannelPositions(info, picks)` | Build adjacency from `FiffInfo` channel positions |
-| `fromTriangulation(tris, nVertices)` | Build adjacency from a triangulated surface mesh |
+| `fromSourceSpace(tris, nVertices)` | Build adjacency from a triangulated surface mesh |
 
 ---
 
@@ -338,7 +338,7 @@ for (int c = 0; c < clusterResult.vecClusterPvals.size(); ++c) {
 | `StatsCluster::permutationTest` | `mne.stats.spatio_temporal_cluster_test` |
 | `StsCovEstimators::ledoitWolf` | `sklearn.covariance.LedoitWolf` / `mne.compute_covariance(method='ledoit_wolf')` |
 | `StatsAdjacency::fromChannelPositions` | `mne.channels.find_ch_adjacency` |
-| `StatsAdjacency::fromTriangulation` | `mne.spatial_src_adjacency` |
+| `StatsAdjacency::fromSourceSpace` | `mne.spatial_src_adjacency` |
 | `StatsMcCorrection::bonferroni` | `mne.stats.bonferroni_correction` |
 | `StatsMcCorrection::fdr` | `mne.stats.fdr_correction` |
 | `StatsSourceMetrics::peakLocalizationError` | Custom (no built-in equivalent) |
