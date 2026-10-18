@@ -181,20 +181,20 @@ static QImage tightlyPackedRgba(const QImage& source)
 namespace
 {
 // Uniform buffer sizing
-constexpr int kUniformSlotCount = 8192; // Max draw calls before overflow
-constexpr int kUniformBlockSize = 256;  // Bound size per SRB dynamic slot (bytes)
-constexpr int kVideoOverlaySlots = 64;  // Video overlay draws per frame
+constexpr int kUniformSlotCount = 8192;                    // Max draw calls before overflow
+constexpr int kUniformBlockSize = 256;                     // Bound size per SRB dynamic slot (bytes)
+constexpr int kVideoOverlaySlots = 64;                     // Video overlay draws per frame
 constexpr quint32 kVideoQuadBytes = 4 * 5 * sizeof(float); // 4 verts × (3 pos + 2 uv)
 
 // Per-object uniform byte offsets (must match .vert shader layout).
 // Kept as documentation of the UBO layout even where not directly indexed.
-[[maybe_unused]] constexpr int kOffsetMVP = 0;                 // mat4  (64 bytes)
-[[maybe_unused]] constexpr int kOffsetCameraPos = 64;          // vec3  (12 bytes)
-[[maybe_unused]] constexpr int kOffsetSelected = 76;           // float
-[[maybe_unused]] constexpr int kOffsetLightDir = 80;           // vec3  (12 bytes)
-[[maybe_unused]] constexpr int kOffsetTissueType = 92;         // float
-[[maybe_unused]] constexpr int kOffsetLighting = 96;           // float
-[[maybe_unused]] constexpr int kOffsetOverlayMode = 100;       // float
+[[maybe_unused]] constexpr int kOffsetMVP = 0;           // mat4  (64 bytes)
+[[maybe_unused]] constexpr int kOffsetCameraPos = 64;    // vec3  (12 bytes)
+[[maybe_unused]] constexpr int kOffsetSelected = 76;     // float
+[[maybe_unused]] constexpr int kOffsetLightDir = 80;     // vec3  (12 bytes)
+[[maybe_unused]] constexpr int kOffsetTissueType = 92;   // float
+[[maybe_unused]] constexpr int kOffsetLighting = 96;     // float
+[[maybe_unused]] constexpr int kOffsetOverlayMode = 100; // float
 }
 
 //=============================================================================================================

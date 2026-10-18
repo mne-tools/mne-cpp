@@ -104,7 +104,14 @@ private:
     std::unique_ptr<QRhiShaderResourceBindings> m_sharedSrb;
     std::unique_ptr<QRhiGraphicsPipeline> m_sharedPipeline;
 
-    enum Mode { UpdatesBeforePass, UpdatesInsidePass, SharedUbufAlignmentStride, SharedUbufBlockStride, Done };
+    enum Mode
+    {
+        UpdatesBeforePass,
+        UpdatesInsidePass,
+        SharedUbufAlignmentStride,
+        SharedUbufBlockStride,
+        Done
+    };
     Mode m_mode = UpdatesBeforePass;
     QRhiReadbackResult m_rb;
     int m_frame = 0;
