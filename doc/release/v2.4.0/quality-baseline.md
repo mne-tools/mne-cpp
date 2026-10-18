@@ -5,7 +5,7 @@ Coverage from `2feea06a7` (https://github.com/mne-tools/mne-cpp/actions/runs/388
 
 | Gate | Criterion | Current | Status |
 |---|---|---|---|
-| G1 | Every registered test runs in CI | 261 registered; CI ran 293 on macos-26, 293 on macos-26-qt-min, 293 on ubuntu-24.04, 293 on ubuntu-24.04-qt-min, 293 on windows-2025-vs2026 (2 declared skips), 293 on windows-2025-vs2026-qt-min (2 declared skips) | met |
+| G1 | Every registered test runs in CI | 262 registered; CI ran 293 on macos-26, 293 on macos-26-qt-min, 293 on ubuntu-24.04, 293 on ubuntu-24.04-qt-min, 293 on windows-2025-vs2026 (2 declared skips), 293 on windows-2025-vs2026-qt-min (2 declared skips); not run on macos-26: test_ieeg; not run on macos-26-qt-min: test_ieeg; not run on ubuntu-24.04: test_ieeg; not run on ubuntu-24.04-qt-min: test_ieeg; not run on windows-2025-vs2026: test_ieeg; not run on windows-2025-vs2026-qt-min: test_ieeg | **open** |
 | G1 | Tests carry labels and timeouts | 0 unlabelled, 0 untimed | met |
 | G1 | No retry-to-pass path | 0 retry lines in local scripts | met |
 | G2 | Combined line coverage >= 60.0% | 73.86% (0 lines short) | met |
@@ -13,14 +13,14 @@ Coverage from `2feea06a7` (https://github.com/mne-tools/mne-cpp/actions/runs/388
 | G2 | Applications >= 50.0% line | 55.79% | met |
 | G2 | Tools >= 50.0% line | 61.2% | met |
 | G2 | Libraries >= 65.0% branch | 65.04% | met |
-| G3 | Eligible APIs have an executable example | 100.0% of 368; 389 snippets | met |
+| G3 | Eligible APIs have an executable example | 100.0% of 372; 393 snippets | met |
 | G3 | Exported API is registered | 0 exported classes unregistered | met |
 | G4 | Documentation images generated in CI | 19 referenced, 0 without producer, placeholders in 0 workflows | met |
 | G4 | Visual regression compares to goldens | 19 golden comparisons | met |
 | G5 | Zero compiler warnings | enforced by -Werror on every matrix entry | met |
 | G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 402, raw_new 168, raw_delete 275, console_io 349, numeric_define 847, qt_new_unparented 811, oversized_unit 8 | baseline recorded |
 | G6 | Pinned reference environment | MNE-Python 1.11.0; unpinned in CI: none | met |
-| G6 | Parity claims cross-validated | cross-validated-static 168, cross-validated-live 4, tested 178, unverified 4 | **open** |
+| G6 | Parity claims cross-validated | cross-validated-static 168, cross-validated-live 4, tested 182, unverified 4 | **open** |
 
 Detailed reports: [test inventory](test-inventory.md), [coverage](coverage-baseline.md), [API evidence](api-evidence-baseline.md), [visual](visual-baseline.md), [maintainability](maintainability-baseline.md), [parity evidence](parity-baseline.md), [MNE-Python gap](mne-python-gap.md).
 

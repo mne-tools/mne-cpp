@@ -6,8 +6,8 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38814813717 (comm
 
 ## Registration
 
-- Test directories: 264
-- Registered unconditionally: 255
+- Test directories: 265
+- Registered unconditionally: 256
 - Registered behind a CMake condition or early `return()`: 6
 - Not registered: 3
 - Registered without `LABELS`: 0
@@ -18,12 +18,12 @@ CI evidence: https://github.com/mne-tools/mne-cpp/actions/runs/38814813717 (comm
 
 | Platform | Executed | Failures | Skipped | Registered but not executed |
 |---|---:|---:|---:|---|
-| macos-26 | 293 | 0 | 0 | - |
-| macos-26-qt-min | 293 | 0 | 0 | - |
-| ubuntu-24.04 | 293 | 0 | 0 | - |
-| ubuntu-24.04-qt-min | 293 | 0 | 0 | - |
-| windows-2025-vs2026 | 293 | 0 | 2 | - |
-| windows-2025-vs2026-qt-min | 293 | 0 | 2 | - |
+| macos-26 | 293 | 0 | 0 | `test_ieeg` |
+| macos-26-qt-min | 293 | 0 | 0 | `test_ieeg` |
+| ubuntu-24.04 | 293 | 0 | 0 | `test_ieeg` |
+| ubuntu-24.04-qt-min | 293 | 0 | 0 | `test_ieeg` |
+| windows-2025-vs2026 | 293 | 0 | 2 | `test_ieeg` |
+| windows-2025-vs2026-qt-min | 293 | 0 | 2 | `test_ieeg` |
 
 ## Run-time requirements (lexical signals)
 

@@ -20,24 +20,24 @@
     "lock_file": null
   },
   "summary": {
-    "claims": 354,
+    "claims": 358,
     "by_evidence": {
       "cross-validated-static": 168,
       "cross-validated-live": 4,
-      "tested": 178,
+      "tested": 182,
       "unverified": 4
     },
     "by_source": {
       "classes": {
         "cross-validated-static": 31,
         "cross-validated-live": 1,
-        "tested": 58,
+        "tested": 61,
         "unverified": 0
       },
       "parity": {
         "cross-validated-static": 137,
         "cross-validated-live": 3,
-        "tested": 120,
+        "tested": 121,
         "unverified": 4
       }
     },
@@ -835,6 +835,30 @@
       "claimed": "implemented",
       "test": "test_inv_eloreta_python",
       "evidence": "cross-validated-static"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "IeegImplantation",
+      "python": "mne.channels.DigMontage (iEEG)",
+      "claimed": "implemented",
+      "test": "test_ieeg",
+      "evidence": "tested"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "IeegReference",
+      "python": "mne.set_bipolar_reference",
+      "claimed": "implemented",
+      "test": "test_ieeg",
+      "evidence": "tested"
+    },
+    {
+      "source": "classes",
+      "mne_cpp": "IeegSurfaceMap",
+      "python": "mne.stc_near_sensors",
+      "claimed": "implemented",
+      "test": "test_ieeg",
+      "evidence": "tested"
     },
     {
       "source": "classes",
@@ -2627,6 +2651,14 @@
       "claimed": "implemented",
       "test": "test_sts_cluster",
       "evidence": "cross-validated-static"
+    },
+    {
+      "source": "parity",
+      "mne_cpp": "IeegSurfaceMap::weights",
+      "python": "mne.stc_near_sensors",
+      "claimed": "partial",
+      "test": "test_ieeg",
+      "evidence": "tested"
     },
     {
       "source": "parity",

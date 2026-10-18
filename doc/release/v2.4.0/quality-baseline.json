@@ -11,7 +11,7 @@
   },
   "gates": {
     "G1_test_integrity": {
-      "registered": 261,
+      "registered": 262,
       "conditional": 6,
       "unregistered": 3,
       "without_labels": 0,
@@ -31,6 +31,26 @@
         "ubuntu-24.04-qt-min": 0,
         "windows-2025-vs2026": 2,
         "windows-2025-vs2026-qt-min": 2
+      },
+      "ci_not_executed": {
+        "macos-26": [
+          "test_ieeg"
+        ],
+        "macos-26-qt-min": [
+          "test_ieeg"
+        ],
+        "ubuntu-24.04": [
+          "test_ieeg"
+        ],
+        "ubuntu-24.04-qt-min": [
+          "test_ieeg"
+        ],
+        "windows-2025-vs2026": [
+          "test_ieeg"
+        ],
+        "windows-2025-vs2026-qt-min": [
+          "test_ieeg"
+        ]
       },
       "ci_failures": 0,
       "ci_platform_exclusions": {},
@@ -53,12 +73,12 @@
       }
     },
     "G3_api_documentation": {
-      "public_api_units": 511,
+      "public_api_units": 518,
       "exported_not_registered": 0,
-      "example_eligible": 368,
+      "example_eligible": 372,
       "eligible_backed_percent": 100.0,
-      "snippets": 389,
-      "registered_test_percent": 29.75
+      "snippets": 393,
+      "registered_test_percent": 31.08
     },
     "G4_screenshots": {
       "referenced_images": 19,
@@ -85,15 +105,15 @@
       "inventoried_apis": 443,
       "by_status": {
         "implemented": 195,
-        "partial": 96,
-        "missing": 144,
+        "partial": 97,
+        "missing": 143,
         "not-applicable": 8
       },
-      "claims": 354,
+      "claims": 358,
       "claims_by_evidence": {
         "cross-validated-static": 168,
         "cross-validated-live": 4,
-        "tested": 178,
+        "tested": 182,
         "unverified": 4
       }
     }

@@ -3,27 +3,27 @@
   "generated_by": "tools/quality/audit_api_evidence.py",
   "policy": "tools/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 463,
-    "exported_free_functions": 116,
-    "registered_classes": 511,
+    "exported_classes": 467,
+    "exported_free_functions": 119,
+    "registered_classes": 518,
     "exported_not_registered": 0,
     "registered_function_modules": 13,
-    "registered_header_only": 35,
+    "registered_header_only": 38,
     "registered_stale": 0,
-    "registered_with_test": 152,
+    "registered_with_test": 161,
     "registered_test_unresolved": 0,
-    "registered_with_example": 368,
+    "registered_with_example": 372,
     "registered_example_not_built": 0,
-    "registered_with_python_equiv": 90,
+    "registered_with_python_equiv": 93,
     "registered_without_api_page": 0,
-    "with_snippet": 389,
-    "public_api_units": 511,
-    "example_eligible": 368,
-    "example_exempt": 143,
-    "eligible_backed_by_registry_example": 368,
-    "eligible_used_by_some_example": 346,
-    "examples_on_disk": 68,
-    "examples_built": 68
+    "with_snippet": 393,
+    "public_api_units": 518,
+    "example_eligible": 372,
+    "example_exempt": 146,
+    "eligible_backed_by_registry_example": 372,
+    "eligible_used_by_some_example": 350,
+    "examples_on_disk": 69,
+    "examples_built": 69
   },
   "by_library": {
     "bids": {
@@ -72,13 +72,13 @@
       "with_snippet": 8
     },
     "disp3D": {
-      "public": 48,
-      "registered": 48,
-      "with_test": 33,
-      "eligible": 20,
-      "eligible_with_registry_example": 20,
-      "eligible_used_by_example": 19,
-      "with_snippet": 20
+      "public": 49,
+      "registered": 49,
+      "with_test": 36,
+      "eligible": 18,
+      "eligible_with_registry_example": 18,
+      "eligible_used_by_example": 17,
+      "with_snippet": 18
     },
     "dsp": {
       "public": 85,
@@ -115,6 +115,15 @@
       "eligible_with_registry_example": 10,
       "eligible_used_by_example": 8,
       "with_snippet": 11
+    },
+    "ieeg": {
+      "public": 6,
+      "registered": 6,
+      "with_test": 6,
+      "eligible": 6,
+      "eligible_with_registry_example": 6,
+      "eligible_used_by_example": 6,
+      "with_snippet": 6
     },
     "inv": {
       "public": 55,
@@ -573,6 +582,21 @@
       "name": "buildHashLong",
       "header": "fwd/fwd_global.h",
       "library": "fwd"
+    },
+    {
+      "name": "buildDateTime",
+      "header": "ieeg/ieeg_global.h",
+      "library": "ieeg"
+    },
+    {
+      "name": "buildHash",
+      "header": "ieeg/ieeg_global.h",
+      "library": "ieeg"
+    },
+    {
+      "name": "buildHashLong",
+      "header": "ieeg/ieeg_global.h",
+      "library": "ieeg"
     },
     {
       "name": "applyInverseEpochs",
@@ -3274,6 +3298,63 @@
       "exempt_reason": "header prefix 'disp3D/core/': Renderer internals behind the BrainView/MultimodalScene facade."
     },
     {
+      "name": "GpuStream",
+      "header": "disp3D/core/rendertypes.h",
+      "library": "disp3D",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_brainsurface",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/disp3-d/gpu-stream.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "header prefix 'disp3D/core/': Renderer internals behind the BrainView/MultimodalScene facade."
+    },
+    {
+      "name": "InstancedStreams",
+      "header": "disp3D/core/rendertypes.h",
+      "library": "disp3D",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_brainview",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/disp3-d/instanced-streams.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "header prefix 'disp3D/core/': Renderer internals behind the BrainView/MultimodalScene facade."
+    },
+    {
+      "name": "RenderKey",
+      "header": "disp3D/core/rendertypes.h",
+      "library": "disp3D",
+      "kind": "header-only",
+      "exported": false,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp3d_brainview",
+      "test_resolves": true,
+      "example": null,
+      "example_state": "none",
+      "including_examples": [],
+      "snippets": [],
+      "api_page": "doc/website/docs/api/disp3-d/render-key.mdx",
+      "python_equiv": null,
+      "example_eligible": false,
+      "exempt_reason": "header prefix 'disp3D/core/': Renderer internals behind the BrainView/MultimodalScene facade."
+    },
+    {
       "name": "SubView",
       "header": "disp3D/core/viewstate.h",
       "library": "disp3D",
@@ -3741,56 +3822,6 @@
       "exempt_reason": null
     },
     {
-      "name": "ElectrodeArray",
-      "header": "disp3D/renderable/electrodeobject.h",
-      "library": "disp3D",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#electrode_object_usage",
-        "ex_disp3d_scene/main.cpp#electrode_object_usage",
-        "ex_disp3d_scene/main.cpp#electrode_object_usage"
-      ],
-      "api_page": "doc/website/docs/api/disp3-d/electrode-array.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
-      "name": "ElectrodeContact",
-      "header": "disp3D/renderable/electrodeobject.h",
-      "library": "disp3D",
-      "kind": "exported-class",
-      "exported": true,
-      "registered": true,
-      "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": "ex_disp3d_scene",
-      "example_state": "built",
-      "including_examples": [
-        "ex_disp3d_scene"
-      ],
-      "snippets": [
-        "ex_disp3d_scene/main.cpp#electrode_object_usage",
-        "ex_disp3d_scene/main.cpp#electrode_object_usage",
-        "ex_disp3d_scene/main.cpp#electrode_object_usage"
-      ],
-      "api_page": "doc/website/docs/api/disp3-d/electrode-contact.mdx",
-      "python_equiv": null,
-      "example_eligible": true,
-      "exempt_reason": null
-    },
-    {
       "name": "ElectrodeObject",
       "header": "disp3D/renderable/electrodeobject.h",
       "library": "disp3D",
@@ -3806,8 +3837,6 @@
         "ex_disp3d_scene"
       ],
       "snippets": [
-        "ex_disp3d_scene/main.cpp#electrode_object_usage",
-        "ex_disp3d_scene/main.cpp#electrode_object_usage",
         "ex_disp3d_scene/main.cpp#electrode_object_usage"
       ],
       "api_page": "doc/website/docs/api/disp3-d/electrode-object.mdx",
@@ -7900,6 +7929,155 @@
       "python_equiv": null,
       "example_eligible": false,
       "exempt_reason": "registry: Per-thread work item of the parallel dipole loop inside ComputeFwd; built and consumed only by FwdBemModel, never by callers."
+    },
+    {
+      "name": "IeegContact",
+      "header": "ieeg/ieeg_implantation.h",
+      "library": "ieeg",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_ieeg",
+      "test_resolves": true,
+      "example": "ex_ieeg",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene",
+        "ex_ieeg"
+      ],
+      "snippets": [
+        "ex_ieeg/main.cpp#ieeg_implantation_usage",
+        "ex_ieeg/main.cpp#ieeg_implantation_usage",
+        "ex_ieeg/main.cpp#ieeg_implantation_usage"
+      ],
+      "api_page": "doc/website/docs/api/ieeg/ieeg-contact.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "IeegImplantation",
+      "header": "ieeg/ieeg_implantation.h",
+      "library": "ieeg",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_ieeg",
+      "test_resolves": true,
+      "example": "ex_ieeg",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene",
+        "ex_ieeg"
+      ],
+      "snippets": [
+        "ex_ieeg/main.cpp#ieeg_implantation_usage",
+        "ex_ieeg/main.cpp#ieeg_implantation_usage",
+        "ex_ieeg/main.cpp#ieeg_implantation_usage"
+      ],
+      "api_page": "doc/website/docs/api/ieeg/ieeg-implantation.mdx",
+      "python_equiv": "mne.channels.DigMontage (iEEG)",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "IeegLead",
+      "header": "ieeg/ieeg_implantation.h",
+      "library": "ieeg",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_ieeg",
+      "test_resolves": true,
+      "example": "ex_ieeg",
+      "example_state": "built",
+      "including_examples": [
+        "ex_disp3d_scene",
+        "ex_ieeg"
+      ],
+      "snippets": [
+        "ex_ieeg/main.cpp#ieeg_implantation_usage",
+        "ex_ieeg/main.cpp#ieeg_implantation_usage",
+        "ex_ieeg/main.cpp#ieeg_implantation_usage"
+      ],
+      "api_page": "doc/website/docs/api/ieeg/ieeg-lead.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "IeegBipolarPair",
+      "header": "ieeg/ieeg_reference.h",
+      "library": "ieeg",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_ieeg",
+      "test_resolves": true,
+      "example": "ex_ieeg",
+      "example_state": "built",
+      "including_examples": [
+        "ex_ieeg"
+      ],
+      "snippets": [
+        "ex_ieeg/main.cpp#ieeg_reference_usage",
+        "ex_ieeg/main.cpp#ieeg_reference_usage"
+      ],
+      "api_page": "doc/website/docs/api/ieeg/ieeg-bipolar-pair.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "IeegReference",
+      "header": "ieeg/ieeg_reference.h",
+      "library": "ieeg",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_ieeg",
+      "test_resolves": true,
+      "example": "ex_ieeg",
+      "example_state": "built",
+      "including_examples": [
+        "ex_ieeg"
+      ],
+      "snippets": [
+        "ex_ieeg/main.cpp#ieeg_reference_usage",
+        "ex_ieeg/main.cpp#ieeg_reference_usage"
+      ],
+      "api_page": "doc/website/docs/api/ieeg/ieeg-reference.mdx",
+      "python_equiv": "mne.set_bipolar_reference",
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "IeegSurfaceMap",
+      "header": "ieeg/ieeg_surface_map.h",
+      "library": "ieeg",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_ieeg",
+      "test_resolves": true,
+      "example": "ex_ieeg",
+      "example_state": "built",
+      "including_examples": [
+        "ex_ieeg"
+      ],
+      "snippets": [
+        "ex_ieeg/main.cpp#ieeg_surface_map_usage"
+      ],
+      "api_page": "doc/website/docs/api/ieeg/ieeg-surface-map.mdx",
+      "python_equiv": "mne.stc_near_sensors",
+      "example_eligible": true,
+      "exempt_reason": null
     },
     {
       "name": "InvBeamformer",
