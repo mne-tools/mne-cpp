@@ -54,6 +54,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     inspect_electrodes
     inspect_mri_slices
     mne_disp3D
+    mne_ieeg
     mne_fiff
     mne_mri
     mne_utils

@@ -106,13 +106,14 @@ subject.
 | Input | Notes |
 |---|---|
 | FIFF | Uses the intracranial points in `ISOTRAK`. Groups are inferred from contact name prefixes. |
-| BIDS `*_electrodes.tsv` | The companion `*_coordsystem.json` selects the source coordinate frame. |
-| CSV (`name,x,y,z[,group]`) | Coordinates are assumed to be in the frame of the currently loaded MRI. |
+| BIDS `*_electrodes.tsv` | The companion `*_coordsystem.json` gives the frame and units. `ACPC` / `ScanRAS` positions are scanner RAS of the T1 and are moved onto the surfaces with the subject's `mri/T1.mgz`; without it the file is refused. |
+| CSV (`name,x,y,z[,lead,type]`) | Coordinates are assumed to be in the frame of the currently loaded MRI. |
 
-The loader produces one `ElectrodeArray` per group, classified as
-`Depth` (sEEG), `Strip`, or `Grid` (ECoG) based on the contact layout.
-Each array becomes a `SceneLayer` of kind `Electrode` and the layout
-type drives the default geometry (cylindrical depths, planar grids).
+The loader produces an `IeegImplantation`: contacts grouped into leads by
+name (`LA1`, `LA2`, … form lead `LA`) and classified as depth (sEEG),
+strip or grid (ECoG), from a declared type or from the contact spacing.
+The implantation is shown as one `SceneLayer` of kind `Electrode`; the
+lead type drives the geometry (shafts for depths, ties for strips and grids).
 
 ![Electrode loader](/img/manual/auto/inspect-multimodal/load-electrodes.png)
 
@@ -180,7 +181,7 @@ MRI slices) is rendered before translucent overlays. The available
 | `MriSlice` | One orthogonal MRI slice (axial / coronal / sagittal). |
 | `Sensor` | MEG / EEG sensor positions. |
 | `Helmet` | MEG helmet shell. |
-| `Electrode` | sEEG depth, ECoG strip or ECoG grid `ElectrodeArray`. |
+| `Electrode` | sEEG depth leads, ECoG strips and grids of an `IeegImplantation`. |
 | `Dipole` | Dipole renderable. |
 | `SourceOverlay` | Source-estimate activation overlay attached to a `BrainSurface`. |
 | `Network` | Connectivity network graph. |

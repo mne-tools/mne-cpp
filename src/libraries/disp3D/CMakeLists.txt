@@ -160,6 +160,7 @@ set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt6::")
 
 set(MNE_LIBS_REQUIRED
+    mne_ieeg
     mne_utils
     mne_math
     mne_fiff

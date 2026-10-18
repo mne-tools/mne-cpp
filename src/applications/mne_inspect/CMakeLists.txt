@@ -86,7 +86,7 @@ set_target_properties(mne_inspect_app_core PROPERTIES
 )
 
 #---------------------------------------------------------------------------
-# mne_inspect_demo_fixtures: synthetic ElectrodeArray/MriVolData payloads
+# mne_inspect_demo_fixtures: synthetic IeegImplantation/MriVolData payloads
 # shared between the screenshot tool (mne_doc_shots) and the multimodal
 # test frame so visual docs and tests render the exact same scene.
 #---------------------------------------------------------------------------
@@ -103,6 +103,7 @@ target_link_libraries(mne_inspect_demo_fixtures PUBLIC
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Gui
     mne_disp3D
+    mne_ieeg
     mne_mri
     mne_fiff
     Eigen3::Eigen

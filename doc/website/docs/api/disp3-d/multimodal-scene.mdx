@@ -35,18 +35,18 @@ The class is **non-virtual** on purpose: it is a pure data/dispatch hub with no 
 MultimodalScene scene;
 scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QVector3D& bbMin, QVector3D& bbMax) {
     const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());
-    bbMin = bbMax = object->arrays().first().contacts.first().position;
-    for (const ElectrodeContact& c : object->arrays().first().contacts) {
-        bbMin = QVector3D(std::min(bbMin.x(), c.position.x()), std::min(bbMin.y(), c.position.y()), std::min(bbMin.z(), c.position.z()));
-        bbMax = QVector3D(std::max(bbMax.x(), c.position.x()), std::max(bbMax.y(), c.position.y()), std::max(bbMax.z(), c.position.z()));
-    }
+    const Eigen::MatrixX3f positions = object->implantation().positions();
+    const Eigen::Vector3f lo = positions.colwise().minCoeff().transpose();
+    const Eigen::Vector3f hi = positions.colwise().maxCoeff().transpose();
+    bbMin = QVector3D(lo.x(), lo.y(), lo.z());
+    bbMax = QVector3D(hi.x(), hi.y(), hi.z());
     return true;
 });
 SceneLayer layer;
 layer.id = "seeg_LH";
 layer.kind = SceneLayerKind::Electrode;
 auto payload = std::make_shared<ElectrodeObject>();
-payload->setArrays(electrodes.arrays());
+payload->setImplantation(electrodes.implantation());
 layer.payload = payload;
 scene.addLayer(layer);
 scene.setOverlayThresholds(2.0f, 4.0f, 8.0f);

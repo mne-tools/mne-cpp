@@ -8508,50 +8508,6 @@
       "python_url": null
     },
     {
-      "name": "ElectrodeArray",
-      "module": "disp3D",
-      "header": "disp3D/renderable/electrodeobject.h",
-      "origin": "custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": "ex_disp3d_scene",
-      "example_snippet": [
-        "ex_disp3d_scene/main.cpp#electrode_object_usage"
-      ],
-      "example_mode": "run",
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 11,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null
-    },
-    {
-      "name": "ElectrodeContact",
-      "module": "disp3D",
-      "header": "disp3D/renderable/electrodeobject.h",
-      "origin": "custom",
-      "mne_c_tool": null,
-      "mne_python": null,
-      "sklearn": null,
-      "test": null,
-      "example": "ex_disp3d_scene",
-      "example_snippet": [
-        "ex_disp3d_scene/main.cpp#electrode_object_usage"
-      ],
-      "example_mode": "run",
-      "status": "documented",
-      "skigen_candidate": false,
-      "documented": true,
-      "sidebar_position": 12,
-      "guide": null,
-      "python_equiv": null,
-      "python_url": null
-    },
-    {
       "name": "PickResult",
       "module": "disp3D",
       "header": "disp3D/scene/pickresult.h",

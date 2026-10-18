@@ -454,6 +454,7 @@ private:
     //=========================================================================================================
     DISP3DLIB::MultimodalScene m_scene;
     ELECTRODESPLUGIN::ElectrodesPlugin m_electrodesPlugin;
+    QString m_subjectDir; /**< FreeSurfer subject directory of the loaded surfaces, for its T1. */
     MRISLICESPLUGIN::MriSlicesPlugin m_mriSlicesPlugin;
     MNEINSPECT::PickReadoutModel m_pickReadout;
 

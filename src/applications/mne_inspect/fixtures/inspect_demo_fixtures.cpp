@@ -17,15 +17,13 @@
 #include <fiff/fiff_file.h>
 #include <mri/mri_types.h>
 
-#include <QColor>
 #include <QString>
-#include <QVector3D>
 
 #include <cmath>
 
-using DISP3DLIB::ElectrodeArray;
-using DISP3DLIB::ElectrodeContact;
-using DISP3DLIB::ElectrodeLayout;
+using IEEGLIB::IeegContact;
+using IEEGLIB::IeegImplantation;
+using IEEGLIB::IeegLeadType;
 using MRILIB::MriSlice;
 using MRILIB::MriVolData;
 
@@ -35,92 +33,48 @@ namespace MNEINSPECT
 namespace
 {
 
-ElectrodeArray makeDepthStrip(const QString& label,
-                              const QVector3D& origin,
-                              int nContacts,
-                              float spacing = 0.005f)
+IeegContact makeContact(const QString& name, const QString& lead, const Eigen::Vector3f& position)
 {
-    ElectrodeArray arr;
-    arr.label = label;
-    arr.layout = ElectrodeLayout::Depth;
-    for (int i = 0; i < nContacts; ++i) {
-        ElectrodeContact c;
-        c.name = QStringLiteral("%1%2").arg(label).arg(i);
-        c.position = origin + QVector3D(0.0f, 0.0f, static_cast<float>(i) * spacing);
-        arr.contacts.append(c);
-    }
-    return arr;
+    IeegContact c;
+    c.name = name;
+    c.lead = lead;
+    c.position = position;
+    return c;
 }
 
-ElectrodeArray makeEcogStrip(const QString& label,
-                             const QVector3D& origin,
-                             int nContacts,
-                             float spacing = 0.008f)
+void addLine(QVector<IeegContact>& contacts, const QString& lead, const Eigen::Vector3f& origin,
+             const Eigen::Vector3f& step, int nContacts, int firstNumber)
 {
-    ElectrodeArray arr;
-    arr.label = label;
-    arr.layout = ElectrodeLayout::Strip;
-    arr.gridRows = 1;
-    arr.gridCols = nContacts;
-    for (int i = 0; i < nContacts; ++i) {
-        ElectrodeContact c;
-        c.name = QStringLiteral("%1%2").arg(label).arg(i + 1);
-        c.position = origin + QVector3D(static_cast<float>(i) * spacing, 0.0f, 0.0f);
-        arr.contacts.append(c);
-    }
-    return arr;
-}
-
-ElectrodeArray makeEcogGrid(const QString& label,
-                            const QVector3D& origin,
-                            int rows,
-                            int cols,
-                            float spacing = 0.006f)
-{
-    ElectrodeArray arr;
-    arr.label = label;
-    arr.layout = ElectrodeLayout::Grid;
-    arr.gridRows = rows;
-    arr.gridCols = cols;
-    for (int r = 0; r < rows; ++r) {
-        for (int c = 0; c < cols; ++c) {
-            ElectrodeContact contact;
-            contact.name = QStringLiteral("%1_R%2C%3").arg(label).arg(r + 1).arg(c + 1);
-            contact.position = origin + QVector3D(static_cast<float>(c) * spacing, static_cast<float>(r) * spacing, 0.0f);
-            arr.contacts.append(contact);
-        }
-    }
-    return arr;
+    for (int i = 0; i < nContacts; ++i)
+        contacts.append(makeContact(QStringLiteral("%1%2").arg(lead).arg(i + firstNumber), lead, origin + float(i) * step));
 }
 
 } // namespace
 
-QVector<ElectrodeArray> demoOneDepthStrip()
+IeegImplantation demoOneDepthStrip()
 {
-    ElectrodeArray arr;
-    arr.label = QStringLiteral("LA");
-    arr.layout = ElectrodeLayout::Depth;
-    for (int i = 0; i < 4; ++i) {
-        ElectrodeContact c;
-        c.name = QStringLiteral("LA%1").arg(i);
-        c.position = QVector3D(0.0f, 0.0f, static_cast<float>(i) * 0.01f);
-        arr.contacts.append(c);
-    }
-    return {arr};
+    QVector<IeegContact> contacts;
+    addLine(contacts, QStringLiteral("LA"), Eigen::Vector3f::Zero(), Eigen::Vector3f(0.0f, 0.0f, 0.01f), 4, 0);
+    IeegImplantation implantation(contacts);
+    implantation.setLeadType(QStringLiteral("LA"), IeegLeadType::Depth);
+    return implantation;
 }
 
-QVector<ElectrodeArray> demoFourArrayMontage()
+IeegImplantation demoFourArrayMontage()
 {
-    QVector<ElectrodeArray> out;
-    out.append(makeDepthStrip(QStringLiteral("LA"),
-                              QVector3D(-0.035f, 0.010f, 0.0f), 6));
-    out.append(makeDepthStrip(QStringLiteral("RA"),
-                              QVector3D(0.035f, 0.010f, 0.0f), 6));
-    out.append(makeEcogStrip(QStringLiteral("LG"),
-                             QVector3D(-0.020f, -0.020f, 0.030f), 6));
-    out.append(makeEcogGrid(QStringLiteral("RG"),
-                            QVector3D(0.010f, -0.020f, 0.030f), 4, 4));
-    return out;
+    QVector<IeegContact> contacts;
+    addLine(contacts, QStringLiteral("LA"), Eigen::Vector3f(-0.035f, 0.010f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.005f), 6, 0);
+    addLine(contacts, QStringLiteral("RA"), Eigen::Vector3f(0.035f, 0.010f, 0.0f), Eigen::Vector3f(0.0f, 0.0f, 0.005f), 6, 0);
+    addLine(contacts, QStringLiteral("LG"), Eigen::Vector3f(-0.020f, -0.020f, 0.030f), Eigen::Vector3f(0.008f, 0.0f, 0.0f), 6, 1);
+    for (int r = 0; r < 4; ++r) {
+        for (int c = 0; c < 4; ++c)
+            contacts.append(makeContact(QStringLiteral("RG%1").arg(r * 4 + c + 1), QStringLiteral("RG"),
+                                        Eigen::Vector3f(0.010f + 0.006f * float(c), -0.020f + 0.006f * float(r), 0.030f)));
+    }
+    IeegImplantation implantation(contacts);
+    implantation.setLeadType(QStringLiteral("LG"), IeegLeadType::Strip);
+    implantation.setLeadType(QStringLiteral("RG"), IeegLeadType::Grid, 4, 4);
+    return implantation;
 }
 
 std::unique_ptr<MriVolData> demoMriSlab(int dim)

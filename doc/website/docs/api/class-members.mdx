@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6345 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6336 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -205,7 +205,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **applyZeroPhaseMatrix** `[fn]` in [IirFilter](/docs/api/dsp/iir-filter) — Apply zero-phase filtering to every row of a matrix (each row = one channel).
 - **area** `[var]` in [MNEPatchInfo](/docs/api/mne/mne-patch-info) — Total surface area of the patch (m^2).
 - **area** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Triangle area.
-- **arrays** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **ArtifactSettingsView** `[fn]` in [ArtifactSettingsView](/docs/api/disp/artifact-settings-view)
 - **aspect_kind** `[var]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Aspect identifier, either FIFFV_ASPECT_AVERAGE or FIFFV_ASPECT_STD_ERR.
 - **aspectKindToString** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Provides the python Evoked string formatted aspect_kind, which is stored in kind: "average" &lt;-&gt; FIFFV_ASPECT_AVERAGE, "standard_error" &lt;-&gt; FIFFV_ASPECT_STD_ERR or "unknown".
@@ -561,6 +560,7 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **clearAllData** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **clearBem** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Remove all BEM surfaces from the scene.
 - **clearCameraFocusOverride** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Remove the camera focus override; revert to auto-computed bounds.
+- **clearContactValues** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Restore the lead colours of all contacts.
 - **clearData** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Clear all stored sample data without affecting channel metadata.
 - **clearData** `[fn]` in [RtSensorDataController](/docs/api/disp3-d/rt-sensor-data-controller) — Clear all queued data and reset the worker state.
 - **clearData** `[fn]` in [RtSourceDataController](/docs/api/disp3-d/rt-source-data-controller) — Clear all queued data and reset the worker state.
@@ -577,7 +577,7 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **clearOpticalFineAdjust** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration) — Undo the last fine adjustment, restoring the original solved axis.
 - **clearProbeVisualization** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Remove the probe visualization from the scene.
 - **clearReferenceMarkersRequested** `[signal]` in [TimeRulerWidget](/docs/api/disp/time-ruler-widget) — Emitted when the user requests that all sample markers be cleared.
-- **clearSelection** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Clear all contact selections.
+- **clearSelection** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Clear the contact selection.
 - **clearSelectionBem** `[fn]` in [CoregSettingsView](/docs/api/disp/coreg-settings-view) — Clear/Emüpty the selection menu for bem models.
 - **clearSelectionGroup** `[fn]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
 - **clearSensors** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Remove sensor geometry, digitizer points, and the MEG helmet surface.
@@ -679,7 +679,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **color** `[var]` in [AverageCategory](/docs/api/fiff/average-category) — Display color (unused in batch).
 - **color** `[var]` in `ButterflyTypeGroup`
 - **color** `[var]` in [ChannelDisplayInfo](/docs/api/disp/channel-display-info) — Line colour to use in the GPU renderer.
-- **color** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Display colour; invalid uses the colour of the array.
 - **color** `[var]` in `EventMarker` — Display colour of the line and label chip.
 - **color** `[var]` in `InstanceData`
 - **color** `[var]` in `InstanceData`
@@ -1067,7 +1066,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **contactAt** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **contactLabel** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **contactRenderKey** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
-- **contacts** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Contacts in order along the lead (contact 1 first).
 - **contacts** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
 - **contacts** `[var]` in [IeegLead](/docs/api/ieeg/ieeg-lead) — Contact indices in order along the lead, contact 1 first.
 - **contactStreams** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
@@ -2372,10 +2370,8 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **graphInputs** `[var]` in `Context` — Graph-level inputs (populated before execution).
 - **graphInputs** `[var]` in [MnaGraph](/docs/api/mna/mna-graph) — Named, typed entry points.
 - **graphOutputs** `[var]` in [MnaGraph](/docs/api/mna/mna-graph) — Named, typed exit points.
-- **gridCols** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Grid only: number of cols (Strip uses Cols = N, Rows = 1).
 - **gridIndex** `[var]` in [InvFocalDipole](/docs/api/inv/inv-focal-dipole) — Nearest grid index (-1 if truly off-grid).
 - **gridIndices** `[var]` in [InvSourceCoupling](/docs/api/inv/inv-source-coupling) — Grid indices of the coupled sources (size N).
-- **gridRows** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Grid only: number of rows.
 - **gridVisible** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **group** `[var]` in [BidsElectrode](/docs/api/bids/bids-electrode) — iEEG: lead (shaft, strip or grid) the contact belongs to (OPTIONAL).
 - **growCircularLabel** `[fn]` in [FsLabelUtils](/docs/api/fs/fs-label-utils) — Grow a circular label around seed vertices, as mne.grow_labels does for one seed set.
@@ -2541,6 +2537,7 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **imbalanceMatrix** `[fn]` in [FineCalibration](/docs/api/dsp/fine-calibration) — Gradiometer imbalance terms.
 - **iMinDistance** `[var]` in [PeakFinderParams](/docs/api/dsp/peak-finder-params) — Minimum distance between peaks (samples).
 - **impedance** `[var]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Impedance value or "n/a" (OPTIONAL).
+- **implantation** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **in_nuse** `[var]` in [MNESssData](/docs/api/mne/mne-sss-data) — How many components included in the inside expansion.
 - **in_order** `[var]` in [MNESssData](/docs/api/mne/mne-sss-data) — Order of the inside expansion.
 - **in_use** `[var]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Per-column count of non-zero elements in the derivation data.
@@ -2782,6 +2779,7 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **isRealtimeStreaming** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Check whether real-time streaming is active.
 - **isRejected** `[fn]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Returns whether this epoch should be excluded from averaging.
 - **isRunning** `[fn]` in [RtNoise](/docs/api/dsp/rt-noise) — Returns whether the worker thread is running.
+- **isScannerRas** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
 - **isSelected** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface)
 - **isSelected** `[var]` in `InstanceData`
 - **isSelected** `[var]` in `InstanceData`
@@ -2873,7 +2871,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **label** `[var]` in `AnnotationSpan` — Annotation label shown near the top edge.
 - **label** `[var]` in [DigitizedPoint](/docs/api/utils/digitized-point) — Human label ("NAS", "Cz", "HSP-42", …).
 - **label** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
-- **label** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Array label: "LH", "GridA", etc.
 - **label** `[var]` in `EventMarker` — Short text label (shown at the bottom strip); defaults to type number.
 - **label** `[var]` in [IcaLabelResult](/docs/api/decoding/ica-label-result) — Assigned label.
 - **label** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Channel names as written in the file (e.g.
@@ -2903,7 +2900,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **layers** `[var]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — An array of layers.
 - **layers** `[fn]` in [MultimodalScene](/docs/api/disp3-d/multimodal-scene)
 - **layersChanged** `[signal]` in [MultimodalScene](/docs/api/disp3-d/multimodal-scene) — Emitted whenever the layer set or any layer flag (visibility, opacity, drawOrder) changes.
-- **layout** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Geometry kind.
 - **layoutChanged** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model) — Updates the layout map.
 - **LayoutScene** `[fn]` in [LayoutScene](/docs/api/disp/layout-scene) — Constructs a [`LayoutScene`](/docs/api/disp/layout-scene).
 - **lead** `[var]` in [IeegContact](/docs/api/ieeg/ieeg-contact) — Lead name; empty when building derives it from the contact name.
@@ -3443,7 +3439,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **name** `[var]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Electrode name (REQUIRED).
 - **name** `[var]` in [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info)
 - **name** `[var]` in [ChannelDisplayInfo](/docs/api/disp/channel-display-info) — Channel name for the label.
-- **name** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Contact label, e.g.
 - **name** `[var]` in [ElectrodePosition](/docs/api/utils/electrode-position) — Electrode name (e.g.
 - **name** `[var]` in [FsLabel](/docs/api/fs/fs-label) — Name of the label.
 - **name** `[var]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — Textual identifier.
@@ -4029,7 +4024,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **pos** `[var]` in [VertexData](/docs/api/disp3-d/vertex-data)
 - **position** `[var]` in [BrainVisionMarker](/docs/api/bids/brain-vision-marker) — 0-based sample position.
 - **position** `[var]` in [DigitizedPoint](/docs/api/utils/digitized-point) — Position in metres, sensor frame.
-- **position** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Position in metres, MRI surface RAS.
 - **position** `[var]` in [FastrakSample](/docs/api/utils/fastrak-sample) — Position in metres (always normalised to SI).
 - **position** `[var]` in [FineCalEntry](/docs/api/dsp/fine-cal-entry) — Coil position in device coordinates (metres).
 - **position** `[var]` in [IeegBipolarPair](/docs/api/ieeg/ieeg-bipolar-pair) — Midpoint of the two contacts.
@@ -4179,7 +4173,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **r2** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Position of vertex 1.
 - **r3** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Position of vertex 2.
 - **rad** `[var]` in [FwdEegSphereLayer](/docs/api/fwd/fwd-eeg-sphere-layer) — The actual rads.
-- **radius** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Drawn radius in metres; 0 uses the default of the array's layout.
 - **radius** `[var]` in [LiveMarker](/docs/api/disp3-d/live-marker)
 - **radius** `[fn]` in [Sphere](/docs/api/math/sphere) — The radius of the sphere.
 - **randomSeed** `[var]` in [MnaProvenance](/docs/api/mna/mna-provenance) — -1 if not applicable
@@ -4683,7 +4676,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **selectChannels** `[fn]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — Select channels This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View).
 - **selectClear** `[fn]` in [ApplyToView](/docs/api/disp/apply-to-view) — Clear all View Select checkboxes.
 - **selectContact** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Select a contact by name.
-- **selected** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Whether the contact is selected/highlighted.
 - **selectedBem** `[signal]` in [DipoleFitView](/docs/api/disp/dipole-fit-view) — Set new Bem model.
 - **selectedContact** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **selectedItemChanged** `[signal]` in [BidsView](/docs/api/disp/bids-view) — Sends the index of currently selected item to update saved current items.
@@ -4748,7 +4740,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **setAnnotationSelectionEnabled** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Enable or disable annotation range selection.
 - **setAnnotationsVisible** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **setAnnotationsVisible** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
-- **setArrays** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Set electrode data from array definitions.
 - **setArtifactReduction** `[fn]` in [RtAveraging](/docs/api/dsp/rt-averaging) — Sets the artifact reduction.
 - **setArtifactReduction** `[fn]` in [RtAveragingWorker](/docs/api/dsp/rt-averaging-worker) — Sets the artifact reduction.
 - **setAutoCompute** `[signal]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
@@ -4830,7 +4821,7 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **setConnection** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **setConnectivityMethod** `[fn]` in [Network](/docs/api/connectivity/network) — Sets the connectivity measure method used to create the data of this network structure.
 - **setConnectivityMethods** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
-- **setContactValues** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Apply per-contact scalar overlay values and map them to a color gradient.
+- **setContactValues** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Colour contacts by value, mapped linearly between the smallest and largest given value.
 - **setCrosshairEnabled** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Enable or disable the crosshair cursor with coordinate readout.
 - **setCrosshairEnabled** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Enable or disable the crosshair cursor overlay.
 - **setCrosshairEnabled** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Shows a crosshair at the mouse position and reports the value under it via `cursorDataChanged()`, like [`ChannelDataView`](/docs/api/disp/channel-data-view).
@@ -4931,6 +4922,7 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **setHoveredContact** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Highlight one contact while the pointer is over it, without changing the selection.
 - **setHpiDigitizer** `[fn]` in [RtHpi](/docs/api/dsp/rt-hpi) — Set the new projection matrix.
 - **setHubStatus** `[fn]` in [NetworkNode](/docs/api/connectivity/network-node) — Sets the hub status of this node.
+- **setImplantation** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Draw an implantation.
 - **setInfo** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Set a new fiff measurement info.
 - **setInfo** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Sets corresponding fiff info.
 - **setInfoPanelVisible** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Show or hide the info panel (FPS, vertices, shader).
@@ -4953,6 +4945,7 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **setLastFileSample** `[fn]` in [OverviewBarWidget](/docs/api/disp/overview-bar-widget)
 - **setLayerOpacity** `[fn]` in [MultimodalScene](/docs/api/disp3-d/multimodal-scene) — Set per-layer opacity in [0, 1].
 - **setLayerVisible** `[fn]` in [MultimodalScene](/docs/api/disp3-d/multimodal-scene) — Toggle visibility of a layer.
+- **setLeadType** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation) — Set a lead's type when it is declared rather than inferred.
 - **setLightingEnabled** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Enable or disable lighting for the scene.
 - **setLineCallback** `[fn]` in [PythonRunner](/docs/api/utils/python-runner) — Set a callback invoked for every stdout/stderr line.
 - **setLiveMarkers** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Replace the set of live overlay markers.
@@ -5262,8 +5255,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **shaderMode** `[fn]` in [SurfaceTreeItem](/docs/api/disp3-d/surface-tree-item)
 - **shaderModeChanged** `[signal]` in [BrainView](/docs/api/disp3-d/brain-view) — Emitted whenever the active brain shader mode changes — either via `setShaderMode` or after restoring persisted state in `BrainView::loadMultiViewSettings` "loadMultiViewSettings".
 - **shaderModeForTarget** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Get configured shader mode name for a target view.
-- **shaftColor** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Lead colour; invalid picks one from the lead palette.
-- **shaftRadius** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Depth only: shaft radius in metres; 0 uses the default.
 - **shape** `[fn]` in [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate) — Get the 3D grid shape.
 - **shape** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
 - **shape** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
@@ -5917,6 +5908,7 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **transform_source_space_to** `[fn]` in [MNE](/docs/api/mne/mne-class) — mne_transform_source_space_to
 - **transform_source_space_to** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces)
 - **transform_source_spaces_to** `[fn]` in [MNESourceSpace](/docs/api/mne/mne-source-space)
+- **transformed** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
 - **TransformMode** `[enum]` in [DecodingCsp](/docs/api/decoding/decoding-csp) — Transform mode for the CSP output.
 - **TransformMode** `[enum]` in [DecodingSpoc](/docs/api/decoding/decoding-spoc) — Transform mode for the SPoC output.
 - **transformToHead** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Move every point that shares the frame of the LPA, nasion and RPA points into the Neuromag head frame defined by these fiducials (mne.channels.transform_to_head).
@@ -6122,7 +6114,6 @@ Index of 6345 public class members (functions, variables, typedefs, enums) acros
 - **validate** `[fn]` in [MNEDeriv](/docs/api/mne/mne-deriv) — Checks every derived channel against channel info (MNE-C `mne_validate_deriv`).
 - **vals** `[var]` in [MNERawBufDef](/docs/api/mne/mne-raw-buf-def) — Sample values matrix [nchan x ns], row-major (empty if not loaded).
 - **value** `[var]` in [BidsEvent](/docs/api/bids/bids-event) — Numeric event value / trigger code.
-- **value** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Optional scalar for colormap overlay.
 - **value** `[var]` in [InvToken](/docs/api/inv/inv-token) — Continuous value (0 for structural tokens).
 - **value** `[var]` in [PickResult](/docs/api/disp3-d/pick-result) — Optional scalar overlay value at the picked element (uV, dSPM, MRI intensity).
 - **value** `[fn]` in [ScaleControl](/docs/api/disp/scale-control) — Return the value of the control.

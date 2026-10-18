@@ -2074,6 +2074,7 @@ void MainWindow::loadInitialData(const QString& subjectPath,
         qWarning() << "or load data interactively through the UI.";
     } else {
         qInfo() << "Loading surfaces...";
+        m_subjectDir = subjectPath + "/" + subjectName;
         loadHemisphere(subjectPath, subjectName, "lh");
         loadHemisphere(subjectPath, subjectName, "rh");
         qInfo() << "Surfaces loaded.";
@@ -3372,12 +3373,16 @@ void MainWindow::onLoadElectrodes()
         return;
     }
     const QString suffix = QFileInfo(path).suffix().toLower();
-    const bool ok = (suffix == QLatin1String("tsv")) ? m_electrodesPlugin.loadBids(path)
-        : (suffix == QLatin1String("csv"))           ? m_electrodesPlugin.loadCsv(path)
-                                                     : m_electrodesPlugin.loadFiff(path);
+    const QString t1Path = m_subjectDir.isEmpty() ? QString() : m_subjectDir + QStringLiteral("/mri/T1.mgz");
+    const bool bids = suffix == QLatin1String("tsv");
+    const bool ok = bids                   ? m_electrodesPlugin.loadBids(path, t1Path)
+        : (suffix == QLatin1String("csv")) ? m_electrodesPlugin.loadCsv(path)
+                                           : m_electrodesPlugin.loadFiff(path);
     if (!ok) {
+        const QString reason = bids ? m_electrodesPlugin.lastError() : QString();
         QMessageBox::warning(this, tr("Load Electrodes"),
-                             tr("Failed to load electrode data from:\n%1").arg(path));
+                             reason.isEmpty() ? tr("Failed to load electrode data from:\n%1").arg(path)
+                                              : tr("Failed to load electrode data from:\n%1\n\n%2").arg(path, reason));
         return;
     }
     if (m_statusLabel) {

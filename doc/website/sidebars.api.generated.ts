@@ -661,8 +661,6 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp3-d/rt-source-interpolation-mat-worker',
         'api/disp3-d/slice-object',
         'api/disp3-d/video-overlay',
-        'api/disp3-d/electrode-array',
-        'api/disp3-d/electrode-contact',
         'api/disp3-d/pick-result',
         'api/disp3-d/scene-layer',
         'api/disp3-d/abstract-tree-item',

@@ -7,8 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.3.0
  * @date     May, 2026
- * @brief    Tests for MultimodalScene, PickResult and the v2.3.0 ElectrodeArray
- *           extension to ElectrodeObject.
+ * @brief    Tests for MultimodalScene, PickResult and ElectrodeObject lead bodies.
  */
 
 //=============================================================================================================
@@ -18,6 +17,7 @@
 #include <disp3D/scene/multimodalscene.h>
 #include <disp3D/scene/pickresult.h>
 #include <disp3D/renderable/electrodeobject.h>
+#include <ieeg/ieeg_implantation.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -68,8 +68,7 @@ private slots:
     void testWorldBoundsFallsBackToUnitCubeWhenEmpty();
     void testWorldBoundsUnionWithRegisteredFn();
 
-    // ElectrodeArray
-    void testElectrodeArrayDefaultLayoutIsDepth();
+    // ElectrodeObject
     void testStripLayoutSkipsCylinderGeometry();
 };
 
@@ -353,36 +352,22 @@ void TestMultimodalScene::testWorldBoundsUnionWithRegisteredFn()
 }
 
 //=============================================================================================================
-// ElectrodeArray
+// ElectrodeObject
 //=============================================================================================================
-
-void TestMultimodalScene::testElectrodeArrayDefaultLayoutIsDepth()
-{
-    ElectrodeArray a;
-    QCOMPARE(a.layout, ElectrodeLayout::Depth);
-    QCOMPARE(a.gridRows, 1);
-    QCOMPARE(a.gridCols, 1);
-}
 
 void TestMultimodalScene::testStripLayoutSkipsCylinderGeometry()
 {
     // A strip has no shaft: its two contacts are joined by one thin tie
-    ElectrodeArray strip;
-    strip.label = "GridStrip";
-    strip.layout = ElectrodeLayout::Strip;
-    strip.gridRows = 1;
-    strip.gridCols = 2;
-    ElectrodeContact c0;
+    IEEGLIB::IeegContact c0;
     c0.name = "S1";
-    c0.position = QVector3D(0, 0, 0);
-    ElectrodeContact c1;
+    IEEGLIB::IeegContact c1;
     c1.name = "S2";
-    c1.position = QVector3D(0.01f, 0, 0);
-    strip.contacts = {c0, c1};
+    c1.position = Eigen::Vector3f(0.01f, 0.0f, 0.0f);
 
     ElectrodeObject obj;
-    obj.setArrays({strip});
+    obj.setImplantation(IEEGLIB::IeegImplantation({c0, c1}));
 
+    QCOMPARE(obj.implantation().leads().first().type, IEEGLIB::IeegLeadType::Strip);
     QCOMPARE(obj.bodyStreams().instanceCount, 1);
     QCOMPARE(obj.contactStreams().instanceCount, 2);
 }

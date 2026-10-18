@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.3.0
  * @date     May, 2026
- * @brief    ElectrodesPlugin — mne_inspect plugin that loads a digitised
- *           electrode set (EEG / sEEG / ECoG) from FIFF or CSV, surfaces an
- *           ElectrodeArray collection (Depth / Strip / Grid layouts), and
- *           publishes the selection through MultimodalScene.
+ * @brief    ElectrodesPlugin — mne_inspect plugin that loads an sEEG / ECoG
+ *           implantation from BIDS, FIFF or CSV into an IEEGLIB::IeegImplantation,
+ *           draws it through DISP3DLIB::ElectrodeObject, and publishes the
+ *           selection through MultimodalScene.
  *
  *           NOTE: mne_inspect does not yet ship a plugin loader. The plugin
  *           is built as a standalone static library that the host owns and
@@ -67,10 +67,10 @@ enum class ElectrodeSource
  * @brief mne_inspect plugin: load and publish a digitised electrode set.
  *
  * Responsibilities:
- *   - Load EEG / sEEG / ECoG contact positions from FIFF (`FiffDigPointSet`)
- *     or CSV (`label,x,y,z[,array,layout]`).
- *   - Group contacts into `DISP3DLIB::ElectrodeArray` records with the
- *     appropriate `Depth` / `Strip` / `Grid` layout.
+ *   - Load sEEG / ECoG contact positions from BIDS iEEG (`*_electrodes.tsv`),
+ *     FIFF (`FiffDigPointSet`) or CSV (`label,x,y,z[,lead,type]`).
+ *   - Group contacts into the depth leads, strips and grids of an
+ *     `IEEGLIB::IeegImplantation`.
  *   - Hand the resulting `DISP3DLIB::ElectrodeObject` to the host through
  *     @ref electrodeObject() and register it as a `SceneLayerKind::Electrode`
  *     layer when @ref attachScene() has been called.
@@ -94,8 +94,8 @@ public:
      * Load digitiser points from a FIFF file.
      *
      * Reads `FiffDigPointSet`, keeps points whose kind is `FIFFV_POINT_EEG`
-     * or `FIFFV_POINT_EXTRA`, and groups them into a single Depth-layout
-     * array labelled by the file basename. Existing data is replaced.
+     * or `FIFFV_POINT_EXTRA`, and groups them into a single lead named after
+     * the file. Existing data is replaced.
      *
      * @param[in] path   Path to a .fif file containing digitiser points.
      * @return true if at least one usable point was found.
@@ -107,12 +107,12 @@ public:
      * Load contacts from a CSV file.
      *
      * Expected columns (header optional, comma-separated):
-     *   label, x, y, z [, array_label [, layout]]
+     *   label, x, y, z [, lead [, type]]
      *
-     * `layout` is one of `depth`, `strip`, `grid` (case-insensitive). Rows
-     * sharing the same `array_label` are grouped into one
-     * `DISP3DLIB::ElectrodeArray`. When `array_label` is missing all rows
-     * collapse into a single array named after the file.
+     * Positions are in metres. `type` is one of `depth`, `strip`, `grid`
+     * (case-insensitive); without it, contact spacing decides. Rows sharing
+     * the same `lead` form one lead; without one, all rows form a single lead
+     * named after the file.
      *
      * @param[in] path   Path to a .csv file.
      * @return true if at least one contact row parsed successfully.
@@ -122,20 +122,31 @@ public:
     //=========================================================================================================
     /**
      * Load sEEG / ECoG contacts from a BIDS iEEG `*_electrodes.tsv`, read and grouped into
-     * leads by IEEGLIB::IeegImplantation::readBids. Positions are taken to be in the frame of
-     * the loaded surfaces (FreeSurfer surface RAS, as MNE-BIDS writes "ACPC").
+     * leads by IEEGLIB::IeegImplantation::readBids.
      *
-     * @param[in] path   Path to a *_electrodes.tsv file.
-     * @return true if at least one contact with coordinates was read.
+     * Positions in "ACPC" or "ScanRAS" are scanner RAS of the subject's T1, as MNE-BIDS reads
+     * them; they are moved into the surface RAS of the FreeSurfer surfaces using the T1 header,
+     * and the file is refused without a T1. Other systems are taken as surface RAS.
+     *
+     * @param[in] path    Path to a *_electrodes.tsv file.
+     * @param[in] t1Path  The subject's mri/T1.mgz.
+     * @return true if at least one contact with coordinates was placed; see @ref lastError otherwise.
      */
-    bool loadBids(const QString& path);
+    bool loadBids(const QString& path, const QString& t1Path = QString());
+
+    /**
+     * @return Why the last @ref loadBids failed, or an empty string.
+     */
+    QString lastError() const
+    {
+        return m_lastError;
+    }
 
     //=========================================================================================================
     /**
-     * Replace the held arrays directly. Useful for tests and for callers
-     * that materialise the geometry themselves (e.g. coregistration wizard).
+     * Replace the implantation directly, e.g. one built in code.
      */
-    void setArrays(const QVector<DISP3DLIB::ElectrodeArray>& arrays);
+    void setImplantation(const IEEGLIB::IeegImplantation& implantation);
 
     //=========================================================================================================
     /**
@@ -157,9 +168,9 @@ public:
 
     //=========================================================================================================
     /**
-     * @return Number of arrays currently held.
+     * @return Number of leads currently held.
      */
-    int arrayCount() const;
+    int leadCount() const;
 
     //=========================================================================================================
     /**
@@ -245,12 +256,13 @@ signals:
 
 private:
     void publishToScene();
-    void rebuildFromArrays(const QVector<DISP3DLIB::ElectrodeArray>& arrays);
+    void rebuild(const IEEGLIB::IeegImplantation& implantation);
 
     std::unique_ptr<DISP3DLIB::ElectrodeObject> m_object;
     DISP3DLIB::MultimodalScene* m_scene = nullptr;
     ElectrodeSource m_source = ElectrodeSource::None;
     QString m_sourcePath;
+    QString m_lastError;
 };
 
 } // namespace ELECTRODESPLUGIN

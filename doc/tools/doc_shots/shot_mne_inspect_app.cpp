@@ -132,7 +132,7 @@ bool renderMneInspectApp(const ShotSpec& spec,
     const QJsonObject setup = spec.setup;
 
     if (setup.value(QStringLiteral("load_demo_electrodes")).toBool(false)) {
-        mw.electrodesPlugin().setArrays(MNEINSPECT::demoFourArrayMontage());
+        mw.electrodesPlugin().setImplantation(MNEINSPECT::demoFourArrayMontage());
     }
     if (setup.value(QStringLiteral("load_demo_mri")).toBool(false)) {
         if (!mw.mriSlicesPlugin().setVolume(MNEINSPECT::demoMriSlab())) {

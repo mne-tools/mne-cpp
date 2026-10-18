@@ -8,7 +8,7 @@
  * @since    2.2.0
  * @date     April, 2026
  * @brief    Tests for ElectrodeObject — sEEG / ECoG electrode geometry and data overlay.
- *           Tests array construction, contact selection, value overlay, and bounding box.
+ *           Tests the view of an IeegImplantation: selection, value overlay, bounding box.
  */
 
 //=============================================================================================================
@@ -16,6 +16,7 @@
 //=============================================================================================================
 
 #include <disp3D/renderable/electrodeobject.h>
+#include <ieeg/ieeg_implantation.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -30,15 +31,27 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace IEEGLIB;
 
 namespace
 {
-DISP3DLIB::ElectrodeContact makeContact(const QString& name, const QVector3D& position)
+IeegContact makeContact(const QString& name, const Eigen::Vector3f& position)
 {
-    DISP3DLIB::ElectrodeContact contact;
+    IeegContact contact;
     contact.name = name;
     contact.position = position;
     return contact;
+}
+
+// nLeads depth leads "S<l>_C<c>" with 3.5 mm spacing, 2 cm apart
+IeegImplantation createTestImplantation(int nLeads, int contactsPerLead)
+{
+    QVector<IeegContact> contacts;
+    for (int l = 0; l < nLeads; ++l) {
+        for (int c = 0; c < contactsPerLead; ++c)
+            contacts.append(makeContact(QString("S%1_C%2").arg(l).arg(c), Eigen::Vector3f(l * 0.02f, 0.0f, c * 0.0035f)));
+    }
+    return IeegImplantation(contacts);
 }
 } // namespace
 
@@ -56,19 +69,14 @@ private slots:
     void initTestCase();
 
     void testEmptyConstruction();
-    void testSetArrays();
-    void testTotalContactCount();
+    void testSetImplantation();
     void testContactSelection();
-    void testClearSelection();
     void testContactValues();
     void testBoundingBox();
     void testSingleContact();
     void testGeometryGeneration();
 
     void cleanupTestCase();
-
-private:
-    QVector<ElectrodeArray> createTestArrays(int nArrays, int contactsPerArray) const;
 };
 
 //=============================================================================================================
@@ -83,56 +91,25 @@ void TestElectrodeObject::testEmptyConstruction()
 {
     ElectrodeObject obj;
     QCOMPARE(obj.totalContactCount(), 0);
-    QVERIFY(obj.arrays().isEmpty());
+    QVERIFY(obj.implantation().isEmpty());
     QVERIFY(obj.selectedContact().isEmpty());
+    QCOMPARE(obj.contactStreams().instanceCount, 0);
 }
 
 //=============================================================================================================
 
-void TestElectrodeObject::testSetArrays()
+void TestElectrodeObject::testSetImplantation()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeArray> arrays = createTestArrays(3, 8);
-    obj.setArrays(arrays);
-
-    QCOMPARE(obj.arrays().size(), 3);
-    QCOMPARE(obj.arrays()[0].contacts.size(), 8);
-    QCOMPARE(obj.arrays()[1].contacts.size(), 8);
-    QCOMPARE(obj.arrays()[2].contacts.size(), 8);
-}
-
-//=============================================================================================================
-
-void TestElectrodeObject::testTotalContactCount()
-{
-    ElectrodeObject obj;
-
-    // 10 arrays × 12 contacts = 120 total
-    QVector<ElectrodeArray> arrays = createTestArrays(10, 12);
-    obj.setArrays(arrays);
+    obj.setImplantation(createTestImplantation(10, 12));
     QCOMPARE(obj.totalContactCount(), 120);
+    QCOMPARE(obj.implantation().leads().size(), 10);
+    QCOMPARE(obj.contactStreams().instanceCount, 120);
+    QCOMPARE(obj.bodyStreams().instanceCount, 10); // one shaft per depth lead
 
-    // Different sizes
-    QVector<ElectrodeArray> mixed;
-    ElectrodeArray a1;
-    a1.label = "A";
-    for (int i = 0; i < 5; ++i) {
-        ElectrodeContact c;
-        c.name = QString("A%1").arg(i);
-        c.position = QVector3D(0, 0, i);
-        a1.contacts.append(c);
-    }
-    ElectrodeArray a2;
-    a2.label = "B";
-    for (int i = 0; i < 3; ++i) {
-        ElectrodeContact c;
-        c.name = QString("B%1").arg(i);
-        c.position = QVector3D(10, 0, i);
-        a2.contacts.append(c);
-    }
-    mixed << a1 << a2;
-    obj.setArrays(mixed);
-    QCOMPARE(obj.totalContactCount(), 8);
+    obj.setImplantation(createTestImplantation(2, 3));
+    QCOMPARE(obj.totalContactCount(), 6);
+    QCOMPARE(obj.contactAt(4)->name, QString("S1_C1"));
 }
 
 //=============================================================================================================
@@ -140,28 +117,16 @@ void TestElectrodeObject::testTotalContactCount()
 void TestElectrodeObject::testContactSelection()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeArray> arrays = createTestArrays(2, 4);
-    obj.setArrays(arrays);
+    obj.setImplantation(createTestImplantation(2, 4));
 
     obj.selectContact("S0_C2");
     QCOMPARE(obj.selectedContact(), QString("S0_C2"));
-
-    // Selecting a different contact replaces the selection
     obj.selectContact("S1_C0");
     QCOMPARE(obj.selectedContact(), QString("S1_C0"));
-}
-
-//=============================================================================================================
-
-void TestElectrodeObject::testClearSelection()
-{
-    ElectrodeObject obj;
-    QVector<ElectrodeArray> arrays = createTestArrays(1, 4);
-    obj.setArrays(arrays);
+    obj.selectContact("nope");
+    QVERIFY(obj.selectedContact().isEmpty());
 
     obj.selectContact("S0_C1");
-    QVERIFY(!obj.selectedContact().isEmpty());
-
     obj.clearSelection();
     QVERIFY(obj.selectedContact().isEmpty());
 }
@@ -171,20 +136,18 @@ void TestElectrodeObject::testClearSelection()
 void TestElectrodeObject::testContactValues()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeArray> arrays = createTestArrays(1, 4);
-    obj.setArrays(arrays);
+    obj.setImplantation(createTestImplantation(1, 4));
+    const quint64 generation = obj.contactStreams().instances.generation;
 
     QMap<QString, float> values;
     values["S0_C0"] = 0.0f;
-    values["S0_C1"] = 0.5f;
     values["S0_C2"] = 1.0f;
-    values["S0_C3"] = 0.75f;
-
     obj.setContactValues(values, Qt::blue, Qt::red);
+    QCOMPARE(obj.contactStreams().instances.generation, generation + 1);
+    QCOMPARE(obj.totalContactCount(), 4);
 
-    // After setting values, the contacts should have updated colors
-    // Verify the array still has the correct contact count
-    QCOMPARE(obj.arrays()[0].contacts.size(), 4);
+    obj.clearContactValues();
+    QCOMPARE(obj.contactStreams().instances.generation, generation + 2);
 }
 
 //=============================================================================================================
@@ -192,47 +155,30 @@ void TestElectrodeObject::testContactValues()
 void TestElectrodeObject::testBoundingBox()
 {
     ElectrodeObject obj;
-    QVector<ElectrodeArray> arrays = createTestArrays(2, 5);
-    obj.setArrays(arrays);
+    const IeegImplantation implantation = createTestImplantation(2, 5);
+    obj.setImplantation(implantation);
 
-    QVector3D bbMin = obj.boundingBoxMin();
-    QVector3D bbMax = obj.boundingBoxMax();
-
-    // Bounding box should enclose all contact positions
-    for (const auto& arr : arrays) {
-        for (const auto& contact : arr.contacts) {
-            // The box includes the drawn contact radius
-            const QVector3D pad(ElectrodeObject::kDepthContactRadius, ElectrodeObject::kDepthContactRadius, ElectrodeObject::kDepthContactRadius);
-            QVERIFY(bbMin.x() <= contact.position.x() - pad.x() + 1e-6f && bbMax.x() >= contact.position.x() + pad.x() - 1e-6f);
-            QVERIFY(bbMin.y() <= contact.position.y() - pad.y() + 1e-6f && bbMax.y() >= contact.position.y() + pad.y() - 1e-6f);
-            QVERIFY(bbMin.z() <= contact.position.z() - pad.z() + 1e-6f && bbMax.z() >= contact.position.z() + pad.z() - 1e-6f);
+    const QVector3D bbMin = obj.boundingBoxMin();
+    const QVector3D bbMax = obj.boundingBoxMax();
+    const float pad = ElectrodeObject::kDepthContactRadius - 1e-6f;
+    for (const IeegContact& contact : implantation.contacts()) {
+        for (int k = 0; k < 3; ++k) {
+            QVERIFY(bbMin[k] <= contact.position[k] - pad);
+            QVERIFY(bbMax[k] >= contact.position[k] + pad);
         }
     }
-
-    QVERIFY(bbMax.x() >= bbMin.x());
-    QVERIFY(bbMax.y() >= bbMin.y());
-    QVERIFY(bbMax.z() >= bbMin.z());
 }
 
 //=============================================================================================================
 
 void TestElectrodeObject::testSingleContact()
 {
-    // Edge case: a depth array with a single contact (no cylinder can be drawn)
+    // A lead with a single contact has no body
     ElectrodeObject obj;
-    ElectrodeArray arr;
-    arr.label = "X";
-    ElectrodeContact c;
-    c.name = "X1";
-    c.position = QVector3D(0.01f, 0.02f, 0.03f);
-    arr.contacts.append(c);
-
-    QVector<ElectrodeArray> arrays;
-    arrays << arr;
-    obj.setArrays(arrays);
-
+    obj.setImplantation(IeegImplantation({makeContact("X1", Eigen::Vector3f(0.01f, 0.02f, 0.03f))}));
     QCOMPARE(obj.totalContactCount(), 1);
-    QCOMPARE(obj.arrays().size(), 1);
+    QCOMPARE(obj.contactStreams().instanceCount, 1);
+    QCOMPARE(obj.bodyStreams().instanceCount, 0);
 }
 
 //=============================================================================================================
@@ -240,34 +186,28 @@ void TestElectrodeObject::testSingleContact()
 void TestElectrodeObject::testGeometryGeneration()
 {
     // A depth lead, a strip and a 2 x 2 grid, in metres
-    ElectrodeArray depth;
-    depth.label = "LA";
-    ElectrodeArray strip;
-    strip.label = "ST";
-    strip.layout = ElectrodeLayout::Strip;
-    ElectrodeArray grid;
-    grid.label = "GR";
-    grid.layout = ElectrodeLayout::Grid;
-    grid.gridRows = 2;
-    grid.gridCols = 2;
-    for (int i = 0; i < 4; ++i) {
-        depth.contacts.append(makeContact(QString("LA%1").arg(i + 1), QVector3D(0.0f, 0.0f, 0.0035f * float(i))));
-        strip.contacts.append(makeContact(QString("ST%1").arg(i + 1), QVector3D(0.05f + 0.01f * float(i), 0.0f, 0.0f)));
-        grid.contacts.append(makeContact(QString("GR%1").arg(i + 1), QVector3D(0.01f * float(i % 2), 0.05f + 0.01f * float(i / 2), 0.0f)));
-    }
+    QVector<IeegContact> contacts;
+    for (int i = 0; i < 4; ++i)
+        contacts.append(makeContact(QString("LA%1").arg(i + 1), Eigen::Vector3f(0.0f, 0.0f, 0.0035f * float(i))));
+    for (int i = 0; i < 4; ++i)
+        contacts.append(makeContact(QString("ST%1").arg(i + 1), Eigen::Vector3f(0.05f + 0.01f * float(i), 0.0f, 0.0f)));
+    for (int i = 0; i < 4; ++i)
+        contacts.append(makeContact(QString("GR%1").arg(i + 1), Eigen::Vector3f(0.01f * float(i % 2), 0.05f + 0.01f * float(i / 2), 0.0f)));
     // A gap too wide for one array is not tied
-    strip.contacts[3].position.setX(0.2f);
+    contacts[7].position.x() = 0.2f;
+    IeegImplantation implantation(contacts);
+    QVERIFY(implantation.setLeadType("GR", IeegLeadType::Grid, 2, 2));
 
     ElectrodeObject obj;
-    obj.setArrays({depth, strip, grid});
+    obj.setImplantation(implantation);
 
     // One sphere per contact; bodies: 1 shaft + 2 strip ties + 4 grid ties
-    const InstancedStreams contacts = obj.contactStreams();
-    QCOMPARE(contacts.instanceCount, 12);
-    QVERIFY(contacts.indexCount > 0 && contacts.vertices.bytes > 0);
+    const InstancedStreams streams = obj.contactStreams();
+    QCOMPARE(streams.instanceCount, 12);
+    QVERIFY(streams.indexCount > 0 && streams.vertices.bytes > 0);
     QCOMPARE(obj.bodyStreams().instanceCount, 1 + 2 + 4);
 
-    // Drawn sizes follow the layout: depth contacts are smaller than subdural ones
+    // Drawn sizes follow the lead type: depth contacts are smaller than subdural ones
     float dist = 0.0f;
     const QVector3D down(0.0f, 0.0f, -1.0f);
     QCOMPARE(obj.intersect(QVector3D(ElectrodeObject::kDepthContactRadius * 0.9f, 0.0f, 1.0f), down, dist), 3);
@@ -281,7 +221,7 @@ void TestElectrodeObject::testGeometryGeneration()
     // Leads get distinct colours; hovering re-uploads only the contact instances
     QVERIFY(ElectrodeObject::leadColor(0) != ElectrodeObject::leadColor(1));
     const quint64 bodyGeneration = obj.bodyStreams().instances.generation;
-    const quint64 contactGeneration = contacts.instances.generation;
+    const quint64 contactGeneration = streams.instances.generation;
     obj.setHoveredContact(4);
     obj.setHoveredContact(4);
     QCOMPARE(obj.contactStreams().instances.generation, contactGeneration + 1);
@@ -292,29 +232,6 @@ void TestElectrodeObject::testGeometryGeneration()
 
 void TestElectrodeObject::cleanupTestCase()
 {
-}
-
-//=============================================================================================================
-
-QVector<ElectrodeArray> TestElectrodeObject::createTestArrays(int nArrays, int contactsPerArray) const
-{
-    QVector<ElectrodeArray> arrays;
-    for (int s = 0; s < nArrays; ++s) {
-        ElectrodeArray arr;
-        arr.label = QString("S%1").arg(s);
-
-        for (int c = 0; c < contactsPerArray; ++c) {
-            ElectrodeContact contact;
-            contact.name = QString("S%1_C%2").arg(s).arg(c);
-            contact.position = QVector3D(s * 0.02f, 0.0f, c * 0.0035f);
-            contact.color = Qt::white;
-            contact.selected = false;
-            contact.value = 0.0f;
-            arr.contacts.append(contact);
-        }
-        arrays.append(arr);
-    }
-    return arrays;
 }
 
 //=============================================================================================================

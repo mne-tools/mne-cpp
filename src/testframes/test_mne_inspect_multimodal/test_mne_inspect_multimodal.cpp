@@ -63,7 +63,7 @@ private slots:
     void pickCorticalVertexFormatsReadout();
 
 private:
-    static QVector<ElectrodeArray> sampleArrays();
+    static IEEGLIB::IeegImplantation sampleImplantation();
 };
 
 //=============================================================================================================
@@ -75,7 +75,7 @@ void TestMneInspectMultimodal::initTestCase()
 
 //=============================================================================================================
 
-QVector<ElectrodeArray> TestMneInspectMultimodal::sampleArrays()
+IEEGLIB::IeegImplantation TestMneInspectMultimodal::sampleImplantation()
 {
     // Delegate to the shared demo fixture so test scenes and doc-shot
     // renders stay byte-identical.
@@ -90,7 +90,7 @@ void TestMneInspectMultimodal::twoPluginsShareSceneAndToggleIndependently()
     ElectrodesPlugin electrodes;
     MriSlicesPlugin mri;
 
-    electrodes.setArrays(sampleArrays());
+    electrodes.setImplantation(sampleImplantation());
     electrodes.attachScene(&scene);
     mri.attachScene(&scene);
 
@@ -195,7 +195,7 @@ void TestMneInspectMultimodal::pickContactDrivesReadoutAndJumpsMri()
     MultimodalScene scene;
     ElectrodesPlugin electrodes;
     MriSlicesPlugin mri;
-    electrodes.setArrays(sampleArrays());
+    electrodes.setImplantation(sampleImplantation());
     electrodes.attachScene(&scene);
     mri.attachScene(&scene);
 
@@ -234,7 +234,7 @@ void TestMneInspectMultimodal::pickMriVoxelHighlightsNearestContact()
     MultimodalScene scene;
     ElectrodesPlugin electrodes;
     MriSlicesPlugin mri;
-    electrodes.setArrays(sampleArrays());
+    electrodes.setImplantation(sampleImplantation());
     electrodes.attachScene(&scene);
     mri.attachScene(&scene);
 

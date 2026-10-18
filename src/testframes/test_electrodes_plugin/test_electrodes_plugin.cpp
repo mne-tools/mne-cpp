@@ -21,11 +21,14 @@
 #include <disp3D/renderable/electrodeobject.h>
 #include <disp3D/scene/multimodalscene.h>
 #include <disp3D/scene/pickresult.h>
+#include <ieeg/ieeg_implantation.h>
+#include <mri/mri_types.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDataStream>
 #include <QObject>
 #include <QSignalSpy>
 #include <QTemporaryDir>
@@ -35,6 +38,36 @@
 
 using namespace ELECTRODESPLUGIN;
 using namespace DISP3DLIB;
+using namespace IEEGLIB;
+
+namespace
+{
+IeegImplantation oneLead(int nContacts)
+{
+    QVector<IeegContact> contacts(nContacts);
+    for (int i = 0; i < nContacts; ++i) {
+        contacts[i].name = QStringLiteral("LA%1").arg(i);
+        contacts[i].position = Eigen::Vector3f(0.0f, 0.0f, float(i) * 0.005f);
+    }
+    return IeegImplantation(contacts);
+}
+
+// Minimal 2x2x2 uchar MGH volume, 1 mm voxels, centred at cRas (mm)
+bool writeMgh(const QString& path, const Eigen::Vector3f& cRas)
+{
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream.setByteOrder(QDataStream::BigEndian);
+    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    stream << qint32(MRILIB::MRI_MGH_VERSION) << qint32(2) << qint32(2) << qint32(2) << qint32(1) << qint32(MRILIB::MRI_UCHAR) << qint32(0);
+    stream << qint16(1) << 1.0f << 1.0f << 1.0f;
+    stream << -1.0f << 0.0f << 0.0f << 0.0f << 0.0f << -1.0f << 0.0f << 1.0f << 0.0f;
+    stream << cRas.x() << cRas.y() << cRas.z();
+    data.append(QByteArray(MRILIB::MRI_MGH_DATA_OFFSET - data.size() + 8, '\0'));
+    QFile file(path);
+    return file.open(QIODevice::WriteOnly) && file.write(data) == data.size();
+}
+} // namespace
 
 //=============================================================================================================
 
@@ -45,9 +78,10 @@ class TestElectrodesPlugin : public QObject
 private slots:
     void initTestCase();
     void emptyOnConstruction();
-    void setArraysReplacesGeometry();
+    void setImplantationReplacesGeometry();
     void csvLoadGroupsByArrayLabel();
     void bidsLoadGroupsLeadsByName();
+    void bidsLoadConvertsScannerRas();
     void attachScenePublishesLayer();
     void handlePickIgnoresOtherKinds();
     void handlePickIgnoresOtherSourceIds();
@@ -66,7 +100,7 @@ void TestElectrodesPlugin::initTestCase()
 void TestElectrodesPlugin::emptyOnConstruction()
 {
     ElectrodesPlugin plugin;
-    QCOMPARE(plugin.arrayCount(), 0);
+    QCOMPARE(plugin.leadCount(), 0);
     QCOMPARE(plugin.contactCount(), 0);
     QVERIFY(plugin.electrodeObject() != nullptr);
     QCOMPARE(plugin.sceneLayerId(), QStringLiteral("electrodes"));
@@ -77,24 +111,13 @@ void TestElectrodesPlugin::emptyOnConstruction()
 
 //=============================================================================================================
 
-void TestElectrodesPlugin::setArraysReplacesGeometry()
+void TestElectrodesPlugin::setImplantationReplacesGeometry()
 {
     ElectrodesPlugin plugin;
     QSignalSpy spy(&plugin, &ElectrodesPlugin::electrodesChanged);
+    plugin.setImplantation(oneLead(4));
 
-    ElectrodeArray arr;
-    arr.label = QStringLiteral("LA");
-    arr.layout = ElectrodeLayout::Depth;
-    for (int i = 0; i < 4; ++i) {
-        ElectrodeContact c;
-        c.name = QStringLiteral("LA%1").arg(i);
-        c.position = QVector3D(0.0f, 0.0f, static_cast<float>(i) * 0.005f);
-        arr.contacts.append(c);
-    }
-    QVector<ElectrodeArray> arrays{arr};
-    plugin.setArrays(arrays);
-
-    QCOMPARE(plugin.arrayCount(), 1);
+    QCOMPARE(plugin.leadCount(), 1);
     QCOMPARE(plugin.contactCount(), 4);
     QCOMPARE(spy.count(), 1);
 }
@@ -107,7 +130,7 @@ void TestElectrodesPlugin::csvLoadGroupsByArrayLabel()
     QVERIFY(file.open());
     {
         QTextStream out(&file);
-        out << "# label,x,y,z,array,layout\n";
+        out << "# label,x,y,z,lead,type\n";
         out << "LA0,0,0,0,LA,depth\n";
         out << "LA1,0,0,0.005,LA,depth\n";
         out << "G00,0.01,0,0,GRID,grid\n";
@@ -118,19 +141,18 @@ void TestElectrodesPlugin::csvLoadGroupsByArrayLabel()
 
     ElectrodesPlugin plugin;
     QVERIFY(plugin.loadCsv(file.fileName()));
-    QCOMPARE(plugin.arrayCount(), 2);
+    QCOMPARE(plugin.leadCount(), 2);
     QCOMPARE(plugin.contactCount(), 5);
     QCOMPARE(plugin.source(), ElectrodeSource::Csv);
     QCOMPARE(plugin.sourcePath(), file.fileName());
 
-    const auto& arrays = plugin.electrodeObject()->arrays();
-    QCOMPARE(arrays.size(), 2);
-    QCOMPARE(arrays[0].label, QStringLiteral("LA"));
-    QCOMPARE(arrays[0].layout, ElectrodeLayout::Depth);
-    QCOMPARE(arrays[1].label, QStringLiteral("GRID"));
-    QCOMPARE(arrays[1].layout, ElectrodeLayout::Grid);
-    QCOMPARE(arrays[1].gridRows, 1);
-    QCOMPARE(arrays[1].gridCols, 3);
+    const QVector<IeegLead>& leads = plugin.electrodeObject()->implantation().leads();
+    QCOMPARE(leads.size(), 2);
+    QCOMPARE(leads[0].name, QStringLiteral("LA"));
+    QCOMPARE(leads[0].type, IeegLeadType::Depth);
+    QCOMPARE(leads[1].name, QStringLiteral("GRID"));
+    QCOMPARE(leads[1].type, IeegLeadType::Grid);
+    QCOMPARE(leads[1].contacts.size(), 3);
 }
 
 //=============================================================================================================
@@ -164,23 +186,58 @@ void TestElectrodesPlugin::bidsLoadGroupsLeadsByName()
     {
         QFile json(dir.filePath(QStringLiteral("sub-01_ses-01_coordsystem.json")));
         QVERIFY(json.open(QIODevice::WriteOnly | QIODevice::Text));
-        json.write(R"({"iEEGCoordinateSystem": "ACPC", "iEEGCoordinateUnits": "mm"})");
+        json.write(R"({"iEEGCoordinateSystem": "Other", "iEEGCoordinateUnits": "mm"})");
     }
     QVERIFY(plugin.loadBids(tsv));
     QCOMPARE(plugin.source(), ElectrodeSource::Bids);
     QCOMPARE(plugin.contactCount(), 7);
 
-    const auto& arrays = plugin.electrodeObject()->arrays();
-    QCOMPARE(arrays.size(), 4);
-    QCOMPARE(arrays[0].label, QStringLiteral("LA"));
-    QCOMPARE(arrays[0].contacts[1].name, QStringLiteral("LA2"));
-    QCOMPARE(arrays[0].contacts[2].name, QStringLiteral("LA10"));
-    QCOMPARE(arrays[0].contacts[2].position, QVector3D(0.0f, 0.0f, 0.0315f));
-    QCOMPARE(arrays[0].layout, ElectrodeLayout::Depth); // contacts 3.5 mm apart
-    QCOMPARE(arrays[1].label, QStringLiteral("A'"));
-    QCOMPARE(arrays[1].layout, ElectrodeLayout::Strip); // 10 mm apart
-    QCOMPARE(arrays[2].label, QStringLiteral("A"));
-    QCOMPARE(arrays[3].layout, ElectrodeLayout::Grid);
+    const IeegImplantation& implantation = plugin.electrodeObject()->implantation();
+    const QVector<IeegLead>& leads = implantation.leads();
+    QCOMPARE(leads.size(), 4);
+    QCOMPARE(leads[0].name, QStringLiteral("LA"));
+    QCOMPARE(implantation.contacts()[leads[0].contacts[1]].name, QStringLiteral("LA2"));
+    const IeegContact& la10 = implantation.contacts()[leads[0].contacts[2]];
+    QCOMPARE(la10.name, QStringLiteral("LA10"));
+    QVERIFY(la10.position.isApprox(Eigen::Vector3f(0.0f, 0.0f, 0.0315f)));
+    QCOMPARE(leads[0].type, IeegLeadType::Depth); // contacts 3.5 mm apart
+    QCOMPARE(leads[1].name, QStringLiteral("A'"));
+    QCOMPARE(leads[1].type, IeegLeadType::Strip); // 10 mm apart
+    QCOMPARE(leads[2].name, QStringLiteral("A"));
+    QCOMPARE(leads[3].type, IeegLeadType::Grid);
+}
+
+//=============================================================================================================
+
+void TestElectrodesPlugin::bidsLoadConvertsScannerRas()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString tsv = dir.filePath(QStringLiteral("sub-01_electrodes.tsv"));
+    {
+        QFile file(tsv);
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+        file.write("name\tx\ty\tz\tsize\nLA1\t10\t20\t30\tn/a\nLA2\t10\t20\t33.5\tn/a\n");
+        QFile json(dir.filePath(QStringLiteral("sub-01_coordsystem.json")));
+        QVERIFY(json.open(QIODevice::WriteOnly | QIODevice::Text));
+        json.write(R"({"iEEGCoordinateSystem": "ACPC", "iEEGCoordinateUnits": "mm"})");
+    }
+
+    // Scanner RAS needs the T1 to reach the surfaces
+    ElectrodesPlugin plugin;
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(QStringLiteral("T1.mgz is needed")));
+    QVERIFY(!plugin.loadBids(tsv));
+    QVERIFY(plugin.lastError().contains(QStringLiteral("ACPC")));
+
+    // Surface RAS drops the T1's centre (c_ras)
+    const QString t1 = dir.filePath(QStringLiteral("T1.mgh"));
+    QVERIFY(writeMgh(t1, Eigen::Vector3f(10.0f, 20.0f, 30.0f)));
+    QVERIFY(plugin.loadBids(tsv, t1));
+    QVERIFY(plugin.lastError().isEmpty());
+    const IeegImplantation& implantation = plugin.electrodeObject()->implantation();
+    QCOMPARE(implantation.coordinateSystem(), QStringLiteral("surface RAS"));
+    QVERIFY(implantation.contacts()[0].position.isZero(1e-6f));
+    QVERIFY(implantation.contacts()[1].position.isApprox(Eigen::Vector3f(0.0f, 0.0f, 0.0035f)));
 }
 
 //=============================================================================================================
@@ -189,14 +246,7 @@ void TestElectrodesPlugin::attachScenePublishesLayer()
 {
     ElectrodesPlugin plugin;
 
-    ElectrodeArray arr;
-    arr.label = QStringLiteral("LA");
-    arr.layout = ElectrodeLayout::Depth;
-    ElectrodeContact c;
-    c.name = QStringLiteral("LA0");
-    c.position = QVector3D(0.0f, 0.0f, 0.0f);
-    arr.contacts.append(c);
-    plugin.setArrays({arr});
+    plugin.setImplantation(oneLead(1));
 
     MultimodalScene scene;
     plugin.attachScene(&scene);
@@ -251,14 +301,7 @@ void TestElectrodesPlugin::handlePickIgnoresOtherSourceIds()
 void TestElectrodesPlugin::handlePickSelectsContact()
 {
     ElectrodesPlugin plugin;
-    ElectrodeArray arr;
-    arr.label = QStringLiteral("LA");
-    arr.layout = ElectrodeLayout::Depth;
-    ElectrodeContact c;
-    c.name = QStringLiteral("LA0");
-    c.position = QVector3D(0.0f, 0.0f, 0.0f);
-    arr.contacts.append(c);
-    plugin.setArrays({arr});
+    plugin.setImplantation(oneLead(1));
 
     QSignalSpy spy(&plugin, &ElectrodesPlugin::contactPicked);
 

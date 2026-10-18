@@ -17,20 +17,14 @@ class DISP3DLIB::ElectrodeObject
 
 Renderable sEEG / ECoG electrodes: contact spheres plus lead bodies.
 
-Holds the arrays and their contacts and provides the instanced streams the renderer draws.
-
 ```cpp title="src/examples/ex_disp3d_scene/main.cpp"
-ElectrodeArray shaft; // an sEEG depth lead; strips and grids use ElectrodeLayout::Strip / Grid
-shaft.label = "LH";
-shaft.layout = ElectrodeLayout::Depth;
+QVector<IeegContact> shaft(4); // LH1..LH4, 3.5 mm apart: grouped into the sEEG depth lead "LH"
 for (int k = 0; k < 4; ++k) {
-    ElectrodeContact contact;
-    contact.name = QString("LH%1").arg(k + 1);
-    contact.position = QVector3D(0.010f + 0.0035f * float(k), -0.020f, 0.005f); // surface RAS, metres
-    shaft.contacts.append(contact);
+    shaft[k].name = QString("LH%1").arg(k + 1);
+    shaft[k].position = Eigen::Vector3f(0.010f + 0.0035f * float(k), -0.020f, 0.005f); // surface RAS, metres
 }
-ElectrodeObject electrodes; // drawn by BrainView::setElectrodes()
-electrodes.setArrays({shaft});
+ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
+electrodes.setImplantation(IeegImplantation(shaft));
 electrodes.selectContact("LH3");
 float contactDistance = 0.0f;
 const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
@@ -48,22 +42,24 @@ const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f),
 
 ---
 
-### setArrays(arrays)
+### setImplantation(implantation)
 
-Set electrode data from array definitions.
+Draw an implantation.
+
+Clears the selection, hover and contact colours.
 
 **Parameters:**
 
-- **arrays** : *const QVector&lt; [ElectrodeArray](/docs/api/disp3-d/electrode-array) &gt; &*
-  Vector of electrode arrays.
+- **implantation** : *const [IeegImplantation](/docs/api/ieeg/ieeg-implantation) &*
+  Contacts and leads, positions in the frame of the surfaces.
 
 ---
 
-### arrays()
+### implantation()
 
 **Returns:**
 
-- *const QVector&lt; [ElectrodeArray](/docs/api/disp3-d/electrode-array) &gt; &* — Const reference to the current arrays.
+- *const [IeegImplantation](/docs/api/ieeg/ieeg-implantation) &* — The drawn implantation.
 
 ---
 
@@ -71,13 +67,15 @@ Set electrode data from array definitions.
 
 **Returns:**
 
-- *int* — Total number of contacts across all shafts.
+- *int* — Total number of contacts.
 
 ---
 
 ### setContactValues(values, minColor, maxColor)
 
-Apply per-contact scalar overlay values and map them to a color gradient.
+Colour contacts by value, mapped linearly between the smallest and largest given value.
+
+Contacts without a value keep the colour of their lead.
 
 **Parameters:**
 
@@ -89,6 +87,12 @@ Apply per-contact scalar overlay values and map them to a color gradient.
 
 - **maxColor** : *const QColor &*
   Color for the maximum value (default: red).
+
+---
+
+### clearContactValues()
+
+Restore the lead colours of all contacts.
 
 ---
 
@@ -107,7 +111,7 @@ Clears the previous selection.
 
 ### clearSelection()
 
-Clear all contact selections.
+Clear the contact selection.
 
 ---
 
@@ -126,7 +130,7 @@ Highlight one contact while the pointer is over it, without changing the selecti
 **Parameters:**
 
 - **index** : *int*
-  Contact index in array order (as returned by `intersect`), or -1 for none.
+  Contact index (as returned by `intersect`), or -1 for none.
 
 ---
 
@@ -155,7 +159,7 @@ Intersect a ray with the contact spheres.
 
 **Returns:**
 
-- *int* — Index of the nearest contact hit (in array order), or -1.
+- *int* — Index of the nearest contact hit, or -1.
 
 ---
 
@@ -164,11 +168,11 @@ Intersect a ray with the contact spheres.
 **Parameters:**
 
 - **index** : *int*
-  Contact index in array order.
+  Contact index.
 
 **Returns:**
 
-- *const [ElectrodeContact](/docs/api/disp3-d/electrode-contact) ** — The contact, or nullptr when out of range.
+- *const [IeegContact](/docs/api/ieeg/ieeg-contact) ** — The contact, or nullptr when out of range.
 
 ---
 
@@ -177,7 +181,7 @@ Intersect a ray with the contact spheres.
 **Parameters:**
 
 - **index** : *int*
-  Contact index in array order.
+  Contact index.
 
 **Returns:**
 

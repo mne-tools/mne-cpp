@@ -118,11 +118,6 @@ void unitCylinder(QByteArray& vertices, QByteArray& indices, int& indexCount)
     indexCount = int(idx.size());
 }
 
-QColor arrayColor(const ElectrodeArray& array, int arrayIndex)
-{
-    return array.shaftColor.isValid() ? array.shaftColor : ElectrodeObject::leadColor(arrayIndex);
-}
-
 } // namespace
 
 //=============================================================================================================
@@ -147,15 +142,19 @@ ElectrodeObject::~ElectrodeObject() = default;
 
 //=============================================================================================================
 
-void ElectrodeObject::setArrays(const QVector<ElectrodeArray>& arrays)
+void ElectrodeObject::setImplantation(const IEEGLIB::IeegImplantation& implantation)
 {
-    m_arrays = arrays;
-    m_selectedContact.clear();
-    m_hoveredContact = -1;
-    for (auto& array : m_arrays) {
-        for (auto& contact : array.contacts)
-            contact.selected = false;
+    m_implantation = implantation;
+    const int contactCount = int(m_implantation.contacts().size());
+    m_leadOfContact.fill(-1, contactCount);
+    const QVector<IEEGLIB::IeegLead>& leads = m_implantation.leads();
+    for (int l = 0; l < leads.size(); ++l) {
+        for (const int c : leads[l].contacts)
+            m_leadOfContact[c] = l;
     }
+    m_contactColors.fill(QColor(), contactCount);
+    m_selectedContact = -1;
+    m_hoveredContact = -1;
     computeBoundingBox();
     buildBodies();
     buildContactInstances();
@@ -163,19 +162,9 @@ void ElectrodeObject::setArrays(const QVector<ElectrodeArray>& arrays)
 
 //=============================================================================================================
 
-const QVector<ElectrodeArray>& ElectrodeObject::arrays() const
-{
-    return m_arrays;
-}
-
-//=============================================================================================================
-
 int ElectrodeObject::totalContactCount() const
 {
-    int count = 0;
-    for (const auto& shaft : m_arrays)
-        count += shaft.contacts.size();
-    return count;
+    return int(m_implantation.contacts().size());
 }
 
 //=============================================================================================================
@@ -187,27 +176,27 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values,
     if (values.isEmpty())
         return;
 
-    // Find global min/max across provided values
     float minVal = std::numeric_limits<float>::max();
     float maxVal = std::numeric_limits<float>::lowest();
     for (auto it = values.cbegin(); it != values.cend(); ++it) {
-        if (it.value() < minVal)
-            minVal = it.value();
-        if (it.value() > maxVal)
-            maxVal = it.value();
+        minVal = std::min(minVal, it.value());
+        maxVal = std::max(maxVal, it.value());
     }
 
-    // Apply to contacts
-    for (auto& shaft : m_arrays) {
-        for (auto& contact : shaft.contacts) {
-            auto it = values.find(contact.name);
-            if (it != values.end()) {
-                contact.value = it.value();
-                contact.color = interpolateColor(it.value(), minVal, maxVal,
-                                                 minColor, maxColor);
-            }
-        }
+    const QVector<IEEGLIB::IeegContact>& contacts = m_implantation.contacts();
+    for (int c = 0; c < contacts.size(); ++c) {
+        const auto it = values.find(contacts[c].name);
+        if (it != values.end())
+            m_contactColors[c] = interpolateColor(it.value(), minVal, maxVal, minColor, maxColor);
     }
+    buildContactInstances();
+}
+
+//=============================================================================================================
+
+void ElectrodeObject::clearContactValues()
+{
+    m_contactColors.fill(QColor());
     buildContactInstances();
 }
 
@@ -215,14 +204,7 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values,
 
 void ElectrodeObject::selectContact(const QString& name)
 {
-    m_selectedContact.clear();
-    for (auto& array : m_arrays) {
-        for (auto& contact : array.contacts) {
-            contact.selected = !name.isEmpty() && contact.name == name && m_selectedContact.isEmpty();
-            if (contact.selected)
-                m_selectedContact = name;
-        }
-    }
+    m_selectedContact = name.isEmpty() ? -1 : m_implantation.indexOf(name);
     buildContactInstances();
 }
 
@@ -247,7 +229,7 @@ void ElectrodeObject::setHoveredContact(int index)
 
 QString ElectrodeObject::selectedContact() const
 {
-    return m_selectedContact;
+    return m_selectedContact >= 0 ? m_implantation.contacts()[m_selectedContact].name : QString();
 }
 
 //=============================================================================================================
@@ -260,38 +242,34 @@ QColor ElectrodeObject::leadColor(int index)
 
 //=============================================================================================================
 
-float ElectrodeObject::contactRadius(const ElectrodeArray& array, const ElectrodeContact& contact) const
+float ElectrodeObject::contactRadius(int contact) const
 {
-    if (contact.radius > 0.0f)
-        return contact.radius;
-    return array.layout == ElectrodeLayout::Depth ? kDepthContactRadius : kSubduralContactRadius;
+    const int lead = m_leadOfContact.value(contact, -1);
+    const bool depth = lead < 0 || m_implantation.leads()[lead].type == IEEGLIB::IeegLeadType::Depth;
+    return depth ? kDepthContactRadius : kSubduralContactRadius;
 }
 
 //=============================================================================================================
 
 void ElectrodeObject::buildContactInstances()
 {
+    const QVector<IEEGLIB::IeegContact>& contacts = m_implantation.contacts();
     std::vector<InstanceData> instances;
-    instances.reserve(size_t(totalContactCount()));
-    int index = 0;
-    for (int a = 0; a < m_arrays.size(); ++a) {
-        const ElectrodeArray& array = m_arrays[a];
-        const QColor lead = arrayColor(array, a);
-        for (const ElectrodeContact& contact : array.contacts) {
-            QMatrix4x4 model;
-            model.translate(contact.position);
-            model.scale(contactRadius(array, contact));
-            const QColor c = contact.color.isValid() ? contact.color : lead;
-            InstanceData d;
-            std::memcpy(d.model, model.constData(), sizeof(d.model));
-            d.color[0] = float(c.redF());
-            d.color[1] = float(c.greenF());
-            d.color[2] = float(c.blueF());
-            d.color[3] = float(c.alphaF());
-            d.isSelected = (contact.selected || index == m_hoveredContact) ? 1.0f : 0.0f;
-            instances.push_back(d);
-            ++index;
-        }
+    instances.reserve(size_t(contacts.size()));
+    for (int c = 0; c < contacts.size(); ++c) {
+        const Eigen::Vector3f& p = contacts[c].position;
+        QMatrix4x4 model;
+        model.translate(p.x(), p.y(), p.z());
+        model.scale(contactRadius(c));
+        const QColor color = m_contactColors.value(c).isValid() ? m_contactColors[c] : leadColor(std::max(0, m_leadOfContact.value(c, 0)));
+        InstanceData d;
+        std::memcpy(d.model, model.constData(), sizeof(d.model));
+        d.color[0] = float(color.redF());
+        d.color[1] = float(color.greenF());
+        d.color[2] = float(color.blueF());
+        d.color[3] = float(color.alphaF());
+        d.isSelected = (c == m_selectedContact || c == m_hoveredContact) ? 1.0f : 0.0f;
+        instances.push_back(d);
     }
     m_contactInstances = toBytes(instances);
     ++m_contactGeneration;
@@ -320,34 +298,37 @@ void ElectrodeObject::buildBodies()
         d.isSelected = 0.0f;
         instances.push_back(d);
     };
+    const QVector<IEEGLIB::IeegContact>& contacts = m_implantation.contacts();
+    auto pos = [&](int c) {
+        const Eigen::Vector3f& p = contacts[c].position;
+        return QVector3D(p.x(), p.y(), p.z());
+    };
 
-    for (int a = 0; a < m_arrays.size(); ++a) {
-        const ElectrodeArray& array = m_arrays[a];
-        const QVector<ElectrodeContact>& contacts = array.contacts;
-        if (contacts.size() < 2)
+    const QVector<IEEGLIB::IeegLead>& leads = m_implantation.leads();
+    for (int l = 0; l < leads.size(); ++l) {
+        const IEEGLIB::IeegLead& lead = leads[l];
+        const QVector<int>& order = lead.contacts;
+        if (order.size() < 2)
             continue;
         // The body is darker than the contacts so these stand out along it
-        const QColor body = arrayColor(array, a).darker(150);
-        if (array.layout == ElectrodeLayout::Depth) {
-            const QVector3D tip = contacts.first().position;
-            const QVector3D tail = contacts.last().position;
+        const QColor body = leadColor(l).darker(150);
+        if (lead.type == IEEGLIB::IeegLeadType::Depth) {
+            const QVector3D tip = pos(order.first());
+            const QVector3D tail = pos(order.last());
             const QVector3D dir = (tail - tip).normalized();
-            addCylinder(tip - dir * kShaftOvershoot, tail + dir * kShaftOvershoot,
-                        array.shaftRadius > 0.0f ? array.shaftRadius : kShaftRadius, body);
+            addCylinder(tip - dir * kShaftOvershoot, tail + dir * kShaftOvershoot, kShaftRadius, body);
             continue;
         }
-        // Strips and grids: ties between neighbours along rows, and along columns for a declared grid
-        const int cols = (array.layout == ElectrodeLayout::Grid && array.gridRows * array.gridCols == contacts.size())
-            ? array.gridCols
-            : int(contacts.size());
+        // Strips and grids: ties between neighbours along rows, and down columns for a grid of known shape
+        const int cols = (lead.type == IEEGLIB::IeegLeadType::Grid && lead.cols > 0) ? lead.cols : int(order.size());
         auto tie = [&](int i, int j) {
-            if ((contacts[i].position - contacts[j].position).length() <= kMaxTieLength)
-                addCylinder(contacts[i].position, contacts[j].position, kTieRadius, body);
+            if ((pos(order[i]) - pos(order[j])).length() <= kMaxTieLength)
+                addCylinder(pos(order[i]), pos(order[j]), kTieRadius, body);
         };
-        for (int i = 0; i < contacts.size(); ++i) {
-            if ((i + 1) % cols != 0 && i + 1 < contacts.size())
+        for (int i = 0; i < order.size(); ++i) {
+            if ((i + 1) % cols != 0 && i + 1 < order.size())
                 tie(i, i + 1);
-            if (i + cols < contacts.size())
+            if (i + cols < order.size())
                 tie(i, i + cols);
         }
     }
@@ -362,21 +343,19 @@ int ElectrodeObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayD
 {
     int best = -1;
     float bestT = std::numeric_limits<float>::max();
-    int index = 0;
-    for (const ElectrodeArray& array : m_arrays) {
-        for (const ElectrodeContact& contact : array.contacts) {
-            const float r = contactRadius(array, contact);
-            const QVector3D oc = rayOrigin - contact.position;
-            const float b = QVector3D::dotProduct(oc, rayDir);
-            const float disc = b * b - (oc.lengthSquared() - r * r);
-            if (disc >= 0.0f) {
-                const float t = -b - std::sqrt(disc);
-                if (t > 0.0f && t < bestT) {
-                    bestT = t;
-                    best = index;
-                }
+    const QVector<IEEGLIB::IeegContact>& contacts = m_implantation.contacts();
+    for (int c = 0; c < contacts.size(); ++c) {
+        const float r = contactRadius(c);
+        const Eigen::Vector3f& p = contacts[c].position;
+        const QVector3D oc = rayOrigin - QVector3D(p.x(), p.y(), p.z());
+        const float b = QVector3D::dotProduct(oc, rayDir);
+        const float disc = b * b - (oc.lengthSquared() - r * r);
+        if (disc >= 0.0f) {
+            const float t = -b - std::sqrt(disc);
+            if (t > 0.0f && t < bestT) {
+                bestT = t;
+                best = c;
             }
-            ++index;
         }
     }
     if (best >= 0)
@@ -386,34 +365,24 @@ int ElectrodeObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayD
 
 //=============================================================================================================
 
-const ElectrodeContact* ElectrodeObject::contactAt(int index) const
+const IEEGLIB::IeegContact* ElectrodeObject::contactAt(int index) const
 {
-    if (index < 0)
-        return nullptr;
-    for (const ElectrodeArray& array : m_arrays) {
-        if (index < array.contacts.size())
-            return &array.contacts[index];
-        index -= int(array.contacts.size());
-    }
-    return nullptr;
+    return (index >= 0 && index < m_implantation.contacts().size()) ? &m_implantation.contacts()[index] : nullptr;
 }
 
 //=============================================================================================================
 
 QString ElectrodeObject::contactLabel(int index) const
 {
-    if (index < 0)
+    const IEEGLIB::IeegContact* contact = contactAt(index);
+    const int lead = m_leadOfContact.value(index, -1);
+    if (!contact || lead < 0)
         return QString();
-    for (const ElectrodeArray& array : m_arrays) {
-        if (index < array.contacts.size()) {
-            const QString kind = array.layout == ElectrodeLayout::Depth ? QStringLiteral("depth lead")
-                : array.layout == ElectrodeLayout::Strip                ? QStringLiteral("strip")
-                                                                        : QStringLiteral("grid");
-            return QStringLiteral("%1 (%2 %3)").arg(array.contacts[index].name, kind, array.label);
-        }
-        index -= int(array.contacts.size());
-    }
-    return QString();
+    const IEEGLIB::IeegLead& l = m_implantation.leads()[lead];
+    const QString kind = l.type == IEEGLIB::IeegLeadType::Depth ? QStringLiteral("depth lead")
+        : l.type == IEEGLIB::IeegLeadType::Strip                ? QStringLiteral("strip")
+                                                                : QStringLiteral("grid");
+    return QStringLiteral("%1 (%2 %3)").arg(contact->name, kind, l.name);
 }
 
 //=============================================================================================================
@@ -456,32 +425,14 @@ QVector3D ElectrodeObject::boundingBoxMax() const
 
 void ElectrodeObject::computeBoundingBox()
 {
-    m_bbMin = QVector3D(std::numeric_limits<float>::max(),
-                        std::numeric_limits<float>::max(),
-                        std::numeric_limits<float>::max());
-    m_bbMax = QVector3D(std::numeric_limits<float>::lowest(),
-                        std::numeric_limits<float>::lowest(),
-                        std::numeric_limits<float>::lowest());
-
-    for (const auto& shaft : m_arrays) {
-        for (const auto& contact : shaft.contacts) {
-            const float pad = contactRadius(shaft, contact);
-            const QVector3D& p = contact.position;
-
-            if (p.x() - pad < m_bbMin.x())
-                m_bbMin.setX(p.x() - pad);
-            if (p.y() - pad < m_bbMin.y())
-                m_bbMin.setY(p.y() - pad);
-            if (p.z() - pad < m_bbMin.z())
-                m_bbMin.setZ(p.z() - pad);
-
-            if (p.x() + pad > m_bbMax.x())
-                m_bbMax.setX(p.x() + pad);
-            if (p.y() + pad > m_bbMax.y())
-                m_bbMax.setY(p.y() + pad);
-            if (p.z() + pad > m_bbMax.z())
-                m_bbMax.setZ(p.z() + pad);
-        }
+    m_bbMin = QVector3D(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    m_bbMax = QVector3D(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+    const QVector<IEEGLIB::IeegContact>& contacts = m_implantation.contacts();
+    for (int c = 0; c < contacts.size(); ++c) {
+        const float pad = contactRadius(c);
+        const QVector3D p(contacts[c].position.x(), contacts[c].position.y(), contacts[c].position.z());
+        m_bbMin = QVector3D(std::min(m_bbMin.x(), p.x() - pad), std::min(m_bbMin.y(), p.y() - pad), std::min(m_bbMin.z(), p.z() - pad));
+        m_bbMax = QVector3D(std::max(m_bbMax.x(), p.x() + pad), std::max(m_bbMax.y(), p.y() + pad), std::max(m_bbMax.z(), p.z() + pad));
     }
 }
 

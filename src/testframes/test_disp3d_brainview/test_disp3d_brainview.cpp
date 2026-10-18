@@ -46,6 +46,7 @@
 #include <disp3D/input/raypicker.h>
 #include <disp3D/renderable/dipoleobject.h>
 #include <disp3D/renderable/electrodeobject.h>
+#include <ieeg/ieeg_implantation.h>
 #include <disp3D/renderable/networkobject.h>
 #include <disp3D/renderable/sourceestimateoverlay.h>
 #include <disp3D/renderable/sliceobject.h>
@@ -92,17 +93,6 @@
 
 using namespace DISP3DLIB;
 using namespace FIFFLIB;
-
-namespace
-{
-DISP3DLIB::ElectrodeContact makeContact(const QString& name, const QVector3D& position)
-{
-    DISP3DLIB::ElectrodeContact contact;
-    contact.name = name;
-    contact.position = position;
-    return contact;
-}
-} // namespace
 
 //=============================================================================================================
 /**
@@ -1517,12 +1507,13 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     NetworkObject networkObject;
     networkObject.load(network, QStringLiteral("Jet"));
     networkObject.setThreshold(0.0);
-    ElectrodeArray lead;
-    lead.label = QStringLiteral("LA");
-    for (int i = 0; i < 3; ++i)
-        lead.contacts.append(makeContact(QStringLiteral("LA%1").arg(i + 1), QVector3D(0.0f, 0.0f, 0.0035f * float(i))));
+    QVector<IEEGLIB::IeegContact> lead(3);
+    for (int i = 0; i < 3; ++i) {
+        lead[i].name = QStringLiteral("LA%1").arg(i + 1);
+        lead[i].position = Eigen::Vector3f(0.0f, 0.0f, 0.0035f * float(i));
+    }
     ElectrodeObject electrodes;
-    electrodes.setArrays({lead});
+    electrodes.setImplantation(IEEGLIB::IeegImplantation(lead));
     PolylineObject path;
     path.setPoints({Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.01f, 0.0f, 0.0f), Eigen::Vector3f(0.01f, 0.01f, 0.0f)});
     QImage mri(4, 3, QImage::Format_Grayscale8);

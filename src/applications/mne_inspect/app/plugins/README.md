@@ -5,7 +5,7 @@ are introduced as part of the v2.3.0 quality push (tasks 10.1 and 10.2):
 
 | Folder         | Static-lib target      | Purpose                                                |
 |----------------|------------------------|--------------------------------------------------------|
-| `electrodes/`  | `inspect_electrodes`   | Load EEG / sEEG / ECoG digitiser data from FIFF or CSV, expose `Disp3D::ElectrodeArray`s and surface picks via `Disp3D::PickResult`. |
+| `electrodes/`  | `inspect_electrodes`   | Load sEEG / ECoG contacts from BIDS, CSV or FIFF into an `IEEGLIB::IeegImplantation`, show it as a `DISP3DLIB::ElectrodeObject` and handle picks via `DISP3DLIB::PickResult`. |
 | `mri_slices/`  | `inspect_mri_slices`   | Load an MRI volume (MGH / MGZ), publish axial / coronal / sagittal `Disp3D::SliceObject`s, and follow `PickKind::MriVoxel` picks with a shared crosshair. |
 
 ## Why static libraries (and not plugins)?

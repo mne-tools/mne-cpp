@@ -91,6 +91,30 @@ A contact without a lead name belongs to the lead named like the contact without
 
 ---
 
+### setLeadType(lead, type, rows, cols)
+
+Set a lead's type when it is declared rather than inferred.
+
+**Parameters:**
+
+- **lead** : *const QString &*
+  Lead name.
+
+- **type** : *IeegLeadType*
+  Lead type.
+
+- **rows** : *int*
+  Grid rows, or 0 when unknown.
+
+- **cols** : *int*
+  Grid columns, or 0 when unknown.
+
+**Returns:**
+
+- *bool* — False when there is no such lead. A shape that does not match the contact count is dropped.
+
+---
+
 ### indexOf(name)
 
 **Parameters:**
@@ -109,6 +133,30 @@ A contact without a lead name belongs to the lead named like the contact without
 **Returns:**
 
 - *Eigen::MatrixX3f* — Contact positions, one row per contact, in metres.
+
+---
+
+### isScannerRas()
+
+**Returns:**
+
+- *bool* — True when the positions are scanner RAS of the subject's T1, which MNE-BIDS reads the BIDS iEEG systems "ACPC" and "ScanRAS" as. Such positions must be moved into the surface (tkr) RAS of the FreeSurfer surfaces before they are drawn on them.
+
+---
+
+### transformed(trans, frame)
+
+**Parameters:**
+
+- **trans** : *const Eigen::Matrix4f &*
+  Affine, in metres, from the current frame to the new one.
+
+- **frame** : *const QString &*
+  Name of the new frame.
+
+**Returns:**
+
+- *IeegImplantation* — A copy with every position transformed; leads are unchanged.
 
 ---
 

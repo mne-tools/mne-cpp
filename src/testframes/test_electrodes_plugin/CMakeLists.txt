@@ -39,6 +39,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     inspect_electrodes
     mne_disp3D
+    mne_ieeg
+    mne_mri
     mne_fiff
     mne_utils
     mne_math

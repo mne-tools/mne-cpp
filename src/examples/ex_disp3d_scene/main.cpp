@@ -24,6 +24,7 @@
 #include <disp3D/renderable/brainsurface.h>
 #include <disp3D/renderable/dipoleobject.h>
 #include <disp3D/renderable/electrodeobject.h>
+#include <ieeg/ieeg_implantation.h>
 #include <disp3D/renderable/networkobject.h>
 #include <disp3D/renderable/polylineobject.h>
 #include <disp3D/renderable/sliceobject.h>
@@ -64,6 +65,7 @@
 using namespace DISP3DLIB;
 using namespace CONNECTIVITYLIB;
 using namespace INVLIB;
+using namespace IEEGLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -129,17 +131,13 @@ int main(int argc, char* argv[])
                  QString("Interpolation: sensors kept, vertex 5 = %1, vertex 3 = %2").arg(atVertices(5)).arg(atVertices(3)));
 
     //! [electrode_object_usage]
-    ElectrodeArray shaft; // an sEEG depth lead; strips and grids use ElectrodeLayout::Strip / Grid
-    shaft.label = "LH";
-    shaft.layout = ElectrodeLayout::Depth;
+    QVector<IeegContact> shaft(4); // LH1..LH4, 3.5 mm apart: grouped into the sEEG depth lead "LH"
     for (int k = 0; k < 4; ++k) {
-        ElectrodeContact contact;
-        contact.name = QString("LH%1").arg(k + 1);
-        contact.position = QVector3D(0.010f + 0.0035f * float(k), -0.020f, 0.005f); // surface RAS, metres
-        shaft.contacts.append(contact);
+        shaft[k].name = QString("LH%1").arg(k + 1);
+        shaft[k].position = Eigen::Vector3f(0.010f + 0.0035f * float(k), -0.020f, 0.005f); // surface RAS, metres
     }
-    ElectrodeObject electrodes; // drawn by BrainView::setElectrodes()
-    electrodes.setArrays({shaft});
+    ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
+    electrodes.setImplantation(IeegImplantation(shaft));
     electrodes.selectContact("LH3");
     float contactDistance = 0.0f;
     const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
@@ -178,18 +176,18 @@ int main(int argc, char* argv[])
     MultimodalScene scene;
     scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QVector3D& bbMin, QVector3D& bbMax) {
         const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());
-        bbMin = bbMax = object->arrays().first().contacts.first().position;
-        for (const ElectrodeContact& c : object->arrays().first().contacts) {
-            bbMin = QVector3D(std::min(bbMin.x(), c.position.x()), std::min(bbMin.y(), c.position.y()), std::min(bbMin.z(), c.position.z()));
-            bbMax = QVector3D(std::max(bbMax.x(), c.position.x()), std::max(bbMax.y(), c.position.y()), std::max(bbMax.z(), c.position.z()));
-        }
+        const Eigen::MatrixX3f positions = object->implantation().positions();
+        const Eigen::Vector3f lo = positions.colwise().minCoeff().transpose();
+        const Eigen::Vector3f hi = positions.colwise().maxCoeff().transpose();
+        bbMin = QVector3D(lo.x(), lo.y(), lo.z());
+        bbMax = QVector3D(hi.x(), hi.y(), hi.z());
         return true;
     });
     SceneLayer layer;
     layer.id = "seeg_LH";
     layer.kind = SceneLayerKind::Electrode;
     auto payload = std::make_shared<ElectrodeObject>();
-    payload->setArrays(electrodes.arrays());
+    payload->setImplantation(electrodes.implantation());
     layer.payload = payload;
     scene.addLayer(layer);
     scene.setOverlayThresholds(2.0f, 4.0f, 8.0f);
@@ -209,8 +207,9 @@ int main(int argc, char* argv[])
     PickResult contactPick;
     contactPick.kind = PickKind::ElectrodeContact;
     contactPick.sourceId = "seeg_LH";
-    contactPick.world = electrodes.arrays().first().contacts.first().position;
-    contactPick.label = electrodes.arrays().first().contacts.first().name;
+    const IeegContact& first = electrodes.implantation().contacts().first();
+    contactPick.world = QVector3D(first.position.x(), first.position.y(), first.position.z());
+    contactPick.label = first.name;
     contactPick.value = 3.5f;
     contactPick.timeSample = 120;
     scene.reportPick(contactPick);

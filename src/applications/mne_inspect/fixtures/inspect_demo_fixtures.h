@@ -17,7 +17,7 @@
 #ifndef MNEINSPECT_DEMO_FIXTURES_H
 #define MNEINSPECT_DEMO_FIXTURES_H
 
-#include <disp3D/renderable/electrodeobject.h>
+#include <ieeg/ieeg_implantation.h>
 #include <mri/mri_vol_data.h>
 
 #include <QVector>
@@ -35,10 +35,9 @@ namespace MNEINSPECT
  * here so the test can keep its existing invariants while doc_shots uses
  * the richer multi-array fixture below.
  *
- * @return One `ElectrodeArray` with layout = Depth, label = "LA", four
- *         contacts at z = 0, 0.01, 0.02, 0.03 m.
+ * @return One depth lead "LA" with four contacts at z = 0, 0.01, 0.02, 0.03 m.
  */
-QVector<DISP3DLIB::ElectrodeArray> demoOneDepthStrip();
+IEEGLIB::IeegImplantation demoOneDepthStrip();
 
 //=============================================================================================================
 /**
@@ -48,10 +47,10 @@ QVector<DISP3DLIB::ElectrodeArray> demoOneDepthStrip();
  * placed at plausible cm-scale offsets so they look like a realistic
  * intracranial montage when rendered in the empty multimodal scene.
  *
- * @return Four `ElectrodeArray`s: "LA" (Depth), "RA" (Depth), "LG"
- *         (Strip / 1×6), "RG" (Grid / 4×4).
+ * @return Four leads: "LA" (depth), "RA" (depth), "LG" (strip of 6),
+ *         "RG" (4×4 grid).
  */
-QVector<DISP3DLIB::ElectrodeArray> demoFourArrayMontage();
+IEEGLIB::IeegImplantation demoFourArrayMontage();
 
 //=============================================================================================================
 /**

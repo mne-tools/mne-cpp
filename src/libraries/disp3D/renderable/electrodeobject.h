@@ -7,26 +7,17 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    ECoG / sEEG electrode model: shaft cylinders, contact spheres and grid layouts mapped to a colour-bar overlay.
+ * @brief    Renderable view of an sEEG / ECoG implantation: contact spheres and lead bodies.
  *
- * ElectrodeObject describes one or more electrode arrays in three
- * topologies (@c ElectrodeLayout::Depth stereotactic shaft,
- * @c ElectrodeLayout::Strip 1xN ECoG, @c ElectrodeLayout::Grid
- * rows x cols ECoG) and provides two instanced streams for the renderer:
- * one sphere per contact, and the lead bodies (one cylinder along each
- * depth shaft, thin ties between neighbouring strip / grid contacts).
- * Depth leads and subdural arrays thus differ by shape, while colour tells
- * one lead from another.
+ * ElectrodeObject draws an @ref IEEGLIB::IeegImplantation. It provides two instanced streams for
+ * the renderer: one sphere per contact, and the lead bodies (one cylinder along each depth lead,
+ * thin ties between neighbouring strip and grid contacts). Depth leads and subdural arrays thus
+ * differ by shape, while colour tells one lead from another.
  *
- * Positions and radii are in metres, in the frame of the brain surfaces
- * (FreeSurfer surface RAS).
+ * The implantation owns the contacts and leads; this object only adds display state: per-contact
+ * colours (e.g. from setContactValues()), the selected and the hovered contact.
  *
- * Per-contact scalar values (e.g. spectral power, evoked amplitude)
- * are mapped to a min / max colour gradient by
- * @ref DISP3DLIB::ElectrodeObject::setContactValues "ElectrodeObject::setContactValues" so the same primitive can
- * show static placement and live activity. Bounding-box accessors
- * include the contact radius so the camera framing keeps every
- * contact visible.
+ * Positions are in metres, in the frame of the brain surfaces (FreeSurfer surface RAS).
  */
 
 #ifndef ELECTRODEOBJECT_H
@@ -38,6 +29,8 @@
 
 #include "../disp3D_global.h"
 #include "../core/rendertypes.h"
+
+#include <ieeg/ieeg_implantation.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,69 +52,7 @@ namespace DISP3DLIB
 
 //=============================================================================================================
 /**
- * @brief Single contact on a depth electrode shaft.
- *
- * @snippet ex_disp3d_scene/main.cpp electrode_object_usage
- */
-struct DISP3DSHARED_EXPORT ElectrodeContact
-{
-    QString name;          /**< Contact label, e.g. "LH1", "LH2". */
-    QVector3D position;    /**< Position in metres, MRI surface RAS. */
-    float radius = 0.0f;   /**< Drawn radius in metres; 0 uses the default of the array's layout. */
-    QColor color;          /**< Display colour; invalid uses the colour of the array. */
-    bool selected = false; /**< Whether the contact is selected/highlighted. */
-    float value = 0.0f;    /**< Optional scalar for colormap overlay. */
-};
-
-//=============================================================================================================
-/**
- * @brief Geometry layout for an electrode array.
- *
- * Added in v2.3.0 to extend the original sEEG-only ElectrodeObject
- * with ECoG strip and grid topologies. The renderer interprets the layout
- * field on @ref DISP3DLIB::ElectrodeArray "ElectrodeArray":
- *
- *   - Depth — render the cylindrical shaft + sphere instances per contact
- *             (the only mode supported in v2.2.0).
- *   - Strip — render sphere instances only, no shaft (a 1×N ECoG strip).
- *   - Grid  — render sphere instances on a regular @ref DISP3DLIB::ElectrodeArray::gridRows "gridRows" × @ref
- *             DISP3DLIB::ElectrodeArray::gridCols "gridCols" lattice, optionally with a translucent quad mesh
- *             linking the contacts as a visual reference.
- */
-enum class ElectrodeLayout
-{
-    Depth = 0, /**< Stereotactic depth electrode (cylinder + contacts). */
-    Strip,     /**< 1×N ECoG strip — spheres only. */
-    Grid       /**< gridRows × gridCols ECoG grid — spheres + optional mesh. */
-};
-
-//=============================================================================================================
-/**
- * @brief One electrode array — sEEG depth shaft, ECoG strip, or ECoG grid.
- *
- * The Depth-only fields (@ref shaftRadius, @ref shaftColor) are ignored
- * for Strip and Grid layouts. The Grid-only fields (@ref gridRows,
- * @ref DISP3DLIB::ElectrodeArray::gridCols "gridCols") default to 1 and so describe a degenerate single
- * contact for the other layouts.
- *
- * @snippet ex_disp3d_scene/main.cpp electrode_object_usage
- */
-struct DISP3DSHARED_EXPORT ElectrodeArray
-{
-    QString label;                                   /**< Array label: "LH", "GridA", etc. */
-    ElectrodeLayout layout = ElectrodeLayout::Depth; /**< Geometry kind. */
-    int gridRows = 1;                                /**< Grid only: number of rows. */
-    int gridCols = 1;                                /**< Grid only: number of cols (Strip uses Cols = N, Rows = 1). */
-    QVector<ElectrodeContact> contacts;              /**< Contacts in order along the lead (contact 1 first). */
-    float shaftRadius = 0.0f;                        /**< Depth only: shaft radius in metres; 0 uses the default. */
-    QColor shaftColor;                               /**< Lead colour; invalid picks one from the lead palette. */
-};
-
-//=============================================================================================================
-/**
  * @brief Renderable sEEG / ECoG electrodes: contact spheres plus lead bodies.
- *
- * Holds the arrays and their contacts and provides the instanced streams the renderer draws.
  *
  * @snippet ex_disp3d_scene/main.cpp electrode_object_usage
  */
@@ -148,27 +79,29 @@ public:
 
     //=========================================================================================================
     /**
-     * Set electrode data from array definitions.
+     * Draw an implantation. Clears the selection, hover and contact colours.
      *
-     * @param[in] arrays  Vector of electrode arrays.
+     * @param[in] implantation  Contacts and leads, positions in the frame of the surfaces.
      */
-    void setArrays(const QVector<ElectrodeArray>& arrays);
+    void setImplantation(const IEEGLIB::IeegImplantation& implantation);
 
-    //=========================================================================================================
     /**
-     * @return Const reference to the current arrays.
+     * @return The drawn implantation.
      */
-    const QVector<ElectrodeArray>& arrays() const;
+    const IEEGLIB::IeegImplantation& implantation() const
+    {
+        return m_implantation;
+    }
 
-    //=========================================================================================================
     /**
-     * @return Total number of contacts across all shafts.
+     * @return Total number of contacts.
      */
     int totalContactCount() const;
 
     //=========================================================================================================
     /**
-     * Apply per-contact scalar overlay values and map them to a color gradient.
+     * Colour contacts by value, mapped linearly between the smallest and largest given value.
+     * Contacts without a value keep the colour of their lead.
      *
      * @param[in] values    Map of contact name -> scalar value.
      * @param[in] minColor  Color for the minimum value (default: blue).
@@ -178,6 +111,11 @@ public:
                           const QColor& minColor = Qt::blue,
                           const QColor& maxColor = Qt::red);
 
+    /**
+     * Restore the lead colours of all contacts.
+     */
+    void clearContactValues();
+
     //=========================================================================================================
     /**
      * Select a contact by name. Clears the previous selection.
@@ -186,13 +124,11 @@ public:
      */
     void selectContact(const QString& name);
 
-    //=========================================================================================================
     /**
-     * Clear all contact selections.
+     * Clear the contact selection.
      */
     void clearSelection();
 
-    //=========================================================================================================
     /**
      * @return Name of the currently selected contact, or empty string if none.
      */
@@ -202,7 +138,7 @@ public:
     /**
      * Highlight one contact while the pointer is over it, without changing the selection.
      *
-     * @param[in] index  Contact index in array order (as returned by @ref intersect), or -1 for none.
+     * @param[in] index  Contact index (as returned by @ref intersect), or -1 for none.
      */
     void setHoveredContact(int index);
 
@@ -221,18 +157,18 @@ public:
      * @param[in]  rayOrigin  Ray origin.
      * @param[in]  rayDir     Normalised ray direction.
      * @param[out] dist       Distance to the nearest hit.
-     * @return Index of the nearest contact hit (in array order), or -1.
+     * @return Index of the nearest contact hit, or -1.
      */
     int intersect(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist) const;
 
     /**
-     * @param[in] index  Contact index in array order.
+     * @param[in] index  Contact index.
      * @return The contact, or nullptr when out of range.
      */
-    const ElectrodeContact* contactAt(int index) const;
+    const IEEGLIB::IeegContact* contactAt(int index) const;
 
     /**
-     * @param[in] index  Contact index in array order.
+     * @param[in] index  Contact index.
      * @return Hover text, e.g. "LA3 (depth lead LA)", or an empty string when out of range.
      */
     QString contactLabel(int index) const;
@@ -275,7 +211,6 @@ public:
      */
     QVector3D boundingBoxMin() const;
 
-    //=========================================================================================================
     /**
      * @return Axis-aligned bounding box maximum corner (with contact-radius padding).
      */
@@ -292,13 +227,15 @@ private:
 
     void buildBodies();
     void buildContactInstances();
-    float contactRadius(const ElectrodeArray& array, const ElectrodeContact& contact) const;
+    float contactRadius(int contact) const;
 
-    QVector<ElectrodeArray> m_arrays; /**< All electrode arrays. */
-    QString m_selectedContact;        /**< Currently selected contact name. */
+    IEEGLIB::IeegImplantation m_implantation;
+    QVector<int> m_leadOfContact;    /**< Lead index per contact. */
+    QVector<QColor> m_contactColors; /**< Per contact; invalid uses the lead colour. */
+    int m_selectedContact = -1;
     int m_hoveredContact = -1;
-    QVector3D m_bbMin; /**< Cached bounding box min. */
-    QVector3D m_bbMax; /**< Cached bounding box max. */
+    QVector3D m_bbMin;
+    QVector3D m_bbMax;
     bool m_visible = true;
 
     // Unit sphere and unit cylinder (along +y, centred) shared by all instances
@@ -317,23 +254,8 @@ private:
     RenderKey m_contactRenderKey;
     RenderKey m_bodyRenderKey;
 
-    //=========================================================================================================
-    /**
-     * Recompute the axis-aligned bounding box from all contact positions.
-     */
     void computeBoundingBox();
 
-    //=========================================================================================================
-    /**
-     * Linearly interpolate between two colors in RGB space.
-     *
-     * @param[in] value     Scalar value to map.
-     * @param[in] minVal    Lower bound of the scalar range.
-     * @param[in] maxVal    Upper bound of the scalar range.
-     * @param[in] minColor  Color at minVal.
-     * @param[in] maxColor  Color at maxVal.
-     * @return Interpolated QColor.
-     */
     static QColor interpolateColor(float value, float minVal, float maxVal,
                                    const QColor& minColor, const QColor& maxColor);
 };

@@ -19,6 +19,7 @@
 #include "electrodes.h"
 
 #include <ieeg/ieeg_implantation.h>
+#include <mri/mri_vol_data.h>
 
 #include <disp3D/scene/multimodalscene.h>
 
@@ -26,6 +27,8 @@
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_stream.h>
+
+#include <Eigen/LU>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -53,16 +56,14 @@ using namespace FIFFLIB;
 namespace
 {
 
-ElectrodeLayout parseLayout(const QString& raw)
+IEEGLIB::IeegLeadType parseLeadType(const QString& raw)
 {
     const QString s = raw.trimmed().toLower();
-    if (s == QLatin1String("strip")) {
-        return ElectrodeLayout::Strip;
-    }
-    if (s == QLatin1String("grid")) {
-        return ElectrodeLayout::Grid;
-    }
-    return ElectrodeLayout::Depth;
+    if (s == QLatin1String("strip"))
+        return IEEGLIB::IeegLeadType::Strip;
+    if (s == QLatin1String("grid"))
+        return IEEGLIB::IeegLeadType::Grid;
+    return IEEGLIB::IeegLeadType::Depth;
 }
 
 } // anonymous namespace
@@ -81,9 +82,9 @@ ElectrodesPlugin::~ElectrodesPlugin() = default;
 
 //=============================================================================================================
 
-int ElectrodesPlugin::arrayCount() const
+int ElectrodesPlugin::leadCount() const
 {
-    return m_object->arrays().size();
+    return int(m_object->implantation().leads().size());
 }
 
 //=============================================================================================================
@@ -116,16 +117,14 @@ void ElectrodesPlugin::selectContact(const QString& name)
 
 QString ElectrodesPlugin::highlightNearest(const QVector3D& worldPosition)
 {
-    const QVector<ElectrodeArray>& arrays = m_object->arrays();
+    const Eigen::Vector3f target(worldPosition.x(), worldPosition.y(), worldPosition.z());
     QString bestName;
     float bestDistSq = std::numeric_limits<float>::max();
-    for (const ElectrodeArray& arr : arrays) {
-        for (const ElectrodeContact& c : arr.contacts) {
-            const float d = (c.position - worldPosition).lengthSquared();
-            if (d < bestDistSq) {
-                bestDistSq = d;
-                bestName = c.name;
-            }
+    for (const IEEGLIB::IeegContact& c : m_object->implantation().contacts()) {
+        const float d = (c.position - target).squaredNorm();
+        if (d < bestDistSq) {
+            bestDistSq = d;
+            bestName = c.name;
         }
     }
     if (bestName.isEmpty()) {
@@ -146,9 +145,9 @@ void ElectrodesPlugin::clearSelection()
 
 //=============================================================================================================
 
-void ElectrodesPlugin::setArrays(const QVector<ElectrodeArray>& arrays)
+void ElectrodesPlugin::setImplantation(const IEEGLIB::IeegImplantation& implantation)
 {
-    rebuildFromArrays(arrays);
+    rebuild(implantation);
     m_source = ElectrodeSource::None;
     m_sourcePath.clear();
 }
@@ -184,23 +183,20 @@ bool ElectrodesPlugin::loadFiff(const QString& path)
         return false;
     }
 
-    ElectrodeArray array;
-    array.label = QFileInfo(path).baseName();
-    array.layout = ElectrodeLayout::Depth;
-    array.contacts.reserve(picked.size());
-
+    // All points form one lead named after the file
+    const QString lead = QFileInfo(path).baseName();
+    QVector<IEEGLIB::IeegContact> contacts;
+    contacts.reserve(picked.size());
     for (qint32 i = 0; i < picked.size(); ++i) {
         const FiffDigPoint& dp = picked[i];
-        ElectrodeContact contact;
-        contact.name = QStringLiteral("%1_%2").arg(array.label).arg(dp.ident);
-        contact.position = QVector3D(dp.r[0], dp.r[1], dp.r[2]);
-        array.contacts.append(contact);
+        IEEGLIB::IeegContact contact;
+        contact.name = QStringLiteral("%1_%2").arg(lead).arg(dp.ident);
+        contact.position = Eigen::Vector3f(dp.r[0], dp.r[1], dp.r[2]);
+        contact.lead = lead;
+        contacts.append(contact);
     }
 
-    QVector<ElectrodeArray> arrays;
-    arrays.append(array);
-    rebuildFromArrays(arrays);
-
+    rebuild(IEEGLIB::IeegImplantation(contacts));
     m_source = ElectrodeSource::Fiff;
     m_sourcePath = path;
     return true;
@@ -219,9 +215,9 @@ bool ElectrodesPlugin::loadCsv(const QString& path)
     QTextStream in(&file);
     const QString fallbackLabel = QFileInfo(path).baseName();
 
-    QHash<QString, ElectrodeArray> byLabel;
-    QStringList order;
-    int contacts = 0;
+    QVector<IEEGLIB::IeegContact> contacts;
+    QHash<QString, IEEGLIB::IeegLeadType> declared;
+    QHash<QString, int> leadSize;
 
     while (!in.atEnd()) {
         const QString rawLine = in.readLine().trimmed();
@@ -250,53 +246,33 @@ bool ElectrodesPlugin::loadCsv(const QString& path)
         }
 
         const QString name = parts[0].trimmed();
-        const QString arrayLabel = (parts.size() >= 5 && !parts[4].trimmed().isEmpty())
+        const QString lead = (parts.size() >= 5 && !parts[4].trimmed().isEmpty())
             ? parts[4].trimmed()
             : fallbackLabel;
-        const ElectrodeLayout layout = (parts.size() >= 6)
-            ? parseLayout(parts[5])
-            : ElectrodeLayout::Depth;
-
-        if (!byLabel.contains(arrayLabel)) {
-            ElectrodeArray arr;
-            arr.label = arrayLabel;
-            arr.layout = layout;
-            byLabel.insert(arrayLabel, arr);
-            order.append(arrayLabel);
-        } else if (byLabel[arrayLabel].layout != layout) {
-            // First non-Depth declaration for this array wins.
-            if (byLabel[arrayLabel].layout == ElectrodeLayout::Depth) {
-                byLabel[arrayLabel].layout = layout;
-            }
+        // The first non-depth declaration for a lead wins
+        if (parts.size() >= 6) {
+            const IEEGLIB::IeegLeadType type = parseLeadType(parts[5]);
+            if (!declared.contains(lead) || declared.value(lead) == IEEGLIB::IeegLeadType::Depth)
+                declared.insert(lead, type);
         }
 
-        ElectrodeContact contact;
-        contact.name = name.isEmpty()
-            ? QStringLiteral("%1_%2").arg(arrayLabel).arg(byLabel[arrayLabel].contacts.size())
-            : name;
-        contact.position = QVector3D(x, y, z);
-        byLabel[arrayLabel].contacts.append(contact);
-        ++contacts;
+        IEEGLIB::IeegContact contact;
+        contact.name = name.isEmpty() ? QStringLiteral("%1_%2").arg(lead).arg(leadSize.value(lead)) : name;
+        contact.position = Eigen::Vector3f(x, y, z);
+        contact.lead = lead;
+        contacts.append(contact);
+        leadSize[lead] += 1;
     }
 
-    if (contacts == 0) {
+    if (contacts.isEmpty()) {
         qWarning() << "ElectrodesPlugin::loadCsv: no contact rows parsed from" << path;
         return false;
     }
 
-    QVector<ElectrodeArray> arrays;
-    arrays.reserve(order.size());
-    for (const QString& key : order) {
-        ElectrodeArray& arr = byLabel[key];
-        if (arr.layout == ElectrodeLayout::Grid) {
-            // Default to a 1×N grid when caller did not specify rows/cols.
-            arr.gridRows = 1;
-            arr.gridCols = arr.contacts.size();
-        }
-        arrays.append(arr);
-    }
-
-    rebuildFromArrays(arrays);
+    IEEGLIB::IeegImplantation implantation(contacts);
+    for (auto it = declared.cbegin(); it != declared.cend(); ++it)
+        implantation.setLeadType(it.key(), it.value());
+    rebuild(implantation);
     m_source = ElectrodeSource::Csv;
     m_sourcePath = path;
     return true;
@@ -304,35 +280,28 @@ bool ElectrodesPlugin::loadCsv(const QString& path)
 
 //=============================================================================================================
 
-bool ElectrodesPlugin::loadBids(const QString& path)
+bool ElectrodesPlugin::loadBids(const QString& path, const QString& t1Path)
 {
-    QString error;
-    const IEEGLIB::IeegImplantation implantation = IEEGLIB::IeegImplantation::readBids(path, &error);
+    m_lastError.clear();
+    IEEGLIB::IeegImplantation implantation = IEEGLIB::IeegImplantation::readBids(path, &m_lastError);
     if (implantation.isEmpty()) {
-        qWarning() << "ElectrodesPlugin::loadBids:" << error;
+        qWarning() << "ElectrodesPlugin::loadBids:" << m_lastError;
         return false;
     }
 
-    QVector<ElectrodeArray> arrays;
-    for (const IEEGLIB::IeegLead& lead : implantation.leads()) {
-        ElectrodeArray array;
-        array.label = lead.name;
-        array.layout = lead.type == IEEGLIB::IeegLeadType::Depth ? ElectrodeLayout::Depth
-            : lead.type == IEEGLIB::IeegLeadType::Strip          ? ElectrodeLayout::Strip
-                                                                 : ElectrodeLayout::Grid;
-        array.gridRows = std::max(1, lead.rows);
-        array.gridCols = std::max(1, lead.cols);
-        for (const int c : lead.contacts) {
-            const IEEGLIB::IeegContact& source = implantation.contacts()[c];
-            ElectrodeContact contact;
-            contact.name = source.name;
-            contact.position = QVector3D(source.position.x(), source.position.y(), source.position.z());
-            array.contacts.append(contact);
+    // Scanner RAS of the T1 -> surface (tkr) RAS of the FreeSurfer surfaces, as MNE's convert_montage_to_mri
+    if (implantation.isScannerRas()) {
+        MRILIB::MriVolData t1;
+        if (t1Path.isEmpty() || !t1.read(t1Path)) {
+            m_lastError = QStringLiteral("%1 positions are scanner RAS of the subject's T1; T1.mgz is needed to place them on the surfaces")
+                              .arg(implantation.coordinateSystem());
+            qWarning() << "ElectrodesPlugin::loadBids:" << m_lastError;
+            return false;
         }
-        arrays.append(array);
+        implantation = implantation.transformed(t1.computeVox2RasTkr() * t1.computeVox2Ras().inverse(), QStringLiteral("surface RAS"));
     }
 
-    rebuildFromArrays(arrays);
+    rebuild(implantation);
     m_source = ElectrodeSource::Bids;
     m_sourcePath = path;
     return true;
@@ -380,9 +349,9 @@ void ElectrodesPlugin::handlePick(const PickResult& pick)
 
 //=============================================================================================================
 
-void ElectrodesPlugin::rebuildFromArrays(const QVector<ElectrodeArray>& arrays)
+void ElectrodesPlugin::rebuild(const IEEGLIB::IeegImplantation& implantation)
 {
-    m_object->setArrays(arrays);
+    m_object->setImplantation(implantation);
     publishToScene();
     emit electrodesChanged();
 }

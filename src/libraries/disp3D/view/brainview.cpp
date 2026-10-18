@@ -2166,8 +2166,8 @@ void BrainView::mouseReleaseEvent(QMouseEvent* event)
     // Emit surface click if a clean left-click (no rotate or pan drag) landed on geometry
     if (event->button() == Qt::LeftButton && !m_draggedSincePress) {
         castRay(event->pos());
-        if (const ElectrodeContact* contact = m_electrodes ? m_electrodes->contactAt(m_electrodes->hoveredContact()) : nullptr) {
-            emit electrodeContactClicked(contact->name, contact->position);
+        if (const IEEGLIB::IeegContact* contact = m_electrodes ? m_electrodes->contactAt(m_electrodes->hoveredContact()) : nullptr) {
+            emit electrodeContactClicked(contact->name, QVector3D(contact->position.x(), contact->position.y(), contact->position.z()));
         } else if (m_hasIntersection) {
             emit surfacePointClicked(m_lastIntersectionPoint);
         }
