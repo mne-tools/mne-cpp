@@ -10,11 +10,10 @@
  *
  * Purpose
  * -------
- * Probe whether the Qt QRhi GLES2/WebGL backend still breaks when more than one
- * drawIndexed() is issued inside a SINGLE render pass. Historically (Qt 6.11.0)
- * a second draw call per pass blanked the entire frame on WebGL, forcing
- * mne_inspect to merge every surface into one VBO/IBO and emit a single draw.
- * See /memories/repo/qrhi_webgl_single_draw_constraint.md.
+ * Probe which multi-draw patterns render on the QRhi GLES2/WebGL backend. A
+ * second draw call per pass used to blank the whole frame in disp3D on WebGL,
+ * which led to merging every surface into one VBO/IBO with a single draw. The
+ * cause was disp3D's uniform slot stride, reproduced by the shared-ubuf modes.
  *
  * What this renders
  * -----------------
@@ -34,9 +33,12 @@
  * The verdict is written to qDebug() (browser console / emrun stdout) and the
  * window title.
  *
- * Both cases run in sequence: first with all resource updates committed via
+ * Four cases run in sequence: first with all resource updates committed via
  * beginPass(), then the disp3D pattern of a cb->resourceUpdate() per draw
  * INSIDE the pass, which QRhi documents as "Cannot be called inside a pass".
+ * The last two share one dynamic-offset uniform buffer like disp3D: slots spaced
+ * by rhi->ubufAlignment() overlap on GL, where that alignment is 1 byte, and
+ * slots spaced by rhi->ubufAligned(block size) do not.
  */
 
 #include <QApplication>
@@ -97,7 +99,12 @@ private:
 
     std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
 
-    enum Mode { UpdatesBeforePass, UpdatesInsidePass, Done };
+    // One uniform buffer for both draws, addressed with dynamic offsets
+    std::unique_ptr<QRhiBuffer> m_sharedUbuf;
+    std::unique_ptr<QRhiShaderResourceBindings> m_sharedSrb;
+    std::unique_ptr<QRhiGraphicsPipeline> m_sharedPipeline;
+
+    enum Mode { UpdatesBeforePass, UpdatesInsidePass, SharedUbufAlignmentStride, SharedUbufBlockStride, Done };
     Mode m_mode = UpdatesBeforePass;
     QRhiReadbackResult m_rb;
     int m_frame = 0;
@@ -149,11 +156,18 @@ void MultiDrawWidget::initialize(QRhiCommandBuffer*)
         };
         makeMesh(m_red);
         makeMesh(m_green);
+
+        m_sharedUbuf.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 2 * rhi->ubufAligned(256)));
+        m_sharedUbuf->create();
+        m_sharedSrb.reset(rhi->newShaderResourceBindings());
+        m_sharedSrb->setBindings({QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(
+            0, QRhiShaderResourceBinding::VertexStage, m_sharedUbuf.get(), 64)});
+        m_sharedSrb->create();
     }
 
-    if (!m_pipeline) {
-        m_pipeline.reset(rhi->newGraphicsPipeline());
-        m_pipeline->setShaderStages({
+    auto makePipeline = [&](std::unique_ptr<QRhiGraphicsPipeline>& pipeline, QRhiShaderResourceBindings* srb) {
+        pipeline.reset(rhi->newGraphicsPipeline());
+        pipeline->setShaderStages({
             {QRhiShaderStage::Vertex, loadShader(QShader::VertexStage)},
             {QRhiShaderStage::Fragment, loadShader(QShader::FragmentStage)},
         });
@@ -164,13 +178,17 @@ void MultiDrawWidget::initialize(QRhiCommandBuffer*)
             {0, 0, QRhiVertexInputAttribute::Float3, offsetof(Vertex, pos)},
             {0, 1, QRhiVertexInputAttribute::Float3, offsetof(Vertex, col)},
         });
-        m_pipeline->setVertexInputLayout(layout);
-        m_pipeline->setShaderResourceBindings(m_red.srb.get());
-        m_pipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
-        m_pipeline->setDepthTest(true);
-        m_pipeline->setDepthWrite(true);
-        m_pipeline->setCullMode(QRhiGraphicsPipeline::None);
-        m_pipeline->create();
+        pipeline->setVertexInputLayout(layout);
+        pipeline->setShaderResourceBindings(srb);
+        pipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
+        pipeline->setDepthTest(true);
+        pipeline->setDepthWrite(true);
+        pipeline->setCullMode(QRhiGraphicsPipeline::None);
+        pipeline->create();
+    };
+    if (!m_pipeline) {
+        makePipeline(m_pipeline, m_red.srb.get());
+        makePipeline(m_sharedPipeline, m_sharedSrb.get());
     }
 }
 
@@ -193,8 +211,16 @@ void MultiDrawWidget::render(QRhiCommandBuffer* cb)
         u->updateDynamicBuffer(mesh.ubuf.get(), 0, 64, mvp.constData());
     };
 
-    auto drawTriangle = [&](TriMesh& mesh) {
-        cb->setShaderResources(mesh.srb.get());
+    const bool shared = m_mode == SharedUbufAlignmentStride || m_mode == SharedUbufBlockStride;
+    const quint32 slotStride = m_mode == SharedUbufAlignmentStride ? quint32(rhi->ubufAlignment()) : quint32(rhi->ubufAligned(256));
+
+    auto drawTriangle = [&](TriMesh& mesh, quint32 slot) {
+        if (shared) {
+            const QRhiCommandBuffer::DynamicOffset offset = {0, slot * slotStride};
+            cb->setShaderResources(m_sharedSrb.get(), 1, &offset);
+        } else {
+            cb->setShaderResources(mesh.srb.get());
+        }
         const QRhiCommandBuffer::VertexInput vbuf(mesh.vbuf.get(), 0);
         cb->setVertexInput(0, 1, &vbuf, mesh.ibuf.get(), 0,
                            QRhiCommandBuffer::IndexUInt32);
@@ -207,17 +233,22 @@ void MultiDrawWidget::render(QRhiCommandBuffer* cb)
         queueUpdates(pre, m_red, triangleRed);
         queueUpdates(pre, m_green, triangleGreen);
     }
+    if (shared) {
+        pre->updateDynamicBuffer(m_sharedUbuf.get(), 0, 64, mvp.constData());
+        pre->updateDynamicBuffer(m_sharedUbuf.get(), slotStride, 64, mvp.constData());
+    }
     cb->beginPass(rt, QColor(30, 30, 30), {1.0f, 0}, pre);
-    cb->setGraphicsPipeline(m_pipeline.get());
+    cb->setGraphicsPipeline(shared ? m_sharedPipeline.get() : m_pipeline.get());
     cb->setViewport(QRhiViewport(0, 0, sz.width(), sz.height()));
 
+    quint32 slot = 0;
     for (auto [mesh, data] : {std::pair{&m_red, triangleRed}, std::pair{&m_green, triangleGreen}}) {
         if (m_mode == UpdatesInsidePass) {
             QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
             queueUpdates(u, *mesh, data);
             cb->resourceUpdate(u);
         }
-        drawTriangle(*mesh);
+        drawTriangle(*mesh, slot++);
     }
 
     cb->endPass();
@@ -279,23 +310,25 @@ void MultiDrawWidget::evaluate()
 
     QString verdict;
     if (leftRed && rightGreen)
-        verdict = QStringLiteral("PASS — two drawIndexed() in one pass BOTH rendered (WebGL multi-draw bug is FIXED)");
+        verdict = QStringLiteral("PASS — both drawIndexed() calls in one pass rendered");
     else if (!leftRed && !rightGreen)
-        verdict = QStringLiteral("FAIL — frame blank; multi-draw still blanks the pass (bug PRESENT)");
+        verdict = QStringLiteral("FAIL — frame blank, neither draw rendered");
     else if (leftRed && !rightGreen)
-        verdict = QStringLiteral("PARTIAL — only draw 1 (red) survived; draw 2 dropped (bug PRESENT)");
+        verdict = QStringLiteral("PARTIAL — only draw 1 (red) rendered");
     else
-        verdict = QStringLiteral("PARTIAL — only draw 2 (green) survived; draw 1 dropped (bug PRESENT)");
+        verdict = QStringLiteral("PARTIAL — only draw 2 (green) rendered");
 
-    const char* mode = m_mode == UpdatesBeforePass ? "updates-before-pass" : "updates-inside-pass";
-    qInfo("[multi-draw] mode=%s backend=%s  size=%dx%d  leftRed=%d  rightGreen=%d",
-          mode, rhi() ? rhi()->backendName() : "?", w, h, int(leftRed), int(rightGreen));
+    static const char* const modeNames[] = {"updates-before-pass", "updates-inside-pass",
+                                            "shared-ubuf-alignment-stride", "shared-ubuf-block-stride"};
+    const char* mode = modeNames[m_mode];
+    qInfo("[multi-draw] mode=%s backend=%s ubufAlignment=%d  size=%dx%d  leftRed=%d  rightGreen=%d",
+          mode, rhi() ? rhi()->backendName() : "?", rhi() ? rhi()->ubufAlignment() : 0, w, h, int(leftRed), int(rightGreen));
     qInfo("[multi-draw] mode=%s %s", mode, qPrintable(verdict));
     setWindowTitle(QStringLiteral("Multi-Draw QRhi Test — ") + verdict);
 
     // Re-arm for the next mode; buffers are re-uploaded inside the pass there.
-    m_mode = m_mode == UpdatesBeforePass ? UpdatesInsidePass : Done;
-    if (m_mode == UpdatesInsidePass) {
+    m_mode = static_cast<Mode>(m_mode + 1);
+    if (m_mode != Done) {
         m_red.uploaded = m_green.uploaded = false;
         m_frame = 0;
         m_readbackScheduled = false;
