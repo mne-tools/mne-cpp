@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6300 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6317 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -323,6 +323,8 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **bmin** `[var]` in [AverageCategory](/docs/api/fiff/average-category) — Baseline min (s).
 - **bmin** `[var]` in [CovDefinition](/docs/api/mne/cov-definition) — Baseline min (s).
 - **bmin** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Baseline start time (s).
+- **bodyRenderKey** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
+- **bodyStreams** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **bonferroni** `[fn]` in [StatsMcCorrection](/docs/api/sts/stats-mc-correction) — Bonferroni correction as mne.stats.bonferroni_correction: corrected_p = min(p * n, 1.0).
 - **border** `[var]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Per-vertex flag: non-zero if the vertex lies on the patch border (size np).
 - **borderChanged** `[signal]` in [Spline](/docs/api/disp/spline) — emit signal consisting of three threshold lines x-axis value if any one of them is changed
@@ -673,8 +675,9 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **color** `[var]` in [AverageCategory](/docs/api/fiff/average-category) — Display color (unused in batch).
 - **color** `[var]` in `ButterflyTypeGroup`
 - **color** `[var]` in [ChannelDisplayInfo](/docs/api/disp/channel-display-info) — Line colour to use in the GPU renderer.
-- **color** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Display color.
+- **color** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Display colour; invalid uses the colour of the array.
 - **color** `[var]` in `EventMarker` — Display colour of the line and label chip.
+- **color** `[var]` in `InstanceData`
 - **color** `[var]` in `InstanceData`
 - **color** `[var]` in `InstanceData`
 - **color** `[var]` in `InstanceData`
@@ -1056,8 +1059,11 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **ConstUPtr** `[type]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Const unique pointer type for [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix).
 - **ConstUPtr** `[type]` in [FiffStream](/docs/api/fiff/fiff-stream) — Const unique pointer type for [`FiffStream`](/docs/api/fiff/fiff-stream).
 - **ConstUPtr** `[type]` in [FiffTag](/docs/api/fiff/fiff-tag) — Const unique pointer type for [`FiffTag`](/docs/api/fiff/fiff-tag).
-- **contactInstanceCount** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
-- **contacts** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Contacts in array-local order.
+- **contactAt** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
+- **contactLabel** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
+- **contactRenderKey** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
+- **contacts** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Contacts in order along the lead (contact 1 first).
+- **contactStreams** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **contains** `[fn]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Returns whether `channel` (any spelling) is one of the port's channels.
 - **contHpiStatusChanged** `[signal]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Emit this signal whenever continous HPI checkbox changed.
 - **continuousHPIChecked** `[fn]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Returns whether continuous fitting is checked.
@@ -1473,6 +1479,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **eigen_leads_weighted** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — True if eigenleads already include R^\{0.5\} weighting.
 - **eigenvalues** `[fn]` in [DecodingSsd](/docs/api/decoding/decoding-ssd)
 - **eigvec** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — Matrix of eigenvectors (each row represents an eigenvector).
+- **electrodeContactClicked** `[signal]` in [BrainView](/docs/api/disp3-d/brain-view) — Emitted when a click lands on an electrode contact.
 - **electrodeCount** `[fn]` in [StandardMontage](/docs/api/utils/standard-montage) — Get the number of electrodes in a montage.
 - **ElectrodeObject** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **electrodes** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Electrode positions from *_electrodes.tsv.
@@ -2039,10 +2046,8 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **gaussianLogLikelihood** `[fn]` in [StsCovEstimators](/docs/api/sts/sts-cov-estimators) — Gaussian log-likelihood of held-out data given a covariance model.
 - **gcd** `[fn]` in [Numerics](/docs/api/utils/numerics) — Finds the Greatest Common Divisor (GCD) of two integer values.
 - **GEE2** `[fn]` in [ParksMcClellan](/docs/api/utils/parks-mc-clellan) — Function to evaluate the frequency response using the Lagrange interpolation formula in the barycentric form.
-- **generateContactInstances** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Generate per-instance data for contact spheres.
 - **generateQuadIndices** `[fn]` in [SliceObject](/docs/api/disp3-d/slice-object) — Generate quad index buffer: 2 triangles = 6 indices.
 - **generateQuadVertices** `[fn]` in [SliceObject](/docs/api/disp3-d/slice-object) — Generate quad vertex buffer: 4 vertices × (3 pos + 2 UV) = 20 floats.
-- **generateShaftGeometry** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Generate interleaved vertex + index data for all shaft cylinders.
 - **generateTapers** `[fn]` in [Spectral](/docs/api/utils/spectral) — Calculates a hanning window of given length.
 - **generateTapers** `[fn]` in [Spectral](/docs/api/utils/spectral) — Calculates a hanning window of given length.
 - **generation** `[var]` in [GpuStream](/docs/api/disp3-d/gpu-stream) — Bumped by the owner on every change of the data.
@@ -2473,6 +2478,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **holmBonferroni** `[fn]` in [StatsMcCorrection](/docs/api/sts/stats-mc-correction) — Holm-Bonferroni step-down correction.
 - **Holographic** `[var]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer)
 - **hostName** `[var]` in [MnaProvenance](/docs/api/mna/mna-provenance) — Machine name (for cluster provenance).
+- **hoveredContact** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **hoveredRegionChanged** `[signal]` in [BrainView](/docs/api/disp3-d/brain-view) — Emitted when the hovered brain region changes.
 - **hpi_coil_freqs** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — Excitation frequencies of the HPI coils in Hz, in coil order.
 - **hpiFreqs** `[var]` in [HpiFitResult](/docs/api/inv/hpi-fit-result)
@@ -2536,7 +2542,6 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **includeGridData** `[var]` in [InvTokenizeOptions](/docs/api/inv/inv-tokenize-options) — Emit grid amplitude data.
 - **includePositions** `[var]` in [InvTokenizeOptions](/docs/api/inv/inv-tokenize-options) — Emit explicit 3-D positions.
 - **independent** `[fn]` in [StatsTtest](/docs/api/sts/stats-ttest) — Independent two-sample t-test.
-- **indexBuffer** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **indexCount** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface)
 - **indexCount** `[fn]` in [DipoleObject](/docs/api/disp3-d/dipole-object)
 - **indexCount** `[var]` in [InstancedStreams](/docs/api/disp3-d/instanced-streams) — Number of indices of the shape.
@@ -2585,7 +2590,6 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **insertRows** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model)
 - **insetForSeparator** `[fn]` in [MultiViewLayout](/docs/api/disp3-d/multi-view-layout) — Apply a separator-pixel inset to a pane rect so adjacent panes don't overlap the separator bar.
 - **instance** `[fn]` in [MnaOpRegistry](/docs/api/mna/mna-op-registry) — Access the singleton instance.
-- **instanceBuffer** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **instanceCount** `[fn]` in [DipoleObject](/docs/api/disp3-d/dipole-object)
 - **instanceCount** `[var]` in [InstancedStreams](/docs/api/disp3-d/instanced-streams) — Number of instances.
 - **instanceCount** `[fn]` in [PolylineObject](/docs/api/disp3-d/polyline-object)
@@ -2602,6 +2606,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **interpreter** `[var]` in [MnaScript](/docs/api/mna/mna-script) — Interpreter command (e.g.
 - **interpreterArgs** `[var]` in [MnaScript](/docs/api/mna/mna-script) — Extra args before the script file (e.g. ["-u"] for unbuffered Python).
 - **intersect** `[fn]` in [DipoleObject](/docs/api/disp3-d/dipole-object) — Test ray intersection with dipoles.
+- **intersect** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Intersect a ray with the contact spheres.
 - **intersect** `[fn]` in [Linalg](/docs/api/math/linalg) — Find the intersection of two vectors.
 - **intersects** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface) — Test ray intersection with this surface.
 - **intersectWorldRay** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Intersect a world-space ray with loaded scene geometry.
@@ -2766,6 +2771,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **isSelected** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface)
 - **isSelected** `[var]` in `InstanceData`
 - **isSelected** `[var]` in `InstanceData`
+- **isSelected** `[var]` in `InstanceData`
 - **isSelected** `[var]` in `InstanceData` — Always 0, polylines are not pickable.
 - **isSelectionEmpty** `[fn]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — Returns whether there is a user selection.
 - **issparse** `[fn]` in [Numerics](/docs/api/utils/numerics) — Determines if a given data (stored as vector v) are representing a sparse matrix.
@@ -2774,6 +2780,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **isStreaming** `[fn]` in [RtSourceDataController](/docs/api/disp3-d/rt-source-data-controller) — Check if streaming is active.
 - **isStreaming** `[fn]` in [SourceEstimateManager](/docs/api/disp3-d/source-estimate-manager)
 - **issueDipoleDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Draw dipoles as instanced cones.
+- **issueElectrodeDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Draw electrode lead bodies and contacts, opaque and depth-tested.
 - **issueNetworkDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Draw a connectivity network: instanced node spheres and edge cylinders.
 - **issuePolylineDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Draw a polyline as connected segments.
 - **issueSliceDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Draw an MRI slice prepared with `prepareSliceDraw()`.
@@ -2791,6 +2798,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **isVisible** `[fn]` in [AbstractTreeItem](/docs/api/disp3-d/abstract-tree-item)
 - **isVisible** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface) — Check if the surface is visible.
 - **isVisible** `[fn]` in [DipoleObject](/docs/api/disp3-d/dipole-object)
+- **isVisible** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **isVisible** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns whether a port lies completely inside the visible area.
 - **isVisible** `[fn]` in [NetworkObject](/docs/api/disp3-d/network-object)
 - **isVisible** `[fn]` in [PolylineObject](/docs/api/disp3-d/polyline-object)
@@ -2811,6 +2819,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 ## K {#k}
 
 - **kBarHeight** `[var]` in [OverviewBarWidget](/docs/api/disp/overview-bar-widget)
+- **kDepthContactRadius** `[var]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **keepTempFile** `[var]` in [MnaScript](/docs/api/mna/mna-script) — true → preserve temp script file after execution (debug aid)
 - **khi2** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — khi^2 value.
 - **khi2** `[var]` in [InvFocalDipole](/docs/api/inv/inv-focal-dipole) — Chi-squared value of the fit.
@@ -2831,10 +2840,15 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **kind** `[var]` in [MNEProjItem](/docs/api/mne/mne-proj-item) — FIFF projection item kind (FIFFV_PROJ_ITEM_*).
 - **kind** `[var]` in [PickResult](/docs/api/disp3-d/pick-result) — What was hit.
 - **kind** `[var]` in [SceneLayer](/docs/api/disp3-d/scene-layer)
+- **kMaxTieLength** `[var]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Longer gaps are not tied: not one array.
 - **KMeans** `[fn]` in [KMeans](/docs/api/math/k-means) — Constructs a [`KMeans`](/docs/api/math/k-means) algorithm object.
 - **KMeans** `[fn]` in [KMeans](/docs/api/math/k-means) — Constructs a [`KMeans`](/docs/api/math/k-means) algorithm object using enum parameters (preferred for performance).
 - **knownTrackerToObjectiveDistance** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
+- **kShaftOvershoot** `[var]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Shaft extension past the outer contacts.
+- **kShaftRadius** `[var]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **kStimZoneH** `[var]` in [TimeRulerWidget](/docs/api/disp/time-ruler-widget) — Height of the stimulus lane (px).
+- **kSubduralContactRadius** `[var]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
+- **kTieRadius** `[var]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Ties between neighbouring strip / grid contacts.
 - **kTimeZoneH** `[var]` in [TimeRulerWidget](/docs/api/disp/time-ruler-widget) — Height of the time-tick zone (px).
 - **kTotalH** `[var]` in [TimeRulerWidget](/docs/api/disp/time-ruler-widget) — Total widget height (px).
 
@@ -2876,6 +2890,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **layout** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Geometry kind.
 - **layoutChanged** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model) — Updates the layout map.
 - **LayoutScene** `[fn]` in [LayoutScene](/docs/api/disp/layout-scene) — Constructs a [`LayoutScene`](/docs/api/disp/layout-scene).
+- **leadColor** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **ledoitWolf** `[fn]` in [StsCovEstimators](/docs/api/sts/sts-cov-estimators) — Ledoit-Wolf optimal shrinkage covariance estimator.
 - **left** `[var]` in [MNEMshEyes](/docs/api/mne/mne-msh-eyes) — Left hemisphere viewpoint (x, y, z).
 - **left_up** `[var]` in [MNEMshEyes](/docs/api/mne/mne-msh-eyes) — Left hemisphere up-vector.
@@ -3347,6 +3362,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **ModeAnnotation** `[var]` in [BrainSurface](/docs/api/disp3-d/brain-surface)
 - **model** `[var]` in [CameraResult](/docs/api/disp3-d/camera-result)
 - **model** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Returns the underlying data model (non-owning pointer).
+- **model** `[var]` in `InstanceData`
 - **model** `[var]` in `InstanceData`
 - **model** `[var]` in `InstanceData`
 - **model** `[var]` in `InstanceData`
@@ -3992,7 +4008,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **pos** `[var]` in [VertexData](/docs/api/disp3-d/vertex-data)
 - **position** `[var]` in [BrainVisionMarker](/docs/api/bids/brain-vision-marker) — 0-based sample position.
 - **position** `[var]` in [DigitizedPoint](/docs/api/utils/digitized-point) — Position in metres, sensor frame.
-- **position** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — 3-D position in MRI (surface RAS) coords.
+- **position** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Position in metres, MRI surface RAS.
 - **position** `[var]` in [FastrakSample](/docs/api/utils/fastrak-sample) — Position in metres (always normalised to SI).
 - **position** `[var]` in [FineCalEntry](/docs/api/dsp/fine-cal-entry) — Coil position in device coordinates (metres).
 - **position** `[var]` in [InvFocalDipole](/docs/api/inv/inv-focal-dipole) — Dipole position (m) in head coordinates.
@@ -4017,6 +4033,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **prepare_noise_cov** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Prepare noise covariance matrix.
 - **prepareDataAndProjectors** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater) — Reduce data to only use good channels.
 - **prepareDipoleDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Upload the dipoles' streams if they changed and write the uniforms of their draw.
+- **prepareElectrodeDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Upload the electrodes' streams if they changed and write the uniforms of their draws.
 - **prepareFilter** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel) — Prepares a filter kernel to be used wiht a specific data block length.
 - **prepareNetworkDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Upload the network's streams if they changed and write the uniforms of its draws.
 - **preparePolylineDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Upload the polyline's streams if they changed and write the uniforms of its draw.
@@ -4138,7 +4155,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **r2** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Position of vertex 1.
 - **r3** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Position of vertex 2.
 - **rad** `[var]` in [FwdEegSphereLayer](/docs/api/fwd/fwd-eeg-sphere-layer) — The actual rads.
-- **radius** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Contact radius in mm.
+- **radius** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Drawn radius in metres; 0 uses the default of the array's layout.
 - **radius** `[var]` in [LiveMarker](/docs/api/disp3-d/live-marker)
 - **radius** `[fn]` in [Sphere](/docs/api/math/sphere) — The radius of the sphere.
 - **randomSeed** `[var]` in [MnaProvenance](/docs/api/mna/mna-provenance) — -1 if not applicable
@@ -4821,6 +4838,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **setDraggable** `[fn]` in [DraggableFramelessWidget](/docs/api/disp/draggable-frameless-widget) — Set the draggable flag of this widget.
 - **setEegSurface** `[fn]` in [RtSensorDataController](/docs/api/disp3-d/rt-sensor-data-controller) — Set the EEG target surface geometry for on-the-fly mapping.
 - **setEegSurface** `[fn]` in [RtSensorInterpolationMatWorker](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker) — Set the surface geometry used for EEG field mapping.
+- **setElectrodes** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Set the sEEG / ECoG electrodes to draw, picked under the pointer like the other scene objects.
 - **setELoretaOptions** `[fn]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Set eLORETA options.
 - **setEnabled** `[fn]` in [VideoOverlay](/docs/api/disp3-d/video-overlay)
 - **setEpochMarkers** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
@@ -4884,6 +4902,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **setHideBadChannels** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Show or hide waveform traces of channels marked bad.
 - **setHighpassFreq** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
 - **setHorizontal** `[fn]` in [ProgressView](/docs/api/disp/progress-view) — Sets message to appear next to loading bar.
+- **setHoveredContact** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Highlight one contact while the pointer is over it, without changing the selection.
 - **setHpiDigitizer** `[fn]` in [RtHpi](/docs/api/dsp/rt-hpi) — Set the new projection matrix.
 - **setHubStatus** `[fn]` in [NetworkNode](/docs/api/connectivity/network-node) — Sets the hub status of this node.
 - **setInfo** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Set a new fiff measurement info.
@@ -5173,6 +5192,7 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **setVisible** `[fn]` in [AbstractTreeItem](/docs/api/disp3-d/abstract-tree-item)
 - **setVisible** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface) — Set the visibility of the surface.
 - **setVisible** `[fn]` in [DipoleObject](/docs/api/disp3-d/dipole-object)
+- **setVisible** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **setVisible** `[fn]` in [NetworkObject](/docs/api/disp3-d/network-object)
 - **setVisible** `[fn]` in [PolylineObject](/docs/api/disp3-d/polyline-object) — Sets whether the polyline is drawn.
 - **setVisibleChannelCount** `[fn]` in [ChannelLabelPanel](/docs/api/disp/channel-label-panel) — Set how many channel rows are simultaneously visible (kept in sync with [`ChannelRhiView`](/docs/api/disp/channel-rhi-view)).
@@ -5216,9 +5236,8 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **shaderMode** `[fn]` in [SurfaceTreeItem](/docs/api/disp3-d/surface-tree-item)
 - **shaderModeChanged** `[signal]` in [BrainView](/docs/api/disp3-d/brain-view) — Emitted whenever the active brain shader mode changes — either via `setShaderMode` or after restoring persisted state in `BrainView::loadMultiViewSettings` "loadMultiViewSettings".
 - **shaderModeForTarget** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Get configured shader mode name for a target view.
-- **shaftColor** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Depth only: shaft body color.
-- **shaftIndexCount** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
-- **shaftRadius** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Depth only: cylinder radius in mm.
+- **shaftColor** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Lead colour; invalid picks one from the lead palette.
+- **shaftRadius** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Depth only: shaft radius in metres; 0 uses the default.
 - **shape** `[fn]` in [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate) — Get the 3D grid shape.
 - **shape** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
 - **shape** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
@@ -5956,7 +5975,6 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **update** `[fn]` in [IObserver](/docs/api/utils/i-observer) — Updates the [`IObserver`](/docs/api/utils/i-observer).
 - **update_inuse** `[fn]` in [MNESourceSpace](/docs/api/mne/mne-source-space) — Update the active vertex (inuse) vector and recompute vertno.
 - **updateBadChannels** `[fn]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — Update the scene items according to the bad channel list in the fiff info file.
-- **updateBuffers** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Update GPU buffers (shaft vertex/index, contact instance) via QRhi.
 - **updateCompensator** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Update the compensator.
 - **updateCompensator** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Update the compensator.
 - **updateCompensator** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Update the compensator.
@@ -6141,7 +6159,6 @@ Index of 6300 public class members (functions, variables, typedefs, enums) acros
 - **vert** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Triangle vertex indices (non-owning; points into parent surface itris).
 - **vert_dist** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Euclidean distances between neighboring vertices (np entries, variable length).
 - **vertex_colors** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Per-vertex RGBA color array.
-- **vertexBuffer** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **vertexCount** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface)
 - **vertexCount** `[var]` in `ChannelGpuData`
 - **vertexData** `[fn]` in [InvVectorSourceEstimate](/docs/api/inv/inv-vector-source-estimate) — Extract the (x, y, z) data for a specific vertex.

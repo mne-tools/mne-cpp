@@ -19,6 +19,7 @@
 #include <rhi/qrhi.h>
 #include "renderable/brainsurface.h"
 #include "renderable/dipoleobject.h"
+#include "renderable/electrodeobject.h"
 #include "renderable/networkobject.h"
 #include "renderable/polylineobject.h"
 #include "renderable/videooverlay.h"
@@ -74,7 +75,8 @@ struct BrainRenderer::Impl
     bool uploadSurface(BrainSurface* surface, QRhiResourceUpdateBatch* u);
     bool uploadInstanced(const RenderKey& key, const InstancedStreams& streams, QRhiResourceUpdateBatch* u);
     void bindSurface(QRhiCommandBuffer* cb, const GpuMesh& mesh);
-    void issueInstanced(QRhiCommandBuffer* cb, int uniformOffset, const RenderKey& key, const InstancedStreams& streams);
+    void issueInstanced(QRhiCommandBuffer* cb, int uniformOffset, const RenderKey& key, const InstancedStreams& streams,
+                        QRhiGraphicsPipeline* pipeline);
     int writeInstancedUniforms(const SceneData& data, const char* caller);
 
     QRhi* rhi = nullptr;
@@ -91,6 +93,7 @@ struct BrainRenderer::Impl
     // Pipelines for each mode — indexed by ShaderMode enum (O(1) lookup)
     std::array<std::unique_ptr<QRhiGraphicsPipeline>, kNumShaderModes> pipelines{};
     std::array<std::unique_ptr<QRhiGraphicsPipeline>, kNumShaderModes> pipelinesBackColor{};
+    std::unique_ptr<QRhiGraphicsPipeline> electrodePipeline;
 
     std::unique_ptr<QRhiBuffer> uniformBuffer;
     // Whole bound block, not ubufAlignment(): that is 1 on GL, where slots would overlap
@@ -192,6 +195,22 @@ static QRhiVertexInputLayout surfaceInputLayout()
                       {0, 1, QRhiVertexInputAttribute::Float3, 12},
                       {1, 2, QRhiVertexInputAttribute::UNormByte4, 0},
                       {2, 3, QRhiVertexInputAttribute::UNormByte4, 0}});
+    return il;
+}
+
+// Instanced glyphs: unit mesh (position, normal) plus a model matrix, RGBA colour and selected flag per instance
+static QRhiVertexInputLayout instancedInputLayout()
+{
+    QRhiVertexInputLayout il;
+    il.setBindings({{6 * sizeof(float)}, {21 * sizeof(float), QRhiVertexInputBinding::PerInstance}});
+    il.setAttributes({{0, 0, QRhiVertexInputAttribute::Float3, 0},
+                      {0, 1, QRhiVertexInputAttribute::Float3, 3 * sizeof(float)},
+                      {1, 2, QRhiVertexInputAttribute::Float4, 0},
+                      {1, 3, QRhiVertexInputAttribute::Float4, 4 * sizeof(float)},
+                      {1, 4, QRhiVertexInputAttribute::Float4, 8 * sizeof(float)},
+                      {1, 5, QRhiVertexInputAttribute::Float4, 12 * sizeof(float)},
+                      {1, 6, QRhiVertexInputAttribute::Float4, 16 * sizeof(float)},
+                      {1, 7, QRhiVertexInputAttribute::Float, 20 * sizeof(float)}});
     return il;
 }
 
@@ -448,33 +467,7 @@ void BrainRenderer::Impl::createResources(QRhi* newRhi, QRhiRenderPassDescriptor
         auto setup = [&](QRhiGraphicsPipeline* p, QRhiGraphicsPipeline::CullMode cull) {
             p->setShaderStages({{QRhiShaderStage::Vertex, vS}, {QRhiShaderStage::Fragment, fS}});
 
-            QRhiVertexInputLayout il;
-
-            if (mode == Dipole) {
-                il.setBindings({
-                    {6 * sizeof(float)},                                      // Binding 0: Vertex Data (Pos + Normal) -> stride 6 floats
-                    {21 * sizeof(float), QRhiVertexInputBinding::PerInstance} // Binding 1: Instance Data (Mat4 + Color + Selected) -> stride 21 floats
-                });
-
-                il.setAttributes({                                                             // Vertex Buffer (Binding 0)
-                                  {0, 0, QRhiVertexInputAttribute::Float3, 0},                 // Pos
-                                  {0, 1, QRhiVertexInputAttribute::Float3, 3 * sizeof(float)}, // Normal
-
-                                  // Instance Buffer (Binding 1)
-                                  // Model Matrix (4 x vec4)
-                                  {1, 2, QRhiVertexInputAttribute::Float4, 0},
-                                  {1, 3, QRhiVertexInputAttribute::Float4, 4 * sizeof(float)},
-                                  {1, 4, QRhiVertexInputAttribute::Float4, 8 * sizeof(float)},
-                                  {1, 5, QRhiVertexInputAttribute::Float4, 12 * sizeof(float)},
-                                  // Color
-                                  {1, 6, QRhiVertexInputAttribute::Float4, 16 * sizeof(float)},
-                                  // isSelected
-                                  {1, 7, QRhiVertexInputAttribute::Float, 20 * sizeof(float)}});
-            } else {
-                il = surfaceInputLayout();
-            }
-
-            p->setVertexInputLayout(il);
+            p->setVertexInputLayout(mode == Dipole ? instancedInputLayout() : surfaceInputLayout());
             p->setShaderResourceBindings(srb.get());
             p->setRenderPassDescriptor(rp);
             p->setSampleCount(sampleCount);
@@ -510,6 +503,26 @@ void BrainRenderer::Impl::createResources(QRhi* newRhi, QRhiRenderPassDescriptor
             setup(pipeline.get(), QRhiGraphicsPipeline::None);
         }
         pipelines[mode] = std::move(pipeline);
+    }
+
+    // Electrodes: opaque and depth-written, unlike the translucent dipole glyphs
+    const QShader evS = getShader(QStringLiteral(":/electrode.vert.qsb"));
+    const QShader efS = getShader(QStringLiteral(":/electrode.frag.qsb"));
+    electrodePipeline.reset();
+    if (evS.isValid() && efS.isValid()) {
+        electrodePipeline.reset(rhi->newGraphicsPipeline());
+        electrodePipeline->setShaderStages({{QRhiShaderStage::Vertex, evS}, {QRhiShaderStage::Fragment, efS}});
+        electrodePipeline->setVertexInputLayout(instancedInputLayout());
+        electrodePipeline->setShaderResourceBindings(srb.get());
+        electrodePipeline->setRenderPassDescriptor(rp);
+        electrodePipeline->setSampleCount(sampleCount);
+        electrodePipeline->setCullMode(QRhiGraphicsPipeline::None);
+        electrodePipeline->setDepthTest(true);
+        electrodePipeline->setDepthWrite(true);
+        electrodePipeline->setFlags(QRhiGraphicsPipeline::UsesScissor);
+        electrodePipeline->create();
+    } else {
+        qWarning() << "BrainRenderer: Could not load the electrode shaders";
     }
 
     resourcesDirty = false;
@@ -1461,14 +1474,12 @@ int BrainRenderer::Impl::writeInstancedUniforms(const SceneData& data, const cha
         float cameraPos[3];    // 64..75
         float _pad0;           // 76..79
         float lightDir[3];     // 80..91
-        float _pad1;           // 92..95
-        float lightingEnabled; // 96..99
+        float lightingEnabled; // 92..95: std140 packs a float into the vec3's last slot
     } ub;
     memcpy(ub.mvp, data.mvp.constData(), 64);
     memcpy(ub.cameraPos, &data.cameraPos, 12);
     ub._pad0 = 0.0f;
     memcpy(ub.lightDir, &data.lightDir, 12);
-    ub._pad1 = 0.0f;
     ub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
     memcpy(uniformShadow.data() + offset, &ub, sizeof(ub));
     return offset;
@@ -1511,13 +1522,36 @@ int BrainRenderer::preparePolylineDraw(QRhiResourceUpdateBatch* u, const SceneDa
 
 //=============================================================================================================
 
+int BrainRenderer::prepareElectrodeDraw(QRhiResourceUpdateBatch* u, const SceneData& data, ElectrodeObject* electrodes)
+{
+    if (!electrodes || !electrodes->isVisible() || d->insidePass("prepareElectrodeDraw"))
+        return -1;
+    const bool bodies = d->uploadInstanced(electrodes->bodyRenderKey(), electrodes->bodyStreams(), u);
+    const bool contacts = d->uploadInstanced(electrodes->contactRenderKey(), electrodes->contactStreams(), u);
+    if (!bodies && !contacts)
+        return -1;
+    return d->writeInstancedUniforms(data, "prepareElectrodeDraw");
+}
+
+//=============================================================================================================
+
+void BrainRenderer::issueElectrodeDraw(QRhiCommandBuffer* cb, ElectrodeObject* electrodes, int uniformOffset)
+{
+    if (!electrodes || !electrodes->isVisible())
+        return;
+    QRhiGraphicsPipeline* pipeline = d->electrodePipeline.get();
+    d->issueInstanced(cb, uniformOffset, electrodes->bodyRenderKey(), electrodes->bodyStreams(), pipeline);
+    d->issueInstanced(cb, uniformOffset, electrodes->contactRenderKey(), electrodes->contactStreams(), pipeline);
+}
+
+//=============================================================================================================
+
 void BrainRenderer::Impl::issueInstanced(QRhiCommandBuffer* cb,
                                          int uniformOffset,
                                          const RenderKey& key,
-                                         const InstancedStreams& streams)
+                                         const InstancedStreams& streams,
+                                         QRhiGraphicsPipeline* pipeline)
 {
-    // Dipoles, network nodes and edges, and polylines share the Dipole pipeline's instance layout
-    QRhiGraphicsPipeline* pipeline = pipelines[Dipole].get();
     const GpuMesh* m = findMesh(key);
     if (!pipeline || !m || uniformOffset < 0 || streams.indexCount <= 0 || streams.instanceCount <= 0)
         return;
@@ -1535,7 +1569,7 @@ void BrainRenderer::Impl::issueInstanced(QRhiCommandBuffer* cb,
 void BrainRenderer::issueDipoleDraw(QRhiCommandBuffer* cb, DipoleObject* dipoles, int uniformOffset)
 {
     if (dipoles && dipoles->isVisible())
-        d->issueInstanced(cb, uniformOffset, dipoles->renderKey(), dipoles->streams());
+        d->issueInstanced(cb, uniformOffset, dipoles->renderKey(), dipoles->streams(), d->pipelines[Dipole].get());
 }
 
 //=============================================================================================================
@@ -1544,8 +1578,8 @@ void BrainRenderer::issueNetworkDraw(QRhiCommandBuffer* cb, NetworkObject* netwo
 {
     if (!network || !network->isVisible() || !network->hasData())
         return;
-    d->issueInstanced(cb, uniformOffset, network->nodeRenderKey(), network->nodeStreams());
-    d->issueInstanced(cb, uniformOffset, network->edgeRenderKey(), network->edgeStreams());
+    d->issueInstanced(cb, uniformOffset, network->nodeRenderKey(), network->nodeStreams(), d->pipelines[Dipole].get());
+    d->issueInstanced(cb, uniformOffset, network->edgeRenderKey(), network->edgeStreams(), d->pipelines[Dipole].get());
 }
 
 //=============================================================================================================
@@ -1553,7 +1587,7 @@ void BrainRenderer::issueNetworkDraw(QRhiCommandBuffer* cb, NetworkObject* netwo
 void BrainRenderer::issuePolylineDraw(QRhiCommandBuffer* cb, PolylineObject* polyline, int uniformOffset)
 {
     if (polyline && polyline->isVisible() && polyline->hasData())
-        d->issueInstanced(cb, uniformOffset, polyline->renderKey(), polyline->streams());
+        d->issueInstanced(cb, uniformOffset, polyline->renderKey(), polyline->streams(), d->pipelines[Dipole].get());
 }
 
 } // namespace DISP3DLIB

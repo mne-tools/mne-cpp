@@ -71,6 +71,7 @@ class BrainTreeModel;
 class BrainRenderer;
 class BrainSurface;
 class DipoleObject;
+class ElectrodeObject;
 class NetworkObject;
 class PolylineObject;
 class VideoOverlay;
@@ -1090,6 +1091,13 @@ public slots:
      */
     void setMriSlicesVisible(bool visible);
 
+    /**
+     * Set the sEEG / ECoG electrodes to draw, picked under the pointer like the other scene objects.
+     *
+     * @param[in] electrodes  Non-owning pointer; it must outlive this view or be reset to nullptr.
+     */
+    void setElectrodes(DISP3DLIB::ElectrodeObject* electrodes);
+
 signals:
     //=========================================================================================================
     /**
@@ -1151,6 +1159,14 @@ signals:
      * @param[in] regionName  Name of the region under the cursor.
      */
     void hoveredRegionChanged(const QString& regionName);
+
+    /**
+     * Emitted when a click lands on an electrode contact.
+     *
+     * @param[in] contactName  Name of the clicked contact.
+     * @param[in] position     Contact position.
+     */
+    void electrodeContactClicked(const QString& contactName, const QVector3D& position);
 
     //=========================================================================================================
     /**
@@ -1324,6 +1340,7 @@ private:
 
     // ── MRI slices ─────────────────────────────────────────────────────
     static constexpr int kMaxSliceSlots = 3;
+    DISP3DLIB::ElectrodeObject* m_electrodes = nullptr;       /**< Non-owning. */
     DISP3DLIB::SliceObject* m_slices[kMaxSliceSlots] = {};    /**< Non-owning pointers to slice data. */
     bool m_sliceVisible[kMaxSliceSlots] = {true, true, true}; /**< Per-slot visibility flags. */
 

@@ -1,51 +1,38 @@
 #version 440
 
-// Electrode vertex shader: instanced contact spheres + shaft cylinders
-// Per-vertex: position, normal
-// Per-instance (contacts only): contact position, radius, RGBA colour, selected flag
+// sEEG / ECoG electrodes: instanced unit spheres (contacts) and unit cylinders (lead bodies),
+// with the per-instance layout shared with the dipole pipeline
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
 
-// Instance attributes (only used for contact sphere instancing)
-layout(location = 2) in vec3  instPos;
-layout(location = 3) in float instRadius;
-layout(location = 4) in vec4  instColor;
-layout(location = 5) in float instSelected;
+layout(location = 2) in vec4 modelRow0;
+layout(location = 3) in vec4 modelRow1;
+layout(location = 4) in vec4 modelRow2;
+layout(location = 5) in vec4 modelRow3;
+layout(location = 6) in vec4 color;
+layout(location = 7) in float isSelected;
 
-layout(location = 0) out vec3 v_normal;
-layout(location = 1) out vec4 v_color;
-layout(location = 2) out vec3 v_worldPos;
+layout(location = 0) out vec3 v_worldPos;
+layout(location = 1) out vec3 v_normal;
+layout(location = 2) out vec3 v_color;
 layout(location = 3) out float v_selected;
 
-layout(std140, binding = 0) uniform UniformBlock {
+layout(std140, binding = 0) uniform buf {
     mat4 mvp;
     vec3 cameraPos;
-    float isSelected;
     vec3 lightDir;
-    float useInstancing; // 1.0 = contact spheres (instanced), 0.0 = shaft cylinders
-    float opacity;
-    float _pad0;
-    float _pad1;
-    float _pad2;
-};
+    float lightingEnabled;
+} ubuf;
 
-void main() {
-    vec3 worldPos;
-
-    if (useInstancing > 0.5) {
-        // Contact sphere: scale unit sphere by radius and translate to contact position
-        worldPos = instPos + position * instRadius;
-        v_color = instColor;
-        v_selected = instSelected;
-    } else {
-        // Shaft cylinder: position is pre-transformed
-        worldPos = position;
-        v_color = vec4(0.6, 0.6, 0.6, 1.0); // Default shaft grey
-        v_selected = 0.0;
-    }
-
-    v_worldPos = worldPos;
-    v_normal = normalize(normal);
-    gl_Position = mvp * vec4(worldPos, 1.0);
+void main()
+{
+    mat4 model = mat4(modelRow0, modelRow1, modelRow2, modelRow3);
+    vec4 world = model * vec4(position, 1.0);
+    v_worldPos = world.xyz;
+    // Exact for these meshes: cylinders scale x and z alike, and their normals lie in the xz-plane or along y
+    v_normal = mat3(model) * normal;
+    v_color = color.rgb;
+    v_selected = isSelected;
+    gl_Position = ubuf.mvp * world;
 }

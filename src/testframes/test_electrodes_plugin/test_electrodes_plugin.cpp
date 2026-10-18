@@ -28,6 +28,7 @@
 
 #include <QObject>
 #include <QSignalSpy>
+#include <QTemporaryDir>
 #include <QTemporaryFile>
 #include <QTest>
 #include <QTextStream>
@@ -46,6 +47,7 @@ private slots:
     void emptyOnConstruction();
     void setArraysReplacesGeometry();
     void csvLoadGroupsByArrayLabel();
+    void bidsLoadGroupsLeadsByName();
     void attachScenePublishesLayer();
     void handlePickIgnoresOtherKinds();
     void handlePickIgnoresOtherSourceIds();
@@ -129,6 +131,56 @@ void TestElectrodesPlugin::csvLoadGroupsByArrayLabel()
     QCOMPARE(arrays[1].layout, ElectrodeLayout::Grid);
     QCOMPARE(arrays[1].gridRows, 1);
     QCOMPARE(arrays[1].gridCols, 3);
+}
+
+//=============================================================================================================
+
+void TestElectrodesPlugin::bidsLoadGroupsLeadsByName()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString tsv = dir.filePath(QStringLiteral("sub-01_ses-01_electrodes.tsv"));
+    {
+        QFile file(tsv);
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+        QTextStream out(&file);
+        out << "name\tx\ty\tz\tsize\ttype\n";
+        // Numbers order a lead; A' (left, French convention) never merges with A; G declares its type
+        out << "LA10\t0\t0\t31.5\tn/a\tn/a\n";
+        out << "LA1\t0\t0\t0\tn/a\tn/a\n";
+        out << "LA2\t0\t0\t3.5\tn/a\tn/a\n";
+        out << "A'1\t-30\t0\t0\tn/a\tn/a\n";
+        out << "A'2\t-30\t0\t10\tn/a\tn/a\n";
+        out << "A1\t30\t0\t0\tn/a\tn/a\n";
+        out << "G1\t0\t40\t0\tn/a\tgrid\n";
+        out << "NOPOS\tn/a\tn/a\tn/a\tn/a\tn/a\n";
+    }
+
+    // Units are unknown without a coordsystem sidecar, so the file is refused
+    ElectrodesPlugin plugin;
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(QStringLiteral("no \\*_coordsystem.json")));
+    QVERIFY(!plugin.loadBids(tsv));
+
+    {
+        QFile json(dir.filePath(QStringLiteral("sub-01_ses-01_coordsystem.json")));
+        QVERIFY(json.open(QIODevice::WriteOnly | QIODevice::Text));
+        json.write(R"({"iEEGCoordinateSystem": "ACPC", "iEEGCoordinateUnits": "mm"})");
+    }
+    QVERIFY(plugin.loadBids(tsv));
+    QCOMPARE(plugin.source(), ElectrodeSource::Bids);
+    QCOMPARE(plugin.contactCount(), 7);
+
+    const auto& arrays = plugin.electrodeObject()->arrays();
+    QCOMPARE(arrays.size(), 4);
+    QCOMPARE(arrays[0].label, QStringLiteral("LA"));
+    QCOMPARE(arrays[0].contacts[1].name, QStringLiteral("LA2"));
+    QCOMPARE(arrays[0].contacts[2].name, QStringLiteral("LA10"));
+    QCOMPARE(arrays[0].contacts[2].position, QVector3D(0.0f, 0.0f, 0.0315f));
+    QCOMPARE(arrays[0].layout, ElectrodeLayout::Depth); // contacts 3.5 mm apart
+    QCOMPARE(arrays[1].label, QStringLiteral("A'"));
+    QCOMPARE(arrays[1].layout, ElectrodeLayout::Strip); // 10 mm apart
+    QCOMPARE(arrays[2].label, QStringLiteral("A"));
+    QCOMPARE(arrays[3].layout, ElectrodeLayout::Grid);
 }
 
 //=============================================================================================================

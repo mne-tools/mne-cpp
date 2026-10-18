@@ -12,10 +12,14 @@
  * ElectrodeObject describes one or more electrode arrays in three
  * topologies (@c ElectrodeLayout::Depth stereotactic shaft,
  * @c ElectrodeLayout::Strip 1xN ECoG, @c ElectrodeLayout::Grid
- * rows x cols ECoG) and generates CPU-side geometry that the
- * renderer uploads as a cylinder mesh (shafts) plus a per-contact
- * instance buffer (spheres with position, radius, RGBA colour,
- * selected flag).
+ * rows x cols ECoG) and provides two instanced streams for the renderer:
+ * one sphere per contact, and the lead bodies (one cylinder along each
+ * depth shaft, thin ties between neighbouring strip / grid contacts).
+ * Depth leads and subdural arrays thus differ by shape, while colour tells
+ * one lead from another.
+ *
+ * Positions and radii are in metres, in the frame of the brain surfaces
+ * (FreeSurfer surface RAS).
  *
  * Per-contact scalar values (e.g. spectral power, evoked amplitude)
  * are mapped to a min / max colour gradient by
@@ -33,23 +37,18 @@
 //=============================================================================================================
 
 #include "../disp3D_global.h"
+#include "../core/rendertypes.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QByteArray>
 #include <QColor>
 #include <QMap>
 #include <QString>
 #include <QVector>
 #include <QVector3D>
-
-#include <memory>
-
-// Forward-declare QRhi types so that this header stays QRhi-free
-class QRhi;
-class QRhiBuffer;
-class QRhiResourceUpdateBatch;
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
@@ -66,12 +65,12 @@ namespace DISP3DLIB
  */
 struct DISP3DSHARED_EXPORT ElectrodeContact
 {
-    QString name;              /**< Contact label, e.g. "LH1", "LH2". */
-    QVector3D position;        /**< 3-D position in MRI (surface RAS) coords. */
-    float radius = 0.5f;       /**< Contact radius in mm. */
-    QColor color = Qt::yellow; /**< Display color. */
-    bool selected = false;     /**< Whether the contact is selected/highlighted. */
-    float value = 0.0f;        /**< Optional scalar for colormap overlay. */
+    QString name;          /**< Contact label, e.g. "LH1", "LH2". */
+    QVector3D position;    /**< Position in metres, MRI surface RAS. */
+    float radius = 0.0f;   /**< Drawn radius in metres; 0 uses the default of the array's layout. */
+    QColor color;          /**< Display colour; invalid uses the colour of the array. */
+    bool selected = false; /**< Whether the contact is selected/highlighted. */
+    float value = 0.0f;    /**< Optional scalar for colormap overlay. */
 };
 
 //=============================================================================================================
@@ -113,25 +112,39 @@ struct DISP3DSHARED_EXPORT ElectrodeArray
     ElectrodeLayout layout = ElectrodeLayout::Depth; /**< Geometry kind. */
     int gridRows = 1;                                /**< Grid only: number of rows. */
     int gridCols = 1;                                /**< Grid only: number of cols (Strip uses Cols = N, Rows = 1). */
-    QVector<ElectrodeContact> contacts;              /**< Contacts in array-local order. */
-    float shaftRadius = 0.4f;                        /**< Depth only: cylinder radius in mm. */
-    QColor shaftColor = Qt::gray;                    /**< Depth only: shaft body color. */
+    QVector<ElectrodeContact> contacts;              /**< Contacts in order along the lead (contact 1 first). */
+    float shaftRadius = 0.0f;                        /**< Depth only: shaft radius in metres; 0 uses the default. */
+    QColor shaftColor;                               /**< Lead colour; invalid picks one from the lead palette. */
 };
 
 //=============================================================================================================
 /**
- * @brief Data model for stereotactic depth electrode (sEEG) visualization.
+ * @brief Renderable sEEG / ECoG electrodes: contact spheres plus lead bodies.
  *
- * Holds electrode shaft definitions and contact metadata, and generates CPU-side
- * geometry (vertices/indices) that a QRhi-based renderer can upload to the GPU.
+ * Holds the arrays and their contacts and provides the instanced streams the renderer draws.
  *
  * @snippet ex_disp3d_scene/main.cpp electrode_object_usage
  */
 class DISP3DSHARED_EXPORT ElectrodeObject
 {
 public:
+    // Drawn sizes in metres. Real contacts are about 0.8 mm (depth) and 4 mm (subdural) across;
+    // both are enlarged to stay visible and pickable, keeping their ratio.
+    static constexpr float kDepthContactRadius = 0.0011f;
+    static constexpr float kSubduralContactRadius = 0.0019f;
+    static constexpr float kShaftRadius = 0.00045f;
+    static constexpr float kShaftOvershoot = 0.004f; /**< Shaft extension past the outer contacts. */
+    static constexpr float kTieRadius = 0.00035f;    /**< Ties between neighbouring strip / grid contacts. */
+    static constexpr float kMaxTieLength = 0.015f;   /**< Longer gaps are not tied: not one array. */
+
     ElectrodeObject();
     ~ElectrodeObject();
+
+    /**
+     * @param[in] index  Lead index.
+     * @return Lead colour: golden-angle hues, so neighbouring leads differ clearly.
+     */
+    static QColor leadColor(int index);
 
     //=========================================================================================================
     /**
@@ -187,25 +200,74 @@ public:
 
     //=========================================================================================================
     /**
-     * Generate interleaved vertex + index data for all shaft cylinders.
-     * Each vertex: position (3 floats) + normal (3 floats) = 6 floats.
+     * Highlight one contact while the pointer is over it, without changing the selection.
      *
-     * @param[out] vertices         Vertex buffer (position + normal interleaved).
-     * @param[out] indices          Index buffer (triangles).
-     * @param[in]  cylinderSides    Number of sides for the cylinder cross-section.
+     * @param[in] index  Contact index in array order (as returned by @ref intersect), or -1 for none.
      */
-    void generateShaftGeometry(QVector<float>& vertices,
-                               QVector<unsigned int>& indices,
-                               int cylinderSides = 16) const;
+    void setHoveredContact(int index);
+
+    /**
+     * @return Hovered contact index, or -1.
+     */
+    int hoveredContact() const
+    {
+        return m_hoveredContact;
+    }
 
     //=========================================================================================================
     /**
-     * Generate per-instance data for contact spheres.
-     * Per instance: position (3) + radius (1) + color RGBA (4) + selected flag (1) = 9 floats.
+     * Intersect a ray with the contact spheres.
      *
-     * @param[out] instanceData     Flat float buffer.
+     * @param[in]  rayOrigin  Ray origin.
+     * @param[in]  rayDir     Normalised ray direction.
+     * @param[out] dist       Distance to the nearest hit.
+     * @return Index of the nearest contact hit (in array order), or -1.
      */
-    void generateContactInstances(QVector<float>& instanceData) const;
+    int intersect(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist) const;
+
+    /**
+     * @param[in] index  Contact index in array order.
+     * @return The contact, or nullptr when out of range.
+     */
+    const ElectrodeContact* contactAt(int index) const;
+
+    /**
+     * @param[in] index  Contact index in array order.
+     * @return Hover text, e.g. "LA3 (depth lead LA)", or an empty string when out of range.
+     */
+    QString contactLabel(int index) const;
+
+    //=========================================================================================================
+    /**
+     * @return Instanced streams of the contact spheres (one instance per contact).
+     */
+    InstancedStreams contactStreams() const;
+
+    /**
+     * @return Instanced streams of the lead bodies (unit cylinders: shafts and ties).
+     */
+    InstancedStreams bodyStreams() const;
+
+    /** @return Identity of the contact mesh in the renderer's GPU cache. */
+    const RenderKey& contactRenderKey() const
+    {
+        return m_contactRenderKey;
+    }
+
+    /** @return Identity of the body mesh in the renderer's GPU cache. */
+    const RenderKey& bodyRenderKey() const
+    {
+        return m_bodyRenderKey;
+    }
+
+    bool isVisible() const
+    {
+        return m_visible;
+    }
+    void setVisible(bool visible)
+    {
+        m_visible = visible;
+    }
 
     //=========================================================================================================
     /**
@@ -219,50 +281,41 @@ public:
      */
     QVector3D boundingBoxMax() const;
 
-    //=========================================================================================================
-    /**
-     * Update GPU buffers (shaft vertex/index, contact instance) via QRhi.
-     *
-     * @param[in] rhi        Pointer to QRhi instance.
-     * @param[in] u          Resource update batch.
-     */
-    void updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u);
-
-    //=========================================================================================================
-    /**
-     * @return Shaft vertex buffer (position + normal interleaved, 6 floats/vertex).
-     */
-    QRhiBuffer* vertexBuffer() const;
-
-    //=========================================================================================================
-    /**
-     * @return Shaft index buffer.
-     */
-    QRhiBuffer* indexBuffer() const;
-
-    //=========================================================================================================
-    /**
-     * @return Contact instance buffer (9 floats/instance).
-     */
-    QRhiBuffer* instanceBuffer() const;
-
-    //=========================================================================================================
-    /**
-     * @return Number of shaft indices for drawIndexed.
-     */
-    uint32_t shaftIndexCount() const;
-
-    //=========================================================================================================
-    /**
-     * @return Number of contact instances for instanced draw.
-     */
-    uint32_t contactInstanceCount() const;
-
 private:
+    /** Per-instance layout shared with the renderer's instanced pipelines. */
+    struct InstanceData
+    {
+        float model[16];
+        float color[4];
+        float isSelected;
+    };
+
+    void buildBodies();
+    void buildContactInstances();
+    float contactRadius(const ElectrodeArray& array, const ElectrodeContact& contact) const;
+
     QVector<ElectrodeArray> m_arrays; /**< All electrode arrays. */
     QString m_selectedContact;        /**< Currently selected contact name. */
-    QVector3D m_bbMin;                /**< Cached bounding box min. */
-    QVector3D m_bbMax;                /**< Cached bounding box max. */
+    int m_hoveredContact = -1;
+    QVector3D m_bbMin; /**< Cached bounding box min. */
+    QVector3D m_bbMax; /**< Cached bounding box max. */
+    bool m_visible = true;
+
+    // Unit sphere and unit cylinder (along +y, centred) shared by all instances
+    QByteArray m_sphereVertices;
+    QByteArray m_sphereIndices;
+    QByteArray m_cylinderVertices;
+    QByteArray m_cylinderIndices;
+    int m_sphereIndexCount = 0;
+    int m_cylinderIndexCount = 0;
+
+    QByteArray m_contactInstances;
+    QByteArray m_bodyInstances;
+    int m_bodyCount = 0;
+    quint64 m_contactGeneration = 0;
+    quint64 m_bodyGeneration = 0;
+    RenderKey m_contactRenderKey;
+    RenderKey m_bodyRenderKey;
 
     //=========================================================================================================
     /**
@@ -283,10 +336,6 @@ private:
      */
     static QColor interpolateColor(float value, float minVal, float maxVal,
                                    const QColor& minColor, const QColor& maxColor);
-
-    /** @brief QRhi vertex, index, and instance buffers for electrode GPU rendering. */
-    struct GpuBuffers;
-    std::unique_ptr<GpuBuffers> m_gpu;
 };
 
 } // namespace DISP3DLIB

@@ -129,23 +129,23 @@ int main(int argc, char* argv[])
                  QString("Interpolation: sensors kept, vertex 5 = %1, vertex 3 = %2").arg(atVertices(5)).arg(atVertices(3)));
 
     //! [electrode_object_usage]
-    ElectrodeArray shaft;
+    ElectrodeArray shaft; // an sEEG depth lead; strips and grids use ElectrodeLayout::Strip / Grid
     shaft.label = "LH";
     shaft.layout = ElectrodeLayout::Depth;
     for (int k = 0; k < 4; ++k) {
         ElectrodeContact contact;
         contact.name = QString("LH%1").arg(k + 1);
-        contact.position = QVector3D(10.0f + 3.5f * k, -20.0f, 5.0f); // surface RAS, mm
+        contact.position = QVector3D(0.010f + 0.0035f * float(k), -0.020f, 0.005f); // surface RAS, metres
         shaft.contacts.append(contact);
     }
-    ElectrodeObject electrodes;
+    ElectrodeObject electrodes; // drawn by BrainView::setElectrodes()
     electrodes.setArrays({shaft});
     electrodes.selectContact("LH3");
-    QVector<float> instances; // per contact: position, radius, RGBA, selected = 9 floats
-    electrodes.generateContactInstances(instances);
+    float contactDistance = 0.0f;
+    const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
     //! [electrode_object_usage]
-    ok &= expect(electrodes.totalContactCount() == 4 && electrodes.selectedContact() == "LH3" && instances.size() == 36 && instances[2 * 9] == 17.0f && instances[2 * 9 + 8] == 1.0f && instances[9 + 8] == 0.0f,
-                 "ElectrodeObject: 4 contacts, 9 floats each, only LH3 flagged as selected");
+    ok &= expect(electrodes.totalContactCount() == 4 && electrodes.selectedContact() == "LH3" && electrodes.contactStreams().instanceCount == 4 && electrodes.bodyStreams().instanceCount == 1 && electrodes.contactLabel(pickedContact) == "LH3 (depth lead LH)",
+                 "ElectrodeObject: 4 contacts on one shaft, a ray through LH3 picks it");
 
     //! [slice_object_usage]
     QImage axial(256, 256, QImage::Format_Grayscale8);
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
     SceneLayer layer;
     layer.id = "seeg_LH";
     layer.kind = SceneLayerKind::Electrode;
-    auto payload = std::make_shared<ElectrodeObject>(); // owns GPU buffers, so it is not copyable
+    auto payload = std::make_shared<ElectrodeObject>();
     payload->setArrays(electrodes.arrays());
     layer.payload = payload;
     scene.addLayer(layer);
@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
     QVector3D bbMax;
     scene.worldBounds(bbMin, bbMax); // union over visible layers with a bounds function
     //! [multimodal_scene_usage]
-    ok &= expect(scene.layers().size() == 1 && bbMin == QVector3D(10.0f, -20.0f, 5.0f) && bbMax == QVector3D(20.5f, -20.0f, 5.0f) && scene.overlayFmid() == 4.0f,
+    ok &= expect(scene.layers().size() == 1 && bbMin == QVector3D(0.010f, -0.020f, 0.005f) && bbMax == QVector3D(0.0205f, -0.020f, 0.005f) && scene.overlayFmid() == 4.0f,
                  "MultimodalScene bounds equal the electrode extent");
     scene.setLayerVisible("seeg_LH", false);
     scene.worldBounds(bbMin, bbMax);
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
     scene.reportPick(contactPick);
     const PickResult& lastPick = scene.lastPick();
     //! [pick_result_usage]
-    ok &= expect(!hitBefore && isHit(lastPick) && lastPick.sourceId == "seeg_LH" && lastPick.world == QVector3D(10.0f, -20.0f, 5.0f) && lastPick.value == 3.5f &&
+    ok &= expect(!hitBefore && isHit(lastPick) && lastPick.sourceId == "seeg_LH" && lastPick.world == QVector3D(0.010f, -0.020f, 0.005f) && lastPick.value == 3.5f &&
                      lastPick.objectId == -1,
                  "MultimodalScene keeps the reported contact pick");
 

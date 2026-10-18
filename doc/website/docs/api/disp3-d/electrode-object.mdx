@@ -15,25 +15,25 @@ sidebar_position: 1
 class DISP3DLIB::ElectrodeObject
 ```
 
-Data model for stereotactic depth electrode (sEEG) visualization.
+Renderable sEEG / ECoG electrodes: contact spheres plus lead bodies.
 
-Holds electrode shaft definitions and contact metadata, and generates CPU-side geometry (vertices/indices) that a QRhi-based renderer can upload to the GPU.
+Holds the arrays and their contacts and provides the instanced streams the renderer draws.
 
 ```cpp title="src/examples/ex_disp3d_scene/main.cpp"
-ElectrodeArray shaft;
+ElectrodeArray shaft; // an sEEG depth lead; strips and grids use ElectrodeLayout::Strip / Grid
 shaft.label = "LH";
 shaft.layout = ElectrodeLayout::Depth;
 for (int k = 0; k < 4; ++k) {
     ElectrodeContact contact;
     contact.name = QString("LH%1").arg(k + 1);
-    contact.position = QVector3D(10.0f + 3.5f * k, -20.0f, 5.0f); // surface RAS, mm
+    contact.position = QVector3D(0.010f + 0.0035f * float(k), -0.020f, 0.005f); // surface RAS, metres
     shaft.contacts.append(contact);
 }
-ElectrodeObject electrodes;
+ElectrodeObject electrodes; // drawn by BrainView::setElectrodes()
 electrodes.setArrays({shaft});
 electrodes.selectContact("LH3");
-QVector<float> instances; // per contact: position, radius, RGBA, selected = 9 floats
-electrodes.generateContactInstances(instances);
+float contactDistance = 0.0f;
+const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
 ```
 
 ---
@@ -119,35 +119,109 @@ Clear all contact selections.
 
 ---
 
-### generateShaftGeometry(vertices, indices, cylinderSides)
+### setHoveredContact(index)
 
-Generate interleaved vertex + index data for all shaft cylinders.
-
-Each vertex: position (3 floats) + normal (3 floats) = 6 floats.
+Highlight one contact while the pointer is over it, without changing the selection.
 
 **Parameters:**
 
-- **vertices** : *QVector&lt; float &gt; &*
-  Vertex buffer (position + normal interleaved).
-
-- **indices** : *QVector&lt; unsigned int &gt; &*
-  Index buffer (triangles).
-
-- **cylinderSides** : *int*
-  Number of sides for the cylinder cross-section.
+- **index** : *int*
+  Contact index in array order (as returned by `intersect`), or -1 for none.
 
 ---
 
-### generateContactInstances(instanceData)
+### hoveredContact()
 
-Generate per-instance data for contact spheres.
+**Returns:**
 
-Per instance: position (3) + radius (1) + color RGBA (4) + selected flag (1) = 9 floats.
+- *int* — Hovered contact index, or -1.
+
+---
+
+### intersect(rayOrigin, rayDir, dist)
+
+Intersect a ray with the contact spheres.
 
 **Parameters:**
 
-- **instanceData** : *QVector&lt; float &gt; &*
-  Flat float buffer.
+- **rayOrigin** : *const QVector3D &*
+  Ray origin.
+
+- **rayDir** : *const QVector3D &*
+  Normalised ray direction.
+
+- **dist** : *float &*
+  Distance to the nearest hit.
+
+**Returns:**
+
+- *int* — Index of the nearest contact hit (in array order), or -1.
+
+---
+
+### contactAt(index)
+
+**Parameters:**
+
+- **index** : *int*
+  Contact index in array order.
+
+**Returns:**
+
+- *const [ElectrodeContact](/docs/api/disp3-d/electrode-contact) ** — The contact, or nullptr when out of range.
+
+---
+
+### contactLabel(index)
+
+**Parameters:**
+
+- **index** : *int*
+  Contact index in array order.
+
+**Returns:**
+
+- *QString* — Hover text, e.g. "LA3 (depth lead LA)", or an empty string when out of range.
+
+---
+
+### contactStreams()
+
+**Returns:**
+
+- *[InstancedStreams](/docs/api/disp3-d/instanced-streams)* — Instanced streams of the contact spheres (one instance per contact).
+
+---
+
+### bodyStreams()
+
+**Returns:**
+
+- *[InstancedStreams](/docs/api/disp3-d/instanced-streams)* — Instanced streams of the lead bodies (unit cylinders: shafts and ties).
+
+---
+
+### contactRenderKey()
+
+**Returns:**
+
+- *const [RenderKey](/docs/api/disp3-d/render-key) &* — Identity of the contact mesh in the renderer's GPU cache.
+
+---
+
+### bodyRenderKey()
+
+**Returns:**
+
+- *const [RenderKey](/docs/api/disp3-d/render-key) &* — Identity of the body mesh in the renderer's GPU cache.
+
+---
+
+### isVisible()
+
+---
+
+### setVisible(visible)
 
 ---
 
@@ -167,57 +241,18 @@ Per instance: position (3) + radius (1) + color RGBA (4) + selected flag (1) = 9
 
 ---
 
-### updateBuffers(rhi, u)
+## Static Methods
 
-Update GPU buffers (shaft vertex/index, contact instance) via QRhi.
+### leadColor(index)
 
 **Parameters:**
 
-- **rhi** : *QRhi **
-  Pointer to QRhi instance.
-
-- **u** : *QRhiResourceUpdateBatch **
-  Resource update batch.
-
----
-
-### vertexBuffer()
+- **index** : *int*
+  Lead index.
 
 **Returns:**
 
-- *QRhiBuffer ** — Shaft vertex buffer (position + normal interleaved, 6 floats/vertex).
-
----
-
-### indexBuffer()
-
-**Returns:**
-
-- *QRhiBuffer ** — Shaft index buffer.
-
----
-
-### instanceBuffer()
-
-**Returns:**
-
-- *QRhiBuffer ** — Contact instance buffer (9 floats/instance).
-
----
-
-### shaftIndexCount()
-
-**Returns:**
-
-- *uint32_t* — Number of shaft indices for drawIndexed.
-
----
-
-### contactInstanceCount()
-
-**Returns:**
-
-- *uint32_t* — Number of contact instances for instanced draw.
+- *QColor* — Lead colour: golden-angle hues, so neighbouring leads differ clearly.
 
 ---
 

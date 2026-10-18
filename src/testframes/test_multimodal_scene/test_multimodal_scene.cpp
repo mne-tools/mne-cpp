@@ -366,9 +366,7 @@ void TestMultimodalScene::testElectrodeArrayDefaultLayoutIsDepth()
 
 void TestMultimodalScene::testStripLayoutSkipsCylinderGeometry()
 {
-    // Build a Strip array with two contacts and verify generateShaftGeometry
-    // emits no triangles (the renderer reaches the contacts via the per-
-    // instance buffer instead).
+    // A strip has no shaft: its two contacts are joined by one thin tie
     ElectrodeArray strip;
     strip.label = "GridStrip";
     strip.layout = ElectrodeLayout::Strip;
@@ -379,23 +377,14 @@ void TestMultimodalScene::testStripLayoutSkipsCylinderGeometry()
     c0.position = QVector3D(0, 0, 0);
     ElectrodeContact c1;
     c1.name = "S2";
-    c1.position = QVector3D(1, 0, 0);
+    c1.position = QVector3D(0.01f, 0, 0);
     strip.contacts = {c0, c1};
 
     ElectrodeObject obj;
     obj.setArrays({strip});
 
-    QVector<float> verts;
-    QVector<unsigned int> idx;
-    obj.generateShaftGeometry(verts, idx);
-
-    QVERIFY(verts.isEmpty());
-    QVERIFY(idx.isEmpty());
-
-    // Per-instance contact data must still be emitted.
-    QVector<float> instances;
-    obj.generateContactInstances(instances);
-    QCOMPARE(instances.size(), 2 * 9);
+    QCOMPARE(obj.bodyStreams().instanceCount, 1);
+    QCOMPARE(obj.contactStreams().instanceCount, 2);
 }
 
 QTEST_GUILESS_MAIN(TestMultimodalScene)

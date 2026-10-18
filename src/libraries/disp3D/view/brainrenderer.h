@@ -61,6 +61,7 @@ namespace DISP3DLIB
 
 class BrainSurface;
 class DipoleObject;
+class ElectrodeObject;
 class NetworkObject;
 class PolylineObject;
 class VideoOverlay;
@@ -267,6 +268,25 @@ public:
      * @param[in] uniformOffset  Offset returned by preparePolylineDraw().
      */
     void issuePolylineDraw(QRhiCommandBuffer* cb, PolylineObject* polyline, int uniformOffset);
+
+    /**
+     * Upload the electrodes' streams if they changed and write the uniforms of their draws.
+     *
+     * @param[in] u           Resource update batch, committed before the pass.
+     * @param[in] data        Scene uniforms.
+     * @param[in] electrodes  Pointer to ElectrodeObject.
+     * @return Uniform buffer offset, or -1 when nothing is drawn.
+     */
+    int prepareElectrodeDraw(QRhiResourceUpdateBatch* u, const SceneData& data, ElectrodeObject* electrodes);
+
+    /**
+     * Draw electrode lead bodies and contacts, opaque and depth-tested. Call inside a pass.
+     *
+     * @param[in] cb             Command buffer.
+     * @param[in] electrodes     Pointer to ElectrodeObject.
+     * @param[in] uniformOffset  Offset returned by prepareElectrodeDraw().
+     */
+    void issueElectrodeDraw(QRhiCommandBuffer* cb, ElectrodeObject* electrodes, int uniformOffset);
 
     //=========================================================================================================
     /**

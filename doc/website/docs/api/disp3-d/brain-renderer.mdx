@@ -310,6 +310,46 @@ Call inside a pass.
 
 ---
 
+### prepareElectrodeDraw(u, data, electrodes)
+
+Upload the electrodes' streams if they changed and write the uniforms of their draws.
+
+**Parameters:**
+
+- **u** : *QRhiResourceUpdateBatch **
+  Resource update batch, committed before the pass.
+
+- **data** : *const SceneData &*
+  Scene uniforms.
+
+- **electrodes** : *[ElectrodeObject](/docs/api/disp3-d/electrode-object) **
+  Pointer to [`ElectrodeObject`](/docs/api/disp3-d/electrode-object).
+
+**Returns:**
+
+- *int* — Uniform buffer offset, or -1 when nothing is drawn.
+
+---
+
+### issueElectrodeDraw(cb, electrodes, uniformOffset)
+
+Draw electrode lead bodies and contacts, opaque and depth-tested.
+
+Call inside a pass.
+
+**Parameters:**
+
+- **cb** : *QRhiCommandBuffer **
+  Command buffer.
+
+- **electrodes** : *[ElectrodeObject](/docs/api/disp3-d/electrode-object) **
+  Pointer to [`ElectrodeObject`](/docs/api/disp3-d/electrode-object).
+
+- **uniformOffset** : *int*
+  Offset returned by `prepareElectrodeDraw()`.
+
+---
+
 ### prepareVideoOverlay(rhi, u, overlay)
 
 Prepare live video overlay GPU resources and upload the latest frame.

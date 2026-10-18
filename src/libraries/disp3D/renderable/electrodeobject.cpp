@@ -16,11 +16,15 @@
 
 #include "electrodeobject.h"
 
-#include <rhi/qrhi.h>
-
+#include <QMatrix4x4>
+#include <QQuaternion>
 #include <QtMath>
 
+#include <array>
+#include <cstring>
 #include <limits>
+#include <map>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -28,19 +32,98 @@
 
 using namespace DISP3DLIB;
 
-//=============================================================================================================
-// PIMPL
-//=============================================================================================================
-
-struct ElectrodeObject::GpuBuffers
+namespace
 {
-    std::unique_ptr<QRhiBuffer> vertexBuffer;   // shaft geometry (pos+normal)
-    std::unique_ptr<QRhiBuffer> indexBuffer;    // shaft triangle indices
-    std::unique_ptr<QRhiBuffer> instanceBuffer; // per-contact instance data
-    uint32_t shaftIndexCount = 0;
-    uint32_t instanceCount = 0;
-    bool dirty = true;
+
+struct MeshVertex
+{
+    float x, y, z, nx, ny, nz;
 };
+
+template<typename T>
+QByteArray toBytes(const std::vector<T>& v)
+{
+    return QByteArray(reinterpret_cast<const char*>(v.data()), qsizetype(v.size() * sizeof(T)));
+}
+
+// Unit icosphere, subdivided twice (320 triangles)
+void unitSphere(QByteArray& vertices, QByteArray& indices, int& indexCount)
+{
+    const float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
+    std::vector<QVector3D> v = {{-1, t, 0}, {1, t, 0}, {-1, -t, 0}, {1, -t, 0}, {0, -1, t}, {0, 1, t}, {0, -1, -t}, {0, 1, -t}, {t, 0, -1}, {t, 0, 1}, {-t, 0, -1}, {-t, 0, 1}};
+    for (auto& p : v)
+        p.normalize();
+    std::vector<uint32_t> idx = {0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11, 1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
+                                 3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9, 4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1};
+    for (int level = 0; level < 2; ++level) {
+        std::map<std::pair<uint32_t, uint32_t>, uint32_t> midpoints;
+        auto midpoint = [&](uint32_t a, uint32_t b) {
+            const auto key = std::minmax(a, b);
+            const auto it = midpoints.find(key);
+            if (it != midpoints.end())
+                return it->second;
+            v.push_back(((v[a] + v[b]) * 0.5f).normalized());
+            return midpoints[key] = uint32_t(v.size() - 1);
+        };
+        std::vector<uint32_t> next;
+        for (size_t i = 0; i < idx.size(); i += 3) {
+            const uint32_t a = idx[i], b = idx[i + 1], c = idx[i + 2];
+            const uint32_t ab = midpoint(a, b), bc = midpoint(b, c), ca = midpoint(c, a);
+            next.insert(next.end(), {a, ab, ca, b, bc, ab, c, ca, bc, ab, bc, ca});
+        }
+        idx = std::move(next);
+    }
+    std::vector<MeshVertex> mv;
+    for (const auto& p : v)
+        mv.push_back({p.x(), p.y(), p.z(), p.x(), p.y(), p.z()});
+    vertices = toBytes(mv);
+    indices = toBytes(idx);
+    indexCount = int(idx.size());
+}
+
+// Unit cylinder along +y from -0.5 to 0.5, with caps
+void unitCylinder(QByteArray& vertices, QByteArray& indices, int& indexCount)
+{
+    constexpr int kSides = 12;
+    std::vector<MeshVertex> mv;
+    std::vector<uint32_t> idx;
+    for (int i = 0; i < kSides; ++i) {
+        const float a = 2.0f * float(M_PI) * float(i) / float(kSides);
+        const float x = std::cos(a), z = std::sin(a);
+        mv.push_back({x, 0.5f, z, x, 0, z});
+        mv.push_back({x, -0.5f, z, x, 0, z});
+    }
+    for (int i = 0; i < kSides; ++i) {
+        const uint32_t top = uint32_t(2 * i), bottom = top + 1;
+        const uint32_t nextTop = uint32_t(2 * ((i + 1) % kSides)), nextBottom = nextTop + 1;
+        idx.insert(idx.end(), {top, nextTop, bottom, bottom, nextTop, nextBottom});
+    }
+    for (const float y : {0.5f, -0.5f}) {
+        const uint32_t centre = uint32_t(mv.size());
+        mv.push_back({0, y, 0, 0, y * 2.0f, 0});
+        for (int i = 0; i < kSides; ++i) {
+            const float a = 2.0f * float(M_PI) * float(i) / float(kSides);
+            mv.push_back({std::cos(a), y, std::sin(a), 0, y * 2.0f, 0});
+        }
+        for (int i = 0; i < kSides; ++i) {
+            const uint32_t cur = centre + 1 + uint32_t(i), next = centre + 1 + uint32_t((i + 1) % kSides);
+            if (y > 0)
+                idx.insert(idx.end(), {centre, next, cur});
+            else
+                idx.insert(idx.end(), {centre, cur, next});
+        }
+    }
+    vertices = toBytes(mv);
+    indices = toBytes(idx);
+    indexCount = int(idx.size());
+}
+
+QColor arrayColor(const ElectrodeArray& array, int arrayIndex)
+{
+    return array.shaftColor.isValid() ? array.shaftColor : ElectrodeObject::leadColor(arrayIndex);
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -53,8 +136,9 @@ ElectrodeObject::ElectrodeObject()
 , m_bbMax(std::numeric_limits<float>::lowest(),
           std::numeric_limits<float>::lowest(),
           std::numeric_limits<float>::lowest())
-, m_gpu(std::make_unique<GpuBuffers>())
 {
+    unitSphere(m_sphereVertices, m_sphereIndices, m_sphereIndexCount);
+    unitCylinder(m_cylinderVertices, m_cylinderIndices, m_cylinderIndexCount);
 }
 
 //=============================================================================================================
@@ -67,8 +151,14 @@ void ElectrodeObject::setArrays(const QVector<ElectrodeArray>& arrays)
 {
     m_arrays = arrays;
     m_selectedContact.clear();
+    m_hoveredContact = -1;
+    for (auto& array : m_arrays) {
+        for (auto& contact : array.contacts)
+            contact.selected = false;
+    }
     computeBoundingBox();
-    m_gpu->dirty = true;
+    buildBodies();
+    buildContactInstances();
 }
 
 //=============================================================================================================
@@ -118,42 +208,39 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values,
             }
         }
     }
-    m_gpu->dirty = true;
+    buildContactInstances();
 }
 
 //=============================================================================================================
 
 void ElectrodeObject::selectContact(const QString& name)
 {
-    // Clear previous selection
-    clearSelection();
-
-    // Set new selection
-    m_selectedContact = name;
-    for (auto& shaft : m_arrays) {
-        for (auto& contact : shaft.contacts) {
-            if (contact.name == name) {
-                contact.selected = true;
-                m_gpu->dirty = true;
-                return;
-            }
+    m_selectedContact.clear();
+    for (auto& array : m_arrays) {
+        for (auto& contact : array.contacts) {
+            contact.selected = !name.isEmpty() && contact.name == name && m_selectedContact.isEmpty();
+            if (contact.selected)
+                m_selectedContact = name;
         }
     }
-
-    // Not found — clear name
-    m_selectedContact.clear();
+    buildContactInstances();
 }
 
 //=============================================================================================================
 
 void ElectrodeObject::clearSelection()
 {
-    m_selectedContact.clear();
-    for (auto& shaft : m_arrays) {
-        for (auto& contact : shaft.contacts)
-            contact.selected = false;
-    }
-    m_gpu->dirty = true;
+    selectContact(QString());
+}
+
+//=============================================================================================================
+
+void ElectrodeObject::setHoveredContact(int index)
+{
+    if (index == m_hoveredContact)
+        return;
+    m_hoveredContact = index;
+    buildContactInstances();
 }
 
 //=============================================================================================================
@@ -165,151 +252,190 @@ QString ElectrodeObject::selectedContact() const
 
 //=============================================================================================================
 
-void ElectrodeObject::generateShaftGeometry(QVector<float>& vertices,
-                                            QVector<unsigned int>& indices,
-                                            int cylinderSides) const
+QColor ElectrodeObject::leadColor(int index)
 {
-    vertices.clear();
-    indices.clear();
-
-    if (cylinderSides < 3)
-        cylinderSides = 3;
-
-    for (const auto& shaft : m_arrays) {
-        // v2.3.0: Strip and Grid layouts render as instanced spheres only
-        // (no cylinder shaft). They are emitted via generateContactInstances.
-        if (shaft.layout != ElectrodeLayout::Depth)
-            continue;
-        if (shaft.contacts.size() < 2)
-            continue;
-
-        const QVector3D& tipPos = shaft.contacts.first().position;
-        const QVector3D& tailPos = shaft.contacts.last().position;
-        const QVector3D axis = tailPos - tipPos;
-        const float length = axis.length();
-        if (length < 1e-6f)
-            continue;
-
-        const QVector3D axisNorm = axis.normalized();
-
-        // Build a perpendicular basis
-        QVector3D perp;
-        if (qAbs(QVector3D::dotProduct(axisNorm, QVector3D(0, 1, 0))) < 0.99f)
-            perp = QVector3D::crossProduct(axisNorm, QVector3D(0, 1, 0)).normalized();
-        else
-            perp = QVector3D::crossProduct(axisNorm, QVector3D(1, 0, 0)).normalized();
-
-        const QVector3D biperp = QVector3D::crossProduct(axisNorm, perp).normalized();
-
-        const float r = shaft.shaftRadius;
-        const unsigned int baseIdx = static_cast<unsigned int>(vertices.size() / 6);
-
-        // Generate circle vertices at tip and tail
-        for (int ring = 0; ring < 2; ++ring) {
-            const QVector3D center = (ring == 0) ? tipPos : tailPos;
-            for (int i = 0; i < cylinderSides; ++i) {
-                const float angle = 2.0f * float(M_PI) * float(i) / float(cylinderSides);
-                const float cs = cosf(angle);
-                const float sn = sinf(angle);
-
-                const QVector3D normal = (perp * cs + biperp * sn).normalized();
-                const QVector3D pos = center + normal * r;
-
-                // position
-                vertices.append(pos.x());
-                vertices.append(pos.y());
-                vertices.append(pos.z());
-                // normal
-                vertices.append(normal.x());
-                vertices.append(normal.y());
-                vertices.append(normal.z());
-            }
-        }
-
-        // Side triangles (connect ring 0 to ring 1)
-        for (int i = 0; i < cylinderSides; ++i) {
-            const unsigned int i0 = baseIdx + static_cast<unsigned int>(i);
-            const unsigned int i1 = baseIdx + static_cast<unsigned int>((i + 1) % cylinderSides);
-            const unsigned int i2 = i0 + static_cast<unsigned int>(cylinderSides);
-            const unsigned int i3 = i1 + static_cast<unsigned int>(cylinderSides);
-
-            // Two triangles per quad
-            indices.append(i0);
-            indices.append(i2);
-            indices.append(i1);
-            indices.append(i1);
-            indices.append(i2);
-            indices.append(i3);
-        }
-
-        // Tip endcap (ring 0, center = tipPos)
-        {
-            const QVector3D normal = -axisNorm;
-            const unsigned int centerIdx = static_cast<unsigned int>(vertices.size() / 6);
-            vertices.append(tipPos.x());
-            vertices.append(tipPos.y());
-            vertices.append(tipPos.z());
-            vertices.append(normal.x());
-            vertices.append(normal.y());
-            vertices.append(normal.z());
-
-            for (int i = 0; i < cylinderSides; ++i) {
-                const unsigned int i0 = baseIdx + static_cast<unsigned int>(i);
-                const unsigned int i1 = baseIdx + static_cast<unsigned int>((i + 1) % cylinderSides);
-                indices.append(centerIdx);
-                indices.append(i1);
-                indices.append(i0);
-            }
-        }
-
-        // Tail endcap (ring 1, center = tailPos)
-        {
-            const QVector3D normal = axisNorm;
-            const unsigned int centerIdx = static_cast<unsigned int>(vertices.size() / 6);
-            vertices.append(tailPos.x());
-            vertices.append(tailPos.y());
-            vertices.append(tailPos.z());
-            vertices.append(normal.x());
-            vertices.append(normal.y());
-            vertices.append(normal.z());
-
-            const unsigned int ring1Base = baseIdx + static_cast<unsigned int>(cylinderSides);
-            for (int i = 0; i < cylinderSides; ++i) {
-                const unsigned int i0 = ring1Base + static_cast<unsigned int>(i);
-                const unsigned int i1 = ring1Base + static_cast<unsigned int>((i + 1) % cylinderSides);
-                indices.append(centerIdx);
-                indices.append(i0);
-                indices.append(i1);
-            }
-        }
-    }
+    const double hue = std::fmod(double(index) * 0.618033988749895, 1.0);
+    return QColor::fromHslF(float(hue), 0.72f, 0.62f);
 }
 
 //=============================================================================================================
 
-void ElectrodeObject::generateContactInstances(QVector<float>& instanceData) const
+float ElectrodeObject::contactRadius(const ElectrodeArray& array, const ElectrodeContact& contact) const
 {
-    instanceData.clear();
-    const int floatsPerInstance = 9;
-    instanceData.reserve(totalContactCount() * floatsPerInstance);
+    if (contact.radius > 0.0f)
+        return contact.radius;
+    return array.layout == ElectrodeLayout::Depth ? kDepthContactRadius : kSubduralContactRadius;
+}
 
-    for (const auto& shaft : m_arrays) {
-        for (const auto& contact : shaft.contacts) {
-            // position (3)
-            instanceData.append(contact.position.x());
-            instanceData.append(contact.position.y());
-            instanceData.append(contact.position.z());
-            // radius (1)
-            instanceData.append(contact.radius);
-            // color RGBA (4)
-            instanceData.append(static_cast<float>(contact.color.redF()));
-            instanceData.append(static_cast<float>(contact.color.greenF()));
-            instanceData.append(static_cast<float>(contact.color.blueF()));
-            instanceData.append(static_cast<float>(contact.color.alphaF()));
-            // selected flag (1)
-            instanceData.append(contact.selected ? 1.0f : 0.0f);
+//=============================================================================================================
+
+void ElectrodeObject::buildContactInstances()
+{
+    std::vector<InstanceData> instances;
+    instances.reserve(size_t(totalContactCount()));
+    int index = 0;
+    for (int a = 0; a < m_arrays.size(); ++a) {
+        const ElectrodeArray& array = m_arrays[a];
+        const QColor lead = arrayColor(array, a);
+        for (const ElectrodeContact& contact : array.contacts) {
+            QMatrix4x4 model;
+            model.translate(contact.position);
+            model.scale(contactRadius(array, contact));
+            const QColor c = contact.color.isValid() ? contact.color : lead;
+            InstanceData d;
+            std::memcpy(d.model, model.constData(), sizeof(d.model));
+            d.color[0] = float(c.redF());
+            d.color[1] = float(c.greenF());
+            d.color[2] = float(c.blueF());
+            d.color[3] = float(c.alphaF());
+            d.isSelected = (contact.selected || index == m_hoveredContact) ? 1.0f : 0.0f;
+            instances.push_back(d);
+            ++index;
         }
     }
+    m_contactInstances = toBytes(instances);
+    ++m_contactGeneration;
+}
+
+//=============================================================================================================
+
+void ElectrodeObject::buildBodies()
+{
+    std::vector<InstanceData> instances;
+    auto addCylinder = [&](const QVector3D& from, const QVector3D& to, float radius, const QColor& color) {
+        const QVector3D axis = to - from;
+        const float length = axis.length();
+        if (length < 1e-6f)
+            return;
+        QMatrix4x4 model;
+        model.translate((from + to) * 0.5f);
+        model.rotate(QQuaternion::rotationTo(QVector3D(0.0f, 1.0f, 0.0f), axis / length));
+        model.scale(radius, length, radius);
+        InstanceData d;
+        std::memcpy(d.model, model.constData(), sizeof(d.model));
+        d.color[0] = float(color.redF());
+        d.color[1] = float(color.greenF());
+        d.color[2] = float(color.blueF());
+        d.color[3] = 1.0f;
+        d.isSelected = 0.0f;
+        instances.push_back(d);
+    };
+
+    for (int a = 0; a < m_arrays.size(); ++a) {
+        const ElectrodeArray& array = m_arrays[a];
+        const QVector<ElectrodeContact>& contacts = array.contacts;
+        if (contacts.size() < 2)
+            continue;
+        // The body is darker than the contacts so these stand out along it
+        const QColor body = arrayColor(array, a).darker(150);
+        if (array.layout == ElectrodeLayout::Depth) {
+            const QVector3D tip = contacts.first().position;
+            const QVector3D tail = contacts.last().position;
+            const QVector3D dir = (tail - tip).normalized();
+            addCylinder(tip - dir * kShaftOvershoot, tail + dir * kShaftOvershoot,
+                        array.shaftRadius > 0.0f ? array.shaftRadius : kShaftRadius, body);
+            continue;
+        }
+        // Strips and grids: ties between neighbours along rows, and along columns for a declared grid
+        const int cols = (array.layout == ElectrodeLayout::Grid && array.gridRows * array.gridCols == contacts.size())
+            ? array.gridCols
+            : int(contacts.size());
+        auto tie = [&](int i, int j) {
+            if ((contacts[i].position - contacts[j].position).length() <= kMaxTieLength)
+                addCylinder(contacts[i].position, contacts[j].position, kTieRadius, body);
+        };
+        for (int i = 0; i < contacts.size(); ++i) {
+            if ((i + 1) % cols != 0 && i + 1 < contacts.size())
+                tie(i, i + 1);
+            if (i + cols < contacts.size())
+                tie(i, i + cols);
+        }
+    }
+    m_bodyInstances = toBytes(instances);
+    m_bodyCount = int(instances.size());
+    ++m_bodyGeneration;
+}
+
+//=============================================================================================================
+
+int ElectrodeObject::intersect(const QVector3D& rayOrigin, const QVector3D& rayDir, float& dist) const
+{
+    int best = -1;
+    float bestT = std::numeric_limits<float>::max();
+    int index = 0;
+    for (const ElectrodeArray& array : m_arrays) {
+        for (const ElectrodeContact& contact : array.contacts) {
+            const float r = contactRadius(array, contact);
+            const QVector3D oc = rayOrigin - contact.position;
+            const float b = QVector3D::dotProduct(oc, rayDir);
+            const float disc = b * b - (oc.lengthSquared() - r * r);
+            if (disc >= 0.0f) {
+                const float t = -b - std::sqrt(disc);
+                if (t > 0.0f && t < bestT) {
+                    bestT = t;
+                    best = index;
+                }
+            }
+            ++index;
+        }
+    }
+    if (best >= 0)
+        dist = bestT;
+    return best;
+}
+
+//=============================================================================================================
+
+const ElectrodeContact* ElectrodeObject::contactAt(int index) const
+{
+    if (index < 0)
+        return nullptr;
+    for (const ElectrodeArray& array : m_arrays) {
+        if (index < array.contacts.size())
+            return &array.contacts[index];
+        index -= int(array.contacts.size());
+    }
+    return nullptr;
+}
+
+//=============================================================================================================
+
+QString ElectrodeObject::contactLabel(int index) const
+{
+    if (index < 0)
+        return QString();
+    for (const ElectrodeArray& array : m_arrays) {
+        if (index < array.contacts.size()) {
+            const QString kind = array.layout == ElectrodeLayout::Depth ? QStringLiteral("depth lead")
+                : array.layout == ElectrodeLayout::Strip                ? QStringLiteral("strip")
+                                                                        : QStringLiteral("grid");
+            return QStringLiteral("%1 (%2 %3)").arg(array.contacts[index].name, kind, array.label);
+        }
+        index -= int(array.contacts.size());
+    }
+    return QString();
+}
+
+//=============================================================================================================
+
+InstancedStreams ElectrodeObject::contactStreams() const
+{
+    return {{m_sphereVertices.constData(), quint32(m_sphereVertices.size()), 0},
+            {m_sphereIndices.constData(), quint32(m_sphereIndices.size()), 0},
+            {m_contactInstances.constData(), quint32(m_contactInstances.size()), m_contactGeneration},
+            m_sphereIndexCount,
+            totalContactCount()};
+}
+
+//=============================================================================================================
+
+InstancedStreams ElectrodeObject::bodyStreams() const
+{
+    return {{m_cylinderVertices.constData(), quint32(m_cylinderVertices.size()), 0},
+            {m_cylinderIndices.constData(), quint32(m_cylinderIndices.size()), 0},
+            {m_bodyInstances.constData(), quint32(m_bodyInstances.size()), m_bodyGeneration},
+            m_cylinderIndexCount,
+            m_bodyCount};
 }
 
 //=============================================================================================================
@@ -339,7 +465,7 @@ void ElectrodeObject::computeBoundingBox()
 
     for (const auto& shaft : m_arrays) {
         for (const auto& contact : shaft.contacts) {
-            const float pad = contact.radius;
+            const float pad = contactRadius(shaft, contact);
             const QVector3D& p = contact.position;
 
             if (p.x() - pad < m_bbMin.x())
@@ -381,92 +507,4 @@ QColor ElectrodeObject::interpolateColor(float value, float minVal, float maxVal
     result.setBlueF(static_cast<qreal>(b));
     result.setAlphaF(static_cast<qreal>(a));
     return result;
-}
-
-//=============================================================================================================
-
-void ElectrodeObject::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
-{
-    const bool needsCreate = !m_gpu->vertexBuffer || !m_gpu->indexBuffer || !m_gpu->instanceBuffer;
-
-    if (!m_gpu->dirty && !needsCreate)
-        return;
-
-    // Generate CPU-side data
-    QVector<float> shaftVerts;
-    QVector<unsigned int> shaftIdx;
-    generateShaftGeometry(shaftVerts, shaftIdx);
-
-    QVector<float> instData;
-    generateContactInstances(instData);
-
-    m_gpu->shaftIndexCount = static_cast<uint32_t>(shaftIdx.size());
-    m_gpu->instanceCount = static_cast<uint32_t>(instData.size() / 9);
-
-    // Shaft vertex buffer
-    const quint32 vbufSize = static_cast<quint32>(shaftVerts.size() * sizeof(float));
-    if (vbufSize > 0) {
-        if (!m_gpu->vertexBuffer) {
-            m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
-            m_gpu->vertexBuffer->create();
-        }
-        u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), shaftVerts.constData());
-    }
-
-    // Shaft index buffer
-    const quint32 ibufSize = static_cast<quint32>(shaftIdx.size() * sizeof(unsigned int));
-    if (ibufSize > 0) {
-        if (!m_gpu->indexBuffer) {
-            m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, ibufSize));
-            m_gpu->indexBuffer->create();
-        }
-        u->uploadStaticBuffer(m_gpu->indexBuffer.get(), shaftIdx.constData());
-    }
-
-    // Contact instance buffer
-    const quint32 instBufSize = static_cast<quint32>(instData.size() * sizeof(float));
-    if (instBufSize > 0) {
-        if (!m_gpu->instanceBuffer) {
-            m_gpu->instanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, instBufSize));
-            m_gpu->instanceBuffer->create();
-        }
-        u->uploadStaticBuffer(m_gpu->instanceBuffer.get(), instData.constData());
-    }
-
-    m_gpu->dirty = false;
-}
-
-//=============================================================================================================
-
-QRhiBuffer* ElectrodeObject::vertexBuffer() const
-{
-    return m_gpu->vertexBuffer.get();
-}
-
-//=============================================================================================================
-
-QRhiBuffer* ElectrodeObject::indexBuffer() const
-{
-    return m_gpu->indexBuffer.get();
-}
-
-//=============================================================================================================
-
-QRhiBuffer* ElectrodeObject::instanceBuffer() const
-{
-    return m_gpu->instanceBuffer.get();
-}
-
-//=============================================================================================================
-
-uint32_t ElectrodeObject::shaftIndexCount() const
-{
-    return m_gpu->shaftIndexCount;
-}
-
-//=============================================================================================================
-
-uint32_t ElectrodeObject::contactInstanceCount() const
-{
-    return m_gpu->instanceCount;
 }

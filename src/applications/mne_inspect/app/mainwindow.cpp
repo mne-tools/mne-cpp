@@ -297,6 +297,7 @@ MainWindow::~MainWindow()
     // SliceObjects) are destroyed.  Prevents stale-pointer access if a
     // deferred render event fires during widget teardown.
     if (m_brainView) {
+        m_brainView->setElectrodes(nullptr);
         for (int i = 0; i < 3; ++i) {
             m_brainView->setSlice(i, nullptr);
             m_brainView->setSliceVisible(i, false);
@@ -941,6 +942,19 @@ void MainWindow::setupUI()
 
 void MainWindow::setupConnections()
 {
+    // ── Electrodes: drawn by the 3-D view, picks reported through the shared scene ──
+    m_brainView->setElectrodes(m_electrodesPlugin.electrodeObject());
+    connect(&m_electrodesPlugin, &ELECTRODESPLUGIN::ElectrodesPlugin::electrodesChanged, m_brainView, [this]() { m_brainView->update(); });
+    connect(&m_electrodesPlugin, &ELECTRODESPLUGIN::ElectrodesPlugin::contactPicked, m_brainView, [this]() { m_brainView->update(); });
+    connect(m_brainView, &BrainView::electrodeContactClicked, this, [this](const QString& name, const QVector3D& position) {
+        DISP3DLIB::PickResult pick;
+        pick.kind = DISP3DLIB::PickKind::ElectrodeContact;
+        pick.world = position;
+        pick.label = name;
+        pick.sourceId = m_electrodesPlugin.sceneLayerId();
+        m_scene.reportPick(pick);
+    });
+
     // ── Project ────────────────────────────────────────────────────────
 
     connect(m_actOpenProject, &QAction::triggered, [this]() {
@@ -3216,8 +3230,10 @@ void MainWindow::createLayersDock()
     connect(m_layerBrainCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
         toggleKind(DISP3DLIB::SceneLayerKind::BrainSurface, v);
     });
-    connect(m_layerElectrodesCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
+    connect(m_layerElectrodesCheck, &QCheckBox::toggled, this, [this, toggleKind](bool v) {
         toggleKind(DISP3DLIB::SceneLayerKind::Electrode, v);
+        m_electrodesPlugin.electrodeObject()->setVisible(v);
+        m_brainView->update();
     });
     connect(m_layerMriCheck, &QCheckBox::toggled, this, [toggleKind](bool v) {
         toggleKind(DISP3DLIB::SceneLayerKind::MriSlice, v);
@@ -3349,16 +3365,16 @@ void MainWindow::createOverlayDock()
 
 void MainWindow::onLoadElectrodes()
 {
-    const QString filter = QStringLiteral("Electrode data (*.fif *.csv);;FIFF (*.fif);;CSV (*.csv);;All files (*)");
+    const QString filter = QStringLiteral("Electrode data (*_electrodes.tsv *.fif *.csv);;BIDS iEEG (*_electrodes.tsv);;FIFF (*.fif);;CSV (*.csv);;All files (*)");
     const QString path = QFileDialog::getOpenFileName(this, tr("Load Electrodes"),
                                                       QString(), filter);
     if (path.isEmpty()) {
         return;
     }
     const QString suffix = QFileInfo(path).suffix().toLower();
-    const bool ok = (suffix == QLatin1String("csv"))
-        ? m_electrodesPlugin.loadCsv(path)
-        : m_electrodesPlugin.loadFiff(path);
+    const bool ok = (suffix == QLatin1String("tsv")) ? m_electrodesPlugin.loadBids(path)
+        : (suffix == QLatin1String("csv"))           ? m_electrodesPlugin.loadCsv(path)
+                                                     : m_electrodesPlugin.loadFiff(path);
     if (!ok) {
         QMessageBox::warning(this, tr("Load Electrodes"),
                              tr("Failed to load electrode data from:\n%1").arg(path));

@@ -31,6 +31,17 @@
 
 using namespace DISP3DLIB;
 
+namespace
+{
+DISP3DLIB::ElectrodeContact makeContact(const QString& name, const QVector3D& position)
+{
+    DISP3DLIB::ElectrodeContact contact;
+    contact.name = name;
+    contact.position = position;
+    return contact;
+}
+} // namespace
+
 //=============================================================================================================
 /**
  * DECLARE CLASS TestElectrodeObject
@@ -190,15 +201,11 @@ void TestElectrodeObject::testBoundingBox()
     // Bounding box should enclose all contact positions
     for (const auto& arr : arrays) {
         for (const auto& contact : arr.contacts) {
-            QVERIFY2(contact.position.x() >= bbMin.x() - 1.0f &&
-                         contact.position.x() <= bbMax.x() + 1.0f,
-                     "Contact X outside bounding box");
-            QVERIFY2(contact.position.y() >= bbMin.y() - 1.0f &&
-                         contact.position.y() <= bbMax.y() + 1.0f,
-                     "Contact Y outside bounding box");
-            QVERIFY2(contact.position.z() >= bbMin.z() - 1.0f &&
-                         contact.position.z() <= bbMax.z() + 1.0f,
-                     "Contact Z outside bounding box");
+            // The box includes the drawn contact radius
+            const QVector3D pad(ElectrodeObject::kDepthContactRadius, ElectrodeObject::kDepthContactRadius, ElectrodeObject::kDepthContactRadius);
+            QVERIFY(bbMin.x() <= contact.position.x() - pad.x() + 1e-6f && bbMax.x() >= contact.position.x() + pad.x() - 1e-6f);
+            QVERIFY(bbMin.y() <= contact.position.y() - pad.y() + 1e-6f && bbMax.y() >= contact.position.y() + pad.y() - 1e-6f);
+            QVERIFY(bbMin.z() <= contact.position.z() - pad.z() + 1e-6f && bbMax.z() >= contact.position.z() + pad.z() - 1e-6f);
         }
     }
 
@@ -217,8 +224,7 @@ void TestElectrodeObject::testSingleContact()
     arr.label = "X";
     ElectrodeContact c;
     c.name = "X1";
-    c.position = QVector3D(10.0f, 20.0f, 30.0f);
-    c.radius = 0.5f;
+    c.position = QVector3D(0.01f, 0.02f, 0.03f);
     arr.contacts.append(c);
 
     QVector<ElectrodeArray> arrays;
@@ -233,21 +239,53 @@ void TestElectrodeObject::testSingleContact()
 
 void TestElectrodeObject::testGeometryGeneration()
 {
+    // A depth lead, a strip and a 2 x 2 grid, in metres
+    ElectrodeArray depth;
+    depth.label = "LA";
+    ElectrodeArray strip;
+    strip.label = "ST";
+    strip.layout = ElectrodeLayout::Strip;
+    ElectrodeArray grid;
+    grid.label = "GR";
+    grid.layout = ElectrodeLayout::Grid;
+    grid.gridRows = 2;
+    grid.gridCols = 2;
+    for (int i = 0; i < 4; ++i) {
+        depth.contacts.append(makeContact(QString("LA%1").arg(i + 1), QVector3D(0.0f, 0.0f, 0.0035f * float(i))));
+        strip.contacts.append(makeContact(QString("ST%1").arg(i + 1), QVector3D(0.05f + 0.01f * float(i), 0.0f, 0.0f)));
+        grid.contacts.append(makeContact(QString("GR%1").arg(i + 1), QVector3D(0.01f * float(i % 2), 0.05f + 0.01f * float(i / 2), 0.0f)));
+    }
+    // A gap too wide for one array is not tied
+    strip.contacts[3].position.setX(0.2f);
+
     ElectrodeObject obj;
-    QVector<ElectrodeArray> arrays = createTestArrays(3, 6);
-    obj.setArrays(arrays);
+    obj.setArrays({depth, strip, grid});
 
-    // Generate shaft geometry (cylinder mesh)
-    QVector<float> shaftVerts;
-    QVector<unsigned int> shaftIdx;
-    obj.generateShaftGeometry(shaftVerts, shaftIdx, 16);
-    QVERIFY(!shaftVerts.isEmpty());
+    // One sphere per contact; bodies: 1 shaft + 2 strip ties + 4 grid ties
+    const InstancedStreams contacts = obj.contactStreams();
+    QCOMPARE(contacts.instanceCount, 12);
+    QVERIFY(contacts.indexCount > 0 && contacts.vertices.bytes > 0);
+    QCOMPARE(obj.bodyStreams().instanceCount, 1 + 2 + 4);
 
-    // Generate contact instances (instanced spheres)
-    QVector<float> contactInstData;
-    obj.generateContactInstances(contactInstData);
-    // 3 arrays × 6 contacts = 18 instances, each 9 floats
-    QCOMPARE(contactInstData.size(), 18 * 9);
+    // Drawn sizes follow the layout: depth contacts are smaller than subdural ones
+    float dist = 0.0f;
+    const QVector3D down(0.0f, 0.0f, -1.0f);
+    QCOMPARE(obj.intersect(QVector3D(ElectrodeObject::kDepthContactRadius * 0.9f, 0.0f, 1.0f), down, dist), 3);
+    QVERIFY(qAbs(dist - (1.0f - 0.0105f - 0.00048f)) < 1e-4f);
+    QCOMPARE(obj.intersect(QVector3D(ElectrodeObject::kDepthContactRadius * 1.1f, 0.0f, 1.0f), down, dist), -1);
+    QCOMPARE(obj.intersect(QVector3D(0.05f + ElectrodeObject::kDepthContactRadius * 1.1f, 0.0f, 1.0f), down, dist), 4);
+    QCOMPARE(obj.contactLabel(4), QString("ST1 (strip ST)"));
+    QCOMPARE(obj.contactAt(9)->name, QString("GR2"));
+    QVERIFY(obj.contactAt(12) == nullptr);
+
+    // Leads get distinct colours; hovering re-uploads only the contact instances
+    QVERIFY(ElectrodeObject::leadColor(0) != ElectrodeObject::leadColor(1));
+    const quint64 bodyGeneration = obj.bodyStreams().instances.generation;
+    const quint64 contactGeneration = contacts.instances.generation;
+    obj.setHoveredContact(4);
+    obj.setHoveredContact(4);
+    QCOMPARE(obj.contactStreams().instances.generation, contactGeneration + 1);
+    QCOMPARE(obj.bodyStreams().instances.generation, bodyGeneration);
 }
 
 //=============================================================================================================
@@ -264,14 +302,11 @@ QVector<ElectrodeArray> TestElectrodeObject::createTestArrays(int nArrays, int c
     for (int s = 0; s < nArrays; ++s) {
         ElectrodeArray arr;
         arr.label = QString("S%1").arg(s);
-        arr.shaftRadius = 0.4f;
-        arr.shaftColor = Qt::gray;
 
         for (int c = 0; c < contactsPerArray; ++c) {
             ElectrodeContact contact;
             contact.name = QString("S%1_C%2").arg(s).arg(c);
-            contact.position = QVector3D(s * 20.0f, 0.0f, c * 3.5f);
-            contact.radius = 0.5f;
+            contact.position = QVector3D(s * 0.02f, 0.0f, c * 0.0035f);
             contact.color = Qt::white;
             contact.selected = false;
             contact.value = 0.0f;

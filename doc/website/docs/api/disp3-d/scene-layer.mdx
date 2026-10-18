@@ -35,7 +35,7 @@ scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QV
 SceneLayer layer;
 layer.id = "seeg_LH";
 layer.kind = SceneLayerKind::Electrode;
-auto payload = std::make_shared<ElectrodeObject>(); // owns GPU buffers, so it is not copyable
+auto payload = std::make_shared<ElectrodeObject>();
 payload->setArrays(electrodes.arrays());
 layer.payload = payload;
 scene.addLayer(layer);

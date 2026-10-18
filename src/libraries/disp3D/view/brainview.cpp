@@ -19,6 +19,7 @@
 #include "brainrenderer.h"
 #include "renderable/brainsurface.h"
 #include "renderable/dipoleobject.h"
+#include "renderable/electrodeobject.h"
 #include "renderable/networkobject.h"
 #include "renderable/polylineobject.h"
 #include "renderable/videooverlay.h"
@@ -1621,7 +1622,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
     bool hasDipoles = !m_itemDipoleMap.isEmpty() || m_dipoles; // Check managed dipoles too
 
     // If absolutely nothing is loaded, render black background
-    if (!hasSurfaces && !hasDipoles) {
+    if (!hasSurfaces && !hasDipoles && !m_electrodes) {
         // No surface loaded: render a black background instead of leaving the widget uninitialized
         if (!m_renderer) {
             m_renderer = std::make_unique<BrainRenderer>();
@@ -1745,6 +1746,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
         QVector<DrawItem> transparentDraws;
         int sliceOffsets[kMaxSliceSlots] = {-1, -1, -1};
         int videoOverlayOffset = -1;
+        int electrodeOffset = -1;
         QVector<QPair<DipoleObject*, int>> dipoleDraws;
         int networkOffset = -1;
         int headPathOffset = -1;
@@ -1939,6 +1941,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
             item.uniformOffset = m_renderer->prepareSurfaceDraw(updates, itemData, item.surface);
         }
         pane.transparentDraws = transparentDraws;
+        pane.electrodeOffset = m_renderer->prepareElectrodeDraw(updates, sceneData, m_electrodes);
 
         if (sv.visibility.mriSlices) {
             for (int i = 0; i < kMaxSliceSlots; ++i) {
@@ -1992,6 +1995,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
 
         for (const auto& item : pane.opaqueDraws)
             m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
+        m_renderer->issueElectrodeDraw(cb, m_electrodes, pane.electrodeOffset);
 
         // Issue MRI slice draws after opaque surfaces but before the holographic
         // brain.  Background voxels are discarded in the shader; remaining anatomy
@@ -2162,7 +2166,9 @@ void BrainView::mouseReleaseEvent(QMouseEvent* event)
     // Emit surface click if a clean left-click (no rotate or pan drag) landed on geometry
     if (event->button() == Qt::LeftButton && !m_draggedSincePress) {
         castRay(event->pos());
-        if (m_hasIntersection) {
+        if (const ElectrodeContact* contact = m_electrodes ? m_electrodes->contactAt(m_electrodes->hoveredContact()) : nullptr) {
+            emit electrodeContactClicked(contact->name, contact->position);
+        } else if (m_hasIntersection) {
             emit surfacePointClicked(m_lastIntersectionPoint);
         }
     }
@@ -2916,11 +2922,27 @@ void BrainView::castRay(const QPoint& pos)
         m_lastIntersectionPoint = pickResult.hitPoint;
     }
 
+    // Electrode contacts in front of everything else take the hover
+    int hitContact = -1;
+    if (hasValidPane && m_electrodes && m_electrodes->isVisible()) {
+        float contactDist = 0.0f;
+        hitContact = m_electrodes->intersect(rayOrigin, rayDir, contactDist);
+        if (hitContact >= 0 && pickResult.hit && pickResult.distance < contactDist)
+            hitContact = -1;
+        if (hitContact >= 0) {
+            pickResult = RayHit();
+            m_hasIntersection = true;
+            m_lastIntersectionPoint = rayOrigin + contactDist * rayDir;
+        }
+        m_electrodes->setHoveredContact(hitContact);
+    }
+
     QStandardItem* hitItem = pickResult.item;
     int hitIndex = pickResult.vertexIndex;
 
     // ── Build hover label ──────────────────────────────────────────────
-    const QString displayLabel = RayPicker::buildLabel(pickResult, m_itemSurfaceMap, m_surfaces);
+    const QString displayLabel = hitContact >= 0 ? m_electrodes->contactLabel(hitContact)
+                                                 : RayPicker::buildLabel(pickResult, m_itemSurfaceMap, m_surfaces);
     const QString& hitKey = pickResult.surfaceKey;
     int currentRegionId = pickResult.regionId;
 
@@ -3684,6 +3706,16 @@ void BrainView::setSlice(int slotIndex, DISP3DLIB::SliceObject* slice)
     m_sceneDirty = true;
     update();
 }
+
+void BrainView::setElectrodes(DISP3DLIB::ElectrodeObject* electrodes)
+{
+    if (m_electrodes)
+        m_electrodes->setHoveredContact(-1);
+    m_electrodes = electrodes;
+    update();
+}
+
+//=============================================================================================================
 
 void BrainView::setSliceVisible(int slotIndex, bool visible)
 {

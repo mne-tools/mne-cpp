@@ -45,6 +45,7 @@
 #include <disp3D/input/cameracontroller.h>
 #include <disp3D/input/raypicker.h>
 #include <disp3D/renderable/dipoleobject.h>
+#include <disp3D/renderable/electrodeobject.h>
 #include <disp3D/renderable/networkobject.h>
 #include <disp3D/renderable/sourceestimateoverlay.h>
 #include <disp3D/renderable/sliceobject.h>
@@ -91,6 +92,17 @@
 
 using namespace DISP3DLIB;
 using namespace FIFFLIB;
+
+namespace
+{
+DISP3DLIB::ElectrodeContact makeContact(const QString& name, const QVector3D& position)
+{
+    DISP3DLIB::ElectrodeContact contact;
+    contact.name = name;
+    contact.position = position;
+    return contact;
+}
+} // namespace
 
 //=============================================================================================================
 /**
@@ -1505,6 +1517,12 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     NetworkObject networkObject;
     networkObject.load(network, QStringLiteral("Jet"));
     networkObject.setThreshold(0.0);
+    ElectrodeArray lead;
+    lead.label = QStringLiteral("LA");
+    for (int i = 0; i < 3; ++i)
+        lead.contacts.append(makeContact(QStringLiteral("LA%1").arg(i + 1), QVector3D(0.0f, 0.0f, 0.0035f * float(i))));
+    ElectrodeObject electrodes;
+    electrodes.setArrays({lead});
     PolylineObject path;
     path.setPoints({Eigen::Vector3f(0.0f, 0.0f, 0.0f), Eigen::Vector3f(0.01f, 0.0f, 0.0f), Eigen::Vector3f(0.01f, 0.01f, 0.0f)});
     QImage mri(4, 3, QImage::Format_Grayscale8);
@@ -1545,6 +1563,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         const int dipoleOffset = renderer.prepareDipoleDraw(updates, scene, &dipoles);
         const int networkOffset = renderer.prepareNetworkDraw(updates, scene, &networkObject);
         const int pathOffset = renderer.preparePolylineDraw(updates, scene, &path);
+        const int electrodeOffset = renderer.prepareElectrodeDraw(updates, scene, &electrodes);
         const int quadOffset = renderer.prepareVideoOverlayDraw(updates, scene, &video, nullptr);
         const int decalOffset = renderer.prepareVideoOverlayDraw(updates, scene, &video, &surface);
         const int sliceOffset = renderer.prepareSliceDraw(updates, scene, 0);
@@ -1553,13 +1572,13 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         QVERIFY(decalOffset > quadOffset);
         QCOMPARE(sliceOffset, 0);
         QCOMPARE(renderer.prepareSliceDraw(updates, scene, 1), -1);
-        QVERIFY(dipoleOffset > surfaceOffset && networkOffset > dipoleOffset && pathOffset > networkOffset);
-        // Surface, dipoles, network nodes, network edges and path
-        QCOMPARE(renderer.cachedMeshCount(), 5);
+        QVERIFY(dipoleOffset > surfaceOffset && networkOffset > dipoleOffset && pathOffset > networkOffset && electrodeOffset > pathOffset);
+        // Surface, dipoles, network nodes and edges, path, electrode bodies and contacts
+        QCOMPARE(renderer.cachedMeshCount(), 7);
 
         // Slots are aligned and every slot of the buffer is usable
-        int used = 4;
-        int last = pathOffset;
+        int used = 5;
+        int last = electrodeOffset;
         // One warning per frame, however many draws are skipped
         QTest::ignoreMessage(QtWarningMsg, "BrainRenderer: uniform buffer full at prepareSurfaceDraw; further draws this frame are skipped");
         for (int offset = renderer.prepareSurfaceDraw(updates, scene, &surface); offset >= 0; offset = renderer.prepareSurfaceDraw(updates, scene, &surface)) {
@@ -1580,6 +1599,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.issueDipoleDraw(cb, &dipoles, dipoleOffset);
         renderer.issueNetworkDraw(cb, &networkObject, networkOffset);
         renderer.issuePolylineDraw(cb, &path, pathOffset);
+        renderer.issueElectrodeDraw(cb, &electrodes, electrodeOffset);
         renderer.issueVideoOverlayDraw(cb, &video, nullptr, quadOffset);
         renderer.issueVideoOverlayDraw(cb, &video, &surface, decalOffset);
         renderer.issueSurfaceDraw(cb, &surface, BrainRenderer::Standard, last);
@@ -1614,13 +1634,13 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.newFrame();
         QRhiResourceUpdateBatch* updates = rhi->nextResourceUpdateBatch();
         QVERIFY(renderer.prepareSurfaceDraw(updates, scene, &transient) >= 0);
-        QCOMPARE(renderer.cachedMeshCount(), 6);
+        QCOMPARE(renderer.cachedMeshCount(), 8);
         renderer.beginFrame(cb, updates);
         renderer.endPass(cb);
         QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
     }
     renderer.newFrame();
-    QCOMPARE(renderer.cachedMeshCount(), 5);
+    QCOMPARE(renderer.cachedMeshCount(), 7);
 
     // A new colour texture rebuilds the targets
     std::unique_ptr<QRhiTexture> smaller(rhi->newTexture(QRhiTexture::RGBA8, QSize(32, 24), 1, QRhiTexture::RenderTarget));
