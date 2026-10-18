@@ -195,6 +195,32 @@ class ParityTestFieldTestCase(unittest.TestCase):
                       self.issues(status="missing", mne_cpp="", test="test_fiff_core_python")[0])
 
 
+class EquivalenceTestCase(unittest.TestCase):
+    """AC-T7.3-1/2: an equivalence claim needs a test that embeds MNE-Python reference values for that API."""
+
+    def issues(self, **record) -> list[str]:
+        record = {"python": "mne.channel_indices_by_type", "status": "implemented", "mne_cpp": "F",
+                  "test": "test_fiff_core_python", "equivalence": "equivalent", **record}
+        return validator.validate_parity_block({"parity": {"mne_python_pinned": "1.11", "records": [record]}},
+                                               _REPO_ROOT)[1]
+
+    def test_static_cross_validation_passes(self) -> None:
+        self.assertEqual(self.issues(), [])
+        self.assertEqual(self.issues(equivalence="exceeds", exceeds="streams in real time"), [])
+
+    def test_weaker_evidence_fails(self) -> None:
+        self.assertIn("is 'cross-validated-live'", self.issues(python="mne.make_field_map", test="test_field_map")[0])
+        self.assertIn("is 'tested'", self.issues(test="test_utils_logger")[0])
+        self.assertIn("does not name the claimed API", self.issues(python="mne.not_in_that_test")[0])
+        self.assertIn("needs a registered 'test'", self.issues(test=None)[-1])
+
+    def test_inconsistent_claims_fail(self) -> None:
+        self.assertIn("requires status 'implemented'", self.issues(status="partial")[0])
+        self.assertIn("needs an 'exceeds' note", self.issues(equivalence="exceeds")[0])
+        self.assertIn("not in", self.issues(equivalence="better")[0])
+        self.assertIn("'exceeds' note without", self.issues(equivalence=None, exceeds="faster")[-1])
+
+
 class TestRepositoryRegistry(unittest.TestCase):
     def test_committed_registry_passes(self) -> None:
         registry = json.loads((_REPO_ROOT / "doc" / "api_registry.json").read_text(encoding="utf-8"))

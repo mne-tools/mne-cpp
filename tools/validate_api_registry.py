@@ -37,6 +37,10 @@ _SNIPPET_RE = re.compile(r"[@\\]snippet\s+(\S+)\s+(\S+)")
 _MARKER_RE = re.compile(r"^\s*//!\s*\[([^\]]+)\]\s*$")
 _SUBDIR_RE = re.compile(r"^\s*add_subdirectory\s*\(\s*([A-Za-z0-9_./+-]+)", re.MULTILINE)
 _PROJECT_RE = re.compile(r"^\s*project\s*\(\s*([A-Za-z0-9_]+)", re.MULTILINE | re.IGNORECASE)
+EQUIVALENCE_VALUES = {"equivalent", "exceeds"}
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "quality"))
+import audit_parity_baseline  # noqa: E402
 
 
 def load_json(path: Path) -> Optional[Dict[str, Any]]:
@@ -219,7 +223,54 @@ def validate_parity_block(registry: Dict[str, Any], repo_root: Path) -> Tuple[bo
                                  or not (repo_root / "src" / "testframes" / test).is_dir()):
             issues.append(f"'{py}': 'test' must name an existing src/testframes directory "
                           f"on an implemented/partial record (found '{test}')")
+        if rec.get("equivalence") and status != "implemented":
+            issues.append(f"'{py}': 'equivalence' requires status 'implemented' (found '{status}')")
+    issues += validate_equivalence(registry, repo_root)
     return (len(issues) == 0, issues)
+
+
+def validate_equivalence(registry: Dict[str, Any], repo_root: Path) -> List[str]:
+    """An ``equivalence`` claim (G6) on a class or parity record must be backed by evidence.
+
+    * the value is ``equivalent`` or ``exceeds``; ``exceeds`` also needs a non-empty ``exceeds`` note
+      naming the capability beyond MNE-Python,
+    * ``test`` names a registered test that compares with embedded MNE-Python reference values
+      (``cross-validated-static``) and names the claimed API; live comparisons do not qualify.
+
+    API documentation and examples are enforced for every eligible API by step 7 (G3).
+    """
+    testframes = repo_root / "src" / "testframes"
+    registered = audit_parity_baseline.registered_tests(testframes) if (testframes / "CMakeLists.txt").is_file() else set()
+    texts: Dict[str, str] = {}
+    issues: List[str] = []
+    records = [(r.get("name"), r.get("python_equiv") or r.get("mne_python"), r) for r in registry.get("classes", [])]
+    records += [(r.get("python"), r.get("python"), r) for r in registry.get("parity", {}).get("records", [])
+                if isinstance(r, dict)]
+    for label, python, rec in records:
+        if not rec.get("equivalence"):
+            if rec.get("exceeds"):
+                issues.append(f"'{label}': 'exceeds' note without 'equivalence: exceeds'")
+            continue
+        value = rec["equivalence"]
+        if value not in EQUIVALENCE_VALUES:
+            issues.append(f"'{label}': equivalence '{value}' not in {sorted(EQUIVALENCE_VALUES)}")
+            continue
+        if not python:
+            issues.append(f"'{label}': equivalence needs an MNE-Python counterpart")
+            continue
+        if value == "exceeds" and not str(rec.get("exceeds", "")).strip():
+            issues.append(f"'{label}': equivalence 'exceeds' needs an 'exceeds' note")
+        test = rec.get("test")
+        if test not in registered:
+            issues.append(f"'{label}': equivalence needs a registered 'test' (found '{test}')")
+            continue
+        text = texts.setdefault(test, audit_parity_baseline.test_text(testframes, test))
+        level = audit_parity_baseline.classify_text(text)
+        if level != "cross-validated-static":
+            issues.append(f"'{label}': {test} is '{level}', equivalence needs embedded MNE-Python reference values")
+        elif not audit_parity_baseline.names_api(text, python):
+            issues.append(f"'{label}': {test} does not name the claimed API '{python}'")
+    return issues
 
 
 def example_markers(examples_dir: Path) -> Tuple[Dict[str, Counter], List[str]]:

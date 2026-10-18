@@ -24,7 +24,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 mne_add_test(${PROJECT_NAME}
-    LABELS integration
+    LABELS integration parity
     TIMEOUT 60
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample

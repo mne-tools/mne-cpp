@@ -48,7 +48,7 @@ if(QT_VERSION_MAJOR EQUAL 6)
 endif()
 
 mne_add_test(${PROJECT_NAME}
-    LABELS integration parity
+    LABELS integration
     TIMEOUT 300
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample)

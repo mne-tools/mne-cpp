@@ -86,7 +86,7 @@ configure_file(
 # ── Register as CTest so `ctest` picks it up ─────────────────────────────
 enable_testing()
 mne_add_test(${PROJECT_NAME}
-    LABELS integration parity
+    LABELS integration
     TIMEOUT 300
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample)

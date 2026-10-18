@@ -17,16 +17,24 @@
       "scipy==1.15.3"
     ],
     "ci_unpinned_packages": [],
-    "lock_file": null
+    "lock_file": "tools/parity/reference_lock.json",
+    "lock_mismatch": []
   },
   "summary": {
-    "claims": 358,
+    "claims": 356,
     "by_evidence": {
-      "cross-validated-static": 168,
+      "cross-validated-static": 170,
       "cross-validated-live": 4,
       "tested": 182,
-      "unverified": 4
+      "unverified": 0
     },
+    "by_claim": {
+      "equivalent": 137,
+      "exceeds": 0,
+      "implemented": 124,
+      "partial": 95
+    },
+    "equivalence_without_static_evidence": [],
     "by_source": {
       "classes": {
         "cross-validated-static": 31,
@@ -35,10 +43,10 @@
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 137,
+        "cross-validated-static": 139,
         "cross-validated-live": 3,
         "tested": 121,
-        "unverified": 4
+        "unverified": 0
       }
     },
     "tests_by_relation": {
@@ -98,6 +106,7 @@
         "test_standard_montage",
         "test_sts_cluster",
         "test_surface_laplacian",
+        "test_tool_data_pipeline",
         "test_tool_list_source_space",
         "test_utils_spectral"
       ],
@@ -129,22 +138,27 @@
       "mne_cpp": "FiffStream",
       "python": "mne.io.fiff.FiffStream",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_raw_io",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "classes",
       "mne_cpp": "FiffRawData",
       "python": "mne.io.Raw",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_raw_io",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "classes",
       "mne_cpp": "FiffInfo",
       "python": "mne.Info",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_info",
       "evidence": "tested"
     },
@@ -153,30 +167,37 @@
       "mne_cpp": "FiffEvoked",
       "python": "mne.Evoked",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_io_evoked_info",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.01"
     },
     {
       "source": "classes",
       "mne_cpp": "FiffEpochs",
       "python": "mne.Epochs",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_epochs",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10"
     },
     {
       "source": "classes",
       "mne_cpp": "FiffCov",
       "python": "mne.Covariance",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_cov_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-09"
     },
     {
       "source": "classes",
       "mne_cpp": "FiffProj",
       "python": "mne.Projection",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_proj_python",
       "evidence": "tested"
     },
@@ -185,6 +206,7 @@
       "mne_cpp": "FiffCoordTrans",
       "python": "mne.transforms.Transform",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_coord_trans",
       "evidence": "tested"
     },
@@ -193,6 +215,7 @@
       "mne_cpp": "FiffAnnotations",
       "python": "mne.Annotations",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_annotations",
       "evidence": "tested"
     },
@@ -201,6 +224,7 @@
       "mne_cpp": "FiffAnnotationEventUtils",
       "python": "mne.events_from_annotations",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_annotation_event_utils",
       "evidence": "tested"
     },
@@ -209,14 +233,17 @@
       "mne_cpp": "MNEForwardSolution",
       "python": "mne.Forward",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "classes",
       "mne_cpp": "MNEInverseOperator",
       "python": "mne.InverseOperator",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_inverse_operator",
       "evidence": "tested"
     },
@@ -225,6 +252,7 @@
       "mne_cpp": "MNESourceSpace",
       "python": "mne.SourceSpaces",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_source_data",
       "evidence": "tested"
     },
@@ -233,6 +261,7 @@
       "mne_cpp": "MNEBem",
       "python": "mne.make_bem_model",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fwd_bem_data",
       "evidence": "tested"
     },
@@ -241,6 +270,7 @@
       "mne_cpp": "MneICP",
       "python": "mne.coreg.Coregistration",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_coregistration",
       "evidence": "tested"
     },
@@ -249,14 +279,17 @@
       "mne_cpp": "ComputeFwd",
       "python": "mne.make_forward_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fwd_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.001"
     },
     {
       "source": "classes",
       "mne_cpp": "FwdBemModel",
       "python": "mne.make_bem_model",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fwd_bem_data",
       "evidence": "tested"
     },
@@ -265,38 +298,47 @@
       "mne_cpp": "FwdEegSphereModel",
       "python": "mne.make_sphere_model",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fwd_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.001"
     },
     {
       "source": "classes",
       "mne_cpp": "InvMinimumNorm",
       "python": "mne.minimum_norm.apply_inverse",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_compute_raw_inverse",
-      "evidence": "cross-validated-live"
+      "evidence": "cross-validated-live",
+      "tolerance": "exact"
     },
     {
       "source": "classes",
       "mne_cpp": "InvLCMV",
       "python": "mne.beamformer.make_lcmv / apply_lcmv",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "classes",
       "mne_cpp": "InvDICS",
       "python": "mne.beamformer.make_dics / apply_dics",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "classes",
       "mne_cpp": "InvRapMusic",
       "python": "mne.beamformer.rap_music",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_inv_dipole_rap_mne",
       "evidence": "tested"
     },
@@ -305,6 +347,7 @@
       "mne_cpp": "InvTrapMusic",
       "python": "mne.beamformer.trap_music",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_trap_music",
       "evidence": "tested"
     },
@@ -313,30 +356,37 @@
       "mne_cpp": "InvDipoleFit",
       "python": "mne.fit_dipole",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_dipole_fit_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.02"
     },
     {
       "source": "classes",
       "mne_cpp": "InvMxne",
       "python": "mne.inverse_sparse.mixed_norm",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_sparse",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "classes",
       "mne_cpp": "InvGammaMap",
       "python": "mne.inverse_sparse.gamma_map",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_sparse",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "classes",
       "mne_cpp": "InvTfMxne",
       "python": "mne.inverse_sparse.tf_mixed_norm",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tf_mxne",
       "evidence": "tested"
     },
@@ -345,6 +395,7 @@
       "mne_cpp": "InvHpiFit",
       "python": "mne.chpi",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_hpiFit",
       "evidence": "tested"
     },
@@ -353,6 +404,7 @@
       "mne_cpp": "InvSourceEstimate",
       "python": "mne.SourceEstimate",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_source_estimate_types",
       "evidence": "tested"
     },
@@ -361,14 +413,17 @@
       "mne_cpp": "InvVectorSourceEstimate",
       "python": "mne.VectorSourceEstimate",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_source_estimate_types",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-15 to 1e-07"
     },
     {
       "source": "classes",
       "mne_cpp": "InvVolumeSourceEstimate",
       "python": "mne.VolumeSourceEstimate",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_source_estimate_types",
       "evidence": "tested"
     },
@@ -377,14 +432,17 @@
       "mne_cpp": "InvSourceEstimateIO",
       "python": "mne.SourceEstimate.save / read",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_source_estimate_io",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 1e-05"
     },
     {
       "source": "classes",
       "mne_cpp": "InvLabelTimeCourse",
       "python": "mne.extract_label_time_course",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_label_time_course",
       "evidence": "tested"
     },
@@ -393,6 +451,7 @@
       "mne_cpp": "InvResolutionMatrix",
       "python": "mne.minimum_norm.make_inverse_resolution_matrix",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_resolution_matrix",
       "evidence": "tested"
     },
@@ -401,6 +460,7 @@
       "mne_cpp": "InvConvenience",
       "python": "mne.minimum_norm.apply_inverse_epochs / apply_inverse_raw / apply_inverse_cov",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_inv_convenience",
       "evidence": "tested"
     },
@@ -409,6 +469,7 @@
       "mne_cpp": "SourceMorph",
       "python": "mne.SourceMorph",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_source_morph",
       "evidence": "tested"
     },
@@ -417,6 +478,7 @@
       "mne_cpp": "FilterKernel",
       "python": "mne.filter.create_filter",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_filter_kernel",
       "evidence": "tested"
     },
@@ -425,14 +487,17 @@
       "mne_cpp": "FirFilter",
       "python": "mne.filter.filter_data",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_firfilter",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 1e-08"
     },
     {
       "source": "classes",
       "mne_cpp": "IirFilter",
       "python": "mne.filter.filter_data (method='iir')",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_iirfilter",
       "evidence": "tested"
     },
@@ -441,6 +506,7 @@
       "mne_cpp": "ICA",
       "python": "mne.preprocessing.ICA (fastica)",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_ica",
       "evidence": "tested"
     },
@@ -449,6 +515,7 @@
       "mne_cpp": "PicardIca",
       "python": "mne.preprocessing.ICA (picard)",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_picard_ica",
       "evidence": "tested"
     },
@@ -457,6 +524,7 @@
       "mne_cpp": "ExtendedInfomax",
       "python": "mne.preprocessing.ICA (infomax)",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_infomax",
       "evidence": "tested"
     },
@@ -465,6 +533,7 @@
       "mne_cpp": "SSS",
       "python": "mne.preprocessing.maxwell_filter",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_sss",
       "evidence": "tested"
     },
@@ -473,6 +542,7 @@
       "mne_cpp": "BadChannelsMaxwell",
       "python": "mne.preprocessing.find_bad_channels_maxwell",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_bad_channels_maxwell",
       "evidence": "tested"
     },
@@ -481,6 +551,7 @@
       "mne_cpp": "BadChannelsLof",
       "python": "mne.preprocessing._lof",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_bad_channels_lof",
       "evidence": "tested"
     },
@@ -489,22 +560,27 @@
       "mne_cpp": "EogRegression",
       "python": "mne.preprocessing.EOGRegression",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_eog_regression",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-15 to 0.3"
     },
     {
       "source": "classes",
       "mne_cpp": "EegReference",
       "python": "mne.set_eeg_reference",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_eeg_reference",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "classes",
       "mne_cpp": "StimArtifact",
       "python": "mne.preprocessing.fix_stim_artifact",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_stim_artifact",
       "evidence": "tested"
     },
@@ -513,6 +589,7 @@
       "mne_cpp": "FilterChpi",
       "python": "mne.chpi.filter_chpi",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_filter_chpi",
       "evidence": "tested"
     },
@@ -521,14 +598,17 @@
       "mne_cpp": "AnnotateArtifact",
       "python": "mne.preprocessing.annotate_muscle_zscore / annotate_amplitude",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_annotate_artifact",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-14 to 1e-06"
     },
     {
       "source": "classes",
       "mne_cpp": "BridgedElectrodes",
       "python": "mne.preprocessing.compute_bridged_electrodes",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_bridged_electrodes",
       "evidence": "tested"
     },
@@ -537,6 +617,7 @@
       "mne_cpp": "FineCalibration",
       "python": "mne.preprocessing.read_fine_calibration",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fine_calibration",
       "evidence": "tested"
     },
@@ -545,6 +626,7 @@
       "mne_cpp": "MaxwellMovementComp",
       "python": "mne.preprocessing.maxwell_filter (head_pos)",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_maxwell_movement_comp",
       "evidence": "tested"
     },
@@ -553,14 +635,17 @@
       "mne_cpp": "SurfaceLaplacian",
       "python": "mne.preprocessing.compute_current_source_density",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_surface_laplacian",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "classes",
       "mne_cpp": "PeakFinder",
       "python": "mne.preprocessing.peak_finder",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_peak_finder",
       "evidence": "tested"
     },
@@ -569,6 +654,7 @@
       "mne_cpp": "WelchPsd",
       "python": "mne.time_frequency.psd_welch",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_welch_psd",
       "evidence": "tested"
     },
@@ -577,30 +663,37 @@
       "mne_cpp": "MultitaperPsd",
       "python": "mne.time_frequency.psd_array_multitaper",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_multitaper",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "classes",
       "mne_cpp": "MorletTfr",
       "python": "mne.time_frequency.tfr_morlet",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_morlet_tfr",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.1"
     },
     {
       "source": "classes",
       "mne_cpp": "MultitaperTfr",
       "python": "mne.time_frequency.tfr_multitaper",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_multitaper",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "classes",
       "mne_cpp": "Resample",
       "python": "mne.filter.resample",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_resample",
       "evidence": "tested"
     },
@@ -609,6 +702,7 @@
       "mne_cpp": "Xdawn",
       "python": "mne.preprocessing.Xdawn",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_xdawn",
       "evidence": "tested"
     },
@@ -617,6 +711,7 @@
       "mne_cpp": "ConnectivityAec",
       "python": "mne_connectivity.envelope_correlation",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_connectivity_aec",
       "evidence": "tested"
     },
@@ -625,14 +720,17 @@
       "mne_cpp": "Simulate",
       "python": "mne.simulation.simulate_stc / simulate_evoked",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_simulate",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-15 to 1e-10"
     },
     {
       "source": "classes",
       "mne_cpp": "Connectivity",
       "python": "mne_connectivity.spectral_connectivity_epochs",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_connectivity_metrics",
       "evidence": "tested"
     },
@@ -641,6 +739,7 @@
       "mne_cpp": "Coherence",
       "python": "mne_connectivity.spectral_connectivity_epochs (method='coh')",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_connectivity_metrics",
       "evidence": "tested"
     },
@@ -649,6 +748,7 @@
       "mne_cpp": "PhaseLockingValue",
       "python": "mne_connectivity.spectral_connectivity_epochs (method='plv')",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_connectivity_metrics",
       "evidence": "tested"
     },
@@ -657,6 +757,7 @@
       "mne_cpp": "PhaseLagIndex",
       "python": "mne_connectivity.spectral_connectivity_epochs (method='pli')",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_connectivity_metrics",
       "evidence": "tested"
     },
@@ -665,6 +766,7 @@
       "mne_cpp": "GrangerCausality",
       "python": "mne_connectivity.spectral_connectivity_epochs (method='gc')",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_spectral_connectivity",
       "evidence": "tested"
     },
@@ -673,6 +775,7 @@
       "mne_cpp": "PartialDirectedCoherence",
       "python": "mne_connectivity.spectral_connectivity_epochs (method='pdc')",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_spectral_connectivity",
       "evidence": "tested"
     },
@@ -681,6 +784,7 @@
       "mne_cpp": "DirectedTransferFunction",
       "python": "mne_connectivity.spectral_connectivity_epochs (method='dtf')",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_spectral_connectivity",
       "evidence": "tested"
     },
@@ -689,6 +793,7 @@
       "mne_cpp": "DecodingCsp",
       "python": "mne.decoding.CSP",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_decoding_csp",
       "evidence": "tested"
     },
@@ -697,6 +802,7 @@
       "mne_cpp": "DecodingSpoc",
       "python": "mne.decoding.SPoC",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_decoding_spoc",
       "evidence": "tested"
     },
@@ -705,6 +811,7 @@
       "mne_cpp": "DecodingSsd",
       "python": "mne.decoding.SSD",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_decoding_ssd",
       "evidence": "tested"
     },
@@ -713,6 +820,7 @@
       "mne_cpp": "MlIcaLabel",
       "python": "mne_icalabel",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_ica_label",
       "evidence": "tested"
     },
@@ -721,6 +829,7 @@
       "mne_cpp": "StsCovEstimators",
       "python": "mne.cov (compute_covariance methods)",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_sts_cov_estimators",
       "evidence": "tested"
     },
@@ -729,22 +838,27 @@
       "mne_cpp": "StatsCluster",
       "python": "mne.stats.permutation_cluster_test",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "classes",
       "mne_cpp": "StatsAdjacency",
       "python": "mne.stats.combine_adjacency",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "classes",
       "mne_cpp": "FsSurface",
       "python": "mne.read_surface",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fs",
       "evidence": "tested"
     },
@@ -753,6 +867,7 @@
       "mne_cpp": "FsAnnotation",
       "python": "mne.read_annot",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fs_annotation_labels",
       "evidence": "tested"
     },
@@ -761,6 +876,7 @@
       "mne_cpp": "FsLabel",
       "python": "mne.read_label",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fs_annotation_labels",
       "evidence": "tested"
     },
@@ -769,6 +885,7 @@
       "mne_cpp": "FsLabelUtils",
       "python": "mne.grow_labels / mne.split_label / mne.stc_to_label",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_label_utils",
       "evidence": "tested"
     },
@@ -777,6 +894,7 @@
       "mne_cpp": "Linalg",
       "python": "numpy.linalg / scipy.linalg",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_utils_mnemath",
       "evidence": "tested"
     },
@@ -785,6 +903,7 @@
       "mne_cpp": "SimplexAlgorithm",
       "python": "scipy.optimize.fmin",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_hpiFit",
       "evidence": "tested"
     },
@@ -793,6 +912,7 @@
       "mne_cpp": "Sphere",
       "python": "mne.make_sphere_model",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_utils_sphere",
       "evidence": "tested"
     },
@@ -801,30 +921,37 @@
       "mne_cpp": "BIDSPath",
       "python": "mne_bids.BIDSPath",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_bids",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 0.001"
     },
     {
       "source": "classes",
       "mne_cpp": "BidsRawData",
       "python": "mne_bids.read_raw_bids",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_bids",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 0.001"
     },
     {
       "source": "classes",
       "mne_cpp": "StandardMontage",
       "python": "mne.channels.make_standard_montage",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_standard_montage",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.005"
     },
     {
       "source": "classes",
       "mne_cpp": "Report",
       "python": "mne.Report",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_report",
       "evidence": "tested"
     },
@@ -833,14 +960,17 @@
       "mne_cpp": "MNEMneData",
       "python": "mne.minimum_norm.estimate_snr",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_eloreta_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.0001"
     },
     {
       "source": "classes",
       "mne_cpp": "IeegImplantation",
       "python": "mne.channels.DigMontage (iEEG)",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_ieeg",
       "evidence": "tested"
     },
@@ -849,6 +979,7 @@
       "mne_cpp": "IeegReference",
       "python": "mne.set_bipolar_reference",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_ieeg",
       "evidence": "tested"
     },
@@ -857,6 +988,7 @@
       "mne_cpp": "IeegSurfaceMap",
       "python": "mne.stc_near_sensors",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_ieeg",
       "evidence": "tested"
     },
@@ -865,14 +997,17 @@
       "mne_cpp": "ArtifactDetectProjParams",
       "python": "mne.preprocessing.compute_proj_ecg",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "MNELIB::MNEEpochDataList",
       "python": "mne.BaseEpochs",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_mne_library",
       "evidence": "tested"
     },
@@ -881,14 +1016,17 @@
       "mne_cpp": "ECD (INVERSELIB)",
       "python": "mne.Dipole",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_dipole_fit_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.02"
     },
     {
       "source": "parity",
       "mne_cpp": "MNELIB::MNEEpochData, FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
       "python": "mne.EpochsArray",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_epochs",
       "evidence": "tested"
     },
@@ -897,6 +1035,7 @@
       "mne_cpp": "FiffEvoked (constructed directly)",
       "python": "mne.EvokedArray",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_io_evoked_info",
       "evidence": "tested"
     },
@@ -905,30 +1044,37 @@
       "mne_cpp": "Label (FSLIB)",
       "python": "mne.Label",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fs_annotation_labels",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "INVLIB::InvVolumeSourceEstimate",
       "python": "mne.VolSourceEstimate",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_source_estimate_types",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-15 to 1e-07"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::addReferenceChannels",
       "python": "mne.add_reference_channels",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_eeg_reference",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffAnnotationEventUtils",
       "python": "mne.annotations_from_events",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_annotation_event_utils",
       "evidence": "tested"
     },
@@ -937,14 +1083,17 @@
       "mne_cpp": "INVLIB::applyForward",
       "python": "mne.apply_forward",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "INVLIB::applyForward",
       "python": "mne.apply_forward_raw",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_mne_forward_ops",
       "evidence": "tested"
     },
@@ -953,6 +1102,7 @@
       "mne_cpp": "mne_average_forward_solutions (CLI)",
       "python": "mne.average_forward_solutions",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_data_pipeline",
       "evidence": "tested"
     },
@@ -961,6 +1111,7 @@
       "mne_cpp": "INVLIB::InvBeamformer",
       "python": "mne.beamformer.Beamformer",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_inv_lcmv_python",
       "evidence": "tested"
     },
@@ -969,22 +1120,27 @@
       "mne_cpp": "InvDICS::applyDICS",
       "python": "mne.beamformer.apply_dics",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "InvDICS::applyDICSCsd",
       "python": "mne.beamformer.apply_dics_csd",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "InvDICS::applyDICSEpochs",
       "python": "mne.beamformer.apply_dics_epochs",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_inv_lcmv_python",
       "evidence": "tested"
     },
@@ -993,22 +1149,27 @@
       "mne_cpp": "Lcmv",
       "python": "mne.beamformer.apply_lcmv",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "Lcmv (partial)",
       "python": "mne.beamformer.apply_lcmv_cov",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "InvLCMV::applyLCMVEpochs",
       "python": "mne.beamformer.apply_lcmv_epochs",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_inv_lcmv_python",
       "evidence": "tested"
     },
@@ -1017,6 +1178,7 @@
       "mne_cpp": "InvLCMV::applyLCMVRaw",
       "python": "mne.beamformer.apply_lcmv_raw",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_inv_lcmv_python",
       "evidence": "tested"
     },
@@ -1025,46 +1187,57 @@
       "mne_cpp": "Dics",
       "python": "mne.beamformer.make_dics",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "Lcmv",
       "python": "mne.beamformer.make_lcmv",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "INVLIB::InvLCMV::makeLCMVResolutionMatrix",
       "python": "mne.beamformer.make_lcmv_resolution_matrix",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffInfoBase::channel_indices_by_type",
       "python": "mne.channel_indices_by_type",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffInfoBase::channel_type",
       "python": "mne.channel_type",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FIFFLIB::FiffDigPointSet",
       "python": "mne.channels.DigMontage",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fiff_dig_point_python",
       "evidence": "tested"
     },
@@ -1073,6 +1246,7 @@
       "mne_cpp": "MNELIB::MNELayout",
       "python": "mne.channels.Layout",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_library",
       "evidence": "tested"
     },
@@ -1081,6 +1255,7 @@
       "mne_cpp": "UTILSLIB::ChannelDerivation::apply",
       "python": "mne.channels.combine_channels",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_channel_derivation",
       "evidence": "tested"
     },
@@ -1089,6 +1264,7 @@
       "mne_cpp": "MNELIB::fitMatchedPoints",
       "python": "mne.channels.compute_dev_head_t",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_coregistration",
       "evidence": "tested"
     },
@@ -1097,6 +1273,7 @@
       "mne_cpp": "STSLIB::StatsAdjacency::fromChannelPositions",
       "python": "mne.channels.find_ch_adjacency",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_sts_cluster",
       "evidence": "tested"
     },
@@ -1105,6 +1282,7 @@
       "mne_cpp": "processFile (CLI)",
       "python": "mne.channels.fix_mag_coil_types",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_data_pipeline",
       "evidence": "tested"
     },
@@ -1113,6 +1291,7 @@
       "mne_cpp": "UTILSLIB::LayoutMaker::makeLayout",
       "python": "mne.channels.generate_2d_layout",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_utils_layout_selection",
       "evidence": "tested"
     },
@@ -1121,6 +1300,7 @@
       "mne_cpp": "FiffDigPointSet(QList<FiffDigPoint>)",
       "python": "mne.channels.make_dig_montage",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fiff_dig_point_python",
       "evidence": "tested"
     },
@@ -1129,6 +1309,7 @@
       "mne_cpp": "LayoutMaker::makeLayout (CLI)",
       "python": "mne.channels.make_eeg_layout",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_surface_math",
       "evidence": "tested"
     },
@@ -1137,14 +1318,17 @@
       "mne_cpp": "UTILSLIB::StandardMontage::getMontage",
       "python": "mne.channels.make_standard_montage",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_standard_montage",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.005"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::LayoutLoader::readAsaElcFile",
       "python": "mne.channels.read_custom_montage",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_utils_layout_selection",
       "evidence": "tested"
     },
@@ -1153,38 +1337,47 @@
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readCaptrak",
       "python": "mne.channels.read_dig_captrak",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_dig_point_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readNeuroscanDat",
       "python": "mne.channels.read_dig_dat",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_dig_point_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readEgi",
       "python": "mne.channels.read_dig_egi",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_dig_point_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "FIFFLIB dig I/O",
       "python": "mne.channels.read_dig_fif",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_dig_point_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "readHpts (CLI)",
       "python": "mne.channels.read_dig_hpts",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_conversion_functions",
       "evidence": "tested"
     },
@@ -1193,22 +1386,27 @@
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readLocalite",
       "python": "mne.channels.read_dig_localite",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_dig_point_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
       "python": "mne.channels.read_dig_polhemus_isotrak",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_dig_point_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "DISPLIB layout I/O",
       "python": "mne.channels.read_layout",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_library",
       "evidence": "tested"
     },
@@ -1217,14 +1415,17 @@
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusFastscan",
       "python": "mne.channels.read_polhemus_fastscan",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_dig_point_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::SelectionIO::readMNESelFile",
       "python": "mne.channels.read_vectorview_selection",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_utils_layout_selection",
       "evidence": "tested"
     },
@@ -1233,6 +1434,7 @@
       "mne_cpp": "mne_rename_channels (CLI)",
       "python": "mne.channels.rename_channels",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_preproc_helpers",
       "evidence": "tested"
     },
@@ -1241,22 +1443,27 @@
       "mne_cpp": "FiffDigPointSet::transformToHead",
       "python": "mne.channels.transform_to_head",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_coord_trans",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffEvoked::combine",
       "python": "mne.combine_evoked",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_io_evoked_info",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.01"
     },
     {
       "source": "parity",
       "mne_cpp": "StsCovEstimators / RtCov",
       "python": "mne.compute_covariance",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_sts_cov_estimators",
       "evidence": "tested"
     },
@@ -1265,22 +1472,27 @@
       "mne_cpp": "FiffProj::compute_from_raw",
       "python": "mne.compute_proj_epochs",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffProj::compute_from_evoked",
       "python": "mne.compute_proj_evoked",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FIFFLIB::FiffProj::compute_from_raw",
       "python": "mne.compute_proj_raw",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fiff_core_python",
       "evidence": "tested"
     },
@@ -1289,6 +1501,7 @@
       "mne_cpp": "MATHLIB::Linalg::rank",
       "python": "mne.compute_rank",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_utils_mnemath",
       "evidence": "tested"
     },
@@ -1297,6 +1510,7 @@
       "mne_cpp": "StsCovEstimators",
       "python": "mne.compute_raw_covariance",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_sts_cov_estimators",
       "evidence": "tested"
     },
@@ -1305,6 +1519,7 @@
       "mne_cpp": "INVLIB::SourceMorph::compute, MNEMorphMap::compute",
       "python": "mne.compute_source_morph",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_source_morph",
       "evidence": "tested"
     },
@@ -1313,22 +1528,27 @@
       "mne_cpp": "FIFFLIB::FiffEpochs::concatenateEpochs",
       "python": "mne.concatenate_epochs",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_epochs",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffEvents::concatenate",
       "python": "mne.concatenate_events",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffRawData concatenation",
       "python": "mne.concatenate_raws",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_raw_io",
       "evidence": "tested"
     },
@@ -1337,14 +1557,17 @@
       "mne_cpp": "MNEForwardSolution",
       "python": "mne.convert_forward_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fwd_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffAnnotations",
       "python": "mne.count_annotations",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_annotations",
       "evidence": "tested"
     },
@@ -1353,14 +1576,17 @@
       "mne_cpp": "FiffEvents::count",
       "python": "mne.count_events",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffInfo (constructed directly)",
       "python": "mne.create_info",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_info",
       "evidence": "tested"
     },
@@ -1369,6 +1595,7 @@
       "mne_cpp": "MNEBemSurface::makeScalpSurfaces",
       "python": "mne.decimate_surface",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_tool_data_pipeline",
       "evidence": "tested"
     },
@@ -1377,6 +1604,7 @@
       "mne_cpp": "DecodingCsp",
       "python": "mne.decoding.CSP",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_decoding_csp",
       "evidence": "tested"
     },
@@ -1385,6 +1613,7 @@
       "mne_cpp": "FirFilter::filterData",
       "python": "mne.decoding.FilterEstimator",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_annotate_artifact",
       "evidence": "tested"
     },
@@ -1393,6 +1622,7 @@
       "mne_cpp": "DecodingSpoc",
       "python": "mne.decoding.SPoC",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_decoding_spoc",
       "evidence": "tested"
     },
@@ -1401,22 +1631,16 @@
       "mne_cpp": "DecodingSsd",
       "python": "mne.decoding.SSD",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_decoding_ssd",
       "evidence": "tested"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "StandardScaler",
-      "python": "mne.decoding.Scaler",
-      "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
     },
     {
       "source": "parity",
       "mne_cpp": "DecodingCsp::filters/patterns",
       "python": "mne.decoding.SpatialFilter",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_decoding_csp",
       "evidence": "tested"
     },
@@ -1425,6 +1649,7 @@
       "mne_cpp": "FirFilter::filterData",
       "python": "mne.decoding.TemporalFilter",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_annotate_artifact",
       "evidence": "tested"
     },
@@ -1433,6 +1658,7 @@
       "mne_cpp": "MorletTfr::computeMultiChannel",
       "python": "mne.decoding.TimeFrequency",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_morlet_tfr",
       "evidence": "tested"
     },
@@ -1441,6 +1667,7 @@
       "mne_cpp": "UTILSLIB::Xdawn::fit/apply",
       "python": "mne.decoding.XdawnTransformer",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_xdawn",
       "evidence": "tested"
     },
@@ -1449,6 +1676,7 @@
       "mne_cpp": "FiffAnnotationEventUtils",
       "python": "mne.events_from_annotations",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_annotation_event_utils",
       "evidence": "tested"
     },
@@ -1457,30 +1685,37 @@
       "mne_cpp": "RTPROCESSINGLIB event detection",
       "python": "mne.find_events",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffEvents::find_stim_steps",
       "python": "mne.find_stim_steps",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "INVLIB::applyForward",
       "python": "mne.forward.apply_forward",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "INVLIB::applyForward",
       "python": "mne.forward.apply_forward_raw",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_mne_forward_ops",
       "evidence": "tested"
     },
@@ -1489,6 +1724,7 @@
       "mne_cpp": "mne_average_forward_solutions (CLI)",
       "python": "mne.forward.average_forward_solutions",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_data_pipeline",
       "evidence": "tested"
     },
@@ -1497,46 +1733,57 @@
       "mne_cpp": "MNEForwardSolution::compute_depth_prior",
       "python": "mne.forward.compute_depth_prior",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::compute_orient_prior",
       "python": "mne.forward.compute_orient_prior",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution",
       "python": "mne.forward.convert_forward_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fwd_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::isFixedOrient",
       "python": "mne.forward.is_fixed_orient",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
       "python": "mne.forward.make_field_map",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_field_map",
-      "evidence": "cross-validated-live"
+      "evidence": "cross-validated-live",
+      "tolerance": "1e-20 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "ComputeFwd (partial)",
       "python": "mne.forward.make_forward_dipole",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_tool_forward_generation",
       "evidence": "tested"
     },
@@ -1545,22 +1792,27 @@
       "mne_cpp": "MNEForwardSolution::read",
       "python": "mne.forward.read_forward_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution (partial)",
       "python": "mne.forward.restrict_forward_to_label",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_mne_label_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "FwdCoilSet::read_coil_defs",
       "python": "mne.forward.use_coil_def",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fwd_bem_field_computation",
       "evidence": "tested"
     },
@@ -1569,14 +1821,17 @@
       "mne_cpp": "MNEForwardSolution::write",
       "python": "mne.forward.write_forward_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEBem(QIODevice&)",
       "python": "mne.get_head_surf",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_mne_library",
       "evidence": "tested"
     },
@@ -1585,14 +1840,17 @@
       "mne_cpp": "FWDLIB helmet surface",
       "python": "mne.get_meg_helmet_surf",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_field_map",
-      "evidence": "cross-validated-live"
+      "evidence": "cross-validated-live",
+      "tolerance": "1e-20 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "FSLIB::FsAtlasLookup::load",
       "python": "mne.get_volume_labels_from_aseg",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fs_atlas_lookup",
       "evidence": "tested"
     },
@@ -1601,6 +1859,7 @@
       "mne_cpp": "generateIcoVertices",
       "python": "mne.grade_to_tris",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_mne_source_space_ops_python",
       "evidence": "tested"
     },
@@ -1609,62 +1868,77 @@
       "mne_cpp": "MNESourceSpace::gradeToVertices",
       "python": "mne.grade_to_vertices",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_source_space_ops_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffEvokedSet::computeGrandAverage",
       "python": "mne.grand_average",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fiff_io_evoked_info",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.01"
     },
     {
       "source": "parity",
       "mne_cpp": "FsLabelUtils::growCircularLabel",
       "python": "mne.grow_labels",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fs_annotation_labels",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "FSLIB (partial)",
       "python": "mne.head_to_mni",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffCoordTrans::apply_inverse_trans (head -> MRI) x 1000",
       "python": "mne.head_to_mri",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fiff_coord_trans",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "InvGammaMap::compute",
       "python": "mne.inverse_sparse.gamma_map",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_inv_sparse",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "parity",
       "mne_cpp": "InvMxne::compute",
       "python": "mne.inverse_sparse.mixed_norm",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_inv_sparse",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "parity",
       "mne_cpp": "INVLIB::InvTfMxne::compute",
       "python": "mne.inverse_sparse.tf_mixed_norm",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_tf_mxne",
       "evidence": "tested"
     },
@@ -1673,6 +1947,7 @@
       "mne_cpp": "FiffRawData (BaseRaw)",
       "python": "mne.io.BaseRaw",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_raw_io",
       "evidence": "tested"
     },
@@ -1681,6 +1956,7 @@
       "mne_cpp": "FiffRawData (constructed directly)",
       "python": "mne.io.RawArray",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_raw_io",
       "evidence": "tested"
     },
@@ -1689,6 +1965,7 @@
       "mne_cpp": "FiffAnonymizer (CLI)",
       "python": "mne.io.anonymize_info",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_anonymize",
       "evidence": "tested"
     },
@@ -1697,6 +1974,7 @@
       "mne_cpp": "FiffRawData concatenation",
       "python": "mne.io.concatenate_raws",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_raw_io",
       "evidence": "tested"
     },
@@ -1705,14 +1983,17 @@
       "mne_cpp": "FIFFV_MEG_CH",
       "python": "mne.io.get_channel_type_constants",
       "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
+      "equivalence": null,
+      "test": "test_fiff_core_python",
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffDigPointSet(QIODevice&), FiffDigitizerData",
       "python": "mne.io.read_fiducials",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_library",
       "evidence": "tested"
     },
@@ -1721,38 +2002,47 @@
       "mne_cpp": "FiffInfo::read",
       "python": "mne.io.read_info",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_stream_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "BidsRawData::createReader",
       "python": "mne.io.read_raw",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_bids",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
       "python": "mne.io.read_raw_bdf",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_bids",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "BIDSLIB::BrainVisionReader / mne_brain_vision2fiff (CLI)",
       "python": "mne.io.read_raw_brainvision",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_bids",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_ctf2fiff (CLI)",
       "python": "mne.io.read_raw_ctf",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_conversion_extended",
       "evidence": "tested"
     },
@@ -1761,30 +2051,37 @@
       "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
       "python": "mne.io.read_raw_edf",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_edf2fiff_rwr",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_eximia2fiff (CLI)",
       "python": "mne.io.read_raw_eximia",
       "claimed": "implemented",
-      "test": null,
-      "evidence": "unverified"
+      "equivalence": "equivalent",
+      "test": "test_tool_data_pipeline",
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffRawData",
       "python": "mne.io.read_raw_fif",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_raw_formats_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_kit2fiff (CLI)",
       "python": "mne.io.read_raw_kit",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_conversion_extended",
       "evidence": "tested"
     },
@@ -1793,6 +2090,7 @@
       "mne_cpp": "mne_show_fiff (CLI)",
       "python": "mne.io.show_fiff",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_show_fiff",
       "evidence": "tested"
     },
@@ -1801,6 +2099,7 @@
       "mne_cpp": "FiffDigPointSet::write",
       "python": "mne.io.write_fiducials",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_fs_library",
       "evidence": "tested"
     },
@@ -1809,6 +2108,7 @@
       "mne_cpp": "FiffInfo::write",
       "python": "mne.io.write_info",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_info",
       "evidence": "tested"
     },
@@ -1817,6 +2117,7 @@
       "mne_cpp": "InvLabelTimeCourse::computeSignFlip",
       "python": "mne.label_sign_flip",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_label_time_course",
       "evidence": "tested"
     },
@@ -1825,6 +2126,7 @@
       "mne_cpp": "FsLabelUtils::labelsToStc",
       "python": "mne.labels_to_stc",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_label_utils",
       "evidence": "tested"
     },
@@ -1833,6 +2135,7 @@
       "mne_cpp": "FiffCov (ad-hoc)",
       "python": "mne.make_ad_hoc_cov",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_cov",
       "evidence": "tested"
     },
@@ -1841,6 +2144,7 @@
       "mne_cpp": "mne_surf2bem (CLI)",
       "python": "mne.make_bem_model",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_surf2bem",
       "evidence": "tested"
     },
@@ -1849,38 +2153,47 @@
       "mne_cpp": "mne_setup_forward_model (CLI)",
       "python": "mne.make_bem_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fwd_bem_driver_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.02"
     },
     {
       "source": "parity",
       "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
       "python": "mne.make_field_map",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_field_map",
-      "evidence": "cross-validated-live"
+      "evidence": "cross-validated-live",
+      "tolerance": "1e-20 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
       "python": "mne.make_fixed_length_epochs",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_epochs",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffEvents::make_fixed_length",
       "python": "mne.make_fixed_length_events",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "ComputeFwd (partial)",
       "python": "mne.make_forward_dipole",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_tool_forward_generation",
       "evidence": "tested"
     },
@@ -1889,54 +2202,67 @@
       "mne_cpp": "mne_forward_solution (CLI) / ComputeFwd",
       "python": "mne.make_forward_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fwd_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_make_sphere_bem (CLI)",
       "python": "mne.make_sphere_model",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fwd_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffEvents::merge",
       "python": "mne.merge_events",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "MinimumNorm",
       "python": "mne.minimum_norm.apply_inverse",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_eloreta_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.0001"
     },
     {
       "source": "parity",
       "mne_cpp": "INVLIB::applyInverseEpochs",
       "python": "mne.minimum_norm.apply_inverse_epochs",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_eloreta_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.0001"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_compute_raw_inverse (CLI)",
       "python": "mne.minimum_norm.apply_inverse_raw",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_eloreta_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.0001"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEInverseOperator rank",
       "python": "mne.minimum_norm.compute_rank_inverse",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_inverse_operator",
       "evidence": "tested"
     },
@@ -1945,6 +2271,7 @@
       "mne_cpp": "INVLIB::computeSourcePsd",
       "python": "mne.minimum_norm.compute_source_psd",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_inv_convenience",
       "evidence": "tested"
     },
@@ -1953,14 +2280,17 @@
       "mne_cpp": "INVLIB::estimateSnr",
       "python": "mne.minimum_norm.estimate_snr",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_eloreta_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.0001"
     },
     {
       "source": "parity",
       "mne_cpp": "INVLIB::InvResolutionMatrix::getCtf/getCtfs",
       "python": "mne.minimum_norm.get_cross_talk",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_resolution_matrix",
       "evidence": "tested"
     },
@@ -1969,6 +2299,7 @@
       "mne_cpp": "INVLIB::InvResolutionMatrix::getPsf/getPsfs",
       "python": "mne.minimum_norm.get_point_spread",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_resolution_matrix",
       "evidence": "tested"
     },
@@ -1977,22 +2308,27 @@
       "mne_cpp": "MNEInverseOperator",
       "python": "mne.minimum_norm.make_inverse_operator",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_eloreta_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.0001"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEInverseOperator::prepare",
       "python": "mne.minimum_norm.prepare_inverse_operator",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_eloreta_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.0001"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEInverseOperator::read",
       "python": "mne.minimum_norm.read_inverse_operator",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_inverse_operator",
       "evidence": "tested"
     },
@@ -2001,14 +2337,17 @@
       "mne_cpp": "INVLIB::InvResolutionMatrix::peakLocalisationError/spatialSpread",
       "python": "mne.minimum_norm.resolution_metrics",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_resolution_matrix",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEInverseOperator::write",
       "python": "mne.minimum_norm.write_inverse_operator",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_inv_eloreta_python",
       "evidence": "tested"
     },
@@ -2017,6 +2356,7 @@
       "mne_cpp": "mne_morph_labels (CLI)",
       "python": "mne.morph_labels",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_surface_math",
       "evidence": "tested"
     },
@@ -2025,78 +2365,97 @@
       "mne_cpp": "FiffInfoBase::pick_channels",
       "python": "mne.pick_channels",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_info",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffCov picking",
       "python": "mne.pick_channels_cov",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::pick_channels",
       "python": "mne.pick_channels_forward",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_inv_lcmv_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffInfoBase::pick_channels_regexp",
       "python": "mne.pick_channels_regexp",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffEvents::pick",
       "python": "mne.pick_events",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_core_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffInfo::pick_info",
       "python": "mne.pick_info",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_info",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffInfoBase::pick_types",
       "python": "mne.pick_types",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fiff_info",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::pick_types",
       "python": "mne.pick_types_forward",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::EogRegression",
       "python": "mne.preprocessing.EOGRegression",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_eog_regression",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-15 to 0.3"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax",
       "python": "mne.preprocessing.ICA",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_ica",
       "evidence": "tested"
     },
@@ -2105,30 +2464,37 @@
       "mne_cpp": "UTILSLIB::annotateAmplitude",
       "python": "mne.preprocessing.annotate_amplitude",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_annotate_artifact",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-14 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::annotateMusclZscore",
       "python": "mne.preprocessing.annotate_muscle_zscore",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_annotate_artifact",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-14 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::SurfaceLaplacian::compute",
       "python": "mne.preprocessing.compute_current_source_density",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_surface_laplacian",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "SSS basis (DSPLIB)",
       "python": "mne.preprocessing.compute_maxwell_basis",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_sss",
       "evidence": "tested"
     },
@@ -2137,38 +2503,47 @@
       "mne_cpp": "ArtifactDetect::computeProjEcg",
       "python": "mne.preprocessing.compute_proj_ecg",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "ArtifactDetect::computeProjEog",
       "python": "mne.preprocessing.compute_proj_eog",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "detectEcg, EpochExtractor::extract",
       "python": "mne.preprocessing.create_ecg_epochs",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "detectEog, EpochExtractor::extract",
       "python": "mne.preprocessing.create_eog_epochs",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "BadChannelsLof (skigen LOF)",
       "python": "mne.preprocessing.find_bad_channels_lof",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_bad_channels_lof",
       "evidence": "tested"
     },
@@ -2177,6 +2552,7 @@
       "mne_cpp": "UTILSLIB::findBadChannelsMaxwell",
       "python": "mne.preprocessing.find_bad_channels_maxwell",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_bad_channels_maxwell",
       "evidence": "tested"
     },
@@ -2185,38 +2561,47 @@
       "mne_cpp": "ArtifactDetect::detectEcg",
       "python": "mne.preprocessing.find_ecg_events",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "ArtifactDetect::detectEog",
       "python": "mne.preprocessing.find_eog_events",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "detectEcg",
       "python": "mne.preprocessing.ica_find_ecg_events",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "detectEog",
       "python": "mne.preprocessing.ica_find_eog_events",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "Infomax ICA (DSPLIB)",
       "python": "mne.preprocessing.infomax",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_dsp_ica",
       "evidence": "tested"
     },
@@ -2225,6 +2610,7 @@
       "mne_cpp": "SSS/tSSS (DSPLIB)",
       "python": "mne.preprocessing.maxwell_filter",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_sss",
       "evidence": "tested"
     },
@@ -2233,14 +2619,17 @@
       "mne_cpp": "UTILSLIB::peakFinderMne",
       "python": "mne.preprocessing.peak_finder",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_artifact_detect",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::EogRegression::fitApply",
       "python": "mne.preprocessing.regress_artifact",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_eog_regression",
       "evidence": "tested"
     },
@@ -2249,6 +2638,7 @@
       "mne_cpp": "UTILSLIB::FineCalibration::write",
       "python": "mne.preprocessing.write_fine_calibration",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fine_calibration",
       "evidence": "tested"
     },
@@ -2257,6 +2647,7 @@
       "mne_cpp": "FiffAnnotations",
       "python": "mne.read_annotations",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_annotations",
       "evidence": "tested"
     },
@@ -2265,6 +2656,7 @@
       "mne_cpp": "FWDLIB BEM",
       "python": "mne.read_bem_solution",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fwd_bem_driver_python",
       "evidence": "tested"
     },
@@ -2273,22 +2665,27 @@
       "mne_cpp": "mne_list_bem (CLI) / FWDLIB",
       "python": "mne.read_bem_surfaces",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_source_space_ops_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffCov::FiffCov(io)",
       "python": "mne.read_cov",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_cov_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-09"
     },
     {
       "source": "parity",
       "mne_cpp": "InvEcdSet::read_dipoles_dip",
       "python": "mne.read_dipole",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_inv_dipole_rap_mne",
       "evidence": "tested"
     },
@@ -2297,6 +2694,7 @@
       "mne_cpp": "FiffEpochs / MNEEpochDataList",
       "python": "mne.read_epochs",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_epochs",
       "evidence": "tested"
     },
@@ -2305,6 +2703,7 @@
       "mne_cpp": "FiffEvents::read, read_from_fif, read_from_ascii",
       "python": "mne.read_events",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_data_types",
       "evidence": "tested"
     },
@@ -2313,22 +2712,27 @@
       "mne_cpp": "FiffEvoked::read",
       "python": "mne.read_evokeds",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_evoked_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEForwardSolution::read",
       "python": "mne.read_forward_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "FsAtlasLookup::initLookupTable",
       "python": "mne.read_freesurfer_lut",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fs_atlas_lookup",
       "evidence": "tested"
     },
@@ -2337,38 +2741,47 @@
       "mne_cpp": "Label::read (FSLIB)",
       "python": "mne.read_label",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_label_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_annot2labels (CLI) / FSLIB",
       "python": "mne.read_labels_from_annot",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fs_annotation_labels",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_make_morph_maps (CLI)",
       "python": "mne.read_morph_map",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_source_space_ops_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffProj::read",
       "python": "mne.read_proj",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_stream_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "InvSourceEstimate::read, read_w",
       "python": "mne.read_source_estimate",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_source_estimate_io",
       "evidence": "tested"
     },
@@ -2377,14 +2790,17 @@
       "mne_cpp": "MNESourceSpace::read",
       "python": "mne.read_source_spaces",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_source_space_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "FiffCoordTransSet::readMniTransform",
       "python": "mne.read_talxfm",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_core_python",
       "evidence": "tested"
     },
@@ -2393,14 +2809,17 @@
       "mne_cpp": "FiffCoordTrans::read",
       "python": "mne.read_trans",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_fs_library",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.5"
     },
     {
       "source": "parity",
       "mne_cpp": "readTriFile (CLI)",
       "python": "mne.read_tri",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_conversion_functions",
       "evidence": "tested"
     },
@@ -2409,6 +2828,7 @@
       "mne_cpp": "SelectionIO::readMNESelFile",
       "python": "mne.read_vectorview_selection",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_utils_layout_selection",
       "evidence": "tested"
     },
@@ -2417,6 +2837,7 @@
       "mne_cpp": "mne_rename_channels (CLI)",
       "python": "mne.rename_channels",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_preproc_helpers",
       "evidence": "tested"
     },
@@ -2425,6 +2846,7 @@
       "mne_cpp": "mne_sensitivity_map (CLI)",
       "python": "mne.sensitivity_map",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_tool_data_pipeline",
       "evidence": "tested"
     },
@@ -2433,22 +2855,27 @@
       "mne_cpp": "UTILSLIB::setBipolarReference",
       "python": "mne.set_bipolar_reference",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_eeg_reference",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::setEegReference",
       "python": "mne.set_eeg_reference",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_eeg_reference",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "exact"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_make_source_space (CLI)",
       "python": "mne.setup_source_space",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_forward_generation",
       "evidence": "tested"
     },
@@ -2457,22 +2884,27 @@
       "mne_cpp": "mne_volume_source_space (CLI)",
       "python": "mne.setup_volume_source_space",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_source_space_ops_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::simulateEvoked",
       "python": "mne.simulation.simulate_evoked",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_simulate",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-15 to 1e-10"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::simulateStc",
       "python": "mne.simulation.simulate_sparse_stc",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_simulate",
       "evidence": "tested"
     },
@@ -2481,30 +2913,26 @@
       "mne_cpp": "UTILSLIB::simulateStcFromWaveforms",
       "python": "mne.simulation.simulate_stc",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_simulate",
       "evidence": "tested"
-    },
-    {
-      "source": "parity",
-      "mne_cpp": "MNESurfaceOrVolume::use_itris",
-      "python": "mne.source_space.get_decimated_surfaces",
-      "claimed": "partial",
-      "test": null,
-      "evidence": "unverified"
     },
     {
       "source": "parity",
       "mne_cpp": "MNESourceSpace::read",
       "python": "mne.source_space.read_source_spaces",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_source_space_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "mne_make_source_space (CLI)",
       "python": "mne.source_space.setup_source_space",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_tool_forward_generation",
       "evidence": "tested"
     },
@@ -2513,14 +2941,17 @@
       "mne_cpp": "mne_volume_source_space (CLI)",
       "python": "mne.source_space.setup_volume_source_space",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_source_space_ops_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "MNESourceSpace::write",
       "python": "mne.source_space.write_source_spaces",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_source_data",
       "evidence": "tested"
     },
@@ -2529,38 +2960,47 @@
       "mne_cpp": "StatsAdjacency::fromSourceSpace",
       "python": "mne.spatial_src_adjacency",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency",
       "python": "mne.spatial_tris_adjacency",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency::fromSourceSpaceTemporal",
       "python": "mne.spatio_temporal_src_adjacency",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsAdjacency",
       "python": "mne.spatio_temporal_tris_adjacency",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "FSLIB (partial)",
       "python": "mne.split_label",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fs_annotation_labels",
       "evidence": "tested"
     },
@@ -2569,94 +3009,117 @@
       "mne_cpp": "STSLIB::StatsMcCorrection::bonferroni",
       "python": "mne.stats.bonferroni_correction",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "STSLIB::StatsAdjacency::combine",
       "python": "mne.stats.combine_adjacency",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster f-test",
       "python": "mne.stats.f_oneway",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
       "python": "mne.stats.fdr_correction",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster::oneSamplePermutationTest",
       "python": "mne.stats.permutation_cluster_1samp_test",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster::fTestPermutationTest",
       "python": "mne.stats.permutation_cluster_test",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "STSLIB::StatsTtest::permutation",
       "python": "mne.stats.permutation_t_test",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster",
       "python": "mne.stats.spatio_temporal_cluster_1samp_test",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster",
       "python": "mne.stats.spatio_temporal_cluster_test",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster",
       "python": "mne.stats.ttest_1samp_no_p",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "StatsCluster t-test",
       "python": "mne.stats.ttest_ind_no_p",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_sts_cluster",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.05"
     },
     {
       "source": "parity",
       "mne_cpp": "IeegSurfaceMap::weights",
       "python": "mne.stc_near_sensors",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_ieeg",
       "evidence": "tested"
     },
@@ -2665,6 +3128,7 @@
       "mne_cpp": "FsLabelUtils::stcToLabel",
       "python": "mne.stc_to_label",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_label_utils",
       "evidence": "tested"
     },
@@ -2673,6 +3137,7 @@
       "mne_cpp": "MorletTfrResult, MultitaperTfrResult",
       "python": "mne.time_frequency.AverageTFR",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_morlet_tfr",
       "evidence": "tested"
     },
@@ -2681,6 +3146,7 @@
       "mne_cpp": "MorletTfrResult",
       "python": "mne.time_frequency.AverageTFRArray",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_morlet_tfr",
       "evidence": "tested"
     },
@@ -2689,6 +3155,7 @@
       "mne_cpp": "MultitaperTfrResult",
       "python": "mne.time_frequency.BaseTFR",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_multitaper",
       "evidence": "tested"
     },
@@ -2697,6 +3164,7 @@
       "mne_cpp": "UTILSLIB::CsdResult",
       "python": "mne.time_frequency.CrossSpectralDensity",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_csd",
       "evidence": "tested"
     },
@@ -2705,6 +3173,7 @@
       "mne_cpp": "MorletTfr::computeMultiChannel",
       "python": "mne.time_frequency.RawTFR",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_morlet_tfr",
       "evidence": "tested"
     },
@@ -2713,6 +3182,7 @@
       "mne_cpp": "MorletTfrResult",
       "python": "mne.time_frequency.RawTFRArray",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_morlet_tfr",
       "evidence": "tested"
     },
@@ -2721,6 +3191,7 @@
       "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
       "python": "mne.time_frequency.Spectrum",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_welch_psd",
       "evidence": "tested"
     },
@@ -2729,6 +3200,7 @@
       "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
       "python": "mne.time_frequency.SpectrumArray",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_welch_psd",
       "evidence": "tested"
     },
@@ -2737,86 +3209,107 @@
       "mne_cpp": "Csd::computeFourier",
       "python": "mne.time_frequency.csd_array_fourier",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_csd",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "Csd::computeMorlet",
       "python": "mne.time_frequency.csd_array_morlet",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_csd",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "Csd::computeMultitaper",
       "python": "mne.time_frequency.csd_array_multitaper",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_csd",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "Csd::computeFourier",
       "python": "mne.time_frequency.csd_fourier",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_csd",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "Csd::computeMorlet",
       "python": "mne.time_frequency.csd_morlet",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_csd",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "Csd::computeMultitaper",
       "python": "mne.time_frequency.csd_multitaper",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_csd",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::Dpss::compute",
       "python": "mne.time_frequency.dpss_windows",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_dsp_multitaper",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "MorletTfr::buildWavelet",
       "python": "mne.time_frequency.morlet",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_morlet_tfr",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.1"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::MultitaperPsd::compute",
       "python": "mne.time_frequency.psd_array_multitaper",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_multitaper",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::WelchPsd::compute",
       "python": "mne.time_frequency.psd_array_welch",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_welch_psd",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.1"
     },
     {
       "source": "parity",
       "mne_cpp": "Spectrogram::makeSpectrogram",
       "python": "mne.time_frequency.stft",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_spectrogram",
       "evidence": "tested"
     },
@@ -2825,46 +3318,57 @@
       "mne_cpp": "MATHLIB::Spectral::calculateFFTFreqs",
       "python": "mne.time_frequency.stftfreq",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_utils_spectral",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.01"
     },
     {
       "source": "parity",
       "mne_cpp": "MorletTfr::computeMultiChannel",
       "python": "mne.time_frequency.tfr_array_morlet",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_morlet_tfr",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.1"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
       "python": "mne.time_frequency.tfr_array_multitaper",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_multitaper",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "MorletTfr::compute",
       "python": "mne.time_frequency.tfr_morlet",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_morlet_tfr",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-10 to 0.1"
     },
     {
       "source": "parity",
       "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
       "python": "mne.time_frequency.tfr_multitaper",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_dsp_multitaper",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06"
     },
     {
       "source": "parity",
       "mne_cpp": "MNELIB::MNEBem::transform",
       "python": "mne.transform_surface_to",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_data_types",
       "evidence": "tested"
     },
@@ -2873,6 +3377,7 @@
       "mne_cpp": "FwdCoilSet::read_coil_defs",
       "python": "mne.use_coil_def",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fwd_bem_field_computation",
       "evidence": "tested"
     },
@@ -2881,6 +3386,7 @@
       "mne_cpp": "FiffCoordTransSet::headToMni",
       "python": "mne.vertex_to_mni",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_fiff_core_python",
       "evidence": "tested"
     },
@@ -2889,6 +3395,7 @@
       "mne_cpp": "INVLIB::computeWhitener",
       "python": "mne.whiten_evoked",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_inv_convenience",
       "evidence": "tested"
     },
@@ -2897,14 +3404,17 @@
       "mne_cpp": "FwdBemModel::fwd_bem_save_model",
       "python": "mne.write_bem_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fwd_bem_driver_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-06 to 0.02"
     },
     {
       "source": "parity",
       "mne_cpp": "MNELIB::MNEBem::write",
       "python": "mne.write_bem_surfaces",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_data_types",
       "evidence": "tested"
     },
@@ -2913,6 +3423,7 @@
       "mne_cpp": "FiffCov::write",
       "python": "mne.write_cov",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_cov",
       "evidence": "tested"
     },
@@ -2921,6 +3432,7 @@
       "mne_cpp": "FiffEvents::write_to_fif, write_to_ascii",
       "python": "mne.write_events",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_core_python",
       "evidence": "tested"
     },
@@ -2929,6 +3441,7 @@
       "mne_cpp": "FiffEvoked::write",
       "python": "mne.write_evokeds",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_fiff_io_evoked_info",
       "evidence": "tested"
     },
@@ -2937,14 +3450,17 @@
       "mne_cpp": "MNEForwardSolution::write",
       "python": "mne.write_forward_solution",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_mne_forward_ops",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-12 to 0.001"
     },
     {
       "source": "parity",
       "mne_cpp": "MNEBem::write, --id 4",
       "python": "mne.write_head_bem",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_surf2bem",
       "evidence": "tested"
     },
@@ -2953,6 +3469,7 @@
       "mne_cpp": "writeLabel",
       "python": "mne.write_label",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_tool_data_pipeline",
       "evidence": "tested"
     },
@@ -2961,14 +3478,17 @@
       "mne_cpp": "FiffProj::write",
       "python": "mne.write_proj",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_stream_python",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 1e-05"
     },
     {
       "source": "parity",
       "mne_cpp": "MNESourceSpace::write",
       "python": "mne.write_source_spaces",
       "claimed": "implemented",
+      "equivalence": null,
       "test": "test_mne_source_data",
       "evidence": "tested"
     },
@@ -2977,6 +3497,7 @@
       "mne_cpp": "mne_flash_bem, mne_setup_forward_model (tool-private FreeSurfer writers)",
       "python": "mne.write_surface",
       "claimed": "partial",
+      "equivalence": null,
       "test": "test_mne_flash_bem",
       "evidence": "tested"
     },
@@ -2985,8 +3506,10 @@
       "mne_cpp": "FiffCoordTrans::write",
       "python": "mne.write_trans",
       "claimed": "implemented",
+      "equivalence": "equivalent",
       "test": "test_fiff_coord_trans",
-      "evidence": "cross-validated-static"
+      "evidence": "cross-validated-static",
+      "tolerance": "1e-07 to 1e-06"
     }
   ]
 }

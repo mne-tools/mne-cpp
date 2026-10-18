@@ -15,7 +15,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 
 enable_testing()
 mne_add_test(${PROJECT_NAME}
-    LABELS integration gui
+    LABELS integration gui parity
     TIMEOUT 120
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample

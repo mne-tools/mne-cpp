@@ -8,32 +8,32 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **195**
-- Partial: **97**
-- Missing: **143**
+- Implemented: **195**, of which **113** cross-validated against embedded MNE-Python values (`equivalent`/`exceeds`)
+- Partial: **95**
+- Missing: **145**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **56.0%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **55.7%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
 ## Per-domain status
 
-| Domain | Implemented | Partial | Missing | N/A | Total |
-|---|---:|---:|---:|---:|---:|
-| I/O & Readers | 18 | 2 | 39 | 0 | 59 |
-| Core Data Containers | 39 | 15 | 4 | 3 | 61 |
-| Preprocessing & Artifacts | 16 | 9 | 17 | 1 | 43 |
-| Channels & Montages | 15 | 10 | 16 | 1 | 42 |
-| Epochs & Evoked | 13 | 2 | 1 | 0 | 16 |
-| Covariance & Whitening | 6 | 1 | 0 | 0 | 7 |
-| Forward Modelling | 25 | 9 | 1 | 0 | 35 |
-| Inverse & Source Estimation | 31 | 14 | 15 | 0 | 60 |
-| Source Space & Morphing | 15 | 5 | 7 | 0 | 27 |
-| Time-Frequency | 2 | 22 | 17 | 0 | 41 |
-| Decoding & Machine Learning | 4 | 5 | 13 | 2 | 24 |
-| Statistics | 11 | 0 | 6 | 0 | 17 |
-| Simulation | 0 | 3 | 7 | 0 | 10 |
-| Visualisation | 0 | 0 | 0 | 1 | 1 |
+| Domain | Implemented | of which equivalent | Partial | Missing | N/A | Total |
+|---|---:|---:|---:|---:|---:|---:|
+| I/O & Readers | 18 | 7 | 2 | 39 | 0 | 59 |
+| Core Data Containers | 39 | 24 | 15 | 4 | 3 | 61 |
+| Preprocessing & Artifacts | 16 | 8 | 9 | 17 | 1 | 43 |
+| Channels & Montages | 15 | 8 | 10 | 16 | 1 | 42 |
+| Epochs & Evoked | 13 | 10 | 2 | 1 | 0 | 16 |
+| Covariance & Whitening | 6 | 2 | 1 | 0 | 0 | 7 |
+| Forward Modelling | 25 | 17 | 9 | 1 | 0 | 35 |
+| Inverse & Source Estimation | 31 | 19 | 14 | 15 | 0 | 60 |
+| Source Space & Morphing | 15 | 5 | 4 | 8 | 0 | 27 |
+| Time-Frequency | 2 | 2 | 22 | 17 | 0 | 41 |
+| Decoding & Machine Learning | 4 | 0 | 4 | 14 | 2 | 24 |
+| Statistics | 11 | 11 | 0 | 6 | 0 | 17 |
+| Simulation | 0 | 0 | 3 | 7 | 0 | 10 |
+| Visualisation | 0 | 0 | 0 | 0 | 1 | 1 |
 
 ## Gaps (missing / partial), grouped by domain
 
@@ -240,7 +240,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.compute_source_morph` | partial | INVLIB::SourceMorph::compute, MNEMorphMap::compute | nearest-neighbour surface only; no smoothing/volume |
 | `mne.decimate_surface` | partial | MNEBemSurface::makeScalpSurfaces | MNEBemSurface input only; vertex (not triangle) target |
 | `mne.get_head_surf` | partial | MNEBem(QIODevice&) | readable via MNEBem; no subject/path lookup |
-| `mne.source_space.get_decimated_surfaces` | partial | MNESurfaceOrVolume::use_itris | use_itris stored; no extraction helper |
 | `mne.write_surface` | partial | mne_flash_bem, mne_setup_forward_model (tool-private FreeSurfer writers) | tool-private FreeSurfer writers; no FsSurface write |
 | `mne.add_source_space_distances` | missing | — | geodesic src distances not ported |
 | `mne.dig_mri_distances` | missing | — | dig<->MRI distance QA not ported |
@@ -249,6 +248,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.read_source_morph` | missing | — | no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libraries/mne/mne_morph_map.h:120) |
 | `mne.source_space.add_source_space_distances` | missing | — | geodesic src distances not ported |
 | `mne.source_space.compute_distance_to_sensors` | missing | — | src-sensor distance not ported |
+| `mne.source_space.get_decimated_surfaces` | missing | — | MNESourceSpace stores use_itris; no helper extracts the decimated surfaces |
 
 ### Time-Frequency
 
@@ -299,7 +299,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Python API | Status | MNE-CPP | Notes |
 |---|---|---|---|
 | `mne.decoding.FilterEstimator` | partial | FirFilter::filterData | filters exist; no transformer wrapper |
-| `mne.decoding.Scaler` | partial | StandardScaler | generic external scaler; no per-channel-type scalings |
 | `mne.decoding.SpatialFilter` | partial | DecodingCsp::filters/patterns | no shared base class; each decoder has its own filters/patterns |
 | `mne.decoding.TemporalFilter` | partial | FirFilter::filterData | no transformer wrapper |
 | `mne.decoding.TimeFrequency` | partial | MorletTfr::computeMultiChannel | no transformer; power only |
@@ -308,6 +307,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.decoding.LinearModel` | missing | — | no coef→patterns (Haufe) wrapper |
 | `mne.decoding.PSDEstimator` | missing | — | no transformer wrapper |
 | `mne.decoding.ReceptiveField` | missing | — | encoding/decoding TRF |
+| `mne.decoding.Scaler` | missing | — | no scaler in MNE-CPP; skigen::StandardScaler (external) covers the generic case |
 | `mne.decoding.SlidingEstimator` | missing | — | time-resolved decoding wrapper |
 | `mne.decoding.TimeDelayingRidge` | missing | — | time-delaying ridge (TRF) not ported |
 | `mne.decoding.UnsupervisedSpatialFilter` | missing | — | sklearn PCA/ICA wrapper |

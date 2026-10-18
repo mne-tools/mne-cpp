@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 395709,
+  "scanned_lines": 395741,
   "oversized_threshold": 2000,
   "metrics": {
     "null_macro": {
@@ -403,12 +403,12 @@
       }
     },
     "console_io": {
-      "total": 349,
-      "files": 51,
+      "total": 341,
+      "files": 50,
       "by_scope": {
         "applications": 7,
         "libraries": 52,
-        "tools": 290
+        "tools": 282
       },
       "suppressed": [],
       "top": {
@@ -424,9 +424,9 @@
         "src/tools/inverse/mne_volume_data2mri/main.cpp": 9,
         "src/tools/conversion/mne_convert_surface/main.cpp": 8,
         "src/tools/conversion/mne_epochs2mat/main.cpp": 8,
-        "src/tools/conversion/mne_eximia2fiff/main.cpp": 8,
         "src/tools/forward/mne_surf2bem/surfacechecks.cpp": 8,
-        "src/tools/info/mne_check_eeg_locations/main.cpp": 8
+        "src/tools/info/mne_check_eeg_locations/main.cpp": 8,
+        "src/tools/info/mne_list_bem/main.cpp": 8
       },
       "all_files": {
         "src/applications/mne_analyze/plugins/view3d/view3d.cpp": 1,
@@ -452,7 +452,6 @@
         "src/tools/conversion/mne_convert_surface/main.cpp": 8,
         "src/tools/conversion/mne_ctf_dig2fiff/main.cpp": 3,
         "src/tools/conversion/mne_epochs2mat/main.cpp": 8,
-        "src/tools/conversion/mne_eximia2fiff/main.cpp": 8,
         "src/tools/conversion/mne_make_cor_set/main.cpp": 6,
         "src/tools/conversion/mne_tufts2fiff/main.cpp": 5,
         "src/tools/forward/mne_fit_sphere_to_surf/main.cpp": 6,

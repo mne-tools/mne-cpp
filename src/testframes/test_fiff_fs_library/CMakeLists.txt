@@ -17,7 +17,7 @@ qt_add_executable(test_fiff_fs_library test_fiff_fs_library.cpp)
 # Register with CTest
 enable_testing()
 mne_add_test(${PROJECT_NAME}
-    LABELS integration
+    LABELS integration parity
     TIMEOUT 60
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample

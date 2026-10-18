@@ -206,6 +206,19 @@ def registry_class_python_map(registry: Dict[str, Any]) -> Dict[str, str]:
     return mapping
 
 
+def registry_equivalence(registry: Dict[str, Any]) -> Dict[str, str]:
+    """Python symbol -> 'equivalent'/'exceeds' for every claim the registry backs with cross-validation."""
+    out: Dict[str, str] = {}
+    for cls in registry.get("classes", []):
+        for key in ("mne_python", "python_equiv"):
+            if cls.get(key) and cls.get("equivalence"):
+                out.setdefault(cls[key].strip(), cls["equivalence"])
+    for rec in registry.get("parity", {}).get("records", []):
+        if rec.get("python") and rec.get("equivalence"):
+            out[rec["python"].strip()] = rec["equivalence"]
+    return out
+
+
 def registry_parity_records(registry: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
     """The hand-curated parity verdicts, keyed by fully-qualified Python name."""
     out: Dict[str, Dict[str, str]] = {}
@@ -304,6 +317,7 @@ def classify(
     inventory: List[Dict[str, Any]],
     class_map: Dict[str, str],
     parity: Dict[str, Dict[str, str]],
+    equivalence: Optional[Dict[str, str]] = None,
 ) -> Tuple[List[Dict[str, Any]], List[str]]:
     """Assign each Python API a status from the registry data.
 
@@ -351,6 +365,7 @@ def classify(
         rec_out["mne_cpp"] = mne_cpp
         rec_out["note"] = note
         rec_out["evidence"] = evidence
+        rec_out["equivalence"] = (equivalence or {}).get(py, "") if status == STATUS_IMPLEMENTED else ""
         records.append(rec_out)
     return records, unclassified
 
@@ -375,6 +390,8 @@ def summarise(records: List[Dict[str, Any]]) -> Dict[str, Any]:
         by_status[r["status"]] += 1
         by_domain.setdefault(r["domain"], {s: 0 for s in STATUS_ORDER})
         by_domain[r["domain"]][r["status"]] += 1
+        if r.get("equivalence"):
+            by_domain[r["domain"]]["equivalent"] = by_domain[r["domain"]].get("equivalent", 0) + 1
 
     considered = (
         by_status[STATUS_IMPLEMENTED]
@@ -391,6 +408,7 @@ def summarise(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     return {
         "total": len(records),
         "by_status": by_status,
+        "equivalent": sum(1 for r in records if r.get("equivalence")),
         "by_domain": by_domain,
         "denominator_excludes_not_applicable": considered,
         "parity_percent": round(parity_pct, 1),
@@ -456,7 +474,8 @@ def render_markdown(report: Dict[str, Any]) -> str:
     a("")
     bs = summ["by_status"]
     a(f"- **Total public MNE-Python APIs inventoried:** {summ['total']}")
-    a(f"- Implemented: **{bs['implemented']}**")
+    a(f"- Implemented: **{bs['implemented']}**, of which **{summ['equivalent']}** cross-validated "
+      "against embedded MNE-Python values (`equivalent`/`exceeds`)")
     a(f"- Partial: **{bs['partial']}**")
     a(f"- Missing: **{bs['missing']}**")
     a(f"- Not-applicable: **{bs['not-applicable']}**")
@@ -470,16 +489,16 @@ def render_markdown(report: Dict[str, Any]) -> str:
     a("")
     a("## Per-domain status")
     a("")
-    a("| Domain | Implemented | Partial | Missing | N/A | Total |")
-    a("|---|---:|---:|---:|---:|---:|")
+    a("| Domain | Implemented | of which equivalent | Partial | Missing | N/A | Total |")
+    a("|---|---:|---:|---:|---:|---:|---:|")
     for dom, label in DOMAINS.items():
         counts = summ["by_domain"].get(dom)
         if not counts:
             continue
-        tot = sum(counts.values())
+        tot = sum(counts[s] for s in STATUS_ORDER)
         if tot == 0:
             continue
-        a(f"| {label} | {counts['implemented']} | {counts['partial']} | "
+        a(f"| {label} | {counts['implemented']} | {counts.get('equivalent', 0)} | {counts['partial']} | "
           f"{counts['missing']} | {counts['not-applicable']} | {tot} |")
     a("")
     a("## Gaps (missing / partial), grouped by domain")
@@ -582,7 +601,7 @@ def generate() -> Tuple[Dict[str, Any], str, List[str], List[str]]:
 
     import mne
 
-    records, unclassified = classify(inventory, class_map, parity)
+    records, unclassified = classify(inventory, class_map, parity, registry_equivalence(registry))
     stale = stale_parity_records(inventory, parity)
     summary = summarise(records)
     report = build_report(records, summary, mne.__version__, pinned)

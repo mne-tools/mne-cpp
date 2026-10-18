@@ -94,7 +94,7 @@
       "c_style_cast": 402,
       "raw_new": 168,
       "raw_delete": 275,
-      "console_io": 349,
+      "console_io": 341,
       "numeric_define": 847,
       "qt_new_unparented": 811,
       "oversized_unit": 8
@@ -102,20 +102,29 @@
     "G6_parity": {
       "reference": "1.11.0",
       "unpinned_ci_packages": [],
+      "lock_file": "tools/parity/reference_lock.json",
+      "lock_mismatch": [],
       "inventoried_apis": 443,
       "by_status": {
         "implemented": 195,
-        "partial": 97,
-        "missing": 143,
+        "partial": 95,
+        "missing": 145,
         "not-applicable": 8
       },
-      "claims": 358,
+      "claims": 356,
       "claims_by_evidence": {
-        "cross-validated-static": 168,
+        "cross-validated-static": 170,
         "cross-validated-live": 4,
         "tested": 182,
-        "unverified": 4
-      }
+        "unverified": 0
+      },
+      "claims_by_status": {
+        "equivalent": 137,
+        "exceeds": 0,
+        "implemented": 124,
+        "partial": 95
+      },
+      "equivalence_without_static_evidence": []
     }
   }
 }

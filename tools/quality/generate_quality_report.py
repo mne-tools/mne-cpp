@@ -153,10 +153,14 @@ def build_dashboard(sections: dict[str, dict[str, Any]]) -> dict[str, Any]:
         "G6_parity": {
             "reference": parity["reference_environment"]["registry_mne_python_ref"],
             "unpinned_ci_packages": parity["reference_environment"]["ci_unpinned_packages"],
+            "lock_file": parity["reference_environment"]["lock_file"],
+            "lock_mismatch": parity["reference_environment"]["lock_mismatch"],
             "inventoried_apis": gap["summary"]["total"],
             "by_status": gap["summary"]["by_status"],
             "claims": parity["summary"]["claims"],
             "claims_by_evidence": parity["summary"]["by_evidence"],
+            "claims_by_status": parity["summary"]["by_claim"],
+            "equivalence_without_static_evidence": parity["summary"]["equivalence_without_static_evidence"],
         },
     }
     return {
@@ -210,10 +214,16 @@ def render_dashboard(report: dict[str, Any]) -> str:
         ("G5", "Zero compiler warnings", "enforced by -Werror on every matrix entry", status(True)),
         ("G5", "Debt metrics ratcheted", ", ".join(f"{k} {v:,}" for k, v in g5.items() if k != "compiler_warnings"),
          "baseline recorded"),
-        ("G6", "Pinned reference environment", f"MNE-Python {g6['reference']}; unpinned in CI: "
-         + (", ".join(g6["unpinned_ci_packages"]) or "none"), status(not g6["unpinned_ci_packages"])),
-        ("G6", "Parity claims cross-validated", ", ".join(f"{k} {v}" for k, v in g6["claims_by_evidence"].items()),
-         status(g6["claims_by_evidence"]["unverified"] == 0 and g6["claims_by_evidence"]["tested"] == 0)),
+        ("G6", "Pinned reference environment", f"MNE-Python {g6['reference']}; lock `{g6['lock_file']}`; "
+         + ("; ".join(g6["lock_mismatch"] + g6["unpinned_ci_packages"]) or "CI installs exactly the lock"),
+         status(bool(g6["lock_file"]) and not g6["lock_mismatch"] and not g6["unpinned_ci_packages"])),
+        ("G6", "Equivalent/exceeds claims are cross-validated",
+         ", ".join(f"{k} {v}" for k, v in g6["claims_by_status"].items())
+         + f"; {len(g6['equivalence_without_static_evidence'])} without embedded MNE-Python values",
+         status(not g6["equivalence_without_static_evidence"])),
+        ("G6", "Every claim has evidence, none compares live",
+         ", ".join(f"{k} {v}" for k, v in g6["claims_by_evidence"].items()),
+         status(g6["claims_by_evidence"]["unverified"] == 0 and g6["claims_by_evidence"]["cross-validated-live"] == 0)),
     ]
     lines = [
         "# MNE-CPP v2.4.0 quality baseline",

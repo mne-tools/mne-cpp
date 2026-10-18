@@ -10,28 +10,32 @@
     "total": 443,
     "by_status": {
       "implemented": 195,
-      "partial": 97,
-      "missing": 143,
+      "partial": 95,
+      "missing": 145,
       "not-applicable": 8
     },
+    "equivalent": 113,
     "by_domain": {
       "io": {
         "implemented": 18,
         "partial": 2,
         "missing": 39,
-        "not-applicable": 0
+        "not-applicable": 0,
+        "equivalent": 7
       },
       "core": {
         "implemented": 39,
         "partial": 15,
         "missing": 4,
-        "not-applicable": 3
+        "not-applicable": 3,
+        "equivalent": 24
       },
       "preprocessing": {
         "implemented": 16,
         "partial": 9,
         "missing": 17,
-        "not-applicable": 1
+        "not-applicable": 1,
+        "equivalent": 8
       },
       "filter": {
         "implemented": 0,
@@ -43,43 +47,50 @@
         "implemented": 15,
         "partial": 10,
         "missing": 16,
-        "not-applicable": 1
+        "not-applicable": 1,
+        "equivalent": 8
       },
       "epochs": {
         "implemented": 13,
         "partial": 2,
         "missing": 1,
-        "not-applicable": 0
+        "not-applicable": 0,
+        "equivalent": 10
       },
       "cov": {
         "implemented": 6,
         "partial": 1,
         "missing": 0,
-        "not-applicable": 0
+        "not-applicable": 0,
+        "equivalent": 2
       },
       "forward": {
         "implemented": 25,
         "partial": 9,
         "missing": 1,
-        "not-applicable": 0
+        "not-applicable": 0,
+        "equivalent": 17
       },
       "inverse": {
         "implemented": 31,
         "partial": 14,
         "missing": 15,
-        "not-applicable": 0
+        "not-applicable": 0,
+        "equivalent": 19
       },
       "source_space": {
         "implemented": 15,
-        "partial": 5,
-        "missing": 7,
-        "not-applicable": 0
+        "partial": 4,
+        "missing": 8,
+        "not-applicable": 0,
+        "equivalent": 5
       },
       "time_frequency": {
         "implemented": 2,
         "partial": 22,
         "missing": 17,
-        "not-applicable": 0
+        "not-applicable": 0,
+        "equivalent": 2
       },
       "connectivity": {
         "implemented": 0,
@@ -89,15 +100,16 @@
       },
       "decoding": {
         "implemented": 4,
-        "partial": 5,
-        "missing": 13,
+        "partial": 4,
+        "missing": 14,
         "not-applicable": 2
       },
       "stats": {
         "implemented": 11,
         "partial": 0,
         "missing": 6,
-        "not-applicable": 0
+        "not-applicable": 0,
+        "equivalent": 11
       },
       "simulation": {
         "implemented": 0,
@@ -119,7 +131,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 56.0
+    "parity_percent": 55.7
   },
   "apis": [
     {
@@ -131,7 +143,8 @@
       "status": "implemented",
       "mne_cpp": "FiffRawData concatenation",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.BaseRaw",
@@ -142,7 +155,8 @@
       "status": "implemented",
       "mne_cpp": "FiffRawData (BaseRaw)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.Raw",
@@ -153,7 +167,8 @@
       "status": "implemented",
       "mne_cpp": "FiffRawData",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.io.RawArray",
@@ -164,7 +179,8 @@
       "status": "implemented",
       "mne_cpp": "FiffRawData (constructed directly)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.anonymize_info",
@@ -175,7 +191,8 @@
       "status": "implemented",
       "mne_cpp": "FiffAnonymizer (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.concatenate_raws",
@@ -186,7 +203,8 @@
       "status": "implemented",
       "mne_cpp": "FiffRawData concatenation",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_fiducials",
@@ -197,7 +215,8 @@
       "status": "implemented",
       "mne_cpp": "FiffDigPointSet(QIODevice&), FiffDigitizerData",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_info",
@@ -208,7 +227,8 @@
       "status": "implemented",
       "mne_cpp": "FiffInfo::read",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.io.read_raw_bdf",
@@ -219,7 +239,8 @@
       "status": "implemented",
       "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
       "note": "24-bit BDF samples",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.io.read_raw_brainvision",
@@ -230,7 +251,8 @@
       "status": "implemented",
       "mne_cpp": "BIDSLIB::BrainVisionReader / mne_brain_vision2fiff (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.io.read_raw_ctf",
@@ -241,7 +263,8 @@
       "status": "implemented",
       "mne_cpp": "mne_ctf2fiff (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_edf",
@@ -252,7 +275,8 @@
       "status": "implemented",
       "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.io.read_raw_eximia",
@@ -263,7 +287,8 @@
       "status": "implemented",
       "mne_cpp": "mne_eximia2fiff (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.io.read_raw_fif",
@@ -274,7 +299,8 @@
       "status": "implemented",
       "mne_cpp": "FiffRawData",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.io.read_raw_kit",
@@ -285,7 +311,8 @@
       "status": "implemented",
       "mne_cpp": "mne_kit2fiff (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.show_fiff",
@@ -296,7 +323,8 @@
       "status": "implemented",
       "mne_cpp": "mne_show_fiff (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.write_fiducials",
@@ -307,7 +335,8 @@
       "status": "implemented",
       "mne_cpp": "FiffDigPointSet::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.write_info",
@@ -318,7 +347,8 @@
       "status": "implemented",
       "mne_cpp": "FiffInfo::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.get_channel_type_constants",
@@ -329,7 +359,8 @@
       "status": "partial",
       "mne_cpp": "FIFFV_MEG_CH",
       "note": "macros only; no name→constants map",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw",
@@ -340,7 +371,8 @@
       "status": "partial",
       "mne_cpp": "BidsRawData::createReader",
       "note": "dispatch for BrainVision/EDF/BDF only",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.export.export_epochs",
@@ -351,7 +383,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "only mne_epochs2mat (.mat output)",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.export.export_evokeds",
@@ -362,7 +395,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.export.export_evokeds_mff",
@@ -373,7 +407,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EGI-MFF evoked export not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.export.export_raw",
@@ -384,7 +419,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no EDF/BrainVision/EEGLAB writer",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.match_channel_orders",
@@ -395,7 +431,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_epochs_eeglab",
@@ -406,7 +443,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EEGLAB epochs reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_epochs_fieldtrip",
@@ -417,7 +455,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FieldTrip epochs reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_epochs_kit",
@@ -428,7 +467,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "KIT epochs reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_evoked_besa",
@@ -439,7 +479,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "BESA evoked reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_evoked_fieldtrip",
@@ -450,7 +491,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FieldTrip evoked reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_evokeds_mff",
@@ -461,7 +503,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EGI-MFF evoked reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_ant",
@@ -472,7 +515,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "ANT Neuro reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_artemis123",
@@ -483,7 +527,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Artemis123 reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_boxy",
@@ -494,7 +539,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "BOXY fNIRS reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_bti",
@@ -505,7 +551,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "BTi/4D reader not ported (mne_insert_4D_comp exists)",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_cnt",
@@ -516,7 +563,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Neuroscan CNT reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_curry",
@@ -527,7 +575,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Curry reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_eeglab",
@@ -538,7 +587,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EEGLAB .set reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_egi",
@@ -549,7 +599,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EGI-MFF reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_eyelink",
@@ -560,7 +611,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EyeLink eye-tracking reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_fieldtrip",
@@ -571,7 +623,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FieldTrip reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_fil",
@@ -582,7 +635,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FIL OPM reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_gdf",
@@ -593,7 +647,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "GDF reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_hitachi",
@@ -604,7 +659,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Hitachi fNIRS reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_nedf",
@@ -615,7 +671,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "NEDF reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_neuralynx",
@@ -626,7 +683,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Neuralynx reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_nicolet",
@@ -637,7 +695,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Nicolet reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_nihon",
@@ -648,7 +707,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Nihon Kohden reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_nirx",
@@ -659,7 +719,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "NIRx fNIRS reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_nsx",
@@ -670,7 +731,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Blackrock NSx reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_persyst",
@@ -681,7 +743,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Persyst reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.io.read_raw_snirf",
@@ -692,7 +755,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "SNIRF fNIRS reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.match_channel_orders",
@@ -703,7 +767,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_epochs_eeglab",
@@ -714,7 +779,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EEGLAB epochs reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_epochs_fieldtrip",
@@ -725,7 +791,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FieldTrip epochs reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_epochs_kit",
@@ -736,7 +803,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "KIT epochs reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_evoked_besa",
@@ -747,7 +815,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "BESA evoked reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_evoked_fieldtrip",
@@ -758,7 +827,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FieldTrip evoked reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_evokeds_mff",
@@ -769,7 +839,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EGI-MFF evoked reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.Annotations",
@@ -780,7 +851,8 @@
       "status": "implemented",
       "mne_cpp": "FiffAnnotations",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.Evoked",
@@ -791,7 +863,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvoked",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.EvokedArray",
@@ -802,7 +875,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvoked (constructed directly)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.Info",
@@ -813,7 +887,8 @@
       "status": "implemented",
       "mne_cpp": "FiffInfo",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.Label",
@@ -824,7 +899,8 @@
       "status": "implemented",
       "mne_cpp": "Label (FSLIB)",
       "note": "cortical ROI",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.Projection",
@@ -835,7 +911,8 @@
       "status": "implemented",
       "mne_cpp": "FiffProj",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.Transform",
@@ -846,7 +923,8 @@
       "status": "implemented",
       "mne_cpp": "FiffCoordTrans",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.add_reference_channels",
@@ -857,7 +935,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::addReferenceChannels",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.annotations_from_events",
@@ -868,7 +947,8 @@
       "status": "implemented",
       "mne_cpp": "FiffAnnotationEventUtils",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channel_indices_by_type",
@@ -879,7 +959,8 @@
       "status": "implemented",
       "mne_cpp": "FiffInfoBase::channel_indices_by_type",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.channel_type",
@@ -890,7 +971,8 @@
       "status": "implemented",
       "mne_cpp": "FiffInfoBase::channel_type",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.combine_evoked",
@@ -901,7 +983,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvoked::combine",
       "note": "weights=\"nave\", \"equal\" or explicit weights; nave rounded to an integer as written to FIFF.",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.compute_proj_epochs",
@@ -912,7 +995,8 @@
       "status": "implemented",
       "mne_cpp": "FiffProj::compute_from_raw",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.compute_proj_evoked",
@@ -923,7 +1007,8 @@
       "status": "implemented",
       "mne_cpp": "FiffProj::compute_from_evoked",
       "note": "meg='separate' only; explained_var is not stored.",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.count_annotations",
@@ -934,7 +1019,8 @@
       "status": "implemented",
       "mne_cpp": "FiffAnnotations",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.create_info",
@@ -945,7 +1031,8 @@
       "status": "implemented",
       "mne_cpp": "FiffInfo (constructed directly)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.events_from_annotations",
@@ -956,7 +1043,8 @@
       "status": "implemented",
       "mne_cpp": "FiffAnnotationEventUtils",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.morph_labels",
@@ -967,7 +1055,8 @@
       "status": "implemented",
       "mne_cpp": "mne_morph_labels (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.pick_channels",
@@ -978,7 +1067,8 @@
       "status": "implemented",
       "mne_cpp": "FiffInfoBase::pick_channels",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.pick_channels_cov",
@@ -989,7 +1079,8 @@
       "status": "implemented",
       "mne_cpp": "FiffCov picking",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.pick_channels_forward",
@@ -1000,7 +1091,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::pick_channels",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.pick_channels_regexp",
@@ -1011,7 +1103,8 @@
       "status": "implemented",
       "mne_cpp": "FiffInfoBase::pick_channels_regexp",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.pick_info",
@@ -1022,7 +1115,8 @@
       "status": "implemented",
       "mne_cpp": "FiffInfo::pick_info",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.pick_types_forward",
@@ -1033,7 +1127,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::pick_types",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_annotations",
@@ -1044,7 +1139,8 @@
       "status": "implemented",
       "mne_cpp": "FiffAnnotations",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_evokeds",
@@ -1055,7 +1151,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvoked::read",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_label",
@@ -1066,7 +1163,8 @@
       "status": "implemented",
       "mne_cpp": "Label::read (FSLIB)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_labels_from_annot",
@@ -1077,7 +1175,8 @@
       "status": "implemented",
       "mne_cpp": "mne_annot2labels (CLI) / FSLIB",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_morph_map",
@@ -1088,7 +1187,8 @@
       "status": "implemented",
       "mne_cpp": "mne_make_morph_maps (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_proj",
@@ -1099,7 +1199,8 @@
       "status": "implemented",
       "mne_cpp": "FiffProj::read",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_talxfm",
@@ -1110,7 +1211,8 @@
       "status": "implemented",
       "mne_cpp": "FiffCoordTransSet::readMniTransform",
       "note": "Talairach xfm limited",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_trans",
@@ -1121,7 +1223,8 @@
       "status": "implemented",
       "mne_cpp": "FiffCoordTrans::read",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.set_bipolar_reference",
@@ -1132,7 +1235,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::setBipolarReference",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.set_eeg_reference",
@@ -1143,7 +1247,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::setEegReference",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stc_to_label",
@@ -1154,7 +1259,8 @@
       "status": "implemented",
       "mne_cpp": "FsLabelUtils::stcToLabel",
       "note": "stc->label limited",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.transform_surface_to",
@@ -1165,7 +1271,8 @@
       "status": "implemented",
       "mne_cpp": "MNELIB::MNEBem::transform",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.write_evokeds",
@@ -1176,7 +1283,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvoked::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.write_proj",
@@ -1187,7 +1295,8 @@
       "status": "implemented",
       "mne_cpp": "FiffProj::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.write_trans",
@@ -1198,7 +1307,8 @@
       "status": "implemented",
       "mne_cpp": "FiffCoordTrans::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.compute_proj_raw",
@@ -1209,7 +1319,8 @@
       "status": "partial",
       "mne_cpp": "FIFFLIB::FiffProj::compute_from_raw",
       "note": "event-locked epochs only; no continuous segmenting",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.compute_rank",
@@ -1220,7 +1331,8 @@
       "status": "partial",
       "mne_cpp": "MATHLIB::Linalg::rank",
       "note": "matrix rank; no per-type/info/SSP handling",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.get_volume_labels_from_aseg",
@@ -1231,7 +1343,8 @@
       "status": "partial",
       "mne_cpp": "FSLIB::FsAtlasLookup::load",
       "note": "loads aseg; no listing of present labels",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.grand_average",
@@ -1242,7 +1355,8 @@
       "status": "partial",
       "mne_cpp": "FiffEvokedSet::computeGrandAverage",
       "note": "Evoked only, drop_bads=True path; interpolate_bads and AverageTFR/Spectrum inputs are not supported.",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.grow_labels",
@@ -1253,7 +1367,8 @@
       "status": "partial",
       "mne_cpp": "FsLabelUtils::growCircularLabel",
       "note": "one seed set per call; no overlap=False or colors",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.head_to_mni",
@@ -1264,7 +1379,8 @@
       "status": "partial",
       "mne_cpp": "FSLIB (partial)",
       "note": "MNI transform limited",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.head_to_mri",
@@ -1275,7 +1391,8 @@
       "status": "partial",
       "mne_cpp": "FiffCoordTrans::apply_inverse_trans (head -> MRI) x 1000",
       "note": "kind='mri' only; kind='ras' and unscale are not ported.",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.label_sign_flip",
@@ -1286,7 +1403,8 @@
       "status": "partial",
       "mne_cpp": "InvLabelTimeCourse::computeSignFlip",
       "note": "signs from data SVD, not source normals",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.labels_to_stc",
@@ -1297,7 +1415,8 @@
       "status": "partial",
       "mne_cpp": "FsLabelUtils::labelsToStc",
       "note": "binary mask only; no per-label values",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.pick_types",
@@ -1308,7 +1427,8 @@
       "status": "partial",
       "mne_cpp": "FiffInfoBase::pick_types",
       "note": "only meg/eeg/stim flags; no eog/ecg/seeg…",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_freesurfer_lut",
@@ -1319,7 +1439,8 @@
       "status": "partial",
       "mne_cpp": "FsAtlasLookup::initLookupTable",
       "note": "hard-coded subset; no LUT file parser",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.sensitivity_map",
@@ -1330,7 +1451,8 @@
       "status": "partial",
       "mne_cpp": "mne_sensitivity_map (CLI)",
       "note": "only norm/svd modes",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.split_label",
@@ -1341,7 +1463,8 @@
       "status": "partial",
       "mne_cpp": "FSLIB (partial)",
       "note": "split limited",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.vertex_to_mni",
@@ -1352,7 +1475,8 @@
       "status": "partial",
       "mne_cpp": "FiffCoordTransSet::headToMni",
       "note": "head points only; no vertex/surface-RAS input",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.write_label",
@@ -1363,7 +1487,8 @@
       "status": "partial",
       "mne_cpp": "writeLabel",
       "note": "tool-private writer; FsLabel has no write",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.BiHemiLabel",
@@ -1374,7 +1499,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FsLabel is deliberately single-hemisphere (src/libraries/fs/fs_label.h:170)",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.random_parcellation",
@@ -1385,7 +1511,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "random parcellation not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_lta",
@@ -1396,7 +1523,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "FreeSurfer LTA transform reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.write_labels_to_annot",
@@ -1407,7 +1535,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no .annot writer",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.parse_config",
@@ -1418,7 +1547,8 @@
       "status": "not-applicable",
       "mne_cpp": "",
       "note": "MNE-C .cfg parser; Python helper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_reject_parameters",
@@ -1429,7 +1559,8 @@
       "status": "not-applicable",
       "mne_cpp": "",
       "note": "MNE-C reject-param parser",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.what",
@@ -1440,7 +1571,8 @@
       "status": "not-applicable",
       "mne_cpp": "",
       "note": "Python file-type guesser",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.Xdawn",
@@ -1451,7 +1583,8 @@
       "status": "implemented",
       "mne_cpp": "Xdawn",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.annotate_amplitude",
@@ -1462,7 +1595,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::annotateAmplitude",
       "note": "scalar thresholds for all data channels; BAD_ACQ_SKIP spans not skipped; a channel bad for both reasons listed once",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.preprocessing.annotate_muscle_zscore",
@@ -1473,7 +1607,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::annotateMusclZscore",
       "note": "automatic channel-type choice only",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.preprocessing.compute_bridged_electrodes",
@@ -1484,7 +1619,8 @@
       "status": "implemented",
       "mne_cpp": "BridgedElectrodes",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.compute_current_source_density",
@@ -1495,7 +1631,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::SurfaceLaplacian::compute",
       "note": "data matrix plus positions; no Info conversion",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.preprocessing.compute_maxwell_basis",
@@ -1506,7 +1643,8 @@
       "status": "implemented",
       "mne_cpp": "SSS basis (DSPLIB)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.compute_proj_ecg",
@@ -1517,7 +1655,8 @@
       "status": "implemented",
       "mne_cpp": "ArtifactDetect::computeProjEcg",
       "note": "average=True, meg='separate', FIR filter; raw_event, avg_ref and IIR options are not ported.",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.preprocessing.compute_proj_eog",
@@ -1528,7 +1667,8 @@
       "status": "implemented",
       "mne_cpp": "ArtifactDetect::computeProjEog",
       "note": "average=True, meg='separate', FIR filter; raw_event, avg_ref and IIR options are not ported.",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.preprocessing.find_bad_channels_lof",
@@ -1539,7 +1679,8 @@
       "status": "implemented",
       "mne_cpp": "BadChannelsLof (skigen LOF)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.find_ecg_events",
@@ -1550,7 +1691,8 @@
       "status": "implemented",
       "mne_cpp": "ArtifactDetect::detectEcg",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.preprocessing.find_eog_events",
@@ -1561,7 +1703,8 @@
       "status": "implemented",
       "mne_cpp": "ArtifactDetect::detectEog",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.preprocessing.fix_stim_artifact",
@@ -1572,7 +1715,8 @@
       "status": "implemented",
       "mne_cpp": "StimArtifact",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.infomax",
@@ -1583,7 +1727,8 @@
       "status": "implemented",
       "mne_cpp": "Infomax ICA (DSPLIB)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.peak_finder",
@@ -1594,7 +1739,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::peakFinderMne",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.preprocessing.read_fine_calibration",
@@ -1605,7 +1751,8 @@
       "status": "implemented",
       "mne_cpp": "FineCalibration",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.write_fine_calibration",
@@ -1616,7 +1763,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::FineCalibration::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.EOGRegression",
@@ -1627,7 +1775,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::EogRegression",
       "note": "matrix input; no Epochs/Evoked, picks argument, proj handling or saving",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.ICA",
@@ -1638,7 +1787,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::ICA::run/excludeComponents, ExtendedInfomax",
       "note": "stateless functions; no info-aware object or save",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.create_ecg_epochs",
@@ -1649,7 +1799,8 @@
       "status": "partial",
       "mne_cpp": "detectEcg, EpochExtractor::extract",
       "note": "no combined detect+epoch helper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.create_eog_epochs",
@@ -1660,7 +1811,8 @@
       "status": "partial",
       "mne_cpp": "detectEog, EpochExtractor::extract",
       "note": "no combined detect+epoch helper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.find_bad_channels_maxwell",
@@ -1671,7 +1823,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::findBadChannelsMaxwell",
       "note": "robust z-score of the whole-recording SSS residual, not mne's chunk-wise limit/min_count; no flat channels",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.ica_find_ecg_events",
@@ -1682,7 +1835,8 @@
       "status": "partial",
       "mne_cpp": "detectEcg",
       "note": "needs a FiffInfo ECG channel; no ICA-source input",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.ica_find_eog_events",
@@ -1693,7 +1847,8 @@
       "status": "partial",
       "mne_cpp": "detectEog",
       "note": "needs a FiffInfo EOG channel; no ICA-source input",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.maxwell_filter",
@@ -1704,7 +1859,8 @@
       "status": "partial",
       "mne_cpp": "SSS/tSSS (DSPLIB)",
       "note": "no movement compensation",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.regress_artifact",
@@ -1715,7 +1871,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::EogRegression::fitApply",
       "note": "matrix input; no betas input or output",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.annotate_break",
@@ -1726,7 +1883,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "break annotation not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.annotate_movement",
@@ -1737,7 +1895,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "movement annotation not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.annotate_nan",
@@ -1748,7 +1907,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "NaN annotation not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.apply_pca_obs",
@@ -1759,7 +1919,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "PCA-OBS cardiac removal not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.compute_average_dev_head_t",
@@ -1770,7 +1931,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "average device->head transform not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.compute_fine_calibration",
@@ -1781,7 +1943,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "fine calibration not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.compute_proj_hfc",
@@ -1792,7 +1955,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "homogeneous field correction not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.corrmap",
@@ -1803,7 +1967,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "ICA corrmap not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.cortical_signal_suppression",
@@ -1814,7 +1979,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "CSS not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.equalize_bads",
@@ -1825,7 +1991,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.interpolate_bridged_electrodes",
@@ -1836,7 +2003,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "bridged electrode repair not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.maxwell_filter_prepare_emptyroom",
@@ -1847,7 +2015,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "empty-room Maxwell prep not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.oversampled_temporal_projection",
@@ -1858,7 +2027,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "OTP not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.read_eog_regression",
@@ -1869,7 +2039,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EOG regression I/O not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.read_ica",
@@ -1880,7 +2051,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "ICA solution I/O not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.read_ica_eeglab",
@@ -1891,7 +2063,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EEGLAB ICA reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.realign_raw",
@@ -1902,7 +2075,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "raw realignment not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.preprocessing.get_score_funcs",
@@ -1913,7 +2087,8 @@
       "status": "not-applicable",
       "mne_cpp": "",
       "note": "sklearn score-func registry; Python helper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.Layout",
@@ -1924,7 +2099,8 @@
       "status": "implemented",
       "mne_cpp": "MNELIB::MNELayout",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.fix_mag_coil_types",
@@ -1935,7 +2111,8 @@
       "status": "implemented",
       "mne_cpp": "processFile (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.make_eeg_layout",
@@ -1946,7 +2123,8 @@
       "status": "implemented",
       "mne_cpp": "LayoutMaker::makeLayout (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.read_dig_captrak",
@@ -1957,7 +2135,8 @@
       "status": "implemented",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readCaptrak",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.channels.read_dig_dat",
@@ -1968,7 +2147,8 @@
       "status": "implemented",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readNeuroscanDat",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.channels.read_dig_egi",
@@ -1979,7 +2159,8 @@
       "status": "implemented",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readEgi",
       "note": "positions in metres; mne.channels.read_dig_egi keeps the file's centimetres",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.channels.read_dig_fif",
@@ -1990,7 +2171,8 @@
       "status": "implemented",
       "mne_cpp": "FIFFLIB dig I/O",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.channels.read_dig_hpts",
@@ -2001,7 +2183,8 @@
       "status": "implemented",
       "mne_cpp": "readHpts (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.read_dig_localite",
@@ -2012,7 +2195,8 @@
       "status": "implemented",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readLocalite",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.channels.read_dig_polhemus_isotrak",
@@ -2023,7 +2207,8 @@
       "status": "implemented",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusIsotrak",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.channels.read_layout",
@@ -2034,7 +2219,8 @@
       "status": "implemented",
       "mne_cpp": "DISPLIB layout I/O",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.read_polhemus_fastscan",
@@ -2045,7 +2231,8 @@
       "status": "implemented",
       "mne_cpp": "FIFFLIB::FiffDigPointSet::readPolhemusFastscan",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.channels.rename_channels",
@@ -2056,7 +2243,8 @@
       "status": "implemented",
       "mne_cpp": "mne_rename_channels (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.transform_to_head",
@@ -2067,7 +2255,8 @@
       "status": "implemented",
       "mne_cpp": "FiffDigPointSet::transformToHead",
       "note": "Fiducials must be present (no sphere-projected fallback).",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.rename_channels",
@@ -2078,7 +2267,8 @@
       "status": "implemented",
       "mne_cpp": "mne_rename_channels (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.DigMontage",
@@ -2089,7 +2279,8 @@
       "status": "partial",
       "mne_cpp": "FIFFLIB::FiffDigPointSet",
       "note": "no channel-name→position montage API",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.combine_channels",
@@ -2100,7 +2291,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::ChannelDerivation::apply",
       "note": "weighted sums only; no median/std",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.compute_dev_head_t",
@@ -2111,7 +2303,8 @@
       "status": "partial",
       "mne_cpp": "MNELIB::fitMatchedPoints",
       "note": "rigid point fit; no montage-HPI extraction",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.find_ch_adjacency",
@@ -2122,7 +2315,8 @@
       "status": "partial",
       "mne_cpp": "STSLIB::StatsAdjacency::fromChannelPositions",
       "note": "distance threshold (3x median nearest neighbour), not mne's Delaunay or system templates",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.generate_2d_layout",
@@ -2133,7 +2327,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::LayoutMaker::makeLayout",
       "note": "projects 3-D points; no direct 2-D input",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.make_dig_montage",
@@ -2144,7 +2339,8 @@
       "status": "partial",
       "mne_cpp": "FiffDigPointSet(QList<FiffDigPoint>)",
       "note": "no name→position mapping",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.make_standard_montage",
@@ -2155,7 +2351,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::StandardMontage::getMontage",
       "note": "standard_1005 (and its 10-20/10-10 subsets) from mne's bundled table; the other kinds (biosemi, easycap, GSN-HydroCel, ...) and fiducials are not bundled",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.read_custom_montage",
@@ -2166,7 +2363,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::LayoutLoader::readAsaElcFile",
       "note": ".elc only; no .sfp/.loc/.bvef",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.read_vectorview_selection",
@@ -2177,7 +2375,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::SelectionIO::readMNESelFile",
       "note": "reads .sel; no name filter or space fixing",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_vectorview_selection",
@@ -2188,7 +2387,8 @@
       "status": "partial",
       "mne_cpp": "SelectionIO::readMNESelFile",
       "note": "reads .sel; no name filter or space fixing",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.compute_native_head_t",
@@ -2199,7 +2399,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "native->head transform not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.equalize_channels",
@@ -2210,7 +2411,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.find_layout",
@@ -2221,7 +2423,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no automatic layout selection",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.get_builtin_ch_adjacencies",
@@ -2232,7 +2435,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "builtin adjacency database not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.get_builtin_montages",
@@ -2243,7 +2447,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "builtin montage database not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.make_1020_channel_selections",
@@ -2254,7 +2459,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "10-20 channel selection groups not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.make_grid_layout",
@@ -2265,7 +2471,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.read_ch_adjacency",
@@ -2276,7 +2483,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no reader for FieldTrip neighbour templates",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.read_dig_curry",
@@ -2287,7 +2495,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Curry dig reader not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.channels.unify_bad_channels",
@@ -2298,7 +2507,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.equalize_channels",
@@ -2309,7 +2519,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.find_layout",
@@ -2320,7 +2531,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.scale_bem",
@@ -2331,7 +2543,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "BEM scaling not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.scale_labels",
@@ -2342,7 +2555,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "label scaling not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.scale_mri",
@@ -2353,7 +2567,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "MRI scaling coregistration not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.scale_source_space",
@@ -2364,7 +2579,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "source space scaling not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.create_default_subject",
@@ -2375,7 +2591,8 @@
       "status": "not-applicable",
       "mne_cpp": "",
       "note": "fsaverage setup; FreeSurfer helper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.Epochs",
@@ -2386,7 +2603,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEpochs",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.concatenate_epochs",
@@ -2397,7 +2615,8 @@
       "status": "implemented",
       "mne_cpp": "FIFFLIB::FiffEpochs::concatenateEpochs",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.concatenate_events",
@@ -2408,7 +2627,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvents::concatenate",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.count_events",
@@ -2419,7 +2639,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvents::count",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.find_events",
@@ -2430,7 +2651,8 @@
       "status": "implemented",
       "mne_cpp": "RTPROCESSINGLIB event detection",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.find_stim_steps",
@@ -2441,7 +2663,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvents::find_stim_steps",
       "note": "takes the stimulus channel data instead of a Raw object",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.make_fixed_length_epochs",
@@ -2452,7 +2675,8 @@
       "status": "implemented",
       "mne_cpp": "FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
       "note": "matrix input; no reject_by_annotation",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.make_fixed_length_events",
@@ -2463,7 +2687,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvents::make_fixed_length",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.merge_events",
@@ -2474,7 +2699,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvents::merge",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.pick_events",
@@ -2485,7 +2711,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvents::pick",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_epochs",
@@ -2496,7 +2723,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEpochs / MNEEpochDataList",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_events",
@@ -2507,7 +2735,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvents::read, read_from_fif, read_from_ascii",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.write_events",
@@ -2518,7 +2747,8 @@
       "status": "implemented",
       "mne_cpp": "FiffEvents::write_to_fif, write_to_ascii",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.BaseEpochs",
@@ -2529,7 +2759,8 @@
       "status": "partial",
       "mne_cpp": "MNELIB::MNEEpochDataList",
       "note": "no crop/resample/save/metadata",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.EpochsArray",
@@ -2540,7 +2771,8 @@
       "status": "partial",
       "mne_cpp": "MNELIB::MNEEpochData, FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
       "note": "no info/events-bearing array constructor",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.AcqParserFIF",
@@ -2551,7 +2783,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Elekta acquisition-parameter parser not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.Covariance",
@@ -2562,7 +2795,8 @@
       "status": "implemented",
       "mne_cpp": "FiffCov",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.compute_covariance",
@@ -2573,7 +2807,8 @@
       "status": "implemented",
       "mne_cpp": "StsCovEstimators / RtCov",
       "note": "epochs covariance",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.compute_raw_covariance",
@@ -2584,7 +2819,8 @@
       "status": "implemented",
       "mne_cpp": "StsCovEstimators",
       "note": "raw covariance",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.make_ad_hoc_cov",
@@ -2595,7 +2831,8 @@
       "status": "implemented",
       "mne_cpp": "FiffCov (ad-hoc)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_cov",
@@ -2606,7 +2843,8 @@
       "status": "implemented",
       "mne_cpp": "FiffCov::FiffCov(io)",
       "note": "FIFF covariance I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.write_cov",
@@ -2617,7 +2855,8 @@
       "status": "implemented",
       "mne_cpp": "FiffCov::write",
       "note": "FIFF covariance I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.whiten_evoked",
@@ -2628,7 +2867,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::computeWhitener",
       "note": "builds whitener; not applied to evoked",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.Forward",
@@ -2639,7 +2879,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.apply_forward",
@@ -2650,7 +2891,8 @@
       "status": "implemented",
       "mne_cpp": "INVLIB::applyForward",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.average_forward_solutions",
@@ -2661,7 +2903,8 @@
       "status": "implemented",
       "mne_cpp": "mne_average_forward_solutions (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.convert_forward_solution",
@@ -2672,7 +2915,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution",
       "note": "fixed/free orientation",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.forward.Forward",
@@ -2683,7 +2927,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.forward.apply_forward",
@@ -2694,7 +2939,8 @@
       "status": "implemented",
       "mne_cpp": "INVLIB::applyForward",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.forward.average_forward_solutions",
@@ -2705,7 +2951,8 @@
       "status": "implemented",
       "mne_cpp": "mne_average_forward_solutions (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.forward.compute_depth_prior",
@@ -2716,7 +2963,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::compute_depth_prior",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.forward.compute_orient_prior",
@@ -2727,7 +2975,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::compute_orient_prior",
       "note": "a Cartesian forward with loose < 1 falls back to loose 1 and a fixed-orientation forward ignores loose (mne-python raises)",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.forward.convert_forward_solution",
@@ -2738,7 +2987,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.forward.is_fixed_orient",
@@ -2749,7 +2999,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::isFixedOrient",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.forward.make_forward_solution",
@@ -2760,7 +3011,8 @@
       "status": "implemented",
       "mne_cpp": "ComputeFwd",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.forward.read_forward_solution",
@@ -2771,7 +3023,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::read",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.forward.write_forward_solution",
@@ -2782,7 +3035,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.make_bem_model",
@@ -2793,7 +3047,8 @@
       "status": "implemented",
       "mne_cpp": "mne_surf2bem (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.make_bem_solution",
@@ -2804,7 +3059,8 @@
       "status": "implemented",
       "mne_cpp": "mne_setup_forward_model (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.make_forward_solution",
@@ -2815,7 +3071,8 @@
       "status": "implemented",
       "mne_cpp": "mne_forward_solution (CLI) / ComputeFwd",
       "note": "forward pipeline",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.make_sphere_model",
@@ -2826,7 +3083,8 @@
       "status": "implemented",
       "mne_cpp": "mne_make_sphere_bem (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_bem_solution",
@@ -2837,7 +3095,8 @@
       "status": "implemented",
       "mne_cpp": "FWDLIB BEM",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_bem_surfaces",
@@ -2848,7 +3107,8 @@
       "status": "implemented",
       "mne_cpp": "mne_list_bem (CLI) / FWDLIB",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_forward_solution",
@@ -2859,7 +3119,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::read",
       "note": "FIFF forward I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.write_bem_solution",
@@ -2870,7 +3131,8 @@
       "status": "implemented",
       "mne_cpp": "FwdBemModel::fwd_bem_save_model",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.write_bem_surfaces",
@@ -2881,7 +3143,8 @@
       "status": "implemented",
       "mne_cpp": "MNELIB::MNEBem::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.write_forward_solution",
@@ -2892,7 +3155,8 @@
       "status": "implemented",
       "mne_cpp": "MNEForwardSolution::write",
       "note": "FIFF forward I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.write_head_bem",
@@ -2903,7 +3167,8 @@
       "status": "implemented",
       "mne_cpp": "MNEBem::write, --id 4",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.apply_forward_raw",
@@ -2914,7 +3179,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::applyForward",
       "note": "returns evoked-shaped data, no Raw object",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.forward.apply_forward_raw",
@@ -2925,7 +3191,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::applyForward",
       "note": "returns evoked-shaped data, no Raw object",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.forward.make_field_map",
@@ -2936,7 +3203,8 @@
       "status": "partial",
       "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
       "note": "mapping matrices; no evoked/trans/subject wrapper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.forward.make_forward_dipole",
@@ -2947,7 +3215,8 @@
       "status": "partial",
       "mne_cpp": "ComputeFwd (partial)",
       "note": "dipole forward limited",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.forward.restrict_forward_to_label",
@@ -2958,7 +3227,8 @@
       "status": "partial",
       "mne_cpp": "MNEForwardSolution (partial)",
       "note": "label restriction limited",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.forward.use_coil_def",
@@ -2969,7 +3239,8 @@
       "status": "partial",
       "mne_cpp": "FwdCoilSet::read_coil_defs",
       "note": "custom coil file readable; ComputeFwd path hard-coded",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.make_field_map",
@@ -2980,7 +3251,8 @@
       "status": "partial",
       "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
       "note": "mapping matrices; no evoked/trans/subject wrapper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.make_forward_dipole",
@@ -2991,7 +3263,8 @@
       "status": "partial",
       "mne_cpp": "ComputeFwd (partial)",
       "note": "dipole forward limited",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.use_coil_def",
@@ -3002,7 +3275,8 @@
       "status": "partial",
       "mne_cpp": "FwdCoilSet::read_coil_defs",
       "note": "reader exists; ComputeFwd path hard-coded",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.forward.restrict_forward_to_stc",
@@ -3013,7 +3287,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "stc restriction not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.Dipole",
@@ -3024,7 +3299,8 @@
       "status": "implemented",
       "mne_cpp": "ECD (INVERSELIB)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.SourceEstimate",
@@ -3035,7 +3311,8 @@
       "status": "implemented",
       "mne_cpp": "InvSourceEstimate",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.VectorSourceEstimate",
@@ -3046,7 +3323,8 @@
       "status": "implemented",
       "mne_cpp": "InvVectorSourceEstimate",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.beamformer.apply_dics",
@@ -3057,7 +3335,8 @@
       "status": "implemented",
       "mne_cpp": "InvDICS::applyDICS",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.beamformer.apply_dics_csd",
@@ -3068,7 +3347,8 @@
       "status": "implemented",
       "mne_cpp": "InvDICS::applyDICSCsd",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.beamformer.apply_dics_epochs",
@@ -3079,7 +3359,8 @@
       "status": "implemented",
       "mne_cpp": "InvDICS::applyDICSEpochs",
       "note": "epochs DICS",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.beamformer.apply_lcmv",
@@ -3090,7 +3371,8 @@
       "status": "implemented",
       "mne_cpp": "Lcmv",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.beamformer.apply_lcmv_epochs",
@@ -3101,7 +3383,8 @@
       "status": "implemented",
       "mne_cpp": "InvLCMV::applyLCMVEpochs",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.beamformer.apply_lcmv_raw",
@@ -3112,7 +3395,8 @@
       "status": "implemented",
       "mne_cpp": "InvLCMV::applyLCMVRaw",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.beamformer.make_dics",
@@ -3123,7 +3407,8 @@
       "status": "implemented",
       "mne_cpp": "Dics",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.beamformer.make_lcmv",
@@ -3134,7 +3419,8 @@
       "status": "implemented",
       "mne_cpp": "Lcmv",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.beamformer.make_lcmv_resolution_matrix",
@@ -3145,7 +3431,8 @@
       "status": "implemented",
       "mne_cpp": "INVLIB::InvLCMV::makeLCMVResolutionMatrix",
       "note": "builds the LCMV filter from fwd/info/cov itself",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.beamformer.rap_music",
@@ -3156,7 +3443,8 @@
       "status": "implemented",
       "mne_cpp": "InvRapMusic",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.beamformer.trap_music",
@@ -3167,7 +3455,8 @@
       "status": "implemented",
       "mne_cpp": "InvTrapMusic",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.extract_label_time_course",
@@ -3178,7 +3467,8 @@
       "status": "implemented",
       "mne_cpp": "InvLabelTimeCourse",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.fit_dipole",
@@ -3189,7 +3479,8 @@
       "status": "implemented",
       "mne_cpp": "InvDipoleFit",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.minimum_norm.InverseOperator",
@@ -3200,7 +3491,8 @@
       "status": "implemented",
       "mne_cpp": "MNEInverseOperator",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.apply_inverse",
@@ -3211,7 +3503,8 @@
       "status": "implemented",
       "mne_cpp": "MinimumNorm",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.minimum_norm.apply_inverse_epochs",
@@ -3222,7 +3515,8 @@
       "status": "implemented",
       "mne_cpp": "INVLIB::applyInverseEpochs",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.minimum_norm.apply_inverse_raw",
@@ -3233,7 +3527,8 @@
       "status": "implemented",
       "mne_cpp": "mne_compute_raw_inverse (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.minimum_norm.compute_rank_inverse",
@@ -3244,7 +3539,8 @@
       "status": "implemented",
       "mne_cpp": "MNEInverseOperator rank",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.estimate_snr",
@@ -3255,7 +3551,8 @@
       "status": "implemented",
       "mne_cpp": "INVLIB::estimateSnr",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.minimum_norm.make_inverse_operator",
@@ -3266,7 +3563,8 @@
       "status": "implemented",
       "mne_cpp": "MNEInverseOperator",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.minimum_norm.make_inverse_resolution_matrix",
@@ -3277,7 +3575,8 @@
       "status": "implemented",
       "mne_cpp": "InvResolutionMatrix",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.prepare_inverse_operator",
@@ -3288,7 +3587,8 @@
       "status": "implemented",
       "mne_cpp": "MNEInverseOperator::prepare",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.minimum_norm.read_inverse_operator",
@@ -3299,7 +3599,8 @@
       "status": "implemented",
       "mne_cpp": "MNEInverseOperator::read",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.write_inverse_operator",
@@ -3310,7 +3611,8 @@
       "status": "implemented",
       "mne_cpp": "MNEInverseOperator::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.spatial_src_adjacency",
@@ -3321,7 +3623,8 @@
       "status": "implemented",
       "mne_cpp": "StatsAdjacency::fromSourceSpace",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.spatial_tris_adjacency",
@@ -3332,7 +3635,8 @@
       "status": "implemented",
       "mne_cpp": "StatsAdjacency",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.spatio_temporal_src_adjacency",
@@ -3343,7 +3647,8 @@
       "status": "implemented",
       "mne_cpp": "StatsAdjacency::fromSourceSpaceTemporal",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.spatio_temporal_tris_adjacency",
@@ -3354,7 +3659,8 @@
       "status": "implemented",
       "mne_cpp": "StatsAdjacency",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.VolSourceEstimate",
@@ -3365,7 +3671,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::InvVolumeSourceEstimate",
       "note": "no NIfTI export",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.beamformer.Beamformer",
@@ -3376,7 +3683,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::InvBeamformer",
       "note": "no save/read",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.beamformer.apply_lcmv_cov",
@@ -3387,7 +3695,8 @@
       "status": "partial",
       "mne_cpp": "Lcmv (partial)",
       "note": "covariance source power",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.grade_to_tris",
@@ -3398,7 +3707,8 @@
       "status": "partial",
       "mne_cpp": "generateIcoVertices",
       "note": "ico vertices only (file-private); no triangles returned",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.inverse_sparse.gamma_map",
@@ -3409,7 +3719,8 @@
       "status": "partial",
       "mne_cpp": "InvGammaMap::compute",
       "note": "solver only; no evoked/forward/whitening wrapper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.inverse_sparse.mixed_norm",
@@ -3420,7 +3731,8 @@
       "status": "partial",
       "mne_cpp": "InvMxne::compute",
       "note": "IRLS solver only; no whitening/depth/debias",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.inverse_sparse.tf_mixed_norm",
@@ -3431,7 +3743,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::InvTfMxne::compute",
       "note": "dictionary of 2*nFreqs atoms at one time point, not mne's STFT Gabor frame; no whitening/depth/loose",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.compute_source_psd",
@@ -3442,7 +3755,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::computeSourcePsd",
       "note": "takes an STC; no raw→inverse→PSD pipeline",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.get_cross_talk",
@@ -3453,7 +3767,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::InvResolutionMatrix::getCtf/getCtfs",
       "note": "raw rows only; no mode/n_comp/norm summaries or STC output",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.get_point_spread",
@@ -3464,7 +3779,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::InvResolutionMatrix::getPsf/getPsfs",
       "note": "raw columns only; no mode/n_comp/norm summaries or STC output",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.resolution_metrics",
@@ -3475,7 +3791,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::InvResolutionMatrix::peakLocalisationError/spatialSpread",
       "note": "peak_err and PSF spread only; no cog_err, maxrad_ext, sum_amp, peak_amp or CTF mode",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_dipole",
@@ -3486,7 +3803,8 @@
       "status": "partial",
       "mne_cpp": "InvEcdSet::read_dipoles_dip",
       "note": ".dip only; .bdip is write-only",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_source_estimate",
@@ -3497,7 +3815,8 @@
       "status": "partial",
       "mne_cpp": "InvSourceEstimate::read, read_w",
       "note": ".stc/.w only; no .h5",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.stc_near_sensors",
@@ -3508,7 +3827,8 @@
       "status": "partial",
       "mne_cpp": "IeegSurfaceMap::weights",
       "note": "surface weights only; the caller multiplies them with the contact data",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.DipoleFixed",
@@ -3519,7 +3839,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.MixedSourceEstimate",
@@ -3530,7 +3851,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "mixed STC not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.MixedVectorSourceEstimate",
@@ -3541,7 +3863,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "mixed vector STC not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.VolVectorSourceEstimate",
@@ -3552,7 +3875,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "volume vector STC not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.beamformer.apply_dics_tfr_epochs",
@@ -3563,7 +3887,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "TFR-epochs DICS not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.beamformer.read_beamformer",
@@ -3574,7 +3899,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "InvBeamformer has no I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.inverse_sparse.make_stc_from_dipoles",
@@ -3585,7 +3911,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no dipole-list→STC conversion",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.apply_inverse_cov",
@@ -3596,7 +3923,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "covariance source power convenience",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.apply_inverse_tfr_epochs",
@@ -3607,7 +3935,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "TFR-epochs inverse convenience not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.compute_source_psd_epochs",
@@ -3618,7 +3947,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "epochs source PSD convenience",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.source_band_induced_power",
@@ -3629,7 +3959,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "banded source power convenience",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.minimum_norm.source_induced_power",
@@ -3640,7 +3971,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "source induced power convenience",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.spatial_dist_adjacency",
@@ -3651,7 +3983,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no distance-based source adjacency",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.spatial_inter_hemi_adjacency",
@@ -3662,7 +3995,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no inter-hemisphere adjacency",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.spatio_temporal_dist_adjacency",
@@ -3673,7 +4007,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no distance-based source adjacency",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.SourceMorph",
@@ -3684,7 +4019,8 @@
       "status": "implemented",
       "mne_cpp": "SourceMorph",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.SourceSpaces",
@@ -3695,7 +4031,8 @@
       "status": "implemented",
       "mne_cpp": "MNESourceSpace",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.get_meg_helmet_surf",
@@ -3706,7 +4043,8 @@
       "status": "implemented",
       "mne_cpp": "FWDLIB helmet surface",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.grade_to_vertices",
@@ -3717,7 +4055,8 @@
       "status": "implemented",
       "mne_cpp": "MNESourceSpace::gradeToVertices",
       "note": "Integer grade; grade=None and vertex lists need no computation.",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_source_spaces",
@@ -3728,7 +4067,8 @@
       "status": "implemented",
       "mne_cpp": "MNESourceSpace::read",
       "note": "FIFF source-space I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.read_surface",
@@ -3739,7 +4079,8 @@
       "status": "implemented",
       "mne_cpp": "FsSurface",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.read_tri",
@@ -3750,7 +4091,8 @@
       "status": "implemented",
       "mne_cpp": "readTriFile (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.setup_source_space",
@@ -3761,7 +4103,8 @@
       "status": "implemented",
       "mne_cpp": "mne_make_source_space (CLI)",
       "note": "surface source space",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.setup_volume_source_space",
@@ -3772,7 +4115,8 @@
       "status": "implemented",
       "mne_cpp": "mne_volume_source_space (CLI)",
       "note": "volume source space",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.source_space.SourceSpaces",
@@ -3783,7 +4127,8 @@
       "status": "implemented",
       "mne_cpp": "MNESourceSpace",
       "note": "",
-      "evidence": "registry-class"
+      "evidence": "registry-class",
+      "equivalence": ""
     },
     {
       "python": "mne.source_space.read_source_spaces",
@@ -3794,7 +4139,8 @@
       "status": "implemented",
       "mne_cpp": "MNESourceSpace::read",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.source_space.setup_source_space",
@@ -3805,7 +4151,8 @@
       "status": "implemented",
       "mne_cpp": "mne_make_source_space (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.source_space.setup_volume_source_space",
@@ -3816,7 +4163,8 @@
       "status": "implemented",
       "mne_cpp": "mne_volume_source_space (CLI)",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.source_space.write_source_spaces",
@@ -3827,7 +4175,8 @@
       "status": "implemented",
       "mne_cpp": "MNESourceSpace::write",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.write_source_spaces",
@@ -3838,7 +4187,8 @@
       "status": "implemented",
       "mne_cpp": "MNESourceSpace::write",
       "note": "FIFF source-space I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.compute_source_morph",
@@ -3849,7 +4199,8 @@
       "status": "partial",
       "mne_cpp": "INVLIB::SourceMorph::compute, MNEMorphMap::compute",
       "note": "nearest-neighbour surface only; no smoothing/volume",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decimate_surface",
@@ -3860,7 +4211,8 @@
       "status": "partial",
       "mne_cpp": "MNEBemSurface::makeScalpSurfaces",
       "note": "MNEBemSurface input only; vertex (not triangle) target",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.get_head_surf",
@@ -3871,18 +4223,8 @@
       "status": "partial",
       "mne_cpp": "MNEBem(QIODevice&)",
       "note": "readable via MNEBem; no subject/path lookup",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.source_space.get_decimated_surfaces",
-      "name": "get_decimated_surfaces",
-      "submodule": "source_space",
-      "kind": "function",
-      "domain": "source_space",
-      "status": "partial",
-      "mne_cpp": "MNESurfaceOrVolume::use_itris",
-      "note": "use_itris stored; no extraction helper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.write_surface",
@@ -3893,7 +4235,8 @@
       "status": "partial",
       "mne_cpp": "mne_flash_bem, mne_setup_forward_model (tool-private FreeSurfer writers)",
       "note": "tool-private FreeSurfer writers; no FsSurface write",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.add_source_space_distances",
@@ -3904,7 +4247,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "geodesic src distances not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.dig_mri_distances",
@@ -3915,7 +4259,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "dig<->MRI distance QA not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.get_volume_labels_from_src",
@@ -3926,7 +4271,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.morph_source_spaces",
@@ -3937,7 +4283,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.read_source_morph",
@@ -3948,7 +4295,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no .h5 morph reader (only FIF morph maps: MNEMorphMap::read src/libraries/mne/mne_morph_map.h:120)",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.source_space.add_source_space_distances",
@@ -3959,7 +4307,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "geodesic src distances not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.source_space.compute_distance_to_sensors",
@@ -3970,7 +4319,20 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "src-sensor distance not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
+    },
+    {
+      "python": "mne.source_space.get_decimated_surfaces",
+      "name": "get_decimated_surfaces",
+      "submodule": "source_space",
+      "kind": "function",
+      "domain": "source_space",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "MNESourceSpace stores use_itris; no helper extracts the decimated surfaces",
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.dpss_windows",
@@ -3981,7 +4343,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::Dpss::compute",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.time_frequency.stftfreq",
@@ -3992,7 +4355,8 @@
       "status": "implemented",
       "mne_cpp": "MATHLIB::Spectral::calculateFFTFreqs",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.time_frequency.AverageTFR",
@@ -4003,7 +4367,8 @@
       "status": "partial",
       "mne_cpp": "MorletTfrResult, MultitaperTfrResult",
       "note": "result struct only; no info/average/IO",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.AverageTFRArray",
@@ -4014,7 +4379,8 @@
       "status": "partial",
       "mne_cpp": "MorletTfrResult",
       "note": "result struct only",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.BaseTFR",
@@ -4025,7 +4391,8 @@
       "status": "partial",
       "mne_cpp": "MultitaperTfrResult",
       "note": "no common TFR base class",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.CrossSpectralDensity",
@@ -4036,7 +4403,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::CsdResult",
       "note": "no channel names/pick/IO",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.RawTFR",
@@ -4047,7 +4415,8 @@
       "status": "partial",
       "mne_cpp": "MorletTfr::computeMultiChannel",
       "note": "result struct only",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.RawTFRArray",
@@ -4058,7 +4427,8 @@
       "status": "partial",
       "mne_cpp": "MorletTfrResult",
       "note": "result struct only",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.Spectrum",
@@ -4069,7 +4439,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
       "note": "PSD and frequencies only; no Info, plotting or I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.SpectrumArray",
@@ -4080,7 +4451,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::WelchPsdResult, MultitaperPsdResult",
       "note": "PSD and frequencies only; no Info, plotting or I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.csd_array_fourier",
@@ -4091,7 +4463,8 @@
       "status": "partial",
       "mne_cpp": "Csd::computeFourier",
       "note": "2-D input; no averaging over epochs",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.csd_array_morlet",
@@ -4102,7 +4475,8 @@
       "status": "partial",
       "mne_cpp": "Csd::computeMorlet",
       "note": "2-D input; no averaging over epochs",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.csd_array_multitaper",
@@ -4113,7 +4487,8 @@
       "status": "partial",
       "mne_cpp": "Csd::computeMultitaper",
       "note": "2-D input; no averaging over epochs",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.csd_fourier",
@@ -4124,7 +4499,8 @@
       "status": "partial",
       "mne_cpp": "Csd::computeFourier",
       "note": "matrix input; no Epochs object",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.csd_morlet",
@@ -4135,7 +4511,8 @@
       "status": "partial",
       "mne_cpp": "Csd::computeMorlet",
       "note": "matrix input; no Epochs object",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.csd_multitaper",
@@ -4146,7 +4523,8 @@
       "status": "partial",
       "mne_cpp": "Csd::computeMultitaper",
       "note": "matrix input; no Epochs object",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.morlet",
@@ -4157,7 +4535,8 @@
       "status": "partial",
       "mne_cpp": "MorletTfr::buildWavelet",
       "note": "one frequency per call; no sigma",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.psd_array_multitaper",
@@ -4168,7 +4547,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::MultitaperPsd::compute",
       "note": "normalization='full' only, no adaptive weights or fmin/fmax",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.psd_array_welch",
@@ -4179,7 +4559,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::WelchPsd::compute",
       "note": "overlap as a fraction, n_per_seg = n_fft, mean average only, no fmin/fmax",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.stft",
@@ -4190,7 +4571,8 @@
       "status": "partial",
       "mne_cpp": "Spectrogram::makeSpectrogram",
       "note": "Gaussian-window magnitude only; no complex output/istft",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.tfr_array_morlet",
@@ -4201,7 +4583,8 @@
       "status": "partial",
       "mne_cpp": "MorletTfr::computeMultiChannel",
       "note": "power only; single epoch; no complex/ITC",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.tfr_array_multitaper",
@@ -4212,7 +4595,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
       "note": "power for one epoch; no complex/ITC/decim",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.tfr_morlet",
@@ -4223,7 +4607,8 @@
       "status": "partial",
       "mne_cpp": "MorletTfr::compute",
       "note": "no Epochs input, averaging or ITC",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.tfr_multitaper",
@@ -4234,7 +4619,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::MultitaperTfr::computeArray",
       "note": "matrix input; no Epochs/Evoked, averaging or ITC",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.EpochsSpectrum",
@@ -4245,7 +4631,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no per-epoch spectrum container",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.EpochsSpectrumArray",
@@ -4256,7 +4643,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no per-epoch spectrum container",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.EpochsTFR",
@@ -4267,7 +4655,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no per-epoch TFR container",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.EpochsTFRArray",
@@ -4278,7 +4667,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.combine_spectrum",
@@ -4289,7 +4679,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no spectrum combination",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.combine_tfr",
@@ -4300,7 +4691,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.csd_tfr",
@@ -4311,7 +4703,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.fit_iir_model_raw",
@@ -4322,7 +4715,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "AR/IIR model PSD not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.fwhm",
@@ -4333,7 +4727,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "wavelet FWHM helper not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.istft",
@@ -4344,7 +4739,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "inverse STFT not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.pick_channels_csd",
@@ -4355,7 +4751,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.read_csd",
@@ -4366,7 +4763,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.read_spectrum",
@@ -4377,7 +4775,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no spectrum file I/O",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.read_tfrs",
@@ -4388,7 +4787,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.tfr_array_stockwell",
@@ -4399,7 +4799,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Stockwell TFR not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.tfr_stockwell",
@@ -4410,7 +4811,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "Stockwell TFR not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.time_frequency.write_tfrs",
@@ -4421,7 +4823,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.CSP",
@@ -4432,7 +4835,8 @@
       "status": "implemented",
       "mne_cpp": "DecodingCsp",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.SPoC",
@@ -4443,7 +4847,8 @@
       "status": "implemented",
       "mne_cpp": "DecodingSpoc",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.SSD",
@@ -4454,7 +4859,8 @@
       "status": "implemented",
       "mne_cpp": "DecodingSsd",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.XdawnTransformer",
@@ -4465,7 +4871,8 @@
       "status": "implemented",
       "mne_cpp": "UTILSLIB::Xdawn::fit/apply",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.FilterEstimator",
@@ -4476,18 +4883,8 @@
       "status": "partial",
       "mne_cpp": "FirFilter::filterData",
       "note": "filters exist; no transformer wrapper",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.decoding.Scaler",
-      "name": "Scaler",
-      "submodule": "decoding",
-      "kind": "class",
-      "domain": "decoding",
-      "status": "partial",
-      "mne_cpp": "StandardScaler",
-      "note": "generic external scaler; no per-channel-type scalings",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.SpatialFilter",
@@ -4498,7 +4895,8 @@
       "status": "partial",
       "mne_cpp": "DecodingCsp::filters/patterns",
       "note": "no shared base class; each decoder has its own filters/patterns",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.TemporalFilter",
@@ -4509,7 +4907,8 @@
       "status": "partial",
       "mne_cpp": "FirFilter::filterData",
       "note": "no transformer wrapper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.TimeFrequency",
@@ -4520,7 +4919,8 @@
       "status": "partial",
       "mne_cpp": "MorletTfr::computeMultiChannel",
       "note": "no transformer; power only",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.EMS",
@@ -4531,7 +4931,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "eigenvector method",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.GeneralizingEstimator",
@@ -4542,7 +4943,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "temporal generalization wrapper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.LinearModel",
@@ -4553,7 +4955,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no coef→patterns (Haufe) wrapper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.PSDEstimator",
@@ -4564,7 +4967,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no transformer wrapper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.ReceptiveField",
@@ -4575,7 +4979,20 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "encoding/decoding TRF",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
+    },
+    {
+      "python": "mne.decoding.Scaler",
+      "name": "Scaler",
+      "submodule": "decoding",
+      "kind": "class",
+      "domain": "decoding",
+      "status": "missing",
+      "mne_cpp": "",
+      "note": "no scaler in MNE-CPP; skigen::StandardScaler (external) covers the generic case",
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.SlidingEstimator",
@@ -4586,7 +5003,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "time-resolved decoding wrapper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.TimeDelayingRidge",
@@ -4597,7 +5015,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "time-delaying ridge (TRF) not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.UnsupervisedSpatialFilter",
@@ -4608,7 +5027,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "sklearn PCA/ICA wrapper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.Vectorizer",
@@ -4619,7 +5039,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "flatten wrapper not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.compute_ems",
@@ -4630,7 +5051,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EMS not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.cross_val_multiscore",
@@ -4641,7 +5063,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "cross-validation helper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.get_coef",
@@ -4652,7 +5075,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "coefficient extraction helper",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.get_spatial_filter_from_estimator",
@@ -4663,7 +5087,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "sklearn helper not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.BaseEstimator",
@@ -4674,7 +5099,8 @@
       "status": "not-applicable",
       "mne_cpp": "",
       "note": "sklearn base class; Python framework",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.decoding.TransformerMixin",
@@ -4685,7 +5111,8 @@
       "status": "not-applicable",
       "mne_cpp": "",
       "note": "sklearn mixin; Python framework",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.stats.bonferroni_correction",
@@ -4696,7 +5123,8 @@
       "status": "implemented",
       "mne_cpp": "STSLIB::StatsMcCorrection::bonferroni",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.combine_adjacency",
@@ -4707,7 +5135,8 @@
       "status": "implemented",
       "mne_cpp": "STSLIB::StatsAdjacency::combine",
       "note": "integer dimensions via StatsAdjacency::chain",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.f_oneway",
@@ -4718,7 +5147,8 @@
       "status": "implemented",
       "mne_cpp": "StatsCluster f-test",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.fdr_correction",
@@ -4729,7 +5159,8 @@
       "status": "implemented",
       "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.permutation_cluster_1samp_test",
@@ -4740,7 +5171,8 @@
       "status": "implemented",
       "mne_cpp": "StatsCluster::oneSamplePermutationTest",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.permutation_cluster_test",
@@ -4751,7 +5183,8 @@
       "status": "implemented",
       "mne_cpp": "StatsCluster::fTestPermutationTest",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.permutation_t_test",
@@ -4762,7 +5195,8 @@
       "status": "implemented",
       "mne_cpp": "STSLIB::StatsTtest::permutation",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.spatio_temporal_cluster_1samp_test",
@@ -4773,7 +5207,8 @@
       "status": "implemented",
       "mne_cpp": "StatsCluster",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.spatio_temporal_cluster_test",
@@ -4784,7 +5219,8 @@
       "status": "implemented",
       "mne_cpp": "StatsCluster",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.ttest_1samp_no_p",
@@ -4795,7 +5231,8 @@
       "status": "implemented",
       "mne_cpp": "StatsCluster",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.ttest_ind_no_p",
@@ -4806,7 +5243,8 @@
       "status": "implemented",
       "mne_cpp": "StatsCluster t-test",
       "note": "",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.stats.bootstrap_confidence_interval",
@@ -4817,7 +5255,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "bootstrap CI not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.stats.f_mway_rm",
@@ -4828,7 +5267,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "RM-ANOVA not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.stats.f_threshold_mway_rm",
@@ -4839,7 +5279,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "RM-ANOVA threshold not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.stats.linear_regression",
@@ -4850,7 +5291,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "channel-wise regression not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.stats.linear_regression_raw",
@@ -4861,7 +5303,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "raw linear regression (rERP) not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.stats.summarize_clusters_stc",
@@ -4872,7 +5315,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "cluster summary stc not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.simulate_evoked",
@@ -4883,7 +5327,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::simulateEvoked",
       "note": "no iir_filter; STC rows must equal forward columns",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.simulate_sparse_stc",
@@ -4894,7 +5339,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::simulateStc",
       "note": "caller picks vertices; fixed Gaussian envelopes",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.simulate_stc",
@@ -4905,7 +5351,8 @@
       "status": "partial",
       "mne_cpp": "UTILSLIB::simulateStcFromWaveforms",
       "note": "vertex list + waveforms; no labels/src/value_fun",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.SourceSimulator",
@@ -4916,7 +5363,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "source simulator not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.add_chpi",
@@ -4927,7 +5375,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "cHPI injection not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.add_ecg",
@@ -4938,7 +5387,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "ECG injection not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.add_eog",
@@ -4949,7 +5399,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "EOG injection not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.add_noise",
@@ -4960,7 +5411,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "noise injection not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.select_source_in_label",
@@ -4971,7 +5423,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "source selection in label not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.simulation.simulate_raw",
@@ -4982,7 +5435,8 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "raw simulation not ported",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     },
     {
       "python": "mne.Report",
@@ -4993,7 +5447,8 @@
       "status": "not-applicable",
       "mne_cpp": "Report",
       "note": "HTML report generator; Python-ecosystem tool",
-      "evidence": "parity-record"
+      "evidence": "parity-record",
+      "equivalence": ""
     }
   ]
 }

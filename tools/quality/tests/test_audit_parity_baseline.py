@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -82,7 +83,8 @@ class ParityRecordTests(unittest.TestCase):
                 {"python": "mne.find_events / mne.read_events (stim)", "status": "partial", "mne_cpp": "F",
                  "test": "test_oracle"},
                 {"python": "mne.b", "status": "partial", "mne_cpp": "B", "test": "test_plain"},
-                {"python": "mne.c", "status": "implemented", "mne_cpp": "C", "test": "test_orphan"},
+                {"python": "mne.c", "status": "implemented", "mne_cpp": "C", "test": "test_orphan",
+                 "equivalence": "equivalent"},
                 {"python": "mne.d", "status": "implemented", "mne_cpp": "D"},
             ]
             (root / "doc" / "api_registry.json").write_text(
@@ -93,6 +95,15 @@ class ParityRecordTests(unittest.TestCase):
             "mne.find_events / mne.read_events (stim)": "cross-validated-static",
             "mne.b": "tested", "mne.c": "unverified", "mne.d": "unverified",
         })
+        self.assertEqual(report["summary"]["equivalence_without_static_evidence"], ["C (mne.c)"])
+        self.assertEqual(report["summary"]["by_claim"], {"equivalent": 1, "exceeds": 0, "implemented": 3, "partial": 2})
+
+    def test_tolerances_are_the_asserted_thresholds(self) -> None:
+        text = ("QVERIFY(diff < 1e-6);\nQVERIFY((a - b).norm() <= 2.5e-10 * scale);\nQVERIFY(m.isApprox(r, 1e-9));\n"
+                "const double kTol = 0.01;\nQCOMPARE(x, 3.0);\nconst double expected = -77.6684214541848;\n")
+        self.assertEqual(audit.test_tolerances(text), [2.5e-10, 1e-9, 1e-6, 0.01])
+        self.assertEqual(audit.tolerance_text(audit.test_tolerances(text)), "2.5e-10 to 0.01")
+        self.assertEqual(audit.tolerance_text([]), "exact")
 
 
 class RepositoryTests(unittest.TestCase):
@@ -100,6 +111,17 @@ class RepositoryTests(unittest.TestCase):
         report = audit.build_report()
         self.assertEqual(sum(report["summary"]["by_evidence"].values()), report["summary"]["claims"])
         self.assertEqual(report["reference_environment"]["registry_mne_python_ref"], "1.11.0")
+
+    def test_parity_label_is_exactly_the_static_cross_validation(self) -> None:
+        """AC-T7.5-3: ``ctest -L parity`` runs the offline MNE-Python comparisons and nothing else."""
+        frames = audit.TESTFRAMES_DIR
+        registered = audit.registered_tests(frames)
+        static = {name for name, level in audit.test_evidence(frames).items()
+                  if level == "cross-validated-static" and name in registered}
+        labelled = {d.name for d in frames.iterdir() if (d / "CMakeLists.txt").is_file()
+                    and re.search(r"LABELS(?:[ \t]+[a-z-]+)*[ \t]+parity\b", (d / "CMakeLists.txt").read_text(encoding="utf-8"))}
+        self.assertEqual(sorted(static - labelled), [])
+        self.assertEqual(sorted(labelled - static), [])
 
 
 if __name__ == "__main__":

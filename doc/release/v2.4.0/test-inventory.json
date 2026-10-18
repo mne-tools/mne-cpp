@@ -298,6 +298,7 @@
       "labels": [
         "gui",
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 120,
@@ -514,6 +515,7 @@
       "labels": [
         "gui",
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 120,
@@ -724,6 +726,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -903,7 +906,6 @@
       ],
       "labels": [
         "integration",
-        "parity",
         "requires-data"
       ],
       "timeout": 300,
@@ -1220,7 +1222,6 @@
       ],
       "labels": [
         "integration",
-        "parity",
         "requires-data"
       ],
       "timeout": 300,
@@ -1769,6 +1770,7 @@
         "test_dsp_annotate_artifact"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -1804,6 +1806,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -2006,6 +2009,7 @@
         "test_dsp_csd"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -2038,6 +2042,7 @@
         "test_dsp_eeg_reference"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -2072,6 +2077,7 @@
         "test_dsp_eog_regression"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -2204,6 +2210,7 @@
         "test_dsp_firfilter"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -2340,6 +2347,7 @@
         "test_dsp_morlet_tfr"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -2374,6 +2382,7 @@
         "test_dsp_multitaper"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -2509,6 +2518,7 @@
         "test_dsp_simulate"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -2677,6 +2687,7 @@
         "test_dsp_welch_psd"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -2746,6 +2757,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -2844,6 +2856,7 @@
         "test_epochs"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -2911,7 +2924,6 @@
       ],
       "labels": [
         "integration",
-        "parity",
         "requires-data"
       ],
       "timeout": 300,
@@ -3049,6 +3061,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -3439,6 +3452,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -3474,6 +3488,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -3511,6 +3526,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -3655,6 +3671,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -4006,6 +4023,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -4078,6 +4096,7 @@
         "test_fs_io"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -5165,6 +5184,7 @@
         "test_inv_sparse"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -5441,8 +5461,7 @@
         "test_ml_trainer"
       ],
       "labels": [
-        "integration",
-        "parity"
+        "integration"
       ],
       "timeout": 300,
       "requirements": [
@@ -5959,6 +5978,7 @@
       "labels": [
         "gui",
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 120,
@@ -6062,7 +6082,6 @@
       ],
       "labels": [
         "integration",
-        "parity",
         "requires-data"
       ],
       "timeout": 300,
@@ -6345,6 +6364,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 60,
@@ -7554,6 +7574,7 @@
         "test_resolution_matrix"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -7823,6 +7844,7 @@
         "test_sensor_field_mapper"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -7958,6 +7980,7 @@
         "test_source_estimate_io"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -7992,6 +8015,7 @@
         "test_source_estimate_types"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -8102,6 +8126,7 @@
         "test_standard_montage"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -8136,6 +8161,7 @@
         "test_sts_cluster"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -8481,6 +8507,7 @@
         "test_surface_laplacian"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,
@@ -8655,6 +8682,7 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data",
         "slow"
       ],
@@ -8663,7 +8691,7 @@
         "test-data"
       ],
       "gui": false,
-      "qskip_sites": 218,
+      "qskip_sites": 219,
       "spawns_processes": true,
       "ci_excluded_on": [],
       "ci": {
@@ -9302,6 +9330,7 @@
         "test_utils_spectral"
       ],
       "labels": [
+        "parity",
         "unit"
       ],
       "timeout": 60,

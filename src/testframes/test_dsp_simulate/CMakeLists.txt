@@ -53,5 +53,5 @@ endif()
 # Register with CTest
 enable_testing()
 mne_add_test(${PROJECT_NAME}
-    LABELS unit
+    LABELS unit parity
     TIMEOUT 60)
