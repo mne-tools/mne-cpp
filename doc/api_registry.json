@@ -14004,9 +14004,10 @@
       },
       {
         "python": "mne.stc_near_sensors",
-        "status": "missing",
-        "mne_cpp": "",
-        "note": "sensor-space stc projection not ported"
+        "status": "partial",
+        "mne_cpp": "IeegSurfaceMap::weights",
+        "note": "surface weights only; the caller multiplies them with the contact data",
+        "test": "test_ieeg"
       },
       {
         "python": "mne.stc_to_label",

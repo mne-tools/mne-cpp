@@ -9,10 +9,10 @@
 
 - **Total public MNE-Python APIs inventoried:** 443
 - Implemented: **195**
-- Partial: **96**
-- Missing: **144**
+- Partial: **97**
+- Missing: **143**
 - Not-applicable: **8**
-- **Parity** (implemented + ½·partial, excluding not-applicable): **55.9%** of 435 in-scope APIs
+- **Parity** (implemented + ½·partial, excluding not-applicable): **56.0%** of 435 in-scope APIs
 
 Every parity figure exposes its denominator (in-scope = implemented + partial + missing; not-applicable excluded) and the pinned reference version.
 
@@ -27,7 +27,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Epochs & Evoked | 13 | 2 | 1 | 0 | 16 |
 | Covariance & Whitening | 6 | 1 | 0 | 0 | 7 |
 | Forward Modelling | 25 | 9 | 1 | 0 | 35 |
-| Inverse & Source Estimation | 31 | 13 | 16 | 0 | 60 |
+| Inverse & Source Estimation | 31 | 14 | 15 | 0 | 60 |
 | Source Space & Morphing | 15 | 5 | 7 | 0 | 27 |
 | Time-Frequency | 2 | 22 | 17 | 0 | 41 |
 | Decoding & Machine Learning | 4 | 5 | 13 | 2 | 24 |
@@ -216,6 +216,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.minimum_norm.resolution_metrics` | partial | INVLIB::InvResolutionMatrix::peakLocalisationError/spatialSpread | peak_err and PSF spread only; no cog_err, maxrad_ext, sum_amp, peak_amp or CTF mode |
 | `mne.read_dipole` | partial | InvEcdSet::read_dipoles_dip | .dip only; .bdip is write-only |
 | `mne.read_source_estimate` | partial | InvSourceEstimate::read, read_w | .stc/.w only; no .h5 |
+| `mne.stc_near_sensors` | partial | IeegSurfaceMap::weights | surface weights only; the caller multiplies them with the contact data |
 | `mne.DipoleFixed` | missing | — |  |
 | `mne.MixedSourceEstimate` | missing | — | mixed STC not ported |
 | `mne.MixedVectorSourceEstimate` | missing | — | mixed vector STC not ported |
@@ -231,7 +232,6 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | `mne.spatial_dist_adjacency` | missing | — | no distance-based source adjacency |
 | `mne.spatial_inter_hemi_adjacency` | missing | — | no inter-hemisphere adjacency |
 | `mne.spatio_temporal_dist_adjacency` | missing | — | no distance-based source adjacency |
-| `mne.stc_near_sensors` | missing | — | sensor-space stc projection not ported |
 
 ### Source Space & Morphing
 

@@ -10,8 +10,8 @@
     "total": 443,
     "by_status": {
       "implemented": 195,
-      "partial": 96,
-      "missing": 144,
+      "partial": 97,
+      "missing": 143,
       "not-applicable": 8
     },
     "by_domain": {
@@ -65,8 +65,8 @@
       },
       "inverse": {
         "implemented": 31,
-        "partial": 13,
-        "missing": 16,
+        "partial": 14,
+        "missing": 15,
         "not-applicable": 0
       },
       "source_space": {
@@ -119,7 +119,7 @@
       }
     },
     "denominator_excludes_not_applicable": 435,
-    "parity_percent": 55.9
+    "parity_percent": 56.0
   },
   "apis": [
     {
@@ -3500,6 +3500,17 @@
       "evidence": "parity-record"
     },
     {
+      "python": "mne.stc_near_sensors",
+      "name": "stc_near_sensors",
+      "submodule": "(top-level)",
+      "kind": "function",
+      "domain": "inverse",
+      "status": "partial",
+      "mne_cpp": "IeegSurfaceMap::weights",
+      "note": "surface weights only; the caller multiplies them with the contact data",
+      "evidence": "parity-record"
+    },
+    {
       "python": "mne.DipoleFixed",
       "name": "DipoleFixed",
       "submodule": "(top-level)",
@@ -3662,17 +3673,6 @@
       "status": "missing",
       "mne_cpp": "",
       "note": "no distance-based source adjacency",
-      "evidence": "parity-record"
-    },
-    {
-      "python": "mne.stc_near_sensors",
-      "name": "stc_near_sensors",
-      "submodule": "(top-level)",
-      "kind": "function",
-      "domain": "inverse",
-      "status": "missing",
-      "mne_cpp": "",
-      "note": "sensor-space stc projection not ported",
       "evidence": "parity-record"
     },
     {
