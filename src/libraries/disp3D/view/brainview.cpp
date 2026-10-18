@@ -1688,58 +1688,82 @@ void BrainView::render(QRhiCommandBuffer* cb)
     const auto enabledViewports = enabledViewportIndices();
     int numEnabled = enabledViewports.size();
 
-    // ── Pre-render phase ────────────────────────────────────────────────
-    // Pre-upload ALL Immutable GPU buffers BEFORE the render pass starts.
-    // On Metal, uploading an Immutable buffer during an active render pass
-    // forces an encoder restart which resets the viewport state.  On
-    // WebGL/GLES2, buffer create()/upload calls invoke glBindBuffer() which
-    // silently modifies the currently-bound VAO's element-buffer binding,
-    // corrupting previously drawn surfaces.
-    //
-    // By doing all static uploads here (outside any render pass), we
-    // guarantee that the draw loop below only records Dynamic uniform
-    // updates — those never interrupt the pass.
-
-    // Pre-upload every surface and dipole buffer that is dirty or new.
-    // NOTE: Overlay modes are applied per-pane inside the render loop below
-    // (not here), because different panes can have different overlays on the
-    // same shared BrainSurface objects.  Applying all pane overlays
-    // sequentially here would leave only the last pane's vertex colours.
-    {
-        QRhiResourceUpdateBatch* preUpload = rhi()->nextResourceUpdateBatch();
-        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-            it.value()->updateBuffers(rhi(), preUpload);
-        }
-        if (m_debugPointerSurface) {
-            m_debugPointerSurface->updateBuffers(rhi(), preUpload);
-        }
-        for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-            it.value()->updateBuffers(rhi(), preUpload);
-        }
-        if (m_dipoles) {
-            m_dipoles->updateBuffers(rhi(), preUpload);
-        }
-        if (m_videoOverlay && m_videoOverlay->isEnabled()) {
-            m_renderer->prepareVideoOverlay(rhi(), preUpload, m_videoOverlay.get());
-        }
-
-        // Prepare MRI slice textures and vertex data
-        for (int i = 0; i < kMaxSliceSlots; ++i) {
-            if (m_slices[i] && m_sliceVisible[i]) {
-                m_renderer->prepareSlice(rhi(), preUpload, m_slices[i], i);
-            } else {
-                m_renderer->prepareSlice(rhi(), preUpload, nullptr, i);
-            }
-        }
-
-        // Network buffers are updated inside renderNetwork() via updateNodeBuffers/updateEdgeBuffers
-        cb->resourceUpdate(preUpload);
+    // ── Prepare phase ──────────────────────────────────────────────────
+    // Every upload and uniform of the frame goes into one batch that
+    // beginFrame() commits: QRhi forbids resource updates inside a pass.
+    // Overlay modes are per-draw uniforms, so panes with different overlays
+    // share the same vertex buffers.
+    m_renderer->newFrame();
+    QRhiResourceUpdateBatch* updates = rhi()->nextResourceUpdateBatch();
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        it.value()->updateBuffers(rhi(), updates);
+    }
+    if (m_debugPointerSurface) {
+        m_debugPointerSurface->updateBuffers(rhi(), updates);
+    }
+    for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
+        it.value()->updateBuffers(rhi(), updates);
+    }
+    if (m_dipoles) {
+        m_dipoles->updateBuffers(rhi(), updates);
+    }
+    if (m_network && m_network->hasData()) {
+        m_network->updateNodeBuffers(rhi(), updates);
+        m_network->updateEdgeBuffers(rhi(), updates);
+    }
+    if (m_headPath && m_headPath->hasData()) {
+        m_headPath->updateBuffers(rhi(), updates);
+    }
+    if (m_videoOverlay && m_videoOverlay->isEnabled()) {
+        m_renderer->prepareVideoOverlay(rhi(), updates, m_videoOverlay.get());
+    }
+    for (int i = 0; i < kMaxSliceSlots; ++i) {
+        m_renderer->prepareSlice(rhi(), updates, (m_slices[i] && m_sliceVisible[i]) ? m_slices[i] : nullptr, i);
     }
 
-    // ── Render passes ───────────────────────────────────────────────────
-    m_renderer->beginFrame(cb);
+    BrainSurface* videoOverlayTargetSurface = nullptr;
+    const bool hasVideoOverlay = m_videoOverlay && m_videoOverlay->isEnabled() && m_videoOverlay->hasFrame();
+    if (hasVideoOverlay) {
+        // Target is always the head surface (BEM head or TissueSkin).
+        if (m_surfaces.contains(QStringLiteral("bem_head"))) {
+            videoOverlayTargetSurface = m_surfaces[QStringLiteral("bem_head")].get();
+        } else {
+            for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+                if (it.value() && it.value()->tissueType() == BrainSurface::TissueSkin) {
+                    videoOverlayTargetSurface = it.value().get();
+                    break;
+                }
+            }
+        }
+    }
+
+    struct DrawItem
+    {
+        BrainSurface* surface;
+        BrainRenderer::ShaderMode mode;
+        float overlayMode;
+        float distSq;      // for transparent back-to-front sort
+        int uniformOffset; // filled by prepareSurfaceDraw
+    };
+
+    // What each pane draws, with the uniform slots prepared for it
+    struct PaneDraws
+    {
+        QRhiViewport viewport;
+        QRhiScissor scissor;
+        QVector<DrawItem> opaqueDraws;
+        QVector<DrawItem> transparentDraws;
+        int sliceOffsets[kMaxSliceSlots] = {-1, -1, -1};
+        int videoOverlayOffset = -1;
+        int instancedOffset = -1;
+        bool drawDipoles = false;
+        bool drawNetwork = false;
+        int pointerOffset = -1;
+    };
+    std::vector<PaneDraws> panes(static_cast<size_t>(numEnabled));
 
     for (int slot = 0; slot < numEnabled; ++slot) {
+        PaneDraws& pane = panes[static_cast<size_t>(slot)];
         int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
         const SubView& sv = (m_viewMode == MultiView) ? m_subViews[vp] : m_singleView;
 
@@ -1786,13 +1810,9 @@ void BrainView::render(QRhiCommandBuffer* cb)
         const int viewW = std::max(1, renderRect.width());
         const int viewH = std::max(1, renderRect.height());
 
-        QRhiViewport viewport(viewX, viewY, viewW, viewH);
-        QRhiScissor scissor(viewX, viewY, viewW, viewH);
+        pane.viewport = QRhiViewport(viewX, viewY, viewW, viewH);
+        pane.scissor = QRhiScissor(viewX, viewY, viewW, viewH);
         const float aspectRatio = float(viewW) / float(viewH);
-
-        // Set viewport and scissor
-        cb->setViewport(viewport);
-        cb->setScissor(scissor);
 
         // Calculate camera for this viewport
         const QVector3D effectiveCenter = m_cameraFocusOverride ? m_cameraFocusCenter : m_sceneCenter;
@@ -1814,14 +1834,6 @@ void BrainView::render(QRhiCommandBuffer* cb)
         sceneData.cameraPos = cam.cameraPos;
         sceneData.lightDir = cam.cameraPos.normalized();
         sceneData.lightingEnabled = m_lightingEnabled;
-        sceneData.viewportX = viewX;
-        sceneData.viewportY = viewY;
-        sceneData.viewportW = viewW;
-        sceneData.viewportH = viewH;
-        sceneData.scissorX = viewX;
-        sceneData.scissorY = viewY;
-        sceneData.scissorW = viewW;
-        sceneData.scissorH = viewH;
 
         // Per-draw overlayMode uniform — the shader selects the vertex colour
         // channel (curvature / annotation) so no per-pane vertex buffer
@@ -1852,7 +1864,9 @@ void BrainView::render(QRhiCommandBuffer* cb)
             if (!sv.shouldRenderSurface(it.key()))
                 continue;
             drawnKeys << it.key();
-            m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
+            BrainSurface* surf = it.value().get();
+            pane.opaqueDraws.append({surf, currentShader, sceneData.overlayMode, 0.0f,
+                                     m_renderer->prepareSurfaceDraw(updates, sceneData, surf)});
         }
 
         // Update info panel with drawn brain surface keys after rendering
@@ -1865,11 +1879,8 @@ void BrainView::render(QRhiCommandBuffer* cb)
             }
         }
 
-        // ── Batched desktop rendering ───────────────────────────────────────
         // Single pass over m_surfaces categorises non-brain items into opaque
-        // and transparent draw lists.  All uniform uploads are batched into
-        // one QRhiResourceUpdateBatch and submitted once, eliminating per-
-        // surface batch allocation and redundant viewport/scissor reassertion.
+        // and transparent draw lists.
 
         // Determine per-viewport field-map visibility
         const bool megFieldVisible = sv.visibility.megFieldMap;
@@ -1878,15 +1889,7 @@ void BrainView::render(QRhiCommandBuffer* cb)
         const QString& megFieldKey = m_fieldMapper.megSurfaceKey();
         const QString& eegFieldKey = m_fieldMapper.eegSurfaceKey();
 
-        struct DrawItem
-        {
-            BrainSurface* surface;
-            BrainRenderer::ShaderMode mode;
-            float overlayMode;
-            float distSq;      // for transparent back-to-front sort
-            int uniformOffset; // filled by prepareSurfaceDraw
-        };
-
+        // Brain surfaces were added above; the other opaque items follow them
         QVector<DrawItem> opaqueDraws;
         QVector<DrawItem> transparentDraws;
 
@@ -1945,107 +1948,36 @@ void BrainView::render(QRhiCommandBuffer* cb)
         std::sort(transparentDraws.begin(), transparentDraws.end(),
                   [](const DrawItem& a, const DrawItem& b) { return a.distSq > b.distSq; });
 
-        // Batch all uniform uploads into a single resource update
-        QRhiResourceUpdateBatch* surfBatch = rhi()->nextResourceUpdateBatch();
-        BrainRenderer::SceneData batchData = sceneData;
-
+        BrainRenderer::SceneData itemData = sceneData;
         for (auto& item : opaqueDraws) {
-            batchData.overlayMode = item.overlayMode;
-            item.uniformOffset = m_renderer->prepareSurfaceDraw(surfBatch, batchData, item.surface);
+            itemData.overlayMode = item.overlayMode;
+            item.uniformOffset = m_renderer->prepareSurfaceDraw(updates, itemData, item.surface);
         }
+        pane.opaqueDraws += opaqueDraws;
         for (auto& item : transparentDraws) {
-            batchData.overlayMode = item.overlayMode;
-            item.uniformOffset = m_renderer->prepareSurfaceDraw(surfBatch, batchData, item.surface);
+            itemData.overlayMode = item.overlayMode;
+            item.uniformOffset = m_renderer->prepareSurfaceDraw(updates, itemData, item.surface);
         }
+        pane.transparentDraws = transparentDraws;
 
-        // Batch MRI slice uniform uploads into the same batch
-        int sliceOffsets[kMaxSliceSlots] = {-1, -1, -1};
         if (sv.visibility.mriSlices) {
             for (int i = 0; i < kMaxSliceSlots; ++i) {
                 if (m_slices[i] && m_sliceVisible[i]) {
-                    sliceOffsets[i] = m_renderer->prepareSliceDraw(surfBatch, sceneData, i);
+                    pane.sliceOffsets[i] = m_renderer->prepareSliceDraw(updates, sceneData, i);
                 }
             }
         }
 
-        cb->resourceUpdate(surfBatch);
-
-        // Set viewport/scissor once for all batched draws
-        cb->setViewport(viewport);
-        cb->setScissor(scissor);
-
-        // Issue all draw calls — no resource updates or state resets between them
-        for (const auto& item : opaqueDraws)
-            m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
-
-        // Issue MRI slice draws after opaque surfaces but before the holographic
-        // brain.  Background voxels are discarded in the shader; remaining anatomy
-        // alpha-blends into the framebuffer.  The subsequent holographic additive
-        // pass (SrcAlpha + One) adds its glow on top without being dimmed.
-        // depthTest=true, depthWrite=false keeps slices behind opaque geometry.
-        for (int i = 0; i < kMaxSliceSlots; ++i) {
-            if (sliceOffsets[i] >= 0) {
-                m_renderer->issueSliceDraw(cb, i, sliceOffsets[i]);
-            }
-        }
-
-        BrainSurface* videoOverlayTargetSurface = nullptr;
-        const bool hasVideoOverlay = m_videoOverlay && m_videoOverlay->isEnabled() && m_videoOverlay->hasFrame();
         if (hasVideoOverlay) {
-            // Target is always the head surface (BEM head or TissueSkin).
-            if (m_surfaces.contains(QStringLiteral("bem_head"))) {
-                videoOverlayTargetSurface = m_surfaces[QStringLiteral("bem_head")].get();
-            } else {
-                for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-                    if (it.value() && it.value()->tissueType() == BrainSurface::TissueSkin) {
-                        videoOverlayTargetSurface = it.value().get();
-                        break;
-                    }
-                }
-            }
+            pane.videoOverlayOffset = m_renderer->prepareVideoOverlayDraw(updates, sceneData, m_videoOverlay.get(), videoOverlayTargetSurface);
         }
 
-        bool videoOverlayDrawn = false;
-        auto drawVideoOverlay = [&]() {
-            if (videoOverlayDrawn)
-                return;
-            if (videoOverlayTargetSurface) {
-                m_renderer->renderVideoOverlayOnSurface(cb, rhi(), sceneData,
-                                                        m_videoOverlay.get(), videoOverlayTargetSurface);
-            } else if (hasVideoOverlay) {
-                m_renderer->renderVideoOverlay(cb, rhi(), sceneData, m_videoOverlay.get());
-            }
-            videoOverlayDrawn = true;
-        };
-
-        for (const auto& item : transparentDraws) {
-            m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
-            if (item.surface == videoOverlayTargetSurface) {
-                drawVideoOverlay();
-            }
-        }
-        drawVideoOverlay();
-
-        // Render Dipoles
-        for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-            if (it.value()->isVisible() && sv.visibility.dipoles) {
-                m_renderer->renderDipoles(cb, rhi(), sceneData, it.value().get());
-            }
-        }
-
-        if (sv.visibility.dipoles && m_dipoles) {
-            m_renderer->renderDipoles(cb, rhi(), sceneData, m_dipoles.get());
-        }
-
-        // Render Connectivity Network
-        if (sv.visibility.network && m_network) {
-            m_renderer->renderNetwork(cb, rhi(), sceneData, m_network.get());
-        }
-
-        // Render the head movement path. It is not connectivity data, so it is not
-        // tied to the network visibility flag.
-        if (m_headPath) {
-            m_renderer->renderPolyline(cb, rhi(), sceneData, m_headPath.get());
+        // Dipoles, network and the head movement path share one instanced uniform slot. The path
+        // is not connectivity data, so it is not tied to the network visibility flag.
+        pane.drawDipoles = sv.visibility.dipoles && (m_dipoles || !m_itemDipoleMap.isEmpty());
+        pane.drawNetwork = sv.visibility.network && m_network;
+        if (pane.drawDipoles || pane.drawNetwork || m_headPath) {
+            pane.instancedOffset = m_renderer->prepareInstancedDraw(updates, sceneData);
         }
 
         // Intersection Pointer
@@ -2058,10 +1990,55 @@ void BrainView::render(QRhiCommandBuffer* cb)
 
             debugSceneData.mvp = rhi()->clipSpaceCorrMatrix() * cam.projection * cam.view * cam.model * translation;
 
-            m_renderer->renderSurface(cb, rhi(), debugSceneData, m_debugPointerSurface.get(), BrainRenderer::Holographic);
+            pane.pointerOffset = m_renderer->prepareSurfaceDraw(updates, debugSceneData, m_debugPointerSurface.get());
+        }
+    } // End of viewport loop
+
+    // ── Draw phase: bind and draw only ──────────────────────────────────
+    m_renderer->beginFrame(cb, updates);
+
+    for (const PaneDraws& pane : panes) {
+        cb->setViewport(pane.viewport);
+        cb->setScissor(pane.scissor);
+
+        for (const auto& item : pane.opaqueDraws)
+            m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
+
+        // Issue MRI slice draws after opaque surfaces but before the holographic
+        // brain.  Background voxels are discarded in the shader; remaining anatomy
+        // alpha-blends into the framebuffer.  The subsequent holographic additive
+        // pass (SrcAlpha + One) adds its glow on top without being dimmed.
+        // depthTest=true, depthWrite=false keeps slices behind opaque geometry.
+        for (int i = 0; i < kMaxSliceSlots; ++i) {
+            m_renderer->issueSliceDraw(cb, i, pane.sliceOffsets[i]);
         }
 
-    } // End of viewport loop
+        // The video overlay goes right after its target surface, or last
+        bool videoOverlayDrawn = false;
+        for (const auto& item : pane.transparentDraws) {
+            m_renderer->issueSurfaceDraw(cb, item.surface, item.mode, item.uniformOffset);
+            if (item.surface == videoOverlayTargetSurface && !videoOverlayDrawn) {
+                m_renderer->issueVideoOverlayDraw(cb, m_videoOverlay.get(), videoOverlayTargetSurface, pane.videoOverlayOffset);
+                videoOverlayDrawn = true;
+            }
+        }
+        if (!videoOverlayDrawn) {
+            m_renderer->issueVideoOverlayDraw(cb, m_videoOverlay.get(), videoOverlayTargetSurface, pane.videoOverlayOffset);
+        }
+
+        if (pane.drawDipoles) {
+            for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
+                m_renderer->issueDipoleDraw(cb, it.value().get(), pane.instancedOffset);
+            }
+            m_renderer->issueDipoleDraw(cb, m_dipoles.get(), pane.instancedOffset);
+        }
+        if (pane.drawNetwork) {
+            m_renderer->issueNetworkDraw(cb, m_network.get(), pane.instancedOffset);
+        }
+        m_renderer->issuePolylineDraw(cb, m_headPath.get(), pane.instancedOffset);
+
+        m_renderer->issueSurfaceDraw(cb, m_debugPointerSurface.get(), BrainRenderer::Holographic, pane.pointerOffset);
+    }
 
     m_renderer->endPass(cb);
 }

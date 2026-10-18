@@ -246,7 +246,7 @@ private slots:
     //=========================================================================================================
     /**
      * Per-draw uniform slots must not overlap on any backend, including OpenGL whose
-     * ubufAlignment() is 1.
+     * ubufAlignment() is 1, and two surfaces drawn in one pass must both render.
      */
     void brainRenderer_uniformSlotsDoNotOverlap();
 
@@ -1521,63 +1521,81 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     scene.cameraPos = QVector3D(0.0f, 0.0f, 1.0f);
     scene.lightDir = QVector3D(0.0f, 0.0f, -1.0f);
     scene.lightingEnabled = true;
-    scene.viewportW = 64;
-    scene.viewportH = 48;
-    scene.scissorW = 64;
-    scene.scissorH = 48;
 
     // The uniform buffer holds one slot per draw (8192); a whole frame must stay usable when it overflows
-    QTest::failOnWarning(QRegularExpression(QStringLiteral("exhausted|uniform buffer")));
+    QTest::failOnWarning(QRegularExpression(QStringLiteral("exhausted|uniform buffer|inside a render pass")));
+    const auto modes = {BrainRenderer::Standard, BrainRenderer::Holographic, BrainRenderer::Anatomical, BrainRenderer::XRay, BrainRenderer::ShowNormals};
     for (int frameIndex = 0; frameIndex < 2; ++frameIndex) {
         QRhiCommandBuffer* cb = nullptr;
         QCOMPARE(rhi->beginOffscreenFrame(&cb), QRhi::FrameOpSuccess);
-        QRhiResourceUpdateBatch* upload = rhi->nextResourceUpdateBatch();
-        QVERIFY(upload);
-        surface.updateBuffers(rhi.get(), upload);
-        renderer.prepareVideoOverlay(rhi.get(), upload, &video);
-        renderer.prepareSlice(rhi.get(), upload, &slice, 0);
-        renderer.prepareSlice(rhi.get(), upload, nullptr, 1);
-        cb->resourceUpdate(upload);
 
-        renderer.beginFrame(cb);
-        for (const auto mode : {BrainRenderer::Standard, BrainRenderer::Holographic, BrainRenderer::Anatomical, BrainRenderer::XRay, BrainRenderer::ShowNormals}) {
-            renderer.renderSurface(cb, rhi.get(), scene, &surface, mode);
-        }
-        renderer.renderDipoles(cb, rhi.get(), scene, &dipoles);
-        renderer.renderNetwork(cb, rhi.get(), scene, &networkObject);
-        renderer.renderPolyline(cb, rhi.get(), scene, &path);
-        renderer.renderVideoOverlay(cb, rhi.get(), scene, &video);
-        renderer.renderVideoOverlayOnSurface(cb, rhi.get(), scene, &video, &surface);
-        renderer.endPass(cb);
-        renderer.beginPreservingPass(cb);
-
-        // Slots continue after the draws above and are aligned; every slot of the buffer is usable
-        QRhiResourceUpdateBatch* slotBatch = rhi->nextResourceUpdateBatch();
-        const int sliceOffset = renderer.prepareSliceDraw(slotBatch, scene, 0);
+        // Prepare phase: every upload and uniform goes into one batch
+        renderer.newFrame();
+        QRhiResourceUpdateBatch* updates = rhi->nextResourceUpdateBatch();
+        QVERIFY(updates);
+        surface.updateBuffers(rhi.get(), updates);
+        dipoles.updateBuffers(rhi.get(), updates);
+        networkObject.updateNodeBuffers(rhi.get(), updates);
+        networkObject.updateEdgeBuffers(rhi.get(), updates);
+        path.updateBuffers(rhi.get(), updates);
+        renderer.prepareVideoOverlay(rhi.get(), updates, &video);
+        renderer.prepareSlice(rhi.get(), updates, &slice, 0);
+        renderer.prepareSlice(rhi.get(), updates, nullptr, 1);
+        const int surfaceOffset = renderer.prepareSurfaceDraw(updates, scene, &surface);
+        const int instancedOffset = renderer.prepareInstancedDraw(updates, scene);
+        const int quadOffset = renderer.prepareVideoOverlayDraw(updates, scene, &video, nullptr);
+        const int decalOffset = renderer.prepareVideoOverlayDraw(updates, scene, &video, &surface);
+        const int sliceOffset = renderer.prepareSliceDraw(updates, scene, 0);
+        QCOMPARE(surfaceOffset, 0);
+        QCOMPARE(quadOffset, 0);
+        QVERIFY(decalOffset > quadOffset);
         QCOMPARE(sliceOffset, 0);
-        QCOMPARE(renderer.prepareSliceDraw(slotBatch, scene, 1), -1);
-        int used = 9; // 5 surface modes, dipoles, network nodes + edges, polyline
-        int last = -1;
+        QCOMPARE(renderer.prepareSliceDraw(updates, scene, 1), -1);
+
+        // Slots are aligned and every slot of the buffer is usable
+        int used = 2;
+        int last = instancedOffset;
         // One warning per frame, however many draws are skipped
         QTest::ignoreMessage(QtWarningMsg, "BrainRenderer: uniform buffer full at prepareSurfaceDraw; further draws this frame are skipped");
-        for (int offset = renderer.prepareSurfaceDraw(slotBatch, scene, &surface); offset >= 0; offset = renderer.prepareSurfaceDraw(slotBatch, scene, &surface)) {
+        for (int offset = renderer.prepareSurfaceDraw(updates, scene, &surface); offset >= 0; offset = renderer.prepareSurfaceDraw(updates, scene, &surface)) {
             QCOMPARE(offset % rhi->ubufAlignment(), 0);
             QVERIFY(offset > last);
             last = offset;
             ++used;
         }
         QCOMPARE(used, 8192);
-        cb->resourceUpdate(slotBatch);
-        renderer.issueSliceDraw(cb, 0, sliceOffset);
-        renderer.issueSurfaceDraw(cb, &surface, BrainRenderer::Standard, last);
-        // Overflowing draws are skipped without exhausting QRhi's pool of 64 update batches
-        for (int i = 0; i < 100; ++i) {
-            renderer.renderSurface(cb, rhi.get(), scene, &surface, BrainRenderer::Standard);
-            renderer.renderDipoles(cb, rhi.get(), scene, &dipoles);
-            renderer.renderPolyline(cb, rhi.get(), scene, &path);
-            renderer.renderVideoOverlay(cb, rhi.get(), scene, &video);
-            renderer.renderVideoOverlayOnSurface(cb, rhi.get(), scene, &video, &surface);
+        QCOMPARE(renderer.prepareInstancedDraw(updates, scene), -1);
+
+        // Draw phase: bind and draw only
+        renderer.beginFrame(cb, updates);
+        for (const auto mode : modes) {
+            renderer.issueSurfaceDraw(cb, &surface, mode, surfaceOffset);
         }
+        renderer.issueSliceDraw(cb, 0, sliceOffset);
+        renderer.issueDipoleDraw(cb, &dipoles, instancedOffset);
+        renderer.issueNetworkDraw(cb, &networkObject, instancedOffset);
+        renderer.issuePolylineDraw(cb, &path, instancedOffset);
+        renderer.issueVideoOverlayDraw(cb, &video, nullptr, quadOffset);
+        renderer.issueVideoOverlayDraw(cb, &video, &surface, decalOffset);
+        renderer.issueSurfaceDraw(cb, &surface, BrainRenderer::Standard, last);
+        renderer.issueSurfaceDraw(cb, &surface, BrainRenderer::Standard, -1);
+
+        // QRhi forbids resource updates inside a pass, so preparing one there is refused
+        QRhiResourceUpdateBatch* late = rhi->nextResourceUpdateBatch();
+        for (const char* caller : {"prepareSurfaceDraw", "prepareInstancedDraw", "prepareVideoOverlayDraw", "prepareSliceDraw", "prepareSlice", "prepareVideoOverlay"}) {
+            QTest::ignoreMessage(QtWarningMsg, qPrintable(QStringLiteral("BrainRenderer: %1 called inside a render pass; resource updates must precede beginFrame()").arg(QLatin1String(caller))));
+        }
+        QCOMPARE(renderer.prepareSurfaceDraw(late, scene, &surface), -1);
+        QCOMPARE(renderer.prepareInstancedDraw(late, scene), -1);
+        QCOMPARE(renderer.prepareVideoOverlayDraw(late, scene, &video, nullptr), -1);
+        QCOMPARE(renderer.prepareSliceDraw(late, scene, 0), -1);
+        renderer.prepareSlice(rhi.get(), late, &slice, 0);
+        renderer.prepareVideoOverlay(rhi.get(), late, &video);
+        late->release();
+        renderer.endPass(cb);
+
+        renderer.beginPreservingPass(cb);
+        renderer.issueSurfaceDraw(cb, &surface, BrainRenderer::Standard, surfaceOffset);
         renderer.endPass(cb);
         QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
     }
@@ -1593,13 +1611,17 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
 
 void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
 {
-    Eigen::MatrixX3f rr(3, 3);
-    rr << 0.0f, 0.0f, 0.0f, 0.05f, 0.0f, 0.0f, 0.0f, 0.05f, 0.0f;
-    Eigen::MatrixX3i tris(1, 3);
-    tris << 0, 1, 2;
-    BrainSurface surface;
-    surface.createFromData(rr, tris, Qt::gray);
+    // A red square on the left half of clip space and a green one on the right
+    Eigen::MatrixX3i tris(2, 3);
+    tris << 0, 1, 2, 2, 1, 3;
+    Eigen::MatrixX3f rrLeft(4, 3);
+    rrLeft << -0.9f, -0.5f, 0.0f, -0.1f, -0.5f, 0.0f, -0.9f, 0.5f, 0.0f, -0.1f, 0.5f, 0.0f;
+    Eigen::MatrixX3f rrRight = rrLeft;
+    rrRight.col(0).array() += 1.0f;
     BrainRenderer::SceneData scene;
+    scene.cameraPos = QVector3D(0.0f, 0.0f, 1.0f);
+    scene.lightDir = QVector3D(0.0f, 0.0f, 1.0f);
+    scene.overlayMode = static_cast<float>(BrainSurface::ModeScientific);
 
     const bool hasOpenGl = QGuiApplicationPrivate::platformIntegration()->hasCapability(QPlatformIntegration::OpenGL);
     std::unique_ptr<QOffscreenSurface> glSurface(hasOpenGl ? QRhiGles2InitParams::newFallbackSurface() : nullptr);
@@ -1612,21 +1634,55 @@ void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
         if (backend == QRhi::OpenGLES2 && !hasOpenGl)
             continue;
         std::unique_ptr<QRhi> rhi(QRhi::create(backend, params));
+        if (!rhi && backend == QRhi::OpenGLES2)
+            continue;
         QVERIFY(rhi);
         ++tested;
-        std::unique_ptr<QRhiTexture> color(rhi->newTexture(QRhiTexture::RGBA8, QSize(8, 8), 1, QRhiTexture::RenderTarget));
+        // GPU buffers belong to one QRhi, so each backend gets its own surfaces
+        BrainSurface left;
+        left.createFromData(rrLeft, tris, Qt::red);
+        BrainSurface right;
+        right.createFromData(rrRight, tris, Qt::green);
+        const QSize size(64, 32);
+        std::unique_ptr<QRhiTexture> color(rhi->newTexture(QRhiTexture::RGBA8, size, 1, QRhiTexture::RenderTarget | QRhiTexture::UsedAsTransferSource));
         QVERIFY(color->create());
         BrainRenderer renderer;
-        renderer.ensureRenderTargets(rhi.get(), color.get(), QSize(8, 8));
+        renderer.ensureRenderTargets(rhi.get(), color.get(), size);
         renderer.initialize(rhi.get(), renderer.rtClear()->renderPassDescriptor(), 1);
-        QRhiResourceUpdateBatch* batch = rhi->nextResourceUpdateBatch();
-        const int first = renderer.prepareSurfaceDraw(batch, scene, &surface);
-        const int second = renderer.prepareSurfaceDraw(batch, scene, &surface);
-        batch->release();
+        scene.mvp = rhi->clipSpaceCorrMatrix();
+
+        QRhiCommandBuffer* cb = nullptr;
+        QCOMPARE(rhi->beginOffscreenFrame(&cb), QRhi::FrameOpSuccess);
+        renderer.newFrame();
+        QRhiResourceUpdateBatch* updates = rhi->nextResourceUpdateBatch();
+        left.updateBuffers(rhi.get(), updates);
+        right.updateBuffers(rhi.get(), updates);
+        const int first = renderer.prepareSurfaceDraw(updates, scene, &left);
+        const int second = renderer.prepareSurfaceDraw(updates, scene, &right);
         QCOMPARE(first, 0);
         // The shaders' uniform block is bound with 256 bytes
         QVERIFY2(second >= 256, qPrintable(QStringLiteral("%1: second slot at byte %2").arg(rhi->backendName()).arg(second)));
         QCOMPARE(second % rhi->ubufAlignment(), 0);
+        renderer.beginFrame(cb, updates);
+        renderer.issueSurfaceDraw(cb, &left, BrainRenderer::Standard, first);
+        renderer.issueSurfaceDraw(cb, &right, BrainRenderer::Standard, second);
+        renderer.endPass(cb);
+        QRhiReadbackResult readback;
+        QRhiResourceUpdateBatch* read = rhi->nextResourceUpdateBatch();
+        read->readBackTexture(QRhiReadbackDescription(color.get()), &readback);
+        cb->resourceUpdate(read);
+        QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
+        if (backend == QRhi::Null)
+            continue;
+
+        // Both draws of the pass are on screen, each in its own colour
+        QCOMPARE(readback.pixelSize, size);
+        QCOMPARE(readback.data.size(), qsizetype(size.width() * size.height() * 4));
+        const QImage image(reinterpret_cast<const uchar*>(readback.data.constData()), size.width(), size.height(), QImage::Format_RGBA8888);
+        const QColor leftPixel = image.pixelColor(16, 16);
+        const QColor rightPixel = image.pixelColor(48, 16);
+        QVERIFY2(leftPixel.red() > leftPixel.green() + 40, qPrintable(leftPixel.name()));
+        QVERIFY2(rightPixel.green() > rightPixel.red() + 40, qPrintable(rightPixel.name()));
     }
     if (tested == 1)
         qInfo("No OpenGL on this platform plugin; only the Null backend was checked");

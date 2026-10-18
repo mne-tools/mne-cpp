@@ -17,10 +17,10 @@
  * issues per-frame @c beginPass / @c drawIndexed calls for every
  * visible scene object.
  *
- * The renderer packs camera matrices, light direction, viewport,
- * scissor and the active overlay mode into one @ref DISP3DLIB::BrainRenderer::SceneData uniform
- * block per draw, which keeps the WebGL backend happy (Qt RHI on
- * WebGL cannot rebind state mid-pass).
+ * The renderer packs camera matrices, light direction and the active
+ * overlay mode (@ref DISP3DLIB::BrainRenderer::SceneData) into one uniform
+ * slot per draw. All slots and uploads of a frame are prepared before its
+ * render pass, which then only binds and draws.
  *
  * All scene objects (@ref DISP3DLIB::BrainSurface, @ref DISP3DLIB::DipoleObject,
  * @ref DISP3DLIB::NetworkObject, @ref DISP3DLIB::VideoOverlay) are accepted through opaque
@@ -98,25 +98,15 @@ public:
     static constexpr ShaderMode ShowNormals = DISP3DLIB::ShowNormals;
 
     /**
-     * @brief Aggregated GPU resources and render state for the 3-D brain visualization scene.
-     *
-     * Lightweight scene uniform block passed to every draw call.
-     *
-     * Viewport and scissor are stored as plain numbers so that this struct
-     * does not pull in any Qt-private QRhi headers.
+     * @brief Per-draw scene uniforms: camera matrices, light and overlay mode.
      */
     struct SceneData
     {
         QMatrix4x4 mvp;
         QVector3D cameraPos;
         QVector3D lightDir;
-        bool lightingEnabled;
+        bool lightingEnabled = true;
         float overlayMode = 0.0f; // 0=FsSurface, 1=FsAnnotation, 2=Scientific, 3=STC
-
-        // Viewport rectangle (floating-point, pixels)
-        float viewportX = 0, viewportY = 0, viewportW = 0, viewportH = 0;
-        // Scissor rectangle (integer, pixels)
-        int scissorX = 0, scissorY = 0, scissorW = 0, scissorH = 0;
     };
 
     //=========================================================================================================
@@ -162,11 +152,23 @@ public:
 
     //=========================================================================================================
     /**
+     * Start a new frame: frees all per-draw uniform slots. Call before the frame's first prepare call.
+     *
+     * A frame is recorded in two phases. First every prepare*() call writes its uniforms and
+     * uploads into resource update batches. Then beginFrame() commits them, and the issue*()
+     * calls only bind and draw: QRhi forbids resource updates inside a render pass, and prepare
+     * calls made inside one are rejected with a warning.
+     */
+    void newFrame();
+
+    //=========================================================================================================
+    /**
      * Begin the first render pass of a frame. Clears color and depth.
      *
      * @param[in] cb         Command buffer to record to.
+     * @param[in] updates    Resource updates to commit before the pass, or nullptr.
      */
-    void beginFrame(QRhiCommandBuffer* cb);
+    void beginFrame(QRhiCommandBuffer* cb, QRhiResourceUpdateBatch* updates = nullptr);
 
     //=========================================================================================================
     /**
@@ -174,39 +176,15 @@ public:
      * Uses the internal preserving render target (m_rtPreserve).
      *
      * @param[in] cb         Command buffer.
+     * @param[in] updates    Resource updates to commit before the pass, or nullptr.
      */
-    void beginPreservingPass(QRhiCommandBuffer* cb);
+    void beginPreservingPass(QRhiCommandBuffer* cb, QRhiResourceUpdateBatch* updates = nullptr);
 
     //=========================================================================================================
     /**
-     * Set uniforms that are shared for the entire frame.
-     * 
-     * @param[in, out] rhi QRhi instance that owns the uniform buffers.
-     * @param[in] data       Scene uniforms (MVP, light, etc).
-     */
-    void updateSceneUniforms(QRhi* rhi, const SceneData& data);
-
-    //=========================================================================================================
-    /**
-     * Render a single surface. Must be called between beginFrame/beginPreservingPass and endPass.
+     * Write the uniforms of one surface draw into a resource update batch.
      *
-     * @param[in] cb         Command buffer.
-     * @param[in] rhi        QRhi pointer.
-     * @param[in] data       Scene uniforms (MVP, light, etc).
-     * @param[in] surface    Pointer to surface to draw.
-     * @param[in] mode       Shader mode to use for this surface.
-     */
-    void renderSurface(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, BrainSurface* surface, ShaderMode mode);
-
-    //=========================================================================================================
-    /**
-     * Upload uniform data for a surface into a shared resource batch.
-     *
-     * This is the batched equivalent of the first half of renderSurface().
-     * Call once per surface, then submit the batch with cb->resourceUpdate(),
-     * and finally call issueSurfaceDraw() for each surface.
-     *
-     * @param[in] u          Shared resource update batch.
+     * @param[in] u          Resource update batch, committed before the pass.
      * @param[in] data       Scene uniforms (MVP, light, etc).
      * @param[in] surface    Pointer to surface.
      * @return Uniform buffer offset for this draw, or -1 on failure.
@@ -214,11 +192,7 @@ public:
     int prepareSurfaceDraw(QRhiResourceUpdateBatch* u, const SceneData& data, BrainSurface* surface);
 
     /**
-     * Issue draw commands for a surface using a pre-computed uniform offset.
-     *
-     * Call after cb->resourceUpdate() has been submitted with the batch
-     * from prepareSurfaceDraw().  Does not create resource batches or
-     * modify viewport/scissor state.
+     * Draw a surface with the uniforms from prepareSurfaceDraw(). Call inside a pass.
      *
      * @param[in] cb             Command buffer.
      * @param[in] surface        Pointer to surface to draw.
@@ -229,37 +203,42 @@ public:
 
     //=========================================================================================================
     /**
-     * Render dipoles using instanced rendering.
+     * Write the uniforms shared by the instanced draws (dipoles, network, polylines) of one view.
      *
-     * @param[in] cb         Command buffer.
-     * @param[in] rhi        QRhi pointer.
+     * Their geometry is uploaded by the objects' own updateBuffers() calls.
+     *
+     * @param[in] u          Resource update batch, committed before the pass.
      * @param[in] data       Scene uniforms.
-     * @param[in] dipoles    Pointer to DipoleObject.
+     * @return Uniform buffer offset, or -1 on failure.
      */
-    void renderDipoles(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, DipoleObject* dipoles);
+    int prepareInstancedDraw(QRhiResourceUpdateBatch* u, const SceneData& data);
 
-    //=========================================================================================================
     /**
-     * Render a connectivity network using instanced rendering.
-     * Renders both node spheres and edge cylinders as two draw calls.
+     * Draw dipoles as instanced cones. Call inside a pass.
      *
-     * @param[in] cb         Command buffer.
-     * @param[in] rhi        QRhi pointer.
-     * @param[in] data       Scene uniforms.
-     * @param[in] network    Pointer to NetworkObject.
+     * @param[in] cb             Command buffer.
+     * @param[in] dipoles        Pointer to DipoleObject.
+     * @param[in] uniformOffset  Offset returned by prepareInstancedDraw().
      */
-    void renderNetwork(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, NetworkObject* network);
+    void issueDipoleDraw(QRhiCommandBuffer* cb, DipoleObject* dipoles, int uniformOffset);
 
-    //=========================================================================================================
     /**
-     * Render a polyline as connected segments.
+     * Draw a connectivity network: instanced node spheres and edge cylinders. Call inside a pass.
      *
-     * @param[in] cb         Command buffer.
-     * @param[in] rhi        QRhi pointer.
-     * @param[in] data       Scene uniforms.
-     * @param[in] polyline   Pointer to PolylineObject.
+     * @param[in] cb             Command buffer.
+     * @param[in] network        Pointer to NetworkObject.
+     * @param[in] uniformOffset  Offset returned by prepareInstancedDraw().
      */
-    void renderPolyline(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, PolylineObject* polyline);
+    void issueNetworkDraw(QRhiCommandBuffer* cb, NetworkObject* network, int uniformOffset);
+
+    /**
+     * Draw a polyline as connected segments. Call inside a pass.
+     *
+     * @param[in] cb             Command buffer.
+     * @param[in] polyline       Pointer to PolylineObject.
+     * @param[in] uniformOffset  Offset returned by prepareInstancedDraw().
+     */
+    void issuePolylineDraw(QRhiCommandBuffer* cb, PolylineObject* polyline, int uniformOffset);
 
     //=========================================================================================================
     /**
@@ -279,32 +258,32 @@ public:
 
     //=========================================================================================================
     /**
-     * Render a live video overlay as a camera-facing textured quad.
-     * Always drawn last (depth test disabled) so the cut-out sits on top of
-     * the head surface at the current focus position.
+     * Write the uniforms of one video overlay draw: a camera-facing quad at the focus position,
+     * or, with a target surface, a decal projected onto that mesh. Call after prepareVideoOverlay().
      *
-     * @param[in] cb         Command buffer (must be inside a render pass).
-     * @param[in] rhi        QRhi pointer.
+     * @param[in] u          Resource update batch, committed before the pass.
      * @param[in] data       Scene uniforms (MVP, camera position).
      * @param[in] overlay    Pointer to VideoOverlay; ignored when null/disabled.
+     * @param[in] surface    Target surface mesh (typically scalp/head), or nullptr for the quad.
+     * @return Uniform buffer offset for this draw, or -1 when nothing is drawn.
      */
-    void renderVideoOverlay(QRhiCommandBuffer* cb, QRhi* rhi,
-                            const SceneData& data,
-                            DISP3DLIB::VideoOverlay* overlay);
+    int prepareVideoOverlayDraw(QRhiResourceUpdateBatch* u,
+                                const SceneData& data,
+                                DISP3DLIB::VideoOverlay* overlay,
+                                BrainSurface* surface);
 
     /**
-     * Render a live video overlay projected onto an existing surface mesh.
+     * Draw a video overlay prepared with prepareVideoOverlayDraw(). Call inside a pass.
      *
-     * @param[in] cb         Command buffer (must be inside a render pass).
-     * @param[in] rhi        QRhi pointer.
-     * @param[in] data       Scene uniforms (MVP, camera position).
-     * @param[in] overlay    Pointer to VideoOverlay; ignored when null/disabled.
-     * @param[in] surface    Target surface mesh (typically scalp/head).
+     * @param[in] cb             Command buffer.
+     * @param[in] overlay        Pointer to VideoOverlay.
+     * @param[in] surface        Same target surface as in prepareVideoOverlayDraw().
+     * @param[in] uniformOffset  Offset returned by prepareVideoOverlayDraw().
      */
-    void renderVideoOverlayOnSurface(QRhiCommandBuffer* cb, QRhi* rhi,
-                                     const SceneData& data,
-                                     DISP3DLIB::VideoOverlay* overlay,
-                                     BrainSurface* surface);
+    void issueVideoOverlayDraw(QRhiCommandBuffer* cb,
+                               DISP3DLIB::VideoOverlay* overlay,
+                               BrainSurface* surface,
+                               int uniformOffset);
 
     //=========================================================================================================
     /**
@@ -325,12 +304,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Upload uniform data for an MRI slice into a shared resource batch.
+     * Write the uniforms of one MRI slice draw into a resource update batch.
      *
-     * Call once per visible slice, then submit the batch with
-     * cb->resourceUpdate(), and finally call issueSliceDraw() for each slice.
-     *
-     * @param[in] u          Shared resource update batch.
+     * @param[in] u          Resource update batch, committed before the pass.
      * @param[in] data       Scene uniforms (MVP, camera position).
      * @param[in] slotIndex  Slot index (0=axial, 1=coronal, 2=sagittal).
      * @return Uniform buffer offset for this draw, or -1 on failure.
@@ -341,10 +317,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Issue draw commands for a prepared MRI slice.
-     *
-     * Call after cb->resourceUpdate() has been submitted with the batch
-     * from prepareSliceDraw(). Does not create resource batches.
+     * Draw an MRI slice prepared with prepareSliceDraw(). Call inside a pass.
      *
      * @param[in] cb             Command buffer (must be inside a render pass).
      * @param[in] slotIndex      Slot index matching the prepareSliceDraw call.

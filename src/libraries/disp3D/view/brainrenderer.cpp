@@ -47,8 +47,21 @@ struct BrainRenderer::Impl
 {
     void createResources(QRhi* rhi, QRhiRenderPassDescriptor* rp, int sampleCount);
 
-    // Offset of the next per-draw uniform slot, or -1 (with a warning) when the buffer is full
+    // Offset of the next per-draw uniform slot, or -1 (with a warning) when the buffer is full or a pass is recorded
     int claimUniformSlot(const char* caller);
+
+    void beginPass(QRhiCommandBuffer* cb, QRhiRenderTarget* rt, QRhiResourceUpdateBatch* updates);
+
+    // QRhi forbids resource updates inside a pass; true (with a warning) when a prepare call comes too late
+    bool insidePass(const char* caller) const;
+
+    void issueInstanced(QRhiCommandBuffer* cb, int uniformOffset, QRhiBuffer* vertexBuffer, QRhiBuffer* instanceBuffer,
+                        QRhiBuffer* indexBuffer, int indexCount, int instanceCount);
+
+    bool videoOverlayUsesDepth(const VideoOverlay* overlay) const
+    {
+        return overlay->isDepthEnabled() && overlay->hasDepthFrame() && videoOverlay.depthInitialized && videoOverlay.surfaceDepthPipeline;
+    }
 
     std::unique_ptr<QRhiShaderResourceBindings> srb;
 
@@ -61,6 +74,7 @@ struct BrainRenderer::Impl
     int uniformSlotStride = 0;
     int currentUniformOffset = 0;
     bool overflowReported = false; // Reset per frame so the log gets one line, not one per skipped draw
+    bool passRecording = false;
 
     bool resourcesDirty = true;
 
@@ -143,16 +157,6 @@ struct BrainRenderer::Impl
 // Helpers
 //=============================================================================================================
 
-static inline QRhiViewport toViewport(const BrainRenderer::SceneData& d)
-{
-    return QRhiViewport(d.viewportX, d.viewportY, d.viewportW, d.viewportH);
-}
-
-static inline QRhiScissor toScissor(const BrainRenderer::SceneData& d)
-{
-    return QRhiScissor(d.scissorX, d.scissorY, d.scissorW, d.scissorH);
-}
-
 static QImage tightlyPackedRgba(const QImage& source)
 {
     if (source.isNull())
@@ -179,6 +183,8 @@ namespace
 // Uniform buffer sizing
 constexpr int kUniformSlotCount = 8192; // Max draw calls before overflow
 constexpr int kUniformBlockSize = 256;  // Bound size per SRB dynamic slot (bytes)
+constexpr int kVideoOverlaySlots = 64;  // Video overlay draws per frame
+constexpr quint32 kVideoQuadBytes = 4 * 5 * sizeof(float); // 4 verts × (3 pos + 2 uv)
 
 // Per-object uniform byte offsets (must match .vert shader layout).
 // Kept as documentation of the UBO layout even where not directly indexed.
@@ -219,6 +225,8 @@ void BrainRenderer::initialize(QRhi* rhi, QRhiRenderPassDescriptor* rp, int samp
 
 int BrainRenderer::Impl::claimUniformSlot(const char* caller)
 {
+    if (insidePass(caller))
+        return -1;
     const int offset = currentUniformOffset;
     if (static_cast<quint32>(offset + uniformSlotStride) > uniformBuffer->size()) {
         if (!overflowReported) {
@@ -422,14 +430,20 @@ QRhiRenderTarget* BrainRenderer::rtPreserve() const
 
 //=============================================================================================================
 
-void BrainRenderer::beginFrame(QRhiCommandBuffer* cb)
+void BrainRenderer::newFrame()
 {
     d->currentUniformOffset = 0;
     d->overflowReported = false;
+    d->videoOverlay.currentUniformOffset = 0;
     d->sliceRes.currentUniformOffset = 0;
+}
 
-    auto* rt = d->rtClear.get();
-    cb->beginPass(rt, QColor(0, 0, 0), {1.0f, 0});
+//=============================================================================================================
+
+void BrainRenderer::Impl::beginPass(QRhiCommandBuffer* cb, QRhiRenderTarget* rt, QRhiResourceUpdateBatch* updates)
+{
+    cb->beginPass(rt, QColor(0, 0, 0), {1.0f, 0}, updates);
+    passRecording = true;
     const int w = rt->pixelSize().width();
     const int h = rt->pixelSize().height();
     cb->setViewport(QRhiViewport(0, 0, w, h));
@@ -438,21 +452,25 @@ void BrainRenderer::beginFrame(QRhiCommandBuffer* cb)
 
 //=============================================================================================================
 
-void BrainRenderer::updateSceneUniforms([[maybe_unused]] QRhi* rhi, [[maybe_unused]] const SceneData& data)
+bool BrainRenderer::Impl::insidePass(const char* caller) const
 {
-    // NO-OP: packed into per-object slots for simplicity
+    if (passRecording)
+        qWarning("BrainRenderer: %s called inside a render pass; resource updates must precede beginFrame()", caller);
+    return passRecording;
 }
 
 //=============================================================================================================
 
-void BrainRenderer::beginPreservingPass(QRhiCommandBuffer* cb)
+void BrainRenderer::beginFrame(QRhiCommandBuffer* cb, QRhiResourceUpdateBatch* updates)
 {
-    auto* rt = d->rtPreserve.get();
-    cb->beginPass(rt, QColor(0, 0, 0), {1.0f, 0});
-    const int w = rt->pixelSize().width();
-    const int h = rt->pixelSize().height();
-    cb->setViewport(QRhiViewport(0, 0, w, h));
-    cb->setScissor(QRhiScissor(0, 0, w, h));
+    d->beginPass(cb, d->rtClear.get(), updates);
+}
+
+//=============================================================================================================
+
+void BrainRenderer::beginPreservingPass(QRhiCommandBuffer* cb, QRhiResourceUpdateBatch* updates)
+{
+    d->beginPass(cb, d->rtPreserve.get(), updates);
 }
 
 //=============================================================================================================
@@ -460,6 +478,7 @@ void BrainRenderer::beginPreservingPass(QRhiCommandBuffer* cb)
 void BrainRenderer::endPass(QRhiCommandBuffer* cb)
 {
     cb->endPass();
+    d->passRecording = false;
 }
 
 //=============================================================================================================
@@ -474,7 +493,7 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
         return;
     if (!overlay->hasFrame())
         return;
-    if (!rhi || !u)
+    if (!rhi || !u || d->insidePass("prepareVideoOverlay"))
         return;
 
     QImage frame = tightlyPackedRgba(overlay->frame());
@@ -482,7 +501,6 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
         return;
 
     auto& k = d->videoOverlay;
-    k.currentUniformOffset = 0;
 
     // ── Lazy resource creation ──────────────────────────────────────
     if (!k.initialized) {
@@ -504,13 +522,12 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
         k.uniformSlotStride = rhi->ubufAligned(kUniformBlockSize);
         k.uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
                                              QRhiBuffer::UniformBuffer,
-                                             64 * k.uniformSlotStride));
+                                             kVideoOverlaySlots * k.uniformSlotStride));
         k.uniformBuffer->create();
 
-        // Vertex buffer: 4 vertices × (3 pos + 2 uv) floats — refilled each frame
-        constexpr int kVbSize = 4 * 5 * sizeof(float);
+        // Vertex buffer: one billboard quad per uniform slot — refilled each frame
         k.vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
-                                            QRhiBuffer::VertexBuffer, kVbSize));
+                                            QRhiBuffer::VertexBuffer, kVideoOverlaySlots * kVideoQuadBytes));
         k.vertexBuffer->create();
 
         // Index buffer: 2 triangles, 6 indices — uploaded once
@@ -760,128 +777,95 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
     }
 }
 
-void BrainRenderer::renderVideoOverlay(QRhiCommandBuffer* cb, QRhi* rhi,
-                                       const SceneData& data,
-                                       VideoOverlay* overlay)
+int BrainRenderer::prepareVideoOverlayDraw(QRhiResourceUpdateBatch* u,
+                                           const SceneData& data,
+                                           VideoOverlay* overlay,
+                                           BrainSurface* surface)
 {
-    if (!overlay || !overlay->isEnabled())
-        return;
-    if (!overlay->hasFrame())
-        return;
-
-    auto& k = d->videoOverlay;
-    if (!k.initialized)
-        return;
-    if (k.uniformSlotStride <= 0)
-        return;
-
-    const int uniformOffset = k.currentUniformOffset;
-    k.currentUniformOffset += k.uniformSlotStride;
-    if (static_cast<quint32>(uniformOffset + kUniformBlockSize) > k.uniformBuffer->size())
-        return;
-    QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
-
-    // ── Billboard the quad to face the camera ──────────────────────
-    const QVector3D centre = overlay->focusPosition();
-    const float sizeM = overlay->sizeMeters();
-
-    // Preserve the video frame's aspect ratio: sizeMeters controls the
-    // width, and the height is derived from the frame dimensions.
-    const QImage& frm = overlay->frame();
-    const float aspect = (frm.height() > 0)
-        ? static_cast<float>(frm.width()) / frm.height()
-        : 1.0f;
-    const float halfW = 0.5f * sizeM;
-    const float halfH = (aspect > 0.0f) ? halfW / aspect : halfW;
-
-    QVector3D viewDir = centre - data.cameraPos;
-    if (viewDir.lengthSquared() < 1e-12f)
-        viewDir = QVector3D(0, 0, -1);
-    viewDir.normalize();
-
-    // Use the upHint (tracker→objective axis) when available so that
-    // the quad's long edge is perpendicular to the optical axis.
-    const QVector3D hint = overlay->upHint();
-    QVector3D up;
-    if (hint.lengthSquared() > 1e-8f) {
-        // Project the hint onto the plane perpendicular to viewDir
-        up = (hint - QVector3D::dotProduct(hint, viewDir) * viewDir).normalized();
-        if (up.lengthSquared() < 1e-8f)
-            up = QVector3D(0.0f, 0.0f, 1.0f);
-    } else {
-        QVector3D worldUp(0.0f, 0.0f, 1.0f);
-        if (std::abs(QVector3D::dotProduct(viewDir, worldUp)) > 0.95f)
-            worldUp = QVector3D(0.0f, 1.0f, 0.0f);
-        up = QVector3D::crossProduct(
-                 QVector3D::crossProduct(viewDir, worldUp), viewDir)
-                 .normalized();
-    }
-    QVector3D right = QVector3D::crossProduct(viewDir, up).normalized();
-
-    const QVector3D c00 = centre - right * halfW - up * halfH;
-    const QVector3D c10 = centre + right * halfW - up * halfH;
-    const QVector3D c01 = centre - right * halfW + up * halfH;
-    const QVector3D c11 = centre + right * halfW + up * halfH;
-
-    const float verts[4 * 5] = {
-        c00.x(), c00.y(), c00.z(), 0.0f, 1.0f, // image y is flipped vs uv
-        c10.x(), c10.y(), c10.z(), 1.0f, 1.0f,
-        c01.x(), c01.y(), c01.z(), 0.0f, 0.0f,
-        c11.x(), c11.y(), c11.z(), 1.0f, 0.0f};
-    u->updateDynamicBuffer(k.vertexBuffer.get(), 0, sizeof(verts), verts);
-
-    // ── Uniforms (mat4 mvp, vec4 borderColor, float opacity, 3 pad) ─
-    struct
-    {
-        float mvp[16];
-        float borderColor[4];
-        float opacity;
-        float pad0, pad1, pad2;
-    } ub;
-    memcpy(ub.mvp, data.mvp.constData(), 64);
-    ub.borderColor[0] = 0.0f;
-    ub.borderColor[1] = 0.85f;
-    ub.borderColor[2] = 1.0f;
-    ub.borderColor[3] = 1.0f;
-    ub.opacity = overlay->opacity();
-    ub.pad0 = ub.pad1 = ub.pad2 = 0.0f;
-    u->updateDynamicBuffer(k.uniformBuffer.get(), uniformOffset, sizeof(ub), &ub);
-
-    cb->resourceUpdate(u);
-
-    // ── Draw ────────────────────────────────────────────────────────
-    cb->setViewport(toViewport(data));
-    cb->setScissor(toScissor(data));
-    cb->setGraphicsPipeline(k.pipeline.get());
-    const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(uniformOffset)};
-    cb->setShaderResources(k.srb.get(), 1, &srbOffset);
-    const QRhiCommandBuffer::VertexInput vbuf(k.vertexBuffer.get(), 0);
-    cb->setVertexInput(0, 1, &vbuf, k.indexBuffer.get(), 0, QRhiCommandBuffer::IndexUInt32);
-    cb->drawIndexed(6);
-}
-
-void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer* cb, QRhi* rhi,
-                                                const SceneData& data,
-                                                VideoOverlay* overlay,
-                                                BrainSurface* surface)
-{
-    Q_UNUSED(rhi);
     if (!overlay || !overlay->isEnabled() || !overlay->hasFrame())
-        return;
-    if (!surface)
-        return;
+        return -1;
 
     auto& k = d->videoOverlay;
-    if (!k.initialized || !k.surfacePipeline)
-        return;
-    if (k.uniformSlotStride <= 0)
-        return;
+    if (!k.initialized || (surface && !k.surfacePipeline))
+        return -1;
+    if (d->insidePass("prepareVideoOverlayDraw"))
+        return -1;
 
     const int uniformOffset = k.currentUniformOffset;
-    k.currentUniformOffset += k.uniformSlotStride;
     if (static_cast<quint32>(uniformOffset + kUniformBlockSize) > k.uniformBuffer->size())
-        return;
-    QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
+        return -1;
+    k.currentUniformOffset += k.uniformSlotStride;
+
+    if (!surface) {
+        // ── Billboard the quad to face the camera ──────────────────────
+        const QVector3D centre = overlay->focusPosition();
+        const float sizeM = overlay->sizeMeters();
+
+        // Preserve the video frame's aspect ratio: sizeMeters controls the
+        // width, and the height is derived from the frame dimensions.
+        const QImage& frm = overlay->frame();
+        const float aspect = (frm.height() > 0)
+            ? static_cast<float>(frm.width()) / frm.height()
+            : 1.0f;
+        const float halfW = 0.5f * sizeM;
+        const float halfH = (aspect > 0.0f) ? halfW / aspect : halfW;
+
+        QVector3D viewDir = centre - data.cameraPos;
+        if (viewDir.lengthSquared() < 1e-12f)
+            viewDir = QVector3D(0, 0, -1);
+        viewDir.normalize();
+
+        // Use the upHint (tracker→objective axis) when available so that
+        // the quad's long edge is perpendicular to the optical axis.
+        const QVector3D hint = overlay->upHint();
+        QVector3D up;
+        if (hint.lengthSquared() > 1e-8f) {
+            // Project the hint onto the plane perpendicular to viewDir
+            up = (hint - QVector3D::dotProduct(hint, viewDir) * viewDir).normalized();
+            if (up.lengthSquared() < 1e-8f)
+                up = QVector3D(0.0f, 0.0f, 1.0f);
+        } else {
+            QVector3D worldUp(0.0f, 0.0f, 1.0f);
+            if (std::abs(QVector3D::dotProduct(viewDir, worldUp)) > 0.95f)
+                worldUp = QVector3D(0.0f, 1.0f, 0.0f);
+            up = QVector3D::crossProduct(
+                     QVector3D::crossProduct(viewDir, worldUp), viewDir)
+                     .normalized();
+        }
+        QVector3D right = QVector3D::crossProduct(viewDir, up).normalized();
+
+        const QVector3D c00 = centre - right * halfW - up * halfH;
+        const QVector3D c10 = centre + right * halfW - up * halfH;
+        const QVector3D c01 = centre - right * halfW + up * halfH;
+        const QVector3D c11 = centre + right * halfW + up * halfH;
+
+        const float verts[4 * 5] = {
+            c00.x(), c00.y(), c00.z(), 0.0f, 1.0f, // image y is flipped vs uv
+            c10.x(), c10.y(), c10.z(), 1.0f, 1.0f,
+            c01.x(), c01.y(), c01.z(), 0.0f, 0.0f,
+            c11.x(), c11.y(), c11.z(), 1.0f, 0.0f};
+        // Each slot has its own quad: every pane faces its own camera
+        static_assert(sizeof(verts) == kVideoQuadBytes);
+        u->updateDynamicBuffer(k.vertexBuffer.get(), quint32(uniformOffset / k.uniformSlotStride) * kVideoQuadBytes, sizeof(verts), verts);
+
+        // ── Uniforms (mat4 mvp, vec4 borderColor, float opacity, 3 pad) ─
+        struct
+        {
+            float mvp[16];
+            float borderColor[4];
+            float opacity;
+            float pad0, pad1, pad2;
+        } ub;
+        memcpy(ub.mvp, data.mvp.constData(), 64);
+        ub.borderColor[0] = 0.0f;
+        ub.borderColor[1] = 0.85f;
+        ub.borderColor[2] = 1.0f;
+        ub.borderColor[3] = 1.0f;
+        ub.opacity = overlay->opacity();
+        ub.pad0 = ub.pad1 = ub.pad2 = 0.0f;
+        u->updateDynamicBuffer(k.uniformBuffer.get(), uniformOffset, sizeof(ub), &ub);
+        return uniformOffset;
+    }
 
     // Approximate the local scalp normal from the focus position vector.
     QVector3D localNormal = overlay->focusPosition();
@@ -911,7 +895,7 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer* cb, QRhi* rhi
     const QVector3D axisV = referenceUp;
     const QVector3D axisU = QVector3D::crossProduct(axisV, localNormal).normalized();
 
-    const bool useDepth = overlay->isDepthEnabled() && overlay->hasDepthFrame() && k.depthInitialized && k.surfaceDepthPipeline;
+    const bool useDepth = d->videoOverlayUsesDepth(overlay);
 
     // Uniform block — the depth-enhanced shader has an extra vec4 depthParams
     // but the base 7×vec4 layout (112 bytes) still fits within kUniformBlockSize
@@ -960,22 +944,36 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer* cb, QRhi* rhi
     ub.depthParams[2] = useDepth ? 1.0f : 0.0f;
     ub.depthParams[3] = 0.0f;
     u->updateDynamicBuffer(k.uniformBuffer.get(), uniformOffset, sizeof(ub), &ub);
-    cb->resourceUpdate(u);
+    return uniformOffset;
+}
 
-    cb->setViewport(toViewport(data));
-    cb->setScissor(toScissor(data));
-    if (useDepth) {
-        cb->setGraphicsPipeline(k.surfaceDepthPipeline.get());
-        const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(uniformOffset)};
-        cb->setShaderResources(k.srbDepth.get(), 1, &srbOffset);
-    } else {
-        cb->setGraphicsPipeline(k.surfacePipeline.get());
-        const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(uniformOffset)};
-        cb->setShaderResources(k.srb.get(), 1, &srbOffset);
+//=============================================================================================================
+
+void BrainRenderer::issueVideoOverlayDraw(QRhiCommandBuffer* cb,
+                                          VideoOverlay* overlay,
+                                          BrainSurface* surface,
+                                          int uniformOffset)
+{
+    if (!overlay || uniformOffset < 0)
+        return;
+
+    auto& k = d->videoOverlay;
+    const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(uniformOffset)};
+    if (surface) {
+        const bool useDepth = d->videoOverlayUsesDepth(overlay);
+        cb->setGraphicsPipeline(useDepth ? k.surfaceDepthPipeline.get() : k.surfacePipeline.get());
+        cb->setShaderResources(useDepth ? k.srbDepth.get() : k.srb.get(), 1, &srbOffset);
+        const QRhiCommandBuffer::VertexInput vbuf(surface->vertexBuffer(), 0);
+        cb->setVertexInput(0, 1, &vbuf, surface->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
+        cb->drawIndexed(surface->indexCount());
+        return;
     }
-    const QRhiCommandBuffer::VertexInput vbuf(surface->vertexBuffer(), 0);
-    cb->setVertexInput(0, 1, &vbuf, surface->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
-    cb->drawIndexed(surface->indexCount());
+
+    cb->setGraphicsPipeline(k.pipeline.get());
+    cb->setShaderResources(k.srb.get(), 1, &srbOffset);
+    const QRhiCommandBuffer::VertexInput vbuf(k.vertexBuffer.get(), quint32(uniformOffset / k.uniformSlotStride) * kVideoQuadBytes);
+    cb->setVertexInput(0, 1, &vbuf, k.indexBuffer.get(), 0, QRhiCommandBuffer::IndexUInt32);
+    cb->drawIndexed(6);
 }
 
 //=============================================================================================================
@@ -987,7 +985,7 @@ void BrainRenderer::prepareSlice(QRhi* rhi,
                                  DISP3DLIB::SliceObject* slice,
                                  int slotIndex)
 {
-    if (!rhi || !u)
+    if (!rhi || !u || d->insidePass("prepareSlice"))
         return;
     if (slotIndex < 0 || slotIndex >= Impl::kMaxSliceSlots)
         return;
@@ -1160,9 +1158,7 @@ int BrainRenderer::prepareSliceDraw(QRhiResourceUpdateBatch* u,
         return -1;
 
     const auto& sliceSlot = k.sliceSlots[slotIndex];
-    if (!sliceSlot.visible)
-        return -1;
-    if (k.uniformSlotStride <= 0)
+    if (!sliceSlot.visible || d->insidePass("prepareSliceDraw"))
         return -1;
 
     const int uniformOffset = k.currentUniformOffset;
@@ -1221,82 +1217,6 @@ void BrainRenderer::issueSliceDraw(QRhiCommandBuffer* cb,
     const QRhiCommandBuffer::VertexInput vbuf(k.vertexBuffer[slotIndex].get(), 0);
     cb->setVertexInput(0, 1, &vbuf, k.indexBuffer.get(), 0, QRhiCommandBuffer::IndexUInt32);
     cb->drawIndexed(6);
-}
-
-//=============================================================================================================
-
-void BrainRenderer::renderSurface(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, BrainSurface* surface, ShaderMode mode)
-{
-    if (!surface || !surface->isVisible())
-        return;
-
-    auto* pipeline = d->pipelines[mode].get();
-    if (!pipeline)
-        return;
-
-    // NOTE: Buffer uploads are handled in the pre-render phase
-    // (BrainView::render pre-upload loop).  Do not call
-    // surface->updateBuffers() here — it would allocate a redundant
-    // QRhiResourceUpdateBatch per surface.
-
-    const int offset = d->claimUniformSlot("renderSurface");
-    if (offset < 0)
-        return; // Skip this draw rather than silently corrupt earlier viewport data
-    QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
-
-    // On desktop, when a specific annotation region or vertex range is
-    // selected the CPU vertex-color gold tint (in updateVertexColors)
-    // provides per-region feedback.  Suppress the shader's whole-surface
-    // gold glow so it doesn't drown out the region highlight.
-    float selected = surface->isSelected() ? 1.0f : 0.0f;
-    if (surface->isSelected() && (surface->selectedRegionId() != -1 || surface->selectedVertexStart() >= 0)) {
-        selected = 0.0f;
-    }
-
-    // Pack ALL uniforms into a contiguous block for a single upload
-    struct
-    {
-        float mvp[16];         // 0..63
-        float cameraPos[3];    // 64..75
-        float isSelected;      // 76..79
-        float lightDir[3];     // 80..91
-        float tissueType;      // 92..95
-        float lightingEnabled; // 96..99
-        float overlayMode;     // 100..103
-    } ub;
-    memcpy(ub.mvp, data.mvp.constData(), 64);
-    memcpy(ub.cameraPos, &data.cameraPos, 12);
-    ub.isSelected = selected;
-    memcpy(ub.lightDir, &data.lightDir, 12);
-    ub.tissueType = static_cast<float>(surface->tissueType());
-    ub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
-    ub.overlayMode = data.overlayMode;
-
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
-
-    cb->resourceUpdate(u);
-
-    // Re-assert the per-pane viewport and scissor after resourceUpdate.
-    // The scissor provides a hard pixel clip that guarantees no cross-pane
-    // bleeding, regardless of Metal render-encoder restarts.
-    cb->setViewport(toViewport(data));
-    cb->setScissor(toScissor(data));
-
-    auto draw = [&](QRhiGraphicsPipeline* p) {
-        cb->setGraphicsPipeline(p);
-
-        const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(offset)};
-        cb->setShaderResources(d->srb.get(), 1, &srbOffset);
-        const QRhiCommandBuffer::VertexInput vbuf(surface->vertexBuffer(), 0);
-        cb->setVertexInput(0, 1, &vbuf, surface->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
-        cb->drawIndexed(surface->indexCount());
-    };
-
-    if (mode == Holographic && d->pipelinesBackColor[Holographic]) {
-        draw(d->pipelinesBackColor[Holographic].get());
-    }
-
-    draw(pipeline);
 }
 
 //=============================================================================================================
@@ -1371,26 +1291,12 @@ void BrainRenderer::issueSurfaceDraw(QRhiCommandBuffer* cb,
 
 //=============================================================================================================
 
-void BrainRenderer::renderDipoles(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, DipoleObject* dipoles)
+int BrainRenderer::prepareInstancedDraw(QRhiResourceUpdateBatch* u, const SceneData& data)
 {
-    if (!dipoles || !dipoles->isVisible() || dipoles->instanceCount() == 0)
-        return;
+    const int offset = d->claimUniformSlot("prepareInstancedDraw");
+    if (offset < 0)
+        return -1;
 
-    auto* pipeline = d->pipelines[Dipole].get();
-    if (!pipeline)
-        return;
-
-    QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
-    dipoles->updateBuffers(rhi, u);
-
-    // Geometry uploads go through even when the draw is skipped: the object now considers its buffers current
-    const int offset = d->claimUniformSlot("renderDipoles");
-    if (offset < 0) {
-        cb->resourceUpdate(u);
-        return;
-    }
-
-    // Pack all uniforms into a single contiguous upload
     struct
     {
         float mvp[16];         // 0..63
@@ -1399,191 +1305,72 @@ void BrainRenderer::renderDipoles(QRhiCommandBuffer* cb, QRhi* rhi, const SceneD
         float lightDir[3];     // 80..91
         float _pad1;           // 92..95
         float lightingEnabled; // 96..99
-    } dub;
-    memcpy(dub.mvp, data.mvp.constData(), 64);
-    memcpy(dub.cameraPos, &data.cameraPos, 12);
-    dub._pad0 = 0.0f;
-    memcpy(dub.lightDir, &data.lightDir, 12);
-    dub._pad1 = 0.0f;
-    dub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(dub), &dub);
-
-    cb->resourceUpdate(u);
-
-    // Re-assert the per-pane viewport and scissor.
-    cb->setViewport(toViewport(data));
-    cb->setScissor(toScissor(data));
-
-    cb->setGraphicsPipeline(pipeline);
-
-    const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(offset)};
-    cb->setShaderResources(d->srb.get(), 1, &srbOffset);
-
-    const QRhiCommandBuffer::VertexInput bindings[2] = {
-        QRhiCommandBuffer::VertexInput(dipoles->vertexBuffer(), 0),
-        QRhiCommandBuffer::VertexInput(dipoles->instanceBuffer(), 0)};
-
-    cb->setVertexInput(0, 2, bindings, dipoles->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
-
-    cb->drawIndexed(dipoles->indexCount(), dipoles->instanceCount());
+    } ub;
+    memcpy(ub.mvp, data.mvp.constData(), 64);
+    memcpy(ub.cameraPos, &data.cameraPos, 12);
+    ub._pad0 = 0.0f;
+    memcpy(ub.lightDir, &data.lightDir, 12);
+    ub._pad1 = 0.0f;
+    ub.lightingEnabled = data.lightingEnabled ? 1.0f : 0.0f;
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
+    return offset;
 }
 
 //=============================================================================================================
 
-void BrainRenderer::renderNetwork(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, NetworkObject* network)
+void BrainRenderer::Impl::issueInstanced(QRhiCommandBuffer* cb,
+                                         int uniformOffset,
+                                         QRhiBuffer* vertexBuffer,
+                                         QRhiBuffer* instanceBuffer,
+                                         QRhiBuffer* indexBuffer,
+                                         int indexCount,
+                                         int instanceCount)
+{
+    // Dipoles, network nodes and edges, and polylines share the Dipole pipeline's instance layout
+    QRhiGraphicsPipeline* pipeline = pipelines[Dipole].get();
+    if (!pipeline || uniformOffset < 0 || indexCount <= 0 || instanceCount <= 0)
+        return;
+
+    cb->setGraphicsPipeline(pipeline);
+    const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(uniformOffset)};
+    cb->setShaderResources(srb.get(), 1, &srbOffset);
+    const QRhiCommandBuffer::VertexInput bindings[2] = {
+        QRhiCommandBuffer::VertexInput(vertexBuffer, 0),
+        QRhiCommandBuffer::VertexInput(instanceBuffer, 0)};
+    cb->setVertexInput(0, 2, bindings, indexBuffer, 0, QRhiCommandBuffer::IndexUInt32);
+    cb->drawIndexed(quint32(indexCount), quint32(instanceCount));
+}
+
+//=============================================================================================================
+
+void BrainRenderer::issueDipoleDraw(QRhiCommandBuffer* cb, DipoleObject* dipoles, int uniformOffset)
+{
+    if (!dipoles || !dipoles->isVisible())
+        return;
+    d->issueInstanced(cb, uniformOffset, dipoles->vertexBuffer(), dipoles->instanceBuffer(),
+                      dipoles->indexBuffer(), dipoles->indexCount(), dipoles->instanceCount());
+}
+
+//=============================================================================================================
+
+void BrainRenderer::issueNetworkDraw(QRhiCommandBuffer* cb, NetworkObject* network, int uniformOffset)
 {
     if (!network || !network->isVisible() || !network->hasData())
         return;
-
-    auto* pipeline = d->pipelines[Dipole].get();
-    if (!pipeline)
-        return;
-
-    // --- Render Nodes (instanced spheres) ---
-    if (network->nodeInstanceCount() > 0) {
-        QRhiResourceUpdateBatch* uNodes = rhi->nextResourceUpdateBatch();
-        network->updateNodeBuffers(rhi, uNodes);
-
-        const int offset = d->claimUniformSlot("renderNetwork (nodes)");
-        if (offset < 0) {
-            cb->resourceUpdate(uNodes);
-            return;
-        }
-
-        struct
-        {
-            float mvp[16];
-            float cp[3];
-            float _p0;
-            float ld[3];
-            float _p1;
-            float le;
-        } nub;
-        memcpy(nub.mvp, data.mvp.constData(), 64);
-        memcpy(nub.cp, &data.cameraPos, 12);
-        nub._p0 = 0.0f;
-        memcpy(nub.ld, &data.lightDir, 12);
-        nub._p1 = 0.0f;
-        nub.le = data.lightingEnabled ? 1.0f : 0.0f;
-        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(nub), &nub);
-
-        cb->resourceUpdate(uNodes);
-        cb->setViewport(toViewport(data));
-        cb->setScissor(toScissor(data));
-
-        cb->setGraphicsPipeline(pipeline);
-
-        const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(offset)};
-        cb->setShaderResources(d->srb.get(), 1, &srbOffset);
-
-        const QRhiCommandBuffer::VertexInput nodeBindings[2] = {
-            QRhiCommandBuffer::VertexInput(network->nodeVertexBuffer(), 0),
-            QRhiCommandBuffer::VertexInput(network->nodeInstanceBuffer(), 0)};
-
-        cb->setVertexInput(0, 2, nodeBindings, network->nodeIndexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
-        cb->drawIndexed(network->nodeIndexCount(), network->nodeInstanceCount());
-    }
-
-    // --- Render Edges (instanced cylinders) ---
-    if (network->edgeInstanceCount() > 0) {
-        QRhiResourceUpdateBatch* uEdges = rhi->nextResourceUpdateBatch();
-        network->updateEdgeBuffers(rhi, uEdges);
-
-        const int offset = d->claimUniformSlot("renderNetwork (edges)");
-        if (offset < 0) {
-            cb->resourceUpdate(uEdges);
-            return;
-        }
-
-        struct
-        {
-            float mvp[16];
-            float cp[3];
-            float _p0;
-            float ld[3];
-            float _p1;
-            float le;
-        } eub;
-        memcpy(eub.mvp, data.mvp.constData(), 64);
-        memcpy(eub.cp, &data.cameraPos, 12);
-        eub._p0 = 0.0f;
-        memcpy(eub.ld, &data.lightDir, 12);
-        eub._p1 = 0.0f;
-        eub.le = data.lightingEnabled ? 1.0f : 0.0f;
-        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(eub), &eub);
-
-        cb->resourceUpdate(uEdges);
-        cb->setViewport(toViewport(data));
-        cb->setScissor(toScissor(data));
-
-        cb->setGraphicsPipeline(pipeline);
-
-        const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(offset)};
-        cb->setShaderResources(d->srb.get(), 1, &srbOffset);
-
-        const QRhiCommandBuffer::VertexInput edgeBindings[2] = {
-            QRhiCommandBuffer::VertexInput(network->edgeVertexBuffer(), 0),
-            QRhiCommandBuffer::VertexInput(network->edgeInstanceBuffer(), 0)};
-
-        cb->setVertexInput(0, 2, edgeBindings, network->edgeIndexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
-        cb->drawIndexed(network->edgeIndexCount(), network->edgeInstanceCount());
-    }
+    d->issueInstanced(cb, uniformOffset, network->nodeVertexBuffer(), network->nodeInstanceBuffer(),
+                      network->nodeIndexBuffer(), network->nodeIndexCount(), network->nodeInstanceCount());
+    d->issueInstanced(cb, uniformOffset, network->edgeVertexBuffer(), network->edgeInstanceBuffer(),
+                      network->edgeIndexBuffer(), network->edgeIndexCount(), network->edgeInstanceCount());
 }
 
 //=============================================================================================================
 
-void BrainRenderer::renderPolyline(QRhiCommandBuffer* cb, QRhi* rhi, const SceneData& data, PolylineObject* polyline)
+void BrainRenderer::issuePolylineDraw(QRhiCommandBuffer* cb, PolylineObject* polyline, int uniformOffset)
 {
     if (!polyline || !polyline->isVisible() || !polyline->hasData())
         return;
-
-    // The segments use the same instance layout as dipoles and network edges,
-    // so the Dipole pipeline draws them without a shader of their own.
-    auto* pipeline = d->pipelines[Dipole].get();
-    if (!pipeline)
-        return;
-
-    QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
-    polyline->updateBuffers(rhi, u);
-
-    const int offset = d->claimUniformSlot("renderPolyline");
-    if (offset < 0) {
-        cb->resourceUpdate(u);
-        return;
-    }
-
-    struct
-    {
-        float mvp[16];
-        float cp[3];
-        float _p0;
-        float ld[3];
-        float _p1;
-        float le;
-    } ub;
-    memcpy(ub.mvp, data.mvp.constData(), 64);
-    memcpy(ub.cp, &data.cameraPos, 12);
-    ub._p0 = 0.0f;
-    memcpy(ub.ld, &data.lightDir, 12);
-    ub._p1 = 0.0f;
-    ub.le = data.lightingEnabled ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(d->uniformBuffer.get(), offset, sizeof(ub), &ub);
-
-    cb->resourceUpdate(u);
-    cb->setViewport(toViewport(data));
-    cb->setScissor(toScissor(data));
-
-    cb->setGraphicsPipeline(pipeline);
-
-    const QRhiCommandBuffer::DynamicOffset srbOffset = {0, uint32_t(offset)};
-    cb->setShaderResources(d->srb.get(), 1, &srbOffset);
-
-    const QRhiCommandBuffer::VertexInput bindings[2] = {
-        QRhiCommandBuffer::VertexInput(polyline->vertexBuffer(), 0),
-        QRhiCommandBuffer::VertexInput(polyline->instanceBuffer(), 0)};
-
-    cb->setVertexInput(0, 2, bindings, polyline->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
-    cb->drawIndexed(polyline->indexCount(), polyline->instanceCount());
+    d->issueInstanced(cb, uniformOffset, polyline->vertexBuffer(), polyline->instanceBuffer(),
+                      polyline->indexBuffer(), polyline->indexCount(), polyline->instanceCount());
 }
 
 } // namespace DISP3DLIB
