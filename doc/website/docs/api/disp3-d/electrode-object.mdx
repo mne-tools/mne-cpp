@@ -71,9 +71,9 @@ Clears the selection, hover and contact colours.
 
 ---
 
-### setContactValues(values, minColor, maxColor)
+### setContactValues(values, colormap)
 
-Colour contacts by value, mapped linearly between the smallest and largest given value.
+Colour contacts by value through a colormap spanning [min(0, smallest), largest].
 
 Contacts without a value keep the colour of their lead.
 
@@ -82,17 +82,34 @@ Contacts without a value keep the colour of their lead.
 - **values** : *const QMap&lt; QString, float &gt; &*
   Map of contact name -&gt; scalar value.
 
-- **minColor** : *const QColor &*
-  Color for the minimum value (default: blue).
-
-- **maxColor** : *const QColor &*
-  Color for the maximum value (default: red).
+- **colormap** : *const QString &*
+  [`ColorMap`](/docs/api/disp/color-map) name.
 
 ---
 
 ### clearContactValues()
 
 Restore the lead colours of all contacts.
+
+---
+
+### surfaceColors(vertices, distance)
+
+Paint the contact values onto a surface, as MNE-Python's stc_near_sensors: each vertex takes the distance-weighted mean of the contacts within reach and fades out with the summed weight.
+
+ECoG contacts are first moved onto the surface; depth contacts are not.
+
+**Parameters:**
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  Surface vertex positions in the frame of the implantation, metres.
+
+- **distance** : *double*
+  Reach of each contact in metres.
+
+**Returns:**
+
+- *QVector&lt; uint32_t &gt;* — ABGR colour per vertex, transparent away from the contacts; empty without values.
 
 ---
 

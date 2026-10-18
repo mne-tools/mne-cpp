@@ -16,6 +16,9 @@
 
 #include "electrodeobject.h"
 
+#include <disp/plots/helpers/colormap.h>
+#include <ieeg/ieeg_surface_map.h>
+
 #include <QMatrix4x4>
 #include <QQuaternion>
 #include <QtMath>
@@ -153,6 +156,7 @@ void ElectrodeObject::setImplantation(const IEEGLIB::IeegImplantation& implantat
             m_leadOfContact[c] = l;
     }
     m_contactColors.fill(QColor(), contactCount);
+    m_contactValues.clear();
     m_selectedContact = -1;
     m_hoveredContact = -1;
     computeBoundingBox();
@@ -169,25 +173,27 @@ int ElectrodeObject::totalContactCount() const
 
 //=============================================================================================================
 
-void ElectrodeObject::setContactValues(const QMap<QString, float>& values,
-                                       const QColor& minColor,
-                                       const QColor& maxColor)
+void ElectrodeObject::setContactValues(const QMap<QString, float>& values, const QString& colormap)
 {
-    if (values.isEmpty())
+    if (values.isEmpty()) {
+        clearContactValues();
         return;
-
-    float minVal = std::numeric_limits<float>::max();
-    float maxVal = std::numeric_limits<float>::lowest();
-    for (auto it = values.cbegin(); it != values.cend(); ++it) {
-        minVal = std::min(minVal, it.value());
-        maxVal = std::max(maxVal, it.value());
+    }
+    m_contactValues = values;
+    m_colormap = colormap;
+    m_valueMin = 0.0f;
+    m_valueMax = std::numeric_limits<float>::lowest();
+    for (const float v : values) {
+        m_valueMin = std::min(m_valueMin, v);
+        m_valueMax = std::max(m_valueMax, v);
     }
 
     const QVector<IEEGLIB::IeegContact>& contacts = m_implantation.contacts();
+    m_contactColors.fill(QColor());
     for (int c = 0; c < contacts.size(); ++c) {
         const auto it = values.find(contacts[c].name);
         if (it != values.end())
-            m_contactColors[c] = interpolateColor(it.value(), minVal, maxVal, minColor, maxColor);
+            m_contactColors[c] = QColor::fromRgb(DISPLIB::ColorMap::valueToColor(normalized(it.value()), colormap));
     }
     buildContactInstances();
 }
@@ -196,8 +202,56 @@ void ElectrodeObject::setContactValues(const QMap<QString, float>& values,
 
 void ElectrodeObject::clearContactValues()
 {
+    m_contactValues.clear();
     m_contactColors.fill(QColor());
     buildContactInstances();
+}
+
+//=============================================================================================================
+
+float ElectrodeObject::normalized(float value) const
+{
+    return m_valueMax > m_valueMin ? qBound(0.0f, (value - m_valueMin) / (m_valueMax - m_valueMin), 1.0f) : 1.0f;
+}
+
+//=============================================================================================================
+
+QVector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& vertices, double distance) const
+{
+    if (m_contactValues.isEmpty() || vertices.rows() == 0)
+        return {};
+
+    // Weights (vertices x contacts) of ECoG contacts moved onto the surface plus depth contacts in place
+    const QVector<IEEGLIB::IeegContact>& contacts = m_implantation.contacts();
+    const QVector<IEEGLIB::IeegLead>& leads = m_implantation.leads();
+    const Eigen::Index n = contacts.size();
+    Eigen::MatrixX3f subdural = Eigen::MatrixX3f::Constant(n, 3, std::numeric_limits<float>::quiet_NaN());
+    Eigen::MatrixX3f depth = subdural;
+    Eigen::VectorXd value = Eigen::VectorXd::Zero(n);
+    Eigen::VectorXd hasValue = Eigen::VectorXd::Zero(n);
+    for (int c = 0; c < n; ++c) {
+        const auto it = m_contactValues.find(contacts[c].name);
+        if (it == m_contactValues.end())
+            continue;
+        const int lead = m_leadOfContact.value(c, -1);
+        const bool isDepth = lead < 0 || leads[lead].type == IEEGLIB::IeegLeadType::Depth;
+        (isDepth ? depth : subdural).row(c) = contacts[c].position.transpose();
+        value(c) = it.value();
+        hasValue(c) = 1.0;
+    }
+    const Eigen::SparseMatrix<double> weights = IEEGLIB::IeegSurfaceMap::weights(subdural, vertices, distance, IEEGLIB::IeegSurfaceMapMode::Sum, true) +
+        IEEGLIB::IeegSurfaceMap::weights(depth, vertices, distance, IEEGLIB::IeegSurfaceMapMode::Sum, false);
+    const Eigen::VectorXd weighted = weights * value;
+    const Eigen::VectorXd reach = weights * hasValue;
+
+    QVector<uint32_t> colors(static_cast<int>(vertices.rows()), packABGR(0, 0, 0, 0));
+    for (int v = 0; v < colors.size(); ++v) {
+        if (reach(v) <= 0.0)
+            continue;
+        const QRgb rgb = DISPLIB::ColorMap::valueToColor(normalized(static_cast<float>(weighted(v) / reach(v))), m_colormap);
+        colors[v] = packABGR(qRed(rgb), qGreen(rgb), qBlue(rgb), static_cast<uint32_t>(255.0 * std::min(1.0, reach(v))));
+    }
+    return colors;
 }
 
 //=============================================================================================================
@@ -434,28 +488,4 @@ void ElectrodeObject::computeBoundingBox()
         m_bbMin = QVector3D(std::min(m_bbMin.x(), p.x() - pad), std::min(m_bbMin.y(), p.y() - pad), std::min(m_bbMin.z(), p.z() - pad));
         m_bbMax = QVector3D(std::max(m_bbMax.x(), p.x() + pad), std::max(m_bbMax.y(), p.y() + pad), std::max(m_bbMax.z(), p.z() + pad));
     }
-}
-
-//=============================================================================================================
-
-QColor ElectrodeObject::interpolateColor(float value, float minVal, float maxVal,
-                                         const QColor& minColor, const QColor& maxColor)
-{
-    if (maxVal <= minVal)
-        return minColor;
-
-    float t = (value - minVal) / (maxVal - minVal);
-    t = qBound(0.0f, t, 1.0f);
-
-    const float r = static_cast<float>(minColor.redF()) * (1.0f - t) + static_cast<float>(maxColor.redF()) * t;
-    const float g = static_cast<float>(minColor.greenF()) * (1.0f - t) + static_cast<float>(maxColor.greenF()) * t;
-    const float b = static_cast<float>(minColor.blueF()) * (1.0f - t) + static_cast<float>(maxColor.blueF()) * t;
-    const float a = static_cast<float>(minColor.alphaF()) * (1.0f - t) + static_cast<float>(maxColor.alphaF()) * t;
-
-    QColor result;
-    result.setRedF(static_cast<qreal>(r));
-    result.setGreenF(static_cast<qreal>(g));
-    result.setBlueF(static_cast<qreal>(b));
-    result.setAlphaF(static_cast<qreal>(a));
-    return result;
 }

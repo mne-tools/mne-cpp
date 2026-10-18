@@ -2755,6 +2755,20 @@ void TestDisp3dBrainView::brainView_clickVersusDrag()
     send(QEvent::MouseButtonDblClick, QPoint(2, 2), Qt::LeftButton);
     QCOMPARE(doubleClicked.size(), 1);
 
+    // Contact values paint the white surface of their hemisphere; an empty map clears them
+    QVector<IEEGLIB::IeegContact> grid(1);
+    grid[0].name = QStringLiteral("G1");
+    grid[0].position = lh.rr().row(0).transpose();
+    ElectrodeObject electrodes;
+    electrodes.setImplantation(IEEGLIB::IeegImplantation(grid));
+    view.setElectrodeValues({{QStringLiteral("G1"), 1.0f}}); // no electrodes yet: ignored
+    view.setElectrodes(&electrodes);
+    view.setElectrodeValues({{QStringLiteral("G1"), 1.0f}});
+    QVERIFY(!electrodes.surfaceColors(lh.rr()).isEmpty());
+    view.setElectrodeValues({});
+    QVERIFY(electrodes.surfaceColors(lh.rr()).isEmpty());
+    view.setElectrodes(nullptr);
+
     view.showSingleView();
     view.setVisualizationEditTarget(-1);
 

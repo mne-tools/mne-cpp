@@ -100,21 +100,29 @@ public:
 
     //=========================================================================================================
     /**
-     * Colour contacts by value, mapped linearly between the smallest and largest given value.
+     * Colour contacts by value through a colormap spanning [min(0, smallest), largest].
      * Contacts without a value keep the colour of their lead.
      *
      * @param[in] values    Map of contact name -> scalar value.
-     * @param[in] minColor  Color for the minimum value (default: blue).
-     * @param[in] maxColor  Color for the maximum value (default: red).
+     * @param[in] colormap  DISPLIB::ColorMap name.
      */
-    void setContactValues(const QMap<QString, float>& values,
-                          const QColor& minColor = Qt::blue,
-                          const QColor& maxColor = Qt::red);
+    void setContactValues(const QMap<QString, float>& values, const QString& colormap = QStringLiteral("Hot"));
 
     /**
      * Restore the lead colours of all contacts.
      */
     void clearContactValues();
+
+    /**
+     * Paint the contact values onto a surface, as MNE-Python's stc_near_sensors: each vertex
+     * takes the distance-weighted mean of the contacts within reach and fades out with the
+     * summed weight. ECoG contacts are first moved onto the surface; depth contacts are not.
+     *
+     * @param[in] vertices  Surface vertex positions in the frame of the implantation, metres.
+     * @param[in] distance  Reach of each contact in metres.
+     * @return ABGR colour per vertex, transparent away from the contacts; empty without values.
+     */
+    QVector<uint32_t> surfaceColors(const Eigen::MatrixX3f& vertices, double distance = 0.01) const;
 
     //=========================================================================================================
     /**
@@ -232,6 +240,10 @@ private:
     IEEGLIB::IeegImplantation m_implantation;
     QVector<int> m_leadOfContact;    /**< Lead index per contact. */
     QVector<QColor> m_contactColors; /**< Per contact; invalid uses the lead colour. */
+    QMap<QString, float> m_contactValues;
+    QString m_colormap;
+    float m_valueMin = 0.0f;
+    float m_valueMax = 0.0f;
     int m_selectedContact = -1;
     int m_hoveredContact = -1;
     QVector3D m_bbMin;
@@ -256,8 +268,7 @@ private:
 
     void computeBoundingBox();
 
-    static QColor interpolateColor(float value, float minVal, float maxVal,
-                                   const QColor& minColor, const QColor& maxColor);
+    float normalized(float value) const;
 };
 
 } // namespace DISP3DLIB

@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6336 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6338 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -4821,7 +4821,7 @@ Index of 6336 public class members (functions, variables, typedefs, enums) acros
 - **setConnection** `[fn]` in [PolhemusCoregistration](/docs/api/utils/polhemus-coregistration)
 - **setConnectivityMethod** `[fn]` in [Network](/docs/api/connectivity/network) — Sets the connectivity measure method used to create the data of this network structure.
 - **setConnectivityMethods** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
-- **setContactValues** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Colour contacts by value, mapped linearly between the smallest and largest given value.
+- **setContactValues** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Colour contacts by value through a colormap spanning [min(0, smallest), largest].
 - **setCrosshairEnabled** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Enable or disable the crosshair cursor with coordinate readout.
 - **setCrosshairEnabled** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Enable or disable the crosshair cursor overlay.
 - **setCrosshairEnabled** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Shows a crosshair at the mouse position and reports the value under it via `cursorDataChanged()`, like [`ChannelDataView`](/docs/api/disp/channel-data-view).
@@ -4856,6 +4856,7 @@ Index of 6336 public class members (functions, variables, typedefs, enums) acros
 - **setEegSurface** `[fn]` in [RtSensorDataController](/docs/api/disp3-d/rt-sensor-data-controller) — Set the EEG target surface geometry for on-the-fly mapping.
 - **setEegSurface** `[fn]` in [RtSensorInterpolationMatWorker](/docs/api/disp3-d/rt-sensor-interpolation-mat-worker) — Set the surface geometry used for EEG field mapping.
 - **setElectrodes** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Set the sEEG / ECoG electrodes to draw, picked under the pointer like the other scene objects.
+- **setElectrodeValues** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Show one value per contact (e.g.
 - **setELoretaOptions** `[fn]` in [InvMinimumNorm](/docs/api/inv/inv-minimum-norm) — Set eLORETA options.
 - **setEnabled** `[fn]` in [VideoOverlay](/docs/api/disp3-d/video-overlay)
 - **setEpochMarkers** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
@@ -5692,6 +5693,7 @@ Index of 6336 public class members (functions, variables, typedefs, enums) acros
 - **surf_RAS_RAS_t** `[var]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Transform from surface RAS to RAS (nonzero origin) coordinates.
 - **surf_tri** `[var]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Map from complete-surface triangle index to patch triangle index (-1 if absent).
 - **surf_vert** `[var]` in [MNESurfacePatch](/docs/api/mne/mne-surface-patch) — Map from complete-surface vertex index to patch vertex index (-1 if absent).
+- **surfaceColors** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Paint the contact values onto a surface, as MNE-Python's stc_near_sensors: each vertex takes the distance-weighted mean of the contacts within reach and fades out with the summed weight.
 - **surfaceData** `[fn]` in [SurfaceTreeItem](/docs/api/disp3-d/surface-tree-item)
 - **surfaceKey** `[var]` in [RayHit](/docs/api/disp3-d/ray-hit) — FsSurface map key of the hit surface.
 - **surfacePointClicked** `[signal]` in [BrainView](/docs/api/disp3-d/brain-view) — Emitted on left-click when the click hits a surface.

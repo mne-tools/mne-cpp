@@ -142,12 +142,26 @@ void TestElectrodeObject::testContactValues()
     QMap<QString, float> values;
     values["S0_C0"] = 0.0f;
     values["S0_C2"] = 1.0f;
-    obj.setContactValues(values, Qt::blue, Qt::red);
+    obj.setContactValues(values, QStringLiteral("Jet"));
     QCOMPARE(obj.contactStreams().instances.generation, generation + 1);
     QCOMPARE(obj.totalContactCount(), 4);
 
     obj.clearContactValues();
     QCOMPARE(obj.contactStreams().instances.generation, generation + 2);
+    QVERIFY(obj.surfaceColors(Eigen::MatrixX3f::Zero(3, 3)).isEmpty());
+
+    // Painting the cortex: a depth contact stays in place and fades out linearly over 1 cm
+    values.clear();
+    values["S0_C0"] = 2.0f;
+    obj.setContactValues(values);
+    Eigen::MatrixX3f vertices(3, 3);
+    vertices << 0.0f, 0.0f, 0.0f, -0.005f, 0.0f, 0.0f, -0.02f, 0.0f, 0.0f;
+    const QVector<uint32_t> colors = obj.surfaceColors(vertices);
+    QCOMPARE(colors.size(), 3);
+    QCOMPARE(colors[0] >> 24, 255u);
+    QCOMPARE(colors[1] >> 24, 127u);
+    QCOMPARE(colors[1] & 0xFFFFFFu, colors[0] & 0xFFFFFFu); // same value, same colour
+    QCOMPARE(colors[2] >> 24, 0u);
 }
 
 //=============================================================================================================

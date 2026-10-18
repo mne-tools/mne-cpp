@@ -1098,6 +1098,16 @@ public slots:
      */
     void setElectrodes(DISP3DLIB::ElectrodeObject* electrodes);
 
+    /**
+     * Show one value per contact (e.g. high-gamma power) on the contacts and the cortex around
+     * them, as MNE-Python's stc_near_sensors. Weights come from each hemisphere's pial (or
+     * white) surface and colour every surface of that hemisphere. This replaces a source
+     * estimate overlay; an empty map clears both.
+     *
+     * @param[in] values  Map of contact name -> value.
+     */
+    void setElectrodeValues(const QMap<QString, float>& values);
+
 signals:
     //=========================================================================================================
     /**

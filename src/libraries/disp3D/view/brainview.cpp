@@ -3160,6 +3160,32 @@ void BrainView::clearBem()
 
 //=============================================================================================================
 
+void BrainView::setElectrodeValues(const QMap<QString, float>& values)
+{
+    if (!m_electrodes)
+        return;
+    m_electrodes->setContactValues(values);
+
+    for (const QString& hemi : {QStringLiteral("lh"), QStringLiteral("rh")}) {
+        std::shared_ptr<BrainSurface> anatomy = m_surfaces.value(hemi + QStringLiteral("_pial"));
+        if (!anatomy)
+            anatomy = m_surfaces.value(hemi + QStringLiteral("_white"));
+        const QVector<uint32_t> colors = anatomy ? m_electrodes->surfaceColors(anatomy->vertexPositions()) : QVector<uint32_t>();
+        for (auto it = m_surfaces.cbegin(); it != m_surfaces.cend(); ++it) {
+            if (!it.key().startsWith(hemi + QLatin1Char('_')) || !it.value() || it.value()->tissueType() != BrainSurface::TissueBrain)
+                continue;
+            if (colors.size() == static_cast<int>(it.value()->vertexCount()))
+                it.value()->applySourceEstimateColors(colors);
+            else
+                it.value()->clearSourceEstimateColors();
+        }
+    }
+    m_sceneDirty = true;
+    update();
+}
+
+//=============================================================================================================
+
 void BrainView::clearSourceEstimate()
 {
     m_sourceManager.stopStreaming();
