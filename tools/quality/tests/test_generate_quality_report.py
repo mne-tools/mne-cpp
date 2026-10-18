@@ -55,6 +55,17 @@ class DashboardTests(unittest.TestCase):
         coverage = json.loads((report.RELEASE_DIR / "coverage-baseline.json").read_text(encoding="utf-8"))
         self.assertEqual(gates["G2_coverage"]["line_combined"], coverage["totals"]["line_percent"])
 
+    def test_g1_is_open_when_a_registered_test_did_not_run(self) -> None:
+        dashboard = json.loads(self.files["quality-baseline.json"])
+        g1 = dashboard["gates"]["G1_test_integrity"]
+        g1["ci_not_executed"] = {}
+        row = next(line for line in report.render_dashboard(dashboard).splitlines() if "runs in CI" in line)
+        self.assertTrue(row.endswith("| met |"), row)
+        g1["ci_not_executed"] = {"ubuntu-24.04": ["test_new"]}
+        row = next(line for line in report.render_dashboard(dashboard).splitlines() if "runs in CI" in line)
+        self.assertTrue(row.endswith("| **open** |"), row)
+        self.assertIn("test_new", row)
+
     def test_check_detects_a_stale_report(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             out = Path(temp)
