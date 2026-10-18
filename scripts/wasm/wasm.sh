@@ -21,6 +21,7 @@ ECHO_FLAG=""
 EMSCRIPTEN_VERSION="$(sed -n 's/^EMSCRIPTEN_VERSION=//p' "$(dirname "$0")/../../src/external/external_deps.env")"
 SAVE_LOG="true"
 SHOW_HELP="false"
+WARNINGS_AS_ERRORS="OFF"
 
 SCRIPT_PATH="$(cleanAbsPath "$(dirname "$0")")"
 PROJECT_BASE_PATH="$(cleanAbsPath "$SCRIPT_PATH/../..")"
@@ -44,6 +45,8 @@ for (( j=0; j<argc; j++)); do
 		j=$j+1
 	elif [ "${argv[j]}" == "--no-log" ]; then
 		SAVE_LOG="false"
+	elif [ "${argv[j]}" == "--werror" ]; then
+		WARNINGS_AS_ERRORS="ON"
 	elif [ "${argv[j]}" == "--qt" ] || [ "${argv[j]}" == "-q" ]; then
 	        export Qt6_DIR="${argv[j+1]}"
 	        j=$j+1
@@ -77,6 +80,8 @@ if [ ${SHOW_HELP} == "true" ]; then
         echo "                 contain gcc_64 and wasm_multithread). Must be an absolute path."
 	echo ""
   	echo "    --no-log     Omits build log."
+	echo ""
+	echo "    --werror     Treat compiler warnings in MNE-CPP sources as errors (as CI does)."
 	echo ""
 	echo "    --help, -h   Prints this help text."
 
@@ -147,6 +152,7 @@ ${Qt6_DIR}/wasm_multithread/bin/qt-cmake \
 	-S ${SOURCE_DIRECTORY} \
 	-B ${BUILD_DIRECTORY} \
 	-DWASM=ON \
+	-DMNE_WARNINGS_AS_ERRORS=${WARNINGS_AS_ERRORS} \
 	${EIGEN_CMAKE_ARGS} \
 	${ONNXRUNTIME_CMAKE_ARGS}
 
