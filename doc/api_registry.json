@@ -62,6 +62,15 @@
       "sidebar_position": 6,
       "namespace": "CONNECTIVITYLIB"
     },
+    "ieeg": {
+      "dir": "src/libraries/ieeg",
+      "sidebar_label": "iEEG Library",
+      "origin": "mne-python + custom",
+      "include": "ieeg",
+      "dir_slug": "ieeg",
+      "sidebar_position": 20,
+      "namespace": "IEEGLIB"
+    },
     "decoding": {
       "dir": "src/libraries/decoding",
       "sidebar_label": "Decoding Library",
@@ -8343,6 +8352,138 @@
       "guide": null,
       "python_equiv": null,
       "python_url": null
+    },
+    {
+      "name": "IeegImplantation",
+      "module": "ieeg",
+      "header": "ieeg/ieeg_implantation.h",
+      "origin": "mne-python",
+      "mne_c_tool": null,
+      "mne_python": "mne.channels.DigMontage (iEEG)",
+      "sklearn": null,
+      "test": "test_ieeg",
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 1,
+      "guide": null,
+      "python_equiv": "mne.channels.DigMontage (iEEG)",
+      "python_url": null,
+      "example": "ex_ieeg",
+      "example_snippet": [
+        "ex_ieeg/main.cpp#ieeg_implantation_usage"
+      ],
+      "example_mode": "run"
+    },
+    {
+      "name": "IeegContact",
+      "module": "ieeg",
+      "header": "ieeg/ieeg_implantation.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_ieeg",
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 2,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "example": "ex_ieeg",
+      "example_snippet": [
+        "ex_ieeg/main.cpp#ieeg_implantation_usage"
+      ],
+      "example_mode": "run"
+    },
+    {
+      "name": "IeegLead",
+      "module": "ieeg",
+      "header": "ieeg/ieeg_implantation.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_ieeg",
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 3,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "example": "ex_ieeg",
+      "example_snippet": [
+        "ex_ieeg/main.cpp#ieeg_implantation_usage"
+      ],
+      "example_mode": "run"
+    },
+    {
+      "name": "IeegReference",
+      "module": "ieeg",
+      "header": "ieeg/ieeg_reference.h",
+      "origin": "mne-python",
+      "mne_c_tool": null,
+      "mne_python": "mne.set_bipolar_reference",
+      "sklearn": null,
+      "test": "test_ieeg",
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 4,
+      "guide": null,
+      "python_equiv": "mne.set_bipolar_reference",
+      "python_url": null,
+      "example": "ex_ieeg",
+      "example_snippet": [
+        "ex_ieeg/main.cpp#ieeg_reference_usage"
+      ],
+      "example_mode": "run"
+    },
+    {
+      "name": "IeegBipolarPair",
+      "module": "ieeg",
+      "header": "ieeg/ieeg_reference.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_ieeg",
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 5,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null,
+      "example": "ex_ieeg",
+      "example_snippet": [
+        "ex_ieeg/main.cpp#ieeg_reference_usage"
+      ],
+      "example_mode": "run"
+    },
+    {
+      "name": "IeegSurfaceMap",
+      "module": "ieeg",
+      "header": "ieeg/ieeg_surface_map.h",
+      "origin": "mne-python",
+      "mne_c_tool": null,
+      "mne_python": "mne.stc_near_sensors",
+      "sklearn": null,
+      "test": "test_ieeg",
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 6,
+      "guide": null,
+      "python_equiv": "mne.stc_near_sensors",
+      "python_url": null,
+      "example": "ex_ieeg",
+      "example_snippet": [
+        "ex_ieeg/main.cpp#ieeg_surface_map_usage"
+      ],
+      "example_mode": "run"
     },
     {
       "name": "IcaLabelResult",

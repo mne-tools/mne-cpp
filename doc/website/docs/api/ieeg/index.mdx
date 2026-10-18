@@ -1,0 +1,43 @@
+---
+id: index
+title: "iEEG Library"
+sidebar_label: Overview
+sidebar_position: 0
+---
+
+# iEEG Library
+
+**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Source:** `src/libraries/ieeg`
+The `mne_ieeg` library (`IEEGLIB` namespace) holds what is specific to intracranial recordings, sEEG depth leads and ECoG strips and grids: the implantation (contacts grouped into leads), bipolar re-referencing along the leads, and the mapping of contact values onto the cortical surface.
+
+```cmake
+target_link_libraries(my_app PRIVATE mne_ieeg)
+```
+
+Dependencies: `mne_bids`, `mne_utils`, Qt6::Core, Eigen3. Rendering lives in disp3D (`ElectrodeObject`), which takes the leads as shown in `mne_inspect`.
+
+## Class Inventory
+
+| Class / Struct | Header | Description |
+|---|---|---|
+| `IeegImplantation` | `ieeg/ieeg_implantation.h` | Contacts and the leads they form; BIDS iEEG `*_electrodes.tsv` reader |
+| `IeegContact` | `ieeg/ieeg_implantation.h` | One contact: name, position (m), lead |
+| `IeegLead` | `ieeg/ieeg_implantation.h` | One depth lead, strip or grid: contacts in order along it, grid shape |
+| `IeegReference` | `ieeg/ieeg_reference.h` | Bipolar pairs along leads and their montage matrix |
+| `IeegBipolarPair` | `ieeg/ieeg_reference.h` | One derivation: anode, cathode, name, midpoint |
+| `IeegSurfaceMap` | `ieeg/ieeg_surface_map.h` | Vertices x contacts weights painting contact values onto a surface |
+
+## Conventions
+
+- **Units and frame.** Positions are in metres. `IeegImplantation::coordinateSystem()` names their frame (e.g. `ACPC`); the library does not transform between frames.
+- **Leads from names.** Without a BIDS `group`, a contact belongs to the lead named like the contact without its trailing number (`LA1`, `LA10` → `LA`), ordered by that number. `A'` (the prime marks the other hemisphere) never merges with `A`.
+- **Lead type.** BIDS `type` or a `dimension` of more than one row and column decides; otherwise contacts closer than 6 mm make a depth lead, others a strip.
+- **No guessing of units.** `IeegImplantation::readBids` refuses an `*_electrodes.tsv` without a matching `*_coordsystem.json` or with units other than `m`, `cm` or `mm`. MNE-BIDS infers `n/a` units from the coordinate magnitudes instead; for intracranial contacts a wrong guess moves them by a factor of ten.
+
+## MNE-Python Cross-Reference
+
+| MNE-CPP (IEEGLIB) | MNE-Python Equivalent |
+|---|---|
+| `IeegImplantation::readBids` | `mne_bids.read_raw_bids` (montage from `*_electrodes.tsv`; lead grouping is not part of MNE-BIDS) |
+| `IeegReference::bipolarPairs` + `bipolarMatrix` | `mne.set_bipolar_reference` |
+| `IeegSurfaceMap::weights` | `mne.stc_near_sensors` (surface source estimates; modes `sum`, `single`, `nearest`, `weighted`) |

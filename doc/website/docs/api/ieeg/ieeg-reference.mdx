@@ -1,0 +1,77 @@
+---
+id: ieeg-reference
+title: "IEEGLIB::IeegReference"
+sidebar_label: IeegReference
+sidebar_position: 4
+---
+
+# IeegReference
+
+**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Library:** iEEG Library
+
+:::info[Python equivalent]
+`mne.set_bipolar_reference` in MNE-Python.
+:::
+
+`#include <ieeg/ieeg_reference.h>`
+
+```cpp
+class IEEGLIB::IeegReference
+```
+
+Bipolar montages along sEEG / ECoG leads.
+
+```cpp title="src/examples/ex_ieeg/main.cpp"
+const QVector<IeegBipolarPair> pairs = IeegReference::bipolarPairs(implantation); // LA1-LA2, LA2-LA3
+Eigen::MatrixXd data(3, 1);                                                       // contacts x samples, file order
+data << 30.0, 10.0, 15.0;                                                         // LA3, LA1, LA2
+const Eigen::MatrixXd bipolar = IeegReference::bipolarMatrix(pairs, int(contacts.size())) * data;
+```
+
+---
+
+## Static Methods
+
+### bipolarPairs(implantation)
+
+[Pair](/docs/api/inv/pair) each contact with its next neighbour on the same lead: along a depth lead or strip, and along the rows and then the columns of a grid with a known shape.
+
+The contact earlier along the lead is the anode, so a depth lead gives LA1-LA2, LA2-LA3, …
+
+**Parameters:**
+
+- **implantation** : *const [IeegImplantation](/docs/api/ieeg/ieeg-implantation) &*
+  Contacts and leads.
+
+**Returns:**
+
+- *QVector&lt; [IeegBipolarPair](/docs/api/ieeg/ieeg-bipolar-pair) &gt;* — The derivations, lead by lead.
+
+---
+
+### bipolarMatrix(pairs, contactCount)
+
+Montage matrix of the derivations: bipolar data = M * contact data.
+
+**Parameters:**
+
+- **pairs** : *const QVector&lt; [IeegBipolarPair](/docs/api/ieeg/ieeg-bipolar-pair) &gt; &*
+  Derivations.
+
+- **contactCount** : *int*
+  Number of contacts, the columns of M.
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; double &gt;* — Sparse pairs x contacts matrix, +1 at the anode and -1 at the cathode of each row.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
+- Build target: `ex_ieeg` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

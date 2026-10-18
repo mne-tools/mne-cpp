@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6317 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6345 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -134,6 +134,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **annotationsVisible** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **annotationsVisible** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **annotationsVisibleToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
+- **anode** `[var]` in [IeegBipolarPair](/docs/api/ieeg/ieeg-bipolar-pair) — Contact index of the anode.
 - **append** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points) — Append a new point and emit `UTILSLIB::AcquiredPoints::pointsChanged` "pointsChanged".
 - **append** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **append** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
@@ -314,6 +315,8 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **BidsViewModel** `[fn]` in [BidsViewModel](/docs/api/disp/bids-view-model) — Constructs the Analyze Data Model.
 - **binding** `[var]` in [MnaOpSchema](/docs/api/mna/mna-op-schema) — Binding type: "internal", "cli", or "script".
 - **bindings** `[fn]` in [MnaParamTree](/docs/api/mna/mna-param-tree)
+- **bipolarMatrix** `[fn]` in [IeegReference](/docs/api/ieeg/ieeg-reference) — Montage matrix of the derivations: bipolar data = M * contact data.
+- **bipolarPairs** `[fn]` in [IeegReference](/docs/api/ieeg/ieeg-reference) — Pair each contact with its next neighbour on the same lead: along a depth lead or strip, and along the rows and then the columns of a grid with a known shape.
 - **bIsLargeHeadMovement** `[var]` in [HpiFitResult](/docs/api/inv/hpi-fit-result)
 - **bmax** `[var]` in [AverageCategory](/docs/api/fiff/average-category) — Baseline max (s).
 - **bmax** `[var]` in [CovDefinition](/docs/api/mne/cov-definition) — Baseline max (s).
@@ -435,6 +438,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **categories** `[var]` in [AverageDescription](/docs/api/fiff/average-description) — The categories.
 - **category** `[var]` in [MnaOpSchema](/docs/api/mna/mna-op-schema) — Category: "io", "preprocessing", "source_estimation", etc.
 - **categoryItem** `[fn]` in [DigitizerSetTreeItem](/docs/api/disp3-d/digitizer-set-tree-item) — Returns the child [`DigitizerTreeItem`](/docs/api/disp3-d/digitizer-tree-item) for a given category, or nullptr.
+- **cathode** `[var]` in [IeegBipolarPair](/docs/api/ieeg/ieeg-bipolar-pair) — Contact index of the cathode.
 - **cent** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Centroid position.
 - **center** `[fn]` in [Sphere](/docs/api/math/sphere) — The center of the sphere.
 - **centreOfMass** `[fn]` in [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate) — Compute the centre of mass of the activity at a given time point.
@@ -692,6 +696,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **colorsRef** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface)
 - **colorStream** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface)
 - **cols** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Number of columns.
+- **cols** `[var]` in [IeegLead](/docs/api/ieeg/ieeg-lead) — Grid shape when known, else 0.
 - **cols** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor) — 2-D convenience — equivalent to shape(1).
 - **column_norm** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — What kind of column normalization to apply to the forward solution.
 - **columnCount** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model)
@@ -1063,6 +1068,8 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **contactLabel** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **contactRenderKey** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **contacts** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Contacts in order along the lead (contact 1 first).
+- **contacts** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
+- **contacts** `[var]` in [IeegLead](/docs/api/ieeg/ieeg-lead) — Contact indices in order along the lead, contact 1 first.
 - **contactStreams** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **contains** `[fn]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Returns whether `channel` (any spelling) is one of the port's channels.
 - **contHpiStatusChanged** `[signal]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Emit this signal whenever continous HPI checkbox changed.
@@ -1089,6 +1096,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **coord_frame** `[var]` in [MNESssData](/docs/api/mne/mne-sss-data) — Coordinate frame.
 - **coord_frame** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Which coordinate system the data are in now.
 - **coordinateSystem** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Coordinate system from *_coordsystem.json.
+- **coordinateSystem** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
 - **coordsystemJsonPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the coordsystem.json sidecar.
 - **copy_tree** `[fn]` in [Fiff](/docs/api/fiff/fiff-class) — fiff_copy_tree
 - **copy_tree** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Copies directory subtrees from fidin to fidout.
@@ -1331,6 +1339,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **digTrigger** `[var]` in [ProcessingSettings](/docs/api/mne/processing-settings) — Digital trigger channel name.
 - **digTriggerMask** `[var]` in [ProcessingSettings](/docs/api/mne/processing-settings) — Mask for digital trigger channel.
 - **dim** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — Dimension of the covariance (dim x dim).
+- **dimension** `[var]` in [BidsElectrode](/docs/api/bids/bids-electrode) — iEEG: shape of that group, e.g.
 - **dimensionForOrientation** `[fn]` in [MriSlicer](/docs/api/mri/mri-slicer) — Return the volume dimension used by an anatomical slice orientation.
 - **dimensionForOrientation** `[fn]` in [MriSlicer](/docs/api/mri/mri-slicer) — Return the volume dimension used by an anatomical slice orientation.
 - **dims** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data)
@@ -2368,6 +2377,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **gridIndices** `[var]` in [InvSourceCoupling](/docs/api/inv/inv-source-coupling) — Grid indices of the coupled sources (size N).
 - **gridRows** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Grid only: number of rows.
 - **gridVisible** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
+- **group** `[var]` in [BidsElectrode](/docs/api/bids/bids-electrode) — iEEG: lead (shaft, strip or grid) the contact belongs to (OPTIONAL).
 - **growCircularLabel** `[fn]` in [FsLabelUtils](/docs/api/fs/fs-label-utils) — Grow a circular label around seed vertices, as mne.grow_labels does for one seed set.
 - **growLabel** `[fn]` in [FsLabelUtils](/docs/api/fs/fs-label-utils) — Grow a label by expanding along the surface mesh.
 - **guess_exclude** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Exclude points closer than this to the origin.
@@ -2509,6 +2519,8 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **identNumber** `[var]` in [DigitizedPoint](/docs/api/utils/digitized-point) — 1-based id used by FIFF on export.
 - **idx** `[var]` in [HPISortStruct](/docs/api/inv/hpi-sort-struct)
 - **IdxIntValue** `[type]` in [Linalg](/docs/api/math/linalg) — Typedef of a pair of ints.
+- **IeegImplantation** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
+- **IeegImplantation** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation) — Group contacts into leads.
 - **ieegReference** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Reference electrode name (RECOMMENDED).
 - **iFilterOrder** `[var]` in [FilterChpiParams](/docs/api/dsp/filter-chpi-params) — Butterworth order for each notch filter.
 - **ignore** `[var]` in [AverageCategory](/docs/api/fiff/average-category) — Which trigger lines to ignore.
@@ -2546,6 +2558,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **indexCount** `[fn]` in [DipoleObject](/docs/api/disp3-d/dipole-object)
 - **indexCount** `[var]` in [InstancedStreams](/docs/api/disp3-d/instanced-streams) — Number of indices of the shape.
 - **indexCount** `[fn]` in [PolylineObject](/docs/api/disp3-d/polyline-object)
+- **indexOf** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
 - **indexStream** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface)
 - **indices** `[var]` in [InstancedStreams](/docs/api/disp3-d/instanced-streams) — Shape triangle indices (uint32).
 - **iNeighbours** `[var]` in [BadChannelDetectParams](/docs/api/utils/bad-channel-detect-params) — Number of channels on each side to use as neighbours.
@@ -2728,6 +2741,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **isEmpty** `[fn]` in [FsLabel](/docs/api/fs/fs-label) — True if [`FsLabel`](/docs/api/fs/fs-label) is empty.
 - **isEmpty** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Returns whether [`FsSurface`](/docs/api/fs/fs-surface) is empty.
 - **isEmpty** `[fn]` in [FsSurfaceSet](/docs/api/fs/fs-surface-set) — True if [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) is empty.
+- **isEmpty** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
 - **isEmpty** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Returns whether SourceEstimate is empty.
 - **isEmpty** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — True if [`MNE`](/docs/api/mne/mne-class) Bem is empty.
 - **isEmpty** `[fn]` in [MNEClusterInfo](/docs/api/mne/mne-cluster-info) — Returns true if [`MNE`](/docs/api/mne/mne-class) cluster information contains no data.
@@ -2840,6 +2854,8 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **kind** `[var]` in [MNEProjItem](/docs/api/mne/mne-proj-item) — FIFF projection item kind (FIFFV_PROJ_ITEM_*).
 - **kind** `[var]` in [PickResult](/docs/api/disp3-d/pick-result) — What was hit.
 - **kind** `[var]` in [SceneLayer](/docs/api/disp3-d/scene-layer)
+- **kMaxDepthSpacing** `[var]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation) — Leads whose closest neighbouring contacts are nearer than this are depth leads.
+- **kMaxNeighbourDistance** `[var]` in [IeegReference](/docs/api/ieeg/ieeg-reference) — Contacts further apart than this are not paired: they are not neighbours on one lead.
 - **kMaxTieLength** `[var]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object) — Longer gaps are not tied: not one array.
 - **KMeans** `[fn]` in [KMeans](/docs/api/math/k-means) — Constructs a [`KMeans`](/docs/api/math/k-means) algorithm object.
 - **KMeans** `[fn]` in [KMeans](/docs/api/math/k-means) — Constructs a [`KMeans`](/docs/api/math/k-means) algorithm object using enum parameters (preferred for performance).
@@ -2890,7 +2906,9 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **layout** `[var]` in [ElectrodeArray](/docs/api/disp3-d/electrode-array) — Geometry kind.
 - **layoutChanged** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model) — Updates the layout map.
 - **LayoutScene** `[fn]` in [LayoutScene](/docs/api/disp/layout-scene) — Constructs a [`LayoutScene`](/docs/api/disp/layout-scene).
+- **lead** `[var]` in [IeegContact](/docs/api/ieeg/ieeg-contact) — Lead name; empty when building derives it from the contact name.
 - **leadColor** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
+- **leads** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
 - **ledoitWolf** `[fn]` in [StsCovEstimators](/docs/api/sts/sts-cov-estimators) — Ledoit-Wolf optimal shrinkage covariance estimator.
 - **left** `[var]` in [MNEMshEyes](/docs/api/mne/mne-msh-eyes) — Left hemisphere viewpoint (x, y, z).
 - **left_up** `[var]` in [MNEMshEyes](/docs/api/mne/mne-msh-eyes) — Left hemisphere up-vector.
@@ -3429,6 +3447,9 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **name** `[var]` in [ElectrodePosition](/docs/api/utils/electrode-position) — Electrode name (e.g.
 - **name** `[var]` in [FsLabel](/docs/api/fs/fs-label) — Name of the label.
 - **name** `[var]` in [FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) — Textual identifier.
+- **name** `[var]` in [IeegBipolarPair](/docs/api/ieeg/ieeg-bipolar-pair) — Derivation name, "anode-cathode" as in MNE-Python.
+- **name** `[var]` in [IeegContact](/docs/api/ieeg/ieeg-contact) — Contact (channel) name, e.g.
+- **name** `[var]` in [IeegLead](/docs/api/ieeg/ieeg-lead) — Lead name, e.g.
 - **name** `[var]` in [MnaOpSchemaAttr](/docs/api/mna/mna-op-schema-attr) — Attribute key.
 - **name** `[var]` in [MnaOpSchemaPort](/docs/api/mna/mna-op-schema-port) — Port name.
 - **name** `[var]` in [MnaPort](/docs/api/mna/mna-port) — Port name (unique within a node).
@@ -4011,12 +4032,15 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **position** `[var]` in [ElectrodeContact](/docs/api/disp3-d/electrode-contact) — Position in metres, MRI surface RAS.
 - **position** `[var]` in [FastrakSample](/docs/api/utils/fastrak-sample) — Position in metres (always normalised to SI).
 - **position** `[var]` in [FineCalEntry](/docs/api/dsp/fine-cal-entry) — Coil position in device coordinates (metres).
+- **position** `[var]` in [IeegBipolarPair](/docs/api/ieeg/ieeg-bipolar-pair) — Midpoint of the two contacts.
+- **position** `[var]` in [IeegContact](/docs/api/ieeg/ieeg-contact) — Position in metres, in the frame of the implantation.
 - **position** `[var]` in [InvFocalDipole](/docs/api/inv/inv-focal-dipole) — Dipole position (m) in head coordinates.
 - **position** `[var]` in [LiveMarker](/docs/api/disp3-d/live-marker)
 - **position** `[fn]` in [SensorTreeItem](/docs/api/disp3-d/sensor-tree-item)
 - **position** `[var]` in `StationSample`
 - **position** `[var]` in [TrapMusicDipole](/docs/api/inv/trap-music-dipole) — 3D position (meters).
 - **positions** `[fn]` in [DigitizerTreeItem](/docs/api/disp3-d/digitizer-tree-item) — Returns all point positions in this category.
+- **positions** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
 - **positions** `[var]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — 3D positions (m) in head coordinates, one row per source.
 - **positions** `[fn]` in [SourceSpaceTreeItem](/docs/api/disp3-d/source-space-tree-item) — Returns all source point positions.
 - **postResults** `[var]` in [MnaVerification](/docs/api/mna/mna-verification) — Results of post-execution checks (populated by executor).
@@ -4273,6 +4297,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **readAsaElcFile** `[fn]` in [LayoutLoader](/docs/api/utils/layout-loader) — Reads the specified ANT elc-layout file.
 - **readAvailableData** `[fn]` in [RtCmdClient](/docs/api/com/rt-cmd-client) — Returns the available data.
 - **readBadChannelsFromFile** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Read bad channel names from a plain text file (one name per line, '#' comments skipped).
+- **readBids** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation) — Read a BIDS iEEG `*_electrodes.tsv`.
 - **readBrainstormMonFile** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Reads the specified Brainstorm montage file.
 - **readBrainstormMonFile** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Reads the specified Brainstorm montage file.
 - **readCaptrak** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Reads a BrainVision CapTrak .bvct file, as mne.channels.read_dig_captrak does.
@@ -4477,6 +4502,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **RowMajorMatrixMap** `[type]` in [MlTensor](/docs/api/ml/ml-tensor)
 - **RowMajorMatrixXf** `[type]` in [MlTensor](/docs/api/ml/ml-tensor)
 - **rows** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Number of rows.
+- **rows** `[var]` in [IeegLead](/docs/api/ieeg/ieeg-lead) — Grid shape when known (rows x cols == contact count), else 0.
 - **rows** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor) — 2-D convenience — equivalent to shape(0).
 - **rr** `[var]` in [FitUser](/docs/api/math/fit-user)
 - **rr** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Coordinates of vertices (rr).
@@ -5945,6 +5971,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **type** `[var]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Block type for this directory.
 - **type** `[var]` in [FiffTag](/docs/api/fiff/fiff-tag) — Data type.
 - **type** `[var]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Coil type.
+- **type** `[var]` in [IeegLead](/docs/api/ieeg/ieeg-lead) — Lead type.
 - **type** `[var]` in [MnaOpSchemaAttr](/docs/api/mna/mna-op-schema-attr) — Expected value type.
 - **type** `[var]` in [MNEMshColorScaleDef](/docs/api/mne/mne-msh-color-scale-def)
 - **type** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Is this a volume or a surface.
@@ -6220,6 +6247,7 @@ Index of 6317 public class members (functions, variables, typedefs, enums) acros
 - **warp** `[fn]` in [MNEBem](/docs/api/mne/mne-bem) — Warp the Bem.
 - **WeightedPhaseLagIndex** `[fn]` in [WeightedPhaseLagIndex](/docs/api/connectivity/weighted-phase-lag-index) — Constructs a [`WeightedPhaseLagIndex`](/docs/api/connectivity/weighted-phase-lag-index) object.
 - **weightNorm** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Applied weight normalization.
+- **weights** `[fn]` in [IeegSurfaceMap](/docs/api/ieeg/ieeg-surface-map) — Compute the vertices x contacts weight matrix.
 - **weights** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Filter weights, size 1 for LCMV, n_freqs for DICS.
 - **wheelScrollsChannels** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **whiten_vector** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Apply whitening to a data vector using the inverse square-root eigenvalues stored in this covariance matrix.

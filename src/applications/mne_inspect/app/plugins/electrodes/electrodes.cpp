@@ -18,8 +18,7 @@
 
 #include "electrodes.h"
 
-#include <bids/bids_coordinate_system.h>
-#include <bids/bids_electrode.h>
+#include <ieeg/ieeg_implantation.h>
 
 #include <disp3D/scene/multimodalscene.h>
 
@@ -34,11 +33,9 @@
 
 #include <QByteArray>
 #include <QDebug>
-#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
-#include <QRegularExpression>
 #include <QStringList>
 #include <QTextStream>
 
@@ -309,79 +306,28 @@ bool ElectrodesPlugin::loadCsv(const QString& path)
 
 bool ElectrodesPlugin::loadBids(const QString& path)
 {
-    const QFileInfo info(path);
-    // The coordsystem sidecar sharing the longest name prefix, so sessions are never mixed
-    QString coordPath;
-    int bestPrefix = -1;
-    const QStringList candidates = info.dir().entryList({QStringLiteral("*_coordsystem.json")}, QDir::Files);
-    for (const QString& candidate : candidates) {
-        int prefix = 0;
-        while (prefix < candidate.size() && prefix < info.fileName().size() && candidate[prefix] == info.fileName()[prefix])
-            ++prefix;
-        if (prefix > bestPrefix) {
-            bestPrefix = prefix;
-            coordPath = info.dir().filePath(candidate);
-        }
-    }
-    if (coordPath.isEmpty()) {
-        qWarning() << "ElectrodesPlugin::loadBids: no *_coordsystem.json next to" << path << "- units unknown";
-        return false;
-    }
-    const QString units = BIDSLIB::BidsCoordinateSystem::readJson(coordPath).units;
-    const float scale = units == QLatin1String("m") ? 1.0f : units == QLatin1String("cm") ? 0.01f
-        : units == QLatin1String("mm")                                                    ? 0.001f
-                                                                                          : 0.0f;
-    if (scale == 0.0f) {
-        qWarning() << "ElectrodesPlugin::loadBids: unsupported iEEGCoordinateUnits" << units << "in" << coordPath;
-        return false;
-    }
-
-    // Lead name: the contact name without its trailing number; the number orders the lead
-    static const QRegularExpression trailingNumber(QStringLiteral("^(.*?)[\\s_-]*(\\d+)$"));
-    struct Entry
-    {
-        int number;
-        ElectrodeContact contact;
-    };
-    QHash<QString, QVector<Entry>> leads;
-    QHash<QString, QString> leadTypes;
-    QStringList order;
-    for (const BIDSLIB::BidsElectrode& e : BIDSLIB::BidsElectrode::readTsv(path)) {
-        bool okX = false, okY = false, okZ = false;
-        const float x = e.x.toFloat(&okX), y = e.y.toFloat(&okY), z = e.z.toFloat(&okZ);
-        if (!okX || !okY || !okZ)
-            continue;
-        const QRegularExpressionMatch m = trailingNumber.match(e.name);
-        const QString lead = (m.hasMatch() && !m.captured(1).isEmpty()) ? m.captured(1) : e.name;
-        if (!leads.contains(lead))
-            order.append(lead);
-        ElectrodeContact contact;
-        contact.name = e.name;
-        contact.position = QVector3D(x, y, z) * scale;
-        leads[lead].append({m.hasMatch() ? m.captured(2).toInt() : 0, contact});
-        if (e.type != QLatin1String("n/a") && !e.type.isEmpty())
-            leadTypes[lead] = e.type;
-    }
-    if (order.isEmpty()) {
-        qWarning() << "ElectrodesPlugin::loadBids: no contacts with coordinates in" << path;
+    QString error;
+    const IEEGLIB::IeegImplantation implantation = IEEGLIB::IeegImplantation::readBids(path, &error);
+    if (implantation.isEmpty()) {
+        qWarning() << "ElectrodesPlugin::loadBids:" << error;
         return false;
     }
 
     QVector<ElectrodeArray> arrays;
-    for (const QString& lead : std::as_const(order)) {
-        QVector<Entry>& entries = leads[lead];
-        std::stable_sort(entries.begin(), entries.end(), [](const Entry& a, const Entry& b) { return a.number < b.number; });
+    for (const IEEGLIB::IeegLead& lead : implantation.leads()) {
         ElectrodeArray array;
-        array.label = lead;
-        for (const Entry& entry : std::as_const(entries))
-            array.contacts.append(entry.contact);
-        if (leadTypes.contains(lead)) {
-            array.layout = parseLayout(leadTypes[lead]);
-        } else {
-            float spacing = std::numeric_limits<float>::max();
-            for (int i = 1; i < array.contacts.size(); ++i)
-                spacing = std::min(spacing, (array.contacts[i].position - array.contacts[i - 1].position).length());
-            array.layout = spacing < 0.006f ? ElectrodeLayout::Depth : ElectrodeLayout::Strip;
+        array.label = lead.name;
+        array.layout = lead.type == IEEGLIB::IeegLeadType::Depth ? ElectrodeLayout::Depth
+            : lead.type == IEEGLIB::IeegLeadType::Strip          ? ElectrodeLayout::Strip
+                                                                 : ElectrodeLayout::Grid;
+        array.gridRows = std::max(1, lead.rows);
+        array.gridCols = std::max(1, lead.cols);
+        for (const int c : lead.contacts) {
+            const IEEGLIB::IeegContact& source = implantation.contacts()[c];
+            ElectrodeContact contact;
+            contact.name = source.name;
+            contact.position = QVector3D(source.position.x(), source.position.y(), source.position.z());
+            array.contacts.append(contact);
         }
         arrays.append(array);
     }

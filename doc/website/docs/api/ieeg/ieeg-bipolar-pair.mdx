@@ -1,0 +1,36 @@
+---
+id: ieeg-bipolar-pair
+title: "IEEGLIB::IeegBipolarPair"
+sidebar_label: IeegBipolarPair
+sidebar_position: 5
+---
+
+# IeegBipolarPair
+
+**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Library:** iEEG Library
+
+`#include <ieeg/ieeg_reference.h>`
+
+```cpp
+struct IEEGLIB::IeegBipolarPair
+```
+
+One bipolar derivation: anode minus cathode.
+
+```cpp title="src/examples/ex_ieeg/main.cpp"
+const QVector<IeegBipolarPair> pairs = IeegReference::bipolarPairs(implantation); // LA1-LA2, LA2-LA3
+Eigen::MatrixXd data(3, 1);                                                       // contacts x samples, file order
+data << 30.0, 10.0, 15.0;                                                         // LA3, LA1, LA2
+const Eigen::MatrixXd bipolar = IeegReference::bipolarMatrix(pairs, int(contacts.size())) * data;
+```
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
+- Build target: `ex_ieeg` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -703,6 +703,21 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp3-d/instanced-streams',
         'api/disp3-d/render-key'
       ],
+    },
+    {
+      type: 'category',
+      label: "iEEG Library",
+      collapsible: true,
+      collapsed: true,
+      link: {type: 'doc', id: 'api/ieeg/index'},
+      items: [
+        'api/ieeg/ieeg-implantation',
+        'api/ieeg/ieeg-contact',
+        'api/ieeg/ieeg-lead',
+        'api/ieeg/ieeg-reference',
+        'api/ieeg/ieeg-bipolar-pair',
+        'api/ieeg/ieeg-surface-map'
+      ],
     }
 ];
 

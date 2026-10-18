@@ -1,0 +1,103 @@
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @file     main.cpp
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    2.4.0
+ * @date     October 2026
+ * @brief    IEEG library: group sEEG contacts into a lead, derive a bipolar montage and paint contact values onto a surface.
+ *
+ * Builds a small implantation in code, so it needs no data. Exits non-zero on any mismatch.
+ */
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <ieeg/ieeg_implantation.h>
+#include <ieeg/ieeg_reference.h>
+#include <ieeg/ieeg_surface_map.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QCoreApplication>
+#include <QDebug>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+#include <cstdlib>
+
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace IEEGLIB;
+
+namespace
+{
+
+bool expect(bool condition, const QString& what)
+{
+    qInfo().noquote() << (condition ? "  ok  " : "  FAIL") << what;
+    return condition;
+}
+
+} // namespace
+
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+int main(int argc, char* argv[])
+{
+    QCoreApplication app(argc, argv);
+    bool ok = true;
+
+    //! [ieeg_implantation_usage]
+    // Contacts of one depth lead, 3.5 mm apart, in metres; the lead comes from the names
+    QVector<IeegContact> contacts;
+    for (int k : {3, 1, 2}) {
+        IeegContact contact;
+        contact.name = QStringLiteral("LA%1").arg(k);
+        contact.position = Eigen::Vector3f(-0.03f, 0.0f, 0.0035f * float(k - 1));
+        contacts.append(contact);
+    }
+    const IeegImplantation implantation(contacts, QStringLiteral("ACPC"));
+    const IeegLead& lead = implantation.leads().first(); // contacts ordered LA1, LA2, LA3
+    // IeegImplantation::readBids("sub-01_electrodes.tsv") reads the same from BIDS iEEG
+    //! [ieeg_implantation_usage]
+    ok &= expect(implantation.leads().size() == 1 && lead.name == "LA" && lead.type == IeegLeadType::Depth && lead.contacts == QVector<int>({1, 2, 0}),
+                 "IeegImplantation: one depth lead LA, ordered by contact number");
+
+    //! [ieeg_reference_usage]
+    const QVector<IeegBipolarPair> pairs = IeegReference::bipolarPairs(implantation); // LA1-LA2, LA2-LA3
+    Eigen::MatrixXd data(3, 1);                                                       // contacts x samples, file order
+    data << 30.0, 10.0, 15.0;                                                         // LA3, LA1, LA2
+    const Eigen::MatrixXd bipolar = IeegReference::bipolarMatrix(pairs, int(contacts.size())) * data;
+    //! [ieeg_reference_usage]
+    ok &= expect(pairs.size() == 2 && pairs[0].name == "LA1-LA2" && bipolar(0, 0) == -5.0 && bipolar(1, 0) == -15.0,
+                 "IeegReference: LA1-LA2 = -5, LA2-LA3 = -15");
+
+    //! [ieeg_surface_map_usage]
+    // Vertices of a surface in the same frame; each takes the values of contacts within 1 cm.
+    // Depth contacts lie inside the brain, so they are not projected onto the surface first.
+    Eigen::MatrixX3f vertices(2, 3);
+    vertices << -0.03f, 0.0f, 0.0f, -0.03f, 0.0f, 0.02f;
+    const Eigen::SparseMatrix<double> weights = IeegSurfaceMap::weights(implantation.positions(), vertices, 0.01,
+                                                                        IeegSurfaceMapMode::Sum, false);
+    const Eigen::MatrixXd vertexData = weights * data; // vertices x samples
+    //! [ieeg_surface_map_usage]
+    // Vertex 0 is at LA1 (weight 1), LA2 3.5 mm (0.65) and LA3 7 mm (0.3) away; vertex 1 is beyond reach
+    ok &= expect(std::fabs(vertexData(0, 0) - (10.0 + 0.65 * 15.0 + 0.3 * 30.0)) < 1e-4 && vertexData(1, 0) == 0.0,
+                 QString("IeegSurfaceMap: vertex 0 = %1, vertex 1 = %2").arg(vertexData(0, 0)).arg(vertexData(1, 0)));
+
+    qInfo().noquote() << (ok ? "All iEEG checks passed." : "iEEG checks FAILED.");
+    return ok ? EXIT_SUCCESS : EXIT_FAILURE;
+}

@@ -1,0 +1,74 @@
+---
+id: ieeg-surface-map
+title: "IEEGLIB::IeegSurfaceMap"
+sidebar_label: IeegSurfaceMap
+sidebar_position: 6
+---
+
+# IeegSurfaceMap
+
+**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Library:** iEEG Library
+
+:::info[Python equivalent]
+`mne.stc_near_sensors` in MNE-Python.
+:::
+
+`#include <ieeg/ieeg_surface_map.h>`
+
+```cpp
+class IEEGLIB::IeegSurfaceMap
+```
+
+Weights that paint contact values onto a surface.
+
+```cpp title="src/examples/ex_ieeg/main.cpp"
+// Vertices of a surface in the same frame; each takes the values of contacts within 1 cm.
+// Depth contacts lie inside the brain, so they are not projected onto the surface first.
+Eigen::MatrixX3f vertices(2, 3);
+vertices << -0.03f, 0.0f, 0.0f, -0.03f, 0.0f, 0.02f;
+const Eigen::SparseMatrix<double> weights = IeegSurfaceMap::weights(implantation.positions(), vertices, 0.01,
+                                                                    IeegSurfaceMapMode::Sum, false);
+const Eigen::MatrixXd vertexData = weights * data; // vertices x samples
+```
+
+---
+
+## Static Methods
+
+### weights(contacts, vertices, distance, mode, project)
+
+Compute the vertices x contacts weight matrix.
+
+Equivalent to MNE-Python's `stc_near_sensors` for a surface. Contacts with a non-finite position get an empty column.
+
+**Parameters:**
+
+- **contacts** : *const Eigen::MatrixX3f &*
+  Contact positions, one row per contact, in metres.
+
+- **vertices** : *const Eigen::MatrixX3f &*
+  Surface vertex positions in the same frame, one row per vertex.
+
+- **distance** : *double*
+  Reach of each contact in metres.
+
+- **mode** : *IeegSurfaceMapMode*
+  How weights near one vertex combine.
+
+- **project** : *bool*
+  Move each contact to its nearest vertex first, as ECoG contacts lie on, not in, the cortex.
+
+**Returns:**
+
+- *Eigen::SparseMatrix&lt; double &gt;* — Sparse vertices x contacts weights.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
+- Build target: `ex_ieeg` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

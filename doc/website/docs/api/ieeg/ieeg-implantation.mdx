@@ -1,0 +1,144 @@
+---
+id: ieeg-implantation
+title: "IEEGLIB::IeegImplantation"
+sidebar_label: IeegImplantation
+sidebar_position: 1
+---
+
+# IeegImplantation
+
+**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Library:** iEEG Library
+
+:::info[Python equivalent]
+`mne.channels.DigMontage (iEEG)` in MNE-Python.
+:::
+
+`#include <ieeg/ieeg_implantation.h>`
+
+```cpp
+class IEEGLIB::IeegImplantation
+```
+
+Contacts of an sEEG / ECoG implantation and the leads they belong to.
+
+```cpp title="src/examples/ex_ieeg/main.cpp"
+// Contacts of one depth lead, 3.5 mm apart, in metres; the lead comes from the names
+QVector<IeegContact> contacts;
+for (int k : {3, 1, 2}) {
+    IeegContact contact;
+    contact.name = QStringLiteral("LA%1").arg(k);
+    contact.position = Eigen::Vector3f(-0.03f, 0.0f, 0.0035f * float(k - 1));
+    contacts.append(contact);
+}
+const IeegImplantation implantation(contacts, QStringLiteral("ACPC"));
+const IeegLead& lead = implantation.leads().first(); // contacts ordered LA1, LA2, LA3
+// IeegImplantation::readBids("sub-01_electrodes.tsv") reads the same from BIDS iEEG
+```
+
+---
+
+## Public Methods
+
+### IeegImplantation()
+
+---
+
+### IeegImplantation(contacts, coordinateSystem)
+
+Group contacts into leads.
+
+A contact without a lead name belongs to the lead named like the contact without its trailing number (`LA1`, `LA10` -&gt; `LA`; `A'1` stays apart from `A1`, the prime marking the other hemisphere). Within a lead, contacts are ordered by that number. A lead whose closest neighbouring contacts are less than `kMaxDepthSpacing` apart is a depth lead, others are strips.
+
+**Parameters:**
+
+- **contacts** : *const QVector&lt; [IeegContact](/docs/api/ieeg/ieeg-contact) &gt; &*
+  Contacts, positions in metres.
+
+- **coordinateSystem** : *const QString &*
+  Name of the frame of the positions, e.g. "ACPC".
+
+---
+
+### contacts()
+
+**Returns:**
+
+- *const QVector&lt; [IeegContact](/docs/api/ieeg/ieeg-contact) &gt; &* — All contacts.
+
+---
+
+### leads()
+
+**Returns:**
+
+- *const QVector&lt; [IeegLead](/docs/api/ieeg/ieeg-lead) &gt; &* — All leads, in order of their first contact.
+
+---
+
+### coordinateSystem()
+
+**Returns:**
+
+- *QString* — Name of the frame of the positions, e.g. "ACPC"; empty when unknown.
+
+---
+
+### isEmpty()
+
+**Returns:**
+
+- *bool* — True without contacts.
+
+---
+
+### indexOf(name)
+
+**Parameters:**
+
+- **name** : *const QString &*
+  Contact name.
+
+**Returns:**
+
+- *int* — Index of the contact, or -1.
+
+---
+
+### positions()
+
+**Returns:**
+
+- *Eigen::MatrixX3f* — Contact positions, one row per contact, in metres.
+
+---
+
+## Static Methods
+
+### readBids(electrodesTsv, error)
+
+Read a BIDS iEEG `*_electrodes.tsv`.
+
+Units and the coordinate system come from the `*_coordsystem.json` in the same folder that shares the longest name prefix; without one the file is refused, since the units are then unknown. Contacts without coordinates are skipped. The `group` column assigns leads and the `dimension` column ("[4x8]") the grid shape; a `type` naming depth, strip or grid sets the lead type. Otherwise names and spacing decide, as in the constructor.
+
+**Parameters:**
+
+- **electrodesTsv** : *const QString &*
+  Path to the *_electrodes.tsv file.
+
+- **error** : *QString **
+  Optional: why the file was refused.
+
+**Returns:**
+
+- *IeegImplantation* — The implantation; empty when the file was refused or has no placed contacts.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
+- Build target: `ex_ieeg` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

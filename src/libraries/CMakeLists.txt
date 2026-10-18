@@ -64,6 +64,7 @@ add_subdirectory(lsl)
 
 add_subdirectory(fiff)
 add_subdirectory(bids)
+add_subdirectory(ieeg)
 add_subdirectory(fs)
 add_subdirectory(mri)
 

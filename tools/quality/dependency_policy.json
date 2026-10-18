@@ -50,7 +50,8 @@
       "description": "Estimators that consume the forward solution.",
       "libraries": [
         "mne_inv",
-        "mne_connectivity"
+        "mne_connectivity",
+        "mne_ieeg"
       ]
     },
     {

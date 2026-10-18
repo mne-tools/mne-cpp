@@ -121,15 +121,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Load sEEG / ECoG contacts from a BIDS iEEG `*_electrodes.tsv`.
-     *
-     * Units come from the `*_coordsystem.json` in the same folder that shares the longest name
-     * prefix; without one the file is refused rather than guessed. Positions are taken to be in
-     * the frame of the loaded surfaces (FreeSurfer surface RAS, as MNE-BIDS writes "ACPC").
-     * Contacts are grouped into leads by name without the trailing number (`LA1`, `LA10` -> `LA`;
-     * `A'1` stays apart from `A1`) and ordered by that number. The `type` column sets the layout
-     * (`depth`, `strip`, `grid`); without it, leads with contacts under 6 mm apart are depth leads
-     * and the others strips.
+     * Load sEEG / ECoG contacts from a BIDS iEEG `*_electrodes.tsv`, read and grouped into
+     * leads by IEEGLIB::IeegImplantation::readBids. Positions are taken to be in the frame of
+     * the loaded surfaces (FreeSurfer surface RAS, as MNE-BIDS writes "ACPC").
      *
      * @param[in] path   Path to a *_electrodes.tsv file.
      * @return true if at least one contact with coordinates was read.

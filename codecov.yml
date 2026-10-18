@@ -101,6 +101,10 @@ component_management:
       name: libraries/fwd
       paths:
         - src/libraries/fwd/**
+    - component_id: libraries_ieeg
+      name: libraries/ieeg
+      paths:
+        - src/libraries/ieeg/**
     - component_id: libraries_inv
       name: libraries/inv
       paths:

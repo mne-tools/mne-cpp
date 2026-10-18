@@ -1314,6 +1314,7 @@ _LIBRARY_OVERVIEW_DEV_FILES: Dict[str, str] = {
     "inv": "inverse.mdx",
     "dsp": "dsp.mdx",
     "connectivity": "connectivity.mdx",
+    "ieeg": "ieeg.mdx",
     "ml": "ml.mdx",
     "sts": "sts.mdx",
     "mna": "mna.mdx",

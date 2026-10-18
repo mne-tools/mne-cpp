@@ -1,0 +1,43 @@
+---
+id: ieeg-contact
+title: "IEEGLIB::IeegContact"
+sidebar_label: IeegContact
+sidebar_position: 2
+---
+
+# IeegContact
+
+**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Library:** iEEG Library
+
+`#include <ieeg/ieeg_implantation.h>`
+
+```cpp
+struct IEEGLIB::IeegContact
+```
+
+One recording contact.
+
+```cpp title="src/examples/ex_ieeg/main.cpp"
+// Contacts of one depth lead, 3.5 mm apart, in metres; the lead comes from the names
+QVector<IeegContact> contacts;
+for (int k : {3, 1, 2}) {
+    IeegContact contact;
+    contact.name = QStringLiteral("LA%1").arg(k);
+    contact.position = Eigen::Vector3f(-0.03f, 0.0f, 0.0035f * float(k - 1));
+    contacts.append(contact);
+}
+const IeegImplantation implantation(contacts, QStringLiteral("ACPC"));
+const IeegLead& lead = implantation.leads().first(); // contacts ordered LA1, LA2, LA3
+// IeegImplantation::readBids("sub-01_electrodes.tsv") reads the same from BIDS iEEG
+```
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
+- Build target: `ex_ieeg` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
