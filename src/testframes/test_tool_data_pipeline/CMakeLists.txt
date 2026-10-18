@@ -37,6 +37,7 @@ foreach(CLI_TOOL IN ITEMS
     mne_compute_mne
     mne_convert_ncov
     mne_dacq_annotator
+    mne_eximia2fiff
     mne_evoked_data_summary
     mne_fix_stim14
     mne_insert_4D_comp
@@ -66,7 +67,7 @@ endif()
 
 enable_testing()
 mne_add_test(${PROJECT_NAME}
-    LABELS integration slow
+    LABELS integration slow parity
     TIMEOUT 600
     REQUIRES_DATA
         mne-cpp-test-data/BIDS/sub-01
@@ -74,6 +75,7 @@ mne_add_test(${PROJECT_NAME}
         mne-cpp-test-data/MEG/sample
         mne-cpp-test-data/Result
         mne-cpp-test-data/subjects/sample)
+target_compile_definitions(${PROJECT_NAME} PRIVATE TOOL_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

@@ -23,6 +23,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_tag.h>
+#include <fiff/fiff_dig_point.h>
 #include <mne/mne_bem.h>
 
 //=============================================================================================================
@@ -703,13 +704,86 @@ private slots:
     // mne_eximia2fiff
     //=========================================================================================================
 
-    void testEximia2FiffHelp()
+    void testEximia2FiffMatchesPython()
     {
         if (!toolExists("mne_eximia2fiff"))
             QSKIP("mne_eximia2fiff not found");
-        QString output = runTool("mne_eximia2fiff", {"--help"});
-        QVERIFY(output.contains("help", Qt::CaseInsensitive) ||
-                output.contains("eximia", Qt::CaseInsensitive));
+        // data/eximia.nxe: the first 100 samples (12,800 bytes) of eximia/test_eximia.nxe from the BSD-3-Clause MNE
+        // testing dataset. Expected values produced by mne.io.read_raw_eximia (mne 1.11.0) on that file.
+        const QString outPath = m_tempDir.filePath("eximia_raw.fif");
+        runTool("mne_eximia2fiff", {"--nxe", QStringLiteral(TOOL_DATA_DIR "/eximia.nxe"), "--out", outPath});
+        QCOMPARE(m_lastExitCode, 0);
+
+        QFile file(outPath);
+        FIFFLIB::FiffRawData raw(file);
+        QCOMPARE(raw.info.sfreq, 1450.0);
+        QCOMPARE(raw.info.nchan, 64);
+        QCOMPARE(raw.last_samp - raw.first_samp + 1, 100);
+        QCOMPARE(raw.info.ch_names.first(), QStringLiteral("GateIn"));
+        QCOMPARE(raw.info.ch_names[4], QStringLiteral("Fp1"));
+        QCOMPARE(raw.info.ch_names.last(), QStringLiteral("Iz"));
+        QCOMPARE(raw.info.channel_type(0), QStringLiteral("stim"));
+        QCOMPARE(raw.info.channel_type(3), QStringLiteral("eog"));
+        QCOMPARE(raw.info.channel_type(4), QStringLiteral("eeg"));
+        QCOMPARE(raw.info.chs[4].chpos.coil_type, FIFFV_COIL_EEG);
+
+        Eigen::MatrixXd data, times;
+        QVERIFY(raw.read_raw_segment(data, times));
+        const auto close = [](double value, double expected) {
+            return std::abs(value - expected) <= 1e-6 * std::abs(expected);
+        };
+        QVERIFY(close(data(0, 0), 0.019836728465705347));
+        QVERIFY(close(data(3, 0), -549.7062638284887));
+        QVERIFY(close(data(4, 0), -77.6684214541848));
+        QVERIFY(close(data(4, 99), -94.98741130693523));
+        QVERIFY(close(data(63, 50), -98.03921568627452));
+        QVERIFY(close(data.row(0).sum(), 1.6495002670328827));
+        QVERIFY(close(data.row(3).sum(), -55627.14579995423));
+        QVERIFY(close(data.row(4).sum(), -9377.584496833753));
+        QVERIFY(close(data.row(63).sum(), -9339.589532310978));
+    }
+
+    void testEximia2FiffDigitizer()
+    {
+        if (!toolExists("mne_eximia2fiff"))
+            QSKIP("mne_eximia2fiff not found");
+        // eXimia digitizer text as MNE-C's mne_eximia2fiff reads it: x y z in mm, the electrode number in column 5
+        const QString digPath = m_tempDir.filePath("eximia_dig.txt");
+        QFile dig(digPath);
+        QVERIFY(dig.open(QIODevice::WriteOnly | QIODevice::Text));
+        dig.write("-70.0 0.0 0.0 Scalp Left\n"
+                  "0.0 90.0 0.0 Scalp Nasion\n"
+                  "70.0 0.0 0.0 Scalp Right\n"
+                  "0.0 0.0 80.0 Point 5 Original\n");
+        dig.close();
+        const QString outPath = m_tempDir.filePath("eximia_dig_raw.fif");
+        runTool("mne_eximia2fiff", {"--nxe", QStringLiteral(TOOL_DATA_DIR "/eximia.nxe"), "--dig", digPath, "--out", outPath});
+        QCOMPARE(m_lastExitCode, 0);
+
+        QFile file(outPath);
+        FIFFLIB::FiffRawData raw(file);
+        QCOMPARE(raw.info.dig.size(), 4);
+        for (const FIFFLIB::FiffDigPoint& p : raw.info.dig)
+            QCOMPARE(p.coord_frame, FIFFV_COORD_HEAD);
+        QCOMPARE(raw.info.dig[1].ident, FIFFV_POINT_NASION);
+        QVERIFY(std::abs(raw.info.dig[1].r[0]) < 1e-6f && raw.info.dig[1].r[1] > 0.0f);
+        QCOMPARE(raw.info.dig[3].kind, FIFFV_POINT_EEG);
+        QCOMPARE(raw.info.dig[3].ident, 5);
+        QVERIFY(std::abs(raw.info.dig[3].r[2] - 0.08f) < 1e-6f);
+
+        // Without the fiducials there is no head frame
+        QVERIFY(dig.open(QIODevice::WriteOnly | QIODevice::Text));
+        dig.write("0.0 0.0 80.0 Point 5 Original\n");
+        dig.close();
+        runTool("mne_eximia2fiff", {"--nxe", QStringLiteral(TOOL_DATA_DIR "/eximia.nxe"), "--dig", digPath, "--out", outPath});
+        QCOMPARE(m_lastExitCode, 1);
+
+        const QString emptyPath = m_tempDir.filePath("empty.nxe");
+        QFile empty(emptyPath);
+        QVERIFY(empty.open(QIODevice::WriteOnly));
+        empty.close();
+        runTool("mne_eximia2fiff", {"--nxe", emptyPath, "--out", outPath});
+        QCOMPARE(m_lastExitCode, 1);
     }
 
     //=========================================================================================================
