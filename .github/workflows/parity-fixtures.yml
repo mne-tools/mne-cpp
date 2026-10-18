@@ -1,0 +1,93 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+# ---------------------------------------------------------------------------
+# Parity fixtures
+#
+# Regenerates, from the MNE sample dataset, the MNE-Python reference values that
+# live in mne-cpp-test-data (Result/parity/...) in the pinned environment of
+# tools/parity/reference_lock.json and uploads them as the parity-fixtures
+# artifact. Committing them to mne-cpp-test-data stays a manual, reviewed step.
+# ---------------------------------------------------------------------------
+name: Parity Fixtures
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [staging]
+    paths:
+      - 'tools/parity/reference_lock.json'
+      - 'src/testframes/test_field_map/make_*.py'
+      - 'src/testframes/test_compute_raw_inverse/make_*.py'
+      - '.github/workflows/parity-fixtures.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: parity-fixtures-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  Generate:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        persist-credentials: false
+
+    - name: Read the reference lock
+      id: lock
+      run: |
+        echo "python=$(jq -r .python tools/parity/reference_lock.json)" >> "$GITHUB_OUTPUT"
+        echo "packages=$(jq -r '.packages | to_entries | map("\(.key)==\(.value)") | join(" ")' tools/parity/reference_lock.json)" >> "$GITHUB_OUTPUT"
+
+    - name: Install Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ steps.lock.outputs.python }}
+
+    - name: Install the reference environment
+      env:
+        PACKAGES: ${{ steps.lock.outputs.packages }}
+      run: |
+        # shellcheck disable=SC2086
+        pip install $PACKAGES
+        python tools/parity/reference.py
+
+    - name: Cache MNE sample data
+      id: cache-mne-data
+      uses: actions/cache@v5
+      with:
+        path: ~/mne_data/MNE-sample-data
+        key: mne-sample-data-v3
+
+    - name: Download MNE sample data
+      if: steps.cache-mne-data.outputs.cache-hit != 'true'
+      run: python -c "import mne; mne.datasets.sample.data_path()"
+
+    - name: Generate fixtures
+      run: |
+        data="$HOME/mne_data/MNE-sample-data"
+        out="$RUNNER_TEMP/parity-fixtures/Result/parity"
+        frames=src/testframes
+        sample="$data/MEG/sample"
+        common=(--evoked "$sample/sample_audvis-ave.fif" --trans "$sample/sample_audvis_raw-trans.fif"
+                --surf "$data/subjects/sample/bem/sample-head.fif" --mode accurate --max-verts 642)
+        python "$frames/test_field_map/make_field_map_fixtures.py" "${common[@]}" --condition 0 --outdir "$out/field_map/single"
+        python "$frames/test_field_map/make_multi_evoked_fixtures.py" "${common[@]}" --outdir "$out/field_map/multi"
+        python "$frames/test_field_map/make_helmet_fixtures.py" --sample-dir "$data" --outdir "$out/field_map/helmet"
+        mkdir -p "$out/compute_raw_inverse"
+        python "$frames/test_compute_raw_inverse/make_raw_inverse_fixtures.py" "$out/compute_raw_inverse" "$data"
+        python -c "import mne, numpy, scipy, sklearn; print(f'mne {mne.__version__}, numpy {numpy.__version__}, scipy {scipy.__version__}, scikit-learn {sklearn.__version__}')" > "$out/GENERATED_WITH.txt"
+        echo "commit $GITHUB_SHA" >> "$out/GENERATED_WITH.txt"
+
+    - name: Upload fixtures
+      uses: actions/upload-artifact@v7
+      with:
+        name: parity-fixtures
+        path: ${{ runner.temp }}/parity-fixtures
+        retention-days: 30
+        if-no-files-found: error
