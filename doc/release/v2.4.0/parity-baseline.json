@@ -23,28 +23,28 @@
   "summary": {
     "claims": 356,
     "by_evidence": {
-      "cross-validated-static": 170,
-      "cross-validated-live": 4,
+      "cross-validated-static": 174,
+      "cross-validated-live": 0,
       "tested": 182,
       "unverified": 0
     },
     "by_claim": {
-      "equivalent": 137,
+      "equivalent": 139,
       "exceeds": 0,
-      "implemented": 124,
+      "implemented": 122,
       "partial": 95
     },
     "equivalence_without_static_evidence": [],
     "by_source": {
       "classes": {
-        "cross-validated-static": 31,
-        "cross-validated-live": 1,
+        "cross-validated-static": 32,
+        "cross-validated-live": 0,
         "tested": 61,
         "unverified": 0
       },
       "parity": {
-        "cross-validated-static": 139,
-        "cross-validated-live": 3,
+        "cross-validated-static": 142,
+        "cross-validated-live": 0,
         "tested": 121,
         "unverified": 0
       }
@@ -55,6 +55,7 @@
         "test_analyze_dipolefit",
         "test_anshared_models",
         "test_bids",
+        "test_compute_raw_inverse",
         "test_dsp_annotate_artifact",
         "test_dsp_artifact_detect",
         "test_dsp_csd",
@@ -67,6 +68,7 @@
         "test_dsp_welch_psd",
         "test_edf2fiff_rwr",
         "test_epochs",
+        "test_field_map",
         "test_fiff_coord_trans",
         "test_fiff_core_python",
         "test_fiff_cov_python",
@@ -111,9 +113,7 @@
         "test_utils_spectral"
       ],
       "cross-validated-live": [
-        "test_compute_raw_inverse",
         "test_crossval_covariance",
-        "test_field_map",
         "test_ml_trainer",
         "test_mne_compute_raw_inverse",
         "test_python_runner"
@@ -308,9 +308,9 @@
       "mne_cpp": "InvMinimumNorm",
       "python": "mne.minimum_norm.apply_inverse",
       "claimed": "implemented",
-      "equivalence": null,
+      "equivalence": "equivalent",
       "test": "test_compute_raw_inverse",
-      "evidence": "cross-validated-live",
+      "evidence": "cross-validated-static",
       "tolerance": "exact"
     },
     {
@@ -1775,7 +1775,7 @@
       "claimed": "partial",
       "equivalence": null,
       "test": "test_field_map",
-      "evidence": "cross-validated-live",
+      "evidence": "cross-validated-static",
       "tolerance": "1e-20 to 0.05"
     },
     {
@@ -1840,9 +1840,9 @@
       "mne_cpp": "FWDLIB helmet surface",
       "python": "mne.get_meg_helmet_surf",
       "claimed": "implemented",
-      "equivalence": null,
+      "equivalence": "equivalent",
       "test": "test_field_map",
-      "evidence": "cross-validated-live",
+      "evidence": "cross-validated-static",
       "tolerance": "1e-20 to 0.05"
     },
     {
@@ -2165,7 +2165,7 @@
       "claimed": "partial",
       "equivalence": null,
       "test": "test_field_map",
-      "evidence": "cross-validated-live",
+      "evidence": "cross-validated-static",
       "tolerance": "1e-20 to 0.05"
     },
     {

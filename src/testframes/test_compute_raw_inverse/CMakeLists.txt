@@ -61,10 +61,11 @@ endif()
 # Register with CTest
 enable_testing()
 mne_add_test(${PROJECT_NAME}
-    LABELS integration
+    LABELS integration parity
     TIMEOUT 300
     REQUIRES_DATA
-        mne-cpp-test-data/MEG/sample)
+        mne-cpp-test-data/MEG/sample
+        mne-cpp-test-data/Result/parity/compute_raw_inverse)
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()

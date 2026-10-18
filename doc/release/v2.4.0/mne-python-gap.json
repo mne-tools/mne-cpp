@@ -14,7 +14,7 @@
       "missing": 145,
       "not-applicable": 8
     },
-    "equivalent": 113,
+    "equivalent": 114,
     "by_domain": {
       "io": {
         "implemented": 18,
@@ -83,7 +83,7 @@
         "partial": 4,
         "missing": 8,
         "not-applicable": 0,
-        "equivalent": 5
+        "equivalent": 6
       },
       "time_frequency": {
         "implemented": 2,
@@ -4044,7 +4044,7 @@
       "mne_cpp": "FWDLIB helmet surface",
       "note": "",
       "evidence": "parity-record",
-      "equivalence": ""
+      "equivalence": "equivalent"
     },
     {
       "python": "mne.grade_to_vertices",

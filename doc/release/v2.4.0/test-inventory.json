@@ -18,7 +18,7 @@
     "without_timeout": 0,
     "requirements": {
       "freesurfer": 2,
-      "python": 9,
+      "python": 7,
       "sample-data": 20,
       "test-data": 120
     },
@@ -906,17 +906,17 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 300,
       "requirements": [
-        "python",
         "sample-data",
         "test-data"
       ],
       "gui": false,
-      "qskip_sites": 16,
-      "spawns_processes": true,
+      "qskip_sites": 13,
+      "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",
@@ -2924,17 +2924,17 @@
       ],
       "labels": [
         "integration",
+        "parity",
         "requires-data"
       ],
       "timeout": 300,
       "requirements": [
-        "python",
         "sample-data",
         "test-data"
       ],
       "gui": false,
-      "qskip_sites": 12,
-      "spawns_processes": true,
+      "qskip_sites": 8,
+      "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
         "macos-26": "run",

@@ -18,9 +18,9 @@ tested, not that its output was compared with MNE-Python.
 
 | Claim | Count |
 |---|---:|
-| equivalent | 137 |
+| equivalent | 139 |
 | exceeds | 0 |
-| implemented | 124 |
+| implemented | 122 |
 | partial | 95 |
 
 Equivalence claims without static cross-validation: none
@@ -29,17 +29,17 @@ Equivalence claims without static cross-validation: none
 
 | Evidence | classes (`python_equiv`) | parity records (implemented/partial) | Total |
 |---|---:|---:|---:|
-| cross-validated-static | 31 | 139 | 170 |
-| cross-validated-live | 1 | 3 | 4 |
+| cross-validated-static | 32 | 142 | 174 |
+| cross-validated-live | 0 | 0 | 0 |
 | tested | 61 | 121 | 182 |
 | unverified | 0 | 0 | 0 |
 | **all claims** | 93 | 263 | 356 |
 
 `cross-validated-live` tests call whatever `mne` is installed, so they are neither pinned nor deterministic.
 
-Tests comparing against embedded MNE-Python values: `test_analyze_averaging`, `test_analyze_dipolefit`, `test_anshared_models`, `test_bids`, `test_dsp_annotate_artifact`, `test_dsp_artifact_detect`, `test_dsp_csd`, `test_dsp_eeg_reference`, `test_dsp_eog_regression`, `test_dsp_firfilter`, `test_dsp_morlet_tfr`, `test_dsp_multitaper`, `test_dsp_simulate`, `test_dsp_welch_psd`, `test_edf2fiff_rwr`, `test_epochs`, `test_fiff_coord_trans`, `test_fiff_core_python`, `test_fiff_cov_python`, `test_fiff_dig_point_python`, `test_fiff_evoked_python`, `test_fiff_fs_library`, `test_fiff_info`, `test_fiff_io_evoked_info`, `test_fiff_proj_python`, `test_fiff_raw_formats_python`, `test_fiff_raw_io`, `test_fiff_raw_save_python`, `test_fiff_stream_python`, `test_filtering`, `test_fs_annotation_labels`, `test_fs_io`, `test_fwd_bem_driver_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_lcmv_python`, `test_inv_sparse`, `test_mne_browse_app`, `test_mne_cov_python`, `test_mne_ctf_comp_python`, `test_mne_forward_ops`, `test_mne_label_python`, `test_mne_raw_data_python`, `test_mne_source_space_ops_python`, `test_mne_source_space_python`, `test_resolution_matrix`, `test_sensor_field_mapper`, `test_source_estimate_io`, `test_source_estimate_types`, `test_spectral_connectivity`, `test_standard_montage`, `test_sts_cluster`, `test_surface_laplacian`, `test_tool_data_pipeline`, `test_tool_list_source_space`, `test_utils_spectral`
+Tests comparing against embedded MNE-Python values: `test_analyze_averaging`, `test_analyze_dipolefit`, `test_anshared_models`, `test_bids`, `test_compute_raw_inverse`, `test_dsp_annotate_artifact`, `test_dsp_artifact_detect`, `test_dsp_csd`, `test_dsp_eeg_reference`, `test_dsp_eog_regression`, `test_dsp_firfilter`, `test_dsp_morlet_tfr`, `test_dsp_multitaper`, `test_dsp_simulate`, `test_dsp_welch_psd`, `test_edf2fiff_rwr`, `test_epochs`, `test_field_map`, `test_fiff_coord_trans`, `test_fiff_core_python`, `test_fiff_cov_python`, `test_fiff_dig_point_python`, `test_fiff_evoked_python`, `test_fiff_fs_library`, `test_fiff_info`, `test_fiff_io_evoked_info`, `test_fiff_proj_python`, `test_fiff_raw_formats_python`, `test_fiff_raw_io`, `test_fiff_raw_save_python`, `test_fiff_stream_python`, `test_filtering`, `test_fs_annotation_labels`, `test_fs_io`, `test_fwd_bem_driver_python`, `test_fwd_python`, `test_inv_beamformer_python`, `test_inv_dipole_fit_python`, `test_inv_eloreta_python`, `test_inv_lcmv_python`, `test_inv_sparse`, `test_mne_browse_app`, `test_mne_cov_python`, `test_mne_ctf_comp_python`, `test_mne_forward_ops`, `test_mne_label_python`, `test_mne_raw_data_python`, `test_mne_source_space_ops_python`, `test_mne_source_space_python`, `test_resolution_matrix`, `test_sensor_field_mapper`, `test_source_estimate_io`, `test_source_estimate_types`, `test_spectral_connectivity`, `test_standard_montage`, `test_sts_cluster`, `test_surface_laplacian`, `test_tool_data_pipeline`, `test_tool_list_source_space`, `test_utils_spectral`
 
-Tests running MNE-Python live: `test_compute_raw_inverse`, `test_crossval_covariance`, `test_field_map`, `test_ml_trainer`, `test_mne_compute_raw_inverse`, `test_python_runner`
+Tests running MNE-Python live: `test_crossval_covariance`, `test_ml_trainer`, `test_mne_compute_raw_inverse`, `test_python_runner`
 
 ## Denominator
 
@@ -104,6 +104,7 @@ Tolerance is the range of comparison thresholds the test asserts (`exact` when i
 | `mne.forward.is_fixed_orient` | `MNEForwardSolution::isFixedOrient` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
 | `mne.forward.read_forward_solution` | `MNEForwardSolution::read` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
 | `mne.forward.write_forward_solution` | `MNEForwardSolution::write` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
+| `mne.get_meg_helmet_surf` | `FWDLIB helmet surface` | equivalent | `test_field_map` | 1e-20 to 0.05 |
 | `mne.grade_to_vertices` | `MNESourceSpace::gradeToVertices` | equivalent | `test_mne_source_space_ops_python` | 1e-06 to 1e-05 |
 | `mne.inverse_sparse.gamma_map` | `InvGammaMap` | equivalent | `test_inv_sparse` | exact |
 | `mne.inverse_sparse.mixed_norm` | `InvMxne` | equivalent | `test_inv_sparse` | exact |
@@ -123,6 +124,7 @@ Tolerance is the range of comparison thresholds the test asserts (`exact` when i
 | `mne.make_sphere_model` | `FwdEegSphereModel` | equivalent | `test_fwd_python` | 1e-06 to 0.001 |
 | `mne.make_sphere_model` | `mne_make_sphere_bem (CLI)` | equivalent | `test_fwd_python` | 1e-06 to 0.001 |
 | `mne.merge_events` | `FiffEvents::merge` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
+| `mne.minimum_norm.apply_inverse` | `InvMinimumNorm` | equivalent | `test_compute_raw_inverse` | exact |
 | `mne.minimum_norm.apply_inverse` | `MinimumNorm` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
 | `mne.minimum_norm.apply_inverse_epochs` | `INVLIB::applyInverseEpochs` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
 | `mne.minimum_norm.apply_inverse_raw` | `mne_compute_raw_inverse (CLI)` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |

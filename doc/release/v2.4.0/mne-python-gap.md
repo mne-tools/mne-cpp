@@ -8,7 +8,7 @@
 ## Summary
 
 - **Total public MNE-Python APIs inventoried:** 443
-- Implemented: **195**, of which **113** cross-validated against embedded MNE-Python values (`equivalent`/`exceeds`)
+- Implemented: **195**, of which **114** cross-validated against embedded MNE-Python values (`equivalent`/`exceeds`)
 - Partial: **95**
 - Missing: **145**
 - Not-applicable: **8**
@@ -28,7 +28,7 @@ Every parity figure exposes its denominator (in-scope = implemented + partial + 
 | Covariance & Whitening | 6 | 2 | 1 | 0 | 0 | 7 |
 | Forward Modelling | 25 | 17 | 9 | 1 | 0 | 35 |
 | Inverse & Source Estimation | 31 | 19 | 14 | 15 | 0 | 60 |
-| Source Space & Morphing | 15 | 5 | 4 | 8 | 0 | 27 |
+| Source Space & Morphing | 15 | 6 | 4 | 8 | 0 | 27 |
 | Time-Frequency | 2 | 2 | 22 | 17 | 0 | 41 |
 | Decoding & Machine Learning | 4 | 0 | 4 | 14 | 2 | 24 |
 | Statistics | 11 | 11 | 0 | 6 | 0 | 17 |

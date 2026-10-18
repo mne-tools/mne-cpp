@@ -66,27 +66,11 @@ if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
-# ── Copy the Python cross-validation scripts next to the test binary ─────
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/generate_fieldmap_reference.py
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/generate_fieldmap_reference.py
-    COPYONLY
-)
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/generate_multi_evoked_reference.py
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/generate_multi_evoked_reference.py
-    COPYONLY
-)
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/generate_helmet_reference.py
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/generate_helmet_reference.py
-    COPYONLY
-)
-
 # ── Register as CTest so `ctest` picks it up ─────────────────────────────
 enable_testing()
 mne_add_test(${PROJECT_NAME}
-    LABELS integration
+    LABELS integration parity
     TIMEOUT 300
     REQUIRES_DATA
-        mne-cpp-test-data/MEG/sample)
+        mne-cpp-test-data/MEG/sample
+        mne-cpp-test-data/Result/parity/field_map)

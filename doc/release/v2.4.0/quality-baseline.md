@@ -20,8 +20,8 @@ Coverage from `2feea06a7` (https://github.com/mne-tools/mne-cpp/actions/runs/388
 | G5 | Zero compiler warnings | enforced by -Werror on every matrix entry | met |
 | G5 | Debt metrics ratcheted | null_macro 43, typedef_struct 12, c_style_cast 402, raw_new 168, raw_delete 275, console_io 341, numeric_define 847, qt_new_unparented 811, oversized_unit 8 | baseline recorded |
 | G6 | Pinned reference environment | MNE-Python 1.11.0; lock `tools/parity/reference_lock.json`; CI installs exactly the lock | met |
-| G6 | Equivalent/exceeds claims are cross-validated | equivalent 137, exceeds 0, implemented 124, partial 95; 0 without embedded MNE-Python values | met |
-| G6 | Every claim has evidence, none compares live | cross-validated-static 170, cross-validated-live 4, tested 182, unverified 0 | **open** |
+| G6 | Equivalent/exceeds claims are cross-validated | equivalent 139, exceeds 0, implemented 122, partial 95; 0 without embedded MNE-Python values | met |
+| G6 | Every claim has evidence, none compares live | cross-validated-static 174, cross-validated-live 0, tested 182, unverified 0 | met |
 
 Detailed reports: [test inventory](test-inventory.md), [coverage](coverage-baseline.md), [API evidence](api-evidence-baseline.md), [visual](visual-baseline.md), [maintainability](maintainability-baseline.md), [parity evidence](parity-baseline.md), [MNE-Python gap](mne-python-gap.md).
 

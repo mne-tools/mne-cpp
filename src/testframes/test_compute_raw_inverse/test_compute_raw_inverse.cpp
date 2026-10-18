@@ -39,7 +39,6 @@
 #include <QFile>
 #include <QDir>
 #include <QTemporaryDir>
-#include <QProcess>
 #include <QCoreApplication>
 
 //=============================================================================================================
@@ -93,8 +92,6 @@ private slots:
 
 private:
     QString findDataPath();
-    QString findPython();
-    QString findGenerateScript();
 
     QString m_sDataPath;   /**< Path to MNE sample data directory. */
     QString m_sEvokedFile; /**< Path to sample_audvis-ave.fif. */
@@ -159,53 +156,6 @@ QString TestComputeRawInverse::findDataPath()
 }
 
 //=============================================================================================================
-
-QString TestComputeRawInverse::findPython()
-{
-    // Try common Python executables that have mne installed
-    QStringList candidates;
-    candidates << "python3" << "python" << "python3.14" << "python3.13"
-               << "python3.12" << "python3.11" << "python3.10";
-
-    for (const QString& py : candidates) {
-        QProcess proc;
-        proc.start(py, QStringList() << "-c" << "import mne; print(mne.__version__)");
-        proc.waitForFinished(10000);
-        if (proc.exitCode() == 0) {
-            QString ver = QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
-            printf("  Found Python with MNE %s: %s\n", ver.toUtf8().constData(),
-                   py.toUtf8().constData());
-            return py;
-        }
-    }
-    return QString();
-}
-
-//=============================================================================================================
-
-QString TestComputeRawInverse::findGenerateScript()
-{
-    // Look for the Python script relative to the source tree
-    QStringList candidates;
-
-    // Relative to the test executable
-    QString appDir = QCoreApplication::applicationDirPath();
-    candidates << appDir + "/../../../src/testframes/test_compute_raw_inverse/generate_reference_stc.py";
-    candidates << appDir + "/../../../../src/testframes/test_compute_raw_inverse/generate_reference_stc.py";
-
-    // Relative to known source root paths
-    candidates << QString::fromUtf8(__FILE__).replace("test_compute_raw_inverse.cpp", "generate_reference_stc.py");
-
-    // Absolute fallback
-    candidates << QDir::homePath() + "/Programming/mne-cpp/src/testframes/test_compute_raw_inverse/generate_reference_stc.py";
-
-    for (const QString& path : candidates) {
-        if (QFile::exists(path)) {
-            return QFileInfo(path).absoluteFilePath();
-        }
-    }
-    return QString();
-}
 
 //=============================================================================================================
 
@@ -701,30 +651,20 @@ void TestComputeRawInverse::testStcMatchesMnePython()
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Test STC Matches MNE-Python >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
-    // --- 1. Find Python with MNE ---
-    QString python = findPython();
-    if (python.isEmpty()) {
-        QSKIP("Python with MNE not found. Install mne-python to run this test.");
-        return;
-    }
+    // ref-lh/rh.stc: mne.minimum_norm.apply_inverse (dSPM, lambda2 = 1/9, no baseline) on the same evoked and
+    // inverse in mne-cpp-test-data. Reference values produced by make_raw_inverse_fixtures.py (mne 1.11.0).
+    const QString pyDir = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/parity/compute_raw_inverse";
+    QVERIFY2(QFile::exists(pyDir + "/ref-lh.stc") && QFile::exists(pyDir + "/ref-rh.stc"),
+             qPrintable("MNE-Python reference STCs missing in " + pyDir));
 
-    QString script = findGenerateScript();
-    if (script.isEmpty()) {
-        QSKIP("generate_reference_stc.py not found.");
-        return;
-    }
-    printf("  Script: %s\n", script.toUtf8().constData());
-
-    // --- 2. Create temp directory for output ---
+    // --- 1. Create temp directory for output ---
     QTemporaryDir tmpDir;
     QVERIFY2(tmpDir.isValid(), "Failed to create temporary directory");
 
     QString cppDir = tmpDir.path() + "/cpp";
-    QString pyDir = tmpDir.path() + "/python";
     QDir().mkpath(cppDir);
-    QDir().mkpath(pyDir);
 
-    // --- 3. Write C++ STCs (split lh/rh) ---
+    // --- 2. Write C++ STCs (split lh/rh) ---
     int nSrcLh = m_invOp.src[0].nuse;
     int nSrcRh = m_invOp.src[1].nuse;
     int nSrcTotal = (int)m_stcDSPM.data.rows();
@@ -749,26 +689,7 @@ void TestComputeRawInverse::testStcMatchesMnePython()
         QVERIFY2(stcRh.write(f), "Failed to write C++ RH STC");
     }
 
-    // --- 4. Generate reference STCs using mne-python ---
-    printf("  Running mne-python to generate reference STCs...\n");
-    QProcess proc;
-    proc.setProcessChannelMode(QProcess::MergedChannels);
-    proc.start(python, QStringList() << script << pyDir << m_sDataPath);
-    bool finished = proc.waitForFinished(120000); // 2 min timeout
-
-    QString pyOutput = QString::fromUtf8(proc.readAll());
-    printf("  Python output:\n");
-    for (const QString& line : pyOutput.split('\n')) {
-        printf("    %s\n", line.toUtf8().constData());
-    }
-
-    if (!finished || proc.exitCode() != 0) {
-        printf("  Python exit code: %d\n", proc.exitCode());
-        QSKIP("mne-python reference generation failed (see output above)");
-        return;
-    }
-
-    // --- 5. Read both sets of STCs ---
+    // --- 3. Read both sets of STCs ---
     // Read C++ STCs
     InvSourceEstimate cppLh, cppRh;
     {
@@ -791,7 +712,7 @@ void TestComputeRawInverse::testStcMatchesMnePython()
         QVERIFY2(InvSourceEstimate::read(f, pyRh), "Failed to read Python RH STC");
     }
 
-    // --- 6. Compare LH hemisphere ---
+    // --- 4. Compare LH hemisphere ---
     printf("\n  === Left Hemisphere Comparison ===\n");
     printf("  C++:    %d vertices, %d times, tmin=%.6f, tstep=%.8f\n",
            (int)cppLh.data.rows(), (int)cppLh.data.cols(), cppLh.tmin, cppLh.tstep);
@@ -854,7 +775,7 @@ void TestComputeRawInverse::testStcMatchesMnePython()
     QVERIFY2(corrLh > 0.999, qPrintable(QString("LH correlation too low: %1").arg(corrLh, 0, 'f', 10)));
     QVERIFY2(relErrLh < 0.01, qPrintable(QString("LH relative error too high: %1").arg(relErrLh, 0, 'e', 6)));
 
-    // --- 7. Compare RH hemisphere ---
+    // --- 5. Compare RH hemisphere ---
     printf("\n  === Right Hemisphere Comparison ===\n");
     printf("  C++:    %d vertices, %d times, tmin=%.6f, tstep=%.8f\n",
            (int)cppRh.data.rows(), (int)cppRh.data.cols(), cppRh.tmin, cppRh.tstep);
@@ -916,7 +837,7 @@ void TestComputeRawInverse::testStcMatchesMnePython()
     QVERIFY2(corrRh > 0.999, qPrintable(QString("RH correlation too low: %1").arg(corrRh, 0, 'f', 10)));
     QVERIFY2(relErrRh < 0.01, qPrintable(QString("RH relative error too high: %1").arg(relErrRh, 0, 'e', 6)));
 
-    // --- 8. Summary ---
+    // --- 6. Summary ---
     printf("\n  === Summary ===\n");
     printf("  LH: corr=%.10f, relErr=%.6e\n", corrLh, relErrLh);
     printf("  RH: corr=%.10f, relErr=%.6e\n", corrRh, relErrRh);

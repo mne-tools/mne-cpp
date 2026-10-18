@@ -669,7 +669,8 @@
       "sidebar_position": 1,
       "guide": null,
       "python_equiv": "mne.minimum_norm.apply_inverse",
-      "python_url": null
+      "python_url": null,
+      "equivalence": "equivalent"
     },
     {
       "name": "InvCMNE",
@@ -12567,7 +12568,8 @@
         "status": "implemented",
         "mne_cpp": "FWDLIB helmet surface",
         "note": "",
-        "test": "test_field_map"
+        "test": "test_field_map",
+        "equivalence": "equivalent"
       },
       {
         "python": "mne.get_volume_labels_from_aseg",

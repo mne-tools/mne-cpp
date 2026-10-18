@@ -113,15 +113,15 @@
       },
       "claims": 356,
       "claims_by_evidence": {
-        "cross-validated-static": 170,
-        "cross-validated-live": 4,
+        "cross-validated-static": 174,
+        "cross-validated-live": 0,
         "tested": 182,
         "unverified": 0
       },
       "claims_by_status": {
-        "equivalent": 137,
+        "equivalent": 139,
         "exceeds": 0,
-        "implemented": 124,
+        "implemented": 122,
         "partial": 95
       },
       "equivalence_without_static_evidence": []

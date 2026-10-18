@@ -209,7 +209,7 @@ class EquivalenceTestCase(unittest.TestCase):
         self.assertEqual(self.issues(equivalence="exceeds", exceeds="streams in real time"), [])
 
     def test_weaker_evidence_fails(self) -> None:
-        self.assertIn("is 'cross-validated-live'", self.issues(python="mne.make_field_map", test="test_field_map")[0])
+        self.assertIn("is 'cross-validated-live'", self.issues(python="mne.compute_covariance", test="test_crossval_covariance")[0])
         self.assertIn("is 'tested'", self.issues(test="test_utils_logger")[0])
         self.assertIn("does not name the claimed API", self.issues(python="mne.not_in_that_test")[0])
         self.assertIn("needs a registered 'test'", self.issues(test=None)[-1])

@@ -10,12 +10,12 @@
  * @brief    Cross-validation test for FieldMap against MNE-Python reference.
  *
  * This test:
- *   1. Runs a Python script (generate_fieldmap_reference.py) that uses
- *      MNE-Python's internal routines to compute field-mapping matrices.
- *   2. Loads the same evoked data, coil definitions, and head surface
- *      in mne-cpp and computes field-mapping matrices via FieldMap.
- *   3. Loads the Python-generated .npy reference files and compares
- *      element-wise, verifying numerical agreement.
+ *   1. Loads the evoked data, coil definitions, and head surface of the MNE
+ *      sample dataset and computes field-mapping matrices via FwdFieldMap.
+ *   2. Compares them element-wise with MNE-Python reference values in
+ *      mne-cpp-test-data/Result/parity/field_map, produced by
+ *      make_field_map_fixtures.py, make_multi_evoked_fixtures.py and
+ *      make_helmet_fixtures.py (mne 1.11.0) from the same sample data.
  *
  * The test covers both MEG (magnetometers + gradiometers) and EEG modalities,
  * validating self-dot products, surface-dot products, and the final SVD-based
@@ -45,7 +45,6 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
-#include <QProcess>
 #include <QTextStream>
 #include <QDebug>
 #include <QtTest>
@@ -254,11 +253,9 @@ private slots:
 
 private:
     // ── Paths ─────────────────────────────────────────────────────────
-    QString m_dataDir;      // MNE sample data root
-    QString m_refDir;       // Python-generated reference directory
-    QString m_coilDefPath;  // coil_def.dat
-    QString m_pythonScript; // generate_fieldmap_reference.py
-    QString m_pythonCmd;    // detected Python interpreter command
+    QString m_dataDir;     // MNE sample data root
+    QString m_refDir;      // MNE-Python reference values for one evoked set
+    QString m_coilDefPath; // coil_def.dat
 
     // ── Data ──────────────────────────────────────────────────────────
     FiffEvokedSet m_evokedSet;
@@ -285,12 +282,10 @@ private:
 
     bool m_hasMeg = false;
     bool m_hasEeg = false;
-    bool m_pythonOk = false;
     bool m_multiEvokedOk = false;
 
     // ── Multi-evoked cross-validation ─────────────────────────────────
     QString m_multiRefDir;
-    QString m_multiPythonScript;
     int m_numConditions = 0;
     QStringList m_conditionNames;
     QVector<int> m_peakTimes;
@@ -351,60 +346,11 @@ void TestFieldMap::initTestCase()
     qDebug() << "Data dir:     " << m_dataDir;
     qDebug() << "Coil defs:    " << m_coilDefPath;
 
-    // ── Generate reference data with Python ────────────────────────────
-    m_pythonScript = QCoreApplication::applicationDirPath() + "/generate_fieldmap_reference.py";
-    if (!QFile::exists(m_pythonScript)) {
-        m_pythonScript = QFileInfo(QString::fromUtf8(__FILE__)).absolutePath() + "/generate_fieldmap_reference.py";
-    }
-    QVERIFY2(QFile::exists(m_pythonScript),
-             qPrintable("Python script not found: " + m_pythonScript));
-
-    m_refDir = QCoreApplication::applicationDirPath() + "/test_field_map_ref";
-    QDir().mkpath(m_refDir);
-
-    qDebug() << "Running Python reference generator...";
-
-    // Find Python interpreter (python3 on Unix, python on Windows)
-    QString pythonCmd;
-    {
-        QStringList pyCandidates;
-        pyCandidates << "python3" << "python";
-        for (const QString& py : pyCandidates) {
-            QProcess testProc;
-            testProc.start(py, QStringList() << "-c" << "import mne; print(mne.__version__)");
-            testProc.waitForFinished(10000);
-            if (testProc.exitCode() == 0) {
-                pythonCmd = py;
-                break;
-            }
-        }
-    }
-    if (pythonCmd.isEmpty()) {
-        QSKIP("Python with MNE not found. Install mne-python to run this test.");
-        return;
-    }
-    m_pythonCmd = pythonCmd;
-    qDebug() << "Using Python:" << m_pythonCmd;
-
-    QProcess pyProc;
-    pyProc.setProgram(m_pythonCmd);
-    pyProc.setArguments({m_pythonScript,
-                         "--evoked", evokedPath,
-                         "--trans", transPath,
-                         "--surf", surfPath,
-                         "--outdir", m_refDir,
-                         "--mode", "accurate",
-                         "--condition", "0",
-                         "--max-verts", "642"});
-    pyProc.start();
-    QVERIFY2(pyProc.waitForFinished(600000),
-             "Python script timed out (600s)");
-    if (pyProc.exitCode() != 0) {
-        qWarning() << "Python stderr:" << pyProc.readAllStandardError();
-        QFAIL(qPrintable("Python script failed with exit code " + QString::number(pyProc.exitCode())));
-    }
-    qDebug() << pyProc.readAllStandardOutput();
-    m_pythonOk = true;
+    const QString parityDir = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/parity/field_map";
+    m_refDir = parityDir + "/single";
+    m_multiRefDir = parityDir + "/multi";
+    QVERIFY2(QFile::exists(m_refDir + "/meg_mapping.npy"),
+             qPrintable("MNE-Python field-map references missing in " + m_refDir));
 
     // ── Load sphere origin ─────────────────────────────────────────────
     MatrixXd originMat = loadNpy(m_refDir + "/origin.npy");
@@ -688,45 +634,7 @@ void TestFieldMap::testMultiEvokedMegMapping()
         QSKIP("No MEG data available");
     QVERIFY(m_megMapping != nullptr);
 
-    // ── Run multi-evoked Python reference generator ────────────────────
     if (!m_multiEvokedOk) {
-        m_multiPythonScript = QCoreApplication::applicationDirPath() + "/generate_multi_evoked_reference.py";
-        if (!QFile::exists(m_multiPythonScript)) {
-            m_multiPythonScript = QFileInfo(QString::fromUtf8(__FILE__)).absolutePath() + "/generate_multi_evoked_reference.py";
-        }
-        QVERIFY2(QFile::exists(m_multiPythonScript),
-                 qPrintable("Multi-evoked Python script not found: " + m_multiPythonScript));
-
-        QString evokedPath = m_dataDir + "/MEG/sample/sample_audvis-ave.fif";
-        QString transPath = m_dataDir + "/MEG/sample/sample_audvis_raw-trans.fif";
-        QString surfPath = m_dataDir + "/subjects/sample/bem/sample-head.fif";
-
-        m_multiRefDir = QCoreApplication::applicationDirPath() + "/test_multi_evoked_ref";
-        QDir().mkpath(m_multiRefDir);
-
-        qDebug() << "Running multi-evoked Python reference generator...";
-        if (m_pythonCmd.isEmpty()) {
-            QSKIP("Python interpreter not available");
-            return;
-        }
-        QProcess pyProc;
-        pyProc.setProgram(m_pythonCmd);
-        pyProc.setArguments({m_multiPythonScript,
-                             "--evoked", evokedPath,
-                             "--trans", transPath,
-                             "--surf", surfPath,
-                             "--outdir", m_multiRefDir,
-                             "--mode", "accurate",
-                             "--max-verts", "642"});
-        pyProc.start();
-        QVERIFY2(pyProc.waitForFinished(600000),
-                 "Multi-evoked Python script timed out");
-        if (pyProc.exitCode() != 0) {
-            qWarning() << "Python stderr:" << pyProc.readAllStandardError();
-            QFAIL(qPrintable("Multi-evoked Python script failed: exit code " + QString::number(pyProc.exitCode())));
-        }
-        qDebug() << pyProc.readAllStandardOutput();
-
         // Load condition metadata
         {
             QFile f(m_multiRefDir + "/conditions.txt");
@@ -1099,36 +1007,9 @@ void TestFieldMap::testHelmetFieldMap()
 
     QVERIFY(m_hasMeg);
 
-    // ── Run Python helmet reference generator ──────────────────────────
-    QString helmetScript = QCoreApplication::applicationDirPath() + "/generate_helmet_reference.py";
-    if (!QFile::exists(helmetScript)) {
-        helmetScript = QFileInfo(QString::fromUtf8(__FILE__)).absolutePath() + "/generate_helmet_reference.py";
-    }
-    QVERIFY2(QFile::exists(helmetScript),
-             qPrintable("Helmet Python script not found: " + helmetScript));
-
-    QString helmetRefDir = QCoreApplication::applicationDirPath() + "/test_helmet_ref";
-    QDir().mkpath(helmetRefDir);
-
-    qDebug() << "Running helmet Python reference generator...";
-    if (m_pythonCmd.isEmpty()) {
-        QSKIP("Python interpreter not available");
-        return;
-    }
-    QProcess pyProc;
-    pyProc.setProgram(m_pythonCmd);
-    pyProc.setArguments({helmetScript,
-                         "--outdir", helmetRefDir,
-                         "--sample-dir", m_dataDir});
-    pyProc.start();
-    QVERIFY2(pyProc.waitForFinished(600000),
-             "Helmet Python script timed out");
-    if (pyProc.exitCode() != 0) {
-        QString pyErr = QString::fromUtf8(pyProc.readAllStandardError());
-        qWarning() << "Python stderr:" << pyErr;
-        QSKIP(qPrintable("Helmet Python reference generator unavailable: " + pyErr.left(200)));
-    }
-    qDebug() << pyProc.readAllStandardOutput();
+    const QString helmetRefDir = QFileInfo(m_refDir).path() + "/helmet";
+    QVERIFY2(QFile::exists(helmetRefDir + "/meg_mapping.npy"),
+             qPrintable("MNE-Python helmet references missing in " + helmetRefDir));
 
     // ── Load Python reference data ─────────────────────────────────────
     MatrixXd pyOriginMat = loadNpy(helmetRefDir + "/origin.npy");
