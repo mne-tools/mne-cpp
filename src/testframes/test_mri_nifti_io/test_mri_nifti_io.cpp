@@ -239,11 +239,10 @@ QByteArray variant(qint16 datatype, int bytesPerVoxel, bool bigEndian, bool qfor
     QByteArray buf = makeSyntheticNifti(nx, ny, nz, 1.5f, 1.25f, 2.0f);
     buf.resize(352 + n * bytesPerVoxel);
     const auto put = [&](int off, const void* le, int size) {
-        char bytes[4];
-        std::memcpy(bytes, le, size);
+        char* dst = buf.data() + off;
+        std::memcpy(dst, le, size);
         if (bigEndian)
-            std::reverse(bytes, bytes + size);
-        std::memcpy(buf.data() + off, bytes, size);
+            std::reverse(dst, dst + size);
     };
     const auto putI16 = [&](int off, qint16 v) {
         put(off, &v, 2);
