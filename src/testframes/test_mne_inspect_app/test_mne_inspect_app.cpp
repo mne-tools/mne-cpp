@@ -103,6 +103,8 @@ QAction* findAction(QWidget* window, const QString& text)
 void TestMneInspectApp::initTestCase()
 {
     QStandardPaths::setTestModeEnabled(true);
+    // chooseFile() fills in Qt's own file dialog; native ones (e.g. on cocoa) have no widgets to drive
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeDialogs);
     QSettings(QStringLiteral("mne-cpp"), QStringLiteral("mne_inspect")).clear();
     m_dataPath = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/";
 }
