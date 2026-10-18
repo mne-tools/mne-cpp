@@ -412,8 +412,6 @@ void BrainSurface::updateVertexColors()
     // ── 3. Selection highlighting.
     //       Tint the selected region / vertex range gold in the vertex
     //       buffer so the user gets precise per-region feedback.
-    //       On WASM the merged-draw path re-reads vertexDataRef() every
-    //       frame, so this is safe without separate buffer re-uploads.
     if (m_selected) {
         const uint32_t gold = packABGR(255, 200, 60);
         if (m_selectedRegionId != -1 && m_hasAnnotation) {
@@ -529,20 +527,7 @@ void BrainSurface::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
 {
     const bool needsCreate = !m_gpu->vertexBuffer || !m_gpu->indexBuffer;
 
-#ifdef __EMSCRIPTEN__
-    // On WebGL/WASM, always re-upload vertex and index data.
-    // The QRhi GLES2 backend's VAO cache can lose its element-buffer
-    // binding between frames, causing draws to produce no output.
-    // Re-uploading via uploadStaticBuffer triggers the necessary
-    // glBindBuffer calls that refresh the GL state.
-    if (!needsCreate && !m_gpu->dirty) {
-        // Buffers exist and data hasn't changed — still re-upload
-        u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
-        u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
-        return;
-    }
-#else
-    // Desktop: VBO is Immutable.  Nothing to do unless the data has
+    // The VBO is Immutable.  Nothing to do unless the data has
     // actually changed (markVertexDirty()) or the buffer hasn't been
     // created yet.  When dirty we recreate the VBO below to swap in the
     // new vertex data — this is intentional: an Immutable buffer cannot
@@ -550,19 +535,11 @@ void BrainSurface::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
     // channel of every vertex anyway.
     if (!m_gpu->dirty && !needsCreate)
         return;
-#endif
 
     const quint32 vbufSize = static_cast<quint32>(m_vertexData.size() * sizeof(VertexData));
     const quint32 ibufSize = static_cast<quint32>(m_indexData.size() * sizeof(uint32_t));
 
-#ifdef __EMSCRIPTEN__
-    if (!m_gpu->vertexBuffer) {
-        m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
-        m_gpu->vertexBuffer->create();
-        m_gpu->indexDirty = true; // new VBO implies IBO also needs upload
-    }
-#else
-    // Desktop: recreate the Immutable VBO whenever data is dirty so the
+    // Recreate the Immutable VBO whenever data is dirty so the
     // new vertex contents take effect.  Using Immutable (re-created on
     // change) instead of QRhiBuffer::Dynamic avoids two issues with
     // Dynamic buffers on Metal/Vulkan for multi-MB vertex data:
@@ -578,7 +555,6 @@ void BrainSurface::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
         m_gpu->vertexBuffer->create();
         m_gpu->indexDirty = true; // new VBO implies IBO also needs upload
     }
-#endif
     if (!m_gpu->indexBuffer) {
         m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, ibufSize));
         m_gpu->indexBuffer->create();

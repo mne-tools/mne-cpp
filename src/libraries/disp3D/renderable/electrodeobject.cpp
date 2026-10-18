@@ -389,27 +389,8 @@ void ElectrodeObject::updateBuffers(QRhi* rhi, QRhiResourceUpdateBatch* u)
 {
     const bool needsCreate = !m_gpu->vertexBuffer || !m_gpu->indexBuffer || !m_gpu->instanceBuffer;
 
-#ifdef __EMSCRIPTEN__
-    if (!needsCreate && !m_gpu->dirty) {
-        // WASM: always re-upload to avoid VAO cache staleness
-        if (m_gpu->shaftIndexCount > 0) {
-            QVector<float> verts;
-            QVector<unsigned int> idx;
-            generateShaftGeometry(verts, idx);
-            u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), verts.constData());
-            u->uploadStaticBuffer(m_gpu->indexBuffer.get(), idx.constData());
-        }
-        if (m_gpu->instanceCount > 0) {
-            QVector<float> inst;
-            generateContactInstances(inst);
-            u->uploadStaticBuffer(m_gpu->instanceBuffer.get(), inst.constData());
-        }
-        return;
-    }
-#else
     if (!m_gpu->dirty && !needsCreate)
         return;
-#endif
 
     // Generate CPU-side data
     QVector<float> shaftVerts;

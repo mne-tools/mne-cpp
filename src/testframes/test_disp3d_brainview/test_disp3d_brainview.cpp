@@ -1537,15 +1537,12 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         renderer.prepareVideoOverlay(rhi.get(), upload, &video);
         renderer.prepareSlice(rhi.get(), upload, &slice, 0);
         renderer.prepareSlice(rhi.get(), upload, nullptr, 1);
-        renderer.prepareMergedSurfaces(rhi.get(), upload, {&surface}, QStringLiteral("default"));
-        QVERIFY(renderer.hasMergedContent(QStringLiteral("default")));
         cb->resourceUpdate(upload);
 
         renderer.beginFrame(cb);
         for (const auto mode : {BrainRenderer::Standard, BrainRenderer::Holographic, BrainRenderer::Anatomical, BrainRenderer::XRay, BrainRenderer::ShowNormals}) {
             renderer.renderSurface(cb, rhi.get(), scene, &surface, mode);
         }
-        renderer.drawMergedSurfaces(cb, rhi.get(), scene, BrainRenderer::Standard, QStringLiteral("default"));
         renderer.renderDipoles(cb, rhi.get(), scene, &dipoles);
         renderer.renderNetwork(cb, rhi.get(), scene, &networkObject);
         renderer.renderPolyline(cb, rhi.get(), scene, &path);
@@ -1559,7 +1556,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         const int sliceOffset = renderer.prepareSliceDraw(slotBatch, scene, 0);
         QCOMPARE(sliceOffset, 0);
         QCOMPARE(renderer.prepareSliceDraw(slotBatch, scene, 1), -1);
-        int used = 10; // 5 surface modes, merged group, dipoles, network nodes + edges, polyline
+        int used = 9; // 5 surface modes, dipoles, network nodes + edges, polyline
         int last = -1;
         // One warning per frame, however many draws are skipped
         QTest::ignoreMessage(QtWarningMsg, "BrainRenderer: uniform buffer full at prepareSurfaceDraw; further draws this frame are skipped");
@@ -1585,16 +1582,11 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
         QCOMPARE(rhi->endOffscreenFrame(), QRhi::FrameOpSuccess);
     }
 
-    // A new colour texture rebuilds the targets; an invalidated merged group is rebuilt from the new surface list
+    // A new colour texture rebuilds the targets
     std::unique_ptr<QRhiTexture> smaller(rhi->newTexture(QRhiTexture::RGBA8, QSize(32, 24), 1, QRhiTexture::RenderTarget));
     QVERIFY(smaller->create());
     renderer.ensureRenderTargets(rhi.get(), smaller.get(), QSize(32, 24));
     QCOMPARE(renderer.rtClear()->pixelSize(), QSize(32, 24));
-    renderer.invalidateMergedGroup(QStringLiteral("default"));
-    QRhiResourceUpdateBatch* rebuild = rhi->nextResourceUpdateBatch();
-    renderer.prepareMergedSurfaces(rhi.get(), rebuild, {}, QStringLiteral("default"));
-    rebuild->release();
-    QVERIFY(!renderer.hasMergedContent(QStringLiteral("default")));
 }
 
 //=============================================================================================================

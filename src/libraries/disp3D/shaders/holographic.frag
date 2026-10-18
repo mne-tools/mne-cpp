@@ -6,7 +6,6 @@ layout(location = 2) in vec3 v_color;
 layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
 layout(location = 5) in vec3 v_annotColor;
-layout(location = 6) in float v_surfaceId;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -18,7 +17,6 @@ layout(std140, binding = 0) uniform UniformBlock {
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
-    float selectedSurfaceId; // WORKAROUND(QRhi-GLES2): merged-draw surface selection
     float _pad2;
 };
 
@@ -27,13 +25,8 @@ void main() {
     vec3 V = normalize(v_viewDir);
     
     // Select effective vertex colour from overlayMode.
-    // WORKAROUND(QRhi-GLES2): In the merged-draw path, non-brain surfaces
-    // (BEM, sensors, field maps) get surfaceId >= 100.  Always use their
-    // vertex colour so field-map colours are visible.
     vec3 effectiveColor;
-    if (v_surfaceId >= 99.5) {
-        effectiveColor = v_color;
-    } else if (overlayMode < 0.5) {
+    if (overlayMode < 0.5) {
         effectiveColor = vec3(v_curvature); // Surface: neutral curvature grey
     } else if (overlayMode < 1.5) {
         // Annotation: fall back to white when no annotation loaded (black)
@@ -61,31 +54,6 @@ void main() {
     // === EDGE GLOW ===
     float rim = pow(1.0 - N_dot_V, 3.0);
 
-    // === INSTRUMENT PATH (surfaceId >= 100) ===
-    // Probe and ray surfaces: ethereal additive glow driven by vertex alpha.
-    // v_curvature carries the QColor alpha (0..1) for these surfaces.
-    float vertAlpha = v_curvature; // repurposed: actual alpha for instruments
-    bool isInstrument = (v_surfaceId >= 99.5);
-
-    if (isInstrument) {
-        // Pure additive glow — no solid fill, just edge bloom + colour wash.
-        float glow = fresnel * 1.8 + rim * 0.6;
-        vec3 base_rgb = effectiveColor * (0.5 + glow);
-        float final_alpha = vertAlpha * (0.15 + 0.85 * fresnel);
-
-        // --- Selection Highlight (Silver Rim) ---
-        bool highlighted = (isSelected > 0.5)
-                        || (selectedSurfaceId >= 0.0 && abs(v_surfaceId - selectedSurfaceId) < 0.5);
-        if (highlighted) {
-            float selectionRim = pow(1.0 - N_dot_V, 3.0);
-            base_rgb += vec3(1.0, 1.1, 1.2) * selectionRim * 0.5;
-            final_alpha = clamp(final_alpha + selectionRim * 0.3, 0.0, 1.0);
-        }
-
-        fragColor = vec4(base_rgb * final_alpha, final_alpha);
-        return;
-    }
-    
     // === FINAL COLOR CALCULATION ===
     // Shell: Only glow at edges
     vec3 shell_final = shell_blue * (fresnel * 1.5 + rim * 0.5);
@@ -105,11 +73,7 @@ void main() {
     float final_alpha = mix(alpha_shell, alpha_data, is_data);
     
     // --- Selection Highlight (Silver Rim) ---
-    // WORKAROUND(QRhi-GLES2): On WASM merged-draw path, isSelected is 0;
-    // instead selectedSurfaceId >= 0 and v_surfaceId identifies the surface.
-    bool highlighted = (isSelected > 0.5)
-                    || (selectedSurfaceId >= 0.0 && abs(v_surfaceId - selectedSurfaceId) < 0.5);
-    if (highlighted) {
+    if (isSelected > 0.5) {
         float selectionRim = pow(1.0 - N_dot_V, 3.0);
         vec3 whiteColor = vec3(1.0, 1.1, 1.2); // Cool White
         base_rgb += whiteColor * 0.2; // Constant boost
