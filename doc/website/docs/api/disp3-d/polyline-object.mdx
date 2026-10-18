@@ -91,41 +91,19 @@ Grading the line makes the direction of travel readable without any extra decora
 
 ---
 
-### updateBuffers(rhi, u)
-
-Uploads or refreshes the GPU buffers.
-
-**Parameters:**
-
-- **rhi** : *QRhi **
-  The RHI to allocate through.
-
-- **u** : *QRhiResourceUpdateBatch **
-  Batch collecting the resource updates.
-
----
-
-### vertexBuffer()
+### streams()
 
 **Returns:**
 
-- *QRhiBuffer ** — Vertex buffer of the unit segment mesh.
+- *[InstancedStreams](/docs/api/disp3-d/instanced-streams)* — CPU streams of the unit segment mesh and of one instance per segment.
 
 ---
 
-### indexBuffer()
+### renderKey()
 
 **Returns:**
 
-- *QRhiBuffer ** — Index buffer of the unit segment mesh.
-
----
-
-### instanceBuffer()
-
-**Returns:**
-
-- *QRhiBuffer ** — Per-segment instance buffer.
+- *const [RenderKey](/docs/api/disp3-d/render-key) &* — Identity of this object in the renderer's GPU cache.
 
 ---
 

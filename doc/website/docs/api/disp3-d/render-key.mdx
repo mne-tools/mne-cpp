@@ -1,0 +1,56 @@
+---
+id: render-key
+title: "DISP3DLIB::RenderKey"
+sidebar_label: RenderKey
+sidebar_position: 51
+---
+
+# RenderKey
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/rendertypes.h>`
+
+```cpp
+class DISP3DLIB::RenderKey
+```
+
+Identity of a renderable in the renderer's GPU resource cache.
+
+The renderer drops the GPU copies of a renderable once its key is destroyed. A copied renderable gets a key of its own, so it never shares GPU buffers with the original.
+
+---
+
+## Public Methods
+
+### RenderKey()
+
+---
+
+### RenderKey()
+
+---
+
+### operator=()
+
+---
+
+### id()
+
+**Returns:**
+
+- *const void ** — Address that identifies the renderable while it lives.
+
+---
+
+### token()
+
+**Returns:**
+
+- *std::weak_ptr&lt; const void &gt;* — Token that expires when the renderable is destroyed.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

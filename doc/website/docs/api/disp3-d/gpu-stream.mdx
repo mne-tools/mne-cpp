@@ -1,0 +1,26 @@
+---
+id: gpu-stream
+title: "DISP3DLIB::GpuStream"
+sidebar_label: GpuStream
+sidebar_position: 49
+---
+
+# GpuStream
+
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+
+`#include <disp3D/rendertypes.h>`
+
+```cpp
+struct DISP3DLIB::GpuStream
+```
+
+CPU-side contents of one GPU buffer of a renderable.
+
+Renderables own only CPU data; the renderer keeps the GPU copies and uploads a stream again when its generation changes. The data must stay valid until the next change of the renderable.
+
+---
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

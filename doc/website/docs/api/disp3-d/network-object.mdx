@@ -15,9 +15,9 @@ sidebar_position: 31
 class DISP3DLIB::NetworkObject
 ```
 
-[`NetworkObject`](/docs/api/disp3-d/network-object) renders connectivity network nodes (instanced spheres) and edges (instanced cylinders) using the same instanced rendering pipeline as [`DipoleObject`](/docs/api/disp3-d/dipole-object) for the QRhi backend.
+[`NetworkObject`](/docs/api/disp3-d/network-object) renders connectivity network nodes (instanced spheres) and edges (instanced cylinders) using the same instanced rendering pipeline as [`DipoleObject`](/docs/api/disp3-d/dipole-object).
 
-Renderable network visualization for QRhi.
+Renderable connectivity network visualization.
 
 ```cpp title="src/examples/ex_disp3d_scene/main.cpp"
 Network graph("coherence");
@@ -90,71 +90,47 @@ Set the colormap used for edge/node coloring.
 
 ---
 
-### updateNodeBuffers(rhi, u)
+### nodeStreams()
 
-Upload or update GPU buffers for node geometry.
+**Returns:**
 
-**Parameters:**
-
-- **rhi** : *QRhi **
-  QRhi instance.
-
-- **u** : *QRhiResourceUpdateBatch **
-  Resource update batch.
+- *[InstancedStreams](/docs/api/disp3-d/instanced-streams)* — CPU streams of the node sphere and of one instance per node.
 
 ---
 
-### updateEdgeBuffers(rhi, u)
+### edgeStreams()
 
-Upload or update GPU buffers for edge geometry.
+**Returns:**
 
-**Parameters:**
-
-- **rhi** : *QRhi **
-  QRhi instance.
-
-- **u** : *QRhiResourceUpdateBatch **
-  Resource update batch.
-
----
-
-### nodeVertexBuffer()
-
----
-
-### nodeIndexBuffer()
-
----
-
-### nodeInstanceBuffer()
-
----
-
-### nodeIndexCount()
+- *[InstancedStreams](/docs/api/disp3-d/instanced-streams)* — CPU streams of the edge cylinder and of one instance per edge.
 
 ---
 
 ### nodeInstanceCount()
 
----
+**Returns:**
 
-### edgeVertexBuffer()
-
----
-
-### edgeIndexBuffer()
-
----
-
-### edgeInstanceBuffer()
-
----
-
-### edgeIndexCount()
+- *int* — Number of nodes drawn, i.e. those touching an edge above the threshold.
 
 ---
 
 ### edgeInstanceCount()
+
+**Returns:**
+
+- *int* — Number of edges drawn above the threshold.
+
+---
+
+### nodeRenderKey()
+
+**Returns:**
+
+- *const [RenderKey](/docs/api/disp3-d/render-key) &* — Identities of the node and edge meshes in the renderer's GPU cache.
+
+---
+
+### edgeRenderKey()
 
 ---
 

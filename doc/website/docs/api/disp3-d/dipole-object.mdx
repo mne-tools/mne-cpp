@@ -15,9 +15,9 @@ sidebar_position: 26
 class DISP3DLIB::DipoleObject
 ```
 
-Renderable dipole object that builds instanced arrow geometry from an [InvEcdSet](/docs/api/inv/inv-ecd-set) and manages GPU buffers for QRhi-based rendering.
+Renderable dipole object that builds instanced arrow geometry from an [InvEcdSet](/docs/api/inv/inv-ecd-set) and provides its CPU streams for instanced rendering.
 
-Renderable dipole arrow set with instanced GPU rendering for QRhi.
+Renderable dipole arrow set with instanced GPU rendering.
 
 ```cpp title="src/examples/ex_disp3d_scene/main.cpp"
 InvEcdSet dipoles;
@@ -55,19 +55,19 @@ const int pickedDipole = dipoleGlyphs.intersect(QVector3D(0.03f, 0.0f, 0.2f), QV
 
 ---
 
-### updateBuffers(rhi, u)
+### streams()
+
+**Returns:**
+
+- *[InstancedStreams](/docs/api/disp3-d/instanced-streams)* — CPU streams of the arrow shape and of one instance per dipole.
 
 ---
 
-### vertexBuffer()
+### renderKey()
 
----
+**Returns:**
 
-### indexBuffer()
-
----
-
-### instanceBuffer()
+- *const [RenderKey](/docs/api/disp3-d/render-key) &* — Identity of this object in the renderer's GPU cache.
 
 ---
 

@@ -203,6 +203,19 @@ Add annotation data directly.
 
 ---
 
+### labelElements(verticesPerElement)
+
+Give each run of vertices its own label key, so one element of a batched mesh (e.g.
+
+one digitizer sphere) can be highlighted on its own.
+
+**Parameters:**
+
+- **verticesPerElement** : *int*
+  Number of consecutive vertices per element.
+
+---
+
 ### setVisualizationMode(mode)
 
 Set the visualization mode ([FsSurface](/docs/api/fs/fs-surface), [FsAnnotation](/docs/api/fs/fs-annotation), Scientific).
@@ -231,25 +244,43 @@ Clear source estimate overlay colors and restore curvature-based coloring.
 
 ---
 
-### updateBuffers(rhi, u)
+### geometryStream()
 
-Update graphics buffers (vertex/index) on the GPU.
+**Returns:**
 
-**Parameters:**
-
-- **rhi** : *QRhi **
-  Pointer to QRhi instance.
-
-- **u** : *QRhiResourceUpdateBatch **
-  Resource update batch.
+- *[GpuStream](/docs/api/disp3-d/gpu-stream)* — Geometry stream ([`VertexData`](/docs/api/disp3-d/vertex-data) per vertex).
 
 ---
 
-### vertexBuffer()
+### colorStream()
+
+**Returns:**
+
+- *[GpuStream](/docs/api/disp3-d/gpu-stream)* — Colour stream (packed ABGR per vertex; alpha carries the curvature grey on cortex).
 
 ---
 
-### indexBuffer()
+### annotationStream()
+
+**Returns:**
+
+- *[GpuStream](/docs/api/disp3-d/gpu-stream)* — Annotation colour stream (packed ABGR per vertex, 0 where unlabelled).
+
+---
+
+### indexStream()
+
+**Returns:**
+
+- *[GpuStream](/docs/api/disp3-d/gpu-stream)* — Triangle index stream (three uint32 per triangle).
+
+---
+
+### renderKey()
+
+**Returns:**
+
+- *const [RenderKey](/docs/api/disp3-d/render-key) &* — Identity of this surface in the renderer's GPU cache.
 
 ---
 
@@ -293,31 +324,25 @@ Get the triangle index buffer.
 
 ### vertexDataRef()
 
-Const-ref access to CPU-side vertex data (used by merged rendering).
-
 **Returns:**
 
-- *const QVector&lt; [VertexData](/docs/api/disp3-d/vertex-data) &gt; &* — Reference to the internal vertex array, valid while this surface lives.
+- *const QVector&lt; [VertexData](/docs/api/disp3-d/vertex-data) &gt; &* — Current vertex geometry, valid while this surface lives.
 
 ---
 
-### indexDataRef()
-
-Const-ref access to CPU-side index data (used by merged rendering).
+### colorsRef()
 
 **Returns:**
 
-- *const QVector&lt; uint32_t &gt; &* — Reference to the internal triangle index array, valid while this surface lives.
+- *const QVector&lt; uint32_t &gt; &* — Per-vertex packed ABGR colours, valid while this surface lives.
 
 ---
 
-### vertexGeneration()
-
-Monotonically increasing counter bumped whenever vertex data changes.
+### annotationColorsRef()
 
 **Returns:**
 
-- *quint64* — Current vertex data generation counter.
+- *const QVector&lt; uint32_t &gt; &* — Per-vertex packed ABGR annotation colours, valid while this surface lives.
 
 ---
 
@@ -517,6 +542,14 @@ a single sphere in a batched mesh). Pass start=-1 to clear the vertex range high
 
 - **count** : *int*
   Number of vertices to highlight.
+
+---
+
+### selectedLabel()
+
+**Returns:**
+
+- *std::optional&lt; uint32_t &gt;* — Annotation-stream value of the highlighted vertices (selected region or vertex range), or nothing when no part of the surface is highlighted.
 
 ---
 
