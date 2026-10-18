@@ -153,6 +153,17 @@ public:
     }
 
     /**
+     * Set a lead's type when it is declared rather than inferred.
+     *
+     * @param[in] lead  Lead name.
+     * @param[in] type  Lead type.
+     * @param[in] rows  Grid rows, or 0 when unknown.
+     * @param[in] cols  Grid columns, or 0 when unknown.
+     * @return False when there is no such lead. A shape that does not match the contact count is dropped.
+     */
+    bool setLeadType(const QString& lead, IeegLeadType type, int rows = 0, int cols = 0);
+
+    /**
      * @param[in] name  Contact name.
      * @return Index of the contact, or -1.
      */
@@ -160,6 +171,20 @@ public:
 
     /** @return Contact positions, one row per contact, in metres. */
     Eigen::MatrixX3f positions() const;
+
+    /**
+     * @return True when the positions are scanner RAS of the subject's T1, which MNE-BIDS reads
+     *         the BIDS iEEG systems "ACPC" and "ScanRAS" as. Such positions must be moved into
+     *         the surface (tkr) RAS of the FreeSurfer surfaces before they are drawn on them.
+     */
+    bool isScannerRas() const;
+
+    /**
+     * @param[in] trans  Affine, in metres, from the current frame to the new one.
+     * @param[in] frame  Name of the new frame.
+     * @return A copy with every position transformed; leads are unchanged.
+     */
+    IeegImplantation transformed(const Eigen::Matrix4f& trans, const QString& frame) const;
 
 private:
     QVector<IeegContact> m_contacts;

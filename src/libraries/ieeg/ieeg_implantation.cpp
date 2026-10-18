@@ -156,7 +156,8 @@ IeegImplantation IeegImplantation::readBids(const QString& electrodesTsv, QStrin
 
     IeegImplantation implantation(contacts, coordSystem.system);
     static const QRegularExpression dimension(QStringLiteral("^\\[?\\s*(\\d+)\\s*x\\s*(\\d+)\\s*\\]?$"));
-    for (IeegLead& lead : implantation.m_leads) {
+    for (int l = 0; l < implantation.m_leads.size(); ++l) {
+        const IeegLead lead = implantation.m_leads[l];
         // A declaration on any contact of the lead applies to the lead
         QString type = declaredTypes.value(lead.name);
         QString shape = declaredDimensions.value(lead.name);
@@ -168,20 +169,34 @@ IeegImplantation IeegImplantation::readBids(const QString& electrodesTsv, QStrin
                 shape = declaredDimensions.value(name);
         }
         const QRegularExpressionMatch m = dimension.match(shape);
-        if (m.hasMatch() && m.captured(1).toInt() * m.captured(2).toInt() == lead.contacts.size()) {
-            lead.rows = m.captured(1).toInt();
-            lead.cols = m.captured(2).toInt();
-            if (lead.rows > 1 && lead.cols > 1)
-                lead.type = IeegLeadType::Grid;
-        }
+        const int rows = m.hasMatch() ? m.captured(1).toInt() : 0;
+        const int cols = m.hasMatch() ? m.captured(2).toInt() : 0;
+        IeegLeadType leadType = (rows > 1 && cols > 1 && rows * cols == lead.contacts.size()) ? IeegLeadType::Grid : lead.type;
         if (type.contains(QLatin1String("depth")) || type.contains(QLatin1String("seeg")))
-            lead.type = IeegLeadType::Depth;
+            leadType = IeegLeadType::Depth;
         else if (type.contains(QLatin1String("strip")))
-            lead.type = IeegLeadType::Strip;
+            leadType = IeegLeadType::Strip;
         else if (type.contains(QLatin1String("grid")))
-            lead.type = IeegLeadType::Grid;
+            leadType = IeegLeadType::Grid;
+        implantation.setLeadType(lead.name, leadType, rows, cols);
     }
     return implantation;
+}
+
+//=============================================================================================================
+
+bool IeegImplantation::setLeadType(const QString& lead, IeegLeadType type, int rows, int cols)
+{
+    for (IeegLead& l : m_leads) {
+        if (l.name != lead)
+            continue;
+        l.type = type;
+        const bool shapeFits = rows > 0 && cols > 0 && rows * cols == l.contacts.size();
+        l.rows = shapeFits ? rows : 0;
+        l.cols = shapeFits ? cols : 0;
+        return true;
+    }
+    return false;
 }
 
 //=============================================================================================================
@@ -193,6 +208,24 @@ int IeegImplantation::indexOf(const QString& name) const
             return i;
     }
     return -1;
+}
+
+//=============================================================================================================
+
+bool IeegImplantation::isScannerRas() const
+{
+    return m_coordinateSystem.compare(QLatin1String("ACPC"), Qt::CaseInsensitive) == 0 || m_coordinateSystem.compare(QLatin1String("ScanRAS"), Qt::CaseInsensitive) == 0;
+}
+
+//=============================================================================================================
+
+IeegImplantation IeegImplantation::transformed(const Eigen::Matrix4f& trans, const QString& frame) const
+{
+    IeegImplantation result = *this;
+    for (IeegContact& contact : result.m_contacts)
+        contact.position = trans.topLeftCorner<3, 3>() * contact.position + trans.topRightCorner<3, 1>();
+    result.m_coordinateSystem = frame;
+    return result;
 }
 
 //=============================================================================================================

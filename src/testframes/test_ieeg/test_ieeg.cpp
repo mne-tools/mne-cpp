@@ -136,6 +136,15 @@ void TestIeeg::readsBidsElectrodes()
     QCOMPARE(implantation.contacts().size(), 8);
     QCOMPARE(implantation.coordinateSystem(), QStringLiteral("ACPC"));
     QVERIFY(implantation.contacts()[1].position.isApprox(Eigen::Vector3f(0.01f, 0.0f, 0.0f))); // mm -> m
+
+    // ACPC is scanner RAS of the T1 (as MNE-BIDS reads it): moving it into surface RAS keeps the leads
+    QVERIFY(implantation.isScannerRas());
+    Eigen::Matrix4f scannerToSurface = Eigen::Matrix4f::Identity();
+    scannerToSurface.block<3, 1>(0, 3) = Eigen::Vector3f(-0.005f, 0.02f, 0.0f);
+    const IeegImplantation surfaceRas = implantation.transformed(scannerToSurface, QStringLiteral("surface RAS"));
+    QVERIFY(!surfaceRas.isScannerRas());
+    QVERIFY(surfaceRas.contacts()[1].position.isApprox(Eigen::Vector3f(0.005f, 0.02f, 0.0f)));
+    QCOMPARE(surfaceRas.leads().size(), implantation.leads().size());
     const QVector<IeegLead>& leads = implantation.leads();
     QCOMPARE(leads.size(), 3);
     QCOMPARE(leads[0].name, QStringLiteral("GridA"));
