@@ -14,6 +14,7 @@ FIFF_NAVE (so nave is 1). The values printed at the end are the oracle the
 test asserts (mne.read_evokeds).
 """
 
+import sys
 from pathlib import Path
 
 import mne
@@ -30,6 +31,11 @@ from mne._fiff.write import (
     write_int,
     write_string,
 )
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 out = Path(__file__).parent / "data" / "old_style-ave.fif"
 info = mne.create_info(["MAG 1", "MAG 2", "MAG 3", "EEG 1", "EEG 2", "EEG 3"], 100.0,

@@ -11,6 +11,7 @@ and the CTF head transform only inside the HPI result block. The printed
 values are what mne-python reads back.
 """
 
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +20,11 @@ import mne
 from mne._fiff.constants import FIFF
 from mne._fiff.write import end_block, start_and_end_file, start_block, write_ch_info, write_coord_trans, write_dig_points, write_float, write_id, write_int, write_string
 from mne.transforms import Transform
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 mne.set_log_level("ERROR")
 out = Path(__file__).parent / "data" / "meas_info.fif"

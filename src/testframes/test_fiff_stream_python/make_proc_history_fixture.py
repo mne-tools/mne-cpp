@@ -15,6 +15,11 @@ from pathlib import Path
 
 import mne
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
+
 mne.set_log_level("ERROR")
 raw = mne.io.read_raw_fif(Path(sys.argv[1]))
 raw.crop(0, 2 / raw.info["sfreq"]).pick(raw.ch_names[:3])

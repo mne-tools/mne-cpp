@@ -8,11 +8,17 @@ The ico-2 vertices of mne-python's icosahedron are a subset of ico-4, so a corre
 icosahedral downsampling of the shuffled sphere must select exactly these indices.
 """
 
+import sys
 from pathlib import Path
 
 import numpy as np
 from mne.surface import _get_ico_surface
 from scipy.spatial import cKDTree
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 data = Path(__file__).parent / "data"
 ico4 = _get_ico_surface(4)["rr"]

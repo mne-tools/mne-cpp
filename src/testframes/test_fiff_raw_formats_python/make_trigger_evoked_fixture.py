@@ -9,11 +9,17 @@ mne-python. MNE-C's mne_read_meas_data keeps the trigger channel as stim14,
 divided by its calibration, i.e. the stored trigger codes.
 """
 
+import sys
 from pathlib import Path
 
 import numpy as np
 
 import mne
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 mne.set_log_level("ERROR")
 out = Path(__file__).parent / "data" / "trigger-ave.fif"

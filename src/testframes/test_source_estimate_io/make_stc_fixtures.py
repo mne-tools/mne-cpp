@@ -9,10 +9,16 @@ Seven sources (four left, three right; vertex 70000 needs the third byte of the
 normal data from seed 0. The test asserts these values after reading.
 """
 
+import sys
 from pathlib import Path
 
 import mne
 import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 out = Path(__file__).parent / "data"
 out.mkdir(exist_ok=True)

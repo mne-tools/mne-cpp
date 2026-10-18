@@ -8,9 +8,17 @@ The channel kinds, units and coil types are those mne.create_info assigns (mne-p
 Run from this directory: python make_channel_types_fixture.py
 """
 
+import sys
+from pathlib import Path
+
 import numpy as np
 
 import mne
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 TYPES = list(mne.io.get_channel_type_constants())
 info = mne.create_info([f"CH{k:02d}" for k in range(len(TYPES))], 100.0, TYPES)

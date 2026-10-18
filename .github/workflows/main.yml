@@ -187,6 +187,9 @@ jobs:
     - name: Validate SPDX license headers
       run: python3 -m tools.license_headers.validate
 
+    - name: Check parity fixtures match their manifest
+      run: python3 tools/parity/check_fixtures.py --check
+
     - name: Check committed quality reports are current
       run: python3 tools/quality/generate_quality_report.py --check
 

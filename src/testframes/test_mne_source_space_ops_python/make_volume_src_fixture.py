@@ -17,6 +17,11 @@ from pathlib import Path
 import mne
 import numpy as np
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
+
 subjects_dir, bem = sys.argv[1], sys.argv[2]
 mne.set_log_level("ERROR")
 src = mne.setup_volume_source_space("sample", pos=25.0, mri="T1.mgz", bem=bem, mindist=5.0,

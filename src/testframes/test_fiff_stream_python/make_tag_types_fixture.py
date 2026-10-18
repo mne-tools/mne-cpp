@@ -10,6 +10,7 @@ complex-float matrices, and CSR / CSC sparse float matrices. Tag kinds are
 arbitrary small numbers; the test looks them up by kind.
 """
 
+import sys
 import datetime
 from pathlib import Path
 
@@ -18,6 +19,11 @@ from scipy.sparse import csc_array, csr_array
 
 from mne._fiff.constants import FIFF
 from mne._fiff.write import _write, start_and_end_file, write_complex64, write_complex_float_matrix, write_dau_pack16, write_double, write_double_matrix, write_float_sparse, write_julian
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 out = Path(__file__).parent / "data" / "tag_types.fif"
 sparse = np.array([[1.0, 0, 2.0, 0], [0, 0, 3.0, 4.0], [5.0, 0, 0, 6.0], [0, 7.0, 0, 0]], np.float32)

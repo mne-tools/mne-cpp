@@ -11,12 +11,18 @@ so the stim channel reads as the integer trigger codes. The printed values are
 mne-python's reading, which keeps the stored range and does not apply unit_mul.
 """
 
+import sys
 from pathlib import Path
 
 import numpy as np
 
 import mne
 from mne.io.constants import FIFF
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 mne.set_log_level("ERROR")
 out = Path(__file__).parent / "data" / "raw_unit_mul_raw.fif"

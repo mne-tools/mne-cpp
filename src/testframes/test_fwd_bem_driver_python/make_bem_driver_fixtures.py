@@ -11,6 +11,7 @@ give mne-python's free-orientation gain matrix, saved in gain.txt with one row
 per channel (MEG first) and three columns per source.
 """
 
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +20,11 @@ import mne
 from mne.io.constants import FIFF
 from mne.bem import _surfaces_to_bem
 from mne.surface import _get_ico_surface
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 mne.set_log_level("ERROR")
 out = Path(__file__).parent / "data"

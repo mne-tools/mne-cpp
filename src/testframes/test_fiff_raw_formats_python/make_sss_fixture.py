@@ -11,11 +11,17 @@ printed values are what mne-python reads back: job, frame, origin, nchan, number
 of components, internal and external components in use.
 """
 
+import sys
 from pathlib import Path
 
 import numpy as np
 
 import mne
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 mne.set_log_level("ERROR")
 here = Path(__file__).parent

@@ -10,10 +10,16 @@ on the CTF fixtures of test_mne_ctf_comp_python
 with a sphere at (0, 0, 40) mm, at compensation grade 3 and grade 0.
 """
 
+import sys
 from pathlib import Path
 
 import mne
 import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 here = Path(__file__).parent
 pos = np.array([[0.03, 0.02, 0.07], [-0.02, 0.01, 0.06]])

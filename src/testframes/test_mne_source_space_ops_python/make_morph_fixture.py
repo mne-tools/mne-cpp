@@ -10,12 +10,18 @@ mne.read_morph_map computes and saves the maps both ways; the test reads the
 saved file and recomputes the maps from the spheres.
 """
 
+import sys
 from pathlib import Path
 
 import numpy as np
 from scipy.spatial.transform import Rotation
 
 import mne
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 mne.set_log_level("ERROR")
 subjects = Path(__file__).parent / "data" / "morph-subjects"

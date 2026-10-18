@@ -12,12 +12,18 @@ also replaces stored ones. The values printed at the end are the oracle the
 test asserts.
 """
 
+import sys
 from pathlib import Path
 
 import mne
 import numpy as np
 from mne.io.constants import FIFF
 from mne.surface import _get_ico_surface
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 out = Path(__file__).parent / "data" / "ico2-bem.fif"
 surfs = []

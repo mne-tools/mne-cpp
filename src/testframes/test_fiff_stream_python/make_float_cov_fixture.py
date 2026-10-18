@@ -10,6 +10,7 @@ covariance (lower triangle, with eigen decomposition) and a diagonal source
 covariance. The printed values are what mne-python reads back.
 """
 
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +20,11 @@ from mne._fiff.constants import FIFF
 from mne._fiff.open import fiff_open
 from mne._fiff.write import end_block, start_and_end_file, start_block, write_double, write_float, write_float_matrix, write_int, write_name_list, write_string
 from mne.cov import _read_cov
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
 
 mne.set_log_level("ERROR")
 out = Path(__file__).parent / "data" / "float_cov.fif"

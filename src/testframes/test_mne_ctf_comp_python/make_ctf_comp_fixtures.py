@@ -16,6 +16,11 @@ from pathlib import Path
 
 import mne
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+from reference import require_reference  # noqa: E402
+
+require_reference()
+
 src = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(mne.__file__).parent / "io/tests/data/test_ctf_comp_raw.fif"
 out = Path(__file__).parent / "data"
 raw = mne.io.read_raw_fif(src, preload=True, verbose=False)
