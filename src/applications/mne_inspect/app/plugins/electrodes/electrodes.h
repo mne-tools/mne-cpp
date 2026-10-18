@@ -32,6 +32,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QMap>
 #include <QObject>
 #include <QString>
 #include <QVector>
@@ -134,8 +135,34 @@ public:
      */
     bool loadBids(const QString& path, const QString& t1Path = QString());
 
+    //=========================================================================================================
     /**
-     * @return Why the last @ref loadBids failed, or an empty string.
+     * Load one value per contact (e.g. high-gamma power) from a text file with the columns
+     * `name, value`, separated by a tab or a comma. An optional header row and `#` comments are
+     * skipped. Names that match no loaded contact are ignored.
+     *
+     * @param[in] path   Path to a .tsv or .csv file.
+     * @return true if at least one value matched a loaded contact; see @ref lastError otherwise.
+     */
+    bool loadValues(const QString& path);
+
+    //=========================================================================================================
+    /**
+     * Replace the contact values. Names that match no loaded contact are dropped; an empty map
+     * clears them. Emits @ref valuesChanged.
+     */
+    void setValues(const QMap<QString, float>& values);
+
+    /**
+     * @return Value per contact name; empty when none are loaded.
+     */
+    const QMap<QString, float>& values() const
+    {
+        return m_values;
+    }
+
+    /**
+     * @return Why the last @ref loadBids or @ref loadValues failed, or an empty string.
      */
     QString lastError() const
     {
@@ -250,6 +277,9 @@ signals:
     /** Emitted when the underlying ElectrodeObject is replaced. */
     void electrodesChanged();
 
+    /** Emitted when the contact values change, including when new electrodes clear them. */
+    void valuesChanged();
+
     /** Emitted when the contact selection changes (either via pick or
      *  @ref selectContact). Empty string means cleared. */
     void contactPicked(const QString& contactName);
@@ -263,6 +293,7 @@ private:
     ElectrodeSource m_source = ElectrodeSource::None;
     QString m_sourcePath;
     QString m_lastError;
+    QMap<QString, float> m_values;
 };
 
 } // namespace ELECTRODESPLUGIN

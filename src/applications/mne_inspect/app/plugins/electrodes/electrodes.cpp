@@ -43,6 +43,7 @@
 #include <QTextStream>
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 
 //=============================================================================================================
@@ -349,11 +350,80 @@ void ElectrodesPlugin::handlePick(const PickResult& pick)
 
 //=============================================================================================================
 
+bool ElectrodesPlugin::loadValues(const QString& path)
+{
+    m_lastError.clear();
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        m_lastError = QStringLiteral("Cannot open %1").arg(path);
+        return false;
+    }
+
+    QMap<QString, float> values;
+    QTextStream in(&file);
+    bool firstRow = true;
+    int lineNumber = 0;
+    while (!in.atEnd()) {
+        const QString line = in.readLine().trimmed();
+        ++lineNumber;
+        if (line.isEmpty() || line.startsWith(QLatin1Char('#'))) {
+            continue;
+        }
+        const QStringList parts = line.split(line.contains(QLatin1Char('\t')) ? QLatin1Char('\t') : QLatin1Char(','));
+        bool ok = false;
+        const float value = parts.size() >= 2 ? parts[1].trimmed().toFloat(&ok) : 0.0f;
+        const QString name = parts[0].trimmed();
+        if (!ok || name.isEmpty() || !std::isfinite(value)) {
+            if (firstRow && parts.size() >= 2) {
+                firstRow = false;
+                continue;
+            }
+            m_lastError = QStringLiteral("Line %1 is not 'name, value': %2").arg(lineNumber).arg(line);
+            return false;
+        }
+        firstRow = false;
+        values.insert(name, value);
+    }
+
+    QMap<QString, float> matched;
+    for (const IEEGLIB::IeegContact& contact : m_object->implantation().contacts()) {
+        const auto it = values.constFind(contact.name);
+        if (it != values.cend())
+            matched.insert(contact.name, it.value());
+    }
+    if (matched.isEmpty()) {
+        m_lastError = values.isEmpty() ? QStringLiteral("No values in %1").arg(path)
+                                       : QStringLiteral("None of the %1 names matches a loaded contact").arg(values.size());
+        return false;
+    }
+    setValues(matched);
+    return true;
+}
+
+//=============================================================================================================
+
+void ElectrodesPlugin::setValues(const QMap<QString, float>& values)
+{
+    m_values.clear();
+    for (const IEEGLIB::IeegContact& contact : m_object->implantation().contacts()) {
+        const auto it = values.constFind(contact.name);
+        if (it != values.cend())
+            m_values.insert(contact.name, it.value());
+    }
+    emit valuesChanged();
+}
+
+//=============================================================================================================
+
 void ElectrodesPlugin::rebuild(const IEEGLIB::IeegImplantation& implantation)
 {
     m_object->setImplantation(implantation);
     publishToScene();
     emit electrodesChanged();
+    if (!m_values.isEmpty()) {
+        m_values.clear();
+        emit valuesChanged();
+    }
 }
 
 //=============================================================================================================

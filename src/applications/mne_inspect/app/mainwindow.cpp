@@ -946,6 +946,8 @@ void MainWindow::setupConnections()
     m_brainView->setElectrodes(m_electrodesPlugin.electrodeObject());
     connect(&m_electrodesPlugin, &ELECTRODESPLUGIN::ElectrodesPlugin::electrodesChanged, m_brainView, [this]() { m_brainView->update(); });
     connect(&m_electrodesPlugin, &ELECTRODESPLUGIN::ElectrodesPlugin::contactPicked, m_brainView, [this]() { m_brainView->update(); });
+    connect(&m_electrodesPlugin, &ELECTRODESPLUGIN::ElectrodesPlugin::valuesChanged, m_brainView,
+            [this]() { m_brainView->setElectrodeValues(m_electrodesPlugin.values()); });
     connect(m_brainView, &BrainView::electrodeContactClicked, this, [this](const QString& name, const QVector3D& position) {
         DISP3DLIB::PickResult pick;
         pick.kind = DISP3DLIB::PickKind::ElectrodeContact;
@@ -2845,6 +2847,8 @@ void MainWindow::createMenus()
     m_fileMenu->addSeparator();
     m_actLoadElectrodes = m_fileMenu->addAction("Load &Electrodes...");
     connect(m_actLoadElectrodes, &QAction::triggered, this, &MainWindow::onLoadElectrodes);
+    m_actLoadElectrodeValues = m_fileMenu->addAction("Load Electrode &Values...");
+    connect(m_actLoadElectrodeValues, &QAction::triggered, this, &MainWindow::onLoadElectrodeValues);
     m_actLoadMri = m_fileMenu->addAction("Load &MRI...");
     connect(m_actLoadMri, &QAction::triggered, this, &MainWindow::onLoadMri);
 
@@ -3393,6 +3397,44 @@ void MainWindow::onLoadElectrodes()
     if (m_layerElectrodesCheck) {
         m_layerElectrodesCheck->setChecked(true);
     }
+}
+
+//=============================================================================================================
+
+void MainWindow::onLoadElectrodeValues()
+{
+    if (m_electrodesPlugin.contactCount() == 0) {
+        QMessageBox::information(this, tr("Load Electrode Values"), tr("Load electrodes first."));
+        return;
+    }
+    const auto load = [this](const QString& path, const QString& fileName) {
+        if (!m_electrodesPlugin.loadValues(path)) {
+            QMessageBox::warning(this, tr("Load Electrode Values"),
+                                 tr("Failed to load electrode values from:\n%1\n\n%2").arg(fileName, m_electrodesPlugin.lastError()));
+            return;
+        }
+        if (m_statusLabel) {
+            m_statusLabel->setText(QStringLiteral("Loaded electrode values: %1 (%2 contacts)")
+                                       .arg(fileName)
+                                       .arg(m_electrodesPlugin.values().size()));
+        }
+    };
+#ifdef WASMBUILD
+    QFileDialog::getOpenFileContent(
+        QStringLiteral("Electrode values (*.tsv *.csv *.txt)"),
+        [load](const QString& fileName, const QByteArray& fileContent) {
+            if (fileName.isEmpty())
+                return;
+            const QString path = wasmSaveToTemp(fileName, fileContent);
+            if (!path.isEmpty())
+                load(path, fileName);
+        });
+#else
+    const QString path = QFileDialog::getOpenFileName(this, tr("Load Electrode Values"), QString(),
+                                                      QStringLiteral("Electrode values (*.tsv *.csv *.txt);;All files (*)"));
+    if (!path.isEmpty())
+        load(path, QFileInfo(path).fileName());
+#endif
 }
 
 //=============================================================================================================

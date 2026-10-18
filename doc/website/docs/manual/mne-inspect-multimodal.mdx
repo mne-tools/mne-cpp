@@ -117,6 +117,14 @@ lead type drives the geometry (shafts for depths, ties for strips and grids).
 
 ![Electrode loader](/img/manual/auto/inspect-multimodal/load-electrodes.png)
 
+`File ▸ Load Electrode Values…` then reads one value per contact (for
+example high-gamma power) from a tab- or comma-separated file with the
+columns `name, value`; a header row and `#` comments are skipped. The
+contacts are coloured by value and the values are painted onto the pial
+(or white) surface around them, like MNE-Python's `stc_near_sensors`.
+Names that match no loaded contact are ignored, and loading new
+electrodes clears the values.
+
 ### 5. Toggle modalities in the Layers dock
 
 The **Layers** dock lists every registered `SceneLayer` grouped by

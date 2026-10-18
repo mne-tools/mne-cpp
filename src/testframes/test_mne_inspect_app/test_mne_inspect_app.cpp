@@ -309,6 +309,17 @@ void TestMneInspectApp::loadsFilesThroughTheFileMenu()
     findAction(window, "Load &Electrodes...")->trigger();
     QVERIFY2(warning.contains("Failed to load electrode data"), qPrintable(warning));
     QCOMPARE(window->electrodesPlugin().contactCount(), 3);
+
+    // One value per contact, painted by the 3-D view
+    const QString valuesPath = dir.filePath("values.tsv");
+    QFile values(valuesPath);
+    QVERIFY(values.open(QIODevice::WriteOnly | QIODevice::Text));
+    values.write("name\tvalue\nA1\t0.25\nB1\t1.5\n");
+    values.close();
+    chooseFile(valuesPath);
+    findAction(window, "Load Electrode &Values...")->trigger();
+    QCOMPARE(window->electrodesPlugin().values().size(), 2);
+    QCOMPARE(window->electrodesPlugin().values().value("B1"), 1.5f);
 }
 
 //=============================================================================================================

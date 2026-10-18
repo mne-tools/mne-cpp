@@ -242,6 +242,9 @@ private:
     /** File → Load Electrodes… (FIFF or CSV). */
     void onLoadElectrodes();
 
+    /** File → Load Electrode Values… (name/value TSV or CSV), painted onto contacts and cortex. */
+    void onLoadElectrodeValues();
+
     /** File → Load MRI… (MGH/MGZ/NIfTI). */
     void onLoadMri();
 
@@ -486,6 +489,7 @@ private:
 
     // Multimodal menu actions
     QAction* m_actLoadElectrodes = nullptr;
+    QAction* m_actLoadElectrodeValues = nullptr;
     QAction* m_actLoadMri = nullptr;
     QAction* m_actShowPick = nullptr;
     QAction* m_actShowLayers = nullptr;

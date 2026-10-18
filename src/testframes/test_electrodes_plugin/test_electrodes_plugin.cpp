@@ -81,6 +81,7 @@ private slots:
     void setImplantationReplacesGeometry();
     void csvLoadGroupsByArrayLabel();
     void bidsLoadGroupsLeadsByName();
+    void loadValuesMatchesContacts();
     void bidsLoadConvertsScannerRas();
     void attachScenePublishesLayer();
     void handlePickIgnoresOtherKinds();
@@ -153,6 +154,46 @@ void TestElectrodesPlugin::csvLoadGroupsByArrayLabel()
     QCOMPARE(leads[1].name, QStringLiteral("GRID"));
     QCOMPARE(leads[1].type, IeegLeadType::Grid);
     QCOMPARE(leads[1].contacts.size(), 3);
+}
+
+//=============================================================================================================
+
+void TestElectrodesPlugin::loadValuesMatchesContacts()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const auto write = [&dir](const QString& name, const char* text) {
+        QFile file(dir.filePath(name));
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+            file.write(text);
+        return file.fileName();
+    };
+
+    ElectrodesPlugin plugin;
+    QVERIFY(!plugin.loadValues(write(QStringLiteral("early.tsv"), "LA0\t1\n")));
+    plugin.setImplantation(oneLead(4));
+
+    QSignalSpy spy(&plugin, &ElectrodesPlugin::valuesChanged);
+    QVERIFY(plugin.loadValues(write(QStringLiteral("values.tsv"), "name\tvalue\n# comment\nLA0\t0.5\nLA2\t-1.5\nXX9\t3\n")));
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(plugin.values().size(), 2);
+    QCOMPARE(plugin.values().value(QStringLiteral("LA0")), 0.5f);
+    QCOMPARE(plugin.values().value(QStringLiteral("LA2")), -1.5f);
+
+    QVERIFY(plugin.loadValues(write(QStringLiteral("values.csv"), "LA1,2\n")));
+    QCOMPARE(plugin.values().keys(), QStringList{QStringLiteral("LA1")});
+
+    // A failed load keeps the shown values and says why
+    QVERIFY(!plugin.loadValues(write(QStringLiteral("bad.tsv"), "name\tvalue\nLA0\tlots\n")));
+    QVERIFY(plugin.lastError().contains(QStringLiteral("Line 2")));
+    QVERIFY(!plugin.loadValues(write(QStringLiteral("other.tsv"), "ZZ1\t1\n")));
+    QVERIFY(!plugin.loadValues(dir.filePath(QStringLiteral("missing.tsv"))));
+    QCOMPARE(plugin.values().keys(), QStringList{QStringLiteral("LA1")});
+    QCOMPARE(spy.count(), 2);
+
+    plugin.setImplantation(oneLead(2));
+    QVERIFY(plugin.values().isEmpty());
+    QCOMPARE(spy.count(), 3);
 }
 
 //=============================================================================================================
