@@ -53,8 +53,10 @@ on:
         default: false
 
 # Cancel superseded push runs; a push never cancels a nightly or manual run.
+# Nightly and manual runs share one group: each recreates dev_build, so a
+# second one starting mid-run would delete the first one's installer inputs.
 concurrency:
-  group: staging-${{ github.event_name }}-${{ github.ref }}
+  group: staging-${{ github.event_name == 'push' && 'push' || 'release' }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'push' }}
 
 permissions:
