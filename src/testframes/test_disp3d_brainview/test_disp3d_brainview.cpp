@@ -78,7 +78,10 @@
 
 #include <QtTest>
 #include <QApplication>
+#include <QOffscreenSurface>
 #include <QSettings>
+#include <private/qguiapplication_p.h>
+#include <qpa/qplatformintegration.h>
 #include <QVector3D>
 #include <QQuaternion>
 
@@ -239,6 +242,13 @@ private slots:
      * renderable, the uniform slot budget and recovery after it overflows.
      */
     void brainRenderer_nullRhi();
+
+    //=========================================================================================================
+    /**
+     * Per-draw uniform slots must not overlap on any backend, including OpenGL whose
+     * ubufAlignment() is 1.
+     */
+    void brainRenderer_uniformSlotsDoNotOverlap();
 
     //=========================================================================================================
     /**
@@ -1585,6 +1595,49 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     renderer.prepareMergedSurfaces(rhi.get(), rebuild, {}, QStringLiteral("default"));
     rebuild->release();
     QVERIFY(!renderer.hasMergedContent(QStringLiteral("default")));
+}
+
+//=============================================================================================================
+
+void TestDisp3dBrainView::brainRenderer_uniformSlotsDoNotOverlap()
+{
+    Eigen::MatrixX3f rr(3, 3);
+    rr << 0.0f, 0.0f, 0.0f, 0.05f, 0.0f, 0.0f, 0.0f, 0.05f, 0.0f;
+    Eigen::MatrixX3i tris(1, 3);
+    tris << 0, 1, 2;
+    BrainSurface surface;
+    surface.createFromData(rr, tris, Qt::gray);
+    BrainRenderer::SceneData scene;
+
+    const bool hasOpenGl = QGuiApplicationPrivate::platformIntegration()->hasCapability(QPlatformIntegration::OpenGL);
+    std::unique_ptr<QOffscreenSurface> glSurface(hasOpenGl ? QRhiGles2InitParams::newFallbackSurface() : nullptr);
+    QRhiGles2InitParams glParams;
+    glParams.fallbackSurface = glSurface.get();
+    QRhiNullInitParams nullParams;
+    const std::pair<QRhi::Implementation, QRhiInitParams*> backends[] = {{QRhi::Null, &nullParams}, {QRhi::OpenGLES2, &glParams}};
+    int tested = 0;
+    for (const auto& [backend, params] : backends) {
+        if (backend == QRhi::OpenGLES2 && !hasOpenGl)
+            continue;
+        std::unique_ptr<QRhi> rhi(QRhi::create(backend, params));
+        QVERIFY(rhi);
+        ++tested;
+        std::unique_ptr<QRhiTexture> color(rhi->newTexture(QRhiTexture::RGBA8, QSize(8, 8), 1, QRhiTexture::RenderTarget));
+        QVERIFY(color->create());
+        BrainRenderer renderer;
+        renderer.ensureRenderTargets(rhi.get(), color.get(), QSize(8, 8));
+        renderer.initialize(rhi.get(), renderer.rtClear()->renderPassDescriptor(), 1);
+        QRhiResourceUpdateBatch* batch = rhi->nextResourceUpdateBatch();
+        const int first = renderer.prepareSurfaceDraw(batch, scene, &surface);
+        const int second = renderer.prepareSurfaceDraw(batch, scene, &surface);
+        batch->release();
+        QCOMPARE(first, 0);
+        // The shaders' uniform block is bound with 256 bytes
+        QVERIFY2(second >= 256, qPrintable(QStringLiteral("%1: second slot at byte %2").arg(rhi->backendName()).arg(second)));
+        QCOMPARE(second % rhi->ubufAlignment(), 0);
+    }
+    if (tested == 1)
+        qInfo("No OpenGL on this platform plugin; only the Null backend was checked");
 }
 
 //=============================================================================================================

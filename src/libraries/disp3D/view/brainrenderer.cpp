@@ -58,7 +58,8 @@ struct BrainRenderer::Impl
     std::array<std::unique_ptr<QRhiGraphicsPipeline>, kNumShaderModes> pipelinesBackColor{};
 
     std::unique_ptr<QRhiBuffer> uniformBuffer;
-    int uniformBufferOffsetAlignment = 0;
+    // Whole bound block, not ubufAlignment(): that is 1 on GL, where slots would overlap
+    int uniformSlotStride = 0;
     int currentUniformOffset = 0;
     bool overflowReported = false; // Reset per frame so the log gets one line, not one per skipped draw
 
@@ -118,7 +119,7 @@ struct BrainRenderer::Impl
         std::unique_ptr<QRhiSampler> depthSampler; // mipmap-enabled for vertex displacement
         QSize textureSize;
         QSize depthTextureSize;
-        int uniformBufferOffsetAlignment = 0;
+        int uniformSlotStride = 0;
         int currentUniformOffset = 0;
         quint64 uploadedFrameGen = std::numeric_limits<quint64>::max();
         quint64 uploadedDepthFrameGen = std::numeric_limits<quint64>::max();
@@ -152,7 +153,7 @@ struct BrainRenderer::Impl
         std::unique_ptr<QRhiBuffer> indexBuffer;
         std::unique_ptr<QRhiSampler> sampler;
         SliceSlot sliceSlots[kMaxSliceSlots];
-        int uniformBufferOffsetAlignment = 0;
+        int uniformSlotStride = 0;
         int currentUniformOffset = 0;
         bool indexUploaded = false;
         bool initialized = false;
@@ -242,14 +243,14 @@ void BrainRenderer::initialize(QRhi* rhi, QRhiRenderPassDescriptor* rp, int samp
 int BrainRenderer::Impl::claimUniformSlot(const char* caller)
 {
     const int offset = currentUniformOffset;
-    if (static_cast<quint32>(offset + uniformBufferOffsetAlignment) > uniformBuffer->size()) {
+    if (static_cast<quint32>(offset + uniformSlotStride) > uniformBuffer->size()) {
         if (!overflowReported) {
             qWarning("BrainRenderer: uniform buffer full at %s; further draws this frame are skipped", caller);
             overflowReported = true;
         }
         return -1;
     }
-    currentUniformOffset += uniformBufferOffsetAlignment;
+    currentUniformOffset += uniformSlotStride;
     return offset;
 }
 
@@ -257,12 +258,12 @@ int BrainRenderer::Impl::claimUniformSlot(const char* caller)
 
 void BrainRenderer::Impl::createResources(QRhi* rhi, QRhiRenderPassDescriptor* rp, int sampleCount)
 {
-    uniformBufferOffsetAlignment = rhi->ubufAlignment();
+    uniformSlotStride = rhi->ubufAligned(kUniformBlockSize);
 
     // Create Uniform Buffer
     if (!uniformBuffer) {
         // Size for 8192 slots with alignment — enough for 4 viewports × ~1000 surfaces
-        uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, kUniformSlotCount * uniformBufferOffsetAlignment));
+        uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, kUniformSlotCount * uniformSlotStride));
         uniformBuffer->create();
     }
 
@@ -270,8 +271,6 @@ void BrainRenderer::Impl::createResources(QRhi* rhi, QRhiRenderPassDescriptor* r
     if (!srb) {
         srb.reset(rhi->newShaderResourceBindings());
         srb->setBindings({// Use dynamic offset for the uniform buffer.
-                          // The size of one uniform block in the shader is ~104 bytes,
-                          // but we use uniformBufferOffsetAlignment for the stride.
                           QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0, QRhiShaderResourceBinding::VertexStage | QRhiShaderResourceBinding::FragmentStage, uniformBuffer.get(), kUniformBlockSize)});
         srb->create();
     }
@@ -526,10 +525,10 @@ void BrainRenderer::prepareVideoOverlay(QRhi* rhi,
         }
 
         // Uniform buffer (mat4 + vec4 + 4 floats = 96 bytes, pad to 256)
-        k.uniformBufferOffsetAlignment = rhi->ubufAlignment();
+        k.uniformSlotStride = rhi->ubufAligned(kUniformBlockSize);
         k.uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
                                              QRhiBuffer::UniformBuffer,
-                                             64 * k.uniformBufferOffsetAlignment));
+                                             64 * k.uniformSlotStride));
         k.uniformBuffer->create();
 
         // Vertex buffer: 4 vertices × (3 pos + 2 uv) floats — refilled each frame
@@ -799,11 +798,11 @@ void BrainRenderer::renderVideoOverlay(QRhiCommandBuffer* cb, QRhi* rhi,
     auto& k = d->videoOverlay;
     if (!k.initialized)
         return;
-    if (k.uniformBufferOffsetAlignment <= 0)
+    if (k.uniformSlotStride <= 0)
         return;
 
     const int uniformOffset = k.currentUniformOffset;
-    k.currentUniformOffset += k.uniformBufferOffsetAlignment;
+    k.currentUniformOffset += k.uniformSlotStride;
     if (static_cast<quint32>(uniformOffset + kUniformBlockSize) > k.uniformBuffer->size())
         return;
     QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
@@ -901,11 +900,11 @@ void BrainRenderer::renderVideoOverlayOnSurface(QRhiCommandBuffer* cb, QRhi* rhi
     auto& k = d->videoOverlay;
     if (!k.initialized || !k.surfacePipeline)
         return;
-    if (k.uniformBufferOffsetAlignment <= 0)
+    if (k.uniformSlotStride <= 0)
         return;
 
     const int uniformOffset = k.currentUniformOffset;
-    k.currentUniformOffset += k.uniformBufferOffsetAlignment;
+    k.currentUniformOffset += k.uniformSlotStride;
     if (static_cast<quint32>(uniformOffset + kUniformBlockSize) > k.uniformBuffer->size())
         return;
     QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
@@ -1048,10 +1047,10 @@ void BrainRenderer::prepareSlice(QRhi* rhi,
             return;
         }
 
-        k.uniformBufferOffsetAlignment = rhi->ubufAlignment();
+        k.uniformSlotStride = rhi->ubufAligned(kUniformBlockSize);
         k.uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
                                              QRhiBuffer::UniformBuffer,
-                                             64 * k.uniformBufferOffsetAlignment));
+                                             64 * k.uniformSlotStride));
         k.uniformBuffer->create();
 
         // Index buffer (shared by all 3 slots): 2 triangles = 6 indices
@@ -1189,11 +1188,11 @@ int BrainRenderer::prepareSliceDraw(QRhiResourceUpdateBatch* u,
     const auto& sliceSlot = k.sliceSlots[slotIndex];
     if (!sliceSlot.visible)
         return -1;
-    if (k.uniformBufferOffsetAlignment <= 0)
+    if (k.uniformSlotStride <= 0)
         return -1;
 
     const int uniformOffset = k.currentUniformOffset;
-    k.currentUniformOffset += k.uniformBufferOffsetAlignment;
+    k.currentUniformOffset += k.uniformSlotStride;
     if (static_cast<quint32>(uniformOffset + kUniformBlockSize) > k.uniformBuffer->size())
         return -1;
 
