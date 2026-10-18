@@ -33,6 +33,10 @@
  *   - exactly one colour present              -> PARTIAL
  * The verdict is written to qDebug() (browser console / emrun stdout) and the
  * window title.
+ *
+ * Both cases run in sequence: first with all resource updates committed via
+ * beginPass(), then the disp3D pattern of a cb->resourceUpdate() per draw
+ * INSIDE the pass, which QRhi documents as "Cannot be called inside a pass".
  */
 
 #include <QApplication>
@@ -84,15 +88,17 @@ private:
     {
         std::unique_ptr<QRhiBuffer> vbuf;
         std::unique_ptr<QRhiBuffer> ibuf;
+        std::unique_ptr<QRhiBuffer> ubuf;
+        std::unique_ptr<QRhiShaderResourceBindings> srb;
         bool uploaded = false;
     };
     TriMesh m_red;
     TriMesh m_green;
 
-    std::unique_ptr<QRhiBuffer> m_ubuf;
-    std::unique_ptr<QRhiShaderResourceBindings> m_srb;
     std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
 
+    enum Mode { UpdatesBeforePass, UpdatesInsidePass, Done };
+    Mode m_mode = UpdatesBeforePass;
     QRhiReadbackResult m_rb;
     int m_frame = 0;
     bool m_readbackScheduled = false;
@@ -133,18 +139,16 @@ void MultiDrawWidget::initialize(QRhiCommandBuffer*)
                                            QRhiBuffer::IndexBuffer,
                                            3 * sizeof(uint32_t)));
             mesh.ibuf->create();
+            mesh.ubuf.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
+                                           QRhiBuffer::UniformBuffer, 64));
+            mesh.ubuf->create();
+            mesh.srb.reset(rhi->newShaderResourceBindings());
+            mesh.srb->setBindings({QRhiShaderResourceBinding::uniformBuffer(
+                0, QRhiShaderResourceBinding::VertexStage, mesh.ubuf.get())});
+            mesh.srb->create();
         };
         makeMesh(m_red);
         makeMesh(m_green);
-
-        m_ubuf.reset(rhi->newBuffer(QRhiBuffer::Dynamic,
-                                    QRhiBuffer::UniformBuffer, 64));
-        m_ubuf->create();
-
-        m_srb.reset(rhi->newShaderResourceBindings());
-        m_srb->setBindings({QRhiShaderResourceBinding::uniformBuffer(
-            0, QRhiShaderResourceBinding::VertexStage, m_ubuf.get())});
-        m_srb->create();
     }
 
     if (!m_pipeline) {
@@ -161,7 +165,7 @@ void MultiDrawWidget::initialize(QRhiCommandBuffer*)
             {0, 1, QRhiVertexInputAttribute::Float3, offsetof(Vertex, col)},
         });
         m_pipeline->setVertexInputLayout(layout);
-        m_pipeline->setShaderResourceBindings(m_srb.get());
+        m_pipeline->setShaderResourceBindings(m_red.srb.get());
         m_pipeline->setRenderPassDescriptor(renderTarget()->renderPassDescriptor());
         m_pipeline->setDepthTest(true);
         m_pipeline->setDepthWrite(true);
@@ -179,22 +183,18 @@ void MultiDrawWidget::render(QRhiCommandBuffer* cb)
     const QSize sz = rt->pixelSize();
     ++m_frame;
 
-    QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
-
-    auto uploadMesh = [&](TriMesh& mesh, const Vertex* data) {
+    const QMatrix4x4 mvp; // identity → NDC coordinates straight through
+    auto queueUpdates = [&](QRhiResourceUpdateBatch* u, TriMesh& mesh, const Vertex* data) {
         if (!mesh.uploaded) {
             u->uploadStaticBuffer(mesh.vbuf.get(), data);
             u->uploadStaticBuffer(mesh.ibuf.get(), indices);
             mesh.uploaded = true;
         }
+        u->updateDynamicBuffer(mesh.ubuf.get(), 0, 64, mvp.constData());
     };
-    uploadMesh(m_red, triangleRed);
-    uploadMesh(m_green, triangleGreen);
-
-    QMatrix4x4 mvp; // identity → NDC coordinates straight through
-    u->updateDynamicBuffer(m_ubuf.get(), 0, 64, mvp.constData());
 
     auto drawTriangle = [&](TriMesh& mesh) {
+        cb->setShaderResources(mesh.srb.get());
         const QRhiCommandBuffer::VertexInput vbuf(mesh.vbuf.get(), 0);
         cb->setVertexInput(0, 1, &vbuf, mesh.ibuf.get(), 0,
                            QRhiCommandBuffer::IndexUInt32);
@@ -202,13 +202,23 @@ void MultiDrawWidget::render(QRhiCommandBuffer* cb)
     };
 
     // ── ONE render pass, TWO drawIndexed() calls ────────────────────────
-    cb->beginPass(rt, QColor(30, 30, 30), {1.0f, 0}, u);
+    QRhiResourceUpdateBatch* pre = rhi->nextResourceUpdateBatch();
+    if (m_mode != UpdatesInsidePass) {
+        queueUpdates(pre, m_red, triangleRed);
+        queueUpdates(pre, m_green, triangleGreen);
+    }
+    cb->beginPass(rt, QColor(30, 30, 30), {1.0f, 0}, pre);
     cb->setGraphicsPipeline(m_pipeline.get());
     cb->setViewport(QRhiViewport(0, 0, sz.width(), sz.height()));
-    cb->setShaderResources(m_srb.get());
 
-    drawTriangle(m_red);   // draw 1
-    drawTriangle(m_green); // draw 2 — the call that blanked WebGL in 6.11.0
+    for (auto [mesh, data] : {std::pair{&m_red, triangleRed}, std::pair{&m_green, triangleGreen}}) {
+        if (m_mode == UpdatesInsidePass) {
+            QRhiResourceUpdateBatch* u = rhi->nextResourceUpdateBatch();
+            queueUpdates(u, *mesh, data);
+            cb->resourceUpdate(u);
+        }
+        drawTriangle(*mesh);
+    }
 
     cb->endPass();
 
@@ -226,8 +236,8 @@ void MultiDrawWidget::render(QRhiCommandBuffer* cb)
         }
     }
 
-    if (!m_evaluated)
-        update(); // keep the loop alive until the read-back resolves
+    if (m_mode != Done)
+        update(); // keep the loop alive until both read-backs resolve
 }
 
 // ─── Verdict ────────────────────────────────────────────────────────────────
@@ -277,10 +287,22 @@ void MultiDrawWidget::evaluate()
     else
         verdict = QStringLiteral("PARTIAL — only draw 2 (green) survived; draw 1 dropped (bug PRESENT)");
 
-    qInfo("[multi-draw] backend=%s  size=%dx%d  leftRed=%d  rightGreen=%d",
-          rhi() ? rhi()->backendName() : "?", w, h, int(leftRed), int(rightGreen));
-    qInfo("[multi-draw] %s", qPrintable(verdict));
+    const char* mode = m_mode == UpdatesBeforePass ? "updates-before-pass" : "updates-inside-pass";
+    qInfo("[multi-draw] mode=%s backend=%s  size=%dx%d  leftRed=%d  rightGreen=%d",
+          mode, rhi() ? rhi()->backendName() : "?", w, h, int(leftRed), int(rightGreen));
+    qInfo("[multi-draw] mode=%s %s", mode, qPrintable(verdict));
     setWindowTitle(QStringLiteral("Multi-Draw QRhi Test — ") + verdict);
+
+    // Re-arm for the next mode; buffers are re-uploaded inside the pass there.
+    m_mode = m_mode == UpdatesBeforePass ? UpdatesInsidePass : Done;
+    if (m_mode == UpdatesInsidePass) {
+        m_red.uploaded = m_green.uploaded = false;
+        m_frame = 0;
+        m_readbackScheduled = false;
+        m_evaluated = false;
+        m_rb = {};
+        update();
+    }
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────
