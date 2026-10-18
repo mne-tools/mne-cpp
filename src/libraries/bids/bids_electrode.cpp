@@ -61,6 +61,8 @@ QList<BidsElectrode> BidsElectrode::readTsv(const QString& sFilePath)
         elec.type = naToEmpty(row.value(QStringLiteral("type")));
         elec.material = naToEmpty(row.value(QStringLiteral("material")));
         elec.impedance = naToEmpty(row.value(QStringLiteral("impedance")));
+        elec.group = naToEmpty(row.value(QStringLiteral("group")));
+        elec.dimension = naToEmpty(row.value(QStringLiteral("dimension")));
         electrodes.append(elec);
     }
 
@@ -81,6 +83,8 @@ bool BidsElectrode::writeTsv(const QString& sFilePath,
         QStringLiteral("type"),
         QStringLiteral("material"),
         QStringLiteral("impedance"),
+        QStringLiteral("group"),
+        QStringLiteral("dimension"),
     };
 
     QList<BidsTsvRow> rows;
@@ -96,6 +100,8 @@ bool BidsElectrode::writeTsv(const QString& sFilePath,
         row[QStringLiteral("type")] = elec.type;
         row[QStringLiteral("material")] = elec.material;
         row[QStringLiteral("impedance")] = elec.impedance;
+        row[QStringLiteral("group")] = elec.group;
+        row[QStringLiteral("dimension")] = elec.dimension;
         rows.append(row);
     }
 

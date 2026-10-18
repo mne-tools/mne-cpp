@@ -282,6 +282,9 @@ void TestBids::testElectrodesWriteRoundTrip()
 {
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
     QList<BidsElectrode> original = BidsElectrode::readTsv(path.electrodesTsvPath().filePath());
+    QVERIFY(original.size() > 1 && original[0].group.isEmpty());
+    original[0].group = QStringLiteral("GridA");
+    original[0].dimension = QStringLiteral("[4x8]");
 
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
@@ -296,6 +299,8 @@ void TestBids::testElectrodesWriteRoundTrip()
         QCOMPARE(roundTripped[i].x, original[i].x);
         QCOMPARE(roundTripped[i].y, original[i].y);
         QCOMPARE(roundTripped[i].z, original[i].z);
+        QCOMPARE(roundTripped[i].group, original[i].group);
+        QCOMPARE(roundTripped[i].dimension, original[i].dimension);
     }
 }
 

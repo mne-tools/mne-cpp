@@ -75,6 +75,8 @@ struct BIDSSHARED_EXPORT BidsElectrode
     QString type;      /**< Electrode type: "depth", "strip", "grid" (OPTIONAL). */
     QString material;  /**< Electrode material (OPTIONAL). */
     QString impedance; /**< Impedance value or "n/a" (OPTIONAL). */
+    QString group;     /**< iEEG: lead (shaft, strip or grid) the contact belongs to (OPTIONAL). */
+    QString dimension; /**< iEEG: shape of that group, e.g. "[1x8]" (OPTIONAL). */
 
     /**
      * @brief Read a BIDS *_electrodes.tsv file.
