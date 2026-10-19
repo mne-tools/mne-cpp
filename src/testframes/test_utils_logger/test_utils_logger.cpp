@@ -26,6 +26,13 @@
 #include <QTextStream>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+#include <sstream>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -49,6 +56,7 @@ private slots:
     void initTestCase();
     void testWritesMessagesToFile();
     void testDisablingStopsFileOutput();
+    void testRoutesDiagnosticsToStderr();
     void cleanupTestCase();
 
 private:
@@ -116,6 +124,31 @@ void TestUtilsLogger::testDisablingStopsFileOutput()
     qWarning("test-logger-must-not-appear");
 
     QVERIFY(!readLog().contains("test-logger-must-not-appear"));
+}
+
+//=============================================================================================================
+
+void TestUtilsLogger::testRoutesDiagnosticsToStderr()
+{
+    // Tools are piped: results on stdout must not be interleaved with warnings and errors.
+    std::ostringstream out;
+    std::ostringstream err;
+    std::streambuf* oldOut = std::cout.rdbuf(out.rdbuf());
+    std::streambuf* oldErr = std::cerr.rdbuf(err.rdbuf());
+
+    qInfo("test-logger-info");
+    qWarning("test-logger-warn-stream");
+    qCritical("test-logger-crit-stream");
+
+    std::cout.rdbuf(oldOut);
+    std::cerr.rdbuf(oldErr);
+
+    QVERIFY(out.str().find("test-logger-info") != std::string::npos);
+    QVERIFY(out.str().find("test-logger-warn-stream") == std::string::npos);
+    QVERIFY(out.str().find("test-logger-crit-stream") == std::string::npos);
+    QVERIFY(err.str().find("test-logger-warn-stream") != std::string::npos);
+    QVERIFY(err.str().find("test-logger-crit-stream") != std::string::npos);
+    QVERIFY(err.str().find("test-logger-info") == std::string::npos);
 }
 
 //=============================================================================================================

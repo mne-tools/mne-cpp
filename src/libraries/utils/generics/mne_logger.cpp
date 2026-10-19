@@ -179,8 +179,13 @@ void MNELogger::customLogWriter(QtMsgType type,
         }
     }
 
+    // Results go to stdout and diagnostics to stderr, so piped tool output stays parseable.
+    const bool bDiagnostic = msgLevel >= 2;
+    std::ostream& stream = bDiagnostic ? std::cerr : std::cout;
+
 #ifdef MNE_LOG_MODE_FORMATTED
-    static bool s_startOfLine = true;
+    static bool s_startOfLine[2] = {true, true};
+    bool& startOfLine = s_startOfLine[bDiagnostic ? 1 : 0];
 
     // Determine color and level tag
     const char* color = COLOR_RESET;
@@ -220,27 +225,27 @@ void MNELogger::customLogWriter(QtMsgType type,
     // Walk through the message character by character.
     // Print the prefix only at the start of each new line.
     for (size_t i = 0; i < text.size(); ++i) {
-        if (s_startOfLine && text[i] != '\n') {
-            std::cout << prefix;
-            s_startOfLine = false;
+        if (startOfLine && text[i] != '\n') {
+            stream << prefix;
+            startOfLine = false;
         }
-        std::cout << text[i];
+        stream << text[i];
         if (text[i] == '\n') {
-            s_startOfLine = true;
+            startOfLine = true;
         }
     }
 
     if (text.empty() || text.back() != '\n') {
-        std::cout << '\n';
-        s_startOfLine = true;
+        stream << '\n';
+        startOfLine = true;
     }
 #else
     // PLAIN mode: raw text, like printf
-    std::cout << text;
+    stream << text;
     if (text.empty() || text.back() != '\n') {
-        std::cout << '\n';
+        stream << '\n';
     }
 #endif
 
-    std::cout.flush();
+    stream.flush();
 }

@@ -218,9 +218,8 @@ void TestMneFlashBem::testMissingFreeSurferHome()
     QVERIFY2(proc.exitCode() != 0,
              "Should fail when FREESURFER_HOME is not set");
 
-    // MNELogger routes all output (including qCritical) to stdout
-    QString stdOut = proc.readAllStandardOutput();
-    QVERIFY2(stdOut.contains("FREESURFER_HOME") || stdOut.contains("FreeSurfer"),
+    QString stdErr = proc.readAllStandardError();
+    QVERIFY2(stdErr.contains("FREESURFER_HOME") || stdErr.contains("FreeSurfer"),
              "Error message should mention FREESURFER_HOME");
 }
 
@@ -245,9 +244,8 @@ void TestMneFlashBem::testMissingSubjectsDir()
     QVERIFY2(proc.exitCode() != 0,
              "Should fail when SUBJECTS_DIR is not set");
 
-    // MNELogger routes all output (including qCritical) to stdout
-    QString stdOut = proc.readAllStandardOutput();
-    QVERIFY2(stdOut.contains("SUBJECTS_DIR"),
+    QString stdErr = proc.readAllStandardError();
+    QVERIFY2(stdErr.contains("SUBJECTS_DIR"),
              "Error message should mention SUBJECTS_DIR");
 }
 
@@ -272,9 +270,8 @@ void TestMneFlashBem::testMissingSubject()
     QVERIFY2(proc.exitCode() != 0,
              "Should fail when SUBJECT is not set");
 
-    // MNELogger routes all output (including qCritical) to stdout
-    QString stdOut = proc.readAllStandardOutput();
-    QVERIFY2(stdOut.contains("SUBJECT"),
+    QString stdErr = proc.readAllStandardError();
+    QVERIFY2(stdErr.contains("SUBJECT"),
              "Error message should mention SUBJECT");
 }
 
