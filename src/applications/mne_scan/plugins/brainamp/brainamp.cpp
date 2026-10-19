@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -371,7 +372,7 @@ void BrainAMP::run()
 void BrainAMP::showSetupProjectDialog()
 {
     // Open setup project widget
-    if (m_pBrainAMPSetupProjectWidget == Q_NULLPTR) {
+    if (m_pBrainAMPSetupProjectWidget == nullptr) {
         m_pBrainAMPSetupProjectWidget = QSharedPointer<BrainAMPSetupProjectWidget>(new BrainAMPSetupProjectWidget(this));
 
         connect(m_pBrainAMPSetupProjectWidget.data(), &BrainAMPSetupProjectWidget::cardinalPointsChanged,

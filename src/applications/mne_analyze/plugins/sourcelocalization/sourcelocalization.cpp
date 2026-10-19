@@ -38,7 +38,7 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 SourceLocalization::SourceLocalization()
-: m_pCommu(Q_NULLPTR)
+: m_pCommu(nullptr)
 {
 }
 
@@ -80,14 +80,14 @@ QString SourceLocalization::getName() const
 
 QMenu* SourceLocalization::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
 
 QWidget* SourceLocalization::getView()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -96,7 +96,7 @@ QDockWidget* SourceLocalization::getControl()
 {
     //QDockWidget* pControl = new QDockWidget(getName());
 
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================

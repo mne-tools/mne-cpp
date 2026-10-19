@@ -100,7 +100,7 @@ void QuickControlView::clear()
 
 QVBoxLayout* QuickControlView::findTabWidgetLayout(const QString& sTabName)
 {
-    QVBoxLayout* pTabWidgetLayout = Q_NULLPTR;
+    QVBoxLayout* pTabWidgetLayout = nullptr;
 
     if (QWidget* pTabWidget = m_pUi->m_pTabWidget->findChild<QWidget*>(sTabName + "TabWidget")) {
         // Tab widget already exisits. Get the grid layout and return it.

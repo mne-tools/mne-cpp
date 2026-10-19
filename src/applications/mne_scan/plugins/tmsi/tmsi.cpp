@@ -593,7 +593,7 @@ void TMSI::showImpedanceDialog()
 {
     // Open Impedance dialog only if no sampling process is active
     if (!this->isRunning()) {
-        if (m_pTmsiImpedanceWidget == NULL) {
+        if (m_pTmsiImpedanceWidget == nullptr) {
             m_pTmsiImpedanceWidget = QSharedPointer<TMSIImpedanceWidget>(new TMSIImpedanceWidget(this));
         }
 
@@ -612,7 +612,7 @@ void TMSI::showImpedanceDialog()
 void TMSI::showSetupProjectDialog()
 {
     // Open setup project widget
-    if (m_pTmsiSetupProjectWidget == NULL) {
+    if (m_pTmsiSetupProjectWidget == nullptr) {
         m_pTmsiSetupProjectWidget = QSharedPointer<TMSISetupProjectWidget>(new TMSISetupProjectWidget(this));
     }
 

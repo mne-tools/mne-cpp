@@ -82,7 +82,7 @@ QString Events::getName() const
 
 QMenu* Events::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -140,7 +140,7 @@ QDockWidget* Events::getControl()
 
 QWidget* Events::getView()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================

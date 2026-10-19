@@ -104,9 +104,9 @@ public:
     /**
      * Constructs the Analyze Data Model.
      *
-     * @param[in] pParent  Parent QObject (default Q_NULLPTR).
+     * @param[in] pParent  Parent QObject (default nullptr).
      */
-    BidsViewModel(QObject* pParent = Q_NULLPTR);
+    BidsViewModel(QObject* pParent = nullptr);
 
     //=========================================================================================================
     /**

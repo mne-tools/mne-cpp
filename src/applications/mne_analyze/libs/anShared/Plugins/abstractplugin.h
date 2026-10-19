@@ -105,7 +105,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Provides the menu, in case no menu is provided it returns a Q_NULLPTR
+     * Provides the menu, in case no menu is provided it returns a nullptr
      *
      * @return the menu.
      */
@@ -113,7 +113,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Provides the control, in case no control is provided it returns a Q_NULLPTR
+     * Provides the control, in case no control is provided it returns a nullptr
      *
      * @return the control.
      */
@@ -121,7 +121,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Provides the view, in case no view is provided it returns a Q_NULLPTR
+     * Provides the view, in case no view is provided it returns a nullptr
      *
      * @return the view.
      */

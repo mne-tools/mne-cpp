@@ -27,6 +27,7 @@
 #include <disp/viewers/filterdesignview.h>
 
 #include <dsp/filterkernel.h>
+#include <QDebug>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -47,7 +48,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 Filtering::Filtering()
-: m_pFilterSettingsView(Q_NULLPTR)
+: m_pFilterSettingsView(nullptr)
 {
 }
 
@@ -89,7 +90,7 @@ QString Filtering::getName() const
 
 QMenu* Filtering::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -127,7 +128,7 @@ QDockWidget* Filtering::getControl()
 
 QWidget* Filtering::getView()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================

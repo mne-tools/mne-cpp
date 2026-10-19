@@ -84,11 +84,11 @@ public:
      * child window inside parent. MainWindow is deleted when its parent is deleted.
      *
      * @param [in] pAnalyzeCore Pointer to the application controller class. It is needed to display subwindows froms plugins.
-     * @param [in] parent Pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window.
+     * @param [in] parent Pointer to parent widget; If parent is nullptr, the new MainWindow becomes a window.
      *
      */
     MainWindow(AnalyzeCore* pAnalyzeCore,
-               QWidget* parent = Q_NULLPTR);
+               QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**

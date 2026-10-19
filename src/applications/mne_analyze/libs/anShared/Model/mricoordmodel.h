@@ -48,7 +48,7 @@ public:
 
     MriCoordModel(const QString& sFilePath,
                   const QByteArray& byteLoadedData = QByteArray(),
-                  QObject* parent = Q_NULLPTR);
+                  QObject* parent = nullptr);
 
     //=========================================================================================================
     /**

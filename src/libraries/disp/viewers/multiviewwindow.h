@@ -70,10 +70,10 @@ public:
     /**
      * Constructs an MultiViewWindow.
      *
-     * @param[in] parent  Parent widget (default Q_NULLPTR).
+     * @param[in] parent  Parent widget (default nullptr).
      * @param[in] flags   Window flags passed to the dock widget (default none).
      */
-    explicit MultiViewWindow(QWidget* parent = Q_NULLPTR,
+    explicit MultiViewWindow(QWidget* parent = nullptr,
                              Qt::WindowFlags flags = Qt::WindowFlags());
 
     //=========================================================================================================

@@ -29,6 +29,7 @@
 #include <QFuture>
 #include <QPair>
 #include <QColor>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -774,7 +775,7 @@ void EvokedSetModel::toggleFreeze()
 QSharedPointer<FIFFLIB::FiffEvokedSet> EvokedSetModel::getEvokedSet()
 {
     if (!m_pEvokedSet) {
-        return Q_NULLPTR;
+        return nullptr;
     } else {
         return m_pEvokedSet;
     }

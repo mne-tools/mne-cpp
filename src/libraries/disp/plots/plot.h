@@ -79,7 +79,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit Plot(QWidget* parent = Q_NULLPTR);
+    explicit Plot(QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**

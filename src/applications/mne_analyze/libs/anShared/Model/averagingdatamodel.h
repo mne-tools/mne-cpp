@@ -69,13 +69,13 @@ public:
      * @param[in] pEvokedSet   sets saved evoked set to pEvokedSet. NULL if left empty.
      * @param[in] parent       sets parent of the object. NULL if left empty.
      */
-    AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = Q_NULLPTR,
-                       QObject* parent = Q_NULLPTR);
+    AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = nullptr,
+                       QObject* parent = nullptr);
 
     //=========================================================================================================
     AveragingDataModel(const QString& sFilePath,
                        const QByteArray& byteLoadedData = QByteArray(),
-                       QObject* parent = Q_NULLPTR);
+                       QObject* parent = nullptr);
 
     //=========================================================================================================
     /**

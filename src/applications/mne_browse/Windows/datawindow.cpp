@@ -25,6 +25,7 @@
 #include <cmath>
 #include <QHash>
 #include <QSignalBlocker>
+#include <QDebug>
 #include <utility>
 
 //*************************************************************************************************************
@@ -112,8 +113,8 @@ DataWindow::DataWindow(QWidget* parent)
 : QWidget(parent)
 , ui(new Ui::DataWindowDockWidget)
 , m_pMainWindow(static_cast<MainWindow*>(parent))
-, m_pRawDelegate(Q_NULLPTR)
-, m_pKineticScroller(Q_NULLPTR)
+, m_pRawDelegate(nullptr)
+, m_pKineticScroller(nullptr)
 , m_bHideBadChannels(false)
 {
     ui->setupUi(this);

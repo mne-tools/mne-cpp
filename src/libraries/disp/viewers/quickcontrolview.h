@@ -92,7 +92,7 @@ public:
     QuickControlView(const QString& sSettingsPath = "",
                      const QString& name = "",
                      Qt::WindowFlags flags = Qt::Window | Qt::WindowStaysOnTopHint,
-                     QWidget* parent = Q_NULLPTR,
+                     QWidget* parent = nullptr,
                      bool bDraggable = true);
 
     //=========================================================================================================

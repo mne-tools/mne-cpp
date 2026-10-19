@@ -76,7 +76,7 @@ public:
     /**
     * Constructs a BemDataModel object.
     */
-    explicit BemDataModel(QObject* parent = Q_NULLPTR);
+    explicit BemDataModel(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -87,7 +87,7 @@ public:
      */
     BemDataModel(const QString& sFilePath,
                  const QByteArray& byteLoadedData = QByteArray(),
-                 QObject* pParent = Q_NULLPTR);
+                 QObject* pParent = nullptr);
 
     //=========================================================================================================
     /**

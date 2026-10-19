@@ -106,12 +106,12 @@ public:
 
     QList<ConnectivitySettings::IntermediateTrialData> m_dataListOriginal;
 
-    DISPLIB::Plot* m_pSignalCoursePlot = Q_NULLPTR;
-    DISPLIB::Plot* m_pSpectrumPlot = Q_NULLPTR;
-    DISPLIB::Plot* m_pEvokedSignalCoursePlot = Q_NULLPTR;
-    DISPLIB::Plot* m_pEpochSignalCoursePlot = Q_NULLPTR;
-    DISPLIB::Plot* m_pEvokedSourceSignalCoursePlot = Q_NULLPTR;
-    DISPLIB::ImageSc* m_pImageConnWeights = Q_NULLPTR;
+    DISPLIB::Plot* m_pSignalCoursePlot = nullptr;
+    DISPLIB::Plot* m_pSpectrumPlot = nullptr;
+    DISPLIB::Plot* m_pEvokedSignalCoursePlot = nullptr;
+    DISPLIB::Plot* m_pEpochSignalCoursePlot = nullptr;
+    DISPLIB::Plot* m_pEvokedSourceSignalCoursePlot = nullptr;
+    DISPLIB::ImageSc* m_pImageConnWeights = nullptr;
 
     TFplot::SPtr m_pTfPlot;
     Eigen::MatrixXd m_matEvoked;

@@ -21,7 +21,6 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -29,6 +28,7 @@
 
 #include <QThread>
 #include <QtEndian>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -56,7 +56,7 @@ FtConnector::FtConnector()
 , m_bNewData(false)
 , m_fSampleFreq(0)
 , m_sAddress("127.0.0.1")
-, m_pSocket(Q_NULLPTR)
+, m_pSocket(nullptr)
 {
 }
 
@@ -66,16 +66,16 @@ FtConnector::~FtConnector()
 {
     //disconnect();
     delete m_pSocket;
-    //m_pSocket = Q_NULLPTR;
+    //m_pSocket = nullptr;
 }
 
 //=============================================================================================================
 
 bool FtConnector::connect()
 {
-    if (m_pSocket != Q_NULLPTR) {
+    if (m_pSocket != nullptr) {
         delete m_pSocket;
-        m_pSocket = Q_NULLPTR;
+        m_pSocket = nullptr;
     }
 
     m_pSocket = new QTcpSocket();
@@ -97,7 +97,7 @@ bool FtConnector::connect()
     } else {
         qWarning() << "[FtConnector::connect] Timed out: Failed to connect.";
         delete m_pSocket;
-        m_pSocket = Q_NULLPTR;
+        m_pSocket = nullptr;
         return false;
     }
 }
@@ -491,7 +491,7 @@ void FtConnector::resetEmitData()
 {
     m_bNewData = false;
     delete m_pMatEmit;
-    m_pMatEmit = Q_NULLPTR;
+    m_pMatEmit = nullptr;
 }
 
 //=============================================================================================================
@@ -537,7 +537,7 @@ MetaData FtConnector::parseBufferHeaders()
     getHeader();
     prepBuffer(chunkBuffer, m_iExtendedHeaderSize);
 
-    std::cout << "Parsing extended header\n";
+    qInfo().noquote().nospace() << "Parsing extended header";
 
     FtHeaderParser parser;
     metadata = parser.parseHeader(chunkBuffer);

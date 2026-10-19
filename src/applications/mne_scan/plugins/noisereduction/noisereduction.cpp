@@ -33,6 +33,7 @@
 #include <scMeas/realtimemultisamplearray.h>
 
 #include "FormFiles/noisereductionsetupwidget.h"
+#include <QDebug>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,8 +70,8 @@ NoiseReduction::NoiseReduction()
 , m_iMaxFilterTapSize(-1)
 , m_sCurrentSystem("VectorView")
 , m_pCircularBuffer(QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>::create(40))
-, m_pNoiseReductionInput(Q_NULLPTR)
-, m_pNoiseReductionOutput(Q_NULLPTR)
+, m_pNoiseReductionInput(nullptr)
+, m_pNoiseReductionOutput(nullptr)
 {
     if (m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;

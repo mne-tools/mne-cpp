@@ -110,7 +110,7 @@ bool GUSBAmpDriver::initDevice()
             //open the device
             HANDLE hDevice = GT_OpenDeviceEx(*serialNumber);
 
-            if (hDevice == NULL) {
+            if (hDevice == nullptr) {
                 throw string("Error on GT_OpenDeviceEx: Couldn't open device ").append(*serialNumber);
             }
             //add the device handle to the list of opened devices
@@ -218,7 +218,7 @@ bool GUSBAmpDriver::initDevice()
                 memset(&(m_overlapped[deviceIndex][queueIndex]), 0, sizeof(OVERLAPPED));
 
                 //create a windows event handle that will be signalled when new data from the device has been received for each data buffer
-                m_overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(NULL, false, false, NULL);
+                m_overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(nullptr, false, false, nullptr);
             }
         }
         //start the devices (master device must be started at last)

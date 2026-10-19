@@ -76,11 +76,11 @@ public:
      * Constructs an MultiView.
      *
      * @param[in] sSettingsPath  QSettings key prefix used to persist view settings (default empty).
-     * @param[in] parent         Parent widget (default Q_NULLPTR).
+     * @param[in] parent         Parent widget (default nullptr).
      * @param[in] flags          Window flags passed to the main window (default Qt::Widget).
      */
     explicit MultiView(const QString& sSettingsPath = "",
-                       QWidget* parent = Q_NULLPTR,
+                       QWidget* parent = nullptr,
                        Qt::WindowFlags flags = Qt::Widget);
 
     //=========================================================================================================

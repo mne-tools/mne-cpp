@@ -113,7 +113,7 @@ public:
      *
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit RtDataClient(QObject* parent = Q_NULLPTR);
+    explicit RtDataClient(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**

@@ -24,7 +24,6 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_coord_trans.h>
 
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -325,7 +324,7 @@ void CoregSettingsView::onFiducialChanged()
 
 void CoregSettingsView::onStoreFidFile()
 {
-    QString sFileName = QFileDialog::getSaveFileName(Q_NULLPTR,
+    QString sFileName = QFileDialog::getSaveFileName(nullptr,
                                                      tr("Save Fiducials"), "",
                                                      tr("Fif file (*fiducials.fif)"));
 
@@ -372,7 +371,7 @@ void CoregSettingsView::onLoadTrans()
 
 void CoregSettingsView::onStoreTrans()
 {
-    QString sFileName = QFileDialog::getSaveFileName(Q_NULLPTR,
+    QString sFileName = QFileDialog::getSaveFileName(nullptr,
                                                      tr("Save Transformation"), "",
                                                      tr("Fif file (*-trans.fif)"));
 

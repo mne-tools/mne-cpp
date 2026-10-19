@@ -72,11 +72,11 @@ using namespace MNELIB;
 //=============================================================================================================
 
 Averaging::Averaging()
-: m_pFiffRawModel(Q_NULLPTR)
-, m_pTriggerList(Q_NULLPTR)
-, m_pFiffInfo(Q_NULLPTR)
-, m_pCommu(Q_NULLPTR)
-, m_pAveragingSettingsView(Q_NULLPTR)
+: m_pFiffRawModel(nullptr)
+, m_pTriggerList(nullptr)
+, m_pFiffInfo(nullptr)
+, m_pCommu(nullptr)
+, m_pAveragingSettingsView(nullptr)
 , m_fBaselineFromS(0)
 , m_fBaselineToS(0)
 , m_fPreStim(0)
@@ -129,7 +129,7 @@ QString Averaging::getName() const
 
 QMenu* Averaging::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -405,7 +405,7 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::Fi
     mapReject.insert("eog", 300e-06);
 
     if (matEvents.rows() < 2) {
-        return Q_NULLPTR;
+        return nullptr;
     }
 
     // One evoked response per trigger code of the selected events, like mne.Epochs per event_id
@@ -437,7 +437,7 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::Fi
     }
 
     if (pFiffEvokedSet->evoked.isEmpty())
-        return Q_NULLPTR;
+        return nullptr;
     return pFiffEvokedSet;
 }
 

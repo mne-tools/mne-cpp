@@ -437,6 +437,6 @@ QSharedPointer<EvokedSetModel> AverageLayoutView::getEvokedSetModel()
 
 void AverageLayoutView::clearView()
 {
-    setEvokedSetModel(Q_NULLPTR);
+    setEvokedSetModel(nullptr);
     updateData();
 }

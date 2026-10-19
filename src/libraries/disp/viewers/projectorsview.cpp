@@ -47,7 +47,7 @@ ProjectorsView::ProjectorsView(const QString& sSettingsPath,
                                QWidget* parent,
                                Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pEnableDisableProjectors(Q_NULLPTR)
+, m_pEnableDisableProjectors(nullptr)
 {
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Projectors");

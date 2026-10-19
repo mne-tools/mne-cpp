@@ -43,8 +43,8 @@ using namespace MNEBROWSE;
 NoiseReductionWindow::NoiseReductionWindow(QWidget* parent)
 : QDockWidget(parent)
 , ui(new Ui::NoiseReductionWindow)
-, m_enableDisableProjectors(Q_NULLPTR)
-, m_pCompSignalMapper(Q_NULLPTR)
+, m_enableDisableProjectors(nullptr)
+, m_pCompSignalMapper(nullptr)
 {
     ui->setupUi(this);
 }

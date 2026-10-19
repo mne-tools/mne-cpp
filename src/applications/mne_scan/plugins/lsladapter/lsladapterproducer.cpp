@@ -46,7 +46,7 @@ LSLAdapterProducer::LSLAdapterProducer(QSharedPointer<PluginOutputData<RealTimeM
                                        QObject* parent)
 : QObject(parent)
 , m_StreamInfo()
-, m_StreamInlet(Q_NULLPTR)
+, m_StreamInlet(nullptr)
 , m_bHasStreamInfo(false)
 , m_bIsRunning(false)
 , m_iOutputBlockSize(iOutputBlockSize)
@@ -155,7 +155,7 @@ void LSLAdapterProducer::reset()
     // reset lsl members
     m_StreamInfo = LSLLIB::stream_info();
     delete m_StreamInlet;
-    m_StreamInlet = Q_NULLPTR;
+    m_StreamInlet = nullptr;
 }
 
 //=============================================================================================================

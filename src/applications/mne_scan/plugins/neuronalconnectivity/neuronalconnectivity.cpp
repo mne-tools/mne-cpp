@@ -34,6 +34,7 @@
 #include <mne/mne_bem.h>
 
 #include <disp/viewers/connectivitysettingsview.h>
+#include <QDebug>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -73,7 +74,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_sAvrType("1")
 , m_pCircularBuffer(CircularBuffer<CONNECTIVITYLIB::Network>::SPtr::create(40))
 , m_pRtConnectivity(RtConnectivity::SPtr::create())
-, m_pActionShowYourWidget(Q_NULLPTR)
+, m_pActionShowYourWidget(nullptr)
 {
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;

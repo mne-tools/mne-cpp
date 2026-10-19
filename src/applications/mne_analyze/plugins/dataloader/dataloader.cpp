@@ -33,6 +33,7 @@
 #include <fiff/fiff_constants.h>
 
 #include <disp/viewers/progressview.h>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -195,14 +196,14 @@ QMenu* DataLoader::getMenu()
 
 QDockWidget* DataLoader::getControl()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
 
 QWidget* DataLoader::getView()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -303,7 +304,7 @@ void DataLoader::onLoadFilePressed()
     QFileDialog::getOpenFileContent("Fiff File (*.fif *.fiff)", fileContentReady);
 #else
     //Get the path
-    QString sFilePath = QFileDialog::getOpenFileName(Q_NULLPTR,
+    QString sFilePath = QFileDialog::getOpenFileName(nullptr,
                                                      tr("Open File"),
                                                      m_sLastDir,
                                                      tr("Fiff file (*.fif *.fiff);;Event file (*.eve);;Dipole file (*.dip)"));
@@ -416,7 +417,7 @@ void DataLoader::onSaveFilePressed(FileType type)
     }
 
     //Get the path
-    QString sFilePath = QFileDialog::getSaveFileName(Q_NULLPTR,
+    QString sFilePath = QFileDialog::getSaveFileName(nullptr,
                                                      sFile,
                                                      QDir::currentPath() + sDir,
                                                      sFileType);
@@ -455,7 +456,7 @@ void DataLoader::onSaveFilePressed(FileType type)
 
 void DataLoader::onLoadSubjectPressed()
 {
-    QString dir = QFileDialog::getExistingDirectory(Q_NULLPTR,
+    QString dir = QFileDialog::getExistingDirectory(nullptr,
                                                     tr("select directory"),
                                                     QDir::currentPath() + "/../resources/data/MNE-sample-data");
 

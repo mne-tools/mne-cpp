@@ -24,6 +24,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QAction>
 #include <QtMath>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -38,7 +39,7 @@ using namespace MNESCAN;
 PluginScene::PluginScene(QMenu* pMenuPluginItem, PluginGui* pPluginGui)
 : QGraphicsScene(pPluginGui)
 , m_pPluginGui(pPluginGui)
-, m_pActionPluginItem(Q_NULLPTR)
+, m_pActionPluginItem(nullptr)
 , leftButtonDown(false)
 {
     m_pMenuPluginItem = pMenuPluginItem;

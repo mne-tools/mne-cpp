@@ -15,7 +15,6 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include <iostream>
 #include "view3d.h"
 
 #include <anShared/Management/communicator.h>
@@ -55,9 +54,9 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 View3D::View3D()
-: m_pCommu(Q_NULLPTR)
-, m_pBemTreeCoreg(Q_NULLPTR)
-, m_pView3D(Q_NULLPTR)
+: m_pCommu(nullptr)
+, m_pBemTreeCoreg(nullptr)
+, m_pView3D(nullptr)
 , m_bPickingActivated(false)
 {
     m_iFiducial = 1;
@@ -102,7 +101,7 @@ QString View3D::getName() const
 
 QMenu* View3D::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -132,7 +131,7 @@ QWidget* View3D::getView()
 
 QDockWidget* View3D::getControl()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -197,7 +196,7 @@ void View3D::updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel)
         qWarning() << "[View3D::updateCoregBem] Null Bem Model pointer.";
         return;
     } else if (!m_p3DModel) {
-        std::cout << "[View3D::updateCoregBem] Null BrainTreeModel";
+        qWarning().noquote().nospace() << "[View3D::updateCoregBem] Null BrainTreeModel";
         return;
     } else if (pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         if (!pNewModel->getBem().data()->isEmpty()) {
@@ -353,7 +352,7 @@ void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedM
                                1,
                                index.parent().parent().parent());
 
-        m_pBemTreeCoreg = Q_NULLPTR;
+        m_pBemTreeCoreg = nullptr;
 
         if (m_pView3D) {
             m_pView3D->hide();

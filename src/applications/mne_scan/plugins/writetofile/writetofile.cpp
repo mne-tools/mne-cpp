@@ -26,6 +26,7 @@
 #include <fiff/fiff_stream.h>
 
 #include <QFileInfo>
+#include <QDebug>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -540,7 +541,7 @@ void WriteToFile::promptFileName()
 
     while (!bFileHandled) {
         bool ok;
-        QString sFileName = QInputDialog::getText(Q_NULLPTR, tr("Write to File"), tr("Name your save file:"), QLineEdit::Normal, QString(), &ok);
+        QString sFileName = QInputDialog::getText(nullptr, tr("Write to File"), tr("Name your save file:"), QLineEdit::Normal, QString(), &ok);
 
         if (ok && !sFileName.isEmpty()) {
             bFileHandled = renameRecording(sFileName);

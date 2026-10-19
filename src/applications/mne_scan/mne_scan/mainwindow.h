@@ -104,9 +104,9 @@ public:
     /**
      * Constructs a MainWindow which is a child of parent.
      *
-     * @param[in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
+     * @param[in] parent pointer to parent widget; If parent is nullptr, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
      */
-    MainWindow(QWidget* parent = Q_NULLPTR);
+    MainWindow(QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**

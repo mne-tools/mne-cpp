@@ -84,7 +84,7 @@ public:
 
     explicit AveragingSettingsView(const QString& sSettingsPath = "",
                                    const QMap<QString, int>& mapStimChsIndexNames = QMap<QString, int>(),
-                                   QWidget* parent = Q_NULLPTR);
+                                   QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**

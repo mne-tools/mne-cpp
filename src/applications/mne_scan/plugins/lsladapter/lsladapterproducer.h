@@ -74,7 +74,7 @@ public:
      */
     LSLAdapterProducer(QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>> pRTMSA,
                        int iOutputBlockSize = 100,
-                       QObject* parent = Q_NULLPTR);
+                       QObject* parent = nullptr);
 
     //=========================================================================================================
     /**

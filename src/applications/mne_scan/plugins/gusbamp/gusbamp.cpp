@@ -269,7 +269,7 @@ void GUSBAmp::run()
 void GUSBAmp::showSetupProjectDialog()
 {
     // Open setup project widget
-    if (m_pGUSBampSetupProjectWidget == NULL) {
+    if (m_pGUSBampSetupProjectWidget == nullptr) {
         m_pGUSBampSetupProjectWidget = QSharedPointer<GUSBAmpSetupProjectWidget>(new GUSBAmpSetupProjectWidget(this));
     }
     if (!m_pGUSBampSetupProjectWidget->isVisible()) {

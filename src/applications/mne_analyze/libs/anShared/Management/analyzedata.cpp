@@ -101,7 +101,7 @@ QSharedPointer<AbstractModel> AnalyzeData::getModelByName(const QString& sName) 
     if (!lItems.isEmpty()) {
         return lItems.first()->data().value<QSharedPointer<AbstractModel>>();
     } else {
-        return Q_NULLPTR;
+        return nullptr;
     }
 }
 
@@ -122,7 +122,7 @@ QSharedPointer<AbstractModel> AnalyzeData::getModelByPath(const QString& sPath,
         }
     }
 
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================

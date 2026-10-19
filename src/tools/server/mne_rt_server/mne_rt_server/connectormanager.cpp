@@ -30,7 +30,6 @@
 #include "../plugins/fiffsimulator/fiffsimulator.h"
 #endif
 
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -422,7 +421,7 @@ QByteArray ConnectorManager::setActiveConnector(qint32 ID)
     QString str;
 
     if (ID != getActiveConnector()->getConnectorID()) {
-        IConnector* t_pNewActiveConnector = NULL;
+        IConnector* t_pNewActiveConnector = nullptr;
         QVector<IConnector*>::const_iterator it = s_vecConnectors.begin();
         for (; it != s_vecConnectors.end(); ++it)
             if ((*it)->getConnectorID() == ID)

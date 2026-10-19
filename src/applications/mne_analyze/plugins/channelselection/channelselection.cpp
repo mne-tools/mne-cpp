@@ -26,13 +26,13 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Utils/metatypes.h>
 
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QListWidgetItem>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -47,11 +47,11 @@ using namespace ANSHAREDLIB;
 
 ChannelSelection::ChannelSelection()
 : m_pSelectionItem(new DISPLIB::SelectionItem())
-, m_pChannelSelectionView(Q_NULLPTR)
-, m_pChannelInfoModel(Q_NULLPTR)
-, m_pFiffInfo(Q_NULLPTR)
-, m_pViewLayout(Q_NULLPTR)
-, m_pControlLayout(Q_NULLPTR)
+, m_pChannelSelectionView(nullptr)
+, m_pChannelInfoModel(nullptr)
+, m_pFiffInfo(nullptr)
+, m_pViewLayout(nullptr)
+, m_pControlLayout(nullptr)
 , m_bIsInit(false)
 {
 }
@@ -96,7 +96,7 @@ QString ChannelSelection::getName() const
 
 QMenu* ChannelSelection::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -190,7 +190,7 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
     m_pChannelInfoModel = QSharedPointer<DISPLIB::ChannelInfoModel>(new DISPLIB::ChannelInfoModel(m_pFiffInfo));
 
     m_pChannelSelectionView = new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
-                                                                Q_NULLPTR,
+                                                                nullptr,
                                                                 m_pChannelInfoModel,
                                                                 Qt::Window);
 

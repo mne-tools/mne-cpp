@@ -55,8 +55,8 @@ const char* pluginsDir = "/mne_analyze_plugins"; /**< Holds path to the plugins.
 // GLOBAL DEFINES
 //=============================================================================================================
 
-QPointer<MainWindow> appMainWindowHandler(Q_NULLPTR); /**< The main window. */
-QtMessageHandler previousMessageHandler = nullptr;    /**< Handler to use once the main window is gone. */
+QPointer<MainWindow> appMainWindowHandler(nullptr); /**< The main window. */
+QtMessageHandler previousMessageHandler = nullptr;  /**< Handler to use once the main window is gone. */
 
 //=============================================================================================================
 /**
@@ -89,9 +89,9 @@ static void initSharedResources()
 
 AnalyzeCore::AnalyzeCore(QObject* parent)
 : QObject(parent)
-, m_pPluginManager(Q_NULLPTR)
-, m_pAnalyzeData(Q_NULLPTR)
-, m_pMainWindow(Q_NULLPTR)
+, m_pPluginManager(nullptr)
+, m_pAnalyzeData(nullptr)
+, m_pMainWindow(nullptr)
 {
     initSharedResources();
 

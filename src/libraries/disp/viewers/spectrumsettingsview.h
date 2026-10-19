@@ -75,7 +75,7 @@ public:
      * @param[in] f Qt window flags passed to the QWidget constructor.
      */
     SpectrumSettingsView(const QString& sSettingsPath = "",
-                         QWidget* parent = Q_NULLPTR,
+                         QWidget* parent = nullptr,
                          Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================

@@ -39,7 +39,7 @@ ButterflySceneItem::ButterflySceneItem(QString setName, int setKind, int setUnit
 : m_sSetName(setName)
 , m_iSetKind(setKind)
 , m_iSetUnit(setUnit)
-, m_pFiffInfo(Q_NULLPTR)
+, m_pFiffInfo(nullptr)
 , m_cAverageColors(defaultColors)
 {
     //Init m_scaleMap

@@ -55,8 +55,8 @@ EventView::EventView()
 : m_pUi(new Ui::EventWindowDockWidget)
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
-, m_pEventModel(Q_NULLPTR)
-, m_pFiffRawModel(Q_NULLPTR)
+, m_pEventModel(nullptr)
+, m_pFiffRawModel(nullptr)
 , m_pColordialog(new QColorDialog(this))
 {
     m_pUi->setupUi(this);
@@ -78,7 +78,7 @@ EventView::EventView()
     createContextMenu();
 
     m_pTriggerDetectView = QSharedPointer<DISPLIB::TriggerDetectionView>(new DISPLIB::TriggerDetectionView("MNEANALYZE/EVENTS",
-                                                                                                           Q_NULLPTR,
+                                                                                                           nullptr,
                                                                                                            Qt::Window));
     m_pTriggerDetectView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
     m_pTriggerDetectView->setWindowFlag(Qt::WindowStaysOnTopHint);
@@ -326,7 +326,7 @@ void EventView::onSaveButton()
 #ifdef WASMBUILD
     m_pEventModel->saveToFile("");
 #else
-    QString fileName = QFileDialog::getSaveFileName(Q_NULLPTR,
+    QString fileName = QFileDialog::getSaveFileName(nullptr,
                                                     tr("Save Events"), "",
                                                     tr("Event file (*.eve);;All Files (*)"));
 
@@ -569,7 +569,7 @@ void EventView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedMod
         disconnectFromModel();
         reset();
     } else if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pFiffRawModel) == pRemovedModel) {
-        m_pFiffRawModel = Q_NULLPTR;
+        m_pFiffRawModel = nullptr;
     }
 }
 

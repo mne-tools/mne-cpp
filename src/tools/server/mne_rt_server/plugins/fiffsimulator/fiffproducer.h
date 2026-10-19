@@ -53,7 +53,7 @@ public:
     /**
      * Constructs a FiffProducer.
      */
-    FiffProducer(FiffSimulator* simulator = Q_NULLPTR);
+    FiffProducer(FiffSimulator* simulator = nullptr);
 
     //=========================================================================================================
     /**

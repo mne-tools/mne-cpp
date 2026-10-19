@@ -41,7 +41,7 @@ using namespace LSLADAPTERPLUGIN;
 LSLAdapterSetup::LSLAdapterSetup(int initialBlockSize, QWidget* parent)
 : QWidget(parent)
 , m_mItemToStreamInfo()
-, m_pCurrentSelectedStream(Q_NULLPTR)
+, m_pCurrentSelectedStream(nullptr)
 , ui()
 {
     ui.setupUi(this);
@@ -57,7 +57,7 @@ void LSLAdapterSetup::onLSLScanResults(const QVector<LSLLIB::stream_info>& vStre
     // clear UI list
     ui.listLSLStreams->clear();
     // mark m_pCurentSelectedStream as invalid (it will be deleted by the subsequent call to clear on the map).
-    m_pCurrentSelectedStream = Q_NULLPTR;
+    m_pCurrentSelectedStream = nullptr;
     // clear mapping and create items
     m_mItemToStreamInfo.clear();
     for (LSLLIB::stream_info streamInfo : vStreamInfos) {

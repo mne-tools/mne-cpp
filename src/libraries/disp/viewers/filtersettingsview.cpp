@@ -61,7 +61,7 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
 
     //Create and connect design viewer
     m_pFilterView = FilterDesignView::SPtr::create(m_sSettingsPath,
-                                                   Q_NULLPTR,
+                                                   nullptr,
                                                    Qt::Dialog);
 
     connect(m_pFilterView.data(), &FilterDesignView::updateFilterFrom, [=, this](double dFrom) {

@@ -63,7 +63,7 @@ using namespace FIFFLIB;
 CoRegistration::CoRegistration()
 : m_fRMSE(0.0f)
 , m_iNDiscarded(0)
-, m_pCoregSettingsView(Q_NULLPTR)
+, m_pCoregSettingsView(nullptr)
 {
     m_vecBemDataModels = QVector<QSharedPointer<ANSHAREDLIB::AbstractModel>>();
 
@@ -125,7 +125,7 @@ QString CoRegistration::getName() const
 
 QMenu* CoRegistration::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -180,7 +180,7 @@ QDockWidget* CoRegistration::getControl()
 
 QWidget* CoRegistration::getView()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================

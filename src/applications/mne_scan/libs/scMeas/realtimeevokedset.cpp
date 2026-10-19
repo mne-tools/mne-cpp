@@ -61,7 +61,7 @@ void RealTimeEvokedSet::init(FiffInfo::SPtr p_fiffInfo)
 
     m_pFiffInfo = p_fiffInfo;
 
-    srand(static_cast<uint>(time(Q_NULLPTR)));
+    srand(static_cast<uint>(time(nullptr)));
     for (qint32 i = 0; i < p_fiffInfo->nchan; ++i) {
         m_qListChColors.append(QColor(rand() % 256, rand() % 256, rand() % 256));
 

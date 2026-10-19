@@ -20,6 +20,7 @@
 //=============================================================================================================
 
 #include "plugininputdata.h"
+#include <QDebug>
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
@@ -39,7 +40,7 @@ namespace SCSHAREDLIB
 template<class T>
 PluginInputData<T>::PluginInputData(AbstractPlugin* parent, const QString& name, const QString& descr)
 : PluginInputConnector(parent, name, descr)
-, m_pFunc(NULL)
+, m_pFunc(nullptr)
 {
 }
 

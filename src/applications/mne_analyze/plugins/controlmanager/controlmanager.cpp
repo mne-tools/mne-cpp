@@ -35,6 +35,7 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -90,7 +91,7 @@ QString ControlManager::getName() const
 
 QMenu* ControlManager::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -144,7 +145,7 @@ QDockWidget* ControlManager::getControl()
     m_ViewParameters.m_sImageType = "";
 
     //View3D Settings
-    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
+    m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), nullptr, slControlFlags);
 
     pTabWidget->addTab(m_pControl3DView, "3D");
 
@@ -177,7 +178,7 @@ QDockWidget* ControlManager::getControl()
 
 QWidget* ControlManager::getView()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================

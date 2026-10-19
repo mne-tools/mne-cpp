@@ -47,6 +47,7 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QDir>
+#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -646,7 +647,7 @@ void EEGoSports::showImpedanceDialog()
 {
     // Open Impedance dialog only if no sampling process is active
     if (!this->isRunning()) {
-        if (m_pEEGoSportsImpedanceWidget == NULL) {
+        if (m_pEEGoSportsImpedanceWidget == nullptr) {
             m_pEEGoSportsImpedanceWidget = QSharedPointer<EEGoSportsImpedanceWidget>(new EEGoSportsImpedanceWidget(this));
         }
 
@@ -665,7 +666,7 @@ void EEGoSports::showImpedanceDialog()
 void EEGoSports::showSetupProjectDialog()
 {
     // Open setup project widget
-    if (m_pEEGoSportsSetupProjectWidget == Q_NULLPTR) {
+    if (m_pEEGoSportsSetupProjectWidget == nullptr) {
         m_pEEGoSportsSetupProjectWidget = QSharedPointer<EEGoSportsSetupProjectWidget>(new EEGoSportsSetupProjectWidget(this));
 
         connect(m_pEEGoSportsSetupProjectWidget.data(), &EEGoSportsSetupProjectWidget::cardinalPointsChanged,

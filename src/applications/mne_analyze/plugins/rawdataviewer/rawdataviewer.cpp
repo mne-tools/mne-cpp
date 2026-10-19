@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include <QSpacerItem>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -57,7 +58,7 @@ using namespace UTILSLIB;
 RawDataViewer::RawDataViewer()
 : m_iVisibleBlocks(10)
 , m_iBufferBlocks(10)
-, m_pFiffRawView(Q_NULLPTR)
+, m_pFiffRawView(nullptr)
 {
 }
 
@@ -111,14 +112,14 @@ QString RawDataViewer::getName() const
 
 QMenu* RawDataViewer::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
 
 QDockWidget* RawDataViewer::getControl()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================

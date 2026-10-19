@@ -62,23 +62,23 @@ using namespace DISPLIB;
 MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore,
                        QWidget* parent)
 : QMainWindow(parent)
-, m_pMultiView(Q_NULLPTR)
+, m_pMultiView(nullptr)
 , m_pAnalyzeCoreController(pAnalyzeCore)
-, m_pGridLayout(Q_NULLPTR)
-, m_pActionExit(Q_NULLPTR)
-, m_pActionReloadPlugins(Q_NULLPTR)
-, m_pActionAbout(Q_NULLPTR)
-, m_pActionResearchMode(Q_NULLPTR)
-, m_pActionClinicalMode(Q_NULLPTR)
-, m_pActionDarkMode(Q_NULLPTR)
-, m_pMenuFile(Q_NULLPTR)
-, m_pMenuView(Q_NULLPTR)
-, m_pMenuPlugins(Q_NULLPTR)
-, m_pMenuControl(Q_NULLPTR)
-, m_pMenuAppearance(Q_NULLPTR)
-, m_pMenuHelp(Q_NULLPTR)
-, m_pTextBrowser_Log(Q_NULLPTR)
-, m_pAboutWindow(Q_NULLPTR)
+, m_pGridLayout(nullptr)
+, m_pActionExit(nullptr)
+, m_pActionReloadPlugins(nullptr)
+, m_pActionAbout(nullptr)
+, m_pActionResearchMode(nullptr)
+, m_pActionClinicalMode(nullptr)
+, m_pActionDarkMode(nullptr)
+, m_pMenuFile(nullptr)
+, m_pMenuView(nullptr)
+, m_pMenuPlugins(nullptr)
+, m_pMenuControl(nullptr)
+, m_pMenuAppearance(nullptr)
+, m_pMenuHelp(nullptr)
+, m_pTextBrowser_Log(nullptr)
+, m_pAboutWindow(nullptr)
 , m_sSettingsPath("MNEANALYZE/MainWindow")
 , m_sCurrentStyle("default")
 {
@@ -529,7 +529,7 @@ void MainWindow::createPluginViews()
             pPlugin->setViewLoadingState(true);
             QWidget* pView = pPlugin->getView();
             if (pView) {
-                MultiViewWindow* pWindow = Q_NULLPTR;
+                MultiViewWindow* pWindow = nullptr;
                 pWindow = m_pMultiView->addWidgetTop(pView, pPlugin->getName());
                 QAction* pAction = pWindow->toggleViewAction();
                 pAction->setText(pPlugin->getName());

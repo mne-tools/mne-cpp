@@ -148,7 +148,7 @@ private:
      *
      * @param[in] pSplash   Pointer to the splash screen.
      */
-    void initPluginManager(QSplashScreen* pSplash = Q_NULLPTR);
+    void initPluginManager(QSplashScreen* pSplash = nullptr);
 
     //=========================================================================================================
     /**

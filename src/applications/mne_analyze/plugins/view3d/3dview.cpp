@@ -42,7 +42,7 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 View3D::View3D()
-: m_pCommu(Q_NULLPTR)
+: m_pCommu(nullptr)
 {
 }
 
@@ -84,7 +84,7 @@ QString View3D::getName() const
 
 QMenu* View3D::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -92,7 +92,7 @@ QMenu* View3D::getMenu()
 QWidget* View3D::getView()
 {
     View3D* pView3D = new View3D();
-    QWidget* pWidgetContainer = QWidget::createWindowContainer(pView3D, Q_NULLPTR, Qt::Widget);
+    QWidget* pWidgetContainer = QWidget::createWindowContainer(pView3D, nullptr, Qt::Widget);
 
     return pWidgetContainer;
 }

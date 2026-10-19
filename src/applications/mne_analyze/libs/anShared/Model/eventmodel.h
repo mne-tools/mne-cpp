@@ -69,12 +69,12 @@ public:
      *
      * @param[in] parent   QObject parent of the model.
      */
-    EventModel(QObject* parent = Q_NULLPTR);
+    EventModel(QObject* parent = nullptr);
 
     //=========================================================================================================
 
     EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
-               QObject* parent = Q_NULLPTR);
+               QObject* parent = nullptr);
 
     //=========================================================================================================
 
@@ -82,7 +82,7 @@ public:
                const QByteArray& byteLoadedData = QByteArray(),
                float fSampFreq = 600,
                int iFirstSampOffst = 0,
-               QObject* parent = Q_NULLPTR);
+               QObject* parent = nullptr);
 
     //=========================================================================================================
     /**

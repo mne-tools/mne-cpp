@@ -17,7 +17,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
@@ -890,7 +889,7 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractP
 
                     // Plugins which have a RealTimeMultiSampleArray output are always displayed as the most lowest and tabbified vertical widget in the MultiView by default
                     // Please note that the MultiView will take ownership of the MultiViewWindow which inherits from QWidget
-                    MultiViewWindow* pMultiViewWinow = Q_NULLPTR;
+                    MultiViewWindow* pMultiViewWinow = nullptr;
 
                     if (lPlugins.at(i)->getName() == "Filter" ||
                         lPlugins.at(i)->getName() == "Fiff Simulator" ||

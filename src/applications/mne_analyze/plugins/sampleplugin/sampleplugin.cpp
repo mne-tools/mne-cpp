@@ -26,6 +26,7 @@
 //=============================================================================================================
 
 #include <QListWidgetItem>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -80,7 +81,7 @@ QString SamplePlugin::getName() const
 
 QMenu* SamplePlugin::getMenu()
 {
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -101,7 +102,7 @@ QDockWidget* SamplePlugin::getControl()
     return pControlDock;
 
     //If plugin does not have dock controls:
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================
@@ -117,7 +118,7 @@ QWidget* SamplePlugin::getView()
     return pPluginView;
 
     //If the plugin does not have a view:
-    return Q_NULLPTR;
+    return nullptr;
 }
 
 //=============================================================================================================

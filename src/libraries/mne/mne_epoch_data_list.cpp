@@ -112,7 +112,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
     MatrixXd timesDummy;
     MatrixXd times;
 
-    std::unique_ptr<MNEEpochData> epoch(Q_NULLPTR);
+    std::unique_ptr<MNEEpochData> epoch(nullptr);
 
     for (p = 0; p < count; ++p) {
         // Read a data segment

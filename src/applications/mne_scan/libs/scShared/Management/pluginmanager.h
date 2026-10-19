@@ -76,7 +76,7 @@ public:
      *
      * @param[in] parent    pointer to parent Object. (It's normally the default value.).
      */
-    PluginManager(QObject* parent = Q_NULLPTR);
+    PluginManager(QObject* parent = nullptr);
 
     //=========================================================================================================
     /**

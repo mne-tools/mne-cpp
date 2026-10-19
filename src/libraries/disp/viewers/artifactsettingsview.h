@@ -88,7 +88,7 @@ public:
 
     explicit ArtifactSettingsView(const QString& sSettingsPath = "",
                                   const QList<FIFFLIB::FiffChInfo>& fiffChInfoList = QList<FIFFLIB::FiffChInfo>(),
-                                  QWidget* parent = Q_NULLPTR);
+                                  QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**

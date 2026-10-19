@@ -58,7 +58,7 @@ public:
      *
      * @param[in] parent pointer to potential parent widget.
      */
-    LSLAdapterSetup(int initialBlockSize, QWidget* parent = Q_NULLPTR);
+    LSLAdapterSetup(int initialBlockSize, QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**

@@ -169,7 +169,7 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList& outputConnect
     // If no display was attached return NULL pointer
     if (vboxLayout->count() == 0) {
         delete newDisp;
-        newDisp = Q_NULLPTR;
+        newDisp = nullptr;
     }
 
     return newDisp;

@@ -93,8 +93,8 @@ void FiffRawView::reset()
     if (m_pModel) {
         disconnectModel();
 
-        m_pTableView->setModel(Q_NULLPTR);
-        m_pModel = Q_NULLPTR;
+        m_pTableView->setModel(nullptr);
+        m_pModel = nullptr;
     }
 }
 

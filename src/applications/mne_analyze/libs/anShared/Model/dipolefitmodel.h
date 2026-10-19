@@ -58,13 +58,13 @@ public:
      */
     DipoleFitModel(const QString& sFilePath,
                    const QByteArray& byteLoadedData = QByteArray(),
-                   QObject* parent = Q_NULLPTR);
+                   QObject* parent = nullptr);
 
     //=========================================================================================================
     DipoleFitModel(INVLIB::InvEcdSet InvEcdSet,
                    const QString& sFilePath = "",
                    const QByteArray& byteLoadedData = QByteArray(),
-                   QObject* parent = Q_NULLPTR);
+                   QObject* parent = nullptr);
 
     //=========================================================================================================
     /**

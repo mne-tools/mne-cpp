@@ -43,11 +43,11 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_bUseCommonAverage(false)
 , m_bMeasureImpedances(false)
 {
-    //Initialise NULL pointers
-    m_oLibHandle = NULL;
-    m_HandleMaster = NULL;
-    m_PSPDPMasterDevicePath = NULL;
-    m_lSignalBuffer = NULL;
+    //Initialise null pointers
+    m_oLibHandle = nullptr;
+    m_HandleMaster = nullptr;
+    m_PSPDPMasterDevicePath = nullptr;
+    m_lSignalBuffer = nullptr;
 
     //Open library
     //    TCHAR Path[MAX_PATH];
@@ -65,7 +65,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 #endif
 
     //If dll can't be open return
-    if (m_oLibHandle == NULL) {
+    if (m_oLibHandle == nullptr) {
         cout << "Plugin TMSI - ERROR - Couldn't load DLL - Check if the driver for the TMSi USB Fiber Connector installed in the system dir" << endl;
         m_bDllLoaded = false;
         return;
@@ -131,10 +131,10 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
         m_outputFileStream.open("../resources/mne_scan/plugins/tmsi/TMSi_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
 
     //Check if device handler already exists and a connection was established before
-    //    if(m_HandleMaster != NULL)
+    //    if(m_HandleMaster != nullptr)
     //    {
     //        m_oFpClose(m_HandleMaster);
-    //        m_HandleMaster = NULL;
+    //        m_HandleMaster = nullptr;
     //    }
     int ErrorCode = 0;
     m_HandleMaster = m_oFpLibraryInit(TMSiConnectionUSB, &ErrorCode);
@@ -145,7 +145,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     }
 
     //Get the device list of connected devices
-    char** DeviceList = NULL;
+    char** DeviceList = nullptr;
     int NrOfDevices = 0;
 
     DeviceList = m_oFpGetDeviceList(m_HandleMaster, &NrOfDevices);
@@ -210,9 +210,9 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     }
 
     //Get information about the signal format created by the device - UnitExponent, UnitGain, UnitOffSet
-    PSIGNAL_FORMAT pSignalFormat = m_oFpGetSignalFormat(m_HandleMaster, NULL);
+    PSIGNAL_FORMAT pSignalFormat = m_oFpGetSignalFormat(m_HandleMaster, nullptr);
 
-    if (pSignalFormat != NULL) {
+    if (pSignalFormat != nullptr) {
         wcscpy_s(m_wcDeviceName, pSignalFormat->PortName);
         m_ulSerialNumber = pSignalFormat->SerialNumber;
         m_uiNumberOfAvailableChannels = pSignalFormat[0].Elements;
@@ -299,11 +299,11 @@ bool TMSIDriver::uninitDevice()
 
     m_oFpLibraryExit(m_HandleMaster);
 
-    //Reset to NULL pointers
-    m_oLibHandle = NULL;
-    m_HandleMaster = NULL;
-    m_PSPDPMasterDevicePath = NULL;
-    m_lSignalBuffer = NULL;
+    //Reset to null pointers
+    m_oLibHandle = nullptr;
+    m_HandleMaster = nullptr;
+    m_PSPDPMasterDevicePath = nullptr;
+    m_lSignalBuffer = nullptr;
 
     cout << "Plugin TMSI - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
     return true;

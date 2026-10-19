@@ -58,14 +58,14 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager* pPluginManager,
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
-, m_pGraphicsView(Q_NULLPTR)
-, m_pSensorToolButton(Q_NULLPTR)
-, m_pAlgorithmToolButton(Q_NULLPTR)
-, m_pToolBarPlugins(Q_NULLPTR)
-, m_pPointerButton(Q_NULLPTR)
-, m_pLinePointerButton(Q_NULLPTR)
-, m_pToolBarPointer(Q_NULLPTR)
-, m_pToolBarItem(Q_NULLPTR)
+, m_pGraphicsView(nullptr)
+, m_pSensorToolButton(nullptr)
+, m_pAlgorithmToolButton(nullptr)
+, m_pToolBarPlugins(nullptr)
+, m_pPointerButton(nullptr)
+, m_pLinePointerButton(nullptr)
+, m_pToolBarPointer(nullptr)
+, m_pToolBarItem(nullptr)
 {
     createActions();
     createMenuItem();
@@ -206,7 +206,7 @@ void PluginGui::loadConfigMna(const QString& fullPath)
     // Phase 1: Create plugins from pipeline nodes
     QMap<QString, PluginItem*> itemMap;
     for (const MNALIB::MnaNode& node : project.pipeline) {
-        QAction* pCurrentAction = Q_NULLPTR;
+        QAction* pCurrentAction = nullptr;
         for (int i = 0; i < m_pActionGroupPlugins->actions().size(); ++i) {
             if (m_pActionGroupPlugins->actions()[i]->text() == node.opType) {
                 pCurrentAction = m_pActionGroupPlugins->actions()[i];
