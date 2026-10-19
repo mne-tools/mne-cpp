@@ -17,6 +17,8 @@
 #include <ieeg/ieeg_implantation.h>
 #include <ieeg/ieeg_reference.h>
 #include <ieeg/ieeg_surface_map.h>
+#include <dsp/eeg_reference.h>
+#include <fiff/fiff_info.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -34,6 +36,7 @@
 //=============================================================================================================
 
 using namespace IEEGLIB;
+using namespace FIFFLIB;
 
 namespace
 {
@@ -269,6 +272,27 @@ void TestIeeg::bipolarPairsFollowLeads()
     QCOMPARE(bipolar(0, 0), 3.0);
     QCOMPARE(bipolar(0, 1), -1.0);
     QCOMPARE(bipolar(1, 0), 2.0);
+
+    // It equals the sensor-space derivation on the same pairs, which appends the bipolar rows last
+    FiffInfo info;
+    QStringList anodes, cathodes;
+    for (const IeegContact& c : contacts) {
+        FiffChInfo ch;
+        ch.ch_name = c.name;
+        ch.kind = FIFFV_SEEG_CH;
+        info.chs.append(ch);
+        info.ch_names.append(c.name);
+    }
+    info.nchan = int(contacts.size());
+    for (const IeegBipolarPair& p : pairs) {
+        anodes << contacts[p.anode].name;
+        cathodes << contacts[p.cathode].name;
+    }
+    Eigen::MatrixXd derived = Eigen::MatrixXd::Random(contacts.size(), 5);
+    const Eigen::MatrixXd expected = IeegReference::bipolarMatrix(pairs, int(contacts.size())) * derived;
+    UTILSLIB::setBipolarReference(derived, info, anodes, cathodes);
+    QCOMPARE(derived.bottomRows(pairs.size()), expected);
+    QCOMPARE(info.ch_names.mid(info.nchan - int(pairs.size())), names);
 }
 
 //=============================================================================================================
