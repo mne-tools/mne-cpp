@@ -17,6 +17,9 @@
 
 #include <utils/generics/circularbuffer.h>
 
+#include <memory>
+#include <type_traits>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -59,9 +62,13 @@ void TestCircularBuffer::testBufferCreationDestruction()
         CircularBuffer<float> testBuffer(10);
     }
     {
-        CircularBuffer<int>* testBuffer = new CircularBuffer<int>(10);
-        delete testBuffer;
+        auto testBuffer = std::make_unique<CircularBuffer<int>>(10);
+        QVERIFY(testBuffer->push(1));
     }
+
+    // A copy would share the storage and semaphores and free them twice.
+    static_assert(!std::is_copy_constructible_v<CircularBuffer<int>>);
+    static_assert(!std::is_copy_assignable_v<CircularBuffer<int>>);
 }
 
 //=============================================================================================================

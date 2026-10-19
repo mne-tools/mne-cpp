@@ -27,10 +27,10 @@
     "null_macro": 0,
     "typedef_struct": 0,
     "c_style_cast": 0,
-    "raw_new": 160,
-    "raw_delete": 149,
+    "raw_new": 155,
+    "raw_delete": 136,
     "console_io": 0,
     "numeric_define": 0,
-    "qt_new_unparented": 814
+    "qt_new_unparented": 810
   }
 }

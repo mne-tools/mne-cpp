@@ -124,8 +124,8 @@ public:
     /**
      * @brief Read an evoked-response data set and append it to an existing container.
      *
-     * If @p add_to is @c nullptr a new MNEMeasData is created; otherwise the
-     * loaded epoch is appended to @p add_to's set list.
+     * The loaded epoch is appended to @p add_to's set list; its channel list
+     * selects the channels read from the file.
      *
      * Refactored from @c mne_read_meas_data_add (mne_read_data.c).
      *
@@ -135,21 +135,20 @@ public:
      * @param[in] fwd       Forward operator for consistency checks (may be @c nullptr).
      * @param[in] namesp    Explicit channel name list (fallback if @p op and @p fwd are @c nullptr).
      * @param[in] nnamesp   Number of entries in @p namesp.
-     * @param[in] add_to    Existing container to append to, or @c nullptr to create a new one.
-     * @return Pointer to the (new or existing) container, or @c nullptr on failure.
+     * @param[in,out] add_to Existing container to append to.
+     * @return True if the data set was read and appended.
      */
-    static MNEMeasData* mne_read_meas_data_add(const QString& name,
-                                               int set,
-                                               MNEInverseOperator* op,
-                                               MNENamedMatrix* fwd,
-                                               const QStringList& namesp,
-                                               int nnamesp,
-                                               MNEMeasData* add_to);
+    static bool mne_read_meas_data_add(const QString& name,
+                                       int set,
+                                       MNEInverseOperator* op,
+                                       MNENamedMatrix* fwd,
+                                       const QStringList& namesp,
+                                       int nnamesp,
+                                       MNEMeasData& add_to);
 
     /**
      * @brief Read an evoked-response data set into a new container.
      *
-     * Convenience wrapper around mne_read_meas_data_add() with @p add_to = @c nullptr.
      *
      * @param[in] name      Path to the FIFF measurement file.
      * @param[in] set       1-based data-set index to load.
@@ -157,14 +156,24 @@ public:
      * @param[in] fwd       Forward operator for consistency checks (may be @c nullptr).
      * @param[in] namesp    Explicit channel name list.
      * @param[in] nnamesp   Number of entries in @p namesp.
-     * @return Pointer to the new container, or @c nullptr on failure.
+     * @return The new container, or @c nullptr on failure.
      */
-    static MNEMeasData* mne_read_meas_data(const QString& name,
-                                           int set,
-                                           MNEInverseOperator* op,
-                                           MNENamedMatrix* fwd,
-                                           const QStringList& namesp,
-                                           int nnamesp);
+    static std::unique_ptr<MNEMeasData> mne_read_meas_data(const QString& name,
+                                                           int set,
+                                                           MNEInverseOperator* op,
+                                                           MNENamedMatrix* fwd,
+                                                           const QStringList& namesp,
+                                                           int nnamesp);
+
+private:
+    static bool read_evoked_set(const QString& name,
+                                int set,
+                                MNEInverseOperator* op,
+                                MNENamedMatrix* fwd,
+                                const QStringList& namesp,
+                                int nnamesp,
+                                MNEMeasData& target,
+                                bool fresh);
 
 public:
     QString filename;                                    /**< Path to the source FIFF file. */
@@ -182,15 +191,14 @@ public:
     MNEInverseOperator* op;                              /**< Associated inverse operator (not owned). */
     MNENamedMatrix* fwd;                                 /**< Forward operator for dipole fitting (not owned). */
     std::unique_ptr<MNERawData> raw;                     /**< Raw-data handle when data originates from a raw file. */
-    mneChSelection chsel;                                /**< Channel selection for raw-data access. */
     QStringList badlist;                                 /**< List of bad channel names. */
     int nbad;                                            /**< Number of bad channels. */
     Eigen::VectorXi bad;                                 /**< Per-channel bad flag array (0 = good, 1 = bad). */
 
-    bool ch_major;               /**< If true, data rows are channels (not times). */
-    QList<MNEMeasDataSet*> sets; /**< All loaded data-set epochs. */
-    int nset;                    /**< Number of loaded data sets. */
-    MNEMeasDataSet* current;     /**< Pointer to the currently active data set. */
+    bool ch_major;                                     /**< If true, data rows are channels (not times). */
+    std::vector<std::unique_ptr<MNEMeasDataSet>> sets; /**< All loaded data-set epochs. */
+    int nset;                                          /**< Number of loaded data sets. */
+    MNEMeasDataSet* current;                           /**< Currently active data set (owned by @ref sets). */
 };
 
 //=============================================================================================================

@@ -244,12 +244,12 @@ InvEcdSet InvDipoleFit::calculateFit() const
               settings->measname.toUtf8().constData(), fit_data->nmeg, fit_data->neeg);
     } else {
         qInfo("\n---- Reading data...\n");
-        data.reset(MNEMeasData::mne_read_meas_data(settings->measname,
-                                                   settings->setno,
-                                                   nullptr,
-                                                   nullptr,
-                                                   fit_data->ch_names,
-                                                   fit_data->nmeg + fit_data->neeg));
+        data = MNEMeasData::mne_read_meas_data(settings->measname,
+                                               settings->setno,
+                                               nullptr,
+                                               nullptr,
+                                               fit_data->ch_names,
+                                               fit_data->nmeg + fit_data->neeg);
         if (!data)
             return set;
         if (settings->do_baseline)

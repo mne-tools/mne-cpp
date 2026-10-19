@@ -932,11 +932,10 @@ void TestInvDipoleFitPython::selectsNoiseCov()
         meas.chs << ch;
     }
     meas.nchan = kN;
-    auto* set = new MNEMeasDataSet;
-    set->nave = nave;
-    meas.sets << set;
+    meas.sets.push_back(std::make_unique<MNEMeasDataSet>());
+    meas.sets.back()->nave = nave;
     meas.nset = 1;
-    meas.current = set;
+    meas.current = meas.sets.back().get();
 
     VectorXd diag = VectorXd::LinSpaced(kN, 1.0, 2.0);
     InvDipoleFitData fit;

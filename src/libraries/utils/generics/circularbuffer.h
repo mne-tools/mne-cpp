@@ -45,6 +45,8 @@
 #include <QSemaphore>
 #include <QSharedPointer>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -157,13 +159,13 @@ private:
      * @return the mapped index.
      */
     inline unsigned int mapIndex(int& index);
-    unsigned int m_uiMaxNumElements; /**< Holds the maximal number of buffer elements.*/
-    T* m_pBuffer;                    /**< Holds the circular buffer.*/
-    int m_iCurrentReadIndex;         /**< Holds the current read index.*/
-    int m_iCurrentWriteIndex;        /**< Holds the current write index.*/
-    QSemaphore* m_pFreeElements;     /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
-    QSemaphore* m_pUsedElements;     /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
-    int m_iTimeout;                  /**< Holds the timeout value after which the acquire statement will return false.*/
+    unsigned int m_uiMaxNumElements;             /**< Holds the maximal number of buffer elements.*/
+    std::unique_ptr<T[]> m_pBuffer;              /**< Holds the circular buffer.*/
+    int m_iCurrentReadIndex;                     /**< Holds the current read index.*/
+    int m_iCurrentWriteIndex;                    /**< Holds the current write index.*/
+    std::unique_ptr<QSemaphore> m_pFreeElements; /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
+    std::unique_ptr<QSemaphore> m_pUsedElements; /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
+    int m_iTimeout;                              /**< Holds the timeout value after which the acquire statement will return false.*/
 
     bool m_bPause;
 };
@@ -175,11 +177,11 @@ private:
 template<typename T>
 CircularBuffer<T>::CircularBuffer(unsigned int uiMaxNumElements)
 : m_uiMaxNumElements(uiMaxNumElements)
-, m_pBuffer(new T[m_uiMaxNumElements])
+, m_pBuffer(std::make_unique<T[]>(m_uiMaxNumElements))
 , m_iCurrentReadIndex(-1)
 , m_iCurrentWriteIndex(-1)
-, m_pFreeElements(new QSemaphore(m_uiMaxNumElements))
-, m_pUsedElements(new QSemaphore(0))
+, m_pFreeElements(std::make_unique<QSemaphore>(m_uiMaxNumElements))
+, m_pUsedElements(std::make_unique<QSemaphore>(0))
 , m_iTimeout(1000)
 , m_bPause(false)
 {
@@ -188,12 +190,7 @@ CircularBuffer<T>::CircularBuffer(unsigned int uiMaxNumElements)
 //=============================================================================================================
 
 template<typename T>
-CircularBuffer<T>::~CircularBuffer()
-{
-    delete m_pFreeElements;
-    delete m_pUsedElements;
-    delete[] m_pBuffer;
-}
+CircularBuffer<T>::~CircularBuffer() = default;
 
 //=============================================================================================================
 
@@ -208,7 +205,7 @@ inline bool CircularBuffer<T>::push(const T* pArray, unsigned int size)
         for (unsigned int i = 0; i < size; ++i) {
             m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pArray[i];
         }
-        const QSemaphoreReleaser releaser(m_pUsedElements, size);
+        const QSemaphoreReleaser releaser(m_pUsedElements.get(), size);
     } else {
         return false;
     }
@@ -227,7 +224,7 @@ inline bool CircularBuffer<T>::push(const T& newElement)
 
     if (m_pFreeElements->tryAcquire(1, m_iTimeout)) {
         m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = newElement;
-        const QSemaphoreReleaser releaser(m_pUsedElements, 1);
+        const QSemaphoreReleaser releaser(m_pUsedElements.get(), 1);
     } else {
         return false;
     }
@@ -246,7 +243,7 @@ inline bool CircularBuffer<T>::pop(T& element)
 
     if (m_pUsedElements->tryAcquire(1, m_iTimeout)) {
         element = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
-        const QSemaphoreReleaser releaser(m_pFreeElements, 1);
+        const QSemaphoreReleaser releaser(m_pFreeElements.get(), 1);
     } else {
         return false;
     }
@@ -268,10 +265,8 @@ inline unsigned int CircularBuffer<T>::mapIndex(int& index)
 template<typename T>
 inline void CircularBuffer<T>::clear()
 {
-    delete m_pFreeElements;
-    m_pFreeElements = new QSemaphore(m_uiMaxNumElements);
-    delete m_pUsedElements;
-    m_pUsedElements = new QSemaphore(0);
+    m_pFreeElements = std::make_unique<QSemaphore>(m_uiMaxNumElements);
+    m_pUsedElements = std::make_unique<QSemaphore>(0);
 
     m_iCurrentReadIndex = -1;
     m_iCurrentWriteIndex = -1;

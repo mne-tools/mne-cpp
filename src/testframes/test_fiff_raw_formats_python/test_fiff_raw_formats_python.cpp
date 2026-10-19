@@ -373,7 +373,7 @@ void TestFiffRawFormatsPython::measDataKeepsTrigger()
     std::unique_ptr<MNEMeasData> meas(MNEMeasData::mne_read_meas_data(QStringLiteral(MNE_RAW_FORMATS_DATA_DIR "/trigger-ave.fif"), 1, nullptr, nullptr, QStringList(), 0));
     QVERIFY(meas);
     QCOMPARE(meas->nchan, 2);
-    QCOMPARE(meas->sets.size(), 1);
+    QCOMPARE(meas->sets.size(), std::size_t(1));
     VectorXf codes(8);
     codes << 0, 6, 6, 0, 0, 10, 10, 0;
     QCOMPARE(meas->sets[0]->stim14.size(), 8);

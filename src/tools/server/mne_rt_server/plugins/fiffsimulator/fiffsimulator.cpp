@@ -64,8 +64,7 @@ const QString FiffSimulator::Commands::SIMFILE = "simfile";
 //=============================================================================================================
 
 FiffSimulator::FiffSimulator()
-: m_pFiffProducer(new FiffProducer(this))
-, m_pRawMatrixBuffer(nullptr)
+: m_pFiffProducer(std::make_unique<FiffProducer>(this))
 , m_sResourceDataPath(QString("%1/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
 , m_uiBufferSampleSize(200) //(4)
 , m_AccelerationFactor(1.0)
@@ -82,8 +81,9 @@ FiffSimulator::~FiffSimulator()
     m_bIsRunning = false;
     QThread::wait();
 
-    delete m_pFiffProducer;
-    delete m_pRawMatrixBuffer;
+    // The producer thread pushes into the buffer, so it has to go first.
+    m_pFiffProducer.reset();
+    m_pRawMatrixBuffer.reset();
 }
 
 //=============================================================================================================
@@ -277,11 +277,10 @@ void FiffSimulator::init()
         t_qFile.close();
     }
 
-    delete m_pRawMatrixBuffer;
-    m_pRawMatrixBuffer = nullptr;
+    m_pRawMatrixBuffer.reset();
 
     if (!m_RawInfo.isEmpty())
-        m_pRawMatrixBuffer = new CircularBuffer_Matrix_float(RAW_BUFFFER_SIZE);
+        m_pRawMatrixBuffer = std::make_unique<CircularBuffer_Matrix_float>(RAW_BUFFFER_SIZE);
 }
 
 //=============================================================================================================
@@ -422,8 +421,7 @@ bool FiffSimulator::readRawInfo()
         //
         // Create circular buffer to transfer data form producer to simulator
         //
-        delete m_pRawMatrixBuffer;
-        m_pRawMatrixBuffer = new CircularBuffer_Matrix_float(10);
+        m_pRawMatrixBuffer = std::make_unique<CircularBuffer_Matrix_float>(10);
 
         mutex.unlock();
     }

@@ -55,7 +55,6 @@ MNEMeasData::MNEMeasData()
 , lowpass(0.0f)
 , op(nullptr)
 , fwd(nullptr)
-, chsel(nullptr)
 , nbad(0)
 , ch_major(false)
 , nset(0)
@@ -67,13 +66,7 @@ MNEMeasData::MNEMeasData()
 
 //=============================================================================================================
 
-MNEMeasData::~MNEMeasData()
-{
-    for (int k = 0; k < nset; k++)
-        delete sets[k];
-
-    delete chsel;
-}
+MNEMeasData::~MNEMeasData() = default;
 
 //=============================================================================================================
 
@@ -126,13 +119,14 @@ void MNEMeasData::adjust_baselines(float bmin, float bmax)
 
 //=============================================================================================================
 
-MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
-                                                 int set,
-                                                 MNEInverseOperator* op,
-                                                 MNENamedMatrix* fwd,
-                                                 const QStringList& namesp,
-                                                 int nnamesp,
-                                                 MNEMeasData* add_to) /* Add to this */
+bool MNEMeasData::read_evoked_set(const QString& name,
+                                  int set,
+                                  MNEInverseOperator* op,
+                                  MNENamedMatrix* fwd,
+                                  const QStringList& namesp,
+                                  int nnamesp,
+                                  MNEMeasData& target,
+                                  bool fresh)
 /*
           * Read an evoked-response data file
           */
@@ -146,7 +140,7 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
     if (!FiffEvoked::read(file, evoked, set - 1,
                           QPair<float, float>(-1.0f, -1.0f), false)) {
         qCritical("Failed to read evoked data from %s\n", name.toUtf8().constData());
-        return nullptr;
+        return false;
     }
 
     /*
@@ -181,9 +175,6 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
        */
     float tmin, tmax;
     int k, p, c, np, n1, n2;
-    MNEMeasData* res = nullptr;
-    MNEMeasData* new_data = add_to;
-    MNEMeasDataSet* dataset = nullptr;
 
     stim14_name = qEnvironmentVariable(MNE_ENV_TRIGGER_CH);
     if (stim14_name.isEmpty() || stim14_name.size() == 0)
@@ -191,10 +182,10 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
     // FiffTag::toChInfo strips the spaces from channel names.
     stim14_name.remove(' ');
 
-    if (add_to) {
-        for (int i = 0; i < add_to->nchan; i++)
-            names.append(add_to->chs[i].ch_name);
-        nchan = add_to->nchan;
+    if (!fresh) {
+        for (int i = 0; i < target.nchan; i++)
+            names.append(target.chs[i].ch_name);
+        nchan = target.nchan;
     } else {
         if (op) {
             names = op->eigen_fields->col_names;
@@ -234,7 +225,7 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
                 qCritical("All channels needed were not in the MEG/EEG data file "
                           "(first missing: %s).",
                           names[k].toUtf8().constData());
-                return nullptr;
+                return false;
             }
     } else { /* Load all channels */
         sel.resize(nchan_file);
@@ -261,10 +252,9 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
     /*
        * Just put it together
        */
-    if (!new_data) { /* We need a new meas data structure */
-        new_data = new MNEMeasData;
-        new_data->filename = name;
-        new_data->meas_id = id;
+    if (fresh) {
+        target.filename = name;
+        target.meas_id = id;
         /*
          * Getting starting time from measurement ID is not too accurate...
          */
@@ -273,87 +263,86 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
             md.secs = evoked.info.meas_date[0];
             md.usecs = evoked.info.meas_date[1];
             if (md.secs != 0)
-                new_data->meas_date = md;
-            else if (!new_data->meas_id.isEmpty())
-                new_data->meas_date = new_data->meas_id.time;
+                target.meas_date = md;
+            else if (!target.meas_id.isEmpty())
+                target.meas_date = target.meas_id.time;
             else {
-                new_data->meas_date.secs = 0;
-                new_data->meas_date.usecs = 0;
+                target.meas_date.secs = 0;
+                target.meas_date.usecs = 0;
             }
         }
-        new_data->lowpass = lowpass;
-        new_data->highpass = highpass;
-        new_data->nchan = nchan;
-        new_data->sfreq = sfreq;
+        target.lowpass = lowpass;
+        target.highpass = highpass;
+        target.nchan = nchan;
+        target.sfreq = sfreq;
 
         if (!devHeadT.isEmpty()) {
-            new_data->meg_head_t = std::make_unique<FiffCoordTrans>(devHeadT);
+            target.meg_head_t = std::make_unique<FiffCoordTrans>(devHeadT);
             qInfo("\tUsing MEG <-> head transform from the present data set\n");
         }
         if (op != nullptr && !op->mri_head_t.isEmpty()) { /* Copy if available */
-            new_data->mri_head_t = std::make_unique<FiffCoordTrans>(op->mri_head_t);
+            target.mri_head_t = std::make_unique<FiffCoordTrans>(op->mri_head_t);
             qInfo("\tPicked MRI <-> head transform from the inverse operator\n");
         }
         /*
          * Channel list
          */
         for (k = 0; k < nchan; k++) {
-            new_data->chs.append(FiffChInfo());
-            new_data->chs[k] = chs[sel[k]];
+            target.chs.append(FiffChInfo());
+            target.chs[k] = chs[sel[k]];
         }
 
-        new_data->op = op;   /* Attach inverse operator */
-        new_data->fwd = fwd; /* ...or a fwd operator */
-        if (op) {            /* Attach the projection operator and CTF compensation info to the data, too */
-            new_data->proj = MNEProjOp::read(name);
-            if (new_data->proj && new_data->proj->nitems > 0) {
+        target.op = op;   /* Attach inverse operator */
+        target.fwd = fwd; /* ...or a fwd operator */
+        if (op) {         /* Attach the projection operator and CTF compensation info to the data, too */
+            target.proj = MNEProjOp::read(name);
+            if (target.proj && target.proj->nitems > 0) {
                 qInfo("\tLoaded projection from %s:\n", name.toUtf8().data());
                 QTextStream errStream(stderr);
-                new_data->proj->report(errStream, QStringLiteral("\t\t"));
+                target.proj->report(errStream, QStringLiteral("\t\t"));
             }
         } else {
-            new_data->proj = MNEProjOp::read(name);
-            if (new_data->proj && new_data->proj->nitems > 0) {
+            target.proj = MNEProjOp::read(name);
+            if (target.proj && target.proj->nitems > 0) {
                 qInfo("\tLoaded projection from %s:\n", name.toUtf8().data());
                 QTextStream errStream(stderr);
-                new_data->proj->report(errStream, QStringLiteral("\t\t"));
+                target.proj->report(errStream, QStringLiteral("\t\t"));
             }
-            new_data->comp = MNECTFCompDataSet::read(name);
-            if (!new_data->comp) {
-                delete new_data;
-                return nullptr;
+            target.comp = MNECTFCompDataSet::read(name);
+            if (!target.comp) {
+                return false;
             }
-            if (new_data->comp->ncomp > 0)
-                qInfo("\tRead %d compensation data sets from %s\n", new_data->comp->ncomp, name.toUtf8().data());
+            if (target.comp->ncomp > 0)
+                qInfo("\tRead %d compensation data sets from %s\n", target.comp->ncomp, name.toUtf8().data());
         }
         /*
          * Bad channels — already read by FiffEvoked via FiffStream::read_meas_info()
          */
         {
-            new_data->badlist = evoked.info.bads;
-            new_data->nbad = new_data->badlist.size();
-            new_data->bad = Eigen::VectorXi::Zero(new_data->nchan);
+            target.badlist = evoked.info.bads;
+            target.nbad = target.badlist.size();
+            target.bad = Eigen::VectorXi::Zero(target.nchan);
 
-            for (int b = 0; b < new_data->nbad; b++) {
-                for (k = 0; k < new_data->nchan; k++) {
-                    if (QString::compare(new_data->chs[k].ch_name, new_data->badlist[b], Qt::CaseInsensitive) == 0) {
-                        new_data->bad[k] = 1;
+            for (int b = 0; b < target.nbad; b++) {
+                for (k = 0; k < target.nchan; k++) {
+                    if (QString::compare(target.chs[k].ch_name, target.badlist[b], Qt::CaseInsensitive) == 0) {
+                        target.bad[k] = 1;
                         break;
                     }
                 }
             }
-            qInfo("\t%d bad channels read from %s%s", new_data->nbad, name.toUtf8().data(), new_data->nbad > 0 ? ":\n" : "\n");
-            if (new_data->nbad > 0) {
+            qInfo("\t%d bad channels read from %s%s", target.nbad, name.toUtf8().data(), target.nbad > 0 ? ":\n" : "\n");
+            if (target.nbad > 0) {
                 qInfo("\t\t");
-                for (k = 0; k < new_data->nbad; k++)
-                    qInfo("%s%c", new_data->badlist[k].toUtf8().constData(), k < new_data->nbad - 1 ? ' ' : '\n');
+                for (k = 0; k < target.nbad; k++)
+                    qInfo("%s%c", target.badlist[k].toUtf8().constData(), k < target.nbad - 1 ? ' ' : '\n');
             }
         }
     }
     /*
        * New data set is created anyway
        */
-    dataset = new MNEMeasDataSet;
+    auto dataset = std::make_unique<MNEMeasDataSet>();
     dataset->tmin = tmin;
     dataset->tstep = 1.0 / sfreq;
     dataset->first = n1;
@@ -381,30 +370,39 @@ MNEMeasData* MNEMeasData::mne_read_meas_data_add(const QString& name,
         for (p = 0; p < np; p++) /* Copy the data and correct for the possible non-unit calibration */
             dataset->stim14[p] = data(stim14, p + n1) / chs[stim14].cal;
     }
-    new_data->sets.append(dataset);
-    dataset = nullptr;
-    new_data->nset++;
-    if (!add_to)
-        new_data->current = new_data->sets[0];
-    res = new_data;
-    qInfo("\t%s dataset %s from %s\n",
-          add_to ? "Added" : "Loaded",
-          new_data->sets[new_data->nset - 1]->comment.toUtf8().constData() ? new_data->sets[new_data->nset - 1]->comment.toUtf8().constData() : "unknown", name.toUtf8().data());
-
-    if (res == nullptr && !add_to)
-        delete new_data;
-    return res;
+    const QString comment = dataset->comment.isEmpty() ? QStringLiteral("unknown") : dataset->comment;
+    target.sets.push_back(std::move(dataset));
+    target.nset++;
+    if (fresh)
+        target.current = target.sets.front().get();
+    qInfo("\t%s dataset %s from %s", fresh ? "Loaded" : "Added", qPrintable(comment), qPrintable(name));
+    return true;
 }
 
 //=============================================================================================================
 
-MNEMeasData* MNEMeasData::mne_read_meas_data(const QString& name,
-                                             int set,
-                                             MNEInverseOperator* op,
-                                             MNENamedMatrix* fwd,
-                                             const QStringList& namesp,
-                                             int nnamesp)
-
+std::unique_ptr<MNEMeasData> MNEMeasData::mne_read_meas_data(const QString& name,
+                                                             int set,
+                                                             MNEInverseOperator* op,
+                                                             MNENamedMatrix* fwd,
+                                                             const QStringList& namesp,
+                                                             int nnamesp)
 {
-    return mne_read_meas_data_add(name, set, op, fwd, namesp, nnamesp, nullptr);
+    auto data = std::make_unique<MNEMeasData>();
+    if (!read_evoked_set(name, set, op, fwd, namesp, nnamesp, *data, true))
+        return nullptr;
+    return data;
+}
+
+//=============================================================================================================
+
+bool MNEMeasData::mne_read_meas_data_add(const QString& name,
+                                         int set,
+                                         MNEInverseOperator* op,
+                                         MNENamedMatrix* fwd,
+                                         const QStringList& namesp,
+                                         int nnamesp,
+                                         MNEMeasData& add_to)
+{
+    return read_evoked_set(name, set, op, fwd, namesp, nnamesp, add_to, false);
 }
