@@ -32,6 +32,7 @@
 #include <QLabel>
 #include <QStack>
 #include <QPointer>
+#include <memory>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -122,7 +123,7 @@ private:
      */
     void leaveEvent(QEvent* event) override;
 
-    ANSHAREDLIB::Communicator* m_pCommunicator; /**< Vector containing all plugins. */
+    std::unique_ptr<ANSHAREDLIB::Communicator> m_pCommunicator; /**< Receives the loading events shown in the status bar. */
 
     int m_iMsgTimeout; /**< Timeout of one message in milliseconds. */
 

@@ -21,6 +21,7 @@
 //=============================================================================================================
 
 #include <cstring>
+#include <memory>
 
 #include "ftbuffertypes.h"
 #include "ftheaderparser.h"
@@ -83,7 +84,7 @@ public:
 
     //=========================================================================================================
     /**
-     * ~FtConnector destroys and object of the FtConnector class. Disconnects and deletes m_pSocket.
+     * ~FtConnector destroys and object of the FtConnector class. Disconnects and releases m_pSocket.
      */
     ~FtConnector();
 
@@ -113,7 +114,7 @@ public:
 
     //=========================================================================================================
     /**
-     * equests and receives data from buffer, parses it, and stores it in m_pMatEmit
+     * equests and receives data from buffer, parses it, and stores it in m_matEmit
      *
      * @return true if successful, false if unsuccessful.
      */
@@ -163,9 +164,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns member m_pMatEmit, newest buffer data formatted as an Eigen MatrixXd
+     * Returns member m_matEmit, newest buffer data formatted as an Eigen MatrixXd
      *
-     * @return returns m_pMatEmit.
+     * @return returns m_matEmit.
      */
     Eigen::MatrixXd getMatrix();
 
@@ -179,7 +180,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets m_bNewData to false, deletes m_pMatEmit
+     * Sets m_bNewData to false, clears m_matEmit
      */
     void resetEmitData();
 
@@ -256,7 +257,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Parses sample data received from buffer, formates it and saves it to m_pMatEmit;
+     * Parses sample data received from buffer, formates it and saves it to m_matEmit;
      *
      * @param[in] datasampBuffer    QBuffer with return data from buffer.
      * @param[in] bufsize           Buffer size of sample data.
@@ -307,9 +308,9 @@ private:
 
     QString m_sAddress; /**< Address where the ft buffer is found. */
 
-    QTcpSocket* m_pSocket; /**< Socket that manages the connection to the ft buffer. */
+    std::unique_ptr<QTcpSocket> m_pSocket; /**< Socket that manages the connection to the ft buffer. */
 
-    Eigen::MatrixXd* m_pMatEmit; /**< Container to format data to tansmit to FtBuffProducer. */
+    Eigen::MatrixXd m_matEmit; /**< Container to format data to tansmit to FtBuffProducer. */
 };
 
 } //namespace end bracket

@@ -22,6 +22,7 @@
 
 #include "lsladapter_global.h"
 
+#include <memory>
 #include <vector>
 
 #include <scMeas/realtimemultisamplearray.h>
@@ -122,7 +123,7 @@ public slots:
 private:
     // LSL stuff
     LSLLIB::stream_info m_StreamInfo;
-    LSLLIB::stream_inlet* m_StreamInlet;
+    std::unique_ptr<LSLLIB::stream_inlet> m_StreamInlet;
     bool m_bHasStreamInfo;
 
     // synchronization with main thread

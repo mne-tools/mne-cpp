@@ -265,7 +265,7 @@ bool BrainAMP::start()
         QThread::start();
         return true;
     } else {
-        qWarning() << "BrainAMP::start() - BrainAMPProducer thread could not be started." << endl;
+        qWarning() << "BrainAMP::start() - BrainAMPProducer thread could not be started.";
         return false;
     }
 }

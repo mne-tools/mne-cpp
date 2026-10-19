@@ -217,7 +217,7 @@ void TMSI::setUpFiffInfo()
         digPoint.r[2] = (elcLocation3D[indexLE2][2] - 10) * 0.001;
         digitizerInfo.push_back(digPoint);
     } else
-        cout << "Plugin TMSI - ERROR - LE2 not found. Check loaded layout." << endl;
+        qWarning("Plugin TMSI - ERROR - LE2 not found. Check loaded layout.");
 
     //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
     int indexZ1 = elcChannelNames.indexOf("Z1");
@@ -231,7 +231,7 @@ void TMSI::setUpFiffInfo()
         digPoint.r[2] = (elcLocation3D[indexZ1][2] - 60) * 0.001;
         digitizerInfo.push_back(digPoint);
     } else
-        cout << "Plugin TMSI - ERROR - Z1 not found. Check loaded layout." << endl;
+        qWarning("Plugin TMSI - ERROR - Z1 not found. Check loaded layout.");
 
     //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
     int indexRE2 = elcChannelNames.indexOf("RE2");
@@ -245,7 +245,7 @@ void TMSI::setUpFiffInfo()
         digPoint.r[2] = (elcLocation3D[indexRE2][2] - 10) * 0.001;
         digitizerInfo.push_back(digPoint);
     } else
-        cout << "Plugin TMSI - ERROR - RE2 not found. Check loaded layout." << endl;
+        qWarning("Plugin TMSI - ERROR - RE2 not found. Check loaded layout.");
 
     //Add EEG electrode positions as digitizers
     for (int i = 0; i < numberEEGCh; i++) {
@@ -463,7 +463,7 @@ bool TMSI::start()
         QThread::start();
         return true;
     } else {
-        qWarning() << "[TMSI::start] TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
+        qWarning() << "[TMSI::start] TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory";
         return false;
     }
 }

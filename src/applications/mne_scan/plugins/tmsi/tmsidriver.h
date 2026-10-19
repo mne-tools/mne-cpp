@@ -38,6 +38,7 @@
 #include <qapplication.h>
 #include <QVector>
 #include <QSysInfo>
+#include <QDebug>
 
 //=============================================================================================================
 // DEFINE NAMESPACE TMSIPLUGIN
@@ -174,7 +175,7 @@ inline constexpr auto MAX_BUFFER_SIZE = 0xFFFFFFFF;
 #define __load_dll_func__(var, type, name)            \
     var = (type)::GetProcAddress(m_oLibHandle, name); \
     if (!var)                                         \
-        cout << "Plugin TMSI - ERROR - Error loading method " << name << "\n";
+        qWarning() << "Plugin TMSI - ERROR - Error loading method " << name;
 
 // Measurement modes:
 #define MEASURE_MODE_NORMAL ((ULONG)0x0)

@@ -69,9 +69,7 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 
 //=============================================================================================================
 
-EEGoSportsDriver::~EEGoSportsDriver()
-{
-}
+EEGoSportsDriver::~EEGoSportsDriver() = default;
 
 //=============================================================================================================
 
@@ -101,7 +99,7 @@ bool EEGoSportsDriver::initDevice(bool bWriteDriverDebugToFile,
         factory factoryObj("libeego-SDK.so"); // Make sure that eego-SDK.dll resides in the working directory
 #endif
 
-        m_pAmplifier = factoryObj.getAmplifier(); // Get an amplifier
+        m_pAmplifier.reset(factoryObj.getAmplifier()); // Get an amplifier
 
         //std::cout<<"[EEGoSportsDriver::initDevice] Serial number of connected eegosports device: "<<m_pAmplifier->getSerialNumber()<<std::endl;
 
@@ -156,7 +154,7 @@ bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
     try {
         //Start the stream
         if (bMeasureImpedance) {
-            m_pDataStream = m_pAmplifier->OpenImpedanceStream();
+            m_pDataStream.reset(m_pAmplifier->OpenImpedanceStream());
 
         } else {
             //reference_range the range, in volt, for the referential channels. Valid values are: 1, 0.75, 0.15
@@ -164,7 +162,7 @@ bool EEGoSportsDriver::startRecording(int iSamplesPerBlock,
             double reference_range = 0.75;
             double bipolar_range = 4;
 
-            m_pDataStream = m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range);
+            m_pDataStream.reset(m_pAmplifier->OpenEegStream(m_uiSamplingFrequency, reference_range, bipolar_range));
         }
 
         QThread::msleep(100);
@@ -210,8 +208,8 @@ bool EEGoSportsDriver::uninitDevice()
         m_outputFileStream.clear();
     }
 
-    delete m_pDataStream;
-    delete m_pAmplifier;
+    m_pDataStream.reset();
+    m_pAmplifier.reset();
 
     qInfo() << "[EEGoSportsDriver::uninitDevice] Successfully uninitialised the device";
 

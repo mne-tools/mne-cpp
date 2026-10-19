@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QPointer>
 #include <QHBoxLayout>
+#include <memory>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -136,11 +137,11 @@ private:
 
     QPointer<ANSHAREDLIB::Communicator> m_pCommu; /**< To broadcast signals. */
 
-    DISPLIB::SelectionItem* m_pSelectionItem; /**< Stores parameters from list of QGraphicsItems received by channelselectionview. */
+    std::unique_ptr<DISPLIB::SelectionItem> m_pSelectionItem; /**< Stores parameters from list of QGraphicsItems received by channelselectionview. */
 
-    DISPLIB::ChannelSelectionView* m_pChannelSelectionView;        /**< View for selecting channels to be displayed. */
-    QSharedPointer<DISPLIB::ChannelInfoModel> m_pChannelInfoModel; /**< Hold channel info - needed to initialize channelselectionview. */
-    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;                 /**< Hold Information baout currently loaded file. */
+    std::unique_ptr<DISPLIB::ChannelSelectionView> m_pChannelSelectionView; /**< View for selecting channels to be displayed. */
+    QSharedPointer<DISPLIB::ChannelInfoModel> m_pChannelInfoModel;          /**< Hold channel info - needed to initialize channelselectionview. */
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;                          /**< Hold Information baout currently loaded file. */
 
     DISPLIB::ApplyToView* m_pApplyToView;
 

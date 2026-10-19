@@ -95,8 +95,8 @@ void EEGoSportsImpedanceWidget::updateGraphicScene(const VectorXd& matValue)
     int numberItems = itemList.size();
 
     if (itemList.size() > matValue.rows()) {
-        qDebug() << "EEGoSportsImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout! Only available channels will be displayed!" << endl;
-        //     qDebug()<<"itemlist.size() " << itemList.size() << " matValue.rows() " << matValue.rows() << endl;
+        qDebug() << "EEGoSportsImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout! Only available channels will be displayed!";
+        //     qDebug()<<"itemlist.size() " << itemList.size() << " matValue.rows() " << matValue.rows();
         numberItems = matValue.rows();
         return;
     }

@@ -46,8 +46,7 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 ChannelSelection::ChannelSelection()
-: m_pSelectionItem(new DISPLIB::SelectionItem())
-, m_pChannelSelectionView(nullptr)
+: m_pSelectionItem(std::make_unique<DISPLIB::SelectionItem>())
 , m_pChannelInfoModel(nullptr)
 , m_pFiffInfo(nullptr)
 , m_pViewLayout(nullptr)
@@ -58,11 +57,7 @@ ChannelSelection::ChannelSelection()
 
 //=============================================================================================================
 
-ChannelSelection::~ChannelSelection()
-{
-    delete m_pSelectionItem;
-    delete m_pChannelSelectionView;
-}
+ChannelSelection::~ChannelSelection() = default;
 
 //=============================================================================================================
 
@@ -189,10 +184,10 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
 
     m_pChannelInfoModel = QSharedPointer<DISPLIB::ChannelInfoModel>(new DISPLIB::ChannelInfoModel(m_pFiffInfo));
 
-    m_pChannelSelectionView = new DISPLIB::ChannelSelectionView(QString("MNEANALYZE/CHANSELECT"),
-                                                                nullptr,
-                                                                m_pChannelInfoModel,
-                                                                Qt::Window);
+    m_pChannelSelectionView = std::make_unique<DISPLIB::ChannelSelectionView>(QString("MNEANALYZE/CHANSELECT"),
+                                                                              nullptr,
+                                                                              m_pChannelInfoModel,
+                                                                              Qt::Window);
 
     m_pViewLayout->addWidget(m_pChannelSelectionView->getViewWidget());
     m_pControlLayout->addWidget(m_pChannelSelectionView->getControlWidget());
@@ -201,15 +196,15 @@ void ChannelSelection::setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffIn
 
     m_pControlLayout->addWidget(m_pApplyToView);
 
-    connect(m_pChannelSelectionView, &DISPLIB::ChannelSelectionView::loadedLayoutMap,
+    connect(m_pChannelSelectionView.get(), &DISPLIB::ChannelSelectionView::loadedLayoutMap,
             m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::layoutChanged, Qt::UniqueConnection);
 
     connect(m_pChannelInfoModel.data(), &DISPLIB::ChannelInfoModel::channelsMappedToLayout,
-            m_pChannelSelectionView, &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
+            m_pChannelSelectionView.get(), &DISPLIB::ChannelSelectionView::setCurrentlyMappedFiffChannels, Qt::UniqueConnection);
 
     //Slots for event loop
 
-    connect(m_pChannelSelectionView, &DISPLIB::ChannelSelectionView::selectionChanged,
+    connect(m_pChannelSelectionView.get(), &DISPLIB::ChannelSelectionView::selectionChanged,
             this, &ChannelSelection::onSelectionChanged, Qt::UniqueConnection);
 
     m_pChannelInfoModel->layoutChanged(m_pChannelSelectionView->getLayoutMap());
@@ -246,7 +241,7 @@ void ChannelSelection::onSelectionChanged(const QList<QGraphicsItem*>& selectedC
 
     m_pSelectionItem->m_sViewsToApply = m_pApplyToView->getSelectedViews();
 
-    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(/*static_cast<void*>(*/ m_pSelectionItem /*)*/));
+    m_pCommu->publishEvent(EVENT_TYPE::CHANNEL_SELECTION_ITEMS, QVariant::fromValue(m_pSelectionItem.get()));
 }
 
 //=============================================================================================================

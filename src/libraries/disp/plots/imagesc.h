@@ -36,6 +36,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QPixmap>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -172,8 +174,8 @@ protected:
      */
     void paintEvent(QPaintEvent* event);
 
-    QPixmap* m_pPixmapData;     /**< data pixmap. */
-    QPixmap* m_pPixmapColorbar; /**< colorbar pixmap. */
+    QPixmap m_pixmapData;     /**< data pixmap. */
+    QPixmap m_pixmapColorbar; /**< colorbar pixmap. */
 
     QString m_sColorMap; /**< The colorbar. */
 

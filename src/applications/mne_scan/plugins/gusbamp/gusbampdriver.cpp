@@ -117,7 +117,7 @@ bool GUSBAmpDriver::initDevice()
             m_openedDevicesHandles.push_back(hDevice);
 
             //set the channels from that data should be acquired
-            if (!GT_SetChannels(hDevice, m_channelsToAcquire, m_chNumberOfChannels)) {
+            if (!GT_SetChannels(hDevice, m_channelsToAcquire.data(), m_chNumberOfChannels)) {
                 throw string("Error on GT_SetChannels: Couldn't set channels to acquire for device ").append(*serialNumber);
             }
             //set the sample rate
@@ -204,20 +204,12 @@ bool GUSBAmpDriver::initDevice()
         m_callSequenceHandles = m_openedDevicesHandles;
         m_numDevices = static_cast<int>(m_callSequenceHandles.size());
 
-        m_buffers = new BYTE**[m_numDevices];
-        m_overlapped = new OVERLAPPED*[m_numDevices];
+        m_buffers.assign(m_numDevices, std::vector<std::vector<BYTE>>(m_QUEUE_SIZE, std::vector<BYTE>(m_bufferSizeBytes)));
+        m_overlapped.assign(m_numDevices, std::vector<OVERLAPPED>(m_QUEUE_SIZE, OVERLAPPED{}));
 
-        //for each device create a number of QUEUE_SIZE data buffers
+        //for each device and queue slot create the event signalled when its data buffer has been filled
         for (int deviceIndex = 0; deviceIndex < m_numDevices; deviceIndex++) {
-            m_buffers[deviceIndex] = new BYTE*[m_QUEUE_SIZE];
-            m_overlapped[deviceIndex] = new OVERLAPPED[m_QUEUE_SIZE];
-
-            //for each data buffer allocate a number of bufferSizeBytes bytes
             for (int queueIndex = 0; queueIndex < m_QUEUE_SIZE; queueIndex++) {
-                m_buffers[deviceIndex][queueIndex] = new BYTE[m_bufferSizeBytes];
-                memset(&(m_overlapped[deviceIndex][queueIndex]), 0, sizeof(OVERLAPPED));
-
-                //create a windows event handle that will be signalled when new data from the device has been received for each data buffer
                 m_overlapped[deviceIndex][queueIndex].hEvent = CreateEvent(nullptr, false, false, nullptr);
             }
         }
@@ -227,32 +219,30 @@ bool GUSBAmpDriver::initDevice()
 
             if (!GT_Start(hDevice)) {
                 //throw string("Error on GT_Start: Couldn't start data acquisition of device.");
-                cout << "\tError on GT_Start: Couldn't start data acquisition of device.\n";
+                qWarning("Error on GT_Start: Couldn't start data acquisition of device.");
                 return 0;
             }
 
             //queue-up the first batch of transfer requests
             for (int queueIndex = 0; queueIndex < m_QUEUE_SIZE; queueIndex++) {
-                if (!GT_GetData(hDevice, m_buffers[deviceIndex][queueIndex], m_bufferSizeBytes, &m_overlapped[deviceIndex][queueIndex])) {
-                    cout << "\tError on GT_GetData.\n";
+                if (!GT_GetData(hDevice, m_buffers[deviceIndex][queueIndex].data(), m_bufferSizeBytes, &m_overlapped[deviceIndex][queueIndex])) {
+                    qWarning("Error on GT_GetData.");
                     return 0;
                 }
             }
         }
 
-        qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
+        qDebug() << "Plugin GUSBAmp - INFO - initDevice() - The device has been connected and initialised successfully";
         return true;
     } catch (string& exception) {
         //in case an exception occurred, close all opened devices...
         while (!m_openedDevicesHandles.empty()) {
             GT_CloseDevice(&m_openedDevicesHandles.front());
-            qDebug() << "error occurred - Device " << &m_openedDevicesHandles.front() << "was closed" << endl;
+            qDebug() << "error occurred - Device " << &m_openedDevicesHandles.front() << "was closed";
             m_openedDevicesHandles.pop_front();
         }
-        delete[] m_channelsToAcquire;
-
         m_isRunning = false;
-        cout << exception << '\n';
+        qWarning("%s", exception.c_str());
         return false;
     }
 }
@@ -261,7 +251,7 @@ bool GUSBAmpDriver::initDevice()
 
 bool GUSBAmpDriver::uninitDevice()
 {
-    cout << "Stopping devices and cleaning up..." << "\n";
+    qInfo("Stopping devices and cleaning up...");
     //clean up allocated resources for each device
     for (int i = 0; i < m_numDevices; i++) {
         HANDLE hDevice = m_callSequenceHandles[i];
@@ -270,25 +260,20 @@ bool GUSBAmpDriver::uninitDevice()
         for (int j = 0; j < m_QUEUE_SIZE; j++) {
             WaitForSingleObject(m_overlapped[i][j].hEvent, 1000);
             CloseHandle(m_overlapped[i][j].hEvent);
-            delete[] m_buffers[i][j];
-            qDebug() << "deleted queue buffer" << j << "successfully";
+            qDebug() << "closed queue event" << j << "successfully";
         }
 
         //stop device
         GT_Stop(hDevice);
-        qDebug() << "stopped " << QString(m_callSequenceSerials[i]) << " successfully" << endl;
+        qDebug() << "stopped " << QString(m_callSequenceSerials[i]) << " successfully";
 
         //reset device
         GT_ResetTransfer(hDevice);
-        qDebug() << "reseted Transfer of " << QString(m_callSequenceSerials[i]) << " successfully" << endl;
-
-        delete[] m_overlapped[i];
-        delete[] m_buffers[i];
+        qDebug() << "reseted Transfer of " << QString(m_callSequenceSerials[i]) << " successfully";
     }
 
-    delete[] m_buffers;
-    delete[] m_overlapped;
-    delete[] m_channelsToAcquire;
+    m_buffers.clear();
+    m_overlapped.clear();
 
     //closing all devices from the Call-Sequence-Handle
     while (!m_callSequenceHandles.empty()) {
@@ -304,7 +289,7 @@ bool GUSBAmpDriver::uninitDevice()
     }
 
     m_isRunning = false;
-    qDebug() << "Plugin GUSBAmp - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
+    qDebug() << "Plugin GUSBAmp - INFO - uninitDevice() - Successfully uninitialised the device";
     return true;
 }
 
@@ -322,7 +307,7 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
             //wait for notification from the system telling that new data is available
             if (WaitForSingleObject(m_overlapped[deviceIndex][queueIndex].hEvent, 1000) == WAIT_TIMEOUT) {
                 //throw string("Error on data transfer: timeout occurred.");
-                cout << "Error on data transfer: timeout occurred." << "\n";
+                qWarning("Error on data transfer: timeout occurred.");
                 return 0;
             }
 
@@ -332,7 +317,7 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
             //...and check if we lost something (number of received bytes must be equal to the previously allocated buffer size)
             if (m_numBytesReceived != m_bufferSizeBytes) {
                 //throw string("Error on data transfer: samples lost.");
-                cout << "Error on data transfer: samples lost." << "\n";
+                qWarning("Error on data transfer: samples lost.");
                 return 0;
             }
         }
@@ -360,8 +345,8 @@ bool GUSBAmpDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 
         //add new GetData call to the queue replacing the currently received one
         for (int deviceIndex = 0; deviceIndex < m_numDevices; deviceIndex++)
-            if (!GT_GetData(m_callSequenceHandles[deviceIndex], m_buffers[deviceIndex][queueIndex], m_bufferSizeBytes, &m_overlapped[deviceIndex][queueIndex])) {
-                cout << "\tError on GT_GetData.\n";
+            if (!GT_GetData(m_callSequenceHandles[deviceIndex], m_buffers[deviceIndex][queueIndex].data(), m_bufferSizeBytes, &m_overlapped[deviceIndex][queueIndex])) {
+                qWarning("Error on GT_GetData.");
                 return 0;
             }
     }
@@ -375,11 +360,11 @@ bool GUSBAmpDriver::setSerials(vector<QString>& list)
     int size = list.size();
 
     if (m_isRunning) {
-        cout << "Do not change device-parameters while running the device!\n";
+        qWarning("Do not change device-parameters while running the device!");
         return false;
     }
     if (size > 4) {
-        cout << "ERROR serSerials: max. for serial numbers can be setted!";
+        qWarning("ERROR serSerials: max. for serial numbers can be setted!");
         return false;
     }
     //resize the vectordimensions of the string and byte vectors and convert it to LPSTR(LongPointertoSTRing)
@@ -460,9 +445,9 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
                 break;
         }
         m_iSampleRateHz = sampleRate;
-        //qDebug()<<"Sample Rate is setted"<<endl;
+        //qDebug()<<"Sample Rate is setted";
     } catch (string& exception) {
-        cout << exception << '\n';
+        qWarning("%s", exception.c_str());
         return false;
     }
     refreshSizeOutputMatrix();
@@ -475,12 +460,12 @@ bool GUSBAmpDriver::setSampleRate(int sampleRate)
 bool GUSBAmpDriver::setChannels(vector<int>& list)
 {
     if (m_isRunning) {
-        cout << "Do not change device-parameters while running the device!\n";
+        qWarning("Do not change device-parameters while running the device!");
         return false;
     }
     int size = list.size();
     if (size > 16) {
-        cout << "ERROR in GUSBAmpDriver::setChannels: Could not set channels. Size of channel-vector has to be less then 16\n";
+        qWarning("ERROR in GUSBAmpDriver::setChannels: Could not set channels. Size of channel-vector has to be less then 16");
         return false;
     }
 
@@ -491,14 +476,14 @@ bool GUSBAmpDriver::setChannels(vector<int>& list)
     } while ((i < size) && (list[i] > list[i - 1]) && (list[i] < 17));
 
     if (i != size) {
-        cout << "ERROR in GUSBAmpDriver::setChannels: values of the channels in the vector have to be ascending & less then 16\n";
+        qWarning("ERROR in GUSBAmpDriver::setChannels: values of the channels in the vector have to be ascending & less then 16");
         return false;
     }
 
     m_chNumberOfChannels = UCHAR(size);
 
     //refilling of the pointer to the channelsToAcquire array
-    m_channelsToAcquire = new UCHAR[size];
+    m_channelsToAcquire.resize(size);
     //filling the UCHAR array with the values from the list
     for (int i = 0; i < m_chNumberOfChannels; i++) {
         m_channelsToAcquire[i] = UCHAR(list[i]);

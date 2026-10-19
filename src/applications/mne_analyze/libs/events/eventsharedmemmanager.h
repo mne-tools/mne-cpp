@@ -20,6 +20,7 @@
 //=============================================================================================================
 
 #include <string>
+#include <vector>
 #include <memory>
 #include <chrono>
 #include <thread>
@@ -380,7 +381,7 @@ private:
     std::atomic_bool m_BufferWatcherThreadRunning; /**<  Flag if the BufferWatcher thread has been created.*/
     std::atomic_bool m_WritingToSharedMemory;      /**<  Mutex to control writing new events to the shared memory buffer.*/
     long long m_lastCheckTime;                     /**<  Place holder for the time when the buffer was last checked.*/
-    EventUpdate* m_LocalBuffer;                    /**<  Buffer in the local memory of this application, mirroring the shared memory buffer.*/
+    std::vector<EventUpdate> m_LocalBuffer;        /**<  Buffer in the local memory of this application, mirroring the shared memory buffer.*/
     EventUpdate* m_SharedBuffer;                   /**<  Buffer in shared memory segment.*/
     int m_Id;                                      /**<  Stores the creator Id.*/
     enum EVENTSLIB::SharedMemoryMode m_Mode;       /**<  Shared memory working mode.*/

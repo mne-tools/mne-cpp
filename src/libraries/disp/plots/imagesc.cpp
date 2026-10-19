@@ -38,8 +38,6 @@ using namespace Eigen;
 
 ImageSc::ImageSc(QWidget* parent)
 : Graph(parent)
-, m_pPixmapData(nullptr)
-, m_pPixmapColorbar(nullptr)
 {
     init();
 }
@@ -48,8 +46,6 @@ ImageSc::ImageSc(QWidget* parent)
 
 ImageSc::ImageSc(MatrixXd& p_dMat, QWidget* parent)
 : Graph(parent)
-, m_pPixmapData(nullptr)
-, m_pPixmapColorbar(nullptr)
 {
     init();
     updateData(p_dMat);
@@ -59,8 +55,6 @@ ImageSc::ImageSc(MatrixXd& p_dMat, QWidget* parent)
 
 ImageSc::ImageSc(MatrixXf& p_fMat, QWidget* parent)
 : Graph(parent)
-, m_pPixmapData(nullptr)
-, m_pPixmapColorbar(nullptr)
 {
     init();
     updateData(p_fMat);
@@ -70,8 +64,6 @@ ImageSc::ImageSc(MatrixXf& p_fMat, QWidget* parent)
 
 ImageSc::ImageSc(MatrixXi& p_iMat, QWidget* parent)
 : Graph(parent)
-, m_pPixmapData(nullptr)
-, m_pPixmapColorbar(nullptr)
 {
     init();
     updateData(p_iMat);
@@ -79,11 +71,7 @@ ImageSc::ImageSc(MatrixXi& p_iMat, QWidget* parent)
 
 //=============================================================================================================
 
-ImageSc::~ImageSc()
-{
-    delete m_pPixmapData;
-    delete m_pPixmapColorbar;
-}
+ImageSc::~ImageSc() = default;
 
 //=============================================================================================================
 
@@ -150,14 +138,8 @@ void ImageSc::updateData(MatrixXi& p_iMat)
 
 void ImageSc::updateMaps()
 {
-    if (m_pPixmapData) {
-        delete m_pPixmapData;
-        m_pPixmapData = nullptr;
-    }
-    if (m_pPixmapColorbar) {
-        delete m_pPixmapColorbar;
-        m_pPixmapColorbar = nullptr;
-    }
+    m_pixmapData = QPixmap();
+    m_pixmapColorbar = QPixmap();
 
     if (m_matCentNormData.rows() > 0 && m_matCentNormData.cols() > 0) {
         // --Data--
@@ -168,7 +150,7 @@ void ImageSc::updateMaps()
             for (qint32 j = 0; j < y; ++j)
                 t_qImageData.setPixel(i, j, pColorMapper(m_matCentNormData(j, i), m_sColorMap));
 
-        m_pPixmapData = new QPixmap(QPixmap::fromImage(t_qImageData));
+        m_pixmapData = QPixmap::fromImage(t_qImageData);
 
         // --Colorbar--
         QImage t_qImageColorbar(1, m_iColorbarGradSteps, QImage::Format_RGB32);
@@ -178,7 +160,7 @@ void ImageSc::updateMaps()
             QRgb t_qRgb = pColorMapper(t_dQuantile * (static_cast<double>(m_iColorbarGradSteps - 1 - j)) * 1.0, m_sColorMap);
             t_qImageColorbar.setPixel(0, j, t_qRgb);
         }
-        m_pPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));
+        m_pixmapColorbar = QPixmap::fromImage(t_qImageColorbar);
 
         // --Scale Values--
         m_qVecScaleValues.clear();
@@ -229,7 +211,7 @@ void ImageSc::paintEvent(QPaintEvent* event)
     Q_UNUSED(event);
 
     QPainter painter(this);
-    if (m_pPixmapData) {
+    if (!m_pixmapData.isNull()) {
         QPoint t_qPointTopLeft(0, 0);
 
         // -- Data --
@@ -238,7 +220,7 @@ void ImageSc::paintEvent(QPaintEvent* event)
         t_qSizePixmapData.setHeight(t_qSizePixmapData.height() - m_iBorderTopBottom * 2);
         t_qSizePixmapData.setWidth(t_qSizePixmapData.width() - m_iBorderLeftRight * 2);
         // Scale data
-        QPixmap t_qPixmapScaledData = m_pPixmapData->scaled(t_qSizePixmapData, Qt::IgnoreAspectRatio); //Qt::KeepAspectRatio);
+        QPixmap t_qPixmapScaledData = m_pixmapData.scaled(t_qSizePixmapData, Qt::IgnoreAspectRatio); //Qt::KeepAspectRatio);
         // Calculate data position
         t_qPointTopLeft.setX((m_qSizeWidget.width() - t_qPixmapScaledData.width()) / 2);
         t_qPointTopLeft.setY((m_qSizeWidget.height() - t_qPixmapScaledData.height()) / 2);
@@ -248,14 +230,14 @@ void ImageSc::paintEvent(QPaintEvent* event)
         painter.drawRect(t_qPointTopLeft.x() - 1, t_qPointTopLeft.y() - 1, t_qPixmapScaledData.width() + 1, t_qPixmapScaledData.height() + 1);
 
         // -- Colorbar --
-        if (m_bColorbar && m_pPixmapColorbar && m_qVecScaleValues.size() >= 2) {
+        if (m_bColorbar && !m_pixmapColorbar.isNull() && m_qVecScaleValues.size() >= 2) {
             QSize t_qSizePixmapColorbar = m_qSizeWidget;
 
             t_qSizePixmapColorbar.setWidth(m_iColorbarWidth);
             t_qSizePixmapColorbar.setHeight(t_qPixmapScaledData.height());
 
             // Scale colorbar
-            QPixmap t_qPixmapScaledColorbar = m_pPixmapColorbar->scaled(t_qSizePixmapColorbar, Qt::IgnoreAspectRatio);
+            QPixmap t_qPixmapScaledColorbar = m_pixmapColorbar.scaled(t_qSizePixmapColorbar, Qt::IgnoreAspectRatio);
             // Calculate colorbar position
             t_qPointTopLeft.setY(t_qPointTopLeft.y());
             t_qPointTopLeft.setX(t_qPointTopLeft.x() + t_qPixmapScaledData.width() + m_iBorderLeftRight / 3);

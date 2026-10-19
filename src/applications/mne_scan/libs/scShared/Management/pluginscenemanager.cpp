@@ -36,7 +36,7 @@ using namespace SCSHAREDLIB;
 
 PluginSceneManager::PluginSceneManager(QObject* parent)
 : QObject(parent)
-, m_pPipelineGraph(new MNALIB::MnaGraph())
+, m_pPipelineGraph(std::make_unique<MNALIB::MnaGraph>())
 {
 }
 
@@ -45,7 +45,6 @@ PluginSceneManager::PluginSceneManager(QObject* parent)
 PluginSceneManager::~PluginSceneManager()
 {
     clear();
-    delete m_pPipelineGraph;
 }
 
 //=============================================================================================================

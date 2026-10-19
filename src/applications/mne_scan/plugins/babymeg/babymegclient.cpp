@@ -71,10 +71,7 @@ BabyMEGClient::BabyMEGClient(int myPort, QObject* parent)
 
 //=============================================================================================================
 
-BabyMEGClient::~BabyMEGClient()
-{
-    delete tcpSocket; // added 5.31.2013
-}
+BabyMEGClient::~BabyMEGClient() = default;
 
 //=============================================================================================================
 

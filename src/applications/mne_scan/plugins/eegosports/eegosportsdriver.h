@@ -22,6 +22,7 @@
 //=============================================================================================================
 
 #include <fstream>
+#include <memory>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -164,8 +165,8 @@ private:
 
     QList<Eigen::VectorXd> m_lSampleBlockBuffer; /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
 
-    eemagine::sdk::stream* m_pDataStream;   /**< The EEG/Impedance data stream.*/
-    eemagine::sdk::amplifier* m_pAmplifier; /**< Interface to the amplifier.*/
+    std::unique_ptr<eemagine::sdk::amplifier> m_pAmplifier; /**< Interface to the amplifier.*/
+    std::unique_ptr<eemagine::sdk::stream> m_pDataStream;   /**< The EEG/Impedance data stream (declared after the amplifier so it is destroyed first).*/
 
     std::ofstream m_outputFileStream; /**< fstream for writing the driver debug informations to a txt file.*/
 };

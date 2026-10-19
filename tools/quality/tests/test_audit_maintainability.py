@@ -69,6 +69,8 @@ class PatternTests(unittest.TestCase):
         self.assertEqual(counted("auto x = new Foo();"), {"raw_new": 1})
         self.assertEqual(counted("delete[] buf; delete p;"), {"raw_delete": 2})
         self.assertEqual(counted('fprintf(stderr, "x"); std::cout << 1;'), {"console_io": 2})
+        self.assertEqual(counted("cout << 1; cerr << 2; clog << 3;"), {"console_io": 3})
+        self.assertEqual(counted("out << x; m_cout << y; s.cout << z;"), {})
         self.assertEqual(counted("m.printf();"), {})
         self.assertEqual(counted("#define FIFF_FILE_ID 100\n#define STR(x) #x\n"), {"numeric_define": 1})
 

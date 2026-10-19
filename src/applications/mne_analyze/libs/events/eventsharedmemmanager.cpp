@@ -154,7 +154,7 @@ EVENTSINTERNAL::EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventMan
 , m_BufferWatcherThreadRunning(false)
 , m_WritingToSharedMemory(false)
 , m_lastCheckTime(0)
-, m_LocalBuffer(new EventUpdate[bufferLength])
+, m_LocalBuffer(bufferLength)
 , m_SharedBuffer(nullptr)
 , m_Id(generateId())
 , m_Mode(EVENTSLIB::SharedMemoryMode::READ)
@@ -166,7 +166,6 @@ EVENTSINTERNAL::EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventMan
 EVENTSINTERNAL::EventSharedMemManager::~EventSharedMemManager()
 {
     detachFromSharedMemory();
-    delete[] m_LocalBuffer;
 }
 
 //=============================================================================================================
@@ -306,7 +305,7 @@ void EVENTSINTERNAL::EventSharedMemManager::initializeSharedMemory()
 {
     //    qDebug() << "Initializing Shared Memory Buffer ========  id: " << m_Id;
     //    printLocalBuffer();
-    void* localBuffer = static_cast<void*>(m_LocalBuffer);
+    void* localBuffer = static_cast<void*>(m_LocalBuffer.data());
     char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
     int indexIterator(0);
     m_WritingToSharedMemory = true;
@@ -343,7 +342,7 @@ void EVENTSINTERNAL::EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpd
 
 void EVENTSINTERNAL::EventSharedMemManager::copySharedMemoryToLocalBuffer()
 {
-    void* localBuffer = static_cast<void*>(m_LocalBuffer);
+    void* localBuffer = static_cast<void*>(m_LocalBuffer.data());
     char* sharedBuffer = static_cast<char*>(m_SharedMemory.data()) + sizeof(int);
     if (m_SharedMemory.isAttached()) {
         m_SharedMemory.lock();

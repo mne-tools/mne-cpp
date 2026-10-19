@@ -95,7 +95,7 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
     int numberItems = itemList.size();
 
     if (itemList.size() > matValue.rows()) {
-        qDebug() << "TMSIImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout! Only available channels will be displayed!" << endl;
+        qDebug() << "TMSIImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout! Only available channels will be displayed!";
         numberItems = matValue.rows();
         return;
     }

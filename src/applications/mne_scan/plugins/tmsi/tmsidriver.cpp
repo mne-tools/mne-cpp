@@ -66,7 +66,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 
     //If dll can't be open return
     if (m_oLibHandle == nullptr) {
-        cout << "Plugin TMSI - ERROR - Couldn't load DLL - Check if the driver for the TMSi USB Fiber Connector installed in the system dir" << endl;
+        qWarning("Plugin TMSI - ERROR - Couldn't load DLL - Check if the driver for the TMSi USB Fiber Connector installed in the system dir");
         m_bDllLoaded = false;
         return;
     }
@@ -89,7 +89,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     __load_dll_func__(m_oFpSetMeasuringMode, PSETMEASURINGMODE, "SetMeasuringMode");
     __load_dll_func__(m_oFpGetErrorCode, PGETERRORCODE, "GetErrorCode");
 
-    cout << "Plugin TMSI - INFO - TMSIDriver() - Successfully loaded all DLL functions" << endl;
+    qInfo("Plugin TMSI - INFO - TMSIDriver() - Successfully loaded all DLL functions");
 }
 
 //=============================================================================================================
@@ -140,7 +140,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_HandleMaster = m_oFpLibraryInit(TMSiConnectionUSB, &ErrorCode);
 
     if (ErrorCode != 0) {
-        cout << "Plugin TMSI - ERROR - initDevice() - Can not initialize library" << endl;
+        qWarning("Plugin TMSI - ERROR - initDevice() - Can not initialize library");
         return false;
     }
 
@@ -151,7 +151,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     DeviceList = m_oFpGetDeviceList(m_HandleMaster, &NrOfDevices);
 
     if (NrOfDevices == 0) {
-        cout << "Plugin TMSI - ERROR - initDevice() - Frontend list NOT available - Maybe no devices are connected" << endl;
+        qWarning("Plugin TMSI - ERROR - initDevice() - Frontend list NOT available - Maybe no devices are connected");
         m_oFpLibraryExit(m_HandleMaster);
         return false;
     }
@@ -165,7 +165,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_oFpStop(m_HandleMaster);
 
     if (!Status) {
-        cout << "Plugin TMSI - ERROR - initDevice() - Failed to open connected device" << endl;
+        qWarning("Plugin TMSI - ERROR - initDevice() - Failed to open connected device");
         m_oFpLibraryExit(m_HandleMaster);
         return false;
     }
@@ -176,10 +176,10 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
     if (m_bMeasureImpedances) {
         if (m_oFpSetMeasuringMode(m_HandleMaster, impedanceMode, 1))
-            cout << "Plugin TMSI - INFO - Now measuring impedances" << endl;
+            qInfo("Plugin TMSI - INFO - Now measuring impedances");
         else {
             int ErrorCode = m_oFpGetErrorCode(m_HandleMaster);
-            cout << "Unable to set Measuremode impedance, errorcode = " << ErrorCode << endl;
+            qWarning() << "Unable to set Measuremode impedance, errorcode = " << ErrorCode;
         }
     } else
         m_oFpSetMeasuringMode(m_HandleMaster, normalMode, 0);
@@ -190,7 +190,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     unsigned short serial, hwVersion, swVersion, baseSf, maxRS232, nrOfChannels;
 
     if (!Status)
-        cout << "Plugin TMSI - ERROR - initDevice() - FrontendInfo NOT available" << endl;
+        qWarning("Plugin TMSI - ERROR - initDevice() - FrontendInfo NOT available");
     else {
         serial = FrontEndInfo.Serial;
         hwVersion = FrontEndInfo.HwVersion;
@@ -204,9 +204,9 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     if (m_bUseCommonAverage) {
         BOOLEAN setRefCalculation = m_oFpSetRefCalculation(m_HandleMaster, 1);
         if (setRefCalculation)
-            cout << "Plugin TMSI - INFO - initDevice() - Common average now active" << endl;
+            qInfo("Plugin TMSI - INFO - initDevice() - Common average now active");
         else
-            cout << "Plugin TMSI - INFO - initDevice() - Common average is inactive (Could not be initiated)" << endl;
+            qInfo("Plugin TMSI - INFO - initDevice() - Common average is inactive (Could not be initiated)");
     }
 
     //Get information about the signal format created by the device - UnitExponent, UnitGain, UnitOffSet
@@ -239,7 +239,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     ULONG iBufferSize = MAX_BUFFER_SIZE;                               //see TMSi doc file for more info. This size is not defined in bytes but in the number of elements which are to be sampled. A sample in this case is one conversion result for all input channels..
 
     if (!m_oFpSetSignalBuffer(m_HandleMaster, &iSamplingFrequencyMilliHertz, &iBufferSize)) {
-        cout << "Plugin TMSI - ERROR - initDevice() - Failed to allocate signal buffer" << endl;
+        qWarning("Plugin TMSI - ERROR - initDevice() - Failed to allocate signal buffer");
         m_oFpLibraryExit(m_HandleMaster);
         return false;
     }
@@ -247,7 +247,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     //Start the sampling process
     bool start = m_oFpStart(m_HandleMaster);
     if (!start) {
-        cout << "Plugin TMSI - ERROR - initDevice() - Failed to start the sampling procedure" << endl;
+        qWarning("Plugin TMSI - ERROR - initDevice() - Failed to start the sampling procedure");
         m_oFpLibraryExit(m_HandleMaster);
         return false;
     }
@@ -257,7 +257,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_lSignalBufferSize = m_uiSamplesPerBlock * m_uiNumberOfAvailableChannels * 4;
     m_lSignalBuffer = new LONG[m_lSignalBufferSize];
 
-    cout << "Plugin TMSI - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
+    qInfo("Plugin TMSI - INFO - initDevice() - The device has been connected and initialised successfully");
     m_bInitDeviceSuccess = true;
     return true;
 }
@@ -271,13 +271,13 @@ bool TMSIDriver::uninitDevice()
 
     //Check if the device was initialised
     if (!m_bInitDeviceSuccess) {
-        cout << "Plugin TMSI - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised" << endl;
+        qWarning("Plugin TMSI - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised");
         return false;
     }
 
     //Check if the driver DLL was loaded
     if (!m_bDllLoaded) {
-        cout << "Plugin TMSI - ERROR - uninitDevice() - Driver DLL was not loaded" << endl;
+        qWarning("Plugin TMSI - ERROR - uninitDevice() - Driver DLL was not loaded");
         return false;
     }
 
@@ -288,12 +288,12 @@ bool TMSIDriver::uninitDevice()
     }
 
     if (!m_oFpStop(m_HandleMaster)) {
-        cout << "Plugin TMSI - ERROR - uninitDevice() - Failed to stop the device" << endl;
+        qWarning("Plugin TMSI - ERROR - uninitDevice() - Failed to stop the device");
         return false;
     }
 
     if (!m_oFpClose(m_HandleMaster)) {
-        cout << "Plugin TMSI - ERROR - uninitDevice() - Failed to close the device" << endl;
+        qWarning("Plugin TMSI - ERROR - uninitDevice() - Failed to close the device");
         return false;
     }
 
@@ -305,7 +305,7 @@ bool TMSIDriver::uninitDevice()
     m_PSPDPMasterDevicePath = nullptr;
     m_lSignalBuffer = nullptr;
 
-    cout << "Plugin TMSI - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
+    qInfo("Plugin TMSI - INFO - uninitDevice() - Successfully uninitialised the device");
     return true;
 }
 
@@ -319,7 +319,7 @@ bool TMSIDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 
     //Check if device was initialised and connected correctly
     if (!m_bInitDeviceSuccess) {
-        cout << "Plugin TMSI - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << endl;
+        qWarning("Plugin TMSI - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly");
         return false;
     }
 
@@ -389,13 +389,13 @@ bool TMSIDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
         m_oFpGetBufferInfo(m_HandleMaster, &ulOverflow, &ulPercentFull);
 
         m_outputFileStream << "Unit offset: " << endl;
-        for (int w = 0; w << m_vUnitOffSet.size(); w++)
-            cout << float(m_vUnitOffSet[w]) << "  ";
+        for (int w = 0; w < m_vUnitOffSet.size(); w++)
+            m_outputFileStream << float(m_vUnitOffSet[w]) << "  ";
         m_outputFileStream << endl
                            << endl;
 
         m_outputFileStream << "Unit gain: " << endl;
-        for (int w = 0; w << m_vUnitGain.size(); w++)
+        for (int w = 0; w < m_vUnitGain.size(); w++)
             m_outputFileStream << float(m_vUnitGain[w]) << "  ";
         m_outputFileStream << endl
                            << endl;

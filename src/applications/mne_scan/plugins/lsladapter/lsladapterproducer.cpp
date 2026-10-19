@@ -46,7 +46,6 @@ LSLAdapterProducer::LSLAdapterProducer(QSharedPointer<PluginOutputData<RealTimeM
                                        QObject* parent)
 : QObject(parent)
 , m_StreamInfo()
-, m_StreamInlet(nullptr)
 , m_bHasStreamInfo(false)
 , m_bIsRunning(false)
 , m_iOutputBlockSize(iOutputBlockSize)
@@ -57,10 +56,7 @@ LSLAdapterProducer::LSLAdapterProducer(QSharedPointer<PluginOutputData<RealTimeM
 
 //=============================================================================================================
 
-LSLAdapterProducer::~LSLAdapterProducer()
-{
-    delete m_StreamInlet;
-}
+LSLAdapterProducer::~LSLAdapterProducer() = default;
 
 //=============================================================================================================
 
@@ -74,7 +70,7 @@ void LSLAdapterProducer::readStream()
 
     // start to stream: build a stream inlet
     try {
-        m_StreamInlet = new LSLLIB::stream_inlet(m_StreamInfo);
+        m_StreamInlet = std::make_unique<LSLLIB::stream_inlet>(m_StreamInfo);
         m_StreamInlet->open_stream();
     } catch (std::exception& e) {
         qDebug() << "[LSLAdapterProducer::readStream] Something went wrong when trying to open LSL stream inlet: " << e.what();
@@ -154,8 +150,7 @@ void LSLAdapterProducer::reset()
     m_vBufferedSamples.clear();
     // reset lsl members
     m_StreamInfo = LSLLIB::stream_info();
-    delete m_StreamInlet;
-    m_StreamInlet = nullptr;
+    m_StreamInlet.reset();
 }
 
 //=============================================================================================================

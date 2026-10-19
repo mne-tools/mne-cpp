@@ -56,11 +56,11 @@ StatusBar::StatusBar(QWidget* pParent)
 , m_iMsgTimeout(20000)
 {
     QVector<EVENT_TYPE> vSubs = {EVENT_TYPE::STATUS_BAR_MSG, EVENT_TYPE::LOADING_START, EVENT_TYPE::LOADING_END};
-    m_pCommunicator = new Communicator(std::move(vSubs));
+    m_pCommunicator = std::make_unique<Communicator>(std::move(vSubs));
 
     this->setStyleSheet("QStatusBar { color: red}");
 
-    connect(m_pCommunicator, &Communicator::receivedEvent,
+    connect(m_pCommunicator.get(), &Communicator::receivedEvent,
             this, &StatusBar::onNewMessageReceived);
 
     m_pProgressView = new DISPLIB::ProgressView(true,
@@ -72,10 +72,7 @@ StatusBar::StatusBar(QWidget* pParent)
 
 //=============================================================================================================
 
-StatusBar::~StatusBar()
-{
-    delete m_pCommunicator;
-}
+StatusBar::~StatusBar() = default;
 
 //=============================================================================================================
 
@@ -112,7 +109,7 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
                         m_pProgressView->setMessage("");
                         if (m_pHoverWidget) {
                             m_pHoverWidget->hide();
-                            delete m_pHoverWidget;
+                            m_pHoverWidget->deleteLater();
                         }
                         break;
                     }
@@ -170,7 +167,7 @@ void StatusBar::leaveEvent(QEvent* event)
     }
 
     m_pHoverWidget->hide();
-    delete m_pHoverWidget;
+    m_pHoverWidget->deleteLater();
     QWidget::leaveEvent(event);
 }
 

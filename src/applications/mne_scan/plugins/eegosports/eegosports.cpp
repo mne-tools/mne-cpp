@@ -532,7 +532,7 @@ bool EEGoSports::start()
     //Initialize amplifier
     if (!m_pEEGoSportsProducer->init(m_bWriteDriverDebugToFile,
                                      m_bCheckImpedances)) {
-        qWarning() << "[EEGoSports::start] EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
+        qWarning() << "[EEGoSports::start] EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path.";
         return false;
     }
 
@@ -554,7 +554,7 @@ bool EEGoSports::start()
         QThread::start();
         return true;
     } else {
-        qWarning() << "[EEGoSports::start] EEGoSports thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
+        qWarning() << "[EEGoSports::start] EEGoSports thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path.";
         return false;
     }
 }

@@ -26,6 +26,7 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <memory>
 #include <QMutex>
 
 //=============================================================================================================
@@ -129,7 +130,7 @@ signals:
 private:
     FtBuffer* m_pFtBuffer; /**< Pointer to FtBuffer that created this object. Destination of collected data. */
 
-    FtConnector* m_pFtConnector; /**< FtConnectr object that interfaces with buffer and gets buffer data. */
+    std::unique_ptr<FtConnector> m_pFtConnector; /**< FtConnectr object that interfaces with buffer and gets buffer data. */
 };
 
 } // namespace

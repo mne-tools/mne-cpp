@@ -38,6 +38,7 @@ class MnaGraph;
 #include <QObject>
 #include <QSharedPointer>
 #include <QList>
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
@@ -196,8 +197,8 @@ private:
      */
     void stopNonSensorPlugins();
 
-    PluginList m_pluginList;            /**< List of plugins associated with this set. */
-    MNALIB::MnaGraph* m_pPipelineGraph; /**< MNA graph mirroring the plugin scene. */
+    PluginList m_pluginList;                            /**< List of plugins associated with this set. */
+    std::unique_ptr<MNALIB::MnaGraph> m_pPipelineGraph; /**< MNA graph mirroring the plugin scene. */
 };
 
 //=============================================================================================================

@@ -56,29 +56,18 @@ FtConnector::FtConnector()
 , m_bNewData(false)
 , m_fSampleFreq(0)
 , m_sAddress("127.0.0.1")
-, m_pSocket(nullptr)
 {
 }
 
 //=============================================================================================================
 
-FtConnector::~FtConnector()
-{
-    //disconnect();
-    delete m_pSocket;
-    //m_pSocket = nullptr;
-}
+FtConnector::~FtConnector() = default;
 
 //=============================================================================================================
 
 bool FtConnector::connect()
 {
-    if (m_pSocket != nullptr) {
-        delete m_pSocket;
-        m_pSocket = nullptr;
-    }
-
-    m_pSocket = new QTcpSocket();
+    m_pSocket = std::make_unique<QTcpSocket>();
     m_pSocket->connectToHost(QHostAddress(m_sAddress), m_iPort);
     qint8 iTries = 0;
 
@@ -96,8 +85,7 @@ bool FtConnector::connect()
         return true;
     } else {
         qWarning() << "[FtConnector::connect] Timed out: Failed to connect.";
-        delete m_pSocket;
-        m_pSocket = nullptr;
+        m_pSocket.reset();
         return false;
     }
 }
@@ -479,7 +467,7 @@ bool FtConnector::parseData(QBuffer& datasampBuffer,
     }
 
     //store and flag new data
-    m_pMatEmit = new Eigen::MatrixXd(matData.cast<double>());
+    m_matEmit = matData.cast<double>();
     m_bNewData = true;
 
     return m_bNewData;
@@ -490,8 +478,7 @@ bool FtConnector::parseData(QBuffer& datasampBuffer,
 void FtConnector::resetEmitData()
 {
     m_bNewData = false;
-    delete m_pMatEmit;
-    m_pMatEmit = nullptr;
+    m_matEmit.resize(0, 0);
 }
 
 //=============================================================================================================
@@ -508,7 +495,7 @@ bool FtConnector::disconnect()
 
 Eigen::MatrixXd FtConnector::getMatrix()
 {
-    return *m_pMatEmit;
+    return m_matEmit;
 }
 
 //=============================================================================================================

@@ -1017,7 +1017,7 @@ void MainWindow::startMeasurement()
     uiSetupRunningState(true);
     startTimer(m_iTimeoutMSec);
 
-    delete m_pMultiView;
+    // setCentralWidget() deletes the previous view
     m_pMultiView = new MultiView();
     connect(m_pMultiView.data(), &MultiView::dockLocationChanged,
             this, &MainWindow::onDockLocationChanged);

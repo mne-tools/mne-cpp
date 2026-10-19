@@ -39,16 +39,13 @@ using namespace FTBUFFERPLUGIN;
 
 FtBuffProducer::FtBuffProducer(FtBuffer* pFtBuffer)
 : m_pFtBuffer(pFtBuffer)
+, m_pFtConnector(std::make_unique<FtConnector>())
 {
-    m_pFtConnector = new FtConnector();
 }
 
 //=============================================================================================================
 
-FtBuffProducer::~FtBuffProducer()
-{
-    delete m_pFtConnector;
-}
+FtBuffProducer::~FtBuffProducer() = default;
 
 //=============================================================================================================
 
@@ -95,10 +92,8 @@ void FtBuffProducer::doWork()
 void FtBuffProducer::connectToBuffer(QString addr,
                                      int port)
 {
-    delete m_pFtConnector;
-
     //new parameters, new connector object
-    m_pFtConnector = new FtConnector();
+    m_pFtConnector = std::make_unique<FtConnector>();
     m_pFtConnector->setAddr(addr);
     m_pFtConnector->setPort(port);
 

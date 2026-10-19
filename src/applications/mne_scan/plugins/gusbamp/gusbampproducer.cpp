@@ -87,7 +87,7 @@ void GUSBAmpProducer::run()
     MatrixXf matData(m_viSizeOfSampleMatrix[0], m_viSizeOfSampleMatrix[1]);
 
     while (!isInterruptionRequested()) {
-        //qDebug()<<"GUSBAmpProducer::run()"<<endl;
+        //qDebug()<<"GUSBAmpProducer::run()";
         //Get the GUSBAmp EEG data out of the device buffer and write received data to circular buffer
         if (m_pGUSBAmpDriver->getSampleMatrixValue(matData)) {
             while (!m_pGUSBAmp->m_pCircularBuffer->push(matData) && !isInterruptionRequested()) {

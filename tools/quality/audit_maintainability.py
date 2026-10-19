@@ -56,7 +56,7 @@ PATTERNS: dict[str, re.Pattern[str]] = {
     "c_style_cast": re.compile(rf"(?<![\w\]\)>])\(\s*{_BUILTIN}(?:\s*\*+)?\s*\)\s*(?=[\w(\-])"),
     "raw_new": re.compile(r"\bnew\s+(?!\(std::nothrow\))[A-Za-z_][\w:]*(?:<[^;]*?>)?\s*[\[(;{]"),
     "raw_delete": re.compile(r"(?<![\w.>:])delete\b\s*(?:\[\s*\])?\s*[A-Za-z_(*]"),
-    "console_io": re.compile(r"(?<![\w:.>])(?:std::)?(?:printf|fprintf|puts)\s*\(|\bstd::(?:cout|cerr)\b"),
+    "console_io": re.compile(r"(?<![\w:.>])(?:std::)?(?:printf|fprintf|puts)\s*\(|(?<![\w.>:])(?:std::)?(?:cout|cerr|clog)\b"),
     "numeric_define": re.compile(r"^\s*#\s*define\s+[A-Z_][A-Z0-9_]*\s+\(?-?\d", re.MULTILINE),
 }
 # A `new` whose result lands in a smart pointer (including the project's X::SPtr/UPtr typedefs) is owned.
