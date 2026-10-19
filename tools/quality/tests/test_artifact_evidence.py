@@ -8,6 +8,8 @@ import json
 import sys
 import tempfile
 import unittest
+import zipfile
+from unittest import mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "release"))
@@ -43,6 +45,30 @@ class ArtifactEvidenceTest(unittest.TestCase):
         # Junk installers are never reported as signed, on any host
         for name in ("mne-cpp-macos-installer.dmg", "mne-cpp-windows-installer.exe"):
             self.assertIn(records[name]["signature"], ("unsigned", "unverified"))
+
+    def test_inspect_windows_archive_checks_every_mne_executable(self):
+        archive = self.assets / "mne-cpp-windows-dynamic.zip"
+        with zipfile.ZipFile(archive, "w") as z:
+            z.writestr("bin/mne_scan.exe", b"exe")
+            z.writestr("bin/mne_browse.exe", b"exe")
+            z.writestr("bin/Qt6Core.dll", b"dll")
+        checked = []
+
+        def authenticode(path):
+            checked.append(path.name)
+            return "unsigned" if path.name == "mne_browse.exe" else "signed"
+
+        with mock.patch.object(artifact_evidence, "_authenticode", side_effect=authenticode), \
+                mock.patch.object(artifact_evidence.shutil, "which", return_value="powershell"):
+            self.assertEqual(artifact_evidence.signature(archive), "unsigned")
+            self.assertEqual(sorted(checked), ["mne_browse.exe", "mne_scan.exe"])
+            checked.clear()
+            with zipfile.ZipFile(archive, "w") as z:
+                z.writestr("bin/mne_scan.exe", b"exe")
+            self.assertEqual(artifact_evidence.signature(archive), "signed")
+        # Without PowerShell the archive is only checksummed, never claimed as signed
+        with mock.patch.object(artifact_evidence.shutil, "which", return_value=None):
+            self.assertEqual(artifact_evidence.signature(archive), "checksum-only")
 
     def test_publish_writes_sums_report_and_idempotent_notes(self):
         evidence = self.root / "evidence.json"

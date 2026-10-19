@@ -29,6 +29,8 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
+import zipfile
 from pathlib import Path
 
 NOTES_BEGIN = "<!-- release-evidence:begin -->"
@@ -56,21 +58,39 @@ def _ok(command: list[str]) -> bool:
 
 
 _WINDOWS_SIGNED = (".exe", ".msi")
+_MNE_EXECUTABLE = re.compile(r"(^|[/\\])mne_[^/\\]*\.exe$")
 _MACOS_SIGNED = (".dmg", ".pkg", ".app")
+
+
+def _authenticode(path: Path) -> str:
+    quoted = str(path).replace("'", "''")
+    script = (
+        f"$s = Get-AuthenticodeSignature -LiteralPath '{quoted}'; "
+        "if ($s.Status -ne 'Valid' -or -not $s.TimeStamperCertificate) { exit 1 }"
+    )
+    return "signed" if _ok(["powershell", "-NoProfile", "-Command", script]) else "unsigned"
+
+
+def _archive_signature(path: Path) -> str:
+    """A Windows deployment archive is signed when every MNE-CPP executable in it is."""
+    with zipfile.ZipFile(path) as archive, tempfile.TemporaryDirectory() as tmp:
+        names = [n for n in archive.namelist() if _MNE_EXECUTABLE.search(n)]
+        if not names:
+            return "checksum-only"
+        archive.extractall(tmp, members=names)
+        statuses = {_authenticode(Path(tmp) / name) for name in names}
+    return "signed" if statuses == {"signed"} else "unsigned"
 
 
 def signature(path: Path) -> str:
     """Return the signature status of one artifact, checked on this machine."""
     suffix = path.suffix.lower()
+    if suffix == ".zip":
+        return _archive_signature(path) if shutil.which("powershell") else "checksum-only"
     if suffix in _WINDOWS_SIGNED:
         if not shutil.which("powershell"):
             return "unverified"
-        quoted = str(path).replace("'", "''")
-        script = (
-            f"$s = Get-AuthenticodeSignature -LiteralPath '{quoted}'; "
-            "if ($s.Status -ne 'Valid' -or -not $s.TimeStamperCertificate) { exit 1 }"
-        )
-        return "signed" if _ok(["powershell", "-NoProfile", "-Command", script]) else "unsigned"
+        return _authenticode(path)
     if suffix in _MACOS_SIGNED:
         if not shutil.which("codesign"):
             return "unverified"
