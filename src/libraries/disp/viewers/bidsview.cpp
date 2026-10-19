@@ -44,7 +44,7 @@ using namespace DISPLIB;
 
 BidsView::BidsView(QWidget* parent)
 : AbstractView(parent)
-, m_pUi(new Ui::BidsViewWidget)
+, m_pUi(std::make_unique<Ui::BidsViewWidget>())
 {
     m_pUi->setupUi(this);
     m_pUi->m_pTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -56,7 +56,6 @@ BidsView::BidsView(QWidget* parent)
 
 BidsView::~BidsView()
 {
-    delete m_pUi;
 }
 
 //=============================================================================================================

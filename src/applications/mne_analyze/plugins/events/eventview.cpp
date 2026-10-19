@@ -52,7 +52,7 @@
 //=============================================================================================================
 
 EventView::EventView()
-: m_pUi(new Ui::EventWindowDockWidget)
+: m_pUi(std::make_unique<Ui::EventWindowDockWidget>())
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
 , m_pEventModel(nullptr)

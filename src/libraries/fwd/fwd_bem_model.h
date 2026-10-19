@@ -277,14 +277,14 @@ public:
      * @param[in] grid        Spacing between guess points (meters).
      * @param[in] exclude     Exclude points closer than this to the CM of the boundary.
      * @param[in] mindist     Minimum distance from the boundary surface.
-     * @return FsSurface containing the guess locations, or nullptr on failure.
+     * @return Source space holding the guess locations, or nullptr on failure.
      */
-    static std::unique_ptr<MNELIB::MNESurface> make_guesses(MNELIB::MNESurface* guess_surf,
-                                                            float guessrad,
-                                                            const Eigen::Vector3f& guess_r0,
-                                                            float grid,
-                                                            float exclude,
-                                                            float mindist);
+    static std::unique_ptr<MNELIB::MNESourceSpace> make_guesses(MNELIB::MNESurface* guess_surf,
+                                                                float guessrad,
+                                                                const Eigen::Vector3f& guess_r0,
+                                                                float grid,
+                                                                float exclude,
+                                                                float mindist);
 
     //============================= fwd_bem_linear_collocation.c =============================
 

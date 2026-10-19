@@ -34,6 +34,8 @@
 
 #include <QMap>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -192,7 +194,7 @@ protected:
      */
     void onDetectTriggers();
 
-    Ui::TriggerDetectionViewWidget* m_pUi;
+    std::unique_ptr<Ui::TriggerDetectionViewWidget> m_pUi;
 
     QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo; /**< Connected fiff info. */
 

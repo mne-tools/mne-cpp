@@ -27,6 +27,8 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -129,7 +131,7 @@ protected:
      */
     void onNumberTrialRowChanged();
 
-    Ui::TfSettingsViewWidget* m_pUi;
+    std::unique_ptr<Ui::TfSettingsViewWidget> m_pUi;
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 

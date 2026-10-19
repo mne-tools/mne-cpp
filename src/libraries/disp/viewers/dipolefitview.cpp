@@ -39,13 +39,17 @@ using namespace DISPLIB;
 DipoleFitView::DipoleFitView(QWidget* parent,
                              Qt::WindowFlags)
 : AbstractView(parent)
-, m_pUi(new Ui::DipoleFitViewWidget)
+, m_pUi(std::make_unique<Ui::DipoleFitViewWidget>())
 {
     m_pUi->setupUi(this);
     this->setMinimumWidth(330);
 
     initGui();
 }
+
+//=============================================================================================================
+
+DipoleFitView::~DipoleFitView() = default;
 
 //=============================================================================================================
 

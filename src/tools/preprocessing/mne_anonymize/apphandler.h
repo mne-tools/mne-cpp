@@ -28,6 +28,8 @@
 #include <QCoreApplication>
 #include <QSharedPointer>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -83,7 +85,7 @@ public:
      *
      * @return Pointer to a QCoreApplication.
      */
-    QCoreApplication* createApplication(int& argc, char* argv[]);
+    std::unique_ptr<QCoreApplication> createApplication(int& argc, char* argv[]);
 
     //=========================================================================================================
     /**
@@ -101,7 +103,7 @@ public:
      *
      * @return Pointer to a SettingsControllerCl object.
      */
-    SettingsControllerCl* createController(const QStringList& args);
+    std::unique_ptr<SettingsControllerCl> createController(const QStringList& args);
 
 protected:
 private:

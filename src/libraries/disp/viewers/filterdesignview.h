@@ -41,6 +41,8 @@
 
 #include <QPointer>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -325,7 +327,7 @@ protected:
      */
     void updateGuiFromFilter(const UTILSLIB::FilterKernel& filter);
 
-    Ui::FilterDesignViewWidget* m_pUi; /**< Pointer to the qt designer generated ui class.*/
+    std::unique_ptr<Ui::FilterDesignViewWidget> m_pUi; /**< Pointer to the qt designer generated ui class.*/
 
     QPointer<FilterPlotScene> m_pFilterPlotScene; /**< Pointer to the QGraphicsScene which holds the filter plotting.*/
 

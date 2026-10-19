@@ -64,14 +64,14 @@ int main(int argc, char* argv[])
 {
     qInstallMessageHandler(UTILSLIB::MNELogger::customLogWriter);
 
-    QScopedPointer<MNEANONYMIZE::AppHandler> h(new MNEANONYMIZE::AppHandler);
-    QScopedPointer<QCoreApplication> qtApp(h->createApplication(argc, argv));
+    MNEANONYMIZE::AppHandler handler;
+    const auto qtApp = handler.createApplication(argc, argv);
 
     qtApp->setOrganizationName(APPLICATION_ORG);
     qtApp->setApplicationName(APPLICATION_NAME);
     qtApp->setApplicationVersion(APPLICATION_VERSION);
 
-    QScopedPointer<MNEANONYMIZE::SettingsControllerCl> controller(h->createController(qtApp->arguments()));
+    const auto controller = handler.createController(qtApp->arguments());
 
     if (controller->run()) {
         return 1;

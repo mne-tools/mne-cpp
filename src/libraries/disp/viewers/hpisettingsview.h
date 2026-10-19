@@ -38,6 +38,8 @@
 
 #include <QJsonDocument>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -326,7 +328,7 @@ protected:
      */
     void updateDigitizerInfoGUI(const FIFFLIB::FiffDigPointSet& digSet);
 
-    Ui::HpiSettingsViewWidget* m_pUi; /**< The HPI dialog. */
+    std::unique_ptr<Ui::HpiSettingsViewWidget> m_pUi; /**< The HPI dialog. */
 
     QVector<int> m_vCoilFreqs; /**< Vector contains the HPI coil frequencies. */
 

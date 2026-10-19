@@ -54,7 +54,7 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
                                          const QString& sCurrentParadigm,
                                          QWidget* parent)
 : AbstractView(parent)
-, m_pUi(new Ui::ProjectSettingsViewWidget)
+, m_pUi(std::make_unique<Ui::ProjectSettingsViewWidget>())
 , m_sDataPath(sDataPath)
 , m_sCurrentProject(sCurrentProject)
 , m_sCurrentSubject(sCurrentSubject)
@@ -144,7 +144,6 @@ void ProjectSettingsView::connectGui()
 ProjectSettingsView::~ProjectSettingsView()
 {
     saveSettings();
-    delete m_pUi;
 }
 
 //=============================================================================================================

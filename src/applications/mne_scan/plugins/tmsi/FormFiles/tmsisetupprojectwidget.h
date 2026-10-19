@@ -25,6 +25,8 @@
 
 #include <QWidget>
 
+#include <memory>
+
 namespace Ui
 {
 class TMSISetupProjectWidget;
@@ -80,7 +82,7 @@ public:
 private:
     TMSI* m_pTMSI; /**< a pointer to corresponding TMSI.*/
 
-    Ui::TMSISetupProjectWidget* ui; /**< the user interface for the TMSISetupWidget.*/
+    std::unique_ptr<Ui::TMSISetupProjectWidget> ui; /**< the user interface for the TMSISetupWidget.*/
 
     //=========================================================================================================
     /**

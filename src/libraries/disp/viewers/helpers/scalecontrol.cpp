@@ -51,7 +51,7 @@ ScaleControl::ScaleControl(const char* label,
                            double min,
                            double max)
 : QWidget(parent)
-, m_pUi(new Ui::ScaleControlWidget)
+, m_pUi(std::make_unique<Ui::ScaleControlWidget>())
 , m_bManagingSpinBoxChange(false)
 , m_bManagingSliderChange(false)
 , m_fSensitivity(m_dDefaultSensitivity)
@@ -68,6 +68,10 @@ ScaleControl::ScaleControl(const char* label,
     updateNLMapConstants();
     setRange(min, max);
 }
+
+//=============================================================================================================
+
+ScaleControl::~ScaleControl() = default;
 
 //=============================================================================================================
 
@@ -104,7 +108,7 @@ void ScaleControl::initSlider()
 
 Ui::ScaleControlWidget* ScaleControl::getUI()
 {
-    return m_pUi;
+    return m_pUi.get();
 }
 
 //=============================================================================================================

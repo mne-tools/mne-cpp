@@ -46,7 +46,7 @@ FiffRawViewSettings::FiffRawViewSettings(const QString& sSettingsPath,
                                          QWidget* parent,
                                          Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::FiffRawViewSettingsWidget)
+, m_pUi(std::make_unique<Ui::FiffRawViewSettingsWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -64,7 +64,6 @@ FiffRawViewSettings::FiffRawViewSettings(const QString& sSettingsPath,
 FiffRawViewSettings::~FiffRawViewSettings()
 {
     saveSettings();
-    delete m_pUi;
 }
 
 //=============================================================================================================

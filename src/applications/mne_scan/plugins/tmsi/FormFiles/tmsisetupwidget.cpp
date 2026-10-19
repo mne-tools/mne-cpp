@@ -39,7 +39,7 @@ using namespace TMSIPLUGIN;
 TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 : QWidget(parent)
 , m_pTMSI(pTMSI)
-, m_pUi(new Ui::TMSISetupClass)
+, m_pUi(std::make_unique<Ui::TMSISetupClass>())
 {
     m_pUi->setupUi(this);
 

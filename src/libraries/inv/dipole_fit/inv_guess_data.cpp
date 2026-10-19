@@ -93,7 +93,7 @@ InvGuessData::InvGuessData(const QString& guessname, const QString& guess_surfna
                 return;
             inner_skull = inner_skull_owned.get();
         }
-        guesses.reset(reinterpret_cast<MNESourceSpace*>(FwdBemModel::make_guesses(inner_skull, guessrad, r0, grid, exclude, mindist).release()));
+        guesses = FwdBemModel::make_guesses(inner_skull, guessrad, r0, grid, exclude, mindist);
         if (!guesses)
             return;
     }

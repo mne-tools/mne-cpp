@@ -44,7 +44,7 @@ SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
                                        QWidget* parent,
                                        Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::SpharaSettingsViewWidget)
+, m_pUi(std::make_unique<Ui::SpharaSettingsViewWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -74,7 +74,6 @@ SpharaSettingsView::SpharaSettingsView(const QString& sSettingsPath,
 SpharaSettingsView::~SpharaSettingsView()
 {
     saveSettings();
-    delete m_pUi;
 }
 
 //=============================================================================================================

@@ -33,7 +33,7 @@ using namespace GUSBAMPPLUGIN;
 
 GUSBAmpSetupProjectWidget::GUSBAmpSetupProjectWidget(GUSBAmp* pGUSBAmp, QWidget* parent)
 : QWidget(parent)
-, ui(new Ui::GUSBAmpSetupProjectWidget)
+, ui(std::make_unique<Ui::GUSBAmpSetupProjectWidget>())
 , m_pGUSBAmp(pGUSBAmp)
 {
     ui->setupUi(this);
@@ -50,7 +50,6 @@ GUSBAmpSetupProjectWidget::GUSBAmpSetupProjectWidget(GUSBAmp* pGUSBAmp, QWidget*
 
 GUSBAmpSetupProjectWidget::~GUSBAmpSetupProjectWidget()
 {
-    delete ui;
 }
 
 //=============================================================================================================

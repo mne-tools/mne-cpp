@@ -50,24 +50,24 @@ AppHandler::AppHandler()
 
 //=============================================================================================================
 
-QCoreApplication* AppHandler::createApplication(int& argc, char* argv[])
+std::unique_ptr<QCoreApplication> AppHandler::createApplication(int& argc, char* argv[])
 {
     for (int i = 1; i < argc; ++i) {
         if (!qstrcmp(argv[i], "--no-gui")) {
             m_bGuiMode = false;
-            return new QCoreApplication(argc, argv);
+            return std::make_unique<QCoreApplication>(argc, argv);
         }
     }
-    return new QApplication(argc, argv);
+    return std::make_unique<QApplication>(argc, argv);
 }
 
 //=============================================================================================================
 
-SettingsControllerCl* AppHandler::createController(const QStringList& args)
+std::unique_ptr<SettingsControllerCl> AppHandler::createController(const QStringList& args)
 {
     if (m_bGuiMode) {
-        return new SettingsControllerGui(args);
+        return std::make_unique<SettingsControllerGui>(args);
     } else {
-        return new SettingsControllerCl(args);
+        return std::make_unique<SettingsControllerCl>(args);
     }
 }

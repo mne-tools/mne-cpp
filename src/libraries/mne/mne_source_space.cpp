@@ -289,22 +289,18 @@ std::unique_ptr<MNEVolGeom> read_vol_geom(QFile& fp)
 // read_tag_data
 //=========================================================================
 
-int read_tag_data(QFile& fp, int tag, long long nbytes, unsigned char*& val, long long& nbytesp)
+int read_tag_data(QFile& fp, int tag, long long nbytes, QByteArray& val, long long& nbytesp)
 /*
  * Read the data of one tag
  */
 {
-    size_t snbytes = nbytes;
-
-    val = nullptr;
+    val.clear();
     if (nbytes > 0) {
-        auto dum = std::make_unique<unsigned char[]>(nbytes + 1);
-        if (fp.read(reinterpret_cast<char*>(dum.get()), nbytes) != static_cast<qint64>(snbytes)) {
+        val = fp.read(nbytes);
+        if (val.size() != nbytes) {
             qCritical("Failed to read %d bytes of tag data", static_cast<int>(nbytes));
             return FAIL;
         }
-        dum[nbytes] = '\0'; /* Ensure null termination */
-        val = dum.release();
         nbytesp = nbytes;
     } else { /* Need to handle special cases */
         if (tag == TAG_OLD_SURF_GEOM) {
@@ -314,9 +310,7 @@ int read_tag_data(QFile& fp, int tag, long long nbytes, unsigned char*& val, lon
             /*
              * Serialize MNEVolGeom as POD fields followed by a
              * null-terminated UTF-8 filename.  We must NOT memcpy the
-             * entire MNEVolGeom because it contains a QString member
-             * whose internal pointers become dangling when *g is
-             * destroyed at the end of this block.
+             * entire MNEVolGeom because it contains a QString member.
              */
             struct VolGeomPOD
             {
@@ -326,9 +320,6 @@ int read_tag_data(QFile& fp, int tag, long long nbytes, unsigned char*& val, lon
                 float x_ras[3], y_ras[3], z_ras[3];
                 float c_ras[3];
             };
-            QByteArray fn = g->filename.toUtf8();
-            size_t totalSize = sizeof(VolGeomPOD) + fn.size() + 1;
-            auto buf = std::make_unique<unsigned char[]>(totalSize);
             VolGeomPOD pod;
             pod.valid = g->valid;
             pod.width = g->width;
@@ -341,19 +332,18 @@ int read_tag_data(QFile& fp, int tag, long long nbytes, unsigned char*& val, lon
             std::memcpy(pod.y_ras, g->y_ras, 3 * sizeof(float));
             std::memcpy(pod.z_ras, g->z_ras, 3 * sizeof(float));
             std::memcpy(pod.c_ras, g->c_ras, 3 * sizeof(float));
-            std::memcpy(buf.get(), &pod, sizeof(VolGeomPOD));
-            std::memcpy(buf.get() + sizeof(VolGeomPOD), fn.constData(), fn.size() + 1);
-            val = buf.release();
-            nbytesp = static_cast<long long>(totalSize);
+            val = QByteArray(reinterpret_cast<const char*>(&pod), sizeof(VolGeomPOD));
+            val.append(g->filename.toUtf8());
+            val.append('\0');
+            nbytesp = val.size();
         } else if (tag == TAG_OLD_USEREALRAS || tag == TAG_USEREALRAS) {
-            auto vi = std::make_unique<int[]>(1);
-            if (read_int(fp, vi[0]) == FAIL)
+            int useRealRas = 0;
+            if (read_int(fp, useRealRas) == FAIL)
                 return FAIL;
-            val = reinterpret_cast<unsigned char*>(vi.release());
+            val = QByteArray(reinterpret_cast<const char*>(&useRealRas), sizeof(int));
             nbytesp = sizeof(int);
         } else {
-            qWarning("Encountered an unknown tag with no length specification : %d\n", tag);
-            val = nullptr;
+            qWarning("Encountered an unknown tag with no length specification : %d", tag);
             nbytesp = 0;
         }
     }
@@ -364,15 +354,14 @@ int read_tag_data(QFile& fp, int tag, long long nbytes, unsigned char*& val, lon
 // add_mgh_tag_to_group
 //=========================================================================
 
-void add_mgh_tag_to_group(std::optional<MNEMghTagGroup>& g, int tag, long long len, unsigned char* data)
+void add_mgh_tag_to_group(std::optional<MNEMghTagGroup>& g, int tag, long long len, const QByteArray& data)
 {
     if (!g)
         g = MNEMghTagGroup();
     auto new_tag = std::make_unique<MNEMghTag>();
     new_tag->tag = tag;
     new_tag->len = len;
-    new_tag->data = QByteArray(reinterpret_cast<const char*>(data), static_cast<int>(len));
-    delete[] data;
+    new_tag->data = data;
     g->tags.push_back(std::move(new_tag));
 }
 
@@ -380,7 +369,7 @@ void add_mgh_tag_to_group(std::optional<MNEMghTagGroup>& g, int tag, long long l
 // read_next_tag
 //=========================================================================
 
-int read_next_tag(QFile& fp, int& tagp, long long& lenp, unsigned char*& datap)
+int read_next_tag(QFile& fp, int& tagp, long long& lenp, QByteArray& datap)
 /*
  * Read the next tag in the file
  */
@@ -431,7 +420,7 @@ int read_mgh_tags(QFile& fp, std::optional<MNEMghTagGroup>& tagsp)
 {
     long long len;
     int tag;
-    unsigned char* tag_data;
+    QByteArray tag_data;
 
     while (1) {
         if (read_next_tag(fp, tag, len, tag_data) == FAIL)
@@ -1196,7 +1185,7 @@ static std::optional<FiffCoordTrans> make_voxel_ras_trans(const Eigen::Vector3f&
     return FiffCoordTrans(FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_COORD_MRI, rot, r0);
 }
 
-MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf, float grid, float exclude, float mindist)
+std::unique_ptr<MNESourceSpace> MNESourceSpace::make_volume_source_space(const MNESurface& surf, float grid, float exclude, float mindist)
 /*
      * Make a source space which covers the volume bounded by surf
      */
@@ -1436,7 +1425,7 @@ MNESourceSpace* MNESourceSpace::make_volume_source_space(const MNESurface& surf,
         Eigen::Map<Eigen::Vector3f>(sp->voxel_size) = voxel_size;
     }
 
-    return sp.release();
+    return sp;
 }
 
 //=============================================================================================================

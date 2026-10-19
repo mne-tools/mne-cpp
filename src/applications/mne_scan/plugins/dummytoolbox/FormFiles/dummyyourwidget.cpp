@@ -43,7 +43,7 @@ using namespace DUMMYTOOLBOXPLUGIN;
 DummyYourWidget::DummyYourWidget(const QString& sSettingsPath,
                                  QWidget* parent)
 : QWidget(parent)
-, m_pUi(new Ui::DummyYourWidgetGui)
+, m_pUi(std::make_unique<Ui::DummyYourWidgetGui>())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -56,8 +56,6 @@ DummyYourWidget::DummyYourWidget(const QString& sSettingsPath,
 DummyYourWidget::~DummyYourWidget()
 {
     saveSettings();
-
-    delete m_pUi;
 }
 
 //=============================================================================================================

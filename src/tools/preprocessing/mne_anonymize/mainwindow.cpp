@@ -60,7 +60,7 @@ MainWindow::MainWindow()
 , m_bShowWarningMsgBoxInWasm(true)
 , m_sDefaultWasmInFile("/in.fif")
 , m_sDefaultWasmOutFile("/out.fif")
-, m_pUi(new Ui::MainWindow)
+, m_pUi(std::make_unique<Ui::MainWindow>())
 {
     m_pUi->setupUi(this);
     setDefaultStateUi();
@@ -72,7 +72,6 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow()
 {
-    delete m_pUi;
 }
 
 //=============================================================================================================

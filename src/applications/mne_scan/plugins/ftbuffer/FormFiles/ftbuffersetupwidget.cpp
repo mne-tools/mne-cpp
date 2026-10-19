@@ -40,7 +40,7 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
 : QWidget(parent)
 , m_pFtBuffer(toolbox)
 , m_sSettingsPath(sSettingsPath)
-, m_pUi(new Ui::FtBufferSetupUi)
+, m_pUi(std::make_unique<Ui::FtBufferSetupUi>())
 {
     m_pUi->setupUi(this);
 

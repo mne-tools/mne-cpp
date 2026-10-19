@@ -30,6 +30,8 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -261,7 +263,7 @@ protected:
      */
     void clearView();
 
-    Ui::Control3DViewWidget* m_pUi; /**< The pointer to the QtDesigner ui class. */
+    std::unique_ptr<Ui::Control3DViewWidget> m_pUi; /**< The pointer to the QtDesigner ui class. */
 
     QColor m_colCurrentSceneColor; /**< Current color of the scene in all View3D's. */
     QColor m_colCurrentLightColor; /**< Current color of the lights in all View3D's. */

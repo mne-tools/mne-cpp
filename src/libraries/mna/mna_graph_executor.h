@@ -48,6 +48,8 @@
 #include <QVariantMap>
 #include <QObject>
 #include <functional>
+#include <memory>
+#include <map>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -102,10 +104,10 @@ public:
      */
     struct StreamContext
     {
-        MnaGraph* graph = nullptr;           ///< The pipeline graph (owned externally)
-        QMap<QString, QObject*> livePlugins; ///< nodeId → live plugin instance (QObject* avoids scan dependency)
-        bool running = false;                ///< Whether the stream is active
-        QStringList executionOrder;          ///< Topological order used for startup/shutdown
+        MnaGraph* graph = nullptr;                               ///< The pipeline graph (owned externally)
+        std::map<QString, std::unique_ptr<QObject>> livePlugins; ///< nodeId → owned live plugin (QObject avoids a scan dependency)
+        bool running = false;                                    ///< Whether the stream is active
+        QStringList executionOrder;                              ///< Topological order used for startup/shutdown
     };
 
     /**
@@ -149,7 +151,7 @@ public:
 
     /// Factory callback: given a node's opType, create the corresponding live plugin.
     /// Returns nullptr if the opType is unknown.  The host app provides this callback.
-    using PluginFactory = std::function<QObject*(const QString& opType)>;
+    using PluginFactory = std::function<std::unique_ptr<QObject>(const QString& opType)>;
 
     /**
      * Start stream-mode execution of a graph.

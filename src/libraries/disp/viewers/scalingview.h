@@ -37,6 +37,8 @@
 #include <QMap>
 #include <QPointer>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -337,13 +339,13 @@ private:
 
     QStringList m_lChannelTypesToShow; /**< The channel types as strings to show the sliders for. */
 
-    Ui::ScalingViewWidget* m_pUi;    /**< Pointer to the user interface object. */
-    bool m_bLinkMAGtoGRAD;           /**< If this member is set, we link MAGs and GRad scales. */
-    bool m_bIsShiftKeyPressed;       /**< Bool member value to store the use of the shiftkey. */
-    bool m_bManagingSpinBoxChange;   /**< Bool member mutex the state of the spinbox. */
-    bool m_bManagingSliderChange;    /**< Bool member mutex the state of the slider. */
-    bool m_bManagingLinkMagToGrad;   /**< Bool member mutex the link between MAGs and GRADs. */
-    QPointer<QCheckBox> m_pCheckBox; /**< Stores the conversion ratio between MAGs and GRADs. */
+    std::unique_ptr<Ui::ScalingViewWidget> m_pUi; /**< Pointer to the user interface object. */
+    bool m_bLinkMAGtoGRAD;                        /**< If this member is set, we link MAGs and GRad scales. */
+    bool m_bIsShiftKeyPressed;                    /**< Bool member value to store the use of the shiftkey. */
+    bool m_bManagingSpinBoxChange;                /**< Bool member mutex the state of the spinbox. */
+    bool m_bManagingSliderChange;                 /**< Bool member mutex the state of the slider. */
+    bool m_bManagingLinkMagToGrad;                /**< Bool member mutex the link between MAGs and GRADs. */
+    QPointer<QCheckBox> m_pCheckBox;              /**< Stores the conversion ratio between MAGs and GRADs. */
 };
 
 } // NAMESPACE

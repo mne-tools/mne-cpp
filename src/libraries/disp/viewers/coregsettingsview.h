@@ -37,6 +37,8 @@
 #include <QSharedPointer>
 #include <QVector3D>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -331,8 +333,8 @@ private:
      */
     void setToolTipInfo();
 
-    Ui::CoregSettingsViewWidget* m_pUi; /**< The CoregSettingsViewWidget.*/
-    QString m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
+    std::unique_ptr<Ui::CoregSettingsViewWidget> m_pUi; /**< The CoregSettingsViewWidget.*/
+    QString m_sSettingsPath;                            /**< The settings path to store the GUI settings to. */
 
     QVector3D m_vecLPA; /**< contains LPA position. */
     QVector3D m_vecNAS; /**< contains Nasion position. */

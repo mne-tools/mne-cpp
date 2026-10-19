@@ -34,6 +34,8 @@
 #include <QFuture>
 #include <QFutureWatcher>
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -369,7 +371,7 @@ private:
 
     void createContextMenu();
 
-    Ui::EventWindowDockWidget* m_pUi; /** < Pointer to GUI elements */
+    std::unique_ptr<Ui::EventWindowDockWidget> m_pUi; /** < Pointer to GUI elements */
 
     int m_iCheckState;         /** < State of show events checkbox (0 unchecked, 2 checked) */
     int m_iCheckSelectedState; /** < State of the show selected checkbox (0 unchecked, 2 checked) */

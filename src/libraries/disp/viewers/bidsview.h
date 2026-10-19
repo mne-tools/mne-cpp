@@ -37,6 +37,8 @@
 #include <QItemSelectionModel>
 #include <QStandardItem>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -177,7 +179,7 @@ private:
      */
     void keyPressEvent(QKeyEvent* event);
 
-    Ui::BidsViewWidget* m_pUi; /**< The user interface. */
+    std::unique_ptr<Ui::BidsViewWidget> m_pUi; /**< The user interface. */
 
 signals:
     //=========================================================================================================

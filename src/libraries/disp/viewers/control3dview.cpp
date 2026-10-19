@@ -54,7 +54,7 @@ Control3DView::Control3DView(const QString& sSettingsPath,
                              const QStringList& slFlags,
                              Qt::WindowType type)
 : AbstractView(parent, type)
-, m_pUi(new Ui::Control3DViewWidget)
+, m_pUi(std::make_unique<Ui::Control3DViewWidget>())
 , m_colCurrentSceneColor(QColor(0, 0, 0))
 , m_colCurrentLightColor(QColor(255, 255, 255))
 {
@@ -82,7 +82,6 @@ Control3DView::Control3DView(const QString& sSettingsPath,
 Control3DView::~Control3DView()
 {
     saveSettings();
-    delete m_pUi;
 }
 
 //=============================================================================================================

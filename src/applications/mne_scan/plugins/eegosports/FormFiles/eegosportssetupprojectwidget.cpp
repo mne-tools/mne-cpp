@@ -43,7 +43,7 @@ using namespace UTILSLIB;
 
 EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSports, QWidget* parent)
 : QWidget(parent)
-, m_pUi(new Ui::EEGoSportsSetupProjectWidget)
+, m_pUi(std::make_unique<Ui::EEGoSportsSetupProjectWidget>())
 , m_pEEGoSports(pEEGoSports)
 {
     m_pUi->setupUi(this);
@@ -85,7 +85,6 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
 
 EEGoSportsSetupProjectWidget::~EEGoSportsSetupProjectWidget()
 {
-    delete m_pUi;
 }
 
 //=============================================================================================================

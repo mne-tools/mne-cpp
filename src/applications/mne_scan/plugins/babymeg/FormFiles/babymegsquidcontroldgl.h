@@ -31,6 +31,8 @@
 #include <QGraphicsRectItem>
 #include <QDialog>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -223,7 +225,7 @@ protected:
     virtual void closeEvent(QCloseEvent* event);
 
 private:
-    Ui::BabyMEGSQUIDControlDgl* ui;
+    std::unique_ptr<Ui::BabyMEGSQUIDControlDgl> ui;
 
 signals:
     void SendCMDToMEGSource(QString CMDSTR);

@@ -49,7 +49,7 @@ TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
                                            QWidget* parent,
                                            Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::TriggerDetectionViewWidget)
+, m_pUi(std::make_unique<Ui::TriggerDetectionViewWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -68,8 +68,6 @@ TriggerDetectionView::TriggerDetectionView(const QString& sSettingsPath,
 TriggerDetectionView::~TriggerDetectionView()
 {
     saveSettings();
-
-    delete m_pUi;
 }
 
 //=============================================================================================================

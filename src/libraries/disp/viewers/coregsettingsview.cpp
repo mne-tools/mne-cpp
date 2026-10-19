@@ -61,7 +61,7 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
                                      QWidget* parent,
                                      Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::CoregSettingsViewWidget)
+, m_pUi(std::make_unique<Ui::CoregSettingsViewWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -136,7 +136,6 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
 CoregSettingsView::~CoregSettingsView()
 {
     saveSettings();
-    delete m_pUi;
 }
 
 //=============================================================================================================

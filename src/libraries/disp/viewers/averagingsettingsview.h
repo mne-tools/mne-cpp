@@ -39,6 +39,8 @@
 #include <QPointer>
 #include <QMap>
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -174,7 +176,7 @@ protected:
     void onChangeStimChannel();
     void onChangeGroupSelect(int iIndex);
 
-    Ui::AverageSettingsViewWidget* m_pUi; /**< Holds the user interface for the AverageSettingsViewWidget.*/
+    std::unique_ptr<Ui::AverageSettingsViewWidget> m_pUi; /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
     QString m_sCurrentStimChan = QStringLiteral("STI014");
 

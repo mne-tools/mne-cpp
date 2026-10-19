@@ -57,7 +57,7 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
                                  QWidget* parent,
                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::HpiSettingsViewWidget)
+, m_pUi(std::make_unique<Ui::HpiSettingsViewWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -102,8 +102,6 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
 HpiSettingsView::~HpiSettingsView()
 {
     saveSettings();
-
-    delete m_pUi;
 }
 
 //=============================================================================================================

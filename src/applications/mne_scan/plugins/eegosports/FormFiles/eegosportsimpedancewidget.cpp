@@ -49,7 +49,7 @@ using namespace EEGOSPORTSPLUGIN;
 EEGoSportsImpedanceWidget::EEGoSportsImpedanceWidget(EEGoSports* pEEGoSports, QWidget* parent)
 : m_pEEGoSports(pEEGoSports)
 , QWidget(parent)
-, m_pUi(new Ui::EEGoSportsImpedanceWidget)
+, m_pUi(std::make_unique<Ui::EEGoSportsImpedanceWidget>())
 , m_dMaxImpedance(20000)
 {
     m_pUi->setupUi(this);
@@ -80,8 +80,6 @@ EEGoSportsImpedanceWidget::~EEGoSportsImpedanceWidget()
 {
     if (m_pEEGoSports->m_bCheckImpedances = true)
         stopImpedanceMeasurement();
-
-    delete m_pUi;
 }
 
 //=============================================================================================================

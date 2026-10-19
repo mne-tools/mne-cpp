@@ -46,7 +46,7 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
                                              const QMap<QString, int>& mapStimChsIndexNames,
                                              QWidget* parent)
 : AbstractView(parent)
-, m_pUi(new Ui::AverageSettingsViewWidget)
+, m_pUi(std::make_unique<Ui::AverageSettingsViewWidget>())
 , m_mapStimChsIndexNames(mapStimChsIndexNames)
 {
     m_sSettingsPath = sSettingsPath;
@@ -65,7 +65,6 @@ AveragingSettingsView::AveragingSettingsView(const QString& sSettingsPath,
 AveragingSettingsView::~AveragingSettingsView()
 {
     saveSettings();
-    delete m_pUi;
 }
 
 //=============================================================================================================

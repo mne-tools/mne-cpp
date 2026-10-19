@@ -41,7 +41,7 @@ DummySetupWidget::DummySetupWidget(DummyToolbox* toolbox, QWidget* parent)
 : QWidget(parent)
 , m_pDummyToolbox(toolbox)
 {
-    m_pUi = new DummySetupWidgetClass();
+    m_pUi = std::make_unique<Ui::DummySetupWidgetClass>();
     m_pUi->setupUi(this);
 
     //Always connect GUI elemts after m_pUi->setpUi has been called

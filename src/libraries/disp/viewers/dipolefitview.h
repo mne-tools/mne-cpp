@@ -36,6 +36,8 @@
 #include <QWidget>
 #include <QPointer>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -73,17 +75,19 @@ public:
     DipoleFitView(QWidget* parent = 0,
                   Qt::WindowFlags f = Qt::Widget);
 
+    ~DipoleFitView() override;
+
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.
      */
-    void saveSettings();
+    void saveSettings() override;
 
     //=========================================================================================================
     /**
      * Loads and inits all important settings of this view via QSettings.
      */
-    void loadSettings();
+    void loadSettings() override;
 
     //=========================================================================================================
     /**
@@ -136,7 +140,7 @@ public:
     /**
      * Clears the view
      */
-    void clearView();
+    void clearView() override;
 
 protected:
     //=========================================================================================================
@@ -145,7 +149,7 @@ protected:
      *
      * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
-    void updateGuiMode(GuiMode mode);
+    void updateGuiMode(GuiMode mode) override;
 
     //=========================================================================================================
     /**
@@ -153,7 +157,7 @@ protected:
      *
      * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
-    void updateProcessingMode(ProcessingMode mode);
+    void updateProcessingMode(ProcessingMode mode) override;
 
 private:
     //=========================================================================================================
@@ -162,7 +166,7 @@ private:
      */
     void initGui();
 
-    Ui::DipoleFitViewWidget* m_pUi; /**< Holds GUI for view. */
+    std::unique_ptr<Ui::DipoleFitViewWidget> m_pUi; /**< Holds GUI for view. */
 
 signals:
     //=========================================================================================================

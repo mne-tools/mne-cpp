@@ -194,12 +194,12 @@ public:
      * @param[in] exclude   Exclusion radius from the center of mass (m).
      * @param[in] mindist   Minimum distance from the surface (m).
      *
-     * @return A new volumetric source space, or NULL on failure. Caller takes ownership.
+     * @return A new volumetric source space, or nullptr on failure.
      */
-    static MNESourceSpace* make_volume_source_space(const MNESurface& surf,
-                                                    float grid,
-                                                    float exclude,
-                                                    float mindist);
+    static std::unique_ptr<MNESourceSpace> make_volume_source_space(const MNESurface& surf,
+                                                                    float grid,
+                                                                    float exclude,
+                                                                    float mindist);
 
     //=========================================================================================================
     // Source-space filtering, I/O, and label helpers (moved from MNESurfaceOrVolume)

@@ -435,17 +435,13 @@ MnaGraphExecutor::StreamContext MnaGraphExecutor::startStream(MnaGraph& graph,
     // 4. Instantiate live plugins via factory
     for (const QString& nodeId : ctx.executionOrder) {
         const MnaNode& n = graph.node(nodeId);
-        QObject* plugin = factory(n.opType);
+        std::unique_ptr<QObject> plugin = factory(n.opType);
         if (!plugin) {
             qWarning() << "MnaGraphExecutor::startStream - factory returned nullptr for opType:" << n.opType;
-            // Clean up already-created plugins
-            for (QObject* p : ctx.livePlugins) {
-                delete p;
-            }
             ctx.livePlugins.clear();
             return ctx;
         }
-        ctx.livePlugins.insert(nodeId, plugin);
+        ctx.livePlugins[nodeId] = std::move(plugin);
     }
 
     // 5. Wiring: the host application is responsible for connecting
@@ -470,9 +466,7 @@ void MnaGraphExecutor::stopStream(StreamContext& ctx)
 
     // Stop in reverse topological order
     for (int i = ctx.executionOrder.size() - 1; i >= 0; --i) {
-        const QString& nodeId = ctx.executionOrder[i];
-        QObject* plugin = ctx.livePlugins.value(nodeId);
-        delete plugin;
+        ctx.livePlugins.erase(ctx.executionOrder[i]);
     }
 
     ctx.livePlugins.clear();

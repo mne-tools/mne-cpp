@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
           gridMm, mindistMm, excludeMm);
 
     // Use the existing library function
-    MNESourceSpace* sp = MNESourceSpace::make_volume_source_space(surf, grid, exclude, mindist);
+    const auto sp = MNESourceSpace::make_volume_source_space(surf, grid, exclude, mindist);
     if (!sp) {
         qCritical("Volume source space creation failed.");
         return 1;
@@ -150,13 +150,11 @@ int main(int argc, char* argv[])
     QFile outF(outFile);
     if (!outF.open(QIODevice::WriteOnly)) {
         qCritical("Cannot write output file: %s", qPrintable(outFile));
-        delete sp;
         return 1;
     }
     FiffStream::SPtr outStream = FiffStream::start_file(outF);
     if (!outStream) {
         qCritical("Cannot write output file: %s", qPrintable(outFile));
-        delete sp;
         return 1;
     }
     outStream->start_block(FIFFB_MNE);
@@ -167,7 +165,5 @@ int main(int argc, char* argv[])
     outStream->end_file();
     outF.close();
     qInfo("Written volume source space to: %s", qPrintable(outFile));
-
-    delete sp;
     return 0;
 }

@@ -31,6 +31,8 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -239,7 +241,7 @@ protected:
      */
     void onFrequencyBandChanged();
 
-    Ui::ConnectivitySettingsViewWidget* m_pUi;
+    std::unique_ptr<Ui::ConnectivitySettingsViewWidget> m_pUi;
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
     int m_iNumberTrials;     /**< The number of trials are stored to check whether the number of trials actually changed. */

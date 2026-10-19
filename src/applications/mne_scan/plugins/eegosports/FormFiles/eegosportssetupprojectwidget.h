@@ -26,6 +26,8 @@
 
 #include <QWidget>
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -85,7 +87,7 @@ public:
 private:
     EEGoSports* m_pEEGoSports; /**< a pointer to corresponding EEGoSports.*/
 
-    Ui::EEGoSportsSetupProjectWidget* m_pUi; /**< the user interface for the EEGoSportsSetupWidget.*/
+    std::unique_ptr<Ui::EEGoSportsSetupProjectWidget> m_pUi; /**< the user interface for the EEGoSportsSetupWidget.*/
 
     //=========================================================================================================
     /**

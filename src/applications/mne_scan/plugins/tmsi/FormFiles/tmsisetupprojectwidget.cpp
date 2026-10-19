@@ -32,7 +32,7 @@ using namespace TMSIPLUGIN;
 
 TMSISetupProjectWidget::TMSISetupProjectWidget(TMSI* pTMSI, QWidget* parent)
 : QWidget(parent)
-, ui(new Ui::TMSISetupProjectWidget)
+, ui(std::make_unique<Ui::TMSISetupProjectWidget>())
 , m_pTMSI(pTMSI)
 {
     ui->setupUi(this);
@@ -49,7 +49,6 @@ TMSISetupProjectWidget::TMSISetupProjectWidget(TMSI* pTMSI, QWidget* parent)
 
 TMSISetupProjectWidget::~TMSISetupProjectWidget()
 {
-    delete ui;
 }
 
 //=============================================================================================================

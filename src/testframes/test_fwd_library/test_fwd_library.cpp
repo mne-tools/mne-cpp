@@ -21,6 +21,7 @@
 #include <fiff/fiff_coord_trans.h>
 
 #include <mne/mne_surface.h>
+#include <mne/mne_source_space.h>
 
 #include <fwd/fwd_bem_model.h>
 #include <fwd/fwd_bem_solution.h>

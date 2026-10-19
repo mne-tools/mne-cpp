@@ -25,6 +25,8 @@
 #include <QComboBox>
 #include <QLineEdit>
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -97,8 +99,8 @@ private:
      */
     void changeQLineEdits();
 
-    GUSBAmp* m_pGUSBAmp;               /**< a pointer to corresponding GUSBAmp.*/
-    Ui::GUSBAmpSetupProjectWidget* ui; /**< the user interface for the GUSBAmpSetupProjectWidget.*/
+    GUSBAmp* m_pGUSBAmp;                               /**< a pointer to corresponding GUSBAmp.*/
+    std::unique_ptr<Ui::GUSBAmpSetupProjectWidget> ui; /**< the user interface for the GUSBAmpSetupProjectWidget.*/
 };
 } // NAMESPACE
 

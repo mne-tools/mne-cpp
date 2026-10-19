@@ -38,6 +38,8 @@
 #include <QtAlgorithms>
 #include <QtSvg/QSvgGenerator>
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -160,7 +162,7 @@ private:
 
     QMap<QString, int> m_qmElectrodeNameIndex; /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
 
-    Ui::EEGoSportsImpedanceWidget* m_pUi; /**< The user interface for the EEGoSportsImpedanceWidget.*/
+    std::unique_ptr<Ui::EEGoSportsImpedanceWidget> m_pUi; /**< The user interface for the EEGoSportsImpedanceWidget.*/
 
     QSharedPointer<ColorMap> m_cbColorMap; /**< The pointer the colormap object.*/
 

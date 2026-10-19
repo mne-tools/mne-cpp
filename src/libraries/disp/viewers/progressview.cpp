@@ -31,7 +31,7 @@ using namespace DISPLIB;
 ProgressView::ProgressView(bool bHorizontalMessage,
                            const QString& sStyleSheet)
 : AbstractView()
-, m_pUi(new Ui::ProgressViewWidget)
+, m_pUi(std::make_unique<Ui::ProgressViewWidget>())
 {
     m_pUi->setupUi(this);
 
@@ -55,7 +55,6 @@ ProgressView::ProgressView(bool bHorizontalMessage,
 
 ProgressView::~ProgressView()
 {
-    delete m_pUi;
 }
 
 //=============================================================================================================

@@ -49,7 +49,7 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
                                                  QWidget* parent,
                                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::MinimumNormSettingsViewWidget)
+, m_pUi(std::make_unique<Ui::MinimumNormSettingsViewWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     m_sMethod = sMethod;
@@ -86,7 +86,6 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
 MinimumNormSettingsView::~MinimumNormSettingsView()
 {
     saveSettings();
-    delete m_pUi;
 }
 
 //=============================================================================================================

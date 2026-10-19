@@ -45,7 +45,7 @@ ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
                                                    QWidget* parent,
                                                    Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::ConnectivitySettingsViewWidget)
+, m_pUi(std::make_unique<Ui::ConnectivitySettingsViewWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -89,8 +89,6 @@ ConnectivitySettingsView::ConnectivitySettingsView(const QString& sSettingsPath,
 ConnectivitySettingsView::~ConnectivitySettingsView()
 {
     saveSettings();
-
-    delete m_pUi;
 }
 
 //=============================================================================================================

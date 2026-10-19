@@ -1489,10 +1489,9 @@ void TestMneLibrary::volumeSourceSpace_create()
     auto surf = MNESurface::read_bem_surface2(bemPath(), -1, 1);
     QVERIFY(surf != nullptr);
 
-    MNESourceSpace* vol = MNESourceSpace::make_volume_source_space(*surf, 0.020f, 0.0f, 0.005f);
+    auto vol = MNESourceSpace::make_volume_source_space(*surf, 0.020f, 0.0f, 0.005f);
     QVERIFY(vol != nullptr);
     QVERIFY(vol->np > 0);
-    delete vol;
 }
 
 //=============================================================================================================

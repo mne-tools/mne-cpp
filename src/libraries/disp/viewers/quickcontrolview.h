@@ -32,6 +32,8 @@
 #include "helpers/draggableframelesswidget.h"
 #include "butterflyview.h"
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -216,9 +218,9 @@ protected:
     void onOpacityChange(qint32 value);
 
 private:
-    QString m_sSettingsPath;           /**< The settings path to store the GUI settings to. */
-    QString m_sName;                   /**< Name of the widget which uses this quick control. */
-    Ui::QuickControlViewWidget* m_pUi; /**< The generated UI file. */
+    QString m_sSettingsPath;                           /**< The settings path to store the GUI settings to. */
+    QString m_sName;                                   /**< Name of the widget which uses this quick control. */
+    std::unique_ptr<Ui::QuickControlViewWidget> m_pUi; /**< The generated UI file. */
 
 signals:
 };

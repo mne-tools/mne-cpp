@@ -570,11 +570,11 @@ void TestMnaGraphExecution::testStreamStartStop()
     // One live plugin per node, created in topological order and destroyed in reverse
     QStringList created;
     QStringList destroyed;
-    const auto factory = [&](const QString& opType) -> QObject* {
-        auto* plugin = new QObject;
+    const auto factory = [&](const QString& opType) -> std::unique_ptr<QObject> {
+        auto plugin = std::make_unique<QObject>();
         plugin->setObjectName(opType);
         created.append(opType);
-        connect(plugin, &QObject::destroyed, [&destroyed, opType]() { destroyed.append(opType); });
+        connect(plugin.get(), &QObject::destroyed, [&destroyed, opType]() { destroyed.append(opType); });
         return plugin;
     };
     MnaGraphExecutor::StreamContext ctx = MnaGraphExecutor::startStream(graph, factory);
@@ -582,21 +582,21 @@ void TestMnaGraphExecution::testStreamStartStop()
     QCOMPARE(ctx.graph, &graph);
     QCOMPARE(ctx.executionOrder, QStringList({"src", "dbl"}));
     QCOMPARE(created, QStringList({"test_source", "test_double"}));
-    QCOMPARE(ctx.livePlugins.value("dbl")->objectName(), QStringLiteral("test_double"));
+    QCOMPARE(ctx.livePlugins.at("dbl")->objectName(), QStringLiteral("test_double"));
     QCOMPARE(graph.node("src").attributes.value("value").toDouble(), 5.0);
     MnaGraphExecutor::stopStream(ctx);
-    QVERIFY(!ctx.running && ctx.livePlugins.isEmpty() && !ctx.graph);
+    QVERIFY(!ctx.running && ctx.livePlugins.empty() && !ctx.graph);
     QCOMPARE(destroyed, QStringList({"test_double", "test_source"}));
     MnaGraphExecutor::stopStream(ctx);
 
     // A plugin that cannot be created aborts the start and frees those already created
     destroyed.clear();
-    const auto partial = [&](const QString& opType) -> QObject* {
+    const auto partial = [&](const QString& opType) -> std::unique_ptr<QObject> {
         return opType == QLatin1String("test_double") ? nullptr : factory(opType);
     };
     QTest::ignoreMessage(QtWarningMsg, QRegularExpression("factory returned nullptr"));
     ctx = MnaGraphExecutor::startStream(graph, partial);
-    QVERIFY(!ctx.running && ctx.livePlugins.isEmpty());
+    QVERIFY(!ctx.running && ctx.livePlugins.empty());
     QCOMPARE(destroyed, QStringList({"test_source"}));
 
     // An invalid graph (unconnected input) does not start

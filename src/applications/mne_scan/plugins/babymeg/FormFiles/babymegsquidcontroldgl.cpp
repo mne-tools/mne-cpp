@@ -44,7 +44,7 @@ using namespace Eigen;
 BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG, QWidget* parent)
 : QDialog(parent)
 , m_pBabyMEG(p_pBabyMEG)
-, ui(new Ui::BabyMEGSQUIDControlDgl)
+, ui(std::make_unique<Ui::BabyMEGSQUIDControlDgl>())
 {
     connect(this, &BabyMEGSQUIDControlDgl::SendCMDToMEGSource, p_pBabyMEG, &BabyMEG::comFLL);
     connect(m_pBabyMEG, &BabyMEG::dataToSquidCtrlGUI, this, &BabyMEGSQUIDControlDgl::TuneGraphDispProc);
@@ -128,7 +128,6 @@ BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG, QWidget* par
 BabyMEGSQUIDControlDgl::~BabyMEGSQUIDControlDgl()
 {
     delete d_timeplot;
-    delete ui;
 }
 
 //=============================================================================================================

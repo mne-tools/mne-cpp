@@ -50,7 +50,7 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
                                        QWidget* parent,
                                        Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::FilterSettingsViewWidget)
+, m_pUi(std::make_unique<Ui::FilterSettingsViewWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     this->setWindowTitle("Filter Settings");
@@ -95,7 +95,6 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
 FilterSettingsView::~FilterSettingsView()
 {
     saveSettings();
-    delete m_pUi;
 }
 
 //=============================================================================================================

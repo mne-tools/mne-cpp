@@ -71,7 +71,7 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
                                            ChannelInfoModel::SPtr pChannelInfoModel,
                                            Qt::WindowType f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::ChannelSelectionViewWidget)
+, m_pUi(std::make_unique<Ui::ChannelSelectionViewWidget>())
 , m_pChannelInfoModel(pChannelInfoModel)
 , m_bSetup(false)
 {
@@ -97,8 +97,6 @@ ChannelSelectionView::ChannelSelectionView(const QString& sSettingsPath,
 ChannelSelectionView::~ChannelSelectionView()
 {
     //    saveSettings();
-
-    delete m_pUi;
 }
 
 //=============================================================================================================

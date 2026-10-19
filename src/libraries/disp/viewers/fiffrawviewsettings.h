@@ -36,6 +36,8 @@
 
 #include <QStringList>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -255,7 +257,7 @@ protected:
      */
     void onMakeScreenshot();
 
-    Ui::FiffRawViewSettingsWidget* m_pUi;
+    std::unique_ptr<Ui::FiffRawViewSettingsWidget> m_pUi;
 
     QColor m_colCurrentSignalColor;     /**< Current color of the signal. */
     QColor m_colCurrentBackgroundColor; /**< Current color of the background. */

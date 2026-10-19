@@ -37,6 +37,8 @@
 #include <QMap>
 #include <QPointer>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -199,7 +201,7 @@ protected:
 
     QSharedPointer<FilterDesignView> m_pFilterView; /**< The filter view. */
 
-    Ui::FilterSettingsViewWidget* m_pUi; /**< The filter settings GUI view. */
+    std::unique_ptr<Ui::FilterSettingsViewWidget> m_pUi; /**< The filter settings GUI view. */
 };
 } // NAMESPACE
 

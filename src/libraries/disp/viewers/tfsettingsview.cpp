@@ -45,7 +45,7 @@ TfSettingsView::TfSettingsView(const QString& sSettingsPath,
                                QWidget* parent,
                                Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::TfSettingsViewWidget)
+, m_pUi(std::make_unique<Ui::TfSettingsViewWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -68,8 +68,6 @@ TfSettingsView::TfSettingsView(const QString& sSettingsPath,
 TfSettingsView::~TfSettingsView()
 {
     saveSettings();
-
-    delete m_pUi;
 }
 
 //=============================================================================================================

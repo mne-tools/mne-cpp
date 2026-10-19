@@ -28,6 +28,8 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -139,7 +141,7 @@ protected:
      */
     void onSpharaOptionsChanged();
 
-    Ui::SpharaSettingsViewWidget* m_pUi;
+    std::unique_ptr<Ui::SpharaSettingsViewWidget> m_pUi;
 
 signals:
     //=========================================================================================================

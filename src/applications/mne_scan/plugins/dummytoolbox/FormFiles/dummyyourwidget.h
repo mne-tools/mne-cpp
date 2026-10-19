@@ -26,6 +26,8 @@
 
 #include <QWidget>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -90,8 +92,8 @@ private:
      */
     void loadSettings();
 
-    Ui::DummyYourWidgetGui* m_pUi; /**< The UI class specified in the designer. */
-    QString m_sSettingsPath;       /**< The settings path to store the GUI settings to. */
+    std::unique_ptr<Ui::DummyYourWidgetGui> m_pUi; /**< The UI class specified in the designer. */
+    QString m_sSettingsPath;                       /**< The settings path to store the GUI settings to. */
 };
 } //namespace
 

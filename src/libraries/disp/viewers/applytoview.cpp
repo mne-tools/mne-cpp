@@ -34,7 +34,7 @@ ApplyToView::ApplyToView(const QString& sSettingsPath,
                          Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_sSettingsPath(sSettingsPath)
-, m_pUi(new Ui::ApplyToViewWidget)
+, m_pUi(std::make_unique<Ui::ApplyToViewWidget>())
 {
     m_pUi->setupUi(this);
     this->setMinimumWidth(330);
@@ -50,7 +50,6 @@ ApplyToView::ApplyToView(const QString& sSettingsPath,
 
 ApplyToView::~ApplyToView()
 {
-    delete m_pUi;
 }
 
 //=============================================================================================================

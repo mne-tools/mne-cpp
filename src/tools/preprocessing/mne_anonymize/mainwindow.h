@@ -26,6 +26,8 @@
 #include <QDateTime>
 #include <QFileInfo>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -766,7 +768,7 @@ private:
     const QString m_sDefaultWasmInFile;  /**< In Web Assembly context, the file name of the input file.*/
     const QString m_sDefaultWasmOutFile; /**< In Web Assembly context, the file name of the output file.*/
 
-    Ui::MainWindow* m_pUi; /**< Pointer to the user interface form.*/
+    std::unique_ptr<Ui::MainWindow> m_pUi; /**< Pointer to the user interface form.*/
 };
 
 }

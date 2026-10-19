@@ -39,6 +39,8 @@
 #include <QListWidget>
 #include <QGraphicsItem>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -395,7 +397,7 @@ private:
      */
     bool eventFilter(QObject* obj, QEvent* event);
 
-    Ui::ChannelSelectionViewWidget* m_pUi; /**< Pointer to the qt designer generated ui class. */
+    std::unique_ptr<Ui::ChannelSelectionViewWidget> m_pUi; /**< Pointer to the qt designer generated ui class. */
 
     QSharedPointer<ChannelInfoModel> m_pChannelInfoModel; /**< Pointer to the channel info model. */
 

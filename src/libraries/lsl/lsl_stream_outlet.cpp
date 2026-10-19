@@ -203,8 +203,8 @@ private:
         // Prepare discovery datagram (re-created each loop to include up-to-date port)
         std::string discoveryPayload = m_info.to_string();
 
-        // Track connected client sockets (owned by this thread)
-        std::vector<QTcpSocket*> clients;
+        // Connected client sockets; owned here rather than left to the server's child list
+        std::vector<std::unique_ptr<QTcpSocket>> clients;
 
         auto lastBroadcast = std::chrono::steady_clock::now() - std::chrono::seconds(10); // send immediately
 
@@ -212,12 +212,12 @@ private:
         while (m_bRunning) {
             // 1. Accept new connections
             while (tcpServer.waitForNewConnection(0)) {
-                QTcpSocket* client = tcpServer.nextPendingConnection();
+                std::unique_ptr<QTcpSocket> client(tcpServer.nextPendingConnection());
                 if (client) {
                     // Send handshake to the new client
                     client->write(handshake);
                     client->flush();
-                    clients.push_back(client);
+                    clients.push_back(std::move(client));
                     m_nClients.store(static_cast<int>(clients.size()));
                 }
             }
@@ -244,9 +244,8 @@ private:
                     // Write to all clients, remove disconnected ones
                     auto it = clients.begin();
                     while (it != clients.end()) {
-                        QTcpSocket* client = *it;
+                        QTcpSocket* client = it->get();
                         if (client->state() != QAbstractSocket::ConnectedState) {
-                            delete client;
                             it = clients.erase(it);
                             continue;
                         }
@@ -259,7 +258,7 @@ private:
             }
 
             // Flush all clients
-            for (QTcpSocket* client : clients) {
+            for (const auto& client : clients) {
                 client->flush();
             }
 
@@ -270,9 +269,8 @@ private:
         }
 
         // --- Cleanup ---
-        for (QTcpSocket* client : clients) {
+        for (const auto& client : clients) {
             client->disconnectFromHost();
-            delete client;
         }
         clients.clear();
         m_nClients.store(0);
@@ -296,7 +294,7 @@ private:
 //=============================================================================================================
 
 stream_outlet::stream_outlet(const stream_info& info)
-: m_pImpl(new StreamOutletPrivate(info))
+: m_pImpl(std::make_unique<StreamOutletPrivate>(info))
 {
     m_pImpl->start();
 }

@@ -29,6 +29,8 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -131,7 +133,7 @@ protected:
 
     QList<QString> m_lViewList;
 
-    Ui::ApplyToViewWidget* m_pUi;
+    std::unique_ptr<Ui::ApplyToViewWidget> m_pUi;
 };
 } //NAMESPACE
 

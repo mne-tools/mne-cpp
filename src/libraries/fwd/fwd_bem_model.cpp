@@ -469,11 +469,11 @@ int FwdBemModel::fwd_bem_set_head_mri_t(const FiffCoordTrans& t)
 
 //=============================================================================================================
 
-MNESurface::UPtr FwdBemModel::make_guesses(MNESurface* guess_surf, float guessrad, const Eigen::Vector3f& guess_r0, float grid, float exclude, float mindist)
+std::unique_ptr<MNESourceSpace> FwdBemModel::make_guesses(MNESurface* guess_surf, float guessrad, const Eigen::Vector3f& guess_r0, float grid, float exclude, float mindist)
 {
     QString bemname;
     MNESurface::UPtr sphere_owner;
-    MNESurface::UPtr res;
+    std::unique_ptr<MNESourceSpace> res;
     int k;
     float dist;
 
@@ -510,7 +510,7 @@ MNESurface::UPtr FwdBemModel::make_guesses(MNESurface* guess_surf, float guessra
               mne_coord_frame_name_40(guess_surf->coord_frame).toUtf8().constData());
     }
     qInfo("Filtering (grid = %6.f mm)...", 1000 * grid);
-    res.reset(reinterpret_cast<MNESurface*>(MNESourceSpace::make_volume_source_space(*guess_surf, grid, exclude, mindist)));
+    res = MNESourceSpace::make_volume_source_space(*guess_surf, grid, exclude, mindist);
 
     return res;
 }

@@ -34,6 +34,8 @@
 #include <QWidget>
 #include <QMenu>
 
+#include <memory>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -100,6 +102,8 @@ public:
                           QWidget* parent,
                           double min,
                           double max);
+
+    ~ScaleControl() override;
 
     //=========================================================================================================
     /**
@@ -284,15 +288,15 @@ private:
      */
     void promptMaxValueChange();
 
-    Ui::ScaleControlWidget* m_pUi; /**< Pointer to the user interface object. */
-    bool m_bManagingSpinBoxChange; /**< Bool member guarding the state of the spinbox. */
-    bool m_bManagingSliderChange;  /**< Bool member guarding the state of the slider. */
-    float m_fSensitivity;          /**< Sensitivity of the non-linear mapping fcn for the slider. */
-    float m_fSensitivityWeighted;  /**< Sensitivity of the non-linear mapping fcn, weighted by the max value of the spinbox. */
-    float m_fMaxSensitivityPoint;  /**< Max sensitivity point of the non-linear mapping fcn for the slider. */
-    float m_fMapYconstant;         /**< Y constant in the non-linear mapping curve for the slider. */
-    float m_fMapKconstant;         /**< K constant in the non-linear mapping curve for the slider. */
-    bool m_bSliderInverted;        /**< State variable to store the inverted or not state of the slider. */
+    std::unique_ptr<Ui::ScaleControlWidget> m_pUi; /**< Pointer to the user interface object. */
+    bool m_bManagingSpinBoxChange;                 /**< Bool member guarding the state of the spinbox. */
+    bool m_bManagingSliderChange;                  /**< Bool member guarding the state of the slider. */
+    float m_fSensitivity;                          /**< Sensitivity of the non-linear mapping fcn for the slider. */
+    float m_fSensitivityWeighted;                  /**< Sensitivity of the non-linear mapping fcn, weighted by the max value of the spinbox. */
+    float m_fMaxSensitivityPoint;                  /**< Max sensitivity point of the non-linear mapping fcn for the slider. */
+    float m_fMapYconstant;                         /**< Y constant in the non-linear mapping curve for the slider. */
+    float m_fMapKconstant;                         /**< K constant in the non-linear mapping curve for the slider. */
+    bool m_bSliderInverted;                        /**< State variable to store the inverted or not state of the slider. */
 
     QMenu* m_pSettingsMenu;
 };

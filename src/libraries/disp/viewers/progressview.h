@@ -28,6 +28,8 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -152,7 +154,7 @@ public slots:
     void setLoadingBarVisible(bool bVisible);
 
 private:
-    Ui::ProgressViewWidget* m_pUi;
+    std::unique_ptr<Ui::ProgressViewWidget> m_pUi;
 };
 } //Namespace
 

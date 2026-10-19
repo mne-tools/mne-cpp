@@ -61,7 +61,7 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
                                    QWidget* parent,
                                    Qt::WindowFlags f)
 : AbstractView(parent, f)
-, m_pUi(new Ui::FilterDesignViewWidget)
+, m_pUi(std::make_unique<Ui::FilterDesignViewWidget>())
 , m_iFilterTaps(512)
 , m_dSFreq(600)
 {
@@ -82,8 +82,6 @@ FilterDesignView::FilterDesignView(const QString& sSettingsPath,
 FilterDesignView::~FilterDesignView()
 {
     saveSettings();
-
-    delete m_pUi;
 }
 
 //=============================================================================================================

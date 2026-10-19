@@ -57,7 +57,7 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_bAnnotaionsLoaded(false)
-, m_pUi(new Ui::FwdSettingsViewWidget)
+, m_pUi(std::make_unique<Ui::FwdSettingsViewWidget>())
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
@@ -109,8 +109,6 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
 FwdSettingsView::~FwdSettingsView()
 {
     saveSettings();
-
-    delete m_pUi;
 }
 
 //=============================================================================================================

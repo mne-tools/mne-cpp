@@ -50,7 +50,7 @@ using namespace UTILSLIB;
 
 BrainAMPSetupProjectWidget::BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWidget* parent)
 : QWidget(parent)
-, ui(new Ui::BrainAMPSetupProjectWidget)
+, ui(std::make_unique<Ui::BrainAMPSetupProjectWidget>())
 , m_pBrainAMP(pBrainAMP)
 {
     ui->setupUi(this);
@@ -82,7 +82,6 @@ BrainAMPSetupProjectWidget::BrainAMPSetupProjectWidget(BrainAMP* pBrainAMP, QWid
 
 BrainAMPSetupProjectWidget::~BrainAMPSetupProjectWidget()
 {
-    delete ui;
 }
 
 //=============================================================================================================

@@ -29,6 +29,8 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -183,7 +185,7 @@ private:
 
     void browseDirectories();
 
-    Ui::ProjectSettingsViewWidget* m_pUi;
+    std::unique_ptr<Ui::ProjectSettingsViewWidget> m_pUi;
 
     QStringList m_sListProjects;
     QStringList m_sListSubjects;

@@ -27,6 +27,8 @@
 
 #include <QtWidgets>
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -79,7 +81,7 @@ public:
 private:
     DummyToolbox* m_pDummyToolbox; /**< Holds a pointer to corresponding DummyToolbox.*/
 
-    Ui::DummySetupWidgetClass* m_pUi; /**< Holds the user interface for the DummySetupWidget.*/
+    std::unique_ptr<Ui::DummySetupWidgetClass> m_pUi; /**< Holds the user interface for the DummySetupWidget.*/
 };
 } // NAMESPACE
 

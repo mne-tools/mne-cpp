@@ -139,7 +139,7 @@ ScalingView::ScalingView(const QString& sSettingsPath,
                          const QStringList& lChannelsToShow)
 : AbstractView(parent, f)
 , m_lChannelTypesToShow(lChannelsToShow)
-, m_pUi(new Ui::ScalingViewWidget)
+, m_pUi(std::make_unique<Ui::ScalingViewWidget>())
 , m_bLinkMAGtoGRAD(false)
 , m_bIsShiftKeyPressed(false)
 , m_bManagingSpinBoxChange(false)
@@ -163,7 +163,6 @@ ScalingView::~ScalingView()
 {
     saveSettings();
 
-    delete m_pUi;
 
     for (auto& control : m_qMapScaleControls) {
         delete control;

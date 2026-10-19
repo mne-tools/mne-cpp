@@ -26,6 +26,8 @@
 
 #include <QWidget>
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -84,8 +86,8 @@ public:
     void initGui();
 
 private:
-    BrainAMP* m_pBrainAMP;              /**< a pointer to corresponding BrainAMP.*/
-    Ui::BrainAMPSetupProjectWidget* ui; /**< the user interface for the BrainAMPSetupWidget.*/
+    BrainAMP* m_pBrainAMP;                              /**< a pointer to corresponding BrainAMP.*/
+    std::unique_ptr<Ui::BrainAMPSetupProjectWidget> ui; /**< the user interface for the BrainAMPSetupWidget.*/
 
     //=========================================================================================================
     /**

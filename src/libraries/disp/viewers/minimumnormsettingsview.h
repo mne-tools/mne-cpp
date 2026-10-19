@@ -29,6 +29,8 @@
 #include "../disp_global.h"
 #include "abstractview.h"
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -188,7 +190,7 @@ protected:
      */
     void onBrowseModelCheckpointClicked();
 
-    Ui::MinimumNormSettingsViewWidget* m_pUi;
+    std::unique_ptr<Ui::MinimumNormSettingsViewWidget> m_pUi;
     QString m_sMethod;
     QString m_sModelCheckpoint; /**< Persisted model-checkpoint path for CMNE. */
 

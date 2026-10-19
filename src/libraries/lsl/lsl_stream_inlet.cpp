@@ -65,7 +65,6 @@ class LSLLIB::StreamInletPrivate
 public:
     StreamInletPrivate(const stream_info& info)
     : m_info(info)
-    , m_pSocket(nullptr)
     , m_bIsOpen(false)
     , m_iChannelCount(info.channel_count())
     , m_iBytesPerSample(static_cast<int>(info.channel_count() * sizeof(float)))
@@ -88,14 +87,13 @@ public:
         }
 
         // Create socket (no parent, we manage lifetime ourselves)
-        m_pSocket = new QTcpSocket();
+        m_pSocket = std::make_unique<QTcpSocket>();
 
         QString host = QString::fromStdString(m_info.data_host());
         quint16 port = static_cast<quint16>(m_info.data_port());
 
         if (host.isEmpty() || port == 0) {
-            delete m_pSocket;
-            m_pSocket = nullptr;
+            m_pSocket.reset();
             throw std::runtime_error("[lsl::stream_inlet] Invalid data host or port in stream_info");
         }
 
@@ -103,15 +101,13 @@ public:
 
         if (!m_pSocket->waitForConnected(5000)) {
             QString err = m_pSocket->errorString();
-            delete m_pSocket;
-            m_pSocket = nullptr;
+            m_pSocket.reset();
             throw std::runtime_error(std::string("[lsl::stream_inlet] Failed to connect to outlet: ") + err.toStdString());
         }
 
         // Read the handshake header: "LSL1" (4 bytes) + channel_count (4 bytes, little-endian)
         if (!m_pSocket->waitForReadyRead(5000)) {
-            delete m_pSocket;
-            m_pSocket = nullptr;
+            m_pSocket.reset();
             throw std::runtime_error("[lsl::stream_inlet] Timeout waiting for handshake from outlet");
         }
 
@@ -126,8 +122,7 @@ public:
         }
 
         if (header.size() < 8 || header.left(4) != QByteArray("LSL1", 4)) {
-            delete m_pSocket;
-            m_pSocket = nullptr;
+            m_pSocket.reset();
             throw std::runtime_error("[lsl::stream_inlet] Invalid handshake from outlet");
         }
 
@@ -157,8 +152,7 @@ public:
                     m_pSocket->waitForDisconnected(1000);
                 }
             }
-            delete m_pSocket;
-            m_pSocket = nullptr;
+            m_pSocket.reset();
         }
         m_bIsOpen = false;
         m_rawBuffer.clear();
@@ -229,12 +223,12 @@ public:
         return chunk;
     }
 
-    stream_info m_info;     /**< The stream info for this inlet. */
-    QTcpSocket* m_pSocket;  /**< TCP socket for data reception. */
-    bool m_bIsOpen;         /**< Whether the stream is currently open. */
-    int m_iChannelCount;    /**< Number of channels. */
-    int m_iBytesPerSample;  /**< Bytes per sample (channels * sizeof(float)). */
-    QByteArray m_rawBuffer; /**< Raw byte buffer for incoming TCP data. */
+    stream_info m_info;                    /**< The stream info for this inlet. */
+    std::unique_ptr<QTcpSocket> m_pSocket; /**< TCP socket for data reception. */
+    bool m_bIsOpen;                        /**< Whether the stream is currently open. */
+    int m_iChannelCount;                   /**< Number of channels. */
+    int m_iBytesPerSample;                 /**< Bytes per sample (channels * sizeof(float)). */
+    QByteArray m_rawBuffer;                /**< Raw byte buffer for incoming TCP data. */
 };
 
 //=============================================================================================================
@@ -242,7 +236,7 @@ public:
 //=============================================================================================================
 
 stream_inlet::stream_inlet(const stream_info& info)
-: m_pImpl(new StreamInletPrivate(info))
+: m_pImpl(std::make_unique<StreamInletPrivate>(info))
 {
 }
 

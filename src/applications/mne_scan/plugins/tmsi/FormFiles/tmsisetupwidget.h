@@ -24,6 +24,8 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+
+#include <memory>
 #include "tmsiimpedanceview.h"
 
 //=============================================================================================================
@@ -106,7 +108,7 @@ private:
 
     TMSI* m_pTMSI; /**< a pointer to corresponding TMSI.*/
 
-    Ui::TMSISetupClass* m_pUi; /**< the user interface for the TMSISetupWidget.*/
+    std::unique_ptr<Ui::TMSISetupClass> m_pUi; /**< the user interface for the TMSISetupWidget.*/
 };
 } // NAMESPACE
 

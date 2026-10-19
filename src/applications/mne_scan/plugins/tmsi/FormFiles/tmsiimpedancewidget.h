@@ -36,6 +36,8 @@
 #include <QtAlgorithms>
 #include <QtSvg/QSvgGenerator>
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -91,7 +93,7 @@ private:
 
     QMap<QString, int> m_qmElectrodeNameIndex; /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
 
-    Ui::TMSIImpedanceWidget* ui; /**< The user interface for the TMSIImpedanceWidget.*/
+    std::unique_ptr<Ui::TMSIImpedanceWidget> ui; /**< The user interface for the TMSIImpedanceWidget.*/
 
     QSharedPointer<DISPLIB::ColorMap> m_cbColorMap; /**< The pointer the colormap object.*/
 

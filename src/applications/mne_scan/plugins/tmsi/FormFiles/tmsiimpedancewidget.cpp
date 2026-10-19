@@ -45,7 +45,7 @@ using namespace std;
 TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* pTMSI, QWidget* parent)
 : m_pTMSI(pTMSI)
 , QWidget(parent)
-, ui(new Ui::TMSIImpedanceWidget)
+, ui(std::make_unique<Ui::TMSIImpedanceWidget>())
 , m_dMaxImpedance(200000)
 {
     ui->setupUi(this);
@@ -80,7 +80,6 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* pTMSI, QWidget* parent)
 
 TMSIImpedanceWidget::~TMSIImpedanceWidget()
 {
-    delete ui;
 }
 
 //=============================================================================================================

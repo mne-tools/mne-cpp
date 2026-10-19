@@ -28,6 +28,8 @@
 
 #include <QtWidgets>
 
+#include <memory>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -121,7 +123,7 @@ private:
 
     QString m_sSettingsPath; /**< The settings path to store the GUI settings to. */
 
-    Ui::FtBufferSetupUi* m_pUi; /**< Holds the user interface for the FtBufferSetupWidget.*/
+    std::unique_ptr<Ui::FtBufferSetupUi> m_pUi; /**< Holds the user interface for the FtBufferSetupWidget.*/
 };
 
 } // NAMESPACE
