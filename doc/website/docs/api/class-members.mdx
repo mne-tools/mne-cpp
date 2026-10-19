@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6338 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6336 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -515,7 +515,6 @@ Index of 6338 public class members (functions, variables, typedefs, enums) acros
 - **chs** `[var]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Channel information associated with compensation.
 - **chs** `[var]` in [MNEDeriv](/docs/api/mne/mne-deriv) — First matching channel info for each derivation.
 - **chs** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Channel information list.
-- **chsel** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Channel selection for raw-data access.
 - **chspick** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — Translated into channel names using the present data.
 - **chspick_nospace** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — The same without spaces.
 - **CircularBuffer** `[fn]` in [CircularBuffer](/docs/api/utils/circular-buffer) — Constructs a [`CircularBuffer`](/docs/api/utils/circular-buffer).
@@ -736,7 +735,7 @@ Index of 6338 public class members (functions, variables, typedefs, enums) acros
 - **comp** `[var]` in [FwdThreadArg](/docs/api/fwd/fwd-thread-arg) — Which component to compute for free orientations.
 - **comp** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Software gradient compensation data.
 - **comp** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — CTF compensation data.
-- **comp_coils** `[var]` in [FwdCompData](/docs/api/fwd/fwd-comp-data) — The compensation coil definitions.
+- **comp_coils** `[var]` in [FwdCompData](/docs/api/fwd/fwd-comp-data) — The compensation coil definitions, shared by per-thread copies.
 - **comp_data** `[var]` in [MNECTFCompData](/docs/api/mne/mnectf-comp-data) — Intermediate buffer for compensation results.
 - **comp_file** `[var]` in [MNERawData](/docs/api/mne/mne-raw-data) — Compensation grade stored in the file.
 - **comp_info** `[var]` in [MNESssData](/docs/api/mne/mne-sss-data) — Which components are included.
@@ -1162,7 +1161,7 @@ Index of 6338 public class members (functions, variables, typedefs, enums) acros
 - **ctrs** `[var]` in [RegionMTOut](/docs/api/mne/region-mt-out) — Cluster centroids (nClusters x features).
 - **cubic** `[fn]` in [Interpolation](/docs/api/disp3-d/interpolation) — cubic Cubic hyperbola interpolation function.
 - **current** `[var]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Compiled compensation operator for the current target grade.
-- **current** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Pointer to the currently active data set.
+- **current** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Currently active data set (owned by `sets`).
 - **CURRENT_SCHEMA_VERSION** `[var]` in [MnaProject](/docs/api/mna/mna-project) — Current MNA schema version.
 - **currentTimePoint** `[fn]` in [SourceEstimateManager](/docs/api/disp3-d/source-estimate-manager)
 - **currentTimePoint** `[var]` in [SubView](/docs/api/disp3-d/sub-view)
@@ -1454,8 +1453,7 @@ Index of 6338 public class members (functions, variables, typedefs, enums) acros
 - **edgeInstanceCount** `[fn]` in [NetworkObject](/docs/api/disp3-d/network-object)
 - **edgeRenderKey** `[fn]` in [NetworkObject](/docs/api/disp3-d/network-object)
 - **edgeStreams** `[fn]` in [NetworkObject](/docs/api/disp3-d/network-object)
-- **eeg_client** `[var]` in [dipoleFitFuncsRec](/docs/api/inv/dipole-fit-funcs-rec) — Client data for EEG field computations.
-- **eeg_client_free** `[var]` in [dipoleFitFuncsRec](/docs/api/inv/dipole-fit-funcs-rec) — Destructor for EEG client data.
+- **eeg_client** `[var]` in [dipoleFitFuncsRec](/docs/api/inv/dipole-fit-funcs-rec) — Client data for EEG field computations (not owned).
 - **eeg_els** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — EEG electrode definitions.
 - **eeg_loc** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Channel location.
 - **eeg_model** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — EEG sphere model definition.
@@ -2929,7 +2927,7 @@ Index of 6338 public class members (functions, variables, typedefs, enums) acros
 - **LinePlot** `[fn]` in [LinePlot](/docs/api/disp/line-plot) — Constructs a line series plot.
 - **lineReceived** `[signal]` in [PythonRunner](/docs/api/utils/python-runner) — Emitted for every stdout/stderr line (mirrors the line callback).
 - **linFieldIntFunc** `[type]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Function pointer type for linear field coefficient integration methods.
-- **livePlugins** `[var]` in `StreamContext` — nodeId → live plugin instance (QObject* avoids scan dependency)
+- **livePlugins** `[var]` in `StreamContext` — nodeId → owned live plugin (QObject avoids a scan dependency)
 - **load** `[fn]` in [DipoleObject](/docs/api/disp3-d/dipole-object)
 - **load** `[fn]` in [FsAtlasLookup](/docs/api/fs/fs-atlas-lookup) — Load a FreeSurfer MGH/MGZ volume parcellation.
 - **load** `[fn]` in [MlModel](/docs/api/ml/ml-model) — Load a model from disk.
@@ -3215,8 +3213,8 @@ Index of 6338 public class members (functions, variables, typedefs, enums) acros
 - **measname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Data file.
 - **measure** `[var]` in [InvConnectivity](/docs/api/inv/inv-connectivity) — Metric name, e.g.
 - **meg_client** `[var]` in [dipoleFitFuncsRec](/docs/api/inv/dipole-fit-funcs-rec) — Client data for MEG field computations.
-- **meg_client_free** `[var]` in [dipoleFitFuncsRec](/docs/api/inv/dipole-fit-funcs-rec) — Destructor for MEG client data.
 - **meg_coils** `[var]` in [InvDipoleFitData](/docs/api/inv/inv-dipole-fit-data) — MEG coil definitions.
+- **meg_comp** `[var]` in [dipoleFitFuncsRec](/docs/api/inv/dipole-fit-funcs-rec) — Owns `meg_client` when it is a compensation wrapper.
 - **meg_eeg_fwd_one_source_space** `[fn]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Thread worker: compute the forward solution for one source space.
 - **meg_field** `[var]` in [dipoleFitFuncsRec](/docs/api/inv/dipole-fit-funcs-rec) — MEG forward calculation function.
 - **meg_head_t** `[var]` in [ComputeFwdSettings](/docs/api/fwd/compute-fwd-settings) — The meg &lt;-&gt; head transformation.

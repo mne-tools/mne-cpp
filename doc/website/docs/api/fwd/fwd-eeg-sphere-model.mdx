@@ -189,7 +189,7 @@ Allocate and initialize a fitting workspace for Berg-Scherg parameter estimation
 
 **Returns:**
 
-- *fitUser* — Pointer to the initialized fitting data structure.
+- *std::unique_ptr&lt; [fitUserRec](/docs/api/fwd/fit-user-rec) &gt;* — The initialized fitting data structure.
 
 ---
 
@@ -505,7 +505,7 @@ Returns the relative variance goodness-of-fit metric.
 
 ---
 
-### one_step(mu, user_data)
+### one_step(mu, u)
 
 Objective function for the simplex optimizer: evaluate the residual sum of squares for a given set of mu values.
 
@@ -514,8 +514,8 @@ Objective function for the simplex optimizer: evaluate the residual sum of squar
 - **mu** : *const Eigen::VectorXd &*
   Distance multipliers to evaluate.
 
-- **user_data** : *const void **
-  Pointer to the fitUser workspace.
+- **u** : *[fitUserRec](/docs/api/fwd/fit-user-rec) &*
+  Fitting workspace.
 
 **Returns:**
 

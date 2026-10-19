@@ -73,7 +73,7 @@ Refactored from `mne_adjust_baselines` (mne_apply_baselines.c).
 
 Read an evoked-response data set and append it to an existing container.
 
-If `add_to` is `nullptr` a new [`MNEMeasData`](/docs/api/mne/mne-meas-data) is created; otherwise the loaded epoch is appended to `add_to's` set list.
+The loaded epoch is appended to `add_to's` set list; its channel list selects the channels read from the file.
 
 Refactored from `mne_read_meas_data_add` (mne_read_data.c).
 
@@ -97,20 +97,18 @@ Refactored from `mne_read_meas_data_add` (mne_read_data.c).
 - **nnamesp** : *int*
   Number of entries in `namesp`.
 
-- **add_to** : *[MNEMeasData](/docs/api/mne/mne-meas-data) **
-  Existing container to append to, or `nullptr` to create a new one.
+- **add_to** : *[MNEMeasData](/docs/api/mne/mne-meas-data) &*
+  Existing container to append to.
 
 **Returns:**
 
-- *[MNEMeasData](/docs/api/mne/mne-meas-data) ** — Pointer to the (new or existing) container, or `nullptr` on failure.
+- *bool* — True if the data set was read and appended.
 
 ---
 
 ### mne_read_meas_data(name, set, op, fwd, namesp, nnamesp)
 
 Read an evoked-response data set into a new container.
-
-Convenience wrapper around `mne_read_meas_data_add()` with `add_to` = `nullptr`.
 
 **Parameters:**
 
@@ -134,7 +132,7 @@ Convenience wrapper around `mne_read_meas_data_add()` with `add_to` = `nullptr`.
 
 **Returns:**
 
-- *[MNEMeasData](/docs/api/mne/mne-meas-data) ** — Pointer to the new container, or `nullptr` on failure.
+- *std::unique_ptr&lt; [MNEMeasData](/docs/api/mne/mne-meas-data) &gt;* — The new container, or `nullptr` on failure.
 
 ---
 

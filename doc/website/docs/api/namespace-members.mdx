@@ -7,7 +7,7 @@ sidebar_position: 6
 
 # Namespace Members
 
-Index of 346 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
+Index of 372 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
 
 - **_fiff_block_explanations** `[var]` in [FIFFLIB](/docs/api/fiff/)
 - **_fiff_explanations** `[var]` in [FIFFLIB](/docs/api/fiff/)
@@ -125,6 +125,7 @@ Index of 346 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **COR_PIXEL_SIZE** `[var]` in [MRILIB](/docs/api/mri/) — Pixel size for COR slices (1mm in meters).
 - **COR_WIDTH** `[var]` in [MRILIB](/docs/api/mri/) — Width of each COR slice in pixels.
 - **countAnnotations** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Count annotations by description.
+- **DATA_TYPE** `[var]` in [FIFFLIB](/docs/api/fiff/) — DATA_TYPE encoding 0000ffff.
 - **dateTimeNow** `[fn]` in [UTILSLIB](/docs/api/utils/) — Returns build date and time (time preprocessor was run).
 - **dateToday** `[fn]` in [UTILSLIB](/docs/api/utils/) — Returns build date (time preprocessor was run).
 - **defaultConstMatrixXd** `[fn]` in [FIFFLIB](/docs/api/fiff/)
@@ -222,6 +223,8 @@ Index of 346 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **InvOrientationType** `[enum]` in [INVLIB](/docs/api/inv/) — Enumerates the orientation constraint used during source estimation.
 - **InvSourceSpaceType** `[enum]` in [INVLIB](/docs/api/inv/) — Enumerates the source space type underlying a source estimate.
 - **InvTokenId** `[enum]` in [INVLIB](/docs/api/inv/) — Token vocabulary for the [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) tokenization format.
+- **IS_MATRIX** `[var]` in [FIFFLIB](/docs/api/fiff/) — Is Matrix encoding.
+- **IS_TRANSPOSED** `[var]` in [INVLIB](/docs/api/inv/) — Defines IS_TRANSPOSED.
 - **isHit** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/)
 - **isTrue** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Read a boolean from QSettings with a default fallback.
 - **kBemHead** `[var]` in `SURFACEKEYS`
@@ -250,6 +253,9 @@ Index of 346 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **kSrcSpPrefix** `[var]` in `SURFACEKEYS`
 - **m_matViridrisData** `[var]` in [DISPLIB](/docs/api/disp/)
 - **makeSpharaProjector** `[fn]` in [UTILSLIB](/docs/api/utils/) — Constructs a SPHARA operator.
+- **MATRIX_CODING_CCS** `[var]` in [FIFFLIB](/docs/api/fiff/) — MATRIX_CODING_CCS encoding.
+- **MATRIX_CODING_DENSE** `[var]` in [FIFFLIB](/docs/api/fiff/) — MATRIX_CODING_DENSE encoding.
+- **MATRIX_CODING_RCS** `[var]` in [FIFFLIB](/docs/api/fiff/) — MATRIX_CODING_RCS encoding.
 - **MatrixDau16** `[type]` in [FIFFLIB](/docs/api/fiff/)
 - **MatrixShort** `[type]` in [FIFFLIB](/docs/api/fiff/)
 - **MatrixXdR** `[type]` in [DISPLIB](/docs/api/disp/)
@@ -268,6 +274,25 @@ Index of 346 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **mnaFileRoleToString** `[fn]` in [MNALIB](/docs/api/mna/) — Convert `MnaFileRole` to its string representation.
 - **MnaNodeExecMode** `[enum]` in [MNALIB](/docs/api/mna/) — Execution mode for a graph node.
 - **MnaPortDir** `[enum]` in [MNALIB](/docs/api/mna/) — Direction of a port on a graph node.
+- **MNE_4DV_COMP1** `[var]` in [MNELIB](/docs/api/mne/) — 4D Neuroimaging 1st-order compensation.
+- **MNE_CH_SELECTION_FILE** `[var]` in [MNELIB](/docs/api/mne/) — Loaded from file.
+- **MNE_CH_SELECTION_UNKNOWN** `[var]` in [MNELIB](/docs/api/mne/) — Unknown origin.
+- **MNE_CH_SELECTION_USER** `[var]` in [MNELIB](/docs/api/mne/) — Created interactively.
+- **MNE_CTFV_COMP_G1BR** `[var]` in [MNELIB](/docs/api/mne/) — 1st-order gradient, balanced reference.
+- **MNE_CTFV_COMP_G2BR** `[var]` in [MNELIB](/docs/api/mne/) — 2nd-order gradient, balanced reference.
+- **MNE_CTFV_COMP_G2OI** `[var]` in [MNELIB](/docs/api/mne/) — 2nd-order gradient, off-diagonal.
+- **MNE_CTFV_COMP_G3BR** `[var]` in [MNELIB](/docs/api/mne/) — 3rd-order gradient, balanced reference.
+- **MNE_CTFV_COMP_G3OI** `[var]` in [MNELIB](/docs/api/mne/) — 3rd-order gradient, off-diagonal.
+- **MNE_CTFV_COMP_NONE** `[var]` in [MNELIB](/docs/api/mne/) — No compensation.
+- **MNE_CTFV_COMP_UNKNOWN** `[var]` in [MNELIB](/docs/api/mne/) — Grade not recognized.
+- **MNE_CTFV_GRAD1** `[var]` in [MNELIB](/docs/api/mne/) — 1st-order gradient compensation.
+- **MNE_CTFV_GRAD2** `[var]` in [MNELIB](/docs/api/mne/) — 2nd-order gradient compensation.
+- **MNE_CTFV_GRAD3** `[var]` in [MNELIB](/docs/api/mne/) — 3rd-order gradient compensation.
+- **MNE_CTFV_NOGRAD** `[var]` in [MNELIB](/docs/api/mne/) — No gradient compensation.
+- **MNE_SOURCE_SPACE_DISCRETE** `[var]` in [MNELIB](/docs/api/mne/) — Discrete point set.
+- **MNE_SOURCE_SPACE_SURFACE** `[var]` in [MNELIB](/docs/api/mne/) — FsSurface-based source space.
+- **MNE_SOURCE_SPACE_UNKNOWN** `[var]` in [MNELIB](/docs/api/mne/) — Type not yet determined.
+- **MNE_SOURCE_SPACE_VOLUME** `[var]` in [MNELIB](/docs/api/mne/) — Volumetric (3-D grid) source space.
 - **mneAnalyzeColor** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — MNE analyze colormap: teal → blue → gray → red → yellow.
 - **mneChSelection** `[type]` in [MNELIB](/docs/api/mne/)
 - **mneChSelectionRec** `[type]` in [MNELIB](/docs/api/mne/) — Backward-compatible typedef aliases.
@@ -288,6 +313,7 @@ Index of 346 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **multiViewPresetName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Human-readable name for a multi-view preset index (0–6).
 - **multiViewPresetOffset** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Camera rotation quaternion for a multi-view preset index (0–6).
 - **normalizedVisualizationTarget** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Clamp a visualization target index to [-1, maxIndex].
+- **NOT_TRANSPOSED** `[var]` in [INVLIB](/docs/api/inv/) — Defines NOT_TRANSPOSED.
 - **operator!=** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Compares two [`FiffTime`](/docs/api/fiff/fiff-time) instances for inequality.
 - **operator&lt;&lt;** `[fn]` in [FIFFLIB](/docs/api/fiff/)
 - **operator&lt;&lt;** `[fn]` in [FIFFLIB](/docs/api/fiff/)

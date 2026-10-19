@@ -73,7 +73,7 @@ Find a model with a given name and return a duplicate Refactored from: fwd_eeg_s
 
 **Returns:**
 
-- *[FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model) ** — A duplicat of the found model.
+- *[FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model)::UPtr* — A duplicat of the found model.
 
 ---
 
@@ -103,7 +103,7 @@ The model will be owned by the set.
 
 **Parameters:**
 
-- **s** : *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) **
+- **s** : *UPtr*
   The model set (created if nullptr).
 
 - **m** : *[FwdEegSphereModel](/docs/api/fwd/fwd-eeg-sphere-model)::UPtr*
@@ -111,7 +111,7 @@ The model will be owned by the set.
 
 **Returns:**
 
-- *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) ** — The model set.
+- *UPtr* — The model set.
 
 ---
 
@@ -121,12 +121,12 @@ Choose and setup the default EEG sphere model Refactored from: fwd_eeg_sphere_mo
 
 **Parameters:**
 
-- **s** : *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) **
+- **s** : *UPtr*
   The model set to which loaded models are added.
 
 **Returns:**
 
-- *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) ** — The model set with the default model (s + default models).
+- *UPtr* — The model set with the default model (s + default models).
 
 ---
 
@@ -139,12 +139,12 @@ Load all models available in the specified file Refactored from: fwd_eeg_sphere_
 - **p_sFileName** : *const QString &*
   file name to load models from.
 
-- **now** : *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) **
+- **now** : *UPtr*
   The model set to which loaded models are added.
 
 **Returns:**
 
-- *[FwdEegSphereModelSet](/docs/api/fwd/fwd-eeg-sphere-model-set) ** — The loaded model set (now + loaded models).
+- *UPtr* — The loaded model set (now + loaded models).
 
 ---
 

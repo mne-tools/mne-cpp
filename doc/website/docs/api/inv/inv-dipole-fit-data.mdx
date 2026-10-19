@@ -370,12 +370,12 @@ Refactored: dipole_forward_one (fit_dipoles.c)
 - **rd** : *const Eigen::Vector3f &*
   Dipole position in head coordinates (m).
 
-- **old** : *[InvDipoleForward](/docs/api/inv/inv-dipole-forward) **
-  Existing forward to recycle (may be nullptr).
+- **old** : *std::unique_ptr&lt; [InvDipoleForward](/docs/api/inv/inv-dipole-forward) &gt;*
+  Existing forward to recycle when its size matches (may be nullptr).
 
 **Returns:**
 
-- *[InvDipoleForward](/docs/api/inv/inv-dipole-forward) ** — The populated forward object, or nullptr on error.
+- *std::unique_ptr&lt; [InvDipoleForward](/docs/api/inv/inv-dipole-forward) &gt;* — The populated forward object, or nullptr on error.
 
 ---
 
