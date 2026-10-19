@@ -118,6 +118,8 @@ private slots:
     void testNodeExecModeCbor_data();
     void testNodeExecModeCbor();
     void testNodeWithVerificationRoundTrip();
+    void testNodeRoundTripsEveryField_data();
+    void testNodeRoundTripsEveryField();
 
     // ── MnaParamBinding ──────────────────────────────────────────────
     void testParamBindingDefaults();
@@ -968,6 +970,77 @@ void TestMnaSerialization::testNodeExecModeCbor()
     MnaNode restored = MnaNode::fromCbor(cbor);
 
     QCOMPARE(static_cast<int>(restored.execMode), execMode);
+}
+
+void TestMnaSerialization::testNodeRoundTripsEveryField_data()
+{
+    QTest::addColumn<int>("execMode");
+    QTest::addColumn<bool>("cbor");
+
+    const QList<QPair<const char*, MnaNodeExecMode>> modes = {{"batch", MnaNodeExecMode::Batch},
+                                                              {"stream", MnaNodeExecMode::Stream},
+                                                              {"ipc", MnaNodeExecMode::Ipc},
+                                                              {"script", MnaNodeExecMode::Script}};
+    for (const auto& [name, mode] : modes) {
+        QTest::addRow("%s-json", name) << static_cast<int>(mode) << false;
+        QTest::addRow("%s-cbor", name) << static_cast<int>(mode) << true;
+    }
+}
+
+void TestMnaSerialization::testNodeRoundTripsEveryField()
+{
+    QFETCH(int, execMode);
+    QFETCH(bool, cbor);
+
+    MnaNode node;
+    node.id = "node";
+    node.opType = "op";
+    node.execMode = static_cast<MnaNodeExecMode>(execMode);
+    node.attributes = {{"lambda", 0.1}, {"method", "dSPM"}};
+    node.ipcCommand = "tool";
+    node.ipcArgs = {"--in", "{{input}}"};
+    node.ipcWorkDir = "/tmp";
+    node.ipcTransport = "stdio";
+    node.script.language = "python";
+    node.script.interpreter = "python3";
+    node.script.code = "print(1)";
+    node.toolVersion = "2.4.0";
+    node.executedAt = QDateTime(QDate(2026, 10, 19), QTime(12, 30), QTimeZone::UTC);
+    node.dirty = false;
+    node.extras.insert("x_custom", 42);
+
+    for (int kind = 0; kind <= static_cast<int>(MnaDataKind::Custom); ++kind) {
+        MnaPort port;
+        port.name = QString("p%1").arg(kind);
+        port.dataKind = static_cast<MnaDataKind>(kind);
+        port.direction = kind % 2 ? MnaPortDir::Output : MnaPortDir::Input;
+        port.sourceNodeId = "upstream";
+        port.sourcePortName = "out";
+        port.streamProtocol = "lsl";
+        port.streamEndpoint = "type='EEG'";
+        port.streamBufferMs = 100 + kind;
+        port.cachedResultPath = "cache.fif";
+        port.cachedResultHash = "sha256:abc";
+        port.extras.insert("x_port", kind);
+        (kind % 2 ? node.outputs : node.inputs).append(port);
+    }
+
+    const MnaNode restored = cbor ? MnaNode::fromCbor(node.toCbor()) : MnaNode::fromJson(node.toJson());
+
+    // Fields that are only written for the matching exec mode do not survive the others.
+    const bool ipc = node.execMode == MnaNodeExecMode::Ipc;
+    QCOMPARE(restored.ipcArgs, ipc ? node.ipcArgs : QStringList());
+    QCOMPARE(restored.script.code, node.execMode == MnaNodeExecMode::Script ? node.script.code : QString());
+    QCOMPARE(restored.executedAt, node.executedAt);
+    QCOMPARE(restored.dirty, false);
+    QCOMPARE(restored.extras.value("x_custom").toInt(), 42);
+    QCOMPARE(restored.attributes, node.attributes);
+    QCOMPARE(restored.inputs.size() + restored.outputs.size(), static_cast<int>(MnaDataKind::Custom) + 1);
+    for (const QList<MnaPort>* ports : {&node.inputs, &node.outputs}) {
+        const QList<MnaPort>& got = ports == &node.inputs ? restored.inputs : restored.outputs;
+        for (int i = 0; i < ports->size(); ++i)
+            QCOMPARE(got[i].toJson(), (*ports)[i].toJson());
+    }
 }
 
 void TestMnaSerialization::testNodeWithVerificationRoundTrip()
