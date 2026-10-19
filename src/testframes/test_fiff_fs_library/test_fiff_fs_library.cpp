@@ -232,6 +232,8 @@ private slots:
     // ── FS operator and synthetic exercises (from coverage_push) ──
     void fs_surfaceSetOperators();
     void fs_annotationSetOperators();
+    void fs_setsReadByHemisphere_data();
+    void fs_setsReadByHemisphere();
     void fs_surfaceReadFromSynthetic();
     void fs_annotationReadFromSynthetic();
     void fs_surfaceSetCalcOffset();
@@ -1719,6 +1721,67 @@ void TestFiffFsLibrary::fs_annotationSetOperators()
     const FsAnnotationSet& constAnnot = annotSet;
     QCOMPARE(constAnnot[1].hemi(), 1);
     QCOMPARE(constAnnot[0].getVertices(), vertIdx);
+}
+
+void TestFiffFsLibrary::fs_setsReadByHemisphere_data()
+{
+    QTest::addColumn<int>("hemi");
+    QTest::addColumn<bool>("bySubject");
+    QTest::addColumn<QList<int>>("loaded");
+
+    for (const bool bySubject : {false, true}) {
+        const char* how = bySubject ? "subject" : "path";
+        QTest::addRow("%s-lh", how) << 0 << bySubject << QList<int>{0};
+        QTest::addRow("%s-rh", how) << 1 << bySubject << QList<int>{1};
+        QTest::addRow("%s-both", how) << 2 << bySubject << QList<int>{0, 1};
+        QTest::addRow("%s-invalid", how) << 3 << bySubject << QList<int>{};
+    }
+}
+
+void TestFiffFsLibrary::fs_setsReadByHemisphere()
+{
+    QFETCH(int, hemi);
+    QFETCH(bool, bySubject);
+    QFETCH(QList<int>, loaded);
+
+    // <subjects_dir>/sample/{surf,label} with one triangle pair and one annotation per hemisphere
+    const QString subjectsDir = m_tempDir.filePath("subjects_by_hemi");
+    const QString surfDir = subjectsDir + "/sample/surf";
+    const QString labelDir = subjectsDir + "/sample/label";
+    QVERIFY(QDir().mkpath(surfDir) && QDir().mkpath(labelDir));
+    MatrixX3f verts(4, 3);
+    verts << 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1;
+    MatrixX3i tris(2, 3);
+    tris << 0, 1, 2, 0, 2, 3;
+    VectorXi vertIdx(4);
+    vertIdx << 0, 1, 2, 3;
+    const VectorXi labels = VectorXi::Constant(4, 1638500);
+    for (const QString& h : {QString("lh"), QString("rh")}) {
+        writeSyntheticSurface(surfDir + "/" + h + ".test", 4, 2, verts, tris);
+        writeSyntheticAnnotation(labelDir + "/" + h + ".aparc.annot", 4, vertIdx, labels);
+    }
+
+    const FsSurfaceSet surfs = bySubject ? FsSurfaceSet("sample", hemi, "test", subjectsDir)
+                                         : FsSurfaceSet(surfDir, hemi, "test");
+    const FsAnnotationSet annots = bySubject ? FsAnnotationSet("sample", hemi, "aparc", subjectsDir)
+                                             : FsAnnotationSet(labelDir, hemi, "aparc");
+    QCOMPARE(surfs.size(), loaded.size());
+    QCOMPARE(annots.size(), loaded.size());
+
+    // A hemisphere that was not loaded reads back empty rather than out of range.
+    for (const auto& [h, name] : {std::pair{0, QString("lh")}, std::pair{1, QString("rh")}}) {
+        QCOMPARE(!surfs[h].isEmpty(), loaded.contains(h));
+        QCOMPARE(!surfs[name].isEmpty(), loaded.contains(h));
+        QCOMPARE(!annots[h].isEmpty(), loaded.contains(h));
+        QCOMPARE(!annots[name].isEmpty(), loaded.contains(h));
+        if (loaded.contains(h)) {
+            QCOMPARE(surfs[name].hemi(), h);
+            QCOMPARE(annots[name].hemi(), h);
+        }
+    }
+    // An unknown identifier falls back to the left hemisphere.
+    QCOMPARE(!surfs[QString("xx")].isEmpty(), loaded.contains(0));
+    QCOMPARE(!annots[QString("xx")].isEmpty(), loaded.contains(0));
 }
 
 void TestFiffFsLibrary::fs_surfaceReadFromSynthetic()

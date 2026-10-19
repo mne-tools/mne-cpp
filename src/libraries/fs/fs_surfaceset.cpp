@@ -156,58 +156,62 @@ bool FsSurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileNa
 
 //=============================================================================================================
 
+namespace
+{
+
+qint32 hemiIndex(qint32 idx)
+{
+    if (idx != 0 && idx != 1) {
+        qWarning("Warning: Index is not '0' or '1'! Returning '0'.");
+        return 0;
+    }
+    return idx;
+}
+
+qint32 hemiIndex(const QString& idt)
+{
+    if (idt == QLatin1String("rh"))
+        return 1;
+    if (idt != QLatin1String("lh"))
+        qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
+    return 0;
+}
+
+const FsSurface& surfaceOrEmpty(const QMap<qint32, FsSurface>& surfs, qint32 hemi)
+{
+    static const FsSurface empty;
+    const auto it = surfs.constFind(hemi);
+    return it != surfs.constEnd() ? it.value() : empty;
+}
+
+} // namespace
+
+//=============================================================================================================
+
 const FsSurface& FsSurfaceSet::operator[](qint32 idx) const
 {
-    if (idx == 0)
-        return m_qMapSurfs.find(idx).value();
-    else if (idx == 1)
-        return m_qMapSurfs.find(idx).value();
-    else {
-        qWarning("Warning: Index is not '0' or '1'! Returning '0'.");
-        return m_qMapSurfs.find(0).value();
-    }
+    return surfaceOrEmpty(m_qMapSurfs, hemiIndex(idx));
 }
 
 //=============================================================================================================
 
 FsSurface& FsSurfaceSet::operator[](qint32 idx)
 {
-    if (idx == 0)
-        return m_qMapSurfs.find(idx).value();
-    else if (idx == 1)
-        return m_qMapSurfs.find(idx).value();
-    else {
-        qWarning("Warning: Index is not '0' or '1'! Returning '0'.");
-        return m_qMapSurfs.find(0).value();
-    }
+    return m_qMapSurfs[hemiIndex(idx)];
 }
 
 //=============================================================================================================
 
 const FsSurface& FsSurfaceSet::operator[](QString idt) const
 {
-    if (idt.compare("lh") == 0)
-        return m_qMapSurfs.find(0).value();
-    else if (idt.compare("rh") == 0)
-        return m_qMapSurfs.find(1).value();
-    else {
-        qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
-        return m_qMapSurfs.find(0).value();
-    }
+    return surfaceOrEmpty(m_qMapSurfs, hemiIndex(idt));
 }
 
 //=============================================================================================================
 
 FsSurface& FsSurfaceSet::operator[](QString idt)
 {
-    if (idt.compare("lh") == 0)
-        return m_qMapSurfs.find(0).value();
-    else if (idt.compare("rh") == 0)
-        return m_qMapSurfs.find(1).value();
-    else {
-        qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
-        return m_qMapSurfs.find(0).value();
-    }
+    return m_qMapSurfs[hemiIndex(idt)];
 }
 
 //=============================================================================================================
