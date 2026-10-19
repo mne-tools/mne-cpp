@@ -399,7 +399,7 @@ void FiffRawViewModel::distanceTimeSpacerChanged(int iNewValue)
 
 float FiffRawViewModel::getNumberOfTimeSpacers() const
 {
-    return (float)(1000 / m_iDistanceTimerSpacer);
+    return static_cast<float>(1000 / m_iDistanceTimerSpacer);
 }
 
 //=============================================================================================================
@@ -559,7 +559,7 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
         qint32 sampleDist = (m_iFiffCursorBegin + (m_iPreloadBufferSize - 1) * m_iSamplesPerBlock) - targetCursor;
 
         // Calculate the needed blocks based on the amount of samples to load
-        qint32 blockDist = (qint32)ceil(((double)sampleDist) / ((double)m_iSamplesPerBlock));
+        qint32 blockDist = static_cast<qint32>(ceil((static_cast<double>(sampleDist)) / (static_cast<double>(m_iSamplesPerBlock))));
 
         if (blockDist >= m_iTotalBlockCount) {
             // we must "jump" to the new cursor ...
@@ -577,7 +577,7 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
         qint32 sampleDist = targetCursor + (m_iVisibleWindowSize * m_iSamplesPerBlock) - (m_iFiffCursorBegin + ((m_iPreloadBufferSize + 1) + m_iVisibleWindowSize) * m_iSamplesPerBlock);
 
         // Calculate the needed blocks based on the amount of samples to load
-        qint32 blockDist = (qint32)ceil(((double)sampleDist) / ((double)m_iSamplesPerBlock));
+        qint32 blockDist = static_cast<qint32>(ceil((static_cast<double>(sampleDist)) / (static_cast<double>(m_iSamplesPerBlock))));
 
         if (blockDist >= m_iTotalBlockCount) {
             // we must "jump" to the new cursor ...

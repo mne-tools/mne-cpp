@@ -157,7 +157,7 @@ bool EventManager::startEventHandlingInt(float frequency)
         qDebug() << "[EventManager::startEventHandling] WARNING ! somebody tried to call startEventHandling when already running...";
         return false;
     } else {
-        m_sleepTime = (long)(1000.0f / frequency);
+        m_sleepTime = static_cast<long>(1000.0f / frequency);
         m_running = true;
         // start qthread
         start();

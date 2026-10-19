@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
         return 1;
     }
     qInfo("  [1] %s: %d channels x %d sources (weight=%.4f)",
-          qPrintable(fwdFiles[0]), (int)fwd0.sol->data.rows(), (int)fwd0.sol->data.cols(), weights[0]);
+          qPrintable(fwdFiles[0]), static_cast<int>(fwd0.sol->data.rows()), static_cast<int>(fwd0.sol->data.cols()), weights[0]);
 
     int nChan = fwd0.sol->data.rows();
     int nSrc = fwd0.sol->data.cols();
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
         if (fwdi.sol->data.rows() != nChan || fwdi.sol->data.cols() != nSrc) {
             qCritical("Forward solution dimension mismatch in %s: %dx%d vs %dx%d",
                       qPrintable(fwdFiles[i]),
-                      (int)fwdi.sol->data.rows(), (int)fwdi.sol->data.cols(),
+                      static_cast<int>(fwdi.sol->data.rows()), static_cast<int>(fwdi.sol->data.cols()),
                       nChan, nSrc);
             return 1;
         }

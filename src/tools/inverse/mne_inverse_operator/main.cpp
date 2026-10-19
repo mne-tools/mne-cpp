@@ -139,7 +139,7 @@ static FiffInfo buildInfoFromForward(const MNEForwardSolution& forward,
         }
         if (eegNames.size() > 0) {
             RowVectorXd vecOnes = RowVectorXd::Ones(eegNames.size());
-            MatrixXd data = vecOnes / sqrt((double)eegNames.size());
+            MatrixXd data = vecOnes / sqrt(static_cast<double>(eegNames.size()));
             FiffNamedMatrix projData(1, eegNames.size(),
                                      QStringList(),
                                      eegNames,
@@ -445,7 +445,7 @@ int main(int argc, char* argv[])
     }
 
     qInfo("  Noise covariance: %d x %d",
-          (int)noiseCov.data.rows(), (int)noiseCov.data.cols());
+          static_cast<int>(noiseCov.data.rows()), static_cast<int>(noiseCov.data.cols()));
     if (!noiseCov.projs.isEmpty()) {
         qInfo("  Noise covariance contains %lld SSP projectors.",
               noiseCov.projs.size());

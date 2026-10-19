@@ -404,7 +404,7 @@ bool MNEForwardSolution::write(QIODevice& p_IODevice) const
             const auto& dir = t_pStreamIn->dir();
             for (int i = 0; i < dir.size(); ++i) {
                 if (dir[i]->kind == FIFF_DIR_POINTER) {
-                    fiff_int_t dirpos = (fiff_int_t)t_pStreamIn->write_dir_entries(dir);
+                    fiff_int_t dirpos = static_cast<fiff_int_t>(t_pStreamIn->write_dir_entries(dir));
                     if (dirpos >= 0)
                         t_pStreamIn->write_dir_pointer(dirpos, dir[i]->pos);
                     break;
@@ -757,7 +757,7 @@ MNEForwardSolution MNEForwardSolution::reduce_forward_solution(qint32 p_iNumDipo
 
     for (qint32 i = 0; i < p_iNumDipoles; ++i) {
         float t_fCurrent = static_cast<float>(i) * t_fStep;
-        sel[i] = (quint32)floor(t_fCurrent);
+        sel[i] = static_cast<quint32>(floor(t_fCurrent));
     }
 
     if (isFixed) {

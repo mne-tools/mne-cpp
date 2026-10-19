@@ -128,12 +128,12 @@ void SpectrumSettingsView::setBoundaries(float fSFreq,
                                          float fUpperBound)
 {
     m_pSliderLowerBound->setMinimum(0);
-    m_pSliderLowerBound->setMaximum((qint32)(fSFreq / 2) * 1000);
-    m_pSliderLowerBound->setValue((qint32)(fLowerBound * 1000));
+    m_pSliderLowerBound->setMaximum(static_cast<qint32>(fSFreq / 2) * 1000);
+    m_pSliderLowerBound->setValue(static_cast<qint32>(fLowerBound * 1000));
 
     m_pSliderUpperBound->setMinimum(0);
-    m_pSliderUpperBound->setMaximum((qint32)(fSFreq / 2) * 1000);
-    m_pSliderUpperBound->setValue((qint32)(fUpperBound * 1000));
+    m_pSliderUpperBound->setMaximum(static_cast<qint32>(fSFreq / 2) * 1000);
+    m_pSliderUpperBound->setValue(static_cast<qint32>(fUpperBound * 1000));
 }
 
 //=============================================================================================================

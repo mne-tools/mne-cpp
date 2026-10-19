@@ -387,7 +387,7 @@ void RtFiffRawViewDelegate::createCurrentPositionMarkerPath(const QModelIndex& i
 {
     const RtFiffRawViewModel* t_pModel = static_cast<const RtFiffRawViewModel*>(index.model());
 
-    float dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+    float dDx = (static_cast<float>(option.rect.width())) / t_pModel->getMaxSamples();
     float currentSampleIndex = option.rect.x() + t_pModel->getCurrentSampleIndex() * dDx;
 
     float yStart = option.rect.topLeft().y();
@@ -407,7 +407,7 @@ void RtFiffRawViewDelegate::createGridPath(const QModelIndex& index, const QStyl
 
     if (t_pModel->numVLines() > 0) {
         //vertical lines
-        float distance = float(option.rect.width()) / (t_pModel->numVLines() + 1);
+        float distance = static_cast<float>(option.rect.width()) / (t_pModel->numVLines() + 1);
 
         float yStart = option.rect.topLeft().y();
 
@@ -431,7 +431,7 @@ void RtFiffRawViewDelegate::createTimeSpacersPath(const QModelIndex& index, cons
 
     if (t_pModel->getNumberOfTimeSpacers() > 0) {
         //vertical lines
-        float distanceSec = float(option.rect.width()) / (t_pModel->numVLines() + 1);
+        float distanceSec = static_cast<float>(option.rect.width()) / (t_pModel->numVLines() + 1);
         float distanceSpacers = distanceSec / (t_pModel->getNumberOfTimeSpacers() + 1);
 
         float yStart = option.rect.topLeft().y();
@@ -467,7 +467,7 @@ void RtFiffRawViewDelegate::createTriggerPath(QPainter* painter,
 
     float yStart = option.rect.topLeft().y();
     float yEnd = option.rect.bottomRight().y();
-    float dDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
+    float dDx = (static_cast<float>(option.rect.width())) / t_pModel->getMaxSamples();
 
     int currentSampleIndex = t_pModel->getCurrentSampleIndex();
 

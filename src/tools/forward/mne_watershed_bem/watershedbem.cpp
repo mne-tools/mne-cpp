@@ -334,7 +334,7 @@ bool WatershedBem::convertSurfaces(const QString& wsDir, const QString& mgzFile)
         if (surf.rr().rows() == 0) {
             qWarning() << "FsSurface" << surfPath << "has no vertices.";
         } else if (m_settings.verbose()) {
-            qInfo("  %d vertices, %d triangles", (int)surf.rr().rows(), (int)surf.tris().rows());
+            qInfo("  %d vertices, %d triangles", static_cast<int>(surf.rr().rows()), static_cast<int>(surf.tris().rows()));
         }
     }
 
@@ -365,7 +365,7 @@ bool WatershedBem::createBemFif(const QString& surfFile, const QString& fifFile)
     }
 
     qInfo("Read surface: %d vertices, %d triangles",
-          (int)fsSurface.rr().rows(), (int)fsSurface.tris().rows());
+          static_cast<int>(fsSurface.rr().rows()), static_cast<int>(fsSurface.tris().rows()));
 
     //
     // Create BEM surface

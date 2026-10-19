@@ -179,7 +179,6 @@ static bool parseRes4(CtfDatasetInfo& info)
 
     // Read data time (epoch length in seconds)
     double epochTime = readFloat64BE(ds);
-    (void)epochTime;
 
     // Skip to number of samples if still 0
     if (info.nSamples <= 0 || info.sfreq <= 0) {

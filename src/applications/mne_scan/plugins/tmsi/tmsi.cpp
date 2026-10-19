@@ -26,6 +26,7 @@
 #include <QtCore/QtPlugin>
 #include <QtCore/QTextStream>
 #include <QDebug>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -131,7 +132,7 @@ void TMSI::setUpFiffInfo()
     //Set number of channels, sampling frequency and high/-lowpass
     m_pFiffInfo->nchan = m_iNumberOfChannels;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
-    m_pFiffInfo->highpass = (float)0.001;
+    m_pFiffInfo->highpass = 0.001f;
     m_pFiffInfo->lowpass = m_iSamplingFreq / 2;
 
     //Read electrode positions from .elc file
@@ -153,7 +154,7 @@ void TMSI::setUpFiffInfo()
 
     //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
     Matrix3f rotation_z;
-    rotation_z = AngleAxisf((float)M_PI / 2, Vector3f::UnitZ()); //M_PI/2 = 90°
+    rotation_z = AngleAxisf(std::numbers::pi_v<float> / 2, Vector3f::UnitZ());
     QVector3D center_pos;
 
     for (int i = 0; i < elcLocation3D.size(); i++) {

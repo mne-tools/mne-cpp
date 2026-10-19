@@ -126,7 +126,7 @@ void FiffSimulator::comGetBufsize(Command p_command)
         //create JSON help object
         //
         QJsonObject t_qJsonObjectRoot;
-        t_qJsonObjectRoot.insert(Commands::BUFSIZE, QJsonValue((double)m_uiBufferSampleSize));
+        t_qJsonObjectRoot.insert(Commands::BUFSIZE, QJsonValue(static_cast<double>(m_uiBufferSampleSize)));
         QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
 
         m_commandManager[Commands::GETBUFSIZE].reply(p_qJsonDocument.toJson());
@@ -175,7 +175,7 @@ void FiffSimulator::comGetAccel(Command p_command)
         //create JSON help object
         //
         QJsonObject t_qJsonObjectRoot;
-        t_qJsonObjectRoot.insert(Commands::ACCEL, QJsonValue((double)m_AccelerationFactor));
+        t_qJsonObjectRoot.insert(Commands::ACCEL, QJsonValue(static_cast<double>(m_AccelerationFactor)));
         QJsonDocument p_qJsonDocument(t_qJsonObjectRoot);
 
         m_commandManager[Commands::GETACCEL].reply(p_qJsonDocument.toJson());
@@ -438,9 +438,9 @@ void FiffSimulator::run()
     m_bIsRunning = true;
 
     float t_fSamplingFrequency = m_RawInfo.info.sfreq;
-    float t_fBuffSampleSize = (float)m_uiBufferSampleSize;
+    float t_fBuffSampleSize = static_cast<float>(m_uiBufferSampleSize);
 
-    quint32 uiSamplePeriod = (unsigned int)((t_fBuffSampleSize / t_fSamplingFrequency) * 1000000.0f);
+    quint32 uiSamplePeriod = static_cast<unsigned int>((t_fBuffSampleSize / t_fSamplingFrequency) * 1000000.0f);
 
     //    quint32 count = 0;
     Eigen::MatrixXf matData;

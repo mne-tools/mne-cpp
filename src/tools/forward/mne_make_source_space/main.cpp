@@ -147,7 +147,7 @@ static bool makeIcosahedron(int grade, MatrixX3f& verts)
         verts.row(i) = icoVerts[i].transpose();
     }
 
-    qInfo("  Icosahedron grade %d: %d vertices", std::abs(grade), (int)verts.rows());
+    qInfo("  Icosahedron grade %d: %d vertices", std::abs(grade), static_cast<int>(verts.rows()));
     return true;
 }
 
@@ -479,7 +479,7 @@ int main(int argc, char* argv[])
         if (decimMethod == ICO)
             tag = QString("ico-%1").arg(icoGrade);
         else if (decimMethod == SPACING)
-            tag = QString("spacing-%1").arg((int)spacing);
+            tag = QString("spacing-%1").arg(static_cast<int>(spacing));
         else
             tag = "all";
 
@@ -525,7 +525,7 @@ int main(int argc, char* argv[])
         }
 
         qInfo("  FsSurface: %d vertices, %d triangles",
-              (int)surf.rr().rows(), (int)surf.tris().rows());
+              static_cast<int>(surf.rr().rows()), static_cast<int>(surf.tris().rows()));
 
         // Select source vertices
         VectorXi inuse;

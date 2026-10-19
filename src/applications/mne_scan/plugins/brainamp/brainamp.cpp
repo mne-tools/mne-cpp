@@ -151,7 +151,7 @@ void BrainAMP::setUpFiffInfo()
     //
     m_pFiffInfo->nchan = 33;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
-    m_pFiffInfo->highpass = (float)0.001;
+    m_pFiffInfo->highpass = 0.001f;
     m_pFiffInfo->lowpass = m_iSamplingFreq / 2;
 
     //

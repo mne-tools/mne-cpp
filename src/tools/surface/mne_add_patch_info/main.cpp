@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
     }
     stream->close();
 
-    qInfo("Read source space: %d hemispheres", (int)src.size());
+    qInfo("Read source space: %d hemispheres", static_cast<int>(src.size()));
 
     // Process each hemisphere
     for (int h = 0; h < src.size(); ++h) {
@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
         for (int i = 0; i < activeList.size(); ++i)
             sourceVerts(i) = activeList[i];
 
-        qInfo("  Running multi-source Dijkstra with %d source vertices...", (int)sourceVerts.size());
+        qInfo("  Running multi-source Dijkstra with %d source vertices...", static_cast<int>(sourceVerts.size()));
 
         VectorXi nearest;
         VectorXf dist;
@@ -243,7 +243,7 @@ int main(int argc, char* argv[])
             avgPatch /= patchSizes.size();
 
         qInfo("  Patch info: %d patches, size range %d..%d (avg %.1f)",
-              (int)patchSizes.size(), minPatch, maxPatch, avgPatch);
+              static_cast<int>(patchSizes.size()), minPatch, maxPatch, avgPatch);
     }
 
     // Write output

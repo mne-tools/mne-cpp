@@ -74,7 +74,7 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f& matVertices,
     iCores = qMin(iCores, 2);
 #endif
 
-    qint32 iSubArraySize = int(double(vecVertSubset.size()) / double(iCores));
+    qint32 iSubArraySize = static_cast<int>(static_cast<double>(vecVertSubset.size()) / static_cast<double>(iCores));
     QVector<QFuture<void>> vecThreads(iCores);
     qint32 iBegin = 0;
     qint32 iEnd = iSubArraySize;
@@ -352,10 +352,10 @@ VectorXi GeometryInfo::projectSensors(const MatrixX3f& matVertices,
         iCores = 2;
     }
 #ifdef __EMSCRIPTEN__
-    iCores = qMin(iCores, (qint32)2);
+    iCores = qMin(iCores, 2);
 #endif
 
-    const qint32 iSubArraySize = int(double(iNumSensors) / double(iCores));
+    const qint32 iSubArraySize = static_cast<int>(static_cast<double>(iNumSensors) / static_cast<double>(iCores));
 
     if (iSubArraySize <= 1) {
         return nearestNeighbor(matVertices, matSensorPositions, 0, iNumSensors);

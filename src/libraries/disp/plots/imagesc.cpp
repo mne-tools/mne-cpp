@@ -173,9 +173,9 @@ void ImageSc::updateMaps()
         // --Colorbar--
         QImage t_qImageColorbar(1, m_iColorbarGradSteps, QImage::Format_RGB32);
 
-        double t_dQuantile = 1.0 / ((double)m_iColorbarGradSteps - 1);
+        double t_dQuantile = 1.0 / (static_cast<double>(m_iColorbarGradSteps) - 1);
         for (qint32 j = 0; j < m_iColorbarGradSteps; ++j) {
-            QRgb t_qRgb = pColorMapper(t_dQuantile * ((double)(m_iColorbarGradSteps - 1 - j)) * 1.0, m_sColorMap);
+            QRgb t_qRgb = pColorMapper(t_dQuantile * (static_cast<double>(m_iColorbarGradSteps - 1 - j)) * 1.0, m_sColorMap);
             t_qImageColorbar.setPixel(0, j, t_qRgb);
         }
         m_pPixmapColorbar = new QPixmap(QPixmap::fromImage(t_qImageColorbar));

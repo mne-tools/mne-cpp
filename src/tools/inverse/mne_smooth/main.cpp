@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
         }
         tris = surface.tris();
         nVert = surface.rr().rows();
-        qInfo("Read surface: %d vertices, %d triangles", nVert, (int)tris.rows());
+        qInfo("Read surface: %d vertices, %d triangles", nVert, static_cast<int>(tris.rows()));
     } else {
         // Read source space
         QFile file(srcFile);
@@ -179,12 +179,12 @@ int main(int argc, char* argv[])
         // Use first hemisphere's triangulation
         tris = srcSpaces[0].itris;
         nVert = srcSpaces[0].np;
-        qInfo("Read source space: %d vertices, %d triangles", nVert, (int)tris.rows());
+        qInfo("Read source space: %d vertices, %d triangles", nVert, static_cast<int>(tris.rows()));
     }
 
     // Build smoothing operator
     SparseMatrix<double> S = buildSmoothingOperator(tris, nVert);
-    qInfo("Built smoothing operator: %d x %d", (int)S.rows(), (int)S.cols());
+    qInfo("Built smoothing operator: %d x %d", static_cast<int>(S.rows()), static_cast<int>(S.cols()));
 
     // Read STC data (text format: one value per line, or vertex value pairs)
     QFile stcIn(stcFile);
@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
         if (pair.first >= 0 && pair.first < nVert)
             data(pair.first) = pair.second;
     }
-    qInfo("Read %d data values", (int)dataList.size());
+    qInfo("Read %d data values", static_cast<int>(dataList.size()));
 
     // Apply iterative smoothing
     VectorXd smoothed = data;

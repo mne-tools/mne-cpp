@@ -202,7 +202,7 @@ bool GUSBAmpDriver::initDevice()
         //define the buffer variables and start the device:
         //create _callSequenceHandles for the sequence of calling the devices (Master has to be the last device to be called!)
         m_callSequenceHandles = m_openedDevicesHandles;
-        m_numDevices = (int)m_callSequenceHandles.size();
+        m_numDevices = static_cast<int>(m_callSequenceHandles.size());
 
         m_buffers = new BYTE**[m_numDevices];
         m_overlapped = new OVERLAPPED*[m_numDevices];

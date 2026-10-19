@@ -342,7 +342,7 @@ bool TMSIDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
             //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
             for (int i = 0; i < ulNumSamplesReceived; i++) {
                 for (uint j = i * m_uiNumberOfAvailableChannels; j < (i * m_uiNumberOfAvailableChannels) + m_uiNumberOfChannels; j++)
-                    m_vSampleBlockBuffer.push_back((double)m_lSignalBuffer[j]);
+                    m_vSampleBlockBuffer.push_back(static_cast<double>(m_lSignalBuffer[j]));
             }
 
             //If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
@@ -361,7 +361,7 @@ bool TMSIDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
             //Read the needed number of samples from the vector buffer to store them in the matrix
             for (; sampleIterator < sampleMax; sampleIterator++) {
                 for (int channelIterator = 0; channelIterator < channelMax; channelIterator++) {
-                    sampleMatrix(channelIterator, sampleIterator) = ((m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1)) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 1);
+                    sampleMatrix(channelIterator, sampleIterator) = ((m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1)) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., static_cast<double>(m_vExponentChannel[channelIterator])) : 1);
                     m_vSampleBlockBuffer.pop_front();
                 }
 

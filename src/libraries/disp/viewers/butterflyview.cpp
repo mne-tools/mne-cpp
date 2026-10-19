@@ -330,7 +330,7 @@ void ButterflyView::paintEvent(QPaintEvent* event)
                 return;
             }
 
-            float fDx = (float)(this->width()) / ((float)m_pEvokedSetModel->getNumSamples());
+            float fDx = static_cast<float>(this->width()) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()));
 
             float fromSamp = ((from)*m_pEvokedSetModel->getSamplingFrequency()) + m_pEvokedSetModel->getNumPreStimSamples();
             float posX = fDx * (fromSamp);
@@ -349,8 +349,8 @@ void ButterflyView::paintEvent(QPaintEvent* event)
             painter.save();
             painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
 
-            float fDx = (float)(this->width()) / ((float)m_pEvokedSetModel->getNumSamples());
-            float posX = fDx * ((float)m_pEvokedSetModel->getNumPreStimSamples());
+            float fDx = static_cast<float>(this->width()) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()));
+            float posX = fDx * (static_cast<float>(m_pEvokedSetModel->getNumPreStimSamples()));
             painter.drawLine(posX, 1, posX, this->height());
 
             painter.drawText(QPointF(posX + 5, this->rect().bottomRight().y() - 5), QString("0ms / Stimulus"));
@@ -370,7 +370,7 @@ void ButterflyView::paintEvent(QPaintEvent* event)
 
             float fDx = 1;
             if (m_pEvokedSetModel->getNumSamples() != 0) {
-                fDx = (float)(this->width()) / ((float)m_pEvokedSetModel->getNumSamples());
+                fDx = static_cast<float>(this->width()) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()));
             }
 
             float sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
@@ -488,7 +488,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
     float fScaleY = this->height() / (2 * fMaxValue);
 
     //restrictions for paint performance
-    float fWinMaxVal = ((float)this->height() - 2) / 2.0f;
+    float fWinMaxVal = (static_cast<float>(this->height()) - 2) / 2.0f;
     //    qint32 iDownSampling = (m_pEvokedSetModel->getNumSamples() * 4 / (this->width()-2));
     //    if(iDownSampling < 1) {
     //        iDownSampling = 1;
@@ -496,7 +496,7 @@ void ButterflyView::createPlotPath(qint32 row, QPainter& painter) const
 
     QPointF qSamplePosition;
 
-    float fDx = (float)(this->width() - 2) / ((float)m_pEvokedSetModel->getNumSamples() - 1.0f); //((float)option.rect.width()) / m_pEvokedSetModel->getMaxSamples();
+    float fDx = static_cast<float>(this->width() - 2) / (static_cast<float>(m_pEvokedSetModel->getNumSamples()) - 1.0f); //((float)option.rect.width()) / m_pEvokedSetModel->getMaxSamples();
 
     QList<DISPLIB::AvrTypeRowVector> rowVec = m_pEvokedSetModel->data(row, 1).value<QList<DISPLIB::AvrTypeRowVector>>();
 

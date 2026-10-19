@@ -254,7 +254,7 @@ MatrixXd RTPROCESSINGLIB::filterData(const MatrixXd& matData,
 
     if (matData.cols() > iSize) {
         int from = 0;
-        int numSlices = ceil(float(matData.cols()) / float(iSize)); //calculate number of data slices
+        int numSlices = ceil(static_cast<float>(matData.cols()) / static_cast<float>(iSize)); //calculate number of data slices
 
         for (int i = 0; i < numSlices; i++) {
             if (i == numSlices - 1) {
@@ -458,7 +458,7 @@ MatrixXd FilterOverlapAdd::calculate(const MatrixXd& matData,
 
     if (matData.cols() > iSize) {
         int from = 0;
-        int numSlices = ceil(float(matData.cols()) / float(iSize)); //calculate number of data slices
+        int numSlices = ceil(static_cast<float>(matData.cols()) / static_cast<float>(iSize)); //calculate number of data slices
 
         for (int i = 0; i < numSlices; i++) {
             if (i == numSlices - 1) {
@@ -583,7 +583,7 @@ FiffEvoked RTPROCESSINGLIB::computeFilteredAverage(const FiffRawData& raw,
             if (p == 0) {
                 times.resize(1, to - from + 1);
                 for (qint32 i = 0; i < times.cols(); ++i)
-                    times(0, i) = ((float)(from - event_samp + i)) / raw.info.sfreq;
+                    times(0, i) = (static_cast<float>(from - event_samp + i)) / raw.info.sfreq;
             }
 
             epoch->event = eventType;

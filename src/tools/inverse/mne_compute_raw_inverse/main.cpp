@@ -196,7 +196,7 @@ static InvSourceEstimate processLabel(const QString& labelFile,
 
     qInfo("  FsLabel %s: %ld vertices (%s hemisphere)",
           labelFile.toUtf8().constData(),
-          (long)label.vertices.size(),
+          static_cast<long>(label.vertices.size()),
           hemi == 0 ? "left" : "right");
 
     // Set up minimum norm with label restriction
@@ -249,7 +249,7 @@ static InvSourceEstimate processLabelDir(const QString& labelDir,
         return InvSourceEstimate();
     }
 
-    qInfo("Found %lld label files in %s", (long long)labelFiles.size(), labelDir.toUtf8().constData());
+    qInfo("Found %lld label files in %s", static_cast<long long>(labelFiles.size()), labelDir.toUtf8().constData());
 
     // Compute full inverse solution first (with pickNormal=true for labeldir)
     InvMinimumNorm minimumNorm(invOp, lambda2, method);
@@ -305,7 +305,7 @@ static InvSourceEstimate processLabelDir(const QString& labelDir,
         labelNames.append(fi.fileName());
 
         qInfo("  FsLabel %s: %ld vertices, averaged",
-              fi.fileName().toUtf8().constData(), (long)labelIndices.size());
+              fi.fileName().toUtf8().constData(), static_cast<long>(labelIndices.size()));
 
         validLabels++;
     }
@@ -591,7 +591,7 @@ int main(int argc, char* argv[])
                 return 1;
             }
             qInfo("\nWrote %s (%d labels, %d time points)",
-                  stcOut.toUtf8().constData(), (int)stc.data.rows(), (int)stc.data.cols());
+                  stcOut.toUtf8().constData(), static_cast<int>(stc.data.rows()), static_cast<int>(stc.data.cols()));
 
             // Write label list if requested
             if (!labelListName.isEmpty() && !labelNames.isEmpty()) {
@@ -647,7 +647,7 @@ int main(int argc, char* argv[])
                     continue;
                 }
                 qInfo("  Wrote %s (%d sources, %d time points)",
-                      stcOut.toUtf8().constData(), (int)stc.data.rows(), (int)stc.data.cols());
+                      stcOut.toUtf8().constData(), static_cast<int>(stc.data.rows()), static_cast<int>(stc.data.cols()));
             }
 
         } else {
@@ -688,7 +688,7 @@ int main(int argc, char* argv[])
             // belong to each hemisphere.
             int nSrcLh = inverseOperator.src[0].nuse;
             int nSrcRh = inverseOperator.src[1].nuse;
-            int nSrcTotal = (int)stc.data.rows();
+            int nSrcTotal = static_cast<int>(stc.data.rows());
 
             if (nSrcLh + nSrcRh != nSrcTotal) {
                 qWarning("Warning: Source count mismatch (lh=%d + rh=%d != %d). "
@@ -702,7 +702,7 @@ int main(int argc, char* argv[])
                     return 1;
                 }
                 qInfo("  Wrote %s (%d sources, %d time points)",
-                      stcOutLh.toUtf8().constData(), nSrcTotal, (int)stc.data.cols());
+                      stcOutLh.toUtf8().constData(), nSrcTotal, static_cast<int>(stc.data.cols()));
             } else {
                 // Write left hemisphere STC
                 if (nSrcLh > 0) {
@@ -717,7 +717,7 @@ int main(int argc, char* argv[])
                         return 1;
                     }
                     qInfo("  Wrote %s (%d sources, %d time points)",
-                          stcOutLh.toUtf8().constData(), nSrcLh, (int)stc.data.cols());
+                          stcOutLh.toUtf8().constData(), nSrcLh, static_cast<int>(stc.data.cols()));
                 }
 
                 // Write right hemisphere STC
@@ -733,7 +733,7 @@ int main(int argc, char* argv[])
                         return 1;
                     }
                     qInfo("  Wrote %s (%d sources, %d time points)",
-                          stcOutRh.toUtf8().constData(), nSrcRh, (int)stc.data.cols());
+                          stcOutRh.toUtf8().constData(), nSrcRh, static_cast<int>(stc.data.cols()));
                 }
             }
         }
@@ -769,7 +769,7 @@ int main(int argc, char* argv[])
             return 1;
         }
 
-        qInfo("  Picked %d channels from raw data", (int)picks.size());
+        qInfo("  Picked %d channels from raw data", static_cast<int>(picks.size()));
 
         // Activate projectors
         for (int k = 0; k < raw.info.projs.size(); ++k) {
@@ -788,7 +788,7 @@ int main(int argc, char* argv[])
         float tmin = static_cast<float>(raw.first_samp) * tstep;
 
         qInfo("  Read %d samples (%d channels)",
-              (int)inputData.cols(), (int)inputData.rows());
+              static_cast<int>(inputData.cols()), static_cast<int>(inputData.rows()));
 
         int result = processInverseResults(inputData, tmin, tstep, nave, outName);
         if (result != 0)
@@ -822,7 +822,7 @@ int main(int argc, char* argv[])
         // Determine which sets to process
         QList<int> setsToProcess;
         if (processAllSets) {
-            qInfo("  Found %d evoked data set(s):", (int)evokedSet.evoked.size());
+            qInfo("  Found %d evoked data set(s):", static_cast<int>(evokedSet.evoked.size()));
             for (int i = 0; i < evokedSet.evoked.size(); ++i) {
                 qInfo("    [%d] %s", i, evokedSet.evoked[i].comment.toUtf8().constData());
                 setsToProcess.append(i);
@@ -830,7 +830,7 @@ int main(int argc, char* argv[])
         } else {
             if (setNo < 0 || setNo >= evokedSet.evoked.size()) {
                 qCritical("Error: Set %d out of range (file has %d sets, 0-%d)",
-                          setNo, (int)evokedSet.evoked.size(), (int)evokedSet.evoked.size() - 1);
+                          setNo, static_cast<int>(evokedSet.evoked.size()), static_cast<int>(evokedSet.evoked.size()) - 1);
                 return 1;
             }
             setsToProcess.append(setNo);
@@ -862,7 +862,7 @@ int main(int argc, char* argv[])
             float tstep = 1.0f / pickedEvoked.info.sfreq;
 
             qInfo("  Read %d time points (%d channels)",
-                  (int)inputData.cols(), (int)inputData.rows());
+                  static_cast<int>(inputData.cols()), static_cast<int>(inputData.rows()));
 
             // Compose per-set output name with set description
             QString setOutName;

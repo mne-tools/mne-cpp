@@ -479,22 +479,6 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
             if (t_MT_partial.rows() > 0 && t_MT_partial.cols() > 0) {
                 t_MT_new.conservativeResize(t_MT_partial.rows(), t_MT_new.cols() + t_MT_partial.cols());
                 t_MT_new.block(0, t_MT_new.cols() - t_MT_partial.cols(), t_MT_new.rows(), t_MT_partial.cols()) = t_MT_partial;
-
-                // Map the centroids to the closest rr
-                for (qint32 k = 0; k < nClusters; ++k) {
-                    double sqec = sqrt((itIn->matRoiMTOrig.block(0, 0, itIn->matRoiMTOrig.rows(), 3) - t_MT_partial.block(0, k * 3, t_MT_partial.rows(), 3)).array().pow(2).sum());
-                    double sqec_min = sqec;
-                    qint32 j_min = 0;
-                    for (qint32 j = 1; j < itIn->idcs.rows(); ++j) {
-                        sqec = sqrt((itIn->matRoiMTOrig.block(0, j * 3, itIn->matRoiMTOrig.rows(), 3) - t_MT_partial.block(0, k * 3, t_MT_partial.rows(), 3)).array().pow(2).sum());
-
-                        if (sqec < sqec_min) {
-                            sqec_min = sqec;
-                            j_min = j;
-                        }
-                    }
-                    (void)j_min;
-                }
             }
 
             ++itIn;

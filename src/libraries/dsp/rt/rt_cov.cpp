@@ -101,7 +101,7 @@ FiffCov RtCov::estimateCovariance(const Eigen::MatrixXd& matData,
     bool doProj = true;
 
     if (m_iSamples > 0) {
-        finalResult.mu /= (float)m_iSamples;
+        finalResult.mu /= static_cast<float>(m_iSamples);
         computedCov.data.array() -= m_iSamples * (finalResult.mu * finalResult.mu.transpose()).array();
         computedCov.data.array() /= (m_iSamples - 1);
 

@@ -369,9 +369,9 @@ int mne_read_raw_buffer_t( //fiffFile     in,        /* Input file */
 {
     FiffTag::UPtr t_pTag;
     //    fiffTagRec   tag;
-    fiff_short_t* this_samples;
+    const fiff_short_t* this_samples;
     const fiff_float_t* this_samplef;
-    fiff_int_t* this_sample;
+    const fiff_int_t* this_sample;
 
     int s, c;
 
@@ -408,7 +408,7 @@ int mne_read_raw_buffer_t( //fiffFile     in,        /* Input file */
             qCritical("Incorrect number of samples in buffer.");
             return FAIL;
         }
-        this_samples = (fiff_short_t*)t_pTag->data();
+        this_samples = reinterpret_cast<fiff_short_t*>(t_pTag->data());
         for (s = 0; s < nsamp; s++, this_samples += nchan) {
             for (c = 0; c < npick; c++)
                 data(c, s) = mult[c] * this_samples[pickno[c]];
@@ -1045,7 +1045,8 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float** p
      */
 {
     int k, s, bs, c;
-    int bs1, bs2, s1, s2, lasts;
+    int bs1, s1, s2, lasts;
+    [[maybe_unused]] int bs2; // only reported in DEBUG builds
     MNERawBufDef* this_buf;
     float* values;
     RowMajorMatrixXf deriv_vals;
@@ -1233,7 +1234,6 @@ int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float** p
             }
         }
     }
-    (void)bs2; // squash compiler warning, this is unused
     return OK;
 }
 

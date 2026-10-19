@@ -136,10 +136,10 @@ bool FiffDirNode::copy_tree(FiffStream::SPtr& p_pStreamIn, const FiffId& in_id, 
             FiffStream::SPtr out = p_pStreamOut;
             out->setByteOrder(QDataStream::BigEndian);
 
-            *out << (qint32)tag->kind;
-            *out << (qint32)tag->type;
-            *out << (qint32)tag->size();
-            *out << (qint32)FIFFV_NEXT_SEQ;
+            *out << static_cast<qint32>(tag->kind);
+            *out << static_cast<qint32>(tag->type);
+            *out << static_cast<qint32>(tag->size());
+            *out << static_cast<qint32>(FIFFV_NEXT_SEQ);
 
             out->writeRawData(tag->data(), tag->size());
         }

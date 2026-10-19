@@ -101,11 +101,11 @@ static void makeIcosphere(int nSubdiv, MatrixX3f& verts, MatrixX3i& tris)
     }
 
     verts.resize(v.size(), 3);
-    for (int i = 0; i < (int)v.size(); ++i)
+    for (int i = 0; i < static_cast<int>(v.size()); ++i)
         verts.row(i) = v[i].transpose();
 
     tris.resize(f.size(), 3);
-    for (int i = 0; i < (int)f.size(); ++i)
+    for (int i = 0; i < static_cast<int>(f.size()); ++i)
         tris.row(i) = f[i].transpose();
 }
 
@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
     MatrixX3i tris;
     makeIcosphere(icoLevel, unitVerts, tris);
     qInfo("Icosphere subdivision %d: %d vertices, %d triangles",
-          icoLevel, (int)unitVerts.rows(), (int)tris.rows());
+          icoLevel, static_cast<int>(unitVerts.rows()), static_cast<int>(tris.rows()));
 
     // Create BEM model
     MNEBem bem;

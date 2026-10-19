@@ -139,7 +139,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
 
     //VERTICAL
     //Draw vertical lines
-    double length = double(numberCoeff) / double(m_iNumberVerticalLines + 1);
+    double length = static_cast<double>(numberCoeff) / static_cast<double>(m_iNumberVerticalLines + 1);
     for (int i = 1; i <= m_iNumberVerticalLines; i++)
         addLine(i * length - m_iDiagramMarginsHoriz,
                 -m_iDiagramMarginsVert,
@@ -160,7 +160,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
     double pos = 0;
     switch (FilterKernel::m_filterTypes.indexOf(m_pCurrentFilter.getFilterType())) {
         case 0: //LPF
-            pos = ((double)m_iCutOffLow / (double)fMax) * numberCoeff;
+            pos = (static_cast<double>(m_iCutOffLow) / static_cast<double>(fMax)) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth / 2,
                     pos - m_iDiagramMarginsHoriz,
@@ -169,7 +169,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
             break;
 
         case 1: //HPF
-            pos = ((double)m_iCutOffHigh / (double)fMax) * numberCoeff;
+            pos = (static_cast<double>(m_iCutOffHigh) / static_cast<double>(fMax)) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth / 2,
                     pos - m_iDiagramMarginsHoriz,
@@ -178,14 +178,14 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
             break;
 
         case 2: //BPF
-            pos = ((double)m_iCutOffLow / (double)fMax) * numberCoeff;
+            pos = (static_cast<double>(m_iCutOffLow) / static_cast<double>(fMax)) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth / 2,
                     pos - m_iDiagramMarginsHoriz,
                     m_iMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth / 2,
                     QPen(Qt::red, m_iCutOffMarkerWidth));
 
-            pos = ((double)m_iCutOffHigh / (double)fMax) * numberCoeff;
+            pos = (static_cast<double>(m_iCutOffHigh) / static_cast<double>(fMax)) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
                     -m_iDiagramMarginsVert + m_iCutOffMarkerWidth / 2,
                     pos - m_iDiagramMarginsHoriz,

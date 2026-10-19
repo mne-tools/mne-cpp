@@ -260,9 +260,9 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
         }
     }
 
-    TempVar = (double)(GridIndex - 1) / (double)HalfTapCount;
+    TempVar = static_cast<double>(GridIndex - 1) / static_cast<double>(HalfTapCount);
     for (j = 1; j <= HalfTapCount; j++) {
-        ExchangeIndex[j] = (double)(j - 1) * TempVar + 1.0;
+        ExchangeIndex[j] = static_cast<double>(j - 1) * TempVar + 1.0;
     }
     ExchangeIndex[HalfTapCount + 1] = GridIndex;
 
@@ -341,7 +341,7 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
     for (j = 1; j <= HalfTapCount + 1; j++) {
         k = ExchangeIndex[j];
         DNUM += LeGrangeD[j] * DesiredMag[k];
-        DDEN += (double)K * LeGrangeD[j] / Weight[k];
+        DDEN += static_cast<double>(K) * LeGrangeD[j] / Weight[k];
         K = -K;
     }
     Deviation = DNUM / DDEN;
@@ -349,11 +349,11 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
     NU = 1;
     if (Deviation > 0.0)
         NU = -1;
-    Deviation = -(double)NU * Deviation;
+    Deviation = -static_cast<double>(NU) * Deviation;
     K = NU;
     for (j = 1; j <= HalfTapCount + 1; j++) {
         k = ExchangeIndex[j];
-        TempVar = (double)K * Deviation / Weight[k];
+        TempVar = static_cast<double>(K) * Deviation / Weight[k];
         DesPlus[j] = DesiredMag[k] + TempVar;
         K = -K;
     }
@@ -381,11 +381,11 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
 
         if (k < KUP && !ErrTest(k, NUT, COMP, &ERR)) {
         L210:
-            COMP = (double)NUT * ERR;
+            COMP = static_cast<double>(NUT) * ERR;
             for (k++; k < KUP; k++) {
                 if (ErrTest(k, NUT, COMP, &ERR))
                     break; // for loop
-                COMP = (double)NUT * ERR;
+                COMP = static_cast<double>(NUT) * ERR;
             }
 
             ExchangeIndex[j] = k - 1;
@@ -430,13 +430,13 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
             continue; // while loop
         }
 
-        COMP = (double)NUT * ERR;
+        COMP = static_cast<double>(NUT) * ERR;
 
     L235:
         for (k--; k > KLOW; k--) {
             if (ErrTest(k, NUT, COMP, &ERR))
                 break; // for loop
-            COMP = (double)NUT * ERR;
+            COMP = static_cast<double>(NUT) * ERR;
         }
 
         KLOW = ExchangeIndex[j];
@@ -486,7 +486,7 @@ TOP_LINE: // We come back to here from 3 places at the bottom.
             if (ErrTest(k, NUT, COMP, &ERR))
                 continue; // for loop
             j = HalfTapCount + 2;
-            COMP = (double)NUT * ERR;
+            COMP = static_cast<double>(NUT) * ERR;
             LUCK = 3; // last time in this if(LUCK == 1 || LUCK == 2)
             goto L235;
         }
@@ -576,7 +576,7 @@ bool ParksMcClellan::ErrTest(int k, int Nut, double Comp, double* Err)
 {
     *Err = GEE2(k, HalfTapCount + 1);
     *Err = (*Err - DesiredMag[k]) * Weight[k];
-    if ((double)Nut * *Err - Comp <= 0.0)
+    if (static_cast<double>(Nut) * *Err - Comp <= 0.0)
         return (true);
     else
         return (false);
@@ -593,11 +593,11 @@ void ParksMcClellan::CalcCoefficients()
 
     GTempVar = Grid[1];
     CosOfGrid[HalfTapCount + 2] = -2.0;
-    OneOverNumTaps = 1.0 / (double)(2 * HalfTapCount - 1);
+    OneOverNumTaps = 1.0 / static_cast<double>(2 * HalfTapCount - 1);
     k = 1;
 
     for (j = 1; j <= HalfTapCount; j++) {
-        FreqN = (double)(j - 1) * OneOverNumTaps;
+        FreqN = static_cast<double>(j - 1) * OneOverNumTaps;
         TempX = cos(M_2PI * FreqN);
 
         GridCos = CosOfGrid[k];
@@ -622,9 +622,9 @@ void ParksMcClellan::CalcCoefficients()
     Grid[1] = GTempVar;
     for (j = 1; j <= HalfTapCount; j++) {
         TempVar = 0.0;
-        Omega = (double)(j - 1) * M_2PI * OneOverNumTaps;
+        Omega = static_cast<double>(j - 1) * M_2PI * OneOverNumTaps;
         for (n = 1; n <= HalfTapCount - 1; n++) {
-            TempVar += GeeArray[n + 1] * cos(Omega * (double)n);
+            TempVar += GeeArray[n + 1] * cos(Omega * static_cast<double>(n));
         }
         TempVar = 2.0 * TempVar + GeeArray[1];
         Alpha[j] = TempVar;

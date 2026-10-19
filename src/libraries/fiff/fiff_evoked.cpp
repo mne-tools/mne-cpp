@@ -367,14 +367,14 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
         for (k = 0; k < nepoch; ++k) {
             const int n = epoch[k].size() / static_cast<int>(sizeof(float));
             if (n != all_data.cols()) {
-                qWarning("Old style epochs have different lengths (%d and %d)", n, (int)all_data.cols());
+                qWarning("Old style epochs have different lengths (%d and %d)", n, static_cast<int>(all_data.cols()));
                 return false;
             }
             all_data.row(k) = Map<const RowVectorXf>(epoch[k].toFloat(), n).cast<double>();
         }
     }
     if (all_data.cols() != nsamp) {
-        qWarning("Incorrect number of samples (%d instead of %d)", (int)all_data.cols(), nsamp);
+        qWarning("Incorrect number of samples (%d instead of %d)", static_cast<int>(all_data.cols()), nsamp);
         return false;
     }
 

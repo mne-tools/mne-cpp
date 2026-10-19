@@ -1779,9 +1779,9 @@ void DataWindow::setRangeSampleLabels()
         return;
     QString stringTemp;
     int minSampleRangeSec = (minSampleRange / fiffInfo->sfreq) * 1000;
-    ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number((double)minSampleRangeSec / 1000, 'g')));
+    ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number(static_cast<double>(minSampleRangeSec) / 1000, 'g')));
     int maxSampleRangeSec = (maxSampleRange / fiffInfo->sfreq) * 1000;
-    ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number((double)maxSampleRangeSec / 1000, 'g')));
+    ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number(static_cast<double>(maxSampleRangeSec) / 1000, 'g')));
 }
 
 

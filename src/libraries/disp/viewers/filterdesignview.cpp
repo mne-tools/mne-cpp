@@ -419,9 +419,9 @@ void FilterDesignView::filterParametersChanged()
     m_filterKernel = FilterKernel("Designed Filter",
                                   FilterKernel::m_filterTypes.indexOf(FilterParameter("BPF")),
                                   m_iFilterTaps,
-                                  (double)center / nyquistFrequency,
-                                  (double)bw / nyquistFrequency,
-                                  (double)trans_width / nyquistFrequency,
+                                  center / nyquistFrequency,
+                                  bw / nyquistFrequency,
+                                  trans_width / nyquistFrequency,
                                   m_dSFreq,
                                   iMethod);
 
@@ -484,7 +484,7 @@ void FilterDesignView::onBtnExportFilterCoefficients()
     //Generate appropriate name for the filter to be saved
     QString filtername;
 
-    filtername = QString("%1_%2_%3_Fs%4").arg(m_filterKernel.getFilterType().getName()).arg((int)m_filterKernel.getHighpassFreq()).arg((int)m_filterKernel.getLowpassFreq()).arg((int)m_filterKernel.getSamplingFrequency());
+    filtername = QString("%1_%2_%3_Fs%4").arg(m_filterKernel.getFilterType().getName()).arg(static_cast<int>(m_filterKernel.getHighpassFreq())).arg(static_cast<int>(m_filterKernel.getLowpassFreq())).arg(static_cast<int>(m_filterKernel.getSamplingFrequency()));
 
     //Do not pass m_filterKernel because this is most likely the User Defined filter which name should not change due to the filter model implementation. Hence use temporal copy of m_filterKernel.
     FilterKernel filterWriteTemp = m_filterKernel;

@@ -553,7 +553,7 @@ void RtClustMne::onTimePointValueChanged(int iTimePointMs)
 {
     if (m_pFiffInfoInput && m_pCircularEvokedBuffer) {
         m_qMutex.lock();
-        m_iTimePointSps = m_pFiffInfoInput->sfreq * (float)iTimePointMs * 0.001f;
+        m_iTimePointSps = m_pFiffInfoInput->sfreq * static_cast<float>(iTimePointMs) * 0.001f;
         m_qMutex.unlock();
 
         if (this->isRunning()) {

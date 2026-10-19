@@ -143,8 +143,8 @@ bool FiffEvents::read_from_fif(QIODevice& p_IODevice,
     qint32 k, nelem = 0;
     fiff_int_t kind, pos;
     FiffTag::UPtr t_pTag;
-    quint32* serial_eventlist_uint = nullptr;
-    qint32* serial_eventlist_int = nullptr;
+    const quint32* serial_eventlist_uint = nullptr;
+    const qint32* serial_eventlist_int = nullptr;
 
     for (k = 0; k < eventsBlocks[0]->nent(); ++k) {
         kind = eventsBlocks[0]->dir[k]->kind;

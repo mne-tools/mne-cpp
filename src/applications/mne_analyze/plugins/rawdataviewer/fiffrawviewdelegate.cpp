@@ -235,7 +235,7 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem& option,
         // The spacing we use to paint the samples is therefore dependent on how much data we plot (in samples) in
         // the GUI view with user selected width (in pixels). This relationship is calculated in the FiffRawView
         // and is reflected by dDx
-        qSamplePosition.setX(path.currentPosition().x() + (dDx * (float)iPaintStep));
+        qSamplePosition.setX(path.currentPosition().x() + (dDx * static_cast<float>(iPaintStep)));
 
         path.lineTo(qSamplePosition);
     }

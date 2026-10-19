@@ -419,7 +419,7 @@ void EventManager::insertEvent(const EVENTSINTERNAL::EventINT& e)
 
 int EventManager::getNumGroups() const
 {
-    return (int)(m_GroupsList.size());
+    return static_cast<int>(m_GroupsList.size());
 }
 
 //=============================================================================================================

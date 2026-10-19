@@ -165,7 +165,7 @@ QVariant EventModel::data(const QModelIndex& index, int role) const
                 case Qt::DisplayRole: {
                     int time = ((m_dataSamples_Filtered.at(index.row()) - m_iFirstSample) / m_pFiffInfo->sfreq) * 100;
 
-                    return QVariant((double)time / 100);
+                    return QVariant(static_cast<double>(time) / 100);
                 }
 
                 case Qt::BackgroundRole:

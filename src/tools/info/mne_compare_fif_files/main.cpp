@@ -139,12 +139,12 @@ int main(int argc, char* argv[])
     const QList<FiffDirEntry::SPtr>& dir1 = stream1->dir();
     const QList<FiffDirEntry::SPtr>& dir2 = stream2->dir();
 
-    qInfo("File 1: %s (%d directory entries)", qPrintable(file1), (int)dir1.size());
-    qInfo("File 2: %s (%d directory entries)", qPrintable(file2), (int)dir2.size());
+    qInfo("File 1: %s (%d directory entries)", qPrintable(file1), static_cast<int>(dir1.size()));
+    qInfo("File 2: %s (%d directory entries)", qPrintable(file2), static_cast<int>(dir2.size()));
     qInfo("%s", "");
 
     int nMatch = 0, nDiff = 0, nMissing = 0;
-    int minEntries = (int)std::min(dir1.size(), dir2.size());
+    int minEntries = static_cast<int>(std::min(dir1.size(), dir2.size()));
 
     for (int i = 0; i < minEntries; ++i) {
         FiffTag::UPtr tag1, tag2;
@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
     }
 
     if (dir1.size() != dir2.size()) {
-        nMissing = (int)abs(dir1.size() - dir2.size());
+        nMissing = static_cast<int>(abs(dir1.size() - dir2.size()));
         qInfo("\n  File %s has %d extra directory entries.",
               dir1.size() > dir2.size() ? "1" : "2", nMissing);
     }

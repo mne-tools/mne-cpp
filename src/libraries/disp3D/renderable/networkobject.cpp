@@ -45,18 +45,18 @@ NetworkObject::~NetworkObject() = default;
 
 InstancedStreams NetworkObject::nodeStreams() const
 {
-    return {{m_nodeVertexData.constData(), quint32(m_nodeVertexData.size()), m_nodeGeometryGeneration},
-            {m_nodeIndexData.constData(), quint32(m_nodeIndexData.size()), m_nodeGeometryGeneration},
-            {m_nodeInstanceData.constData(), quint32(m_nodeInstanceCount * sizeof(InstanceData)), m_nodeInstanceGeneration},
+    return {{m_nodeVertexData.constData(), static_cast<quint32>(m_nodeVertexData.size()), m_nodeGeometryGeneration},
+            {m_nodeIndexData.constData(), static_cast<quint32>(m_nodeIndexData.size()), m_nodeGeometryGeneration},
+            {m_nodeInstanceData.constData(), static_cast<quint32>(m_nodeInstanceCount * sizeof(InstanceData)), m_nodeInstanceGeneration},
             m_nodeIndexCount,
             m_nodeInstanceCount};
 }
 
 InstancedStreams NetworkObject::edgeStreams() const
 {
-    return {{m_edgeVertexData.constData(), quint32(m_edgeVertexData.size()), m_edgeGeometryGeneration},
-            {m_edgeIndexData.constData(), quint32(m_edgeIndexData.size()), m_edgeGeometryGeneration},
-            {m_edgeInstanceData.constData(), quint32(m_edgeInstanceCount * sizeof(InstanceData)), m_edgeInstanceGeneration},
+    return {{m_edgeVertexData.constData(), static_cast<quint32>(m_edgeVertexData.size()), m_edgeGeometryGeneration},
+            {m_edgeIndexData.constData(), static_cast<quint32>(m_edgeIndexData.size()), m_edgeGeometryGeneration},
+            {m_edgeInstanceData.constData(), static_cast<quint32>(m_edgeInstanceCount * sizeof(InstanceData)), m_edgeInstanceGeneration},
             m_edgeIndexCount,
             m_edgeInstanceCount};
 }
@@ -190,13 +190,13 @@ void NetworkObject::createNodeGeometry()
         std::map<uint64_t, uint32_t> midpointCache;
 
         auto getMidpoint = [&](uint32_t i0, uint32_t i1) -> uint32_t {
-            uint64_t key = (uint64_t)std::min(i0, i1) << 32 | std::max(i0, i1);
+            uint64_t key = static_cast<uint64_t>(std::min(i0, i1)) << 32 | std::max(i0, i1);
             auto it = midpointCache.find(key);
             if (it != midpointCache.end())
                 return it->second;
 
             QVector3D mid = ((vertices[i0] + vertices[i1]) / 2.0f).normalized() * radius;
-            uint32_t idx = (uint32_t)vertices.size();
+            uint32_t idx = static_cast<uint32_t>(vertices.size());
             vertices.push_back(mid);
             midpointCache[key] = idx;
             return idx;
@@ -225,7 +225,7 @@ void NetworkObject::createNodeGeometry()
         vd.push_back({v.x(), v.y(), v.z(), n.x(), n.y(), n.z()});
     }
 
-    m_nodeIndexCount = (int)indices.size();
+    m_nodeIndexCount = static_cast<int>(indices.size());
 
     m_nodeVertexData.resize(vd.size() * sizeof(VertexData));
     memcpy(m_nodeVertexData.data(), vd.data(), m_nodeVertexData.size());
@@ -258,7 +258,7 @@ void NetworkObject::createEdgeGeometry()
 
     // Side vertices: top ring (2..2+segments-1), bottom ring (2+segments..2+2*segments-1)
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * (float)M_PI * i / segments;
+        float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
         float x = radius * std::cos(angle);
         float z = radius * std::sin(angle);
 
@@ -272,18 +272,18 @@ void NetworkObject::createEdgeGeometry()
     }
 
     // Top cap vertices (for proper normals)
-    int topCapStart = (int)vertices.size();
+    int topCapStart = static_cast<int>(vertices.size());
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * (float)M_PI * i / segments;
+        float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
         float x = radius * std::cos(angle);
         float z = radius * std::sin(angle);
         vertices.push_back({x, halfHeight, z, 0, 1, 0});
     }
 
     // Bottom cap vertices
-    int botCapStart = (int)vertices.size();
+    int botCapStart = static_cast<int>(vertices.size());
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * (float)M_PI * i / segments;
+        float angle = 2.0f * static_cast<float>(M_PI) * i / segments;
         float x = radius * std::cos(angle);
         float z = radius * std::sin(angle);
         vertices.push_back({x, -halfHeight, z, 0, -1, 0});
@@ -298,8 +298,8 @@ void NetworkObject::createEdgeGeometry()
         int topNext = sideStart + next * 2;
         int botNext = sideStart + next * 2 + 1;
 
-        indices.insert(indices.end(), {(uint32_t)topCur, (uint32_t)topNext, (uint32_t)botCur});
-        indices.insert(indices.end(), {(uint32_t)botCur, (uint32_t)topNext, (uint32_t)botNext});
+        indices.insert(indices.end(), {static_cast<uint32_t>(topCur), static_cast<uint32_t>(topNext), static_cast<uint32_t>(botCur)});
+        indices.insert(indices.end(), {static_cast<uint32_t>(botCur), static_cast<uint32_t>(topNext), static_cast<uint32_t>(botNext)});
     }
 
     // Top cap
@@ -318,7 +318,7 @@ void NetworkObject::createEdgeGeometry()
         indices.push_back(botCapStart + i);
     }
 
-    m_edgeIndexCount = (int)indices.size();
+    m_edgeIndexCount = static_cast<int>(indices.size());
 
     m_edgeVertexData.resize(vertices.size() * sizeof(VertexData));
     memcpy(m_edgeVertexData.data(), vertices.data(), m_edgeVertexData.size());
@@ -359,7 +359,7 @@ void NetworkObject::buildNodeInstances()
 
         // Scale: nodes with higher degree are larger
         // Range: 0.0006 to 0.005 (same as disp3D)
-        float scaleFactor = ((float)degree / (float)iMaxDegree) * (0.005f - 0.0006f) + 0.0006f;
+        float scaleFactor = (static_cast<float>(degree) / static_cast<float>(iMaxDegree)) * (0.005f - 0.0006f) + 0.0006f;
 
         QMatrix4x4 m;
         m.translate(pos);
@@ -372,7 +372,7 @@ void NetworkObject::buildNodeInstances()
 
         // Color: colormap-based or fixed
         if (vizInfo.sMethod == "Map") {
-            float normalized = (float)degree / (float)iMaxDegree;
+            float normalized = static_cast<float>(degree) / static_cast<float>(iMaxDegree);
             QRgb rgb = ColorMap::valueToColor(normalized, vizInfo.sColormap.isEmpty() ? m_colormap : vizInfo.sColormap);
             QColor color(rgb);
             float alpha = std::pow(normalized, 4.0f); // Same as disp3D
@@ -391,7 +391,7 @@ void NetworkObject::buildNodeInstances()
         instances.push_back(inst);
     }
 
-    m_nodeInstanceCount = (int)instances.size();
+    m_nodeInstanceCount = static_cast<int>(instances.size());
     m_nodeInstanceData.resize(m_nodeInstanceCount * sizeof(InstanceData));
     if (m_nodeInstanceCount > 0) {
         memcpy(m_nodeInstanceData.data(), instances.data(), m_nodeInstanceData.size());
@@ -454,7 +454,7 @@ void NetworkObject::buildEdgeInstances()
         float length = diff.length();
 
         // Build transform: translate to midpoint, rotate Y-axis to diff direction, scale
-        float normalizedWeight = (float)std::fabs((dWeight - dMinWeight) / dWeightRange);
+        float normalizedWeight = static_cast<float>(std::fabs((dWeight - dMinWeight) / dWeightRange));
 
         // Cylinder radius: proportional to weight, range 0.0001 to 0.001
         float edgeRadius = 0.0001f + normalizedWeight * 0.0009f;
@@ -471,7 +471,7 @@ void NetworkObject::buildEdgeInstances()
 
         // Color
         if (vizInfo.sMethod == "Map") {
-            float normalized = (dMaxWeight != 0.0) ? (float)std::fabs(dWeight / dMaxWeight) : 0.0f;
+            float normalized = (dMaxWeight != 0.0) ? static_cast<float>(std::fabs(dWeight / dMaxWeight)) : 0.0f;
             QRgb rgb = ColorMap::valueToColor(normalized, vizInfo.sColormap.isEmpty() ? m_colormap : vizInfo.sColormap);
             QColor color(rgb);
             float alpha = std::pow(normalized, 1.5f); // Same as disp3D
@@ -490,7 +490,7 @@ void NetworkObject::buildEdgeInstances()
         instances.push_back(inst);
     }
 
-    m_edgeInstanceCount = (int)instances.size();
+    m_edgeInstanceCount = static_cast<int>(instances.size());
     m_edgeInstanceData.resize(m_edgeInstanceCount * sizeof(InstanceData));
     if (m_edgeInstanceCount > 0) {
         memcpy(m_edgeInstanceData.data(), instances.data(), m_edgeInstanceData.size());

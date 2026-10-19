@@ -441,7 +441,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
             p_pStream->close();
             throw std::runtime_error("Source selection information missing.");
         }
-        p_Hemisphere.inuse = VectorXi(Map<VectorXi>(t_pTag->toInt(), t_pTag->size() / 4, 1)); //use copy constructor, for the sake of easy memory management
+        p_Hemisphere.inuse = VectorXi(Map<const VectorXi>(t_pTag->toInt(), t_pTag->size() / 4, 1)); //use copy constructor, for the sake of easy memory management
 
         p_Hemisphere.vertno = VectorXi::Zero(p_Hemisphere.nuse);
         if (p_Hemisphere.inuse.rows() != p_Hemisphere.np) {
@@ -481,7 +481,7 @@ bool MNESourceSpaces::read_source_space(FiffStream::SPtr& p_pStream, const FiffD
         p_Hemisphere.nearest.clear();
     } else {
         //res.nearest = tag1.data + 1;
-        VectorXi nearestIdx = VectorXi(Map<VectorXi>(t_pTag1->toInt(), t_pTag1->size() / 4, 1));
+        VectorXi nearestIdx = VectorXi(Map<const VectorXi>(t_pTag1->toInt(), t_pTag1->size() / 4, 1));
         VectorXd nearestDist = VectorXd((Map<const VectorXf>(t_pTag2->toFloat(), t_pTag2->size() / 4, 1)).cast<double>());
         p_Hemisphere.setNearestData(nearestIdx, nearestDist);
     }

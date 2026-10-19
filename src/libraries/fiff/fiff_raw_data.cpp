@@ -257,13 +257,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 if (mult.cols() == 0) {
                     if (sel.cols() == 0) {
                         if (t_pTag->type == FIFFT_DAU_PACK16)
-                            one = cal * (Map<MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
+                            one = cal * (Map<const MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_INT)
-                            one = cal * (Map<MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
+                            one = cal * (Map<const MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_FLOAT)
                             one = cal * (Map<const MatrixXf>(t_pTag->toFloat(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_SHORT)
-                            one = cal * (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
+                            one = cal * (Map<const MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_DOUBLE)
                             one = cal * Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
                         else {
@@ -276,12 +276,12 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         newData.resize(sel.cols(), thisRawDir.nsamp); //ToDo this can be done much faster, without newData
 
                         if (t_pTag->type == FIFFT_DAU_PACK16) {
-                            tmp_data = (Map<MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
+                            tmp_data = (Map<const MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
 
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
                         } else if (t_pTag->type == FIFFT_INT) {
-                            tmp_data = (Map<MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
+                            tmp_data = (Map<const MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
 
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
@@ -291,7 +291,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
                         } else if (t_pTag->type == FIFFT_SHORT) {
-                            tmp_data = (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
+                            tmp_data = (Map<const MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
 
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
@@ -310,13 +310,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     }
                 } else {
                     if (t_pTag->type == FIFFT_DAU_PACK16)
-                        one = mult * (Map<MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
+                        one = mult * (Map<const MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_INT)
-                        one = mult * (Map<MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
+                        one = mult * (Map<const MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_FLOAT)
                         one = mult * (Map<const MatrixXf>(t_pTag->toFloat(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_SHORT)
-                        one = mult * (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
+                        one = mult * (Map<const MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_DOUBLE)
                         one = mult * Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
                     else {
@@ -559,13 +559,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                 if (mult.cols() == 0) {
                     if (sel.cols() == 0) {
                         if (t_pTag->type == FIFFT_DAU_PACK16)
-                            one = cal * (Map<MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
+                            one = cal * (Map<const MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_INT)
-                            one = cal * (Map<MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
+                            one = cal * (Map<const MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_FLOAT)
                             one = cal * (Map<const MatrixXf>(t_pTag->toFloat(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_SHORT)
-                            one = cal * (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
+                            one = cal * (Map<const MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
                         else if (t_pTag->type == FIFFT_DOUBLE)
                             one = cal * Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
                         else {
@@ -578,12 +578,12 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                         MatrixXd newData(sel.cols(), thisRawDir.nsamp); //ToDo this can be done much faster, without newData
 
                         if (t_pTag->type == FIFFT_DAU_PACK16) {
-                            MatrixXd tmp_data = (Map<MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
+                            MatrixXd tmp_data = (Map<const MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
 
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
                         } else if (t_pTag->type == FIFFT_INT) {
-                            MatrixXd tmp_data = (Map<MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
+                            MatrixXd tmp_data = (Map<const MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
 
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
@@ -593,7 +593,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
                         } else if (t_pTag->type == FIFFT_SHORT) {
-                            MatrixXd tmp_data = (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
+                            MatrixXd tmp_data = (Map<const MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
 
                             for (r = 0; r < sel.size(); ++r)
                                 newData.block(r, 0, 1, thisRawDir.nsamp) = tmp_data.block(sel[r], 0, 1, thisRawDir.nsamp);
@@ -612,13 +612,13 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
                     }
                 } else {
                     if (t_pTag->type == FIFFT_DAU_PACK16)
-                        one = mult * (Map<MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
+                        one = mult * (Map<const MatrixDau16>(t_pTag->toDauPack16(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_INT)
-                        one = mult * (Map<MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
+                        one = mult * (Map<const MatrixXi>(t_pTag->toInt(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_FLOAT)
                         one = mult * (Map<const MatrixXf>(t_pTag->toFloat(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_SHORT)
-                        one = mult * (Map<MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
+                        one = mult * (Map<const MatrixShort>(t_pTag->toShort(), nchan, thisRawDir.nsamp)).cast<double>();
                     else if (t_pTag->type == FIFFT_DOUBLE)
                         one = mult * Map<const MatrixXd>(t_pTag->toDouble(), nchan, thisRawDir.nsamp);
                     else {
@@ -728,7 +728,7 @@ bool FiffRawData::read_raw_segment_times(MatrixXd& data,
     //
     //   Read it
     //
-    return this->read_raw_segment(data, times, (qint32)from, (qint32)to, sel);
+    return this->read_raw_segment(data, times, static_cast<qint32>(from), static_cast<qint32>(to), sel);
 }
 
 //=============================================================================================================

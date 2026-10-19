@@ -103,7 +103,7 @@ int read_int3(QFile& in, int& ival)
         qCritical("read_int3 could not read data");
         return FAIL;
     }
-    s = (unsigned int)FIFFLIB::swap_int(s);
+    s = static_cast<unsigned int>(FIFFLIB::swap_int(s));
     ival = ((s >> 8) & 0xffffff);
     return OK;
 }
@@ -1450,7 +1450,6 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
     int k, p1, p2;
     Eigen::Vector3f r1;
     float mindist, dist;
-    int minnode;
     int omit, omit_outside;
     double tot_angle;
     int nspace = static_cast<int>(spaces.size());
@@ -1499,13 +1498,10 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
                         * Check the distance limit
                         */
                     mindist = 1.0;
-                    minnode = 0;
                     for (p2 = 0; p2 < surf.np; p2++) {
                         dist = (surf.rr.row(p2).transpose() - r1).norm();
-                        if (dist < mindist) {
+                        if (dist < mindist)
                             mindist = dist;
-                            minnode = p2;
-                        }
                     }
                     if (mindist < limit) {
                         omit++;
@@ -1519,7 +1515,6 @@ int MNESourceSpace::filter_source_spaces(const MNESurface& surf, float limit, co
                 }
             }
     }
-    (void)minnode; // squash compiler warning, this is unused
     if (omit_outside > 0)
         qInfo("%d source space points omitted because they are outside the inner skull surface.\n",
               omit_outside);
@@ -1540,7 +1535,6 @@ void MNESourceSpace::filter_source_space(FilterThreadArg* arg)
     int omit, omit_outside;
     Eigen::Vector3f r1;
     float mindist, dist;
-    int minnode;
 
     QSharedPointer<MNESurface> surf = a->surf.toStrongRef();
     if (!surf) {
@@ -1575,13 +1569,10 @@ void MNESourceSpace::filter_source_space(FilterThreadArg* arg)
          * Check the distance limit
          */
                 mindist = 1.0;
-                minnode = 0;
                 for (p2 = 0; p2 < surf->np; p2++) {
                     dist = (surf->rr.row(p2).transpose() - r1).norm();
-                    if (dist < mindist) {
+                    if (dist < mindist)
                         mindist = dist;
-                        minnode = p2;
-                    }
                 }
                 if (mindist < a->limit) {
                     omit++;
@@ -1595,7 +1586,6 @@ void MNESourceSpace::filter_source_space(FilterThreadArg* arg)
             }
         }
     }
-    (void)minnode; // squash compiler warning, set but unused
     if (omit_outside > 0)
         qInfo("%d source space points omitted because they are outside the inner skull surface.\n",
               omit_outside);
@@ -1803,7 +1793,7 @@ int MNESourceSpace::read_source_spaces(const QString& name, std::vector<std::uni
             }
 
             {
-                Eigen::Map<Eigen::VectorXi> inuseMap(t_pTag->toInt(), new_space->np);
+                Eigen::Map<const Eigen::VectorXi> inuseMap(t_pTag->toInt(), new_space->np);
                 new_space->inuse = inuseMap;
             }
             if (new_space->nuse > 0) {
@@ -1837,7 +1827,7 @@ int MNESourceSpace::read_source_spaces(const QString& name, std::vector<std::uni
                 * The patch information becomes relevant here
                 */
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEAREST, t_pTag)) {
-                Eigen::Map<Eigen::VectorXi> nearestMap(t_pTag->toInt(), new_space->np);
+                Eigen::Map<const Eigen::VectorXi> nearestMap(t_pTag->toInt(), new_space->np);
                 new_space->nearest.resize(new_space->np);
                 for (k = 0; k < new_space->np; k++) {
                     new_space->nearest[k].vert = k;
@@ -1887,11 +1877,11 @@ int MNESourceSpace::read_source_spaces(const QString& name, std::vector<std::uni
             ntot = nvert = 0;
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NEIGHBORS, t_pTag)) {
                 ntot = static_cast<int>(t_pTag->size() / sizeof(fiff_int_t));
-                neighborsVec = Eigen::Map<Eigen::VectorXi>(t_pTag->toInt(), ntot);
+                neighborsVec = Eigen::Map<const Eigen::VectorXi>(t_pTag->toInt(), ntot);
             }
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_NNEIGHBORS, t_pTag)) {
                 nvert = static_cast<int>(t_pTag->size() / sizeof(fiff_int_t));
-                nneighborsVec = Eigen::Map<Eigen::VectorXi>(t_pTag->toInt(), nvert);
+                nneighborsVec = Eigen::Map<const Eigen::VectorXi>(t_pTag->toInt(), nvert);
             }
             if (neighborsVec.size() > 0 && nneighborsVec.size() > 0) {
                 if (nvert != new_space->np) {
@@ -1920,7 +1910,7 @@ int MNESourceSpace::read_source_spaces(const QString& name, std::vector<std::uni
                 */
             new_space->voxel_surf_RAS_t = FiffCoordTrans(FiffCoordTrans::readTransformFromNode(stream, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS));
             if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
-                Eigen::Map<Eigen::Vector3i> volDimsMap(t_pTag->toInt());
+                Eigen::Map<const Eigen::Vector3i> volDimsMap(t_pTag->toInt());
                 Eigen::Map<Eigen::Vector3i>(new_space->vol_dims) = volDimsMap;
             }
             {

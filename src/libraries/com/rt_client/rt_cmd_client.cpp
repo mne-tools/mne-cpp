@@ -169,7 +169,7 @@ qint32 RtCmdClient::requestBufsize()
 
         //Switch to command object
         if (t_jsonDocumentOrigin.isObject() && t_jsonDocumentOrigin.object().value(QString("bufsize")) != QJsonValue::Undefined) {
-            qint32 size = (qint32)t_jsonDocumentOrigin.object().value(QString("bufsize")).toDouble();
+            qint32 size = static_cast<qint32>(t_jsonDocumentOrigin.object().value(QString("bufsize")).toDouble());
             return size;
         }
     }
@@ -303,7 +303,7 @@ bool RtCmdClient::waitForDataAvailable(qint32 msecs) const
 
     qint64 t_msecsStart = QDateTime::currentMSecsSinceEpoch();
 
-    while (msecs == -1 || (qint64)msecs < QDateTime::currentMSecsSinceEpoch() - t_msecsStart) {
+    while (msecs == -1 || static_cast<qint64>(msecs) < QDateTime::currentMSecsSinceEpoch() - t_msecsStart) {
         QThread::msleep(5);
         if (m_sAvailableData.size() > 0)
             return true;

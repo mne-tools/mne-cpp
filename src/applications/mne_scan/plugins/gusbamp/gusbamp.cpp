@@ -81,7 +81,7 @@ void GUSBAmp::setUpFiffInfo()
     //Set number of channels, sampling frequency and high/-lowpass
     m_pFiffInfo->nchan = m_iNumberOfChannels;
     m_pFiffInfo->sfreq = m_iSampleRate;
-    m_pFiffInfo->highpass = (float)0.001;
+    m_pFiffInfo->highpass = 0.001f;
     m_pFiffInfo->lowpass = m_iSampleRate / 2;
 
     int numberEEGCh = m_iNumberOfChannels;

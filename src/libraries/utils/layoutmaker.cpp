@@ -332,7 +332,7 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float>>& inputPoints,
         outputPoints.push_back(point);
 
         if (writeFile) {
-            if ((k) < (int)names.size()) {
+            if ((k) < static_cast<int>(names.size())) {
                 outFile << k + 1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k) << std::endl;
             } else {
                 outFile << k + 1 << " " << point[0] << " " << point[1] << " " << w << " " << h << std::endl;

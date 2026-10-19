@@ -508,7 +508,7 @@ qint32 EvokedSetModel::numVLines() const
         iNumSamples = m_matData.first().cols();
     }
 
-    return (qint32)(iNumSamples / m_fSps) - 1;
+    return static_cast<qint32>(iNumSamples / m_fSps) - 1;
 }
 
 //=============================================================================================================

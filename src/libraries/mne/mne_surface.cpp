@@ -270,12 +270,11 @@ void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
                                                 Eigen::VectorXf& distances, int nstep) const
 {
     auto p = std::make_unique<MNEProjData>(this);
-    int k, was;
+    int k;
 
     qInfo("%s for %d points %d steps...", nearest_tri[0] < 0 ? "Closest" : "Approx closest", np_points, nstep);
 
     for (k = 0; k < np_points; k++) {
-        was = nearest_tri[k];
         Eigen::Vector3f pt = Eigen::Map<const Eigen::Vector3f>(r.row(k).data());
         decide_search_restriction(*p, nearest_tri[k], nstep, pt);
         nearest_tri[k] = project_to_surface(p.get(), pt, distances[k]);
@@ -284,7 +283,6 @@ void MNESurface::find_closest_on_surface_approx(const PointsT& r, int np_points,
             nearest_tri[k] = project_to_surface(p.get(), pt, distances[k]);
         }
     }
-    (void)was;
 
     qInfo("[done]\n");
 }

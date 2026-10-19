@@ -91,13 +91,13 @@ void CommandThread::run()
             QByteArray block;
             QDataStream out(&block, QIODevice::WriteOnly);
             out.setVersion(QDataStream::Qt_6_0);
-            out << (quint16)0;
+            out << static_cast<quint16>(0);
             m_qMutex.lock();
             out << m_qSendData;
             m_qSendData.clear();
             m_qMutex.unlock();
             out.device()->seek(0);
-            out << (quint16)(block.size() - sizeof(quint16));
+            out << static_cast<quint16>(block.size() - sizeof(quint16));
 
             t_qTcpSocket.write(block);
             t_qTcpSocket.waitForBytesWritten();
@@ -109,7 +109,7 @@ void CommandThread::run()
 
         t_qTcpSocket.waitForReadyRead(100);
 
-        if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(quint16)) {
+        if (t_qTcpSocket.bytesAvailable() >= static_cast<int>(sizeof(quint16))) {
             quint16 blockSize = 0;
 
             bool respComplete = false;

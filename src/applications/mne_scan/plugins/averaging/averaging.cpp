@@ -241,10 +241,10 @@ void Averaging::initPluginControlWidgets()
         }
 
         // Init Real-Time average
-        int iPreStimSamples = ((float)pAveragingSettingsView->getPreStimMSeconds() / 1000) * m_pFiffInfo->sfreq;
-        int iPostStimSamples = ((float)pAveragingSettingsView->getPostStimMSeconds() / 1000) * m_pFiffInfo->sfreq;
-        int iBaselineFromSamples = ((float)pAveragingSettingsView->getBaselineFromSeconds() / 1000) * m_pFiffInfo->sfreq;
-        int iBaselineToSamples = ((float)pAveragingSettingsView->getBaselineToSeconds() / 1000) * m_pFiffInfo->sfreq;
+        int iPreStimSamples = (static_cast<float>(pAveragingSettingsView->getPreStimMSeconds()) / 1000) * m_pFiffInfo->sfreq;
+        int iPostStimSamples = (static_cast<float>(pAveragingSettingsView->getPostStimMSeconds()) / 1000) * m_pFiffInfo->sfreq;
+        int iBaselineFromSamples = (static_cast<float>(pAveragingSettingsView->getBaselineFromSeconds()) / 1000) * m_pFiffInfo->sfreq;
+        int iBaselineToSamples = (static_cast<float>(pAveragingSettingsView->getBaselineToSeconds()) / 1000) * m_pFiffInfo->sfreq;
 
         m_pRtAve = RtAveraging::SPtr::create(pAveragingSettingsView->getNumAverages(),
                                              iPreStimSamples,
@@ -297,7 +297,7 @@ void Averaging::onChangePreStim(qint32 mseconds)
         return;
     }
 
-    int iPreStimSamples = ((float)(mseconds) / 1000) * m_pFiffInfo->sfreq;
+    int iPreStimSamples = (static_cast<float>(mseconds) / 1000) * m_pFiffInfo->sfreq;
 
     if (m_pAveragingOutput) {
         m_pAveragingOutput->measurementData()->setNumPreStimSamples(iPreStimSamples);
@@ -318,7 +318,7 @@ void Averaging::onChangePostStim(qint32 mseconds)
         return;
     }
 
-    int iPostStimSamples = ((float)(mseconds) / 1000) * m_pFiffInfo->sfreq;
+    int iPostStimSamples = (static_cast<float>(mseconds) / 1000) * m_pFiffInfo->sfreq;
 
     if (m_pRtAve) {
         m_pRtAve->setPostStim(iPostStimSamples, mseconds);
@@ -346,7 +346,7 @@ void Averaging::onChangeBaselineFrom(qint32 fromMS)
         return;
     }
 
-    int iBaselineFromSamples = ((float)(fromMS) / 1000) * m_pFiffInfo->sfreq;
+    int iBaselineFromSamples = (static_cast<float>(fromMS) / 1000) * m_pFiffInfo->sfreq;
 
     if (m_pRtAve) {
         m_pRtAve->setBaselineFrom(iBaselineFromSamples, fromMS);
@@ -363,7 +363,7 @@ void Averaging::onChangeBaselineTo(qint32 toMSeconds)
         return;
     }
 
-    int iBaselineToSamples = ((float)(toMSeconds) / 1000) * m_pFiffInfo->sfreq;
+    int iBaselineToSamples = (static_cast<float>(toMSeconds) / 1000) * m_pFiffInfo->sfreq;
 
     if (m_pRtAve) {
         m_pRtAve->setBaselineTo(iBaselineToSamples, toMSeconds);

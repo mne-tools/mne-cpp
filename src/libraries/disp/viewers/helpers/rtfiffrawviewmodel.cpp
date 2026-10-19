@@ -381,7 +381,7 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
     m_iT = T;
 
-    m_iMaxSamples = (qint32)ceil(static_cast<double>(sps) * T);
+    m_iMaxSamples = static_cast<qint32>(ceil(static_cast<double>(sps) * T));
 
     //Resize data matrix without touching the stored values
     m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);

@@ -568,11 +568,11 @@ FiffCoordTrans FiffCoordTrans::readFromTag(const FiffTag::UPtr& tag)
     if (tag->isMatrix() || tag->getType() != FIFFT_COORD_TRANS_STRUCT || tag->data() == nullptr)
         return t;
 
-    qint32* t_pInt32 = (qint32*)tag->data();
+    qint32* t_pInt32 = reinterpret_cast<qint32*>(tag->data());
     t.from = t_pInt32[0];
     t.to = t_pInt32[1];
 
-    float* t_pFloat = (float*)tag->data();
+    float* t_pFloat = reinterpret_cast<float*>(tag->data());
     int count = 0;
     int r, c;
     for (r = 0; r < 3; ++r) {

@@ -232,7 +232,7 @@ bool BrainAMPDriver::getSampleMatrixValue(Eigen::MatrixXd& sampleMatrix)
 
     // Receive data
     bool bBlockReceived = false;
-    int nTransferSize = (int)pnData.size() * sizeof(short);
+    int nTransferSize = static_cast<int>(pnData.size() * sizeof(short));
 
     while (!bBlockReceived) {
         if (!ReadFile(DeviceAmp, &pnData[0], nTransferSize, &dwBytesReturned, nullptr)) {

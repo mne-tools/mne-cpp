@@ -214,7 +214,7 @@ void MNERTServer::comHelp(Command p_command)
             for (i = 0; i < t_maxSizeParameters - t_sCommandList[1].size(); ++i)
                 t_sCommand.append(QString(" "));
             //Description
-            qint32 lines = (int)ceil((double)t_sCommandList[2].size() / (double)t_maxSizeDescriptions);
+            qint32 lines = static_cast<int>(ceil(static_cast<double>(t_sCommandList[2].size()) / static_cast<double>(t_maxSizeDescriptions)));
             for (i = 0; i < lines; ++i) {
                 t_sCommand.append(QString("%1").arg(t_sCommandList[2].mid(static_cast<qsizetype>(i) * t_maxSizeDescriptions, t_maxSizeDescriptions)));
                 t_sCommand.append(QString("\n\r"));

@@ -464,9 +464,9 @@ bool FiffRawView::eventFilter(QObject* object, QEvent* event)
             case Qt::LeftButton: {
                 if (m_pModel && object == m_pTableView->viewport()) {
                     QPoint pos = mouseEvent->pos();
-                    m_pModel->setScrollerSample(static_cast<int>(floor((float)m_pModel->absoluteFirstSample() +                                       //accounting for first sample offset
+                    m_pModel->setScrollerSample(static_cast<int>(floor(static_cast<float>(m_pModel->absoluteFirstSample()) +                          //accounting for first sample offset
                                                                        (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
-                                                                       ((float)pos.x() / m_pModel->pixelDifference()))));                             //accounting for mouse position offset
+                                                                       (static_cast<float>(pos.x()) / m_pModel->pixelDifference()))));                //accounting for mouse position offset
                     m_pTableView->viewport()->repaint();
                 }
                 break;

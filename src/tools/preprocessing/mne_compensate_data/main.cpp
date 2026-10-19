@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
         qCritical("Cannot read raw data segment");
         return 1;
     }
-    qInfo("Read %d channels x %d samples", (int)data.rows(), (int)data.cols());
+    qInfo("Read %d channels x %d samples", static_cast<int>(data.rows()), static_cast<int>(data.cols()));
 
     // Apply compensation
     data = comp.data->data.cast<double>() * data;
@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
     // Write data in chunks
     int chunkSize = 10000;
     for (int start = 0; start < data.cols(); start += chunkSize) {
-        int end = std::min(start + chunkSize, (int)data.cols());
+        int end = std::min(start + chunkSize, static_cast<int>(data.cols()));
         MatrixXd chunk = data.block(0, start, data.rows(), end - start);
         outStream->write_raw_buffer(chunk);
     }

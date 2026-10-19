@@ -158,8 +158,8 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    qInfo("Source sphere: %d vertices", (int)srcSphere.rr().rows());
-    qInfo("Dest sphere:   %d vertices", (int)dstSphere.rr().rows());
+    qInfo("Source sphere: %d vertices", static_cast<int>(srcSphere.rr().rows()));
+    qInfo("Dest sphere:   %d vertices", static_cast<int>(dstSphere.rr().rows()));
 
     // Build nearest-neighbor mapping on sphere
     qInfo("Building nearest-neighbor mapping on sphere...");
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
         qCritical("Cannot read label: %s", qPrintable(labelFile));
         return 1;
     }
-    qInfo("Input label: %d vertices", (int)label.vertices.size());
+    qInfo("Input label: %d vertices", static_cast<int>(label.vertices.size()));
 
     // Morph label vertices
     std::set<int> morphedSet;
@@ -201,6 +201,6 @@ int main(int argc, char* argv[])
     }
     outF.close();
 
-    qInfo("Morphed label: %d vertices -> %s", (int)morphedSet.size(), qPrintable(outFile));
+    qInfo("Morphed label: %d vertices -> %s", static_cast<int>(morphedSet.size()), qPrintable(outFile));
     return 0;
 }

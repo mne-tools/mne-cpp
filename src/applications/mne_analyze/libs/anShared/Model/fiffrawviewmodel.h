@@ -714,7 +714,7 @@ inline qint32 FiffRawViewModel::sampleWindowSize() const
 
 inline void FiffRawViewModel::setDataColumnWidth(int iWidth)
 {
-    m_dDx = (double)iWidth / double(m_iVisibleWindowSize * m_iSamplesPerBlock);
+    m_dDx = static_cast<double>(iWidth) / double(m_iVisibleWindowSize * m_iSamplesPerBlock);
 }
 
 //=============================================================================================================
@@ -905,7 +905,7 @@ public:
     {
         // see which block we have to access
         std::list<QSharedPointer<QPair<MatrixXd, MatrixXd>>>::const_iterator blockToAccess = m_lData.begin();
-        while (i >= (unsigned long)(*blockToAccess)->first.cols()) {
+        while (i >= static_cast<unsigned long>((*blockToAccess)->first.cols())) {
             i -= (*blockToAccess)->first.cols();
             blockToAccess++;
         }

@@ -240,7 +240,8 @@ void MNEFiffExpSet::print_file_id(QTextStream& out, const FiffTag::UPtr& tag)
     ltime = localtime_r(&time_val, &timeBuf);
 #endif
     if (ltime) {
-        (void)strftime(buf, 100, "%c", ltime);
+        if (strftime(buf, sizeof(buf), "%c", ltime) == 0)
+            buf[0] = '\0';
     } else {
         buf[0] = '\0';
     }
@@ -459,7 +460,7 @@ bool MNEFiffExpSet::show_fiff_contents(QTextStream& out, const QString& name, bo
                                     } else if (tag->size() == sizeof(fiff_int_t))
                                         out << QString::asprintf("\t%d", *tag->toInt());
                                     else
-                                        out << QString::asprintf("\t%d ints", (int)(tag->size() / sizeof(fiff_int_t)));
+                                        out << QString::asprintf("\t%d ints", static_cast<int>(tag->size() / sizeof(fiff_int_t)));
                                 }
                                 break;
                             case FIFFT_UINT:
@@ -467,7 +468,7 @@ bool MNEFiffExpSet::show_fiff_contents(QTextStream& out, const QString& name, bo
                                     if (tag->size() == sizeof(fiff_int_t))
                                         out << QString::asprintf("\t%d", *tag->toUnsignedInt());
                                     else
-                                        out << QString::asprintf("\t%d u_ints", (int)(tag->size() / sizeof(fiff_int_t)));
+                                        out << QString::asprintf("\t%d u_ints", static_cast<int>(tag->size() / sizeof(fiff_int_t)));
                                 }
                                 break;
                             case FIFFT_JULIAN:
@@ -497,7 +498,7 @@ bool MNEFiffExpSet::show_fiff_contents(QTextStream& out, const QString& name, bo
                                     if (tag->size() == sizeof(fiff_float_t))
                                         out << QString::asprintf("\t%g", *tag->toFloat());
                                     else
-                                        out << QString::asprintf("\t%d floats", (int)(tag->size() / sizeof(fiff_float_t)));
+                                        out << QString::asprintf("\t%d floats", static_cast<int>(tag->size() / sizeof(fiff_float_t)));
                                 }
                                 break;
                             case FIFFT_DOUBLE:
@@ -505,7 +506,7 @@ bool MNEFiffExpSet::show_fiff_contents(QTextStream& out, const QString& name, bo
                                     if (tag->size() == sizeof(fiff_double_t))
                                         out << QString::asprintf("\t%g", *tag->toDouble());
                                     else
-                                        out << QString::asprintf("\t%d doubles", (int)(tag->size() / sizeof(fiff_double_t)));
+                                        out << QString::asprintf("\t%d doubles", static_cast<int>(tag->size() / sizeof(fiff_double_t)));
                                 }
                                 break;
                             case FIFFT_COMPLEX_FLOAT:
@@ -515,7 +516,7 @@ bool MNEFiffExpSet::show_fiff_contents(QTextStream& out, const QString& name, bo
                                         out << QString::asprintf("\t(%g %g)", fdata[0], fdata[1]);
                                     else
                                         out << QString::asprintf("\t%d complex numbers",
-                                                                 (int)(tag->size() / (2 * sizeof(fiff_float_t))));
+                                                                 static_cast<int>(tag->size() / (2 * sizeof(fiff_float_t))));
                                 }
                                 break;
                             case FIFFT_COMPLEX_DOUBLE:
@@ -525,7 +526,7 @@ bool MNEFiffExpSet::show_fiff_contents(QTextStream& out, const QString& name, bo
                                         out << QString::asprintf("\t(%g %g)", ddata[0], ddata[1]);
                                     else
                                         out << QString::asprintf("\t%d double complex numbers",
-                                                                 (int)(tag->size() / (2 * sizeof(fiff_double_t))));
+                                                                 static_cast<int>(tag->size() / (2 * sizeof(fiff_double_t))));
                                 }
                                 break;
                             case FIFFT_CH_INFO_STRUCT:

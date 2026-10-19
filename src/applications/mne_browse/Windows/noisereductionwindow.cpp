@@ -231,7 +231,7 @@ void NoiseReductionWindow::checkProjStatusChanged(bool status)
         this->m_pFiffInfo->projs[i].active = m_qListProjCheckBox[i]->isChecked();
         qWarning() << "[NoiseReduction] proj" << i
                    << "checked=" << m_qListProjCheckBox[i]->isChecked()
-                   << "FiffInfo ptr=" << (void*)m_pFiffInfo.data();
+                   << "FiffInfo ptr=" << reinterpret_cast<void*>(m_pFiffInfo.data());
     }
 
     m_enableDisableProjectors->setChecked(bAllActivated);

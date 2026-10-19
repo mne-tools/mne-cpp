@@ -204,7 +204,7 @@ inline constexpr auto SF_UNSIGNED = 0x0; // Unsigned integer
 inline constexpr auto SF_INTEGER = 0x1;  // signed integer
 
 // integer overflow value for analog channels
-#define OVERFLOW_32BITS ((long)0x80000000)
+inline constexpr auto OVERFLOW_32BITS = static_cast<long>(0x80000000);
 // Get Signal info
 
 inline constexpr auto SIGNAL_NAME = 40;

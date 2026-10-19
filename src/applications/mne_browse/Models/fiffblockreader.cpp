@@ -263,7 +263,7 @@ void FiffBlockReader::updateProjections()
         return;
 
     qWarning() << "[FiffBlockReader] updateProjections called. FiffInfo ptr="
-               << (void*)m_fiffInfo.data();
+               << reinterpret_cast<void*>(m_fiffInfo.data());
 
     // Count active projectors for diagnostics
     int nActive = 0;

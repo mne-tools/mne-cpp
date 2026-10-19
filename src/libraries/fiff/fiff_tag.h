@@ -267,7 +267,7 @@ public:
      *
      * @return type cast of the tag data pointer.
      */
-    inline quint8* toByte() const;
+    inline const quint8* toByte() const;
 
     //=========================================================================================================
     /**
@@ -276,7 +276,7 @@ public:
      *
      * @return type cast of the tag data pointer.
      */
-    inline quint16* toUnsignedShort() const;
+    inline const quint16* toUnsignedShort() const;
 
     //=========================================================================================================
     /**
@@ -285,7 +285,7 @@ public:
      *
      * @return type cast of the tag data pointer.
      */
-    inline qint16* toShort() const;
+    inline const qint16* toShort() const;
 
     //=========================================================================================================
     /**
@@ -294,7 +294,7 @@ public:
      *
      * @return type cast of the tag data pointer.
      */
-    inline quint32* toUnsignedInt() const;
+    inline const quint32* toUnsignedInt() const;
 
     //=========================================================================================================
     /**
@@ -303,7 +303,7 @@ public:
      *
      * @return type cast of the tag data pointer.
      */
-    inline qint32* toInt() const;
+    inline const qint32* toInt() const;
 
     //=========================================================================================================
     /**
@@ -312,7 +312,7 @@ public:
     *
     * @return type cast of the tag data pointer.
     */
-    inline qint32* toJulian() const;
+    inline const qint32* toJulian() const;
 
     //=========================================================================================================
     /**
@@ -347,7 +347,7 @@ public:
      *
      * @return type cast of the tag data pointer.
      */
-    inline qint16* toDauPack16() const;
+    inline const qint16* toDauPack16() const;
 
     //
     // Structures
@@ -554,64 +554,64 @@ inline qint32 FiffTag::storageSize()
 // Simple types
 //=============================================================================================================
 
-inline quint8* FiffTag::toByte() const
+inline const quint8* FiffTag::toByte() const
 {
     if (this->isMatrix() || this->getType() != FIFFT_BYTE)
         return nullptr;
     else
-        return (quint8*)this->data();
+        return reinterpret_cast<const quint8*>(this->data());
 }
 
 //=============================================================================================================
 
-inline quint16* FiffTag::toUnsignedShort() const
+inline const quint16* FiffTag::toUnsignedShort() const
 {
     if (this->isMatrix() || this->getType() != FIFFT_USHORT)
         return nullptr;
     else
-        return (quint16*)this->data();
+        return reinterpret_cast<const quint16*>(this->data());
 }
 
 //=============================================================================================================
 
-inline qint16* FiffTag::toShort() const
+inline const qint16* FiffTag::toShort() const
 {
     if (this->isMatrix() || this->getType() != FIFFT_SHORT)
         return nullptr;
     else
-        return (qint16*)this->data();
+        return reinterpret_cast<const qint16*>(this->data());
 }
 
 //=============================================================================================================
 
-inline quint32* FiffTag::toUnsignedInt() const
+inline const quint32* FiffTag::toUnsignedInt() const
 {
     if (this->isMatrix() || this->getType() != FIFFT_UINT)
         return nullptr;
     else
-        return (quint32*)this->data();
+        return reinterpret_cast<const quint32*>(this->data());
 }
 
 //=============================================================================================================
 
-inline qint32* FiffTag::toInt() const
+inline const qint32* FiffTag::toInt() const
 {
     if (this->isMatrix() || this->getType() != FIFFT_INT) {
         qWarning("Expected an integer tag : %d (found data type %d instead)\n", this->kind, this->getType());
         return nullptr;
     } else
-        return (qint32*)this->data();
+        return reinterpret_cast<const qint32*>(this->data());
 }
 
 //=============================================================================================================
 
-inline qint32* FiffTag::toJulian() const
+inline const qint32* FiffTag::toJulian() const
 {
     if (this->isMatrix() || this->getType() != FIFFT_JULIAN) {
         qWarning("Expected a julian tag : %d (found data type %d instead)\n", this->kind, this->getType());
         return nullptr;
     } else
-        return (qint32*)this->data();
+        return reinterpret_cast<const qint32*>(this->data());
 }
 
 //=============================================================================================================
@@ -646,12 +646,12 @@ inline QString FiffTag::toString() const
 
 //=============================================================================================================
 
-inline qint16* FiffTag::toDauPack16() const
+inline const qint16* FiffTag::toDauPack16() const
 {
     if (this->isMatrix() || this->getType() != FIFFT_DAU_PACK16)
         return nullptr;
     else
-        return (qint16*)this->data();
+        return reinterpret_cast<const qint16*>(this->data());
 }
 
 //=============================================================================================================
@@ -664,7 +664,7 @@ inline FiffId FiffTag::toFiffID() const
     if (this->isMatrix() || this->getType() != FIFFT_ID_STRUCT || this->isNull() || this->size() < FiffId::storageSize())
         return p_fiffID;
     else {
-        const qint32* t_pInt32 = (qint32*)this->data();
+        const auto* t_pInt32 = reinterpret_cast<const qint32*>(this->data());
 
         p_fiffID.version = t_pInt32[0];
         p_fiffID.machid[0] = t_pInt32[1];
@@ -840,7 +840,7 @@ inline QList<QSharedPointer<FiffDirEntry>> FiffTag::toDirEntry() const
         return p_ListFiffDir;
     else {
         QSharedPointer<FiffDirEntry> t_pFiffDirEntry;
-        qint32* t_pInt32 = (qint32*)this->data();
+        const auto* t_pInt32 = reinterpret_cast<const qint32*>(this->data());
         for (int k = 0; k < this->size() / 16; ++k) {
             t_pFiffDirEntry = QSharedPointer<FiffDirEntry>(new FiffDirEntry);
             t_pFiffDirEntry->kind = t_pInt32[k * 4];     //fread(fid,1,'int32');

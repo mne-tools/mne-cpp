@@ -319,7 +319,7 @@ void RawModel::genStdFilterOps()
     double center = from_freqHz + bw / 2;
 
     name = QString("BPF_%1-%2").arg(from_freqHz).arg(to_freqHz);
-    m_Operators.insert(name, QSharedPointer<MNEOperator>(new FilterOperator(name, FilterOperator::BPF, 80, (double)center / nyquist_freq, (double)bw / nyquist_freq, (double)trans_width / nyquist_freq, sfreq, fftLength, dMethod)));
+    m_Operators.insert(name, QSharedPointer<MNEOperator>(new FilterOperator(name, FilterOperator::BPF, 80, center / nyquist_freq, bw / nyquist_freq, trans_width / nyquist_freq, sfreq, fftLength, dMethod)));
 
     //Own/manual set filter - only an entry i nthe operator list generated which is called when the filterwindow is used
     cutoffFreqHz = 40;
@@ -381,7 +381,7 @@ bool RawModel::loadFiffData(QIODevice* qFile)
         if (!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, start, end))
             return false;
 
-        newDataPackage = QSharedPointer<DataPackage>(new DataPackage(t_data, (MatrixXdR)t_times));
+        newDataPackage = QSharedPointer<DataPackage>(new DataPackage(t_data, MatrixXdR(t_times)));
 
         m_bFileloaded = true;
     } else {
@@ -542,7 +542,7 @@ void RawModel::resetPosition(qint32 position)
 
     //build data package
     QSharedPointer<DataPackage> newDataPackage;
-    newDataPackage = QSharedPointer<DataPackage>(new DataPackage((MatrixXdR)t_data, (MatrixXdR)t_times));
+    newDataPackage = QSharedPointer<DataPackage>(new DataPackage(MatrixXdR(t_data), MatrixXdR(t_times)));
 
     //append loaded block
     m_data.append(newDataPackage);
@@ -1020,7 +1020,7 @@ void RawModel::updateCompensator(int to)
 //private SLOTS
 void RawModel::insertReloadedData(QPair<MatrixXd, MatrixXd> dataTimesPair)
 {
-    QSharedPointer<DataPackage> newDataPackage = QSharedPointer<DataPackage>(new DataPackage((MatrixXdR)dataTimesPair.first, (MatrixXdR)dataTimesPair.second));
+    QSharedPointer<DataPackage> newDataPackage = QSharedPointer<DataPackage>(new DataPackage(MatrixXdR(dataTimesPair.first), MatrixXdR(dataTimesPair.second)));
 
     //extend m_data with reloaded data
     if (m_bReloadBefore) {

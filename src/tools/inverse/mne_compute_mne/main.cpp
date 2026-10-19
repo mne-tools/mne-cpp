@@ -324,7 +324,7 @@ static bool writeLabelOutput(const FsLabel& label,
 
     file.close();
     qInfo("  FsLabel output: %d vertices, %d times -> %s",
-          (int)srcIdx.size(), nTimes, outputFile.toUtf8().constData());
+          static_cast<int>(srcIdx.size()), nTimes, outputFile.toUtf8().constData());
     return true;
 }
 
@@ -422,7 +422,7 @@ static bool writePredictedData(const QString& fileName,
     MatrixXd predicted = forward.sol->data * stcData;
 
     qInfo("  Predicted data: %d channels, %d time points",
-          (int)predicted.rows(), (int)predicted.cols());
+          static_cast<int>(predicted.rows()), static_cast<int>(predicted.cols()));
 
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -436,11 +436,11 @@ static bool writePredictedData(const QString& fileName,
     out << "# Predicted sensor data (forward * sources)\n";
     out << "# " << predicted.rows() << " channels x " << predicted.cols() << " time points\n";
     out << "# Time(ms):";
-    for (int t = 0; t < (int)predicted.cols(); ++t)
+    for (int t = 0; t < static_cast<int>(predicted.cols()); ++t)
         out << "\t" << timesVec(t) * 1000.0;
     out << "\n";
-    for (int c = 0; c < (int)predicted.rows(); ++c) {
-        for (int t = 0; t < (int)predicted.cols(); ++t) {
+    for (int c = 0; c < static_cast<int>(predicted.rows()); ++c) {
+        for (int t = 0; t < static_cast<int>(predicted.cols()); ++t) {
             if (t > 0)
                 out << "\t";
             out << predicted(c, t);
@@ -873,7 +873,7 @@ int main(int argc, char* argv[])
         nave = 1;
 
         qInfo("  Forward synthetic data: %d channels, %d selected sources (time points)",
-              (int)data.rows(), nTimes);
+              static_cast<int>(data.rows()), nTimes);
 
         // Time vector for label output
         timesVec.resize(nTimes);
@@ -905,7 +905,7 @@ int main(int argc, char* argv[])
         }
 
         qInfo("  Evoked data: %d channels, %d time points",
-              (int)evoked.data.rows(), (int)evoked.data.cols());
+              static_cast<int>(evoked.data.rows()), static_cast<int>(evoked.data.cols()));
         qInfo("  Comment: %s", evoked.comment.toUtf8().constData());
         qInfo("  Nave: %d", evoked.nave);
         qInfo("  Time range: %.1f - %.1f ms",
@@ -1012,7 +1012,7 @@ int main(int argc, char* argv[])
     }
 
     qInfo("  Source estimate: %d sources, %d time points",
-          (int)stc.data.rows(), (int)stc.data.cols());
+          static_cast<int>(stc.data.rows()), static_cast<int>(stc.data.cols()));
     qInfo("  Time range: %.1f - %.1f ms",
           stc.tmin * 1000.0f,
           (stc.tmin + (stc.data.cols() - 1) * stc.tstep) * 1000.0f);
@@ -1100,7 +1100,7 @@ int main(int argc, char* argv[])
             if (!lhStc.write(lhOut)) {
                 qWarning() << "Warning: Failed to write" << lhFile;
             } else {
-                qInfo("  %d vertices, %d time points", nLh, (int)lhData.cols());
+                qInfo("  %d vertices, %d time points", nLh, static_cast<int>(lhData.cols()));
             }
         }
 
@@ -1116,7 +1116,7 @@ int main(int argc, char* argv[])
             if (!rhStc.write(rhOut)) {
                 qWarning() << "Warning: Failed to write" << rhFile;
             } else {
-                qInfo("  %d vertices, %d time points", nRh, (int)rhData.cols());
+                qInfo("  %d vertices, %d time points", nRh, static_cast<int>(rhData.cols()));
             }
         }
 
@@ -1136,7 +1136,7 @@ int main(int argc, char* argv[])
                 }
                 qInfo("  FsLabel: %s (%d vertices, hemi=%d)",
                       label.name.toUtf8().constData(),
-                      (int)label.vertices.size(), label.hemi);
+                      static_cast<int>(label.vertices.size()), label.hemi);
 
                 // Determine hemisphere and write
                 // hemi: 0 = lh, 1 = rh (FsLabel convention)
@@ -1181,7 +1181,7 @@ int main(int argc, char* argv[])
             return 1;
         }
         qInfo("  %d vertices, %d time points",
-              (int)stc.data.rows(), (int)stc.data.cols());
+              static_cast<int>(stc.data.rows()), static_cast<int>(stc.data.cols()));
     }
 
     //=========================================================================================================
@@ -1215,7 +1215,7 @@ int main(int argc, char* argv[])
 
     QStringList pickValues = parser.values(pickOpt);
     if (!pickValues.isEmpty()) {
-        qInfo("\nExtracting source estimates at %d time point(s)...", (int)pickValues.size());
+        qInfo("\nExtracting source estimates at %d time point(s)...", static_cast<int>(pickValues.size()));
 
         for (const QString& pickStr : pickValues) {
             double pickTime_ms = pickStr.toDouble();
