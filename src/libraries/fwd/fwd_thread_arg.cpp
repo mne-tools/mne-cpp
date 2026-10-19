@@ -87,16 +87,12 @@ FwdThreadArg::UPtr FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg&
     *res = one;
     res->client_free = nullptr; /* Don't copy the source's deleter */
 
-    auto comp = std::make_shared<FwdCompData>();
-    *comp = *orig;
-    comp->comp_coils = nullptr; /* Non-owning: shared with original, prevent ~FwdCompData from deleting */
-    comp->set = nullptr;        /* Will be replaced below; prevent dtor from deleting orig's copy */
+    // Each thread gets its own compensation set (it is mutated while applying)
+    // and work buffers; the compensation coils are read-only and shared.
+    auto comp = std::make_shared<FwdCompData>(*orig);
+    comp->set = orig->set ? std::make_shared<MNECTFCompDataSet>(*orig->set) : nullptr;
     comp->work.resize(0);
     comp->vec_work.resize(0, 0);
-
-    std::shared_ptr<MNECTFCompDataSet> set_guard(
-        orig->set ? new MNECTFCompDataSet(*(orig->set)) : nullptr);
-    comp->set = set_guard.get();
 
     res->client = comp.get();
 
@@ -106,12 +102,10 @@ FwdThreadArg::UPtr FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg&
         bem->v0.resize(0);
         comp->client = bem.get();
         /* shared_ptrs release their objects when client_free is destroyed */
-        res->client_free = [comp, set_guard, bem]() {
-            comp->set = nullptr; /* Prevent ~FwdCompData double-free; set_guard owns it */
+        res->client_free = [comp, bem]() {
         };
     } else {
-        res->client_free = [comp, set_guard]() {
-            comp->set = nullptr; /* Prevent ~FwdCompData double-free; set_guard owns it */
+        res->client_free = [comp]() {
         };
     }
     return res;

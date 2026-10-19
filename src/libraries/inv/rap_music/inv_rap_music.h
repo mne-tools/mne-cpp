@@ -171,10 +171,10 @@ protected:
      *
      * @param[in] p_matMeasurement  The current measured data to process (for best performance it should have.
                                     the dimension channels x samples with samples = number of channels)
-     * @param[out] p_pMatPhi_s   The calculated signal subspace.
+     * @param[out] p_matPhi_s    The calculated signal subspace.
      * @return   The rank of the measurement F (named r lt. Mosher 1998, 1999).
      */
-    int calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT*& p_pMatPhi_s) const;
+    int calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT& p_matPhi_s) const;
 
     //=========================================================================================================
     /**

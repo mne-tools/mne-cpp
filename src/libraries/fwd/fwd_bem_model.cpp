@@ -2595,7 +2595,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
     MatrixXd matRes;
     MatrixXd matResGrad;
     int nrow = 0;
-    FwdCompData* comp = nullptr;
+    std::unique_ptr<FwdCompData> comp;
     fwdFieldFunc field;          /* Computes the field for one dipole orientation */
     fwdVecFieldFunc vec_field;   /* Computes the field for all dipole orientations */
     fwdFieldGradFunc field_grad; /* Computes the field and gradient with respect to dipole position
@@ -2612,7 +2612,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
 
     auto cleanup_fail = [&]() {
         one_arg.reset();
-        delete comp;
+        comp.reset();
         return FAIL;
     };
 
@@ -2661,7 +2661,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
 
         if (comp->set && comp->set->current) { /* Test just to specify confusing output */
             qInfo("Composing the field computation matrix (compensation coils)...");
-            if (fwd_bem_specify_coils(comp->comp_coils) == FAIL)
+            if (fwd_bem_specify_coils(comp->comp_coils.get()) == FAIL)
                 return cleanup_fail();
             qInfo("[done]");
         }
@@ -2669,7 +2669,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
     }
     field = FwdCompData::fwd_comp_field;
     field_grad = FwdCompData::fwd_comp_field_grad;
-    client = comp;
+    client = comp.get();
     /*
        * Count the sources
        */
@@ -2773,8 +2773,7 @@ int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>
         names = orig_names;
     }
     one_arg.reset();
-    delete comp;
-    comp = nullptr;
+    comp.reset();
 
     // Store solution: res_mat is (nmeg x nsources), transpose to (nsources x nmeg)
     nrow = fixed_ori ? nsource : 3 * nsource;

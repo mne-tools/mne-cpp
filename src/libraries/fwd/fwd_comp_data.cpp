@@ -42,9 +42,7 @@ using namespace FWDLIB;
 //=============================================================================================================
 
 FwdCompData::FwdCompData()
-: set(nullptr)
-, comp_coils(nullptr)
-, field(nullptr)
+: field(nullptr)
 , vec_field(nullptr)
 , field_grad(nullptr)
 , client(nullptr)
@@ -53,11 +51,7 @@ FwdCompData::FwdCompData()
 
 //=============================================================================================================
 
-FwdCompData::~FwdCompData()
-{
-    delete this->comp_coils;
-    delete this->set;
-}
+FwdCompData::~FwdCompData() = default;
 
 //=============================================================================================================
 
@@ -139,40 +133,31 @@ int FwdCompData::fwd_make_ctf_comp_coils(MNECTFCompDataSet* set,
 
 //=============================================================================================================
 
-FwdCompData* FwdCompData::fwd_make_comp_data(MNECTFCompDataSet* set,
-                                             FwdCoilSet* coils,
-                                             FwdCoilSet* comp_coils,
-                                             fwdFieldFunc field,
-                                             fwdVecFieldFunc vec_field,
-                                             fwdFieldGradFunc field_grad,
-                                             void* client)
+std::unique_ptr<FwdCompData> FwdCompData::fwd_make_comp_data(MNECTFCompDataSet* set,
+                                                             FwdCoilSet* coils,
+                                                             FwdCoilSet* comp_coils,
+                                                             fwdFieldFunc field,
+                                                             fwdVecFieldFunc vec_field,
+                                                             fwdFieldGradFunc field_grad,
+                                                             void* client)
 {
-    FwdCompData* comp = new FwdCompData();
+    auto comp = std::make_unique<FwdCompData>();
 
     if (set)
-        comp->set = new MNECTFCompDataSet(*set);
-    else
-        comp->set = nullptr;
+        comp->set = std::make_shared<MNECTFCompDataSet>(*set);
 
-    if (comp_coils) {
-        comp->comp_coils = comp_coils->dup_coil_set().release();
-    } else {
+    if (comp_coils)
+        comp->comp_coils = comp_coils->dup_coil_set();
+    else
         qWarning("No coils to duplicate");
-        comp->comp_coils = nullptr;
-    }
     comp->field = field;
     comp->vec_field = vec_field;
     comp->field_grad = field_grad;
     comp->client = client;
 
-    if (fwd_make_ctf_comp_coils(comp->set,
-                                coils,
-                                comp->comp_coils) != OK) {
-        delete comp;
+    if (fwd_make_ctf_comp_coils(comp->set.get(), coils, comp->comp_coils.get()) != OK)
         return nullptr;
-    } else {
-        return comp;
-    }
+    return comp;
 }
 
 //=============================================================================================================

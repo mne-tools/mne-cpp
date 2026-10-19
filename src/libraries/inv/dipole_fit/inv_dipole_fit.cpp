@@ -54,11 +54,11 @@ static constexpr float SEG_LEN = 10.0f;
  * @param[in] names    Channel names to include.
  * @param[in] nch      Number of channels.
  *
- * @return Newly allocated channel selection. Caller takes ownership.
+ * @return The new channel selection.
  */
-static mneChSelection mne_ch_selection_these(const QString& selname, const QStringList& names, int nch)
+static std::unique_ptr<MNEChSelection> mne_ch_selection_these(const QString& selname, const QStringList& names, int nch)
 {
-    auto sel = new MNEChSelection();
+    auto sel = std::make_unique<MNEChSelection>();
     sel->name = selname;
     sel->ndef = nch;
     sel->kind = MNE_CH_SELECTION_USER;
@@ -220,7 +220,7 @@ InvEcdSet InvDipoleFit::calculateFit() const
         /*
      * Set up a channel selection to pick data from the raw file
      */
-        sel.reset(mne_ch_selection_these("fit", fit_data->ch_names, fit_data->nmeg + fit_data->neeg));
+        sel = mne_ch_selection_these("fit", fit_data->ch_names, fit_data->nmeg + fit_data->neeg);
         mne_ch_selection_assign_chs(sel.get(), raw.get());
         for (int c = 0; c < sel->nchan; c++)
             if (sel->pick[c] < 0) {

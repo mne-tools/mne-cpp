@@ -157,7 +157,7 @@ bool InvGuessData::compute_guess_fields(InvDipoleFitData* f)
     else
         f->funcs = f->sphere_funcs.get();
     for (int k = 0; k < this->nguess; k++) {
-        this->guess_fwd[k].reset(InvDipoleFitData::dipole_forward_one(f, Eigen::Vector3f(this->rr.row(k).transpose()), this->guess_fwd[k].release()));
+        this->guess_fwd[k] = InvDipoleFitData::dipole_forward_one(f, Eigen::Vector3f(this->rr.row(k).transpose()), std::move(this->guess_fwd[k]));
         if (!this->guess_fwd[k]) {
             if (orig)
                 f->funcs = orig;

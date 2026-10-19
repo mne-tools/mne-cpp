@@ -93,7 +93,6 @@ InvDipoleFitData::~InvDipoleFitData()
  */
 int InvDipoleFitData::setup_forward_model(InvDipoleFitData* d, MNECTFCompDataSet* comp_data, FwdCoilSet* comp_coils)
 {
-    FwdCompData* comp;
     dipoleFitFuncsRec* f;
     int fit_sphere_to_bem = true;
 
@@ -154,8 +153,8 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData* d, MNECTFCompDataSet
            * Use the new compensated field computation
            * It works the same way independent of whether or not the compensation is in effect
            */
-            comp = FwdCompData::fwd_make_comp_data(comp_data, d->meg_coils.get(), comp_coils,
-                                                   FwdBemModel::fwd_bem_field, nullptr, nullptr, d->bem_model.get());
+            auto comp = FwdCompData::fwd_make_comp_data(comp_data, d->meg_coils.get(), comp_coils,
+                                                        FwdBemModel::fwd_bem_field, nullptr, nullptr, d->bem_model.get());
             if (!comp)
                 return FAIL;
             qInfo("Compensation setup done.");
@@ -163,16 +162,14 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData* d, MNECTFCompDataSet
             qInfo("MEG solution matrix...");
             if (d->bem_model->fwd_bem_specify_coils(d->meg_coils.get()) == FAIL)
                 return FAIL;
-            if (d->bem_model->fwd_bem_specify_coils(comp->comp_coils) == FAIL)
+            if (d->bem_model->fwd_bem_specify_coils(comp->comp_coils.get()) == FAIL)
                 return FAIL;
             qInfo("[done]");
 
             f->meg_field = FwdCompData::fwd_comp_field;
             f->meg_vec_field = nullptr;
-            f->meg_client = comp;
-            f->meg_client_free = [](void* d) {
-                delete static_cast<FwdCompData*>(d);
-            };
+            f->meg_client = comp.get();
+            f->meg_comp = std::move(comp);
         }
         if (d->neeg > 0) {
             qInfo("\tEEG solution matrix...");
@@ -201,19 +198,17 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData* d, MNECTFCompDataSet
          * Use the new compensated field computation
          * It works the same way independent of whether or not the compensation is in effect
          */
-        comp = FwdCompData::fwd_make_comp_data(comp_data, d->meg_coils.get(), comp_coils,
-                                               FwdBemModel::fwd_sphere_field,
-                                               FwdBemModel::fwd_sphere_field_vec,
-                                               nullptr,
-                                               d->r0.data());
+        auto comp = FwdCompData::fwd_make_comp_data(comp_data, d->meg_coils.get(), comp_coils,
+                                                    FwdBemModel::fwd_sphere_field,
+                                                    FwdBemModel::fwd_sphere_field_vec,
+                                                    nullptr,
+                                                    d->r0.data());
         if (!comp)
             return FAIL;
         f->meg_field = FwdCompData::fwd_comp_field;
         f->meg_vec_field = FwdCompData::fwd_comp_field_vec;
-        f->meg_client = comp;
-        f->meg_client_free = [](void* d) {
-            delete static_cast<FwdCompData*>(d);
-        };
+        f->meg_client = comp.get();
+        f->meg_comp = std::move(comp);
     }
     qInfo("Sphere model origin : %6.1f %6.1f %6.1f mm.",
           1000 * d->r0[0], 1000 * d->r0[1], 1000 * d->r0[2]);
@@ -227,19 +222,17 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData* d, MNECTFCompDataSet
          * Use the new compensated field computation
          * It works the same way independent of whether or not the compensation is in effect
          */
-        comp = FwdCompData::fwd_make_comp_data(comp_data, d->meg_coils.get(), comp_coils,
-                                               FwdBemModel::fwd_mag_dipole_field,
-                                               FwdBemModel::fwd_mag_dipole_field_vec,
-                                               nullptr,
-                                               nullptr);
+        auto comp = FwdCompData::fwd_make_comp_data(comp_data, d->meg_coils.get(), comp_coils,
+                                                    FwdBemModel::fwd_mag_dipole_field,
+                                                    FwdBemModel::fwd_mag_dipole_field_vec,
+                                                    nullptr,
+                                                    nullptr);
         if (!comp)
             return FAIL;
         f->meg_field = FwdCompData::fwd_comp_field;
         f->meg_vec_field = FwdCompData::fwd_comp_field_vec;
-        f->meg_client = comp;
-        f->meg_client_free = [](void* d) {
-            delete static_cast<FwdCompData*>(d);
-        };
+        f->meg_client = comp.get();
+        f->meg_comp = std::move(comp);
     }
     f->eeg_pot = FwdBemModel::fwd_mag_dipole_field;
     f->eeg_vec_pot = FwdBemModel::fwd_mag_dipole_field_vec;
@@ -856,23 +849,21 @@ bool InvDipoleFitData::print_fields(const Eigen::Vector3f& rd,
 /**
  * @brief Compute the forward solution for one or more dipoles, applying projections and whitening.
  */
-InvDipoleForward* dipole_forward(InvDipoleFitData* d,
-                                 float** rd,
-                                 int ndip,
-                                 InvDipoleForward* old)
+std::unique_ptr<InvDipoleForward> dipole_forward(InvDipoleFitData* d,
+                                                 float** rd,
+                                                 int ndip,
+                                                 std::unique_ptr<InvDipoleForward> old)
 {
-    InvDipoleForward* res;
+    std::unique_ptr<InvDipoleForward> res;
     float S[3];
     int k;
     /*
    * Allocate data if necessary
    */
     if (old && old->ndip == ndip && old->nch == d->nmeg + d->neeg) {
-        res = old;
+        res = std::move(old);
     } else {
-        delete old;
-        old = nullptr;
-        res = new InvDipoleForward;
+        res = std::make_unique<InvDipoleForward>();
         int nch = d->nmeg + d->neeg;
         int m = 3 * ndip;
         res->fwd.resize(m, nch);
@@ -892,11 +883,8 @@ InvDipoleForward* dipole_forward(InvDipoleFitData* d,
      */
         Eigen::MatrixXf this_fwd(d->nmeg + d->neeg, 3);
         Eigen::Map<const Eigen::Vector3f> rd_k(rd[k]);
-        if ((InvDipoleFitData::compute_dipole_field(*d, rd_k, true, this_fwd)) == FAIL) {
-            if (!old)
-                delete res;
+        if ((InvDipoleFitData::compute_dipole_field(*d, rd_k, true, this_fwd)) == FAIL)
             return nullptr;
-        }
         for (int p = 0; p < 3; p++)
             res->fwd.row(3 * k + p) = this_fwd.col(p).transpose();
         /*
@@ -952,13 +940,13 @@ InvDipoleForward* dipole_forward(InvDipoleFitData* d,
 /**
  * @brief Convenience function to compute the forward field of a single dipole.
  */
-InvDipoleForward* InvDipoleFitData::dipole_forward_one(InvDipoleFitData* d,
-                                                       const Eigen::Vector3f& rd,
-                                                       InvDipoleForward* old)
+std::unique_ptr<InvDipoleForward> InvDipoleFitData::dipole_forward_one(InvDipoleFitData* d,
+                                                                       const Eigen::Vector3f& rd,
+                                                                       std::unique_ptr<InvDipoleForward> old)
 {
     float* rds[1];
     rds[0] = const_cast<float*>(rd.data());
-    return dipole_forward(d, rds, 1, old);
+    return dipole_forward(d, rds, 1, std::move(old));
 }
 
 //=============================================================================================================
@@ -974,7 +962,8 @@ static float fit_eval(const VectorXf& rd, const void* user)
     double Bm2, one;
     int ncomp, c;
 
-    fwd = fuser->fwd = InvDipoleFitData::dipole_forward_one(fit, rd.head<3>(), fuser->fwd);
+    fuser->fwd = InvDipoleFitData::dipole_forward_one(fit, rd.head<3>(), std::move(fuser->fwd));
+    fwd = fuser->fwd.get();
     ncomp = fwd->sing[2] / fwd->sing[0] > fuser->limit ? 3 : 2;
     if (fuser->report_dim)
         qInfo("ncomp = %d", ncomp);
@@ -1082,7 +1071,7 @@ static int fit_Q(InvDipoleFitData* fit,
                  float& res)
 {
     int c;
-    InvDipoleForward* fwd = InvDipoleFitData::dipole_forward_one(fit, rd, nullptr);
+    const auto fwd = InvDipoleFitData::dipole_forward_one(fit, rd, nullptr);
     float Bm2, one;
 
     if (!fwd)
@@ -1102,8 +1091,6 @@ static int fit_Q(InvDipoleFitData* fit,
     for (c = 0; c < 3; c++)
         Q[c] = fwd->scales[c] * Q[c];
     res = B.squaredNorm() - Bm2;
-
-    delete fwd;
 
     return OK;
 }
@@ -1203,7 +1190,6 @@ bool InvDipoleFitData::fit_one(InvDipoleFitData* fit,
                 report_interval, /* How often to report (-1 = no_reporting) */
                 dipole_report_func)) {
             if (k == 0) {
-                delete user.fwd;
                 return false;
             } else {
                 float rv = 2.0f * (vals.maxCoeff() - vals.minCoeff()) / (vals.maxCoeff() + vals.minCoeff());
@@ -1239,10 +1225,8 @@ bool InvDipoleFitData::fit_one(InvDipoleFitData* fit,
             res.nfree = nchan - 3 - ncomp;
         res.neval = neval_tot;
     } else {
-        delete user.fwd;
         return false;
     }
-    delete user.fwd;
 
     return true;
 }

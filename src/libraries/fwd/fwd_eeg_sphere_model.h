@@ -159,9 +159,9 @@ public:
      * @param[in] nfit       Number of equivalent dipoles to fit.
      * @param[in] nterms     Number of terms in the series expansion.
      *
-     * @return Pointer to the initialized fitting data structure.
+     * @return The initialized fitting data structure.
      */
-    static fitUser new_fit_user(int nfit, int nterms);
+    static std::unique_ptr<fitUserRec> new_fit_user(int nfit, int nterms);
 
     //=========================================================================================================
     /**
@@ -406,11 +406,11 @@ public:
      * sum of squares for a given set of mu values.
      *
      * @param[in] mu          Distance multipliers to evaluate.
-     * @param[in] user_data   Pointer to the fitUser workspace.
+     * @param[in,out] u       Fitting workspace.
      *
      * @return Sum of squared residuals; 1.0 if any mu exceeds +/-1.
      */
-    static double one_step(const Eigen::VectorXd& mu, const void* user_data);
+    static double one_step(const Eigen::VectorXd& mu, fitUserRec& u);
 
     //=========================================================================================================
     /**

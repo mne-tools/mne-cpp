@@ -34,6 +34,7 @@
 #include <fwd/fwd_types.h>
 #include <fwd/fwd_eeg_sphere_model.h>
 #include <fwd/fwd_bem_model.h>
+#include <fwd/fwd_comp_data.h>
 #include "inv_dipole_forward.h"
 
 //=============================================================================================================
@@ -78,22 +79,14 @@ namespace INVLIB
  */
 struct dipoleFitFuncsRec
 {
-    ~dipoleFitFuncsRec()
-    {
-        if (meg_client_free && meg_client)
-            meg_client_free(meg_client);
-        if (eeg_client_free && eeg_client)
-            eeg_client_free(eeg_client);
-    }
-    fwdFieldFunc meg_field = nullptr;                  /**< MEG forward calculation function. */
-    fwdVecFieldFunc meg_vec_field = nullptr;           /**< MEG vectorized forward calculation function. */
-    void* meg_client = nullptr;                        /**< Client data for MEG field computations. */
-    MNELIB::mneUserFreeFunc meg_client_free = nullptr; /**< Destructor for MEG client data. */
+    fwdFieldFunc meg_field = nullptr;              /**< MEG forward calculation function. */
+    fwdVecFieldFunc meg_vec_field = nullptr;       /**< MEG vectorized forward calculation function. */
+    void* meg_client = nullptr;                    /**< Client data for MEG field computations. */
+    std::unique_ptr<FWDLIB::FwdCompData> meg_comp; /**< Owns @ref meg_client when it is a compensation wrapper. */
 
-    fwdFieldFunc eeg_pot = nullptr;                    /**< EEG forward calculation function. */
-    fwdVecFieldFunc eeg_vec_pot = nullptr;             /**< EEG vectorized forward calculation function. */
-    void* eeg_client = nullptr;                        /**< Client data for EEG field computations. */
-    MNELIB::mneUserFreeFunc eeg_client_free = nullptr; /**< Destructor for EEG client data. */
+    fwdFieldFunc eeg_pot = nullptr;        /**< EEG forward calculation function. */
+    fwdVecFieldFunc eeg_vec_pot = nullptr; /**< EEG vectorized forward calculation function. */
+    void* eeg_client = nullptr;            /**< Client data for EEG field computations (not owned). */
 };
 
 /**
@@ -110,7 +103,7 @@ struct FitDipUserRec
     int report_dim;
     float* B;
     double B2;
-    InvDipoleForward* fwd;
+    std::unique_ptr<InvDipoleForward> fwd;
 };
 
 //=============================================================================================================
@@ -374,13 +367,13 @@ public:
      *
      * @param[in]     d    Dipole fit workspace.
      * @param[in]     rd   Dipole position in head coordinates (m).
-     * @param[in,out] old  Existing forward to recycle (may be nullptr).
+     * @param[in]     old  Existing forward to recycle when its size matches (may be nullptr).
      *
      * @return The populated forward object, or nullptr on error.
      */
-    static InvDipoleForward* dipole_forward_one(InvDipoleFitData* d,
-                                                const Eigen::Vector3f& rd,
-                                                InvDipoleForward* old);
+    static std::unique_ptr<InvDipoleForward> dipole_forward_one(InvDipoleFitData* d,
+                                                                const Eigen::Vector3f& rd,
+                                                                std::unique_ptr<InvDipoleForward> old);
 
 public:
     std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t; /**< MRI <-> head coordinate transformation. */

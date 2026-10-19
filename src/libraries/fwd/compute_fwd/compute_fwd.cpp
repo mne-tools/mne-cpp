@@ -101,7 +101,7 @@ void ComputeFwd::initFwd()
     m_meas_id.clear();
 
     QFile filteredFile;
-    QTextStream* filteredStream = nullptr;
+    std::unique_ptr<QTextStream> filteredStream;
 
     m_eegModel.reset();
     m_bemModel.reset();
@@ -123,13 +123,13 @@ void ComputeFwd::initFwd()
             if (m_pSettings->eeg_model_file.isEmpty()) {
                 qWarning("EEG model file not specified; using default.");
             }
-            m_eegModels.reset(FwdEegSphereModelSet::fwd_load_eeg_sphere_models(m_pSettings->eeg_model_file, m_eegModels.release()));
+            m_eegModels = FwdEegSphereModelSet::fwd_load_eeg_sphere_models(m_pSettings->eeg_model_file, std::move(m_eegModels));
             m_eegModels->fwd_list_eeg_sphere_models();
 
             if (m_pSettings->eeg_model_name.isEmpty()) {
                 m_pSettings->eeg_model_name = QString("Default");
             }
-            m_eegModel.reset(m_eegModels->fwd_select_eeg_sphere_model(m_pSettings->eeg_model_name));
+            m_eegModel = m_eegModels->fwd_select_eeg_sphere_model(m_pSettings->eeg_model_name);
             if (!m_eegModel) {
                 return;
             }
@@ -426,16 +426,14 @@ void ComputeFwd::initFwd()
                 qCritical() << m_pSettings->mindistoutname;
                 return;
             }
-            filteredStream = new QTextStream(&filteredFile);
+            filteredStream = std::make_unique<QTextStream>(&filteredFile);
             qInfo("Omitted source space points will be output to : %s", m_pSettings->mindistoutname.toUtf8().constData());
         }
         MNESourceSpace::filter_source_spaces(m_pSettings->mindist,
                                              m_pSettings->bemname,
                                              m_mri_head_t,
                                              m_spaces,
-                                             filteredStream, m_pSettings->use_threads);
-        delete filteredStream;
-        filteredStream = nullptr;
+                                             filteredStream.get(), m_pSettings->use_threads);
     }
     m_bInitialized = true;
 }

@@ -551,24 +551,22 @@ void TestFwdLibrary::settings_buildCommandLine()
 
 void TestFwdLibrary::eegSphere_addDefault()
 {
-    FwdEegSphereModelSet* set = FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr);
+    auto set = FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr);
     QVERIFY(set != nullptr);
     QVERIFY(set->nmodel() > 0);
     set->fwd_list_eeg_sphere_models();
-    delete set;
 }
 
 void TestFwdLibrary::eegSphere_selectModel()
 {
-    FwdEegSphereModelSet* set = FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr);
+    auto set = FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr);
     QVERIFY(set != nullptr);
 
-    FwdEegSphereModel* model = set->fwd_select_eeg_sphere_model("Default");
+    auto model = set->fwd_select_eeg_sphere_model("Default");
     QVERIFY(model != nullptr);
 
-    FwdEegSphereModel* noModel = set->fwd_select_eeg_sphere_model("NonExistent");
-    Q_UNUSED(noModel);
-    delete set;
+    QCOMPARE(model->name, QStringLiteral("Default"));
+    QVERIFY(set->fwd_select_eeg_sphere_model("NonExistent") == nullptr);
 }
 
 void TestFwdLibrary::eegSphere_getCoeff()

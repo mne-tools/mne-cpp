@@ -375,9 +375,9 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
     //        p_pMatMeasurement->rows(),
     //        p_pMatMeasurement->cols() );
 
-    //Calculate the signal subspace (t_pMatPhi_s)
-    MatrixXT* t_pMatPhi_s = nullptr; //(m_iNumChannels, m_iN < t_r ? m_iN : t_r);
-    int t_r = calcPhi_s(/*(MatrixXT)*/ p_matMeasurement, t_pMatPhi_s);
+    //Calculate the signal subspace
+    MatrixXT t_matPhi_s;
+    int t_r = calcPhi_s(p_matMeasurement, t_matPhi_s);
 
     int t_iMaxSearch = m_iN < t_r ? m_iN : t_r; //The smallest of Rank and Iterations
 
@@ -415,12 +415,12 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
 
     qDebug() << "##### Calculation of RAP MUSIC started ######\n\n";
 
-    MatrixXT t_matProj_Phi_s(t_matOrthProj.rows(), t_pMatPhi_s->cols());
+    MatrixXT t_matProj_Phi_s(t_matOrthProj.rows(), t_matPhi_s.cols());
     //new Version: Calculate projection before
     MatrixXT t_matProj_LeadField(m_ForwardSolution.sol->data.rows(), m_ForwardSolution.sol->data.cols());
 
     for (int r = 0; r < t_iMaxSearch; ++r) {
-        t_matProj_Phi_s = t_matOrthProj * (*t_pMatPhi_s);
+        t_matProj_Phi_s = t_matOrthProj * t_matPhi_s;
 
         //new Version: Calculating Projection before
         t_matProj_LeadField = t_matOrthProj * m_ForwardSolution.sol->data; //Subtract the found sources from the current found source
@@ -540,17 +540,13 @@ InvSourceEstimate InvRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
     float t_fElapsedTime = (static_cast<float>(end - start) / static_cast<float>(CLOCKS_PER_SEC)) * 1000.0f;
     qDebug() << "Total Time Elapsed: " << t_fElapsedTime << " ms";
 
-    //garbage collecting
-    delete t_pMatPhi_s;
-
     return p_SourceEstimate;
 }
 
 //=============================================================================================================
 
-int InvRapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT*& p_pMatPhi_s) const
+int InvRapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT& p_matPhi_s) const
 {
-    //Calculate p_pMatPhi_s
     MatrixXT t_matF; //t_matF = makeSquareMat(p_pMatMeasurement); //FF^T -> ToDo Check this
     if (p_matMeasurement.cols() > p_matMeasurement.rows())
         t_matF = makeSquareMat(p_matMeasurement); //FF^T
@@ -563,13 +559,8 @@ int InvRapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT*& p_pMatPh
 
     int t_iCols = t_r; //t_r < m_iN ? m_iN : t_r;
 
-    delete p_pMatPhi_s;
-
     //m_iNumChannels has to be equal to t_svdF.matrixU().rows()
-    p_pMatPhi_s = new MatrixXT(m_iNumChannels, t_iCols);
-
-    //assign the signal subspace
-    memcpy(p_pMatPhi_s->data(), t_svdF.matrixU().data(), sizeof(double) * m_iNumChannels * t_iCols);
+    p_matPhi_s = t_svdF.matrixU().topLeftCorner(m_iNumChannels, t_iCols);
 
     return t_r;
 }

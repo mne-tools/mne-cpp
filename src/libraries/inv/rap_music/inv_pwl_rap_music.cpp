@@ -109,9 +109,9 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
     //        p_pMatMeasurement->rows(),
     //        p_pMatMeasurement->cols() );
 
-    //Calculate the signal subspace (t_pMatPhi_s)
-    MatrixXT* t_pMatPhi_s = nullptr; //(m_iNumChannels, m_iN < t_r ? m_iN : t_r);
-    int t_r = calcPhi_s(/*(MatrixXT)*/ p_matMeasurement, t_pMatPhi_s);
+    //Calculate the signal subspace
+    MatrixXT t_matPhi_s;
+    int t_r = calcPhi_s(p_matMeasurement, t_matPhi_s);
 
     int t_iMaxSearch = m_iN < t_r ? m_iN : t_r; //The smallest of Rank and Iterations
 
@@ -149,12 +149,12 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
 
     qDebug() << "##### Calculation of PWL RAP MUSIC started ######\n\n";
 
-    MatrixXT t_matProj_Phi_s(t_matOrthProj.rows(), t_pMatPhi_s->cols());
+    MatrixXT t_matProj_Phi_s(t_matOrthProj.rows(), t_matPhi_s.cols());
     //new Version: Calculate projection before
     MatrixXT t_matProj_LeadField(m_ForwardSolution.sol->data.rows(), m_ForwardSolution.sol->data.cols());
 
     for (int r = 0; r < t_iMaxSearch; ++r) {
-        t_matProj_Phi_s = t_matOrthProj * (*t_pMatPhi_s);
+        t_matProj_Phi_s = t_matOrthProj * t_matPhi_s;
 
         //new Version: Calculating Projection before
         t_matProj_LeadField = t_matOrthProj * m_ForwardSolution.sol->data; //Subtract the found sources from the current found source
@@ -309,9 +309,6 @@ InvSourceEstimate InvPwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurem
 
     float t_fElapsedTime = (static_cast<float>(end - start) / static_cast<float>(CLOCKS_PER_SEC)) * 1000.0f;
     qDebug() << "Total Time Elapsed: " << t_fElapsedTime << " ms";
-
-    //garbage collecting
-    delete t_pMatPhi_s;
 
     return p_SourceEstimate;
 }

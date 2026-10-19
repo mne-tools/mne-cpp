@@ -119,10 +119,10 @@ FwdEegSphereModel::UPtr FwdEegSphereModel::setup_eeg_sphere_model(const QString&
     if (eeg_model_name.isEmpty())
         eeg_model_name = QString("Default");
 
-    FwdEegSphereModelSet::UPtr eeg_models(FwdEegSphereModelSet::fwd_load_eeg_sphere_models(eeg_model_file, nullptr));
+    FwdEegSphereModelSet::UPtr eeg_models = FwdEegSphereModelSet::fwd_load_eeg_sphere_models(eeg_model_file, nullptr);
     eeg_models->fwd_list_eeg_sphere_models();
 
-    FwdEegSphereModel::UPtr eeg_model(eeg_models->fwd_select_eeg_sphere_model(eeg_model_name));
+    FwdEegSphereModel::UPtr eeg_model = eeg_models->fwd_select_eeg_sphere_model(eeg_model_name);
     if (!eeg_model) {
         return nullptr;
     }
@@ -138,10 +138,9 @@ FwdEegSphereModel::UPtr FwdEegSphereModel::setup_eeg_sphere_model(const QString&
 
 //=============================================================================================================
 
-fitUser FwdEegSphereModel::new_fit_user(int nfit, int nterms)
-
+std::unique_ptr<fitUserRec> FwdEegSphereModel::new_fit_user(int nfit, int nterms)
 {
-    fitUser u = new fitUserRec();
+    auto u = std::make_unique<fitUserRec>();
     u->y.resize(nterms - 1);
     u->resi.resize(nterms - 1);
     u->M = MatrixXd::Zero(nterms - 1, nfit - 1);
@@ -955,7 +954,7 @@ double FwdEegSphereModel::compute_linear_parameters(const VectorXd& mu,
 }
 
 // fwd_fit_berg_scherg.c
-double FwdEegSphereModel::one_step(const VectorXd& mu, const void* user_data)
+double FwdEegSphereModel::one_step(const VectorXd& mu, fitUserRec& user)
 /*
       * Evaluate the residual sum of squares fit for one set of
       * mu values
@@ -963,7 +962,7 @@ double FwdEegSphereModel::one_step(const VectorXd& mu, const void* user_data)
 {
     int k, p;
     double dot;
-    fitUser u = (fitUser)user_data;
+    fitUser u = &user;
 
     for (k = 0; k < u->nfit; k++) {
         if (std::fabs(mu[k]) > 1.0)
@@ -1016,7 +1015,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int nTerms, /* Number of terms t
     int neval;
     int max_eval = 1000;
     int report = 1;
-    fitUser u = new_fit_user(nFit, nTerms);
+    const auto u = new_fit_user(nFit, nTerms);
 
     if (nFit < 2) {
         qWarning("fwd_fit_berg_scherg does not work with less than two equivalent sources.");
@@ -1070,11 +1069,11 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int nTerms, /* Number of terms t
 
     simplex = get_initial_simplex(muFit, simplex_size);
     for (k = 0; k < nFit + 1; k++)
-        func_val[k] = one_step(VectorXd(simplex.row(k).transpose()), u);
+        func_val[k] = one_step(VectorXd(simplex.row(k).transpose()), *u);
 
     // Capture user data in type-safe lambdaFit — no void* needed
-    auto cost = [u](const VectorXd& x) -> double {
-        return one_step(x, u);
+    auto cost = [&u](const VectorXd& x) -> double {
+        return one_step(x, *u);
     };
 
     /*
@@ -1097,7 +1096,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int nTerms, /* Number of terms t
         /*
        * (6) Do the final step: calculation of the linear parameters
        */
-        rv = compute_linear_parameters(muFit, lambdaFit, u);
+        rv = compute_linear_parameters(muFit, lambdaFit, u.get());
 
         sort_parameters(muFit, lambdaFit, nFit);
 #ifdef LOG_FIT
@@ -1118,6 +1117,5 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int nTerms, /* Number of terms t
         }
     }
 
-    delete u;
     return res;
 }

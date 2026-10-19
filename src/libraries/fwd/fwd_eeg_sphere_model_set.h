@@ -102,7 +102,7 @@ public:
      *
      * @return The model set.
      */
-    static FwdEegSphereModelSet* fwd_add_to_eeg_sphere_model_set(FwdEegSphereModelSet* s, FwdEegSphereModel::UPtr m);
+    static UPtr fwd_add_to_eeg_sphere_model_set(UPtr s, FwdEegSphereModel::UPtr m);
 
     //=========================================================================================================
     /**
@@ -113,7 +113,7 @@ public:
      *
      * @return The model set with the default model (s + default models).
      */
-    static FwdEegSphereModelSet* fwd_add_default_eeg_sphere_model(FwdEegSphereModelSet* s);
+    static UPtr fwd_add_default_eeg_sphere_model(UPtr s);
 
     //=========================================================================================================
     /**
@@ -125,7 +125,7 @@ public:
      *
      * @return The loaded model set (now + loaded models).
      */
-    static FwdEegSphereModelSet* fwd_load_eeg_sphere_models(const QString& p_sFileName, FwdEegSphereModelSet* now);
+    static UPtr fwd_load_eeg_sphere_models(const QString& p_sFileName, UPtr now);
 
     //=========================================================================================================
     /**
@@ -136,7 +136,7 @@ public:
      *
      * @return A duplicat of the found model.
      */
-    FwdEegSphereModel* fwd_select_eeg_sphere_model(const QString& p_sName);
+    FwdEegSphereModel::UPtr fwd_select_eeg_sphere_model(const QString& p_sName) const;
 
     //=========================================================================================================
     /**

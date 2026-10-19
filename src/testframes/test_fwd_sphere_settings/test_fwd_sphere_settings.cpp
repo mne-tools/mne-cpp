@@ -170,16 +170,14 @@ private slots:
 
     void sphereModelSet_addDefault()
     {
-        FwdEegSphereModelSet* s = FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr);
+        auto s = FwdEegSphereModelSet::fwd_add_default_eeg_sphere_model(nullptr);
         QVERIFY(s != nullptr);
         QVERIFY(s->nmodel() > 0);
 
         // Select by name
-        FwdEegSphereModel* selected = s->fwd_select_eeg_sphere_model("Default");
-        // May or may not match depending on exact name
-        Q_UNUSED(selected);
-
-        delete s;
+        auto selected = s->fwd_select_eeg_sphere_model("Default");
+        QVERIFY(selected);
+        QCOMPARE(selected->name, QStringLiteral("Default"));
     }
 
     void sphereModelSet_addCustom()
@@ -192,11 +190,9 @@ private slots:
         auto m = FwdEegSphereModel::fwd_create_eeg_sphere_model(
             "custom", 3, rads, sigs);
 
-        FwdEegSphereModelSet* s = FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(nullptr, std::move(m));
+        auto s = FwdEegSphereModelSet::fwd_add_to_eeg_sphere_model_set(nullptr, std::move(m));
         QVERIFY(s != nullptr);
         QCOMPARE(s->nmodel(), 1);
-
-        delete s; // also deletes m
     }
 
     //=========================================================================
