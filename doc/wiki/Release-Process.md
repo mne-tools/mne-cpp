@@ -11,7 +11,9 @@ GitHub Release.
 1. All tasks in `doc/dev-notes/vX.Y.Z-requirements.md` are DONE or
    explicitly deferred.
 2. `staging.yml` is green on the latest `staging` commit (all 22 jobs).
-3. Versioned files are bumped to `X.Y.Z`:
+3. Versioned files are bumped to `X.Y.Z` in one commit:
+   - [`src/CMakeLists.txt`](https://github.com/mne-tools/mne-cpp/blob/main/src/CMakeLists.txt) — `MNE_CPP_VERSION_MAJOR/MINOR/PATCH`
+   - [`doc/Doxyfile`](https://github.com/mne-tools/mne-cpp/blob/main/doc/Doxyfile) — `PROJECT_NUMBER`
    - [`CITATION.cff`](https://github.com/mne-tools/mne-cpp/blob/main/CITATION.cff) — `version:` and `date-released:`
    - [`README.md`](https://github.com/mne-tools/mne-cpp/blob/main/README.md) — version badge
    - [`CHANGELOG.md`](https://github.com/mne-tools/mne-cpp/blob/main/CHANGELOG.md) — new section with highlights
@@ -43,6 +45,55 @@ git push origin vX.Y.Z
 | [`release-windows.yml`](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release-windows.yml) | Windows dynamic + static `.zip` |
 | [`release-installer.yml`](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release-installer.yml) | QtIFW cross-platform installers |
 | [`release-sdk.yml`](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release-sdk.yml) | `mnecpp-X.Y.Z-sdk-<plat>.tar.gz` (CMake `find_package`) |
+
+## Code signing
+
+Tagged releases are signed or they fail; `staging` and `main` builds stay
+unsigned. `release-evidence.json` and the release notes record the status of
+every artifact, and `SHA256SUMS` covers all of them.
+
+**Windows (Authenticode via [SignPath Foundation](https://signpath.org)).**
+The [`signpath-sign`](https://github.com/mne-tools/mne-cpp/blob/main/.github/actions/signpath-sign/action.yml)
+action submits the deployment `.zip` files and the installer `.exe` to the
+SignPath project `mne-cpp` (signing policy `release-signing`) and verifies
+every signed file with `signtool verify /pa /all /tw`. Repository settings:
+
+| Kind | Name | Value |
+|------|------|-------|
+| Secret | `SIGNPATH_API_TOKEN` | API token of a submitter in the SignPath project |
+| Variable | `SIGNPATH_ORGANIZATION_ID` | SignPath organization ID |
+
+Artifact configurations in SignPath (files are uploaded unwrapped):
+
+```xml
+<!-- windows-archive -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <zip-file>
+    <pe-file-set>
+      <include path="**/mne_*.exe" max-matches="unbounded" />
+      <include path="**/mne_*.dll" min-matches="0" max-matches="unbounded" />
+      <include path="**/mne_*_plugins/*.dll" min-matches="0" max-matches="unbounded" />
+      <for-each><authenticode-sign /></for-each>
+    </pe-file-set>
+  </zip-file>
+</artifact-configuration>
+
+<!-- windows-installer -->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <pe-file><authenticode-sign /></pe-file>
+</artifact-configuration>
+```
+
+**macOS (Developer ID, paid Apple Developer Program).**
+[`macos-codesign-setup`](https://github.com/mne-tools/mne-cpp/blob/main/.github/actions/macos-codesign-setup/action.yml)
+imports the certificate into a temporary keychain; the `.app` bundles are
+signed with the hardened runtime, and
+[`macos_notarize.sh`](https://github.com/mne-tools/mne-cpp/blob/main/scripts/deploy/macos_notarize.sh)
+signs, notarizes and staples each `.dmg`, then checks it with
+`codesign --verify`, `stapler validate` and `spctl --assess`. Secrets:
+`APPLE_DEVELOPER_ID_P12` (base64 `.p12`), `APPLE_DEVELOPER_ID_PASSWORD`,
+`APPLE_ID`, `APPLE_APP_PASSWORD` (app-specific password) and `APPLE_TEAM_ID`.
+The `.tar.gz` archives are covered by `SHA256SUMS` only.
 
 ## Post-release
 

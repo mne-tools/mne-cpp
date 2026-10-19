@@ -93,12 +93,18 @@ jobs:
     - name: Install create-dmg
       run: |
         brew list create-dmg >/dev/null 2>&1 || brew install create-dmg
+    - name: Import Apple Developer ID certificate
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: ./.github/actions/macos-codesign-setup
+      with:
+        certificate-p12-base64: ${{ secrets.APPLE_DEVELOPER_ID_P12 }}
+        certificate-password: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
     - name: Deploy binaries (MacOS)
       env:
-        # Signing + notarization secrets are optional. When unset, deploy.bat
-        # falls back to producing an unsigned .dmg next to the tarball.
-        MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-        MACOS_NOTARY_PROFILE: ${{ secrets.MACOS_NOTARY_PROFILE }}
+        # With CODESIGN_IDENTITY set (tagged releases), deploy.bat signs the apps and notarizes the .dmg.
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
         echo "Qt environment:"
         echo "  QT_ROOT_DIR=${QT_ROOT_DIR:-<not set>}"
@@ -137,6 +143,10 @@ jobs:
         else
           echo "No .dmg artefact present; uploading tarball only."
         fi
+
+    - name: Cleanup keychain
+      if: always() && env.KEYCHAIN_PATH != ''
+      run: security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
 
     - name: Upload signing evidence
       if: steps.release-info.outputs.should_upload == 'true'

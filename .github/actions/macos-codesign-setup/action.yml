@@ -1,0 +1,55 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+name: Import the Developer ID certificate
+description: >
+  Import the Apple Developer ID Application certificate into a temporary
+  keychain and export CODESIGN_IDENTITY and KEYCHAIN_PATH (v2.4.0 T10.7b).
+  Fails when the certificate is missing, so tagged releases are never shipped
+  unsigned. Remove the keychain with `security delete-keychain "$KEYCHAIN_PATH"`.
+
+inputs:
+  certificate-p12-base64:
+    description: Base64-encoded .p12 (secrets.APPLE_DEVELOPER_ID_P12).
+    required: true
+  certificate-password:
+    description: Password of the .p12 (secrets.APPLE_DEVELOPER_ID_PASSWORD).
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Import certificate
+    shell: bash
+    env:
+      P12: ${{ inputs.certificate-p12-base64 }}
+      P12_PASSWORD: ${{ inputs.certificate-password }}
+    run: |
+      if [ -z "$P12" ]; then
+        echo "::error::macOS signing needs the APPLE_DEVELOPER_ID_P12 and APPLE_DEVELOPER_ID_PASSWORD secrets"
+        exit 1
+      fi
+      KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
+      KEYCHAIN_PASSWORD="$(openssl rand -hex 16)"
+      security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+      security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+      security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+      echo "$P12" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+      security import "$RUNNER_TEMP/certificate.p12" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" \
+        -T /usr/bin/codesign -T /usr/bin/productsign
+      rm -f "$RUNNER_TEMP/certificate.p12"
+      security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+      # One argument per existing keychain.
+      # shellcheck disable=SC2046
+      security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
+      IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | head -1 | awk -F'"' '{print $2}')
+      if [ -z "$IDENTITY" ]; then
+        echo "::error::The certificate holds no code-signing identity"
+        exit 1
+      fi
+      {
+        echo "CODESIGN_IDENTITY=$IDENTITY"
+        echo "KEYCHAIN_PATH=$KEYCHAIN_PATH"
+      } >> "$GITHUB_ENV"
+      echo "Signing identity: $IDENTITY"

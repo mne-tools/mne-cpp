@@ -614,6 +614,13 @@ if [[ ${LinkOption} == "dynamic" ]]; then
                 [ -d "${app}" ] || continue
                 ${MockText}cp -a "${app}" "${DMG_STAGE}/"
             done
+            # Release builds sign every bundle with the hardened runtime, which notarization requires.
+            if [ -n "${CODESIGN_IDENTITY:-}" ]; then
+                for app in "${DMG_STAGE}"/*.app; do
+                    ${MockText}codesign --force --deep --options runtime --timestamp --sign "${CODESIGN_IDENTITY}" "${app}" || exit 1
+                    ${MockText}codesign --verify --strict --deep "${app}" || exit 1
+                done
+            fi
             ${MockText}create-dmg \
                 --volname "MNE-CPP ${MACOS_ARCH}" \
                 --window-pos 200 120 \
@@ -624,23 +631,8 @@ if [[ ${LinkOption} == "dynamic" ]]; then
                 "${DMG_NAME}" \
                 "${DMG_STAGE}" || echo "[deploy] create-dmg failed; tarball remains the primary artefact."
             ${MockText}rm -rf "${DMG_STAGE}"
-            # Optional code-signing + notarization (release builds only).
-            # Activated when the following env vars are all set, which the
-            # GitHub release workflow conditionally exports from secrets:
-            #   MACOS_SIGN_IDENTITY      Developer ID Application: ...
-            #   MACOS_NOTARY_PROFILE     notarytool keychain profile name
-            if [ -f "${DMG_NAME}" ] && [ -n "${MACOS_SIGN_IDENTITY:-}" ]; then
-                echo "[deploy] codesigning ${DMG_NAME} with ${MACOS_SIGN_IDENTITY}"
-                ${MockText}codesign --force --sign "${MACOS_SIGN_IDENTITY}" --timestamp "${DMG_NAME}" || \
-                    echo "[deploy] codesign failed (continuing unsigned)"
-                if [ -n "${MACOS_NOTARY_PROFILE:-}" ]; then
-                    echo "[deploy] submitting ${DMG_NAME} for notarization (profile ${MACOS_NOTARY_PROFILE})"
-                    ${MockText}xcrun notarytool submit "${DMG_NAME}" \
-                        --keychain-profile "${MACOS_NOTARY_PROFILE}" --wait || \
-                        echo "[deploy] notarytool submit failed (continuing un-notarized)"
-                    ${MockText}xcrun stapler staple "${DMG_NAME}" || \
-                        echo "[deploy] stapler failed (continuing without stapled ticket)"
-                fi
+            if [ -n "${CODESIGN_IDENTITY:-}" ]; then
+                ${MockText}"${BasePath}/scripts/deploy/macos_notarize.sh" "${DMG_NAME}" || exit 1
             fi
         else
             echo "[deploy] create-dmg not found on PATH; skipping .dmg generation (tarball is the only artefact)."

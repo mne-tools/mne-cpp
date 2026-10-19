@@ -1,0 +1,92 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+name: Authenticode-sign with SignPath
+description: >
+  Submit one file (installer .exe or deployment .zip) to SignPath, replace it
+  with the signed result and verify every signed executable with signtool
+  (v2.4.0 T10.7a). Windows runners only.
+
+inputs:
+  file:
+    description: File to sign in place.
+    required: true
+  artifact-configuration-slug:
+    description: SignPath artifact configuration that describes what inside the file is signed.
+    required: true
+  api-token:
+    description: SignPath API token (secrets.SIGNPATH_API_TOKEN).
+    required: true
+  organization-id:
+    description: SignPath organization ID (vars.SIGNPATH_ORGANIZATION_ID).
+    required: true
+  project-slug:
+    description: SignPath project slug.
+    default: mne-cpp
+  signing-policy-slug:
+    description: SignPath signing policy slug.
+    default: release-signing
+
+runs:
+  using: composite
+  steps:
+  - name: Require signing credentials
+    shell: bash
+    env:
+      API_TOKEN: ${{ inputs.api-token }}
+      ORGANIZATION_ID: ${{ inputs.organization-id }}
+    run: |
+      if [ -z "$API_TOKEN" ] || [ -z "$ORGANIZATION_ID" ]; then
+        echo "::error::Authenticode signing needs the SIGNPATH_API_TOKEN secret and the SIGNPATH_ORGANIZATION_ID variable"
+        exit 1
+      fi
+
+  - name: Upload unsigned file
+    id: unsigned
+    uses: actions/upload-artifact@v7
+    with:
+      name: unsigned-${{ inputs.file }}
+      path: ${{ inputs.file }}
+      archive: false
+
+  - name: Submit signing request
+    uses: signpath/github-action-submit-signing-request@v3
+    with:
+      api-token: ${{ inputs.api-token }}
+      organization-id: ${{ inputs.organization-id }}
+      project-slug: ${{ inputs.project-slug }}
+      signing-policy-slug: ${{ inputs.signing-policy-slug }}
+      artifact-configuration-slug: ${{ inputs.artifact-configuration-slug }}
+      github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+      wait-for-completion: true
+      wait-for-completion-timeout-in-seconds: 3600
+      output-artifact-directory: ${{ runner.temp }}/signed
+      skip-decompress: true
+
+  - name: Replace with the signed file and verify
+    shell: pwsh
+    env:
+      FILE: ${{ inputs.file }}
+      SIGNED_DIR: ${{ runner.temp }}/signed
+    run: |
+      $ErrorActionPreference = 'Stop'
+      $signed = Join-Path $env:SIGNED_DIR (Split-Path $env:FILE -Leaf)
+      Copy-Item $signed $env:FILE -Force
+      $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" |
+        Sort-Object FullName -Descending | Select-Object -First 1
+      if (-not $signtool) { throw 'signtool.exe not found' }
+      $targets = @()
+      if ($env:FILE -like '*.zip') {
+        $dir = Join-Path $env:RUNNER_TEMP ('verify-' + [IO.Path]::GetFileNameWithoutExtension($env:FILE))
+        Expand-Archive $env:FILE -DestinationPath $dir -Force
+        $targets = Get-ChildItem $dir -Recurse -Include 'mne_*.exe', 'mne_*.dll'
+      } else {
+        $targets = Get-Item $env:FILE
+      }
+      if ($targets.Count -eq 0) { throw "No MNE-CPP executables found in $env:FILE" }
+      foreach ($t in $targets) {
+        & $signtool.FullName verify /pa /all /tw $t.FullName
+        if ($LASTEXITCODE -ne 0) { throw "Signature verification failed: $($t.Name)" }
+      }
+      Write-Host "Verified $($targets.Count) signed file(s) in $env:FILE"

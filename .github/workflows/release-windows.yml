@@ -101,6 +101,14 @@ jobs:
           echo "ERROR: Archive file not found!"
           exit 1
         }
+    - name: Authenticode-sign the archive
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: ./.github/actions/signpath-sign
+      with:
+        file: mne-cpp-windows-dynamic-x86_64.zip
+        artifact-configuration-slug: windows-archive
+        api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+        organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       shell: bash
@@ -208,6 +216,14 @@ jobs:
     - name: Deploy binaries (Windows)
       run: |
         ./scripts/deploy/deploy.bat static pack
+    - name: Authenticode-sign the archive
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: ./.github/actions/signpath-sign
+      with:
+        file: mne-cpp-windows-static-x86_64.zip
+        artifact-configuration-slug: windows-archive
+        api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+        organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       shell: bash
