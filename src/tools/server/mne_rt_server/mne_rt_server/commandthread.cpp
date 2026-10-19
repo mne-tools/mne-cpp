@@ -31,8 +31,6 @@
 
 using namespace RTSERVER;
 
-#define USENEWSERVER 1
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -85,12 +83,7 @@ void CommandThread::run()
     QDataStream t_FiffStreamIn(&t_qTcpSocket);
     t_FiffStreamIn.setVersion(QDataStream::Qt_6_0);
 
-#ifndef USENEWSERVER
-    qint64 t_iMaxBufSize = 1024;
-#endif
-
     while (t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning) {
-#ifdef USENEWSERVER
         //
         // Write available data
         //
@@ -141,42 +134,6 @@ void CommandThread::run()
                 }
             }
         }
-
-#else
-        //
-        // Write available data
-        //
-        if (m_qSendBlock.size() > 0) {
-            qint32 t_iBlockSize = m_qSendBlock.size();
-            m_qMutex.lock();
-            qint32 t_iBytesWritten = t_qTcpSocket.write(m_qSendBlock);
-            t_qTcpSocket.waitForBytesWritten();
-            if (t_iBytesWritten == t_iBlockSize)
-                m_qSendBlock.clear();
-            else
-                m_qSendBlock = m_qSendBlock.mid(t_iBytesWritten, t_iBlockSize - t_iBytesWritten);
-            m_qMutex.unlock();
-        }
-
-        //
-        // Read: Wait 100ms for incomming tag header, read and continue
-        //
-        //ToDo its not the best solution in terms of receiving the command for sure
-        t_qTcpSocket.waitForReadyRead(100);
-
-        if (t_qTcpSocket.bytesAvailable() > 0 && t_qTcpSocket.canReadLine()) {
-            QByteArray t_qByteArrayRaw = t_qTcpSocket.readLine(t_iMaxBufSize);
-            QString t_sCommand = QString(t_qByteArrayRaw).simplified();
-
-            //
-            // Parse command
-            //
-            if (!t_sCommand.isEmpty())
-                emit newCommand(t_sCommand, m_iThreadID);
-        } else if (t_qTcpSocket.bytesAvailable() > t_iMaxBufSize) {
-            t_qTcpSocket.readAll(); //readAll that QTcpSocket is empty again -> prevent overflow
-        }
-#endif
     }
 
     t_qTcpSocket.disconnectFromHost();

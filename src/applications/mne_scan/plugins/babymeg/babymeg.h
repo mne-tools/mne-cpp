@@ -59,8 +59,8 @@ namespace DISPLIB
 class ProjectSettingsView;
 }
 
-#define MAX_DATA_LEN 2000000000L
-#define MAX_POS 2000000000L
+inline constexpr auto MAX_DATA_LEN = 2000000000L;
+inline constexpr auto MAX_POS = 2000000000L;
 
 //=============================================================================================================
 // DEFINE NAMESPACE BABYMEGPLUGIN

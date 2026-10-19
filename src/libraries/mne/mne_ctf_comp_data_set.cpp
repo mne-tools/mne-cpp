@@ -215,14 +215,6 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     return FIFF_OK;
 }
 
-#define MNE_CTFV_COMP_UNKNOWN -1
-#define MNE_CTFV_COMP_NONE 0
-#define MNE_CTFV_COMP_G1BR 0x47314252
-#define MNE_CTFV_COMP_G2BR 0x47324252
-#define MNE_CTFV_COMP_G3BR 0x47334252
-#define MNE_CTFV_COMP_G2OI 0x47324f49
-#define MNE_CTFV_COMP_G3OI 0x47334f49
-
 static struct
 {
     int grad_comp;

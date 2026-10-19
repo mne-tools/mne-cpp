@@ -37,7 +37,7 @@ using namespace SHOWFIFF;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 #endif
 
-#define DEFAULT_INDENT 3
+constexpr auto DEFAULT_INDENT = 3;
 
 
 //*************************************************************************************************************

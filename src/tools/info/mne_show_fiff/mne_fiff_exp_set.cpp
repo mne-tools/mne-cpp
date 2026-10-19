@@ -51,13 +51,13 @@ using namespace FIFFLIB;
 // Static Definitions
 //=============================================================================================================
 
-#define LONG_LINE 80
+constexpr auto LONG_LINE = 80;
 
-#define CLASS_TAG 1
-#define CLASS_BLOCK 2
-#define CLASS_UNIT 3
-#define CLASS_UNITM 4
-#define CLASS_CH_KIND 5
+constexpr auto CLASS_TAG = 1;
+constexpr auto CLASS_BLOCK = 2;
+constexpr auto CLASS_UNIT = 3;
+constexpr auto CLASS_UNITM = 4;
+constexpr auto CLASS_CH_KIND = 5;
 
 
 //*************************************************************************************************************

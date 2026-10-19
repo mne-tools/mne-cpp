@@ -26,11 +26,11 @@
     "$comment": "Per-metric upper bound enforced in CI (audit_maintainability.py --ceilings). Lower a ceiling in the same commit that retires debt; it may never rise. 0 means the construct is gone for good.",
     "null_macro": 0,
     "typedef_struct": 0,
-    "c_style_cast": 402,
+    "c_style_cast": 401,
     "raw_new": 168,
     "raw_delete": 149,
     "console_io": 0,
-    "numeric_define": 847,
+    "numeric_define": 0,
     "qt_new_unparented": 811
   }
 }

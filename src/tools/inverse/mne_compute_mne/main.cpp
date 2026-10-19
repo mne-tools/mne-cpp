@@ -79,9 +79,9 @@ using namespace UTILSLIB;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 // Collapse modes (matching SVN MNE-C)
-#define COLLAPSE_MAX 1
-#define COLLAPSE_L1 2
-#define COLLAPSE_L2 3
+constexpr auto COLLAPSE_MAX = 1;
+constexpr auto COLLAPSE_L1 = 2;
+constexpr auto COLLAPSE_L2 = 3;
 
 //=============================================================================================================
 // HELPERS

@@ -75,7 +75,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
-#define BIG_TIME 1e6f
+constexpr auto BIG_TIME = 1e6f;
 
 //=============================================================================================================
 // HELPER: detect whether a FIFF file is raw or evoked

@@ -48,10 +48,10 @@
 /**
  * Channel-type classification constants for the ch_class field in MNECovMatrix.
  */
-#define MNE_COV_CH_UNKNOWN -1 /**< Unknown channel type. */
-#define MNE_COV_CH_MEG_MAG 0  /**< Axial gradiometer or magnetometer [T]. */
-#define MNE_COV_CH_MEG_GRAD 1 /**< Planar gradiometer [T/m]. */
-#define MNE_COV_CH_EEG 2      /**< EEG [V]. */
+inline constexpr auto MNE_COV_CH_UNKNOWN = -1; /**< Unknown channel type. */
+inline constexpr auto MNE_COV_CH_MEG_MAG = 0;  /**< Axial gradiometer or magnetometer [T]. */
+inline constexpr auto MNE_COV_CH_MEG_GRAD = 1; /**< Planar gradiometer [T/m]. */
+inline constexpr auto MNE_COV_CH_EEG = 2;      /**< EEG [V]. */
 
 //=============================================================================================================
 // FORWARD DECLARATIONS

@@ -34,8 +34,6 @@
 // DEFINE NAMESPACE FIFFLIB
 //=============================================================================================================
 
-namespace FIFFLIB
-{
 
 /*
  * Tag numbers < 100 are only used during the acquisition
@@ -209,8 +207,8 @@ namespace FIFFLIB
  * functions to test type properties.
  */
 
-#define FIFFC_MAJOR_VERSION 1L
-#define FIFFC_MINOR_VERSION 3L
+inline constexpr auto FIFFC_MAJOR_VERSION = 1L;
+inline constexpr auto FIFFC_MINOR_VERSION = 3L;
 
 #define FIFFC_VERSION (FIFFC_MAJOR_VERSION << 16 | FIFFC_MINOR_VERSION)
 
@@ -218,49 +216,49 @@ namespace FIFFLIB
  * Constants for types
  */
 
-#define FIFFT_VOID 0
-#define FIFFT_BYTE 1
-#define FIFFT_SHORT 2
-#define FIFFT_INT 3
-#define FIFFT_FLOAT 4
-#define FIFFT_DOUBLE 5
-#define FIFFT_JULIAN 6 /**< Julian day. */
-#define FIFFT_USHORT 7
-#define FIFFT_UINT 8
-#define FIFFT_ULONG 9
-#define FIFFT_STRING 10
-#define FIFFT_ASCII 10
-#define FIFFT_LONG 11
-#define FIFFT_DAU_PACK13 13
-#define FIFFT_DAU_PACK14 14
-#define FIFFT_DAU_PACK16 16
-#define FIFFT_COMPLEX_FLOAT 20
-#define FIFFT_COMPLEX_DOUBLE 21
-#define FIFFT_OLD_PACK 23
-#define FIFFT_CH_INFO_STRUCT 30
-#define FIFFT_ID_STRUCT 31
-#define FIFFT_DIR_ENTRY_STRUCT 32
-#define FIFFT_DIG_POINT_STRUCT 33
-#define FIFFT_CH_POS_STRUCT 34
-#define FIFFT_COORD_TRANS_STRUCT 35
-#define FIFFT_DIG_STRING_STRUCT 36
-#define FIFFT_STREAM_SEGMENT_STRUCT 37
-#define FIFFT_DATA_REF_STRUCT 38
+inline constexpr auto FIFFT_VOID = 0;
+inline constexpr auto FIFFT_BYTE = 1;
+inline constexpr auto FIFFT_SHORT = 2;
+inline constexpr auto FIFFT_INT = 3;
+inline constexpr auto FIFFT_FLOAT = 4;
+inline constexpr auto FIFFT_DOUBLE = 5;
+inline constexpr auto FIFFT_JULIAN = 6; /**< Julian day. */
+inline constexpr auto FIFFT_USHORT = 7;
+inline constexpr auto FIFFT_UINT = 8;
+inline constexpr auto FIFFT_ULONG = 9;
+inline constexpr auto FIFFT_STRING = 10;
+inline constexpr auto FIFFT_ASCII = 10;
+inline constexpr auto FIFFT_LONG = 11;
+inline constexpr auto FIFFT_DAU_PACK13 = 13;
+inline constexpr auto FIFFT_DAU_PACK14 = 14;
+inline constexpr auto FIFFT_DAU_PACK16 = 16;
+inline constexpr auto FIFFT_COMPLEX_FLOAT = 20;
+inline constexpr auto FIFFT_COMPLEX_DOUBLE = 21;
+inline constexpr auto FIFFT_OLD_PACK = 23;
+inline constexpr auto FIFFT_CH_INFO_STRUCT = 30;
+inline constexpr auto FIFFT_ID_STRUCT = 31;
+inline constexpr auto FIFFT_DIR_ENTRY_STRUCT = 32;
+inline constexpr auto FIFFT_DIG_POINT_STRUCT = 33;
+inline constexpr auto FIFFT_CH_POS_STRUCT = 34;
+inline constexpr auto FIFFT_COORD_TRANS_STRUCT = 35;
+inline constexpr auto FIFFT_DIG_STRING_STRUCT = 36;
+inline constexpr auto FIFFT_STREAM_SEGMENT_STRUCT = 37;
+inline constexpr auto FIFFT_DATA_REF_STRUCT = 38;
 /*
  * These are for matrices of any of the above 
  */
-#define FIFFC_MATRIX_MAX_DIM 9
+inline constexpr auto FIFFC_MATRIX_MAX_DIM = 9;
 
-#define FIFFTS_FS_MASK 0xFF000000
-#define FIFFTS_BASE_MASK 0x00000FFF
-#define FIFFTS_MC_MASK 0x00FF0000
+inline constexpr auto FIFFTS_FS_MASK = 0xFF000000;
+inline constexpr auto FIFFTS_BASE_MASK = 0x00000FFF;
+inline constexpr auto FIFFTS_MC_MASK = 0x00FF0000;
 
-#define FIFFTS_FS_SCALAR 0x00000000
-#define FIFFTS_FS_MATRIX 0x40000000
+inline constexpr auto FIFFTS_FS_SCALAR = 0x00000000;
+inline constexpr auto FIFFTS_FS_MATRIX = 0x40000000;
 
-#define FIFFTS_MC_DENSE 0x00000000
-#define FIFFTS_MC_CCS 0x00100000
-#define FIFFTS_MC_RCS 0x00200000
+inline constexpr auto FIFFTS_MC_DENSE = 0x00000000;
+inline constexpr auto FIFFTS_MC_CCS = 0x00100000;
+inline constexpr auto FIFFTS_MC_RCS = 0x00200000;
 
 #define FIFFT_MATRIX (FIFFTS_FS_MATRIX | FIFFTS_MC_DENSE)
 #define FIFFT_CCS_MATRIX (FIFFTS_FS_MATRIX | FIFFTS_MC_CCS)
@@ -277,71 +275,71 @@ namespace FIFFLIB
 /*
  * Real-time shmem
  */
-#define FIFF_NEW_FILE 1
-#define FIFF_CLOSE_FILE 2
-#define FIFF_DISCARD_FILE 3
-#define FIFF_ERROR_MESSAGE 4
-#define FIFF_SUSPEND_READING 5
-#define FIFF_FATAL_ERROR_MESSAGE 6
-#define FIFF_CONNECTION_CHECK 7
-#define FIFF_SUSPEND_FILING 8
-#define FIFF_RESUME_FILING 9
-#define FIFF_RAW_PREBASE 10
-#define FIFF_RAW_PICK_LIST 11
-#define FIFF_ECHO 12
-#define FIFF_RESUME_READING 13
-#define FIFF_DACQ_SYSTEM_TYPE 14
-#define FIFF_SELECT_RAW_CH 15  /**< Instruct rawdisp to select this channel. */
-#define FIFF_PLAYBACK_MODE 16  /**< Tell that we are playing data back from the hard disks in the data acquisition front end. */
-#define FIFF_CONTINUE_FILE 17  /**< Used to inform that data is saved into a continuation file. */
-#define FIFF_JITTER_MAX 18     /**< Used to tell the jitter in the timing of data packets. */
-#define FIFF_STREAM_SEGMENT 19 /**< A segment of data stream. */
+inline constexpr auto FIFF_NEW_FILE = 1;
+inline constexpr auto FIFF_CLOSE_FILE = 2;
+inline constexpr auto FIFF_DISCARD_FILE = 3;
+inline constexpr auto FIFF_ERROR_MESSAGE = 4;
+inline constexpr auto FIFF_SUSPEND_READING = 5;
+inline constexpr auto FIFF_FATAL_ERROR_MESSAGE = 6;
+inline constexpr auto FIFF_CONNECTION_CHECK = 7;
+inline constexpr auto FIFF_SUSPEND_FILING = 8;
+inline constexpr auto FIFF_RESUME_FILING = 9;
+inline constexpr auto FIFF_RAW_PREBASE = 10;
+inline constexpr auto FIFF_RAW_PICK_LIST = 11;
+inline constexpr auto FIFF_ECHO = 12;
+inline constexpr auto FIFF_RESUME_READING = 13;
+inline constexpr auto FIFF_DACQ_SYSTEM_TYPE = 14;
+inline constexpr auto FIFF_SELECT_RAW_CH = 15;  /**< Instruct rawdisp to select this channel. */
+inline constexpr auto FIFF_PLAYBACK_MODE = 16;  /**< Tell that we are playing data back from the hard disks in the data acquisition front end. */
+inline constexpr auto FIFF_CONTINUE_FILE = 17;  /**< Used to inform that data is saved into a continuation file. */
+inline constexpr auto FIFF_JITTER_MAX = 18;     /**< Used to tell the jitter in the timing of data packets. */
+inline constexpr auto FIFF_STREAM_SEGMENT = 19; /**< A segment of data stream. */
 /*
 define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere? 
  */
 
-#define FIFFV_DACQ_SYSTEM_DAU 0
-#define FIFFV_DACQ_SYSTEM_VXI 1
-#define FIFFV_DACQ_SYSTEM_RPU 2
-#define FIFFV_DACQ_SYSTEM_ORION 3
+inline constexpr auto FIFFV_DACQ_SYSTEM_DAU = 0;
+inline constexpr auto FIFFV_DACQ_SYSTEM_VXI = 1;
+inline constexpr auto FIFFV_DACQ_SYSTEM_RPU = 2;
+inline constexpr auto FIFFV_DACQ_SYSTEM_ORION = 3;
 
 #ifdef _DATA_SERVER
-#define FIFF_MEM_DATA_BUFFER 10300 /**< This is only used by cm_sender to indicate a data buffer which is not logged into the file. */
+inline constexpr auto FIFF_MEM_DATA_BUFFER = 10300; /**< This is only used by cm_sender to indicate a data buffer which is not logged into the file. */
 #endif
 
 /*
  * Standard tags used in all blocks
  */
 
-#define FIFF_FILE_ID 100
-#define FIFF_DIR_POINTER 101
-#define FIFF_DIR 102
-#define FIFF_BLOCK_ID 103
-#define FIFF_BLOCK_START 104
-#define FIFF_BLOCK_END 105
-#define FIFF_FREE_LIST 106
-#define FIFF_FREE_BLOCK 107
-#define FIFF_NOP 108
-#define FIFF_PARENT_FILE_ID 109
-#define FIFF_PARENT_BLOCK_ID 110
-#define FIFF_BLOCK_NAME 111
-#define FIFF_BLOCK_VERSION 112
-#define FIFF_CREATOR 113  /**< Program that created the file (string) . */
-#define FIFF_MODIFIER 114 /**< Program that modified the file (string). */
+inline constexpr auto FIFF_FILE_ID = 100;
+inline constexpr auto FIFF_DIR_POINTER = 101;
+inline constexpr auto FIFF_DIR = 102;
+inline constexpr auto FIFF_BLOCK_ID = 103;
+inline constexpr auto FIFF_BLOCK_START = 104;
+inline constexpr auto FIFF_BLOCK_END = 105;
+inline constexpr auto FIFF_FREE_LIST = 106;
+inline constexpr auto FIFF_FREE_BLOCK = 107;
+inline constexpr auto FIFF_NOP = 108;
+inline constexpr auto FIFF_PARENT_FILE_ID = 109;
+inline constexpr auto FIFF_PARENT_BLOCK_ID = 110;
+inline constexpr auto FIFF_BLOCK_NAME = 111;
+inline constexpr auto FIFF_BLOCK_VERSION = 112;
+inline constexpr auto FIFF_CREATOR = 113;  /**< Program that created the file (string) . */
+inline constexpr auto FIFF_MODIFIER = 114; /**< Program that modified the file (string). */
 
-#define FIFF_REF_ROLE 115
-#define FIFF_REF_FILE_ID 116
-#define FIFF_REF_FILE_NUM 117
-#define FIFF_REF_FILE_NAME 118
+inline constexpr auto FIFF_REF_ROLE = 115;
+inline constexpr auto FIFF_REF_FILE_ID = 116;
+inline constexpr auto FIFF_REF_FILE_NUM = 117;
+inline constexpr auto FIFF_REF_FILE_NAME = 118;
 /* reserverd                 119 */
-#define FIFF_REF_BLOCK_ID 120
+inline constexpr auto FIFF_REF_BLOCK_ID = 120;
 
 /*
  * Megacq saves the parameters in these tags
  */
 
-#define FIFF_DACQ_PARS 150
-#define FIFF_DACQ_STIM 151
+inline constexpr auto FIFF_DACQ_PARS = 150;
+inline constexpr auto FIFF_DACQ_STIM = 151;
 
 /*
  * Structured objects (blocks)
@@ -351,318 +349,318 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
  * MEG/EEG
  */
 
-#define FIFFB_ROOT 999
-#define FIFFB_MEAS 100
-#define FIFFB_MEAS_INFO 101
-#define FIFFB_RAW_DATA 102
-#define FIFFB_PROCESSED_DATA 103
-#define FIFFB_EVOKED 104
+inline constexpr auto FIFFB_ROOT = 999;
+inline constexpr auto FIFFB_MEAS = 100;
+inline constexpr auto FIFFB_MEAS_INFO = 101;
+inline constexpr auto FIFFB_RAW_DATA = 102;
+inline constexpr auto FIFFB_PROCESSED_DATA = 103;
+inline constexpr auto FIFFB_EVOKED = 104;
 #define FIFFB_MCG_AVE FIFFB_EVOKED
-#define FIFFB_ASPECT 105
-#define FIFFB_SUBJECT 106
-#define FIFFB_ISOTRAK 107
-#define FIFFB_HPI_MEAS 108
-#define FIFFB_HPI_RESULT 109
-#define FIFFB_HPI_COIL 110
-#define FIFFB_PROJECT 111
-#define FIFFB_CONTINUOUS_DATA 112
-#define FIFFB_VOID 114
-#define FIFFB_EVENTS 115
-#define FIFFB_INDEX 116
-#define FIFFB_DACQ_PARS 117
-#define FIFFB_REF 118 /**< Fiff referencing mechanism. */
+inline constexpr auto FIFFB_ASPECT = 105;
+inline constexpr auto FIFFB_SUBJECT = 106;
+inline constexpr auto FIFFB_ISOTRAK = 107;
+inline constexpr auto FIFFB_HPI_MEAS = 108;
+inline constexpr auto FIFFB_HPI_RESULT = 109;
+inline constexpr auto FIFFB_HPI_COIL = 110;
+inline constexpr auto FIFFB_PROJECT = 111;
+inline constexpr auto FIFFB_CONTINUOUS_DATA = 112;
+inline constexpr auto FIFFB_VOID = 114;
+inline constexpr auto FIFFB_EVENTS = 115;
+inline constexpr auto FIFFB_INDEX = 116;
+inline constexpr auto FIFFB_DACQ_PARS = 117;
+inline constexpr auto FIFFB_REF = 118; /**< Fiff referencing mechanism. */
 
-#define FIFFB_SMSH_RAW_DATA 119 /**< SmartShield raw data. */
-#define FIFFB_SMSH_ASPECT 120   /**< SmartShield averaged data. */
-#define FIFFB_HPI_SUBSYSTEM 121 /**< HPI subsystem. */
+inline constexpr auto FIFFB_SMSH_RAW_DATA = 119; /**< SmartShield raw data. */
+inline constexpr auto FIFFB_SMSH_ASPECT = 120;   /**< SmartShield averaged data. */
+inline constexpr auto FIFFB_HPI_SUBSYSTEM = 121; /**< HPI subsystem. */
 
 /*
  * MRI
  */
 
-#define FIFFB_MRI 200            /**< MRI/CT data. */
-#define FIFFB_MRI_SET 201        /**< MRI/CT volume. */
-#define FIFFB_MRI_SLICE 202      /**< MRI/CT slice (image). */
-#define FIFFB_MRI_SCENERY 203    /**< These are for writing unrelated 'slices'. */
-#define FIFFB_MRI_SCENE 204      /**< Which are actually 3D scenes... */
-#define FIFFB_MRI_SEG 205        /**< MRI segmentation data. */
-#define FIFFB_MRI_SEG_REGION 206 /**< One MRI segmentation region. */
+inline constexpr auto FIFFB_MRI = 200;            /**< MRI/CT data. */
+inline constexpr auto FIFFB_MRI_SET = 201;        /**< MRI/CT volume. */
+inline constexpr auto FIFFB_MRI_SLICE = 202;      /**< MRI/CT slice (image). */
+inline constexpr auto FIFFB_MRI_SCENERY = 203;    /**< These are for writing unrelated 'slices'. */
+inline constexpr auto FIFFB_MRI_SCENE = 204;      /**< Which are actually 3D scenes... */
+inline constexpr auto FIFFB_MRI_SEG = 205;        /**< MRI segmentation data. */
+inline constexpr auto FIFFB_MRI_SEG_REGION = 206; /**< One MRI segmentation region. */
 
 /*
  * Forward and inverse modelling
  */
 
-#define FIFFB_SPHERE 300          /**< Concentric sphere model related. */
-#define FIFFB_BEM 310             /**< Boundary-element method. */
-#define FIFFB_BEM_SURF 311        /**< Boundary-element method surfaces. */
-#define FIFFB_CONDUCTOR_MODEL 312 /**< One conductor model definition. */
-#define FIFFB_XFIT_PROJ 313       /**< xfit saves the linear projection information here. */
-#define FIFFB_XFIT_PROJ_ITEM 314  /**< Each projection item goes here. */
-#define FIFFB_XFIT_AUX 315        /**< xfit saves its auxliary data into this block. */
+inline constexpr auto FIFFB_SPHERE = 300;          /**< Concentric sphere model related. */
+inline constexpr auto FIFFB_BEM = 310;             /**< Boundary-element method. */
+inline constexpr auto FIFFB_BEM_SURF = 311;        /**< Boundary-element method surfaces. */
+inline constexpr auto FIFFB_CONDUCTOR_MODEL = 312; /**< One conductor model definition. */
+inline constexpr auto FIFFB_XFIT_PROJ = 313;       /**< xfit saves the linear projection information here. */
+inline constexpr auto FIFFB_XFIT_PROJ_ITEM = 314;  /**< Each projection item goes here. */
+inline constexpr auto FIFFB_XFIT_AUX = 315;        /**< xfit saves its auxliary data into this block. */
 #define FIFFB_PROJ FIFFB_XFIT_PROJ
 #define FIFFB_PROJ_ITEM FIFFB_XFIT_PROJ_ITEM
 /*                            350...
  *                            370          Reserved for MNE estimates (MHa) 
  */
 
-#define FIFFB_BAD_CHANNELS 359 /**< Alias of FIFFB_MNE_BAD_CHANNELS. */
+inline constexpr auto FIFFB_BAD_CHANNELS = 359; /**< Alias of FIFFB_MNE_BAD_CHANNELS. */
 
 /*
  * Volume info
  */
-#define FIFFB_VOL_INFO 400
+inline constexpr auto FIFFB_VOL_INFO = 400;
 
 /*
  * Sparse matrix, cross-talk correction, and SSS blocks
  */
-#define FIFFB_DATA_CORRECTION 500   /**< Correction to data. */
-#define FIFFB_CHANNEL_DECOUPLER 501 /**< Cross-talk correction . */
-#define FIFFB_SSS_INFO 502          /**< SSS processing info. */
-#define FIFFB_SSS_CAL_ADJUST 503    /**< Fine-calibration adjustment data. */
-#define FIFFB_SSS_ST_INFO 504       /**< TSSS info. */
-#define FIFFB_SSS_BASES 505         /**< SSS bases. */
+inline constexpr auto FIFFB_DATA_CORRECTION = 500;   /**< Correction to data. */
+inline constexpr auto FIFFB_CHANNEL_DECOUPLER = 501; /**< Cross-talk correction . */
+inline constexpr auto FIFFB_SSS_INFO = 502;          /**< SSS processing info. */
+inline constexpr auto FIFFB_SSS_CAL_ADJUST = 503;    /**< Fine-calibration adjustment data. */
+inline constexpr auto FIFFB_SSS_ST_INFO = 504;       /**< TSSS info. */
+inline constexpr auto FIFFB_SSS_BASES = 505;         /**< SSS bases. */
 
-#define FIFFB_SMARTSHIELD 510 /**< SmartShield data. */
+inline constexpr auto FIFFB_SMARTSHIELD = 510; /**< SmartShield data. */
 
 /*
  * Different aspects of data
  */
 
-#define FIFFV_ASPECT_AVERAGE 100 /**< Normal average of epochs. */
-#define FIFFV_ASPECT_STD_ERR 101 /**< Std. error of mean. */
-#define FIFFV_ASPECT_SINGLE 102  /**< Single epoch cut out from the continuous data. */
-#define FIFFV_ASPECT_SUBAVERAGE 103
-#define FIFFV_ASPECT_ALTAVERAGE 104    /**< Alternating subaverage. */
-#define FIFFV_ASPECT_SAMPLE 105        /**< A sample cut out by graph. */
-#define FIFFV_ASPECT_POWER_DENSITY 106 /**< Power density spectrum. */
-#define FIFFV_ASPECT_DIPOLE_WAVE 200   /**< Dipole amplitude curve. */
+inline constexpr auto FIFFV_ASPECT_AVERAGE = 100; /**< Normal average of epochs. */
+inline constexpr auto FIFFV_ASPECT_STD_ERR = 101; /**< Std. error of mean. */
+inline constexpr auto FIFFV_ASPECT_SINGLE = 102;  /**< Single epoch cut out from the continuous data. */
+inline constexpr auto FIFFV_ASPECT_SUBAVERAGE = 103;
+inline constexpr auto FIFFV_ASPECT_ALTAVERAGE = 104;    /**< Alternating subaverage. */
+inline constexpr auto FIFFV_ASPECT_SAMPLE = 105;        /**< A sample cut out by graph. */
+inline constexpr auto FIFFV_ASPECT_POWER_DENSITY = 106; /**< Power density spectrum. */
+inline constexpr auto FIFFV_ASPECT_DIPOLE_WAVE = 200;   /**< Dipole amplitude curve. */
 
 /*
  * Tags used in data files
  */
 
-#define FIFF_UTC_OFFSET 159 /**< UTC offset of related meas_date (sHH:MM). */
+inline constexpr auto FIFF_UTC_OFFSET = 159; /**< UTC offset of related meas_date (sHH:MM). */
 
-#define FIFF_NCHAN 200                /**< Number of channels. */
-#define FIFF_SFREQ 201                /**< Sampling frequency (Hz). */
-#define FIFF_DATA_PACK 202            /**< How the raw data is packed. */
-#define FIFF_CH_INFO 203              /**< Channel descriptor. */
-#define FIFF_MEAS_DATE 204            /**< Measurement date. */
-#define FIFF_SUBJECT 205              /**< This might be deleted later. */
-#define FIFF_COMMENT 206              /**< This is used in a questionable way... */
-#define FIFF_NAVE 207                 /**< Number of averages. */
-#define FIFF_FIRST_SAMPLE 208         /**< The first sample of an epoch. */
-#define FIFF_LAST_SAMPLE 209          /**< The last sample of an epoch. */
-#define FIFF_ASPECT_KIND 210          /**< Aspect label. */
-#define FIFF_REF_EVENT 211            /**< Reference event. */
-#define FIFF_EXPERIMENTER 212         /**< Experimenter name. */
-#define FIFF_DIG_POINT 213            /**< Digitization point. */
-#define FIFF_CH_POS_VEC 214           /**< Channel positions. */
-#define FIFF_HPI_SLOPES 215           /**< HPI data. */
-#define FIFF_HPI_NCOIL 216            /**< Number of HPI coils. */
-#define FIFF_REQ_EVENT 217            /**< Required event. */
-#define FIFF_REQ_LIMIT 218            /**< Window for required event. */
-#define FIFF_LOWPASS 219              /**< Analog lowpass. */
-#define FIFF_BAD_CHS 220              /**< List of bad channels. */
-#define FIFF_ARTEF_REMOVAL 221        /**< Artifact removal. */
-#define FIFF_COORD_TRANS 222          /**< Coordinate transformation. */
-#define FIFF_HIGHPASS 223             /**< Analog highpass. */
-#define FIFF_CH_CALS_VEC 224          /**< This will not occur in new files. */
-#define FIFF_HPI_BAD_CHS 225          /**< List of channels considered to be bad in hpi. */
-#define FIFF_HPI_CORR_COEFF 226       /**< Hpi curve fit correlations. */
-#define FIFF_EVENT_COMMENT 227        /**< Comment about the events used in averaging. */
-#define FIFF_NO_SAMPLES 228           /**< Number of samples in an epoch. */
-#define FIFF_FIRST_TIME 229           /**< Time scale minimum. */
-#define FIFF_SUBAVE_SIZE 230          /**< Size of a subaverage. */
-#define FIFF_SUBAVE_FIRST 231         /**< The first epoch # contained in the subaverage. */
-#define FIFF_NAME 233                 /**< Intended to be a short name. */
-#define FIFF_DESCRIPTION FIFF_COMMENT /**< (Textual) Description of an object. */
-#define FIFF_DIG_STRING 234           /**< String of digitized points. */
+inline constexpr auto FIFF_NCHAN = 200;          /**< Number of channels. */
+inline constexpr auto FIFF_SFREQ = 201;          /**< Sampling frequency (Hz). */
+inline constexpr auto FIFF_DATA_PACK = 202;      /**< How the raw data is packed. */
+inline constexpr auto FIFF_CH_INFO = 203;        /**< Channel descriptor. */
+inline constexpr auto FIFF_MEAS_DATE = 204;      /**< Measurement date. */
+inline constexpr auto FIFF_SUBJECT = 205;        /**< This might be deleted later. */
+inline constexpr auto FIFF_COMMENT = 206;        /**< This is used in a questionable way... */
+inline constexpr auto FIFF_NAVE = 207;           /**< Number of averages. */
+inline constexpr auto FIFF_FIRST_SAMPLE = 208;   /**< The first sample of an epoch. */
+inline constexpr auto FIFF_LAST_SAMPLE = 209;    /**< The last sample of an epoch. */
+inline constexpr auto FIFF_ASPECT_KIND = 210;    /**< Aspect label. */
+inline constexpr auto FIFF_REF_EVENT = 211;      /**< Reference event. */
+inline constexpr auto FIFF_EXPERIMENTER = 212;   /**< Experimenter name. */
+inline constexpr auto FIFF_DIG_POINT = 213;      /**< Digitization point. */
+inline constexpr auto FIFF_CH_POS_VEC = 214;     /**< Channel positions. */
+inline constexpr auto FIFF_HPI_SLOPES = 215;     /**< HPI data. */
+inline constexpr auto FIFF_HPI_NCOIL = 216;      /**< Number of HPI coils. */
+inline constexpr auto FIFF_REQ_EVENT = 217;      /**< Required event. */
+inline constexpr auto FIFF_REQ_LIMIT = 218;      /**< Window for required event. */
+inline constexpr auto FIFF_LOWPASS = 219;        /**< Analog lowpass. */
+inline constexpr auto FIFF_BAD_CHS = 220;        /**< List of bad channels. */
+inline constexpr auto FIFF_ARTEF_REMOVAL = 221;  /**< Artifact removal. */
+inline constexpr auto FIFF_COORD_TRANS = 222;    /**< Coordinate transformation. */
+inline constexpr auto FIFF_HIGHPASS = 223;       /**< Analog highpass. */
+inline constexpr auto FIFF_CH_CALS_VEC = 224;    /**< This will not occur in new files. */
+inline constexpr auto FIFF_HPI_BAD_CHS = 225;    /**< List of channels considered to be bad in hpi. */
+inline constexpr auto FIFF_HPI_CORR_COEFF = 226; /**< Hpi curve fit correlations. */
+inline constexpr auto FIFF_EVENT_COMMENT = 227;  /**< Comment about the events used in averaging. */
+inline constexpr auto FIFF_NO_SAMPLES = 228;     /**< Number of samples in an epoch. */
+inline constexpr auto FIFF_FIRST_TIME = 229;     /**< Time scale minimum. */
+inline constexpr auto FIFF_SUBAVE_SIZE = 230;    /**< Size of a subaverage. */
+inline constexpr auto FIFF_SUBAVE_FIRST = 231;   /**< The first epoch # contained in the subaverage. */
+inline constexpr auto FIFF_NAME = 233;           /**< Intended to be a short name. */
+#define FIFF_DESCRIPTION FIFF_COMMENT            /**< (Textual) Description of an object. */
+inline constexpr auto FIFF_DIG_STRING = 234;     /**< String of digitized points. */
 
-#define FIFF_LINE_FREQ 235      /**< Line interference frequency. */
-#define FIFF_HPI_COIL_FREQ 236  /**< HPI coil excitation frequency. */
-#define FIFF_SIGNAL_CHANNEL 237 /**< Signal channel name. */
+inline constexpr auto FIFF_LINE_FREQ = 235;      /**< Line interference frequency. */
+inline constexpr auto FIFF_HPI_COIL_FREQ = 236;  /**< HPI coil excitation frequency. */
+inline constexpr auto FIFF_SIGNAL_CHANNEL = 237; /**< Signal channel name. */
 
-#define FIFFC_HPI_MAX_NCOIL 1000 /**< Max value for FIFF_HPI_NCOIL. */
+inline constexpr auto FIFFC_HPI_MAX_NCOIL = 1000; /**< Max value for FIFF_HPI_NCOIL. */
 
 /*
  *
  * HPI fitting program tags
  *
  */
-#define FIFF_HPI_COIL_MOMENTS 240       /**< Estimated moment vectors for the HPI coil magnetic dipoles. */
-#define FIFF_HPI_FIT_GOODNESS 241       /**< Three floats indicating the goodness of fit. */
-#define FIFF_HPI_FIT_ACCEPT 242         /**< Bitmask indicating acceptance (see below). */
-#define FIFF_HPI_FIT_GOOD_LIMIT 243     /**< Limit for the goodness-of-fit. */
-#define FIFF_HPI_FIT_DIST_LIMIT 244     /**< Limit for the coil distance difference. */
-#define FIFF_HPI_COIL_NO 245            /**< Coil number listed by HPI measurement. */
-#define FIFF_HPI_COILS_USED 246         /**< List of coils finally used when the transformation
+inline constexpr auto FIFF_HPI_COIL_MOMENTS = 240;       /**< Estimated moment vectors for the HPI coil magnetic dipoles. */
+inline constexpr auto FIFF_HPI_FIT_GOODNESS = 241;       /**< Three floats indicating the goodness of fit. */
+inline constexpr auto FIFF_HPI_FIT_ACCEPT = 242;         /**< Bitmask indicating acceptance (see below). */
+inline constexpr auto FIFF_HPI_FIT_GOOD_LIMIT = 243;     /**< Limit for the goodness-of-fit. */
+inline constexpr auto FIFF_HPI_FIT_DIST_LIMIT = 244;     /**< Limit for the coil distance difference. */
+inline constexpr auto FIFF_HPI_COIL_NO = 245;            /**< Coil number listed by HPI measurement. */
+inline constexpr auto FIFF_HPI_COILS_USED = 246;         /**< List of coils finally used when the transformation
 					   * was computed */
-#define FIFF_HPI_DIGITIZATION_ORDER 247 /**< Which Isotrak digitization point corresponds to
+inline constexpr auto FIFF_HPI_DIGITIZATION_ORDER = 247; /**< Which Isotrak digitization point corresponds to
 					   * each of the coils energized */
 
-#define FIFFV_HPI_ACCEPT_PROGRAM (1 << 0) /**< The fit was accepted by the software. */
-#define FIFFV_HPI_ACCEPT_USER (1 << 1)    /**< The fit was accepted by user action. */
-#define FIFFV_HPI_ACCEPT_NONE 0
+inline constexpr auto FIFFV_HPI_ACCEPT_PROGRAM = (1 << 0); /**< The fit was accepted by the software. */
+inline constexpr auto FIFFV_HPI_ACCEPT_USER = (1 << 1);    /**< The fit was accepted by user action. */
+inline constexpr auto FIFFV_HPI_ACCEPT_NONE = 0;
 
 /**< Following corresponsds to fields in channel info record. */
 
-#define FIFF_CH_SCAN_NO 250    /**< int32 "Channel scan number. Corresponds to fiffChInfoRec.scanNo field". */
-#define FIFF_CH_LOGICAL_NO 251 /**< int32 "Channel logical number. Corresponds to fiffChInfoRec.logNo field". */
-#define FIFF_CH_KIND 252       /**< enum(ch_kind)  "Channel type. Corresponds to fiffChInfoRec.kind field". */
-#define FIFF_CH_RANGE 253      /**< float          "Conversion from recorded number to (possibly virtual) voltage at the output". */
-#define FIFF_CH_CAL 254        /**< float          "Calibration coefficients from output voltage to some real units". */
-#define FIFF_CH_POS 255        /**< ch_pos_rec     "Channel position". */
-#define FIFF_CH_UNIT 256       /**< enum(unit)     "Unit of the data". */
-#define FIFF_CH_UNIT_MUL 257   /**< int            "Unit multiplier exponent. */
-#define FIFF_CH_DACQ_NAME 258  /**< string "Name of the channel in the data acquisition system. Same as fiffChInfoRec.name.". */
+inline constexpr auto FIFF_CH_SCAN_NO = 250;    /**< int32 "Channel scan number. Corresponds to fiffChInfoRec.scanNo field". */
+inline constexpr auto FIFF_CH_LOGICAL_NO = 251; /**< int32 "Channel logical number. Corresponds to fiffChInfoRec.logNo field". */
+inline constexpr auto FIFF_CH_KIND = 252;       /**< enum(ch_kind)  "Channel type. Corresponds to fiffChInfoRec.kind field". */
+inline constexpr auto FIFF_CH_RANGE = 253;      /**< float          "Conversion from recorded number to (possibly virtual) voltage at the output". */
+inline constexpr auto FIFF_CH_CAL = 254;        /**< float          "Calibration coefficients from output voltage to some real units". */
+inline constexpr auto FIFF_CH_POS = 255;        /**< ch_pos_rec     "Channel position". */
+inline constexpr auto FIFF_CH_UNIT = 256;       /**< enum(unit)     "Unit of the data". */
+inline constexpr auto FIFF_CH_UNIT_MUL = 257;   /**< int            "Unit multiplier exponent. */
+inline constexpr auto FIFF_CH_DACQ_NAME = 258;  /**< string "Name of the channel in the data acquisition system. Same as fiffChInfoRec.name.". */
 
-#define FIFF_SSS_FRAME 263      /**< SSS coordinate frame. */
-#define FIFF_SSS_JOB 264        /**< SSS job. */
-#define FIFF_SSS_ORIGIN 265     /**< Origin of the SSS inside expansion. */
-#define FIFF_SSS_ORD_IN 266     /**< Order of the SSS inside expansion. */
-#define FIFF_SSS_ORD_OUT 267    /**< Order of the SSS outside expansion. */
-#define FIFF_SSS_NMAG 268       /**< Number of MEG channels. */
-#define FIFF_SSS_COMPONENTS 269 /**< Number of SSS moments. */
-#define FIFF_SSS_CAL_CHANS 270  /**< INT matrix (nmag x 2) for fine-calibrated channel numbers and types. */
-#define FIFF_SSS_CAL_CORRS 271  /**< FLOAT matrix (nmag x 14) for fine-calibration coefficients. */
-#define FIFF_SSS_ST_CORR 272    /**< TSSS subspace correlation. */
+inline constexpr auto FIFF_SSS_FRAME = 263;      /**< SSS coordinate frame. */
+inline constexpr auto FIFF_SSS_JOB = 264;        /**< SSS job. */
+inline constexpr auto FIFF_SSS_ORIGIN = 265;     /**< Origin of the SSS inside expansion. */
+inline constexpr auto FIFF_SSS_ORD_IN = 266;     /**< Order of the SSS inside expansion. */
+inline constexpr auto FIFF_SSS_ORD_OUT = 267;    /**< Order of the SSS outside expansion. */
+inline constexpr auto FIFF_SSS_NMAG = 268;       /**< Number of MEG channels. */
+inline constexpr auto FIFF_SSS_COMPONENTS = 269; /**< Number of SSS moments. */
+inline constexpr auto FIFF_SSS_CAL_CHANS = 270;  /**< INT matrix (nmag x 2) for fine-calibrated channel numbers and types. */
+inline constexpr auto FIFF_SSS_CAL_CORRS = 271;  /**< FLOAT matrix (nmag x 14) for fine-calibration coefficients. */
+inline constexpr auto FIFF_SSS_ST_CORR = 272;    /**< TSSS subspace correlation. */
 
-#define FIFFV_SSS_JOB_NOTHING 0   /**< Just copy input to output. */
-#define FIFFV_SSS_JOB_CTC 1       /**< Only cross-talk correction. */
-#define FIFFV_SSS_JOB_FILTER 2    /**< Spatial filtering (default). */
-#define FIFFV_SSS_JOB_VIRT 3      /**< Reconstruct virtual data. */
-#define FIFFV_SSS_JOB_HEAD_POS 4  /**< Estimate head positions, no movecomp. */
-#define FIFFV_SSS_JOB_MOVEC_FIT 5 /**< Estimate head positions, do movecomp. */
-#define FIFFV_SSS_JOB_MOVEC_QUA 6 /**< Do movecomp from prev estimated positions. */
-#define FIFFV_SSS_JOB_REC_ALL 7   /**< Reconstruct fields from inside and outside moments. */
-#define FIFFV_SSS_JOB_REC_IN 8    /**< Reconstruct fields from inside moments. */
-#define FIFFV_SSS_JOB_REC_OUT 9   /**< Reconstruct fields from outside moments. */
-#define FIFFV_SSS_JOB_ST 10       /**< TSSS. */
+inline constexpr auto FIFFV_SSS_JOB_NOTHING = 0;   /**< Just copy input to output. */
+inline constexpr auto FIFFV_SSS_JOB_CTC = 1;       /**< Only cross-talk correction. */
+inline constexpr auto FIFFV_SSS_JOB_FILTER = 2;    /**< Spatial filtering (default). */
+inline constexpr auto FIFFV_SSS_JOB_VIRT = 3;      /**< Reconstruct virtual data. */
+inline constexpr auto FIFFV_SSS_JOB_HEAD_POS = 4;  /**< Estimate head positions, no movecomp. */
+inline constexpr auto FIFFV_SSS_JOB_MOVEC_FIT = 5; /**< Estimate head positions, do movecomp. */
+inline constexpr auto FIFFV_SSS_JOB_MOVEC_QUA = 6; /**< Do movecomp from prev estimated positions. */
+inline constexpr auto FIFFV_SSS_JOB_REC_ALL = 7;   /**< Reconstruct fields from inside and outside moments. */
+inline constexpr auto FIFFV_SSS_JOB_REC_IN = 8;    /**< Reconstruct fields from inside moments. */
+inline constexpr auto FIFFV_SSS_JOB_REC_OUT = 9;   /**< Reconstruct fields from outside moments. */
+inline constexpr auto FIFFV_SSS_JOB_ST = 10;       /**< TSSS. */
 
-#define FIFF_SSS_BASE_IN 273    /**< DOUBLE matrix for SSS inside basis. */
-#define FIFF_SSS_BASE_OUT 274   /**< DOUBLE matrix for SSS outside basis. */
-#define FIFF_SSS_BASE_VIRT 275  /**< DOUBLE matrix for SSS virtual basis. */
-#define FIFF_SSS_NORM 276       /**< Froebius norm of the inside basis. */
-#define FIFF_SSS_ITERATE 277    /**< Nr of iterations in iterative SSS pseudo-inverse. */
-#define FIFF_GANTRY_ANGLE 282   /**< Tilt angle of the dewar in degrees. */
-#define FIFF_DATA_BUFFER 300    /**< Buffer containing measurement data. */
-#define FIFF_DATA_SKIP 301      /**< Data skip in buffers. */
-#define FIFF_EPOCH 302          /**< Buffer containing one epoch and channel. */
-#define FIFF_DATA_SKIP_SAMP 303 /**< Data skip in samples. */
-#define FIFF_DATA_BUFFER2 304   /**< Int_32 data buffer in dacq outgen. */
-#define FIFF_TIME_STAMP 305     /**< Int_32[3] meas time stamp (sec,usec,sampleno). */
+inline constexpr auto FIFF_SSS_BASE_IN = 273;    /**< DOUBLE matrix for SSS inside basis. */
+inline constexpr auto FIFF_SSS_BASE_OUT = 274;   /**< DOUBLE matrix for SSS outside basis. */
+inline constexpr auto FIFF_SSS_BASE_VIRT = 275;  /**< DOUBLE matrix for SSS virtual basis. */
+inline constexpr auto FIFF_SSS_NORM = 276;       /**< Froebius norm of the inside basis. */
+inline constexpr auto FIFF_SSS_ITERATE = 277;    /**< Nr of iterations in iterative SSS pseudo-inverse. */
+inline constexpr auto FIFF_GANTRY_ANGLE = 282;   /**< Tilt angle of the dewar in degrees. */
+inline constexpr auto FIFF_DATA_BUFFER = 300;    /**< Buffer containing measurement data. */
+inline constexpr auto FIFF_DATA_SKIP = 301;      /**< Data skip in buffers. */
+inline constexpr auto FIFF_EPOCH = 302;          /**< Buffer containing one epoch and channel. */
+inline constexpr auto FIFF_DATA_SKIP_SAMP = 303; /**< Data skip in samples. */
+inline constexpr auto FIFF_DATA_BUFFER2 = 304;   /**< Int_32 data buffer in dacq outgen. */
+inline constexpr auto FIFF_TIME_STAMP = 305;     /**< Int_32[3] meas time stamp (sec,usec,sampleno). */
 
-#define FIFF_SUBJ_ID 400          /**< Subject ID. */
-#define FIFF_SUBJ_FIRST_NAME 401  /**< First name of the subject. */
-#define FIFF_SUBJ_MIDDLE_NAME 402 /**< Middle name of the subject. */
-#define FIFF_SUBJ_LAST_NAME 403   /**< Last name of the subject. */
-#define FIFF_SUBJ_BIRTH_DAY 404   /**< Birthday of the subject. */
-#define FIFF_SUBJ_SEX 405         /**< Sex of the subject. */
-#define FIFF_SUBJ_HAND 406        /**< Handedness of the subject. */
-#define FIFF_SUBJ_WEIGHT 407      /**< Weight of the subject. */
-#define FIFF_SUBJ_HEIGHT 408      /**< Height of the subject. */
-#define FIFF_SUBJ_COMMENT 409     /**< Comment about the subject. */
-#define FIFF_SUBJ_HIS_ID 410      /**< ID used in the Hospital Information System. */
+inline constexpr auto FIFF_SUBJ_ID = 400;          /**< Subject ID. */
+inline constexpr auto FIFF_SUBJ_FIRST_NAME = 401;  /**< First name of the subject. */
+inline constexpr auto FIFF_SUBJ_MIDDLE_NAME = 402; /**< Middle name of the subject. */
+inline constexpr auto FIFF_SUBJ_LAST_NAME = 403;   /**< Last name of the subject. */
+inline constexpr auto FIFF_SUBJ_BIRTH_DAY = 404;   /**< Birthday of the subject. */
+inline constexpr auto FIFF_SUBJ_SEX = 405;         /**< Sex of the subject. */
+inline constexpr auto FIFF_SUBJ_HAND = 406;        /**< Handedness of the subject. */
+inline constexpr auto FIFF_SUBJ_WEIGHT = 407;      /**< Weight of the subject. */
+inline constexpr auto FIFF_SUBJ_HEIGHT = 408;      /**< Height of the subject. */
+inline constexpr auto FIFF_SUBJ_COMMENT = 409;     /**< Comment about the subject. */
+inline constexpr auto FIFF_SUBJ_HIS_ID = 410;      /**< ID used in the Hospital Information System. */
 
-#define FIFF_PROJ_ID 500      /**< Project ID. */
-#define FIFF_PROJ_NAME 501    /**< Project name. */
-#define FIFF_PROJ_AIM 502     /**< Projct description. */
-#define FIFF_PROJ_PERSONS 503 /**< Persons participating in the project. */
-#define FIFF_PROJ_COMMENT 504 /**< Comment about the project. */
+inline constexpr auto FIFF_PROJ_ID = 500;      /**< Project ID. */
+inline constexpr auto FIFF_PROJ_NAME = 501;    /**< Project name. */
+inline constexpr auto FIFF_PROJ_AIM = 502;     /**< Projct description. */
+inline constexpr auto FIFF_PROJ_PERSONS = 503; /**< Persons participating in the project. */
+inline constexpr auto FIFF_PROJ_COMMENT = 504; /**< Comment about the project. */
 
 /**< Special values used in the project tags. */
 
-#define FIFFV_SEX_UNKNOWN 0
-#define FIFFV_SEX_MALE 1
-#define FIFFV_SEX_FEMALE 2
+inline constexpr auto FIFFV_SEX_UNKNOWN = 0;
+inline constexpr auto FIFFV_SEX_MALE = 1;
+inline constexpr auto FIFFV_SEX_FEMALE = 2;
 
-#define FIFFV_HAND_RIGHT 1
-#define FIFFV_HAND_LEFT 2
-#define FIFFV_HAND_AMBIDEXTROUS 3
+inline constexpr auto FIFFV_HAND_RIGHT = 1;
+inline constexpr auto FIFFV_HAND_LEFT = 2;
+inline constexpr auto FIFFV_HAND_AMBIDEXTROUS = 3;
 
 /*
  * Event list saving...
  */
-#define FIFF_EVENT_CHANNELS 600 /**< Event channel numbers. */
-#define FIFF_EVENT_LIST 601     /**< List of events (integers:
+inline constexpr auto FIFF_EVENT_CHANNELS = 600; /**< Event channel numbers. */
+inline constexpr auto FIFF_EVENT_LIST = 601;     /**< List of events (integers:
 					 * (sample, before, after) triplets). */
 /*
  * Event spec tags
  */
-#define FIFF_EVENT_CHANNEL 602 /**< Event channel name. */
-#define FIFF_EVENT_BITS 603    /**< Event bits array. */
+inline constexpr auto FIFF_EVENT_CHANNEL = 602; /**< Event channel name. */
+inline constexpr auto FIFF_EVENT_BITS = 603;    /**< Event bits array. */
 
 /*
  * Event bitmask constants
  */
-#define FIFFC_EVENT_FROMMASK 0
-#define FIFFC_EVENT_FROMBITS 1
-#define FIFFC_EVENT_TOMASK 2
-#define FIFFC_EVENT_TOBITS 3
+inline constexpr auto FIFFC_EVENT_FROMMASK = 0;
+inline constexpr auto FIFFC_EVENT_FROMBITS = 1;
+inline constexpr auto FIFFC_EVENT_TOMASK = 2;
+inline constexpr auto FIFFC_EVENT_TOBITS = 3;
 
 /*
  * Tags used in saving SQUID characteristics etc.
  */
-#define FIFF_SQUID_BIAS 701
-#define FIFF_SQUID_OFFSET 702
-#define FIFF_SQUID_GATE 703
+inline constexpr auto FIFF_SQUID_BIAS = 701;
+inline constexpr auto FIFF_SQUID_OFFSET = 702;
+inline constexpr auto FIFF_SQUID_GATE = 703;
 
 /*
  * Tags for sparse matrices
  */
-#define FIFF_DECOUPLER_MATRIX 800
+inline constexpr auto FIFF_DECOUPLER_MATRIX = 800;
 #define FIFF_SPARSE_CH_NAME_LIST FIFF_PROJ_ITEM_CH_NAME_LIST
 
 /*
  * Processing history tags
  */
-#define FIFFB_PROCESSING_HISTORY 900 /**< Processing history block. */
-#define FIFFB_PROCESSING_RECORD 901  /**< Can contain several processing records. */
+inline constexpr auto FIFFB_PROCESSING_HISTORY = 900; /**< Processing history block. */
+inline constexpr auto FIFFB_PROCESSING_RECORD = 901;  /**< Can contain several processing records. */
 
 /*
  * Aspect values used to save characteristic curves of SQUIDs.
  */
-#define FIFFV_ASPECT_IFII_LOW 1100
-#define FIFFV_ASPECT_IFII_HIGH 1101
-#define FIFFV_ASPECT_GATE 1102
+inline constexpr auto FIFFV_ASPECT_IFII_LOW = 1100;
+inline constexpr auto FIFFV_ASPECT_IFII_HIGH = 1101;
+inline constexpr auto FIFFV_ASPECT_GATE = 1102;
 /*
  * References
  */
-#define FIFF_REF_PATH 1101
+inline constexpr auto FIFF_REF_PATH = 1101;
 /*
  * MRI...
  */
 #define FIFF_MRI_SOURCE_PATH FIFF_REF_PATH
-#define FIFF_MRI_SOURCE_FORMAT 2002
-#define FIFF_MRI_PIXEL_ENCODING 2003
-#define FIFF_MRI_PIXEL_DATA_OFFSET 2004
-#define FIFF_MRI_PIXEL_SCALE 2005
-#define FIFF_MRI_PIXEL_DATA 2006
-#define FIFF_MRI_PIXEL_OVERLAY_ENCODING 2007
-#define FIFF_MRI_PIXEL_OVERLAY_DATA 2008
+inline constexpr auto FIFF_MRI_SOURCE_FORMAT = 2002;
+inline constexpr auto FIFF_MRI_PIXEL_ENCODING = 2003;
+inline constexpr auto FIFF_MRI_PIXEL_DATA_OFFSET = 2004;
+inline constexpr auto FIFF_MRI_PIXEL_SCALE = 2005;
+inline constexpr auto FIFF_MRI_PIXEL_DATA = 2006;
+inline constexpr auto FIFF_MRI_PIXEL_OVERLAY_ENCODING = 2007;
+inline constexpr auto FIFF_MRI_PIXEL_OVERLAY_DATA = 2008;
 
-#define FIFF_MRI_BOUNDING_BOX 2009
-#define FIFF_MRI_WIDTH 2010
-#define FIFF_MRI_WIDTH_M 2011
-#define FIFF_MRI_HEIGHT 2012
-#define FIFF_MRI_HEIGHT_M 2013
-#define FIFF_MRI_DEPTH 2014
-#define FIFF_MRI_DEPTH_M 2015
-#define FIFF_MRI_THICKNESS 2016
-#define FIFF_MRI_SCENE_AIM 2017
+inline constexpr auto FIFF_MRI_BOUNDING_BOX = 2009;
+inline constexpr auto FIFF_MRI_WIDTH = 2010;
+inline constexpr auto FIFF_MRI_WIDTH_M = 2011;
+inline constexpr auto FIFF_MRI_HEIGHT = 2012;
+inline constexpr auto FIFF_MRI_HEIGHT_M = 2013;
+inline constexpr auto FIFF_MRI_DEPTH = 2014;
+inline constexpr auto FIFF_MRI_DEPTH_M = 2015;
+inline constexpr auto FIFF_MRI_THICKNESS = 2016;
+inline constexpr auto FIFF_MRI_SCENE_AIM = 2017;
 
-#define FIFF_MRI_ORIG_SOURCE_PATH 2020
-#define FIFF_MRI_ORIG_SOURCE_FORMAT 2021
-#define FIFF_MRI_ORIG_PIXEL_ENCODING 2022
-#define FIFF_MRI_ORIG_PIXEL_DATA_OFFSET 2023
+inline constexpr auto FIFF_MRI_ORIG_SOURCE_PATH = 2020;
+inline constexpr auto FIFF_MRI_ORIG_SOURCE_FORMAT = 2021;
+inline constexpr auto FIFF_MRI_ORIG_PIXEL_ENCODING = 2022;
+inline constexpr auto FIFF_MRI_ORIG_PIXEL_DATA_OFFSET = 2023;
 
-#define FIFF_MRI_VOXEL_DATA 2030
-#define FIFF_MRI_VOXEL_ENCODING 2031
+inline constexpr auto FIFF_MRI_VOXEL_DATA = 2030;
+inline constexpr auto FIFF_MRI_VOXEL_ENCODING = 2031;
 
-#define FIFF_MRI_MRILAB_SETUP 2100
+inline constexpr auto FIFF_MRI_MRILAB_SETUP = 2100;
 
-#define FIFF_MRI_SEG_REGION_ID 2200
+inline constexpr auto FIFF_MRI_SEG_REGION_ID = 2200;
 
 /*
  * FIFF_MRI_SOURCE_FORMAT can be one of the following
@@ -676,82 +674,82 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
  * from the FIFF_MRI_PIXEL_DATA tag.
  * 
  */
-#define FIFFV_MRI_FORMAT_UNKNOWN 0
-#define FIFFV_MRI_FORMAT_MAGNETOM_SHORT 1
-#define FIFFV_MRI_FORMAT_MAGNETOM_LONG 2
-#define FIFFV_MRI_FORMAT_MERIT 3
-#define FIFFV_MRI_FORMAT_SIGNA 4
-#define FIFFV_MRI_FORMAT_PIXEL_RAW 5
-#define FIFFV_MRI_FORMAT_PIXEL_RAW_PACKED 6
-#define FIFFV_MRI_FORMAT_MAGNETOM_NEW 7
-#define FIFFV_MRI_FORMAT_FIFF 8
-#define FIFFV_MRI_FORMAT_ACR_NEMA 9
-#define FIFFV_MRI_FORMAT_DICOM_3 10
-#define FIFFV_MRI_FORMAT_VISTA 11
+inline constexpr auto FIFFV_MRI_FORMAT_UNKNOWN = 0;
+inline constexpr auto FIFFV_MRI_FORMAT_MAGNETOM_SHORT = 1;
+inline constexpr auto FIFFV_MRI_FORMAT_MAGNETOM_LONG = 2;
+inline constexpr auto FIFFV_MRI_FORMAT_MERIT = 3;
+inline constexpr auto FIFFV_MRI_FORMAT_SIGNA = 4;
+inline constexpr auto FIFFV_MRI_FORMAT_PIXEL_RAW = 5;
+inline constexpr auto FIFFV_MRI_FORMAT_PIXEL_RAW_PACKED = 6;
+inline constexpr auto FIFFV_MRI_FORMAT_MAGNETOM_NEW = 7;
+inline constexpr auto FIFFV_MRI_FORMAT_FIFF = 8;
+inline constexpr auto FIFFV_MRI_FORMAT_ACR_NEMA = 9;
+inline constexpr auto FIFFV_MRI_FORMAT_DICOM_3 = 10;
+inline constexpr auto FIFFV_MRI_FORMAT_VISTA = 11;
 /*
  * FIFF_MRI_PIXEL_ENCODING is one of the following
  */
-#define FIFFV_MRI_PIXEL_UNKNOWN 0
-#define FIFFV_MRI_PIXEL_BYTE 1
-#define FIFFV_MRI_PIXEL_WORD 2
-#define FIFFV_MRI_PIXEL_SWAP_WORD 3
-#define FIFFV_MRI_PIXEL_FLOAT 4
-#define FIFFV_MRI_PIXEL_BYTE_INDEXED_COLOR 5
-#define FIFFV_MRI_PIXEL_BYTE_RGB_COLOR 6
-#define FIFFV_MRI_PIXEL_BYTE_RLE_RGB_COLOR 7
-#define FIFFV_MRI_PIXEL_BIT_RLE 8
+inline constexpr auto FIFFV_MRI_PIXEL_UNKNOWN = 0;
+inline constexpr auto FIFFV_MRI_PIXEL_BYTE = 1;
+inline constexpr auto FIFFV_MRI_PIXEL_WORD = 2;
+inline constexpr auto FIFFV_MRI_PIXEL_SWAP_WORD = 3;
+inline constexpr auto FIFFV_MRI_PIXEL_FLOAT = 4;
+inline constexpr auto FIFFV_MRI_PIXEL_BYTE_INDEXED_COLOR = 5;
+inline constexpr auto FIFFV_MRI_PIXEL_BYTE_RGB_COLOR = 6;
+inline constexpr auto FIFFV_MRI_PIXEL_BYTE_RLE_RGB_COLOR = 7;
+inline constexpr auto FIFFV_MRI_PIXEL_BIT_RLE = 8;
 /*
  * Forward and inverse modelling...
  */
 /*
  * Sphere model     (3000...)
  */
-#define FIFF_CONDUCTOR_MODEL_KIND 3000 /**< What kind of conductor model. */
+inline constexpr auto FIFF_CONDUCTOR_MODEL_KIND = 3000; /**< What kind of conductor model. */
 /*
  * These are the models we support
  */
-#define FIFFV_COND_MODEL_UNKNOWN 0   /**< Not known. */
-#define FIFFV_COND_MODEL_SPHERE 1    /**< Spherically symmetric. */
-#define FIFFV_COND_MODEL_BEM_HOMOG 2 /**< Homogeneous BEM model. */
-#define FIFFV_COND_MODEL_BEM 3       /**< Multilayer BEM model. */
+inline constexpr auto FIFFV_COND_MODEL_UNKNOWN = 0;   /**< Not known. */
+inline constexpr auto FIFFV_COND_MODEL_SPHERE = 1;    /**< Spherically symmetric. */
+inline constexpr auto FIFFV_COND_MODEL_BEM_HOMOG = 2; /**< Homogeneous BEM model. */
+inline constexpr auto FIFFV_COND_MODEL_BEM = 3;       /**< Multilayer BEM model. */
 
-#define FIFF_SPHERE_ORIGIN 3001
-#define FIFF_SPHERE_COORD_FRAME 3002 /**< Which coordinate frame are we using? */
-#define FIFF_SPHERE_LAYERS 3003      /**< Array of layer structures. */
+inline constexpr auto FIFF_SPHERE_ORIGIN = 3001;
+inline constexpr auto FIFF_SPHERE_COORD_FRAME = 3002; /**< Which coordinate frame are we using? */
+inline constexpr auto FIFF_SPHERE_LAYERS = 3003;      /**< Array of layer structures. */
 /*
  * Surfaces for BEM (3100...)
  */
-#define FIFF_BEM_SURF_ID 3101          /**< int    surface number. */
-#define FIFF_BEM_SURF_NAME 3102        /**< string surface name. */
-#define FIFF_BEM_SURF_NNODE 3103       /**< int    # of nodes on a surface. */
-#define FIFF_BEM_SURF_NTRI 3104        /**< int    # number of triangles on a surface. */
-#define FIFF_BEM_SURF_NODES 3105       /**< float  surface nodes (nnode,3). */
-#define FIFF_BEM_SURF_TRIANGLES 3106   /**< int    surface triangles (ntri,3). */
-#define FIFF_BEM_SURF_NORMALS 3107     /**< float  surface node normal unit vectors (nnode,3). */
-#define FIFF_BEM_SURF_CURVS 3108       /**< float  surface node first principal curvature unit vectors (nnode,3). */
-#define FIFF_BEM_SURF_CURV_VALUES 3109 /**< float  the two curvature values (nnode,2). */
+inline constexpr auto FIFF_BEM_SURF_ID = 3101;          /**< int    surface number. */
+inline constexpr auto FIFF_BEM_SURF_NAME = 3102;        /**< string surface name. */
+inline constexpr auto FIFF_BEM_SURF_NNODE = 3103;       /**< int    # of nodes on a surface. */
+inline constexpr auto FIFF_BEM_SURF_NTRI = 3104;        /**< int    # number of triangles on a surface. */
+inline constexpr auto FIFF_BEM_SURF_NODES = 3105;       /**< float  surface nodes (nnode,3). */
+inline constexpr auto FIFF_BEM_SURF_TRIANGLES = 3106;   /**< int    surface triangles (ntri,3). */
+inline constexpr auto FIFF_BEM_SURF_NORMALS = 3107;     /**< float  surface node normal unit vectors (nnode,3). */
+inline constexpr auto FIFF_BEM_SURF_CURVS = 3108;       /**< float  surface node first principal curvature unit vectors (nnode,3). */
+inline constexpr auto FIFF_BEM_SURF_CURV_VALUES = 3109; /**< float  the two curvature values (nnode,2). */
 
-#define FIFF_BEM_POT_SOLUTION 3110 /**< float ** The solution matrix. */
-#define FIFF_BEM_APPROX 3111       /**< int    approximation method, see below. */
-#define FIFF_BEM_COORD_FRAME 3112  /**< The coordinate frame of the model. */
-#define FIFF_BEM_SIGMA 3113        /**< Conductivity of a compartment. */
+inline constexpr auto FIFF_BEM_POT_SOLUTION = 3110; /**< float ** The solution matrix. */
+inline constexpr auto FIFF_BEM_APPROX = 3111;       /**< int    approximation method, see below. */
+inline constexpr auto FIFF_BEM_COORD_FRAME = 3112;  /**< The coordinate frame of the model. */
+inline constexpr auto FIFF_BEM_SIGMA = 3113;        /**< Conductivity of a compartment. */
 /*
  * FIFF_BEM_SURF_ID can be one of the following
  */
-#define FIFFV_BEM_SURF_ID_UNKNOWN -1
-#define FIFFV_BEM_SURF_ID_BRAIN 1
-#define FIFFV_BEM_SURF_ID_CSF 2
-#define FIFFV_BEM_SURF_ID_SKULL 3
-#define FIFFV_BEM_SURF_ID_HEAD 4
+inline constexpr auto FIFFV_BEM_SURF_ID_UNKNOWN = -1;
+inline constexpr auto FIFFV_BEM_SURF_ID_BRAIN = 1;
+inline constexpr auto FIFFV_BEM_SURF_ID_CSF = 2;
+inline constexpr auto FIFFV_BEM_SURF_ID_SKULL = 3;
+inline constexpr auto FIFFV_BEM_SURF_ID_HEAD = 4;
 
-#define FIFFV_BEM_SURF_ID_BLOOD 11
-#define FIFFV_BEM_SURF_ID_HEART 12
-#define FIFFV_BEM_SURF_ID_LUNGS 13
-#define FIFFV_BEM_SURF_ID_TORSO 14
+inline constexpr auto FIFFV_BEM_SURF_ID_BLOOD = 11;
+inline constexpr auto FIFFV_BEM_SURF_ID_HEART = 12;
+inline constexpr auto FIFFV_BEM_SURF_ID_LUNGS = 13;
+inline constexpr auto FIFFV_BEM_SURF_ID_TORSO = 14;
 
-#define FIFFV_BEM_SURF_ID_NM122 21
-#define FIFFV_BEM_SURF_UNIT_SPHERE 22
-#define FIFFV_BEM_SURF_ID_VV 23
+inline constexpr auto FIFFV_BEM_SURF_ID_NM122 = 21;
+inline constexpr auto FIFFV_BEM_SURF_UNIT_SPHERE = 22;
+inline constexpr auto FIFFV_BEM_SURF_ID_VV = 23;
 /*
  * FIFF_MRI_SEG_REGION_ID can be one of the following
  */
@@ -768,38 +766,38 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 /*
  * FIFF_BEM_APPROX		     
  */
-#define FIFFV_BEM_APPROX_CONST 1  /**< The constant potential approach. */
-#define FIFFV_BEM_APPROX_LINEAR 2 /**< The linear potential approach. */
+inline constexpr auto FIFFV_BEM_APPROX_CONST = 1;  /**< The constant potential approach. */
+inline constexpr auto FIFFV_BEM_APPROX_LINEAR = 2; /**< The linear potential approach. */
 /*
  * Source descriptions (3200...)
  * The dipole is six floats (position and dipole moment)
  */
-#define FIFF_SOURCE_DIPOLE 3201
+inline constexpr auto FIFF_SOURCE_DIPOLE = 3201;
 /*
  * These tags are used by xfit
  */
-#define FIFF_XFIT_LEAD_PRODUCTS 3401
-#define FIFF_XFIT_MAP_PRODUCTS 3402
-#define FIFF_XFIT_GRAD_MAP_PRODUCTS 3403
-#define FIFF_XFIT_VOL_INTEGRATION 3404
-#define FIFF_XFIT_INTEGRATION_RADIUS 3405
-#define FIFF_XFIT_CONDUCTOR_MODEL_NAME 3406
-#define FIFF_XFIT_CONDUCTOR_MODEL_TRANS_NAME 3407
-#define FIFF_XFIT_CONT_SURF_TYPE 3408 /**< Xfit contour surface type. */
+inline constexpr auto FIFF_XFIT_LEAD_PRODUCTS = 3401;
+inline constexpr auto FIFF_XFIT_MAP_PRODUCTS = 3402;
+inline constexpr auto FIFF_XFIT_GRAD_MAP_PRODUCTS = 3403;
+inline constexpr auto FIFF_XFIT_VOL_INTEGRATION = 3404;
+inline constexpr auto FIFF_XFIT_INTEGRATION_RADIUS = 3405;
+inline constexpr auto FIFF_XFIT_CONDUCTOR_MODEL_NAME = 3406;
+inline constexpr auto FIFF_XFIT_CONDUCTOR_MODEL_TRANS_NAME = 3407;
+inline constexpr auto FIFF_XFIT_CONT_SURF_TYPE = 3408; /**< Xfit contour surface type. */
 
 /*
  * These relate to linear projection
  */
-#define FIFF_PROJ_ITEM_KIND 3411
-#define FIFF_PROJ_ITEM_TIME 3412
+inline constexpr auto FIFF_PROJ_ITEM_KIND = 3411;
+inline constexpr auto FIFF_PROJ_ITEM_TIME = 3412;
 #define FIFF_PROJ_ITEM_DIPOLE FIFF_SOURCE_DIPOLE
-#define FIFF_PROJ_ITEM_IGN_CHS 3413
-#define FIFF_PROJ_ITEM_NVEC 3414
-#define FIFF_PROJ_ITEM_VECTORS 3415
+inline constexpr auto FIFF_PROJ_ITEM_IGN_CHS = 3413;
+inline constexpr auto FIFF_PROJ_ITEM_NVEC = 3414;
+inline constexpr auto FIFF_PROJ_ITEM_VECTORS = 3415;
 #define FIFF_PROJ_ITEM_COMMENT FIFF_COMMENT
 #define FIFF_PROJ_ITEM_DESCRIPTION FIFF_DESCRIPTION
-#define FIFF_PROJ_ITEM_DEFINITION 3416
-#define FIFF_PROJ_ITEM_CH_NAME_LIST 3417
+inline constexpr auto FIFF_PROJ_ITEM_DEFINITION = 3416;
+inline constexpr auto FIFF_PROJ_ITEM_CH_NAME_LIST = 3417;
 
 #define FIFF_XFIT_PROJ_ITEM_KIND FIFF_PROJ_ITEM_KIND
 #define FIFF_XFIT_PROJ_ITEM_TIME FIFF_PROJ_ITEM_TIME
@@ -812,13 +810,13 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
  * The FIFF_PROJ_ITEM_KIND is an integer,
  * one of the following
  */
-#define FIFFV_PROJ_ITEM_NONE 0
-#define FIFFV_PROJ_ITEM_FIELD 1
-#define FIFFV_PROJ_ITEM_DIP_FIX 2
-#define FIFFV_PROJ_ITEM_DIP_ROT 3
-#define FIFFV_PROJ_ITEM_HOMOG_GRAD 4
-#define FIFFV_PROJ_ITEM_HOMOG_FIELD 5
-#define FIFFV_PROJ_ITEM_EEG_AVREF 10
+inline constexpr auto FIFFV_PROJ_ITEM_NONE = 0;
+inline constexpr auto FIFFV_PROJ_ITEM_FIELD = 1;
+inline constexpr auto FIFFV_PROJ_ITEM_DIP_FIX = 2;
+inline constexpr auto FIFFV_PROJ_ITEM_DIP_ROT = 3;
+inline constexpr auto FIFFV_PROJ_ITEM_HOMOG_GRAD = 4;
+inline constexpr auto FIFFV_PROJ_ITEM_HOMOG_FIELD = 5;
+inline constexpr auto FIFFV_PROJ_ITEM_EEG_AVREF = 10;
 
 #define FIFFV_XFIT_PROJ_ITEM_NONE FIFFV_PROJ_ITEM_NONE
 #define FIFFV_XFIT_PROJ_ITEM_FIELD FIFFV_PROJ_ITEM_FIELD
@@ -827,37 +825,37 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_XFIT_PROJ_ITEM_HOMOG_GRAD FIFFV_PROJ_ITEM_HOMOG_GRAD
 #define FIFFV_XFIT_PROJ_ITEM_HOMOG_FIELD FIFFV_PROJ_ITEM_HOMOG_FIELD
 
-#define FIFF_XPLOTTER_LAYOUT 3501 /**< xplotter layout tag. */
+inline constexpr auto FIFF_XPLOTTER_LAYOUT = 3501; /**< xplotter layout tag. */
 
 /*  FIFF_MNE_xxxx                     3502
  *                                     ...
  *  Reserved for MNE data             3799 
  */
-#define FIFF_CH_NAME_LIST 3507 /**< Alias of FIFF_MNE_CH_NAME_LIST. */
+inline constexpr auto FIFF_CH_NAME_LIST = 3507; /**< Alias of FIFF_MNE_CH_NAME_LIST. */
 
 /*
  * These occur in the volume info files
  */
-#define FIFF_VOL_ID 4001
-#define FIFF_VOL_NAME 4002
-#define FIFF_VOL_OWNER_ID 4003        /**< User id of the owner. */
-#define FIFF_VOL_OWNER_NAME 4004      /**< User name of the owner. */
-#define FIFF_VOL_OWNER_REAL_NAME 4005 /**< User name of the owner. */
-#define FIFF_VOL_TYPE 4006            /**< See below... */
-#define FIFF_VOL_HOST 4007            /**< Where does the volume reside. */
-#define FIFF_VOL_REAL_ROOT 4008       /**< The root of the volume in in the machine where the file system is mounted. */
-#define FIFF_VOL_SYMBOLIC_ROOT 4009   /**< Symbolic link to the root of the volume (if any) system is mounted. */
-#define FIFF_VOL_MOUNT_POINT 4010     /**< Last mount point of the volume. */
-#define FIFF_VOL_BLOCKS 4011          /**< Total # of blocks. */
-#define FIFF_VOL_FREE_BLOCKS 4012     /**< # of free blocks. */
-#define FIFF_VOL_AVAIL_BLOCKS 4013    /**< # of free blocks available to non-superuser. */
-#define FIFF_VOL_BLOCK_SIZE 4014      /**< Block size in bytes. */
-#define FIFF_VOL_DIRECTORY 4015       /**< Contents of the volume in a special format the data type will be FIFF_VOID. */
+inline constexpr auto FIFF_VOL_ID = 4001;
+inline constexpr auto FIFF_VOL_NAME = 4002;
+inline constexpr auto FIFF_VOL_OWNER_ID = 4003;        /**< User id of the owner. */
+inline constexpr auto FIFF_VOL_OWNER_NAME = 4004;      /**< User name of the owner. */
+inline constexpr auto FIFF_VOL_OWNER_REAL_NAME = 4005; /**< User name of the owner. */
+inline constexpr auto FIFF_VOL_TYPE = 4006;            /**< See below... */
+inline constexpr auto FIFF_VOL_HOST = 4007;            /**< Where does the volume reside. */
+inline constexpr auto FIFF_VOL_REAL_ROOT = 4008;       /**< The root of the volume in in the machine where the file system is mounted. */
+inline constexpr auto FIFF_VOL_SYMBOLIC_ROOT = 4009;   /**< Symbolic link to the root of the volume (if any) system is mounted. */
+inline constexpr auto FIFF_VOL_MOUNT_POINT = 4010;     /**< Last mount point of the volume. */
+inline constexpr auto FIFF_VOL_BLOCKS = 4011;          /**< Total # of blocks. */
+inline constexpr auto FIFF_VOL_FREE_BLOCKS = 4012;     /**< # of free blocks. */
+inline constexpr auto FIFF_VOL_AVAIL_BLOCKS = 4013;    /**< # of free blocks available to non-superuser. */
+inline constexpr auto FIFF_VOL_BLOCK_SIZE = 4014;      /**< Block size in bytes. */
+inline constexpr auto FIFF_VOL_DIRECTORY = 4015;       /**< Contents of the volume in a special format the data type will be FIFF_VOID. */
 /*
  * Index
  */
-#define FIFF_INDEX_KIND 5001
-#define FIFF_INDEX 5002
+inline constexpr auto FIFF_INDEX_KIND = 5001;
+inline constexpr auto FIFF_INDEX = 5002;
 
 /*======================================================================
  * Enumerated types used as tag values.
@@ -867,29 +865,28 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 /*
  * Values for FIFF_REF_ROLE. The role of a reference
  */
-#define FIFFV_ROLE_PREV_FILE 1
-#define FIFFV_ROLE_NEXT_FILE 2
+inline constexpr auto FIFFV_ROLE_PREV_FILE = 1;
+inline constexpr auto FIFFV_ROLE_NEXT_FILE = 2;
 
 /*
  * Method by which a projection is defined (FIFF_PROJ_ITEM_DEFINITION).
  * If tag is not present, FIFF_PROJ_BY_COMPLEMENT should be assumed.
  */
-#define FIFFV_PROJ_BY_COMPLEMENT 0
-#define FIFFV_PROJ_BY_SPACE 1
+inline constexpr auto FIFFV_PROJ_BY_COMPLEMENT = 0;
+inline constexpr auto FIFFV_PROJ_BY_SPACE = 1;
 
 /*
  * Volume types used in FIFF_VOL_TYPE
  */
 
-#define FIFFV_VOL_TYPE_HD 1  /**< Hard disk. */
-#define FIFFV_VOL_TYPE_MOD 2 /**< Magneto-optical disk. */
+inline constexpr auto FIFFV_VOL_TYPE_HD = 1;  /**< Hard disk. */
+inline constexpr auto FIFFV_VOL_TYPE_MOD = 2; /**< Magneto-optical disk. */
 
 /*
  * Byte order
  */
-#define FIFFV_NATIVE_ENDIAN 0 /**< This refers to the byte order in the current system. */
-#define FIFFV_LITTLE_ENDIAN 1 /**< The little-endian (Intel) byte order. */
-#define FIFFV_BIG_ENDIAN 2    /**< The big-endian (Motorola) byte order. */
-} // NAMESPACE
+inline constexpr auto FIFFV_NATIVE_ENDIAN = 0; /**< This refers to the byte order in the current system. */
+inline constexpr auto FIFFV_LITTLE_ENDIAN = 1; /**< The little-endian (Intel) byte order. */
+inline constexpr auto FIFFV_BIG_ENDIAN = 2;    /**< The big-endian (Motorola) byte order. */
 
 #endif // FIFF_FILE_H

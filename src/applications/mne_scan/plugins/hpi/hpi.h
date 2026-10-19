@@ -62,7 +62,7 @@ class RealTimeMultiSampleArray;
 class RealTimeHpiResult;
 }
 
-#define MAX_DATA_LEN 2000000000L
+inline constexpr auto MAX_DATA_LEN = 2000000000L;
 
 //=============================================================================================================
 // DEFINE NAMESPACE HPIPLUGIN

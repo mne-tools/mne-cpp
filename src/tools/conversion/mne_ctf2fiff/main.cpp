@@ -57,20 +57,17 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 // CTF sensor types (from res4 file)
-#define CTF_SEN_TYPE_MEG 5      // MEG magnetometer/gradiometer
-#define CTF_SEN_TYPE_REF_MAG 0  // Reference magnetometer
-#define CTF_SEN_TYPE_REF_GRAD 1 // Reference gradiometer
-#define CTF_SEN_TYPE_EEG 9      // EEG channel
-#define CTF_SEN_TYPE_STIM 11    // Stimulus/trigger
-#define CTF_SEN_TYPE_ADC 18     // ADC channel
-#define CTF_SEN_TYPE_DAC 17     // DAC channel
+constexpr auto CTF_SEN_TYPE_MEG = 5;      // MEG magnetometer/gradiometer
+constexpr auto CTF_SEN_TYPE_REF_MAG = 0;  // Reference magnetometer
+constexpr auto CTF_SEN_TYPE_REF_GRAD = 1; // Reference gradiometer
+constexpr auto CTF_SEN_TYPE_EEG = 9;      // EEG channel
+constexpr auto CTF_SEN_TYPE_STIM = 11;    // Stimulus/trigger
 
 // CTF res4 structure sizes
-#define CTF_RES4_HEADER_SIZE 1844
-#define CTF_SENSOR_RECORD_SIZE 1328
-#define CTF_SENSOR_NAME_SIZE 32
-#define CTF_MAX_COILS 8
-#define CTF_COIL_POS_SIZE 56 // 7 doubles per coil
+constexpr auto CTF_RES4_HEADER_SIZE = 1844;
+constexpr auto CTF_SENSOR_RECORD_SIZE = 1328;
+constexpr auto CTF_SENSOR_NAME_SIZE = 32;
+constexpr auto CTF_MAX_COILS = 8;
 
 //=============================================================================================================
 // CTF data structures

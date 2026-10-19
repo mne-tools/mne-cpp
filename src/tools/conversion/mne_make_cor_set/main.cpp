@@ -53,8 +53,8 @@ using namespace Eigen;
 
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
-#define COR_NSLICE 256
-#define COR_NPIX 256
+constexpr auto COR_NSLICE = 256;
+constexpr auto COR_NPIX = 256;
 #define COR_SLICE_SIZE (COR_NPIX * COR_NPIX)
 
 //=============================================================================================================

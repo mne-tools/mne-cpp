@@ -29,7 +29,6 @@
 
 using namespace Eigen;
 using namespace MNELIB;
-using namespace FIFFLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

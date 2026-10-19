@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1508,
-  "scanned_lines": 395754,
+  "scanned_lines": 395669,
   "metrics": {
     "null_macro": {
       "total": 0,
@@ -22,10 +22,10 @@
       "all_files": {}
     },
     "c_style_cast": {
-      "total": 402,
-      "files": 70,
+      "total": 401,
+      "files": 69,
       "by_scope": {
-        "applications": 45,
+        "applications": 44,
         "libraries": 264,
         "tools": 93
       },
@@ -64,7 +64,6 @@
         "src/applications/mne_scan/plugins/averaging/averaging.cpp": 8,
         "src/applications/mne_scan/plugins/brainamp/brainamp.cpp": 1,
         "src/applications/mne_scan/plugins/brainamp/brainampdriver.cpp": 1,
-        "src/applications/mne_scan/plugins/eegosports/eegosports.cpp": 1,
         "src/applications/mne_scan/plugins/gusbamp/gusbamp.cpp": 1,
         "src/applications/mne_scan/plugins/gusbamp/gusbampdriver.cpp": 1,
         "src/applications/mne_scan/plugins/rtclustmne/rtclustmne.cpp": 1,
@@ -348,63 +347,12 @@
       "all_files": {}
     },
     "numeric_define": {
-      "total": 847,
-      "files": 30,
-      "by_scope": {
-        "applications": 64,
-        "libraries": 748,
-        "tools": 35
-      },
+      "total": 0,
+      "files": 0,
+      "by_scope": {},
       "suppressed": [],
-      "top": {
-        "src/libraries/fiff/fiff_file.h": 401,
-        "src/libraries/fiff/fiff_constants.h": 283,
-        "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/rawsettings.h": 35,
-        "src/applications/mne_scan/plugins/tmsi/tmsidriver.h": 24,
-        "src/libraries/disp/viewers/helpers/bidsviewmodel.h": 13,
-        "src/libraries/mne/mne_types.h": 12,
-        "src/tools/conversion/mne_ctf2fiff/main.cpp": 12,
-        "src/libraries/mne/mne_ctf_comp_data.cpp": 7,
-        "src/libraries/mne/mne_ctf_comp_data_set.cpp": 7,
-        "src/libraries/mne/mne_surface_or_volume.h": 6,
-        "src/tools/conversion/mne_kit2fiff/main.cpp": 6,
-        "src/tools/info/mne_show_fiff/mne_fiff_exp_set.cpp": 6,
-        "src/libraries/fiff/fiff_tag.h": 5,
-        "src/libraries/inv/dipole_fit/inv_dipole_fit_data.cpp": 4,
-        "src/libraries/mne/mne_cov_matrix.h": 4
-      },
-      "all_files": {
-        "src/applications/mne_analyze_studio/extensions/fiff_browser_extension/browsercore/Utils/rawsettings.h": 35,
-        "src/applications/mne_scan/plugins/babymeg/babymeg.h": 2,
-        "src/applications/mne_scan/plugins/eegosports/eegosports.h": 1,
-        "src/applications/mne_scan/plugins/hpi/hpi.h": 1,
-        "src/applications/mne_scan/plugins/tmsi/tmsidriver.h": 24,
-        "src/applications/mne_scan/plugins/writetofile/writetofile.h": 1,
-        "src/libraries/disp/viewers/coregsettingsview.cpp": 1,
-        "src/libraries/disp/viewers/helpers/bidsviewmodel.h": 13,
-        "src/libraries/fiff/fiff_constants.h": 283,
-        "src/libraries/fiff/fiff_file.h": 401,
-        "src/libraries/fiff/fiff_tag.h": 5,
-        "src/libraries/inv/dipole_fit/inv_dipole_fit_data.cpp": 4,
-        "src/libraries/inv/rap_music/inv_pwl_rap_music.h": 2,
-        "src/libraries/inv/rap_music/inv_rap_music.h": 2,
-        "src/libraries/mne/mne_cov_matrix.h": 4,
-        "src/libraries/mne/mne_ctf_comp_data.cpp": 7,
-        "src/libraries/mne/mne_ctf_comp_data_set.cpp": 7,
-        "src/libraries/mne/mne_raw_data.cpp": 1,
-        "src/libraries/mne/mne_surface_or_volume.h": 6,
-        "src/libraries/mne/mne_types.h": 12,
-        "src/tools/conversion/mne_ctf2fiff/main.cpp": 12,
-        "src/tools/conversion/mne_kit2fiff/main.cpp": 6,
-        "src/tools/conversion/mne_make_cor_set/main.cpp": 2,
-        "src/tools/info/mne_show_fiff/mne_fiff_exp_set.cpp": 6,
-        "src/tools/info/mne_show_fiff/mne_show_fiff_settings.cpp": 1,
-        "src/tools/inverse/mne_compute_mne/main.cpp": 3,
-        "src/tools/inverse/mne_compute_raw_inverse/main.cpp": 1,
-        "src/tools/server/mne_rt_server/mne_rt_server/IConnector.h": 1,
-        "src/tools/server/mne_rt_server/mne_rt_server/commandthread.cpp": 1,
-        "src/tools/server/mne_rt_server/mne_rt_server/mne_rt_commands.h": 2
-      }
+      "top": {},
+      "all_files": {}
     },
     "qt_new_unparented": {
       "total": 811,

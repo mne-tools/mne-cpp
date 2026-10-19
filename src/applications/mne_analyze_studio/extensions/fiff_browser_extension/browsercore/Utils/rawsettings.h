@@ -46,63 +46,63 @@
 //=============================================================================================================
 
 //MainWindow
-#define MAINWINDOW_WINDOW_SIZE_W 1200   //width of MainWindow
-#define MAINWINDOW_WINDOW_SIZE_H 800    //width of MainWindow
-#define MAINWINDOW_WINDOW_POSITION_X 50 //initial window position x
-#define MAINWINDOW_WINDOW_POSITION_Y 50 //initial window position y
+inline constexpr auto MAINWINDOW_WINDOW_SIZE_W = 1200;   //width of MainWindow
+inline constexpr auto MAINWINDOW_WINDOW_SIZE_H = 800;    //width of MainWindow
+inline constexpr auto MAINWINDOW_WINDOW_POSITION_X = 50; //initial window position x
+inline constexpr auto MAINWINDOW_WINDOW_POSITION_Y = 50; //initial window position y
 
 //RawModel
-#define MODEL_WINDOW_SIZE 4016      //this value+MODEL_NUM_FILTER_TAPS must be a multiple integer of 2^x (e.g. 4016 or 8112 for 80 filter taps), length of data window to preload [in samples]
-#define MODEL_RELOAD_POS 2000       //Distance that the current window needs to be off the ends of m_data[i] [in samples]
-#define MODEL_MAX_WINDOWS 3         //number of windows that are at maximum remained in m_data
-#define MODEL_NUM_FILTER_TAPS 80    //number of filter taps, required to take into account because of FFT convolution (zero padding)
-#define MODEL_MAX_NUM_FILTER_TAPS 0 //number of maximal filter taps
+inline constexpr auto MODEL_WINDOW_SIZE = 4016;      //this value+MODEL_NUM_FILTER_TAPS must be a multiple integer of 2^x (e.g. 4016 or 8112 for 80 filter taps), length of data window to preload [in samples]
+inline constexpr auto MODEL_RELOAD_POS = 2000;       //Distance that the current window needs to be off the ends of m_data[i] [in samples]
+inline constexpr auto MODEL_MAX_WINDOWS = 3;         //number of windows that are at maximum remained in m_data
+inline constexpr auto MODEL_NUM_FILTER_TAPS = 80;    //number of filter taps, required to take into account because of FFT convolution (zero padding)
+inline constexpr auto MODEL_MAX_NUM_FILTER_TAPS = 0; //number of maximal filter taps
 
 //RawDelegate
 //Look
-#define DELEGATE_PLOT_HEIGHT 40 //height of a single plot (row)
-#define DELEGATE_DX 1           //each DX pixel a sample is plot -> plot resolution
-#define DELEGATE_NHLINES 6      //number of horizontal lines within a single plot (row)
+inline constexpr auto DELEGATE_PLOT_HEIGHT = 40; //height of a single plot (row)
+inline constexpr auto DELEGATE_DX = 1;           //each DX pixel a sample is plot -> plot resolution
+inline constexpr auto DELEGATE_NHLINES = 6;      //number of horizontal lines within a single plot (row)
 
 //maximum values for different channels types according to FiffChInfo
-#define DELEGATE_MAX_MEG_GRAD 1e-10 // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T_M
-#define DELEGATE_MAX_MEG_MAG 1e-11  // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T
-#define DELEGATE_MAX_EEG 1e-4       // kind=FIFFV_EEG_CH
-#define DELEGATE_MAX_EOG 1e-3       // kind=FIFFV_EOG_CH
-#define DELEGATE_MAX_STIM 5         // kind=FIFFV_STIM_CH
+inline constexpr auto DELEGATE_MAX_MEG_GRAD = 1e-10; // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T_M
+inline constexpr auto DELEGATE_MAX_MEG_MAG = 1e-11;  // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T
+inline constexpr auto DELEGATE_MAX_EEG = 1e-4;       // kind=FIFFV_EEG_CH
+inline constexpr auto DELEGATE_MAX_EOG = 1e-3;       // kind=FIFFV_EOG_CH
+inline constexpr auto DELEGATE_MAX_STIM = 5;         // kind=FIFFV_STIM_CH
 
 //Define Event design parameters
 //Event marker width
-#define EVENT_MARKER_WIDTH 3 // in pixels
+inline constexpr auto EVENT_MARKER_WIDTH = 3; // in pixels
 
 //Event marker opacity
-#define EVENT_MARKER_OPACITY 110 // opacity of the markers and backgorunds in the table columns. Range: 0...255
+inline constexpr auto EVENT_MARKER_OPACITY = 110; // opacity of the markers and backgorunds in the table columns. Range: 0...255
 
 //Data marker
-#define DATA_MARKER_WIDTH 3           // in pixels
-#define DATA_MARKER_OPACITY 200       // opacity of the data marker and backgorunds in the table columns. Range: 0...255
-#define DATA_MARKER_INITIAL_X 74      // initial x-pixel of the data marker after a file is loaded
-#define DATA_MARKER_LABEL_V_OFFSET 20 // vertical pixel offset of the marker sample label above the marker line
+inline constexpr auto DATA_MARKER_WIDTH = 3;           // in pixels
+inline constexpr auto DATA_MARKER_OPACITY = 200;       // opacity of the data marker and backgorunds in the table columns. Range: 0...255
+inline constexpr auto DATA_MARKER_INITIAL_X = 74;      // initial x-pixel of the data marker after a file is loaded
+inline constexpr auto DATA_MARKER_LABEL_V_OFFSET = 20; // vertical pixel offset of the marker sample label above the marker line
 
 //RawDelegate: initial/fallback scaling
-#define DELEGATE_INITIAL_MAX_VALUE 65530.0 // placeholder max-value before a file is loaded
-#define DELEGATE_FALLBACK_SCALE 1e-9       // fallback amplitude scale for unknown/unhandled channel types
+inline constexpr auto DELEGATE_INITIAL_MAX_VALUE = 65530.0; // placeholder max-value before a file is loaded
+inline constexpr auto DELEGATE_FALLBACK_SCALE = 1e-9;       // fallback amplitude scale for unknown/unhandled channel types
 
 //Raw view keyboard navigation
-#define RAWVIEW_KEYBOARD_SCROLL_STEP 25 // pixels per Left/Right key press
+inline constexpr auto RAWVIEW_KEYBOARD_SCROLL_STEP = 25; // pixels per Left/Right key press
 
 //Filter design
-#define FILTER_DEFAULT_TRANS_BW_RATIO 0.2 // default transition-band width as fraction of Nyquist
+inline constexpr auto FILTER_DEFAULT_TRANS_BW_RATIO = 0.2; // default transition-band width as fraction of Nyquist
 
 //Default channel amplitude scales (used to initialize the scale map)
-#define DELEGATE_SCALE_MEG_GRAD (400e-15 * 100) // fT/m (*100 because fiff stores fT/cm)
-#define DELEGATE_SCALE_MEG_MAG 1.2e-12
-#define DELEGATE_SCALE_EEG 30e-6
-#define DELEGATE_SCALE_EOG 150e-6
-#define DELEGATE_SCALE_EMG 1e-3
-#define DELEGATE_SCALE_ECG 1e-3
-#define DELEGATE_SCALE_MISC 1.0
-#define DELEGATE_SCALE_STIM 5.0
+inline constexpr auto DELEGATE_SCALE_MEG_GRAD = (400e-15 * 100); // fT/m (*100 because fiff stores fT/cm)
+inline constexpr auto DELEGATE_SCALE_MEG_MAG = 1.2e-12;
+inline constexpr auto DELEGATE_SCALE_EEG = 30e-6;
+inline constexpr auto DELEGATE_SCALE_EOG = 150e-6;
+inline constexpr auto DELEGATE_SCALE_EMG = 1e-3;
+inline constexpr auto DELEGATE_SCALE_ECG = 1e-3;
+inline constexpr auto DELEGATE_SCALE_MISC = 1.0;
+inline constexpr auto DELEGATE_SCALE_STIM = 5.0;
 
 //*************************************************************************************************************
 //=============================================================================================================

@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -181,7 +182,7 @@ void EEGoSports::setUpFiffInfo()
 
     //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
     Matrix3f rotation_z;
-    rotation_z = AngleAxisf((float)M_PI / 2, Vector3f::UnitZ()); //M_PI/2 = 90°
+    rotation_z = AngleAxisf(std::numbers::pi_v<float> / 2, Vector3f::UnitZ());
     QVector3D center_pos;
 
     for (int i = 0; i < elcLocation3D.size(); i++) {

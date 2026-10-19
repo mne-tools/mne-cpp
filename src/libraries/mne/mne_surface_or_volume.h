@@ -54,16 +54,16 @@
 #include <QDebug>
 
 
-#define FIFF_MNE_SOURCE_SPACE_NNEIGHBORS 3594 /* Number of neighbors for each source space point (used for volume source spaces) */
-#define FIFF_MNE_SOURCE_SPACE_NEIGHBORS 3595  /* Neighbors for each source space point (used for volume source spaces) */
+inline constexpr auto FIFF_MNE_SOURCE_SPACE_NNEIGHBORS = 3594; /* Number of neighbors for each source space point (used for volume source spaces) */
+inline constexpr auto FIFF_MNE_SOURCE_SPACE_NEIGHBORS = 3595;  /* Neighbors for each source space point (used for volume source spaces) */
 
 #define FIFFV_MNE_COORD_SURFACE_RAS FIFFV_COORD_MRI /* The surface RAS coordinates */
 
-#define TRIANGLE_FILE_MAGIC_NUMBER (0xfffffe)
-#define NEW_QUAD_FILE_MAGIC_NUMBER (0xfffffd)
-#define QUAD_FILE_MAGIC_NUMBER (0xffffff)
+inline constexpr auto TRIANGLE_FILE_MAGIC_NUMBER = (0xfffffe);
+inline constexpr auto NEW_QUAD_FILE_MAGIC_NUMBER = (0xfffffd);
+inline constexpr auto QUAD_FILE_MAGIC_NUMBER = (0xffffff);
 
-#define TAG_OLD_SURF_GEOM 20
+inline constexpr auto TAG_OLD_SURF_GEOM = 20;
 
 //=============================================================================================================
 // FORWARD DECLARATIONS

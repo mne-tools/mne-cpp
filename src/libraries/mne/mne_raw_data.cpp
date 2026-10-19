@@ -519,7 +519,7 @@ int mne_sparse_mat_mult2(FiffSparseMatrix* mat,        /* The sparse matrix */
     return 0;
 }
 
-#define APPROX_RING_BUF_SIZE (600 * 1024 * 1024)
+constexpr auto APPROX_RING_BUF_SIZE = (600 * 1024 * 1024);
 
 static int approx_ring_buf_size = APPROX_RING_BUF_SIZE;
 

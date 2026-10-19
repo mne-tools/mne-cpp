@@ -58,24 +58,6 @@ using namespace MNELIB;
 using namespace FWDLIB;
 using namespace INVLIB;
 
-// CTF coil type constants
-
-#ifndef FIFFV_COIL_CTF_GRAD
-#define FIFFV_COIL_CTF_GRAD 5001
-#endif
-
-#ifndef FIFFV_COIL_CTF_REF_MAG
-#define FIFFV_COIL_CTF_REF_MAG 5002
-#endif
-
-#ifndef FIFFV_COIL_CTF_REF_GRAD
-#define FIFFV_COIL_CTF_REF_GRAD 5003
-#endif
-
-#ifndef FIFFV_COIL_CTF_OFFDIAG_REF_GRAD
-#define FIFFV_COIL_CTF_OFFDIAG_REF_GRAD 5004
-#endif
-
 constexpr int FAIL = -1;
 constexpr int OK = 0;
 
@@ -301,7 +283,7 @@ std::unique_ptr<MNECovMatrix> InvDipoleFitData::ad_hoc_noise(FwdCoilSet* meg, Fw
 #ifdef TEST_REF
                 if (meg->coils[k]->type == FIFFV_COIL_CTF_REF_MAG ||
                     meg->coils[k]->type == FIFFV_COIL_CTF_REF_GRAD ||
-                    meg->coils[k]->type == FIFFV_COIL_CTF_OFFDIAG_REF_GRAD)
+                    meg->coils[k]->type == FIFFV_COIL_CTF_REF_GOFF)
                     stds[n] = 1e6 * stds[n];
 #endif
             } else

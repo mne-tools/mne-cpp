@@ -12,8 +12,6 @@
  * @brief    Implementation of the CoregSettingsView co-registration parameter panel.
  */
 
-#define M_PI 3.14159265358979323846 /* pi */
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -42,6 +40,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <numbers>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -546,9 +545,9 @@ void CoregSettingsView::setTransParams(const Vector3f& vecTrans,
     m_pUi->m_qDoubleSpinBox_TransZ->setValue(vecTrans(2) * 1000);
 
     // Inverted order due to euler rotation
-    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecRot(2) * 180 / M_PI);
-    m_pUi->m_qDoubleSpinBox_RotY->setValue(vecRot(1) * 180 / M_PI);
-    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecRot(0) * 180 / M_PI);
+    m_pUi->m_qDoubleSpinBox_RotX->setValue(vecRot(2) * 180 / std::numbers::pi);
+    m_pUi->m_qDoubleSpinBox_RotY->setValue(vecRot(1) * 180 / std::numbers::pi);
+    m_pUi->m_qDoubleSpinBox_RotZ->setValue(vecRot(0) * 180 / std::numbers::pi);
 
     m_pUi->m_qDoubleSpinBox_ScalingX->setValue(vecScale(0));
     m_pUi->m_qDoubleSpinBox_ScalingY->setValue(vecScale(1));
@@ -566,9 +565,9 @@ void CoregSettingsView::getTransParams(Vector3f& vecRot,
     vecTrans(2) = m_pUi->m_qDoubleSpinBox_TransZ->value() / 1000.0;
 
     // Inverted order due to euler rotation
-    vecRot(2) = m_pUi->m_qDoubleSpinBox_RotX->value() * M_PI / 180.0;
-    vecRot(1) = m_pUi->m_qDoubleSpinBox_RotY->value() * M_PI / 180.0;
-    vecRot(0) = m_pUi->m_qDoubleSpinBox_RotZ->value() * M_PI / 180.0;
+    vecRot(2) = m_pUi->m_qDoubleSpinBox_RotX->value() * std::numbers::pi / 180.0;
+    vecRot(1) = m_pUi->m_qDoubleSpinBox_RotY->value() * std::numbers::pi / 180.0;
+    vecRot(0) = m_pUi->m_qDoubleSpinBox_RotZ->value() * std::numbers::pi / 180.0;
 
     // apply different scaling modes
     if (m_pUi->m_qComboBox_ScalingMode->currentText() == "Uniform") {

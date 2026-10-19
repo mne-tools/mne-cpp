@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "mne_ctf_comp_data.h"
+#include "mne_types.h"
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_tag.h>
@@ -29,14 +30,6 @@
 
 constexpr int FAIL = -1;
 constexpr int OK = 0;
-
-#define MNE_CTFV_COMP_UNKNOWN -1
-#define MNE_CTFV_COMP_NONE 0
-#define MNE_CTFV_COMP_G1BR 0x47314252
-#define MNE_CTFV_COMP_G2BR 0x47324252
-#define MNE_CTFV_COMP_G3BR 0x47334252
-#define MNE_CTFV_COMP_G2OI 0x47324f49
-#define MNE_CTFV_COMP_G3OI 0x47334f49
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -60,12 +60,12 @@ using namespace Eigen;
 #define PROGRAM_VERSION MNE_CPP_VERSION
 
 // KIT system constants
-#define KIT_HEADER_SIZE 16384 // Typical header size
-#define KIT_SYSTEM_ID_OFFSET 16
-#define KIT_NCHAN_OFFSET 128
-#define KIT_SFREQ_OFFSET 136
-#define KIT_NSAMP_OFFSET 144
-#define KIT_DATA_OFFSET_OFFSET 152 // offset to data start
+constexpr auto KIT_HEADER_SIZE = 16384; // Typical header size
+constexpr auto KIT_SYSTEM_ID_OFFSET = 16;
+constexpr auto KIT_NCHAN_OFFSET = 128;
+constexpr auto KIT_SFREQ_OFFSET = 136;
+constexpr auto KIT_NSAMP_OFFSET = 144;
+constexpr auto KIT_DATA_OFFSET_OFFSET = 152; // offset to data start
 
 //=============================================================================================================
 // Structures

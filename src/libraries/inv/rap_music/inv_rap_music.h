@@ -59,8 +59,8 @@ namespace INVLIB
 // SOME DEFINES
 //=============================================================================================================
 
-#define NOT_TRANSPOSED 0 /**< Defines NOT_TRANSPOSED. */
-#define IS_TRANSPOSED 1  /**< Defines IS_TRANSPOSED. */
+inline constexpr auto NOT_TRANSPOSED = 0; /**< Defines NOT_TRANSPOSED. */
+inline constexpr auto IS_TRANSPOSED = 1;  /**< Defines IS_TRANSPOSED. */
 
 //=============================================================================================================
 /**

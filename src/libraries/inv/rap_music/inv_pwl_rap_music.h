@@ -52,13 +52,6 @@ namespace INVLIB
 {
 
 //=============================================================================================================
-// SOME DEFINES
-//=============================================================================================================
-
-#define NOT_TRANSPOSED 0 /**< Defines NOT_TRANSPOSED. */
-#define IS_TRANSPOSED 1  /**< Defines IS_TRANSPOSED. */
-
-//=============================================================================================================
 /**
  * @brief Powell-accelerated RAP MUSIC variant using gradient-free optimization for refined dipole fitting
  *

@@ -33,24 +33,24 @@
 //ITEM TYPES
 
 //CONTAINERS
-#define BIDS_SUBJECT 01
-#define BIDS_SESSION 02
-#define BIDS_FOLDER 03
+inline constexpr auto BIDS_SUBJECT = 01;
+inline constexpr auto BIDS_SESSION = 02;
+inline constexpr auto BIDS_FOLDER = 03;
 
 //DATA TYPES
-#define BIDS_FUNCTIONALDATA 10
-#define BIDS_ANATOMICALDATA 11
-#define BIDS_BEHAVIORALDATA 12
-#define BIDS_IEEGDATA 13
+inline constexpr auto BIDS_FUNCTIONALDATA = 10;
+inline constexpr auto BIDS_ANATOMICALDATA = 11;
+inline constexpr auto BIDS_BEHAVIORALDATA = 12;
+inline constexpr auto BIDS_IEEGDATA = 13;
 
 //SUB-ITEMS
-#define BIDS_AVERAGE 20
-#define BIDS_EVENT 21
-#define BIDS_DIPOLE 22
-#define BIDS_ELECTRODES 23
-#define BIDS_COORDSYSTEM 24
+inline constexpr auto BIDS_AVERAGE = 20;
+inline constexpr auto BIDS_EVENT = 21;
+inline constexpr auto BIDS_DIPOLE = 22;
+inline constexpr auto BIDS_ELECTRODES = 23;
+inline constexpr auto BIDS_COORDSYSTEM = 24;
 
-#define BIDS_UNKNOWN 99
+inline constexpr auto BIDS_UNKNOWN = 99;
 
 //=============================================================================================================
 // INCLUDES
