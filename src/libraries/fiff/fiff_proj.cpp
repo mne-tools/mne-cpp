@@ -116,7 +116,7 @@ FiffProj::FiffProj()
 : kind(-1)
 , active(false)
 , desc("")
-, data(new FiffNamedMatrix)
+, data(FiffNamedMatrix::SDPtr(new FiffNamedMatrix()))
 {
 }
 
@@ -136,7 +136,7 @@ FiffProj::FiffProj(fiff_int_t p_kind, bool p_active, QString p_desc, FiffNamedMa
 : kind(p_kind)
 , active(p_active)
 , desc(p_desc)
-, data(new FiffNamedMatrix(p_data))
+, data(FiffNamedMatrix::SDPtr(new FiffNamedMatrix(p_data)))
 {
 }
 

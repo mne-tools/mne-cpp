@@ -18,7 +18,8 @@ Counts lexical debt candidates in maintained C++ under ``src/libraries``,
 * ``typedef_struct``    C-style ``typedef struct`` / ``typedef enum`` / ``typedef union``
 * ``c_style_cast``      casts to a builtin/pointer type written as ``(T)expr``
 * ``raw_new``           non-Qt ``new T`` not immediately handed to a smart pointer or a parent
-* ``qt_new_unparented`` ``new QXxx`` with no parent on the same line (often reparented later by a layout)
+* ``qt_new_unparented`` ``new QXxx`` -- or of a project class deriving from a Qt class -- with no parent on the
+                        same line (usually handed to a layout, scene, model or dock afterwards)
 * ``raw_delete``        explicit ``delete`` / ``delete[]``
 * ``console_io``        ``printf``/``fprintf``/``std::cout``/``std::cerr`` (T6.6 decides keep-or-convert)
 * ``numeric_define``    ``#define NAME <number>`` constants that could be ``constexpr``
@@ -61,11 +62,32 @@ PATTERNS: dict[str, re.Pattern[str]] = {
 }
 # A `new` whose result lands in a smart pointer (including the project's X::SPtr/UPtr typedefs) is owned.
 _OWNED_NEW = re.compile(
-    r"(?:make_(?:unique|shared)|(?:std::(?:unique|shared)_ptr|Q(?:Shared|Scoped)Pointer)\s*<[^;]*>\s*\w*\s*[({=]"
+    r"(?:make_(?:unique|shared)|(?:std::(?:unique|shared)_ptr|Q(?:Shared|Scoped|ScopedArray)Pointer)\s*<[^;]*>\s*\w*\s*[({=]"
     r"|\b(?:Const)?(?:S|U|SD|CS)Ptr\s*(?:\w+\s*)?[({=]|\.reset\s*\(|::create\s*\()\s*[^;]*$"
 )
 # Qt objects are usually handed to a parent or layout after construction, which a lexical scan cannot see.
 _QT_NEW = re.compile(r"\bnew\s+Q[A-Z]\w*")
+# `class [EXPORT_MACRO] Name [final] : bases {` -- project classes deriving from Qt types are Qt-owned too.
+_CLASS_DECL = re.compile(r"\bclass\s+(?:[A-Z0-9_]+\s+)?(\w+)\s*(?:final\s*)?:\s*([^{;()]+)\{")
+_NEW_TYPE = re.compile(r"new\s+([\w:]+)")
+
+
+def qt_derived_classes(texts: Any) -> set[str]:
+    """Names of the classes that derive, directly or transitively, from a ``Q*`` class other than ``QSharedData``."""
+    bases: dict[str, set[str]] = {}
+    for text in texts:
+        for match in _CLASS_DECL.finditer(text):
+            names = {re.sub(r"<.*", "", base.split()[-1]).split("::")[-1] for base in match.group(2).split(",") if base.strip()}
+            bases.setdefault(match.group(1), set()).update(names)
+    derived: set[str] = set()
+    grown = True
+    while grown:
+        grown = False
+        for name, parents in bases.items():
+            if name not in derived and any((re.match(r"Q[A-Z]", p) and p != "QSharedData") or p in derived for p in parents):
+                derived.add(name)
+                grown = True
+    return derived
 
 
 def strip_comments_and_strings(text: str) -> str:
@@ -99,7 +121,7 @@ def strip_comments_and_strings(text: str) -> str:
     return "".join(out)
 
 
-def count_file(text: str) -> dict[str, int]:
+def count_file(text: str, qt_classes: set[str] | frozenset[str] = frozenset()) -> dict[str, int]:
     code = strip_comments_and_strings(text)
     counts = {name: len(pattern.findall(code)) for name, pattern in PATTERNS.items()}
     owned = qt = 0
@@ -109,7 +131,8 @@ def count_file(text: str) -> dict[str, int]:
                 owned += 1
             elif re.search(r"^\s*this\s*\)|[(,]\s*this\s*\)|\bparent\w*\s*\)", line[match.end():]):
                 owned += 1  # Qt parent-child ownership
-            elif _QT_NEW.match(line, match.start()):
+            elif (_QT_NEW.match(line, match.start())
+                  or _NEW_TYPE.match(line, match.start()).group(1).split("::")[-1] in qt_classes):
                 qt += 1
     counts["raw_new"] -= owned + qt
     counts["qt_new_unparented"] = qt
@@ -119,18 +142,20 @@ def count_file(text: str) -> dict[str, int]:
 def scan(repo_root: Path, policy: dict[str, Any]) -> dict[str, dict[str, int]]:
     extensions = set(policy["extensions"])
     excluded = tuple(policy.get("exclude_path_fragments", {}))
-    files: dict[str, dict[str, int]] = {}
+    texts: dict[str, str] = {}
     for root in policy["scan_roots"]:
         for path in sorted((repo_root / root).rglob("*")):
-            if path.suffix not in extensions or not path.is_file():
-                continue
-            relative = path.relative_to(repo_root).as_posix()
-            if any(fragment in f"/{relative}" for fragment in excluded):
-                continue
-            text = path.read_text(encoding="utf-8", errors="replace")
-            counts = count_file(text)
-            counts["lines"] = text.count("\n") + 1
-            files[relative] = counts
+            if path.suffix in extensions and path.is_file():
+                texts[path.relative_to(repo_root).as_posix()] = path.read_text(encoding="utf-8", errors="replace")
+    # Class hierarchies come from every file, including excluded ones such as the Designer form classes.
+    qt_classes = qt_derived_classes(strip_comments_and_strings(text) for text in texts.values())
+    files: dict[str, dict[str, int]] = {}
+    for relative, text in texts.items():
+        if any(fragment in f"/{relative}" for fragment in excluded):
+            continue
+        counts = count_file(text, qt_classes)
+        counts["lines"] = text.count("\n") + 1
+        files[relative] = counts
     return files
 
 

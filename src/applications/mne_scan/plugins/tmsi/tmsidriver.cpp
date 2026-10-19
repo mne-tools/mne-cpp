@@ -47,7 +47,6 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     m_oLibHandle = nullptr;
     m_HandleMaster = nullptr;
     m_PSPDPMasterDevicePath = nullptr;
-    m_lSignalBuffer = nullptr;
 
     //Open library
     //    TCHAR Path[MAX_PATH];
@@ -255,7 +254,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     //Create the buffers
     //The sampling frequency is not needed here because it is only used to specify the internal buffer size used by the driver with setSignalBuffer()
     m_lSignalBufferSize = m_uiSamplesPerBlock * m_uiNumberOfAvailableChannels * 4;
-    m_lSignalBuffer = new LONG[m_lSignalBufferSize];
+    m_lSignalBuffer.assign(m_lSignalBufferSize, 0);
 
     qInfo("Plugin TMSI - INFO - initDevice() - The device has been connected and initialised successfully");
     m_bInitDeviceSuccess = true;
@@ -303,7 +302,7 @@ bool TMSIDriver::uninitDevice()
     m_oLibHandle = nullptr;
     m_HandleMaster = nullptr;
     m_PSPDPMasterDevicePath = nullptr;
-    m_lSignalBuffer = nullptr;
+    m_lSignalBuffer.clear();
 
     qInfo("Plugin TMSI - INFO - uninitDevice() - Successfully uninitialised the device");
     return true;
@@ -332,7 +331,7 @@ bool TMSIDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
     //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
     while (iSamplesWrittenToMatrix < m_uiSamplesPerBlock) {
         //Get sample block from device
-        LONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);
+        LONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, reinterpret_cast<PULONG>(m_lSignalBuffer.data()), m_lSignalBufferSize);
         LONG ulNumSamplesReceived = ulSizeSamples / (m_uiNumberOfAvailableChannels * 4);
 
         //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received

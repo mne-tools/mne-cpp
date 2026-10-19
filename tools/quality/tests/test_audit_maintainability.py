@@ -48,6 +48,19 @@ class PatternTests(unittest.TestCase):
     def test_unowned_allocations_are_counted_separately_for_qt(self) -> None:
         self.assertEqual(counted("Foo* f = new Foo;"), {"raw_new": 1})
         self.assertEqual(counted("auto* l = new QGridLayout();"), {"qt_new_unparented": 1})
+        self.assertEqual(counted("QScopedArrayPointer<char> d(new char[n]);"), {})
+
+    def test_project_classes_derived_from_qt_count_as_qt_allocations(self) -> None:
+        headers = ("class DISPSHARED_EXPORT View : public QWidget, private Ui::Form\n{",
+                   "class ScaleView final : public View {",
+                   "class Item : public QGraphicsItem, public Base {",
+                   "class Plain : public Base {",
+                   "class Data : public QSharedData {")
+        classes = audit.qt_derived_classes(headers)
+        self.assertEqual(classes, {"View", "ScaleView", "Item"})
+        code = "auto* a = new DISPLIB::ScaleView(label); auto* b = new Item(x); auto* c = new Plain();"
+        self.assertEqual({k: v for k, v in audit.count_file(code, classes).items() if v},
+                         {"qt_new_unparented": 2, "raw_new": 1})
 
     def test_comments_and_strings_do_not_count(self) -> None:
         for snippet in ('// new Foo; NULL (int)x', '/* delete p; */', 'qInfo("NULL printf(")', "int n = 1'000;"):

@@ -36,7 +36,7 @@ FiffCtfComp::FiffCtfComp()
 : ctfkind(-1)
 , kind(-1)
 , save_calibrated(false)
-, data(new FiffNamedMatrix())
+, data(FiffNamedMatrix::SDPtr(new FiffNamedMatrix()))
 {
 }
 

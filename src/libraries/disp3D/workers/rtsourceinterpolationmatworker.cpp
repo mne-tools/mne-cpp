@@ -318,8 +318,7 @@ QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::compu
     }
 
     // One row per surface vertex: labels need not cover the surface, and their vertex indices are surface indices
-    auto mat = QSharedPointer<Eigen::SparseMatrix<float>>(
-        new Eigen::SparseMatrix<float>(nVertices, vertNos.size()));
+    auto mat = QSharedPointer<Eigen::SparseMatrix<float>>::create(nVertices, vertNos.size());
 
     // For each label: assign uniform weight to all its vertices from sources in that label
     for (int i = 0; i < lLabels.size(); ++i) {
