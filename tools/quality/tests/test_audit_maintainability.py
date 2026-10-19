@@ -63,6 +63,10 @@ class PatternTests(unittest.TestCase):
         self.assertEqual(counted("w->deleteLater(); deleteEvent(id); m.delete_all(); delete p; delete[] q;"),
                          {"raw_delete": 2})
         self.assertEqual(counted("typedef enum { A } E;"), {"typedef_struct": 1})
+        self.assertEqual(counted("return std::unique_ptr<Cov>(new Cov(1));"), {})
+        self.assertEqual(counted("p = FiffCov::SDPtr(new FiffCov());"), {})
+        self.assertEqual(counted("std::shared_ptr<A> a(new A);"), {})
+        self.assertEqual(counted("auto x = new Foo();"), {"raw_new": 1})
         self.assertEqual(counted("delete[] buf; delete p;"), {"raw_delete": 2})
         self.assertEqual(counted('fprintf(stderr, "x"); std::cout << 1;'), {"console_io": 2})
         self.assertEqual(counted("m.printf();"), {})

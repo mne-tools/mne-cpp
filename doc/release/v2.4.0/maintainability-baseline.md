@@ -10,31 +10,31 @@ Scanned 1,508 files / 395,642 lines in `src/libraries`, `src/applications`, `src
 | `null_macro` | 0 | 0 | 0 | 0 | 0 |
 | `typedef_struct` | 0 | 0 | 0 | 0 | 0 |
 | `c_style_cast` | 0 | 0 | 0 | 0 | 0 |
-| `raw_new` | 168 | 90 | 62 | 100 | 6 |
+| `raw_new` | 160 | 85 | 56 | 100 | 4 |
 | `raw_delete` | 149 | 69 | 73 | 66 | 10 |
 | `console_io` | 0 | 0 | 0 | 0 | 0 |
 | `numeric_define` | 0 | 0 | 0 | 0 | 0 |
-| `qt_new_unparented` | 811 | 80 | 104 | 705 | 2 |
+| `qt_new_unparented` | 814 | 81 | 107 | 705 | 2 |
 
 ## `raw_new` — top files
 
 | count | File |
 |---:|---|
+| 8 | `src/libraries/disp/viewers/scalingview.cpp` |
 | 7 | `src/applications/mne_scan/libs/scShared/Management/displaymanager.cpp` |
 | 6 | `src/applications/mne_analyze/plugins/averaging/averaging.cpp` |
 | 6 | `src/libraries/disp3D/model/braintreemodel.cpp` |
-| 6 | `src/libraries/mne/mne_inverse_operator.cpp` |
 | 4 | `src/applications/mne_analyze/plugins/controlmanager/controlmanager.cpp` |
 | 4 | `src/applications/mne_analyze_studio/workbench/mainwindow.cpp` |
 | 4 | `src/applications/mne_scan/libs/scDisp/realtimeevokedsetwidget.cpp` |
 | 4 | `src/applications/mne_scan/libs/scDisp/realtimemultisamplearraywidget.cpp` |
 | 4 | `src/applications/mne_scan/plugins/noisereduction/noisereduction.cpp` |
 | 4 | `src/libraries/disp3D/model/items/digitizersettreeitem.cpp` |
-| 4 | `src/libraries/mne/mne_cov_matrix.h` |
 | 3 | `src/applications/mne_analyze/plugins/channelselection/channelselection.cpp` |
 | 3 | `src/applications/mne_inspect/app/mainwindow.cpp` |
 | 3 | `src/applications/mne_scan/mne_scan/mainwindow.cpp` |
 | 3 | `src/applications/mne_scan/plugins/gusbamp/gusbampdriver.cpp` |
+| 2 | `src/applications/mne_analyze/libs/anShared/Management/statusbar.cpp` |
 
 ## `raw_delete` — top files
 

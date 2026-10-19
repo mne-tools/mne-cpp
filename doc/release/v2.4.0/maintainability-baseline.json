@@ -30,30 +30,30 @@
       "all_files": {}
     },
     "raw_new": {
-      "total": 168,
-      "files": 90,
+      "total": 160,
+      "files": 85,
       "by_scope": {
         "applications": 100,
-        "libraries": 62,
-        "tools": 6
+        "libraries": 56,
+        "tools": 4
       },
       "suppressed": [],
       "top": {
+        "src/libraries/disp/viewers/scalingview.cpp": 8,
         "src/applications/mne_scan/libs/scShared/Management/displaymanager.cpp": 7,
         "src/applications/mne_analyze/plugins/averaging/averaging.cpp": 6,
         "src/libraries/disp3D/model/braintreemodel.cpp": 6,
-        "src/libraries/mne/mne_inverse_operator.cpp": 6,
         "src/applications/mne_analyze/plugins/controlmanager/controlmanager.cpp": 4,
         "src/applications/mne_analyze_studio/workbench/mainwindow.cpp": 4,
         "src/applications/mne_scan/libs/scDisp/realtimeevokedsetwidget.cpp": 4,
         "src/applications/mne_scan/libs/scDisp/realtimemultisamplearraywidget.cpp": 4,
         "src/applications/mne_scan/plugins/noisereduction/noisereduction.cpp": 4,
         "src/libraries/disp3D/model/items/digitizersettreeitem.cpp": 4,
-        "src/libraries/mne/mne_cov_matrix.h": 4,
         "src/applications/mne_analyze/plugins/channelselection/channelselection.cpp": 3,
         "src/applications/mne_inspect/app/mainwindow.cpp": 3,
         "src/applications/mne_scan/mne_scan/mainwindow.cpp": 3,
-        "src/applications/mne_scan/plugins/gusbamp/gusbampdriver.cpp": 3
+        "src/applications/mne_scan/plugins/gusbamp/gusbampdriver.cpp": 3,
+        "src/applications/mne_analyze/libs/anShared/Management/statusbar.cpp": 2
       },
       "all_files": {
         "src/applications/mne_align/align_3d_view.cpp": 1,
@@ -113,6 +113,7 @@
         "src/libraries/disp/viewers/channelselectionview.cpp": 1,
         "src/libraries/disp/viewers/helpers/averagescene.cpp": 2,
         "src/libraries/disp/viewers/helpers/selectionscene.cpp": 2,
+        "src/libraries/disp/viewers/scalingview.cpp": 8,
         "src/libraries/disp3D/core/dataloader.cpp": 2,
         "src/libraries/disp3D/model/braintreemodel.cpp": 6,
         "src/libraries/disp3D/model/items/digitizersettreeitem.cpp": 4,
@@ -125,9 +126,8 @@
         "src/libraries/dsp/rt/rt_hpis.cpp": 2,
         "src/libraries/dsp/rt/rt_inv_op.cpp": 2,
         "src/libraries/dsp/rt/rt_noise.cpp": 1,
-        "src/libraries/fiff/fiff_ctf_comp.cpp": 2,
+        "src/libraries/fiff/fiff_ctf_comp.cpp": 1,
         "src/libraries/fiff/fiff_proj.cpp": 1,
-        "src/libraries/fiff/fiff_stream.cpp": 1,
         "src/libraries/fwd/fwd_comp_data.cpp": 2,
         "src/libraries/fwd/fwd_eeg_sphere_model.cpp": 1,
         "src/libraries/fwd/fwd_eeg_sphere_model_set.cpp": 2,
@@ -137,14 +137,9 @@
         "src/libraries/inv/rap_music/inv_rap_music.cpp": 1,
         "src/libraries/lsl/lsl_stream_inlet.cpp": 1,
         "src/libraries/lsl/lsl_stream_outlet.cpp": 1,
-        "src/libraries/mne/mne_cov_matrix.h": 4,
-        "src/libraries/mne/mne_forward_solution.cpp": 2,
-        "src/libraries/mne/mne_inverse_operator.cpp": 6,
         "src/libraries/mne/mne_meas_data.cpp": 2,
         "src/libraries/utils/generics/circularbuffer.h": 1,
-        "src/tools/inverse/mne_inverse_operator/main.cpp": 1,
         "src/tools/preprocessing/mne_anonymize/apphandler.cpp": 2,
-        "src/tools/preprocessing/mne_cov2proj/main.cpp": 1,
         "src/tools/server/mne_rt_server/plugins/fiffsimulator/fiffsimulator.cpp": 2
       }
     },
@@ -265,11 +260,11 @@
       "all_files": {}
     },
     "qt_new_unparented": {
-      "total": 811,
-      "files": 80,
+      "total": 814,
+      "files": 81,
       "by_scope": {
         "applications": 705,
-        "libraries": 104,
+        "libraries": 107,
         "tools": 2
       },
       "suppressed": [],
@@ -349,7 +344,7 @@
         "src/libraries/disp/plots/tfplot.cpp": 15,
         "src/libraries/disp/viewers/artifactsettingsview.cpp": 5,
         "src/libraries/disp/viewers/averagelayoutview.cpp": 3,
-        "src/libraries/disp/viewers/averageselectionview.cpp": 1,
+        "src/libraries/disp/viewers/averageselectionview.cpp": 3,
         "src/libraries/disp/viewers/averagingsettingsview.cpp": 5,
         "src/libraries/disp/viewers/bidsview.cpp": 5,
         "src/libraries/disp/viewers/channeldataview.cpp": 5,
@@ -364,6 +359,7 @@
         "src/libraries/disp/viewers/projectorsview.cpp": 4,
         "src/libraries/disp/viewers/quickcontrolview.cpp": 7,
         "src/libraries/disp/viewers/rtfiffrawview.cpp": 2,
+        "src/libraries/disp/viewers/scalingview.cpp": 1,
         "src/libraries/disp/viewers/spectrumsettingsview.cpp": 5,
         "src/libraries/disp/viewers/spectrumview.cpp": 1,
         "src/libraries/disp3D/model/braintreemodel.cpp": 4,

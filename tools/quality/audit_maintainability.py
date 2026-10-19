@@ -61,8 +61,8 @@ PATTERNS: dict[str, re.Pattern[str]] = {
 }
 # A `new` whose result lands in a smart pointer (including the project's X::SPtr/UPtr typedefs) is owned.
 _OWNED_NEW = re.compile(
-    r"(?:make_(?:unique|shared)|(?:Q|std::)(?:Shared|Scoped|Unique)?(?:Pointer|_ptr|Ptr)\s*<[^;]*>\s*\w*\s*[({=]"
-    r"|\b(?:Const)?[SU]Ptr\s*(?:\w+\s*)?[({=]|\.reset\s*\(|::create\s*\()\s*[^;]*$"
+    r"(?:make_(?:unique|shared)|(?:std::(?:unique|shared)_ptr|Q(?:Shared|Scoped)Pointer)\s*<[^;]*>\s*\w*\s*[({=]"
+    r"|\b(?:Const)?(?:S|U|SD|CS)Ptr\s*(?:\w+\s*)?[({=]|\.reset\s*\(|::create\s*\()\s*[^;]*$"
 )
 # Qt objects are usually handed to a parent or layout after construction, which a lexical scan cannot see.
 _QT_NEW = re.compile(r"\bnew\s+Q[A-Z]\w*")
