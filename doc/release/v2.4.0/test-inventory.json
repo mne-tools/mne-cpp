@@ -18,7 +18,7 @@
     "without_timeout": 0,
     "requirements": {
       "freesurfer": 2,
-      "python": 7,
+      "python": 8,
       "sample-data": 20,
       "test-data": 120
     },
@@ -5562,9 +5562,11 @@
         "unit"
       ],
       "timeout": 60,
-      "requirements": [],
+      "requirements": [
+        "python"
+      ],
       "gui": false,
-      "qskip_sites": 1,
+      "qskip_sites": 2,
       "spawns_processes": false,
       "ci_excluded_on": [],
       "ci": {
