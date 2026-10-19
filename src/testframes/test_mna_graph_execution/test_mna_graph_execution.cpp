@@ -160,6 +160,8 @@ private slots:
     void testProgressCallback();
     void testStreamStartStop();
     void testScriptAndIpcNodes();
+    void testScriptFileExtension_data();
+    void testScriptFileExtension();
 
     void cleanupTestCase();
 
@@ -645,6 +647,49 @@ void TestMnaGraphExecution::testScriptAndIpcNodes()
     QCOMPARE(ctx.results.value("ipc::stdout").toString(), QStringLiteral("3 ") + ipc.ipcWorkDir + QStringLiteral("\n"));
     QCOMPARE(ctx.results.value("ipc::exit_code").toInt(), 0);
     QCOMPARE(ctx.results.value("ipc::out").toString(), QStringLiteral("result.fif"));
+#endif
+}
+
+//=============================================================================================================
+
+void TestMnaGraphExecution::testScriptFileExtension_data()
+{
+    QTest::addColumn<QString>("language");
+    QTest::addColumn<QString>("interpreter");
+    QTest::addColumn<QString>("extension");
+
+    QTest::newRow("python") << "python" << "/bin/sh" << "py";
+    QTest::newRow("shell") << "shell" << "/bin/sh" << "sh";
+    QTest::newRow("shell-default-bash") << "shell" << "" << "sh";
+    QTest::newRow("r") << "r" << "/bin/sh" << "R";
+    QTest::newRow("matlab") << "matlab" << "/bin/sh" << "m";
+    QTest::newRow("octave") << "octave" << "/bin/sh" << "m";
+    QTest::newRow("julia") << "julia" << "/bin/sh" << "jl";
+    QTest::newRow("other") << "perl" << "/bin/sh" << "txt";
+}
+
+void TestMnaGraphExecution::testScriptFileExtension()
+{
+#ifdef Q_OS_WIN
+    QSKIP("Uses /bin/sh and /bin/bash");
+#else
+    QFETCH(QString, language);
+    QFETCH(QString, interpreter);
+    QFETCH(QString, extension);
+
+    // The interpreter receives the temporary script file; the script prints that file's extension.
+    MnaGraph graph;
+    MnaNode script = makeNode("script", "script");
+    script.inputs.clear();
+    script.execMode = MnaNodeExecMode::Script;
+    script.script.language = language;
+    script.script.interpreter = interpreter;
+    script.script.code = QStringLiteral("printf %s \"${0##*.}\"");
+    graph.addNode(script);
+
+    MnaGraphExecutor::Context ctx = MnaGraphExecutor::execute(graph, {});
+    QCOMPARE(ctx.results.value("script::exit_code").toInt(), 0);
+    QCOMPARE(ctx.results.value("script::stdout").toString(), extension);
 #endif
 }
 
