@@ -28,7 +28,6 @@
 #include "fiff_tag.h"
 #include "fiff_dir_node.h"
 
-#include <iostream>
 
 #include <QFile>
 #include <QTextStream>
@@ -283,12 +282,11 @@ bool FiffCoordTrans::addInverse(FiffCoordTrans& t)
 
 void FiffCoordTrans::print() const
 {
-    std::cout << "Coordinate transformation: ";
-    std::cout << (QString("%1 -> %2\n").arg(frame_name(this->from)).arg(frame_name(this->to))).toUtf8().data();
+    qInfo().noquote() << QString("Coordinate transformation: %1 -> %2").arg(frame_name(this->from), frame_name(this->to));
 
     for (int p = 0; p < 3; p++)
-        qDebug("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p, 0), trans(p, 1), trans(p, 2), 1000 * trans(p, 3));
-    qDebug("\t% 8.6f % 8.6f % 8.6f   % 7.2f\n", trans(3, 0), trans(3, 1), trans(3, 2), trans(3, 3));
+        qInfo("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm", trans(p, 0), trans(p, 1), trans(p, 2), 1000 * trans(p, 3));
+    qInfo("\t% 8.6f % 8.6f % 8.6f   % 7.2f", trans(3, 0), trans(3, 1), trans(3, 2), trans(3, 3));
 }
 
 //=============================================================================================================

@@ -162,7 +162,7 @@ void FiffStreamServer::connectCommands()
 //        //
 //        // client list
 //        //
-//        printf("clist\n");
+//        qInfo("clist");
 
 //        p_blockOutputInfo.append("\tID\tAlias\r\n");
 //        QMap<qint32, FiffStreamThread*>::iterator i;
@@ -189,7 +189,7 @@ void FiffStreamServer::connectCommands()
 
 //            if(t_isInt)// ToDo Check whether ID is correct --> move this parsing to fiff stream server
 //            {
-//                printf("measinfo %d\r\n", t_id);
+//                qInfo("measinfo %d\r", t_id);
 //            }
 //            if(t_id != -1)
 //            {
@@ -211,7 +211,7 @@ void FiffStreamServer::connectCommands()
 //            qint32 t_id = -1;
 //            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
 
-//            printf("meas %d\n", t_id);
+//            qInfo("meas %d", t_id);
 //            if(t_id != -1)
 //            {
 //                emit startMeasFiffStreamClient(t_id);
@@ -233,7 +233,7 @@ void FiffStreamServer::connectCommands()
 //            qint32 t_id = -1;
 //            p_blockOutputInfo.append(parseToId(p_sListCommand[1],t_id));
 
-//            printf("stop %d\n", t_id);
+//            qInfo("stop %d", t_id);
 
 //            if(t_id != -1)
 //            {

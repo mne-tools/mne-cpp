@@ -94,7 +94,7 @@ void FiffSimulator::comBufsize(Command p_command)
     quint32 t_uiBuffSize = p_command.pValues()[0].toUInt();
 
     if (t_uiBuffSize > 0) {
-        //        printf("bufsize %d\n", t_uiBuffSize);
+        //        qInfo("bufsize %d", t_uiBuffSize);
 
         bool t_bWasRunning = m_bIsRunning;
 
@@ -360,7 +360,7 @@ bool FiffSimulator::readRawInfo()
         //        //
         //        qint32 k = 0;
         //        if (m_RawInfo.info.projs.size() == 0)
-        //            printf("No projector specified for these data\n");
+        //            qInfo("No projector specified for these data");
         //        else
         //        {
         //            //
@@ -369,7 +369,7 @@ bool FiffSimulator::readRawInfo()
         //            for (k = 0; k < m_RawInfo.info.projs.size(); ++k)
         //                m_RawInfo.info.projs[k].active = true;
 
-        //            printf("%d projection items activated\n",m_RawInfo.info.projs.size());
+        //            qInfo("%d projection items activated",m_RawInfo.info.projs.size());
         //            //
         //            //   Create the projector
         //            //
@@ -382,11 +382,11 @@ bool FiffSimulator::readRawInfo()
 
         //            if (nproj == 0)
         //            {
-        //                printf("The projection vectors do not apply to these channels\n");
+        //                qInfo("The projection vectors do not apply to these channels");
         //            }
         //            else
         //            {
-        //                printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+        //                qInfo("Created an SSP operator (subspace dimension = %d)",nproj);
         //            }
         //        }
 
@@ -398,7 +398,7 @@ bool FiffSimulator::readRawInfo()
         //        qint32 dest_comp = -1;
 
         //        if (current_comp > 0)
-        //            printf("Current compensation grade : %d\n",current_comp);
+        //            qInfo("Current compensation grade : %d",current_comp);
 
         //        if (keep_comp)
         //            dest_comp = current_comp;
@@ -410,11 +410,11 @@ bool FiffSimulator::readRawInfo()
         //            {
         //    //            m_RawInfo.info.chs = MNE::set_current_comp(m_RawInfo.info.chs,dest_comp);
         //                m_RawInfo.info.set_current_comp(dest_comp);
-        //                printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+        //                qInfo("Appropriate compensator added to change to grade %d.",dest_comp);
         //            }
         //            else
         //            {
-        //                printf("Could not make the compensator\n");
+        //                qCritical("Could not make the compensator");
         //                return -1;
         //            }
         //        }
@@ -449,7 +449,7 @@ void FiffSimulator::run()
         if (m_pRawMatrixBuffer->pop(matData)) {
             QSharedPointer<Eigen::MatrixXf> t_pRawBuffer(new Eigen::MatrixXf(matData));
             //        ++count;
-            //        printf("%d raw buffer (%d x %d) generated\r\n", count, t_pRawBuffer->rows(), t_pRawBuffer->cols());
+            //        qInfo("%d raw buffer (%d x %d) generated\r", count, t_pRawBuffer->rows(), t_pRawBuffer->cols());
 
             emit remitRawBuffer(t_pRawBuffer);
             usleep(uiSamplePeriod);

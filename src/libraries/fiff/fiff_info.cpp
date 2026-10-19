@@ -28,7 +28,6 @@
 #include "fiff_file.h"
 
 #include <utils/ioutils.h>
-#include <iostream>
 #include <QDebug>
 
 #include <Eigen/LU>
@@ -489,12 +488,12 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
 
 void FiffInfo::print() const
 {
-    std::cout << "Sample frequency: " << sfreq << "\n";
-    std::cout << "LineFreq: " << linefreq << " | Highpass: " << highpass << " | Lowpass: " << lowpass << "\n";
-    std::cout << "Number of digitizer points: " << dig.size() << "\n";
+    qInfo().noquote().nospace() << "Sample frequency: " << sfreq;
+    qInfo().noquote().nospace() << "LineFreq: " << linefreq << " | Highpass: " << highpass << " | Lowpass: " << lowpass;
+    qInfo().noquote().nospace() << "Number of digitizer points: " << dig.size();
     for (auto& point : dig) {
         if (point.kind == FIFFV_POINT_HPI) {
-            std::cout << "HPI Point " << point.ident << " - " << point.r[0] << ", " << point.r[1] << ", " << point.r[2] << "\n";
+            qInfo().noquote().nospace() << "HPI Point " << point.ident << " - " << point.r[0] << ", " << point.r[1] << ", " << point.r[2];
         }
     }
 }

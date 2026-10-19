@@ -146,15 +146,15 @@ int main(int argc, char* argv[])
     int tpoint = parser.value(tpointOpt).toInt();
 
     if (srcFile.isEmpty()) {
-        fprintf(stderr, "Source space file (--src) is required.\n");
+        qCritical("Source space file (--src) is required.");
         return 1;
     }
     if (stcFile.isEmpty() && wFile.isEmpty()) {
-        fprintf(stderr, "Either --stc or --w must be specified.\n");
+        qInfo("Either --stc or --w must be specified.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        fprintf(stderr, "Output file (--out) is required.\n");
+        qCritical("Output file (--out) is required.");
         return 1;
     }
 
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
     //
     std::vector<std::unique_ptr<MNESourceSpace>> spaces;
     if (MNESourceSpace::read_source_spaces(srcFile, spaces) != FIFF_OK || spaces.empty()) {
-        fprintf(stderr, "Failed to read source space from: %s\n", srcFile.toUtf8().constData());
+        qCritical("Failed to read source space from: %s", srcFile.toUtf8().constData());
         return 1;
     }
 
@@ -180,12 +180,12 @@ int main(int argc, char* argv[])
         float tmin;
         float tstep;
         if (!readStcFile(stcFile, stcData, vertices, tmin, tstep)) {
-            fprintf(stderr, "Failed to read stc file.\n");
+            qCritical("Failed to read stc file.");
             return 1;
         }
         if (tpoint < 0 || tpoint >= static_cast<int>(stcData.cols())) {
-            fprintf(stderr, "Time point %d out of range (0-%ld)\n",
-                    tpoint, static_cast<long>(stcData.cols() - 1));
+            qInfo("Time point %d out of range (0-%ld)",
+                  tpoint, static_cast<long>(stcData.cols() - 1));
             return 1;
         }
         values = stcData.col(tpoint);
@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
               static_cast<long>(stcData.rows()), static_cast<long>(stcData.cols()), tpoint);
     } else {
         if (!readWFile(wFile, values, vertices)) {
-            fprintf(stderr, "Failed to read w file.\n");
+            qCritical("Failed to read w file.");
             return 1;
         }
         qInfo("Read W: %ld vertices", static_cast<long>(values.size()));
@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
         // Write vertex values as text (vertex index and value)
         QFile outF(outFile);
         if (!outF.open(QIODevice::WriteOnly | QIODevice::Text)) {
-            fprintf(stderr, "Cannot write output file: %s\n", outFile.toUtf8().constData());
+            qCritical("Cannot write output file: %s", outFile.toUtf8().constData());
             return 1;
         }
         QTextStream out(&outF);
@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
     }
 
     if (!found) {
-        fprintf(stderr, "No matching source data found in any source space.\n");
+        qInfo("No matching source data found in any source space.");
         return 1;
     }
 

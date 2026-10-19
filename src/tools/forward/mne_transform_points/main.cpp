@@ -130,9 +130,9 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    fprintf(stderr, "Read transform: %s -> %s\n",
-            qPrintable(FiffCoordTrans::frame_name(trans.from)),
-            qPrintable(FiffCoordTrans::frame_name(trans.to)));
+    qInfo("Read transform: %s -> %s",
+          qPrintable(FiffCoordTrans::frame_name(trans.from)),
+          qPrintable(FiffCoordTrans::frame_name(trans.to)));
 
     // Read input points
     QFile inFile(inName);
@@ -164,7 +164,7 @@ int main(int argc, char* argv[])
     }
     inFile.close();
 
-    fprintf(stderr, "Read %lld points from %s\n", static_cast<long long>(points.size()), qPrintable(inName));
+    qInfo("Read %lld points from %s", static_cast<long long>(points.size()), qPrintable(inName));
 
     // Build matrix from points
     MatrixX3f rr(points.size(), 3);
@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
     }
     outFile.close();
 
-    fprintf(stderr, "Wrote %d transformed points to %s\n", static_cast<int>(transformed.rows()), qPrintable(outName));
+    qInfo("Wrote %d transformed points to %s", static_cast<int>(transformed.rows()), qPrintable(outName));
 
     return 0;
 }

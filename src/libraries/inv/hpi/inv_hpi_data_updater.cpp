@@ -25,7 +25,6 @@
 #include "inv_hpi_data_updater.h"
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_info.h>
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -36,6 +35,7 @@
 //=============================================================================================================
 
 #include <Eigen/Dense>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -126,7 +126,7 @@ void InvHpiDataUpdater::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
             m_matHpiDigitizer(i, 2) = lHPIPoints.at(i).r[2];
         }
     } else {
-        std::cout << "InvHpiFit::updateHpiDigitizer - No HPI coils digitized. Returning." << std::endl;
+        qWarning().noquote().nospace() << "InvHpiFit::updateHpiDigitizer - No HPI coils digitized. Returning.";
         return;
     }
 }
@@ -182,7 +182,7 @@ void InvHpiDataUpdater::prepareProjectors(const Eigen::MatrixXd& matProjectors)
 {
     // check if m_vecInnerInd is alreadz initialized
     if (m_vecInnerind.size() == 0) {
-        std::cout << "InvHpiFit::updateProjectors - No channels. Returning." << std::endl;
+        qWarning().noquote().nospace() << "InvHpiFit::updateProjectors - No channels. Returning.";
         return;
     }
 

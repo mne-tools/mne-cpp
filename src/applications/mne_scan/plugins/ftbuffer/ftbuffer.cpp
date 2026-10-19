@@ -18,12 +18,12 @@
 
 #include "ftbuffer.h"
 #include "ftbuffproducer.h"
+#include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -246,11 +246,11 @@ bool FtBuffer::setupRTMSA(const FIFFLIB::FiffInfo& FiffInfo)
         return false;
     }
 
-    std::cout << "attempting to init info\n";
+    qInfo().noquote().nospace() << "attempting to init info";
 
     m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(FiffInfo));
 
-    std::cout << "init info\n";
+    qInfo().noquote().nospace() << "init info";
 
     //Set the RMTSA parameters
     m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);

@@ -33,6 +33,7 @@
 #include <QRandomGenerator>
 #include <QDir>
 #include <QFileInfo>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -380,7 +381,7 @@ int SettingsControllerCl::run()
     }
 
     if (!m_bSilentMode) {
-        std::printf("\n%s\n", QString("MNE Anonymize finished correctly: " + m_fiInFile.fileName() + " -> " + m_fiOutFile.fileName()).toUtf8().data());
+        qInfo("\n%s", QString("MNE Anonymize finished correctly: " + m_fiInFile.fileName() + " -> " + m_fiOutFile.fileName()).toUtf8().data());
     }
 
     printFooterIfVerbose();
@@ -397,15 +398,17 @@ bool SettingsControllerCl::checkDeleteInputFile()
     if (m_bDeleteInputFileAfter) //false by default
     {
         if (!m_bSilentMode) {
-            std::printf("\n%s", QString("You have requested to delete the input file: " + m_fiInFile.fileName()).toUtf8().data());
+            qInfo("You have requested to delete the input file: %s", qPrintable(m_fiInFile.fileName()));
         }
 
         if (m_bDeleteInputFileConfirmation) //true by default
         {
             QTextStream consoleIn(stdin);
             QString confirmation;
-            std::printf("\n%s", QString("You can avoid this confirmation by using the delete_confirmation [-f] option.").toUtf8().data());
-            std::printf("\n%s", QString("Are you sure you want to delete the input file? [Y/n] ").toUtf8().data());
+            qInfo("You can avoid this confirmation by using the delete_confirmation [-f] option.");
+            // A prompt is not a log message: it must show regardless of the log level.
+            QTextStream consoleOut(stdout);
+            consoleOut << "Are you sure you want to delete the input file? [Y/n] " << Qt::flush;
             consoleIn >> confirmation;
 
             if (confirmation == "Y") {
@@ -453,9 +456,8 @@ bool SettingsControllerCl::checkRenameOutputFile()
                 return true;
             } else {
                 if (!m_bSilentMode) {
-                    std::printf("\n%s", QString("You have requested to save the output file with the same name as the input file.").toUtf8().data());
-                    std::printf("\n%s", QString("This cannot be done without deleting or modifying the input file.").toUtf8().data());
-                    std::printf("\n%s", QString(" ").toUtf8().data());
+                    qWarning("You have requested to save the output file with the same name as the input file.");
+                    qWarning("This cannot be done without deleting or modifying the input file.");
                 }
             }
         }
@@ -471,7 +473,7 @@ void SettingsControllerCl::renameOutputFileAsInputFile()
     QFile auxFile(m_fiOutFile.absoluteFilePath());
     if ((m_bOutFileRenamed = auxFile.rename(m_fiInFile.absoluteFilePath()))) {
         if (m_bVerboseMode) {
-            std::printf("\n%s", QString("Output file named: " + m_fiOutFile.fileName() + " --> renamed as: " + m_fiInFile.fileName()).toUtf8().data());
+            qInfo("Output file named: %s --> renamed as: %s", qPrintable(m_fiOutFile.fileName()), qPrintable(m_fiInFile.fileName()));
         }
         m_fiOutFile.setFile(m_fiInFile.absoluteFilePath());
     } else {

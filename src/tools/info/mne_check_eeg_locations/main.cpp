@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    fprintf(stderr, "Opened %s : %d channels\n", qPrintable(measName), raw.info.nchan);
+    qInfo("Opened %s : %d channels", qPrintable(measName), raw.info.nchan);
 
     // Collect EEG channels
     struct EegEntry
@@ -110,19 +110,19 @@ int main(int argc, char* argv[])
     }
 
     if (eegChannels.isEmpty()) {
-        fprintf(stderr, "No EEG channels found.\n");
+        qInfo("No EEG channels found.");
         return 0;
     }
 
-    fprintf(stderr, "Found %d EEG channels.\n", static_cast<int>(eegChannels.size()));
+    qInfo("Found %d EEG channels.", static_cast<int>(eegChannels.size()));
 
     int nProblems = 0;
 
     // Check 1: Undefined locations (all zeros)
     for (const auto& e : eegChannels) {
         if (e.pos.norm() < 1e-10f) {
-            fprintf(stdout, "WARNING: %s (ch %d): location is undefined (all zeros).\n",
-                    qPrintable(e.name), e.index + 1);
+            qWarning("WARNING: %s (ch %d): location is undefined (all zeros).",
+                     qPrintable(e.name), e.index + 1);
             ++nProblems;
         }
     }
@@ -137,10 +137,10 @@ int main(int argc, char* argv[])
                 continue;
             float dist = (eegChannels[i].pos - eegChannels[j].pos).norm();
             if (dist < dupTol) {
-                fprintf(stdout, "WARNING: %s and %s have duplicate positions (distance = %.4f mm).\n",
-                        qPrintable(eegChannels[i].name),
-                        qPrintable(eegChannels[j].name),
-                        dist * 1000.0f);
+                qWarning("WARNING: %s and %s have duplicate positions (distance = %.4f mm).",
+                         qPrintable(eegChannels[i].name),
+                         qPrintable(eegChannels[j].name),
+                         dist * 1000.0f);
                 ++nProblems;
             }
         }
@@ -154,19 +154,19 @@ int main(int argc, char* argv[])
             continue; // skip undefined
         float r = e.pos.norm();
         if (r < minRadius || r > maxRadius) {
-            fprintf(stdout, "WARNING: %s (ch %d): distance from origin = %.1f mm (expected %.0f-%.0f mm).\n",
-                    qPrintable(e.name), e.index + 1,
-                    r * 1000.0f, minRadius * 1000.0f, maxRadius * 1000.0f);
+            qWarning("WARNING: %s (ch %d): distance from origin = %.1f mm (expected %.0f-%.0f mm).",
+                     qPrintable(e.name), e.index + 1,
+                     r * 1000.0f, minRadius * 1000.0f, maxRadius * 1000.0f);
             ++nProblems;
         }
     }
 
     // Summary
     if (nProblems == 0) {
-        fprintf(stdout, "All %d EEG channels have valid locations.\n", static_cast<int>(eegChannels.size()));
+        qInfo("All %d EEG channels have valid locations.", static_cast<int>(eegChannels.size()));
         return 0;
     } else {
-        fprintf(stdout, "\n%d problem(s) found in %d EEG channels.\n", nProblems, static_cast<int>(eegChannels.size()));
+        qInfo("\n%d problem(s) found in %d EEG channels.", nProblems, static_cast<int>(eegChannels.size()));
         return 1;
     }
 }

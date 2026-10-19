@@ -28,7 +28,6 @@
 #include <fiff/fiff_proj.h>
 #include <math/linalg.h>
 
-#include <iostream>
 #include <cmath>
 #include <algorithm>
 
@@ -40,6 +39,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 #include <Eigen/SVD>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -197,7 +197,7 @@ void InvMinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
     qInfo("Computing inverse...");
     inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
 
-    std::cout << "K " << K.rows() << " x " << K.cols() << std::endl;
+    qInfo().noquote().nospace() << "K " << K.rows() << " x " << K.cols();
 
     inverseSetup = true;
 }

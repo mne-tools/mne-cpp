@@ -39,7 +39,6 @@
 
 #include <Eigen/Dense>
 
-#include <iostream>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -212,7 +211,7 @@ bool Sphere::report_func(int loop, const VectorXf& fitpar, double fval_lo, doubl
      */
     const VectorXf& r0 = fitpar;
 
-    std::cout << "loop: " << loop << "; r0: " << 1000 * r0[0] << ", r1: " << 1000 * r0[1] << ", r2: " << 1000 * r0[2] << "; fval: " << fval_lo << std::endl;
+    qDebug().noquote().nospace() << "loop: " << loop << "; r0: " << 1000 * r0[0] << ", r1: " << 1000 * r0[1] << ", r2: " << 1000 * r0[2] << "; fval: " << fval_lo;
 
     return true;
 }
@@ -268,7 +267,7 @@ float Sphere::fit_eval(const VectorXf& fitpar, const void* user_data)
     F = sum2 - sum * sum / user->rr.rows();
 
     if (user->report)
-        std::cout << "r0: " << 1000 * r0[0] << ", r1: " << 1000 * r0[1] << ", r2: " << 1000 * r0[2] << "; R: " << 1000 * sum / user->rr.rows() << "; fval: " << F << std::endl;
+        qDebug().noquote().nospace() << "r0: " << 1000 * r0[0] << ", r1: " << 1000 * r0[1] << ", r2: " << 1000 * r0[2] << "; R: " << 1000 * sum / user->rr.rows() << "; fval: " << F;
 
     return F;
 }

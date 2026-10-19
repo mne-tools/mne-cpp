@@ -49,7 +49,6 @@
 #include <utils/ioutils.h>
 
 #include <functional>
-#include <iostream>
 #include <time.h>
 
 //=============================================================================================================
@@ -1427,7 +1426,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
         //            }
         //            else
         //            {
-        //                printf("Projection item channel list missing\n");
+        //                qCritical("Projection item channel list missing");
         //                return projdata;
         //            }
         t_pFiffDirTreeItem->find_tag(this, FIFF_PROJ_ITEM_KIND, t_pTag);
@@ -1616,10 +1615,10 @@ bool FiffStream::read_tag(FiffTag::UPtr& p_pTag,
     int endian;
     if (this->byteOrder() == QDataStream::LittleEndian) {
         endian = FIFFV_LITTLE_ENDIAN;
-        //printf("Endian: Little\n");
+        //qInfo("Endian: Little");
     } else {
         endian = FIFFV_BIG_ENDIAN;
-        //printf("Endian: Big\n");
+        //qInfo("Endian: Big");
     }
 
     if (p_pTag->size() > 0) {
@@ -1649,7 +1648,7 @@ bool FiffStream::setup_read_raw(QIODevice& p_IODevice,
     QString t_sFileName = t_pStream->streamName();
 
     if (is_littleEndian) {
-        //printf("Setting stream to little Endian\n");
+        //qInfo("Setting stream to little Endian");
         t_pStream->setByteOrder(QDataStream::LittleEndian);
     }
 

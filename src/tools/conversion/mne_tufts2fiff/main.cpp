@@ -195,11 +195,11 @@ int main(int argc, char* argv[])
     float sfreqOverride = parser.isSet(sfreqOpt) ? parser.value(sfreqOpt).toFloat() : 0.0f;
 
     if (rawFile.isEmpty()) {
-        fprintf(stderr, "Raw data file (--raw) is required.\n");
+        qCritical("Raw data file (--raw) is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        fprintf(stderr, "Output file (--out) is required.\n");
+        qCritical("Output file (--out) is required.");
         return 1;
     }
 
@@ -208,13 +208,13 @@ int main(int argc, char* argv[])
     //
     QFile raw(rawFile);
     if (!raw.open(QIODevice::ReadOnly)) {
-        fprintf(stderr, "Cannot open raw file: %s\n", rawFile.toUtf8().constData());
+        qCritical("Cannot open raw file: %s", rawFile.toUtf8().constData());
         return 1;
     }
 
     TuftsHeader header;
     if (!readTuftsHeader(raw, header)) {
-        fprintf(stderr, "Failed to read Tufts header.\n");
+        qCritical("Failed to read Tufts header.");
         return 1;
     }
 
@@ -298,7 +298,7 @@ int main(int argc, char* argv[])
     QFile outF(outFile);
     FiffStream::SPtr stream = FiffStream::start_file(outF);
     if (!stream) {
-        fprintf(stderr, "Cannot create output FIFF file.\n");
+        qCritical("Cannot create output FIFF file.");
         return 1;
     }
 

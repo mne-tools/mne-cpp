@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    fprintf(stderr, "Reading coil definitions from: %s\n", qPrintable(coildefName));
+    qInfo("Reading coil definitions from: %s", qPrintable(coildefName));
 
     FwdCoilSet::UPtr coilSet = FwdCoilSet::read_coil_defs(coildefName);
     if (!coilSet) {
@@ -129,23 +129,23 @@ int main(int argc, char* argv[])
     }
 
     int ncoils = coilSet->ncoil();
-    fprintf(stderr, "Read %d coil definitions.\n\n", ncoils);
+    qInfo("Read %d coil definitions.\n", ncoils);
 
     // Print header
-    fprintf(stdout, "%-8s %-14s %-10s %-6s %-10s %s\n",
-            "Type", "Class", "Accuracy", "NP", "Size(m)", "Description");
-    fprintf(stdout, "%-8s %-14s %-10s %-6s %-10s %s\n",
-            "--------", "--------------", "----------", "------", "----------", "--------------------");
+    qInfo("%-8s %-14s %-10s %-6s %-10s %s",
+          "Type", "Class", "Accuracy", "NP", "Size(m)", "Description");
+    qInfo("%-8s %-14s %-10s %-6s %-10s %s",
+          "--------", "--------------", "----------", "------", "----------", "--------------------");
 
     for (int k = 0; k < ncoils; ++k) {
         const FwdCoil& coil = *(coilSet->coils[k]);
-        fprintf(stdout, "%-8d %-14s %-10s %-6d %-10.4f %s\n",
-                coil.type,
-                qPrintable(coilClassName(coil.coil_class)),
-                qPrintable(accuracyName(coil.accuracy)),
-                coil.np,
-                coil.size,
-                qPrintable(coil.desc));
+        qInfo("%-8d %-14s %-10s %-6d %-10.4f %s",
+              coil.type,
+              qPrintable(coilClassName(coil.coil_class)),
+              qPrintable(accuracyName(coil.accuracy)),
+              coil.np,
+              coil.size,
+              qPrintable(coil.desc));
     }
 
     return 0;

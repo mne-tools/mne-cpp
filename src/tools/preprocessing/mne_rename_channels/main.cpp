@@ -131,7 +131,7 @@ static QList<ChannelAlias> readAliases(const QString& filename, bool reverse)
         // Truncate to 15 chars (FIFF channel name limit)
         if (a.to.length() > 15) {
             a.to.truncate(15);
-            fprintf(stderr, "Warning: name truncated to <%s>\n", qPrintable(a.to));
+            qWarning("Warning: name truncated to <%s>", qPrintable(a.to));
         }
 
         aliases.append(a);
@@ -173,19 +173,19 @@ int main(int argc, char* argv[])
         parser.showHelp(1);
     }
 
-    fprintf(stderr, "fif file   : %s\n", qPrintable(fifName));
-    fprintf(stderr, "alias file : %s\n", qPrintable(aliasName));
+    qInfo("fif file   : %s", qPrintable(fifName));
+    qInfo("alias file : %s", qPrintable(aliasName));
     if (reverse)
-        fprintf(stderr, "Exchange the roles of old and new channel names in the alias file\n");
+        qInfo("Exchange the roles of old and new channel names in the alias file");
 
     QList<ChannelAlias> aliases = readAliases(aliasName, reverse);
     if (aliases.isEmpty()) {
         qCritical("No aliases read.");
         return 1;
     }
-    fprintf(stderr, "%lld aliases read from %s\n",
-            static_cast<long long>(aliases.size()),
-            qPrintable(aliasName));
+    qInfo("%lld aliases read from %s",
+          static_cast<long long>(aliases.size()),
+          qPrintable(aliasName));
 
     // Open FIFF file for in-place update
     QFile file(fifName);
@@ -204,17 +204,14 @@ int main(int argc, char* argv[])
 
             for (const ChannelAlias& a : aliases) {
                 if (ch.ch_name == a.from) {
-                    fprintf(stderr, "%s -> %s", qPrintable(ch.ch_name), qPrintable(a.to));
+                    QString line = QString("%1 -> %2").arg(ch.ch_name, a.to);
                     nMod++;
                     ch.ch_name = a.to;
                     if (a.toKind > 0) {
-                        fprintf(stderr, " (%s -> %s)\n",
-                                qPrintable(explainKind(ch.kind)),
-                                qPrintable(explainKind(a.toKind)));
+                        line += QString(" (%1 -> %2)").arg(explainKind(ch.kind), explainKind(a.toKind));
                         ch.kind = a.toKind;
-                    } else {
-                        fprintf(stderr, "\n");
                     }
+                    qInfo("%s", qPrintable(line));
                     FiffTag::UPtr dummyTag; // unused
                     stream->device()->seek(stream->dir()[k]->pos);
                     stream->write_ch_info(ch);
@@ -225,8 +222,8 @@ int main(int argc, char* argv[])
     }
 
     stream->close();
-    fprintf(stderr, "%d changes done\n", nMod);
-    fprintf(stderr, "%s processed.\n", qPrintable(fifName));
+    qInfo("%d changes done", nMod);
+    qInfo("%s processed.", qPrintable(fifName));
 
     return 0;
 }

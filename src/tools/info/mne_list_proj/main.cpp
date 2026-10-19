@@ -103,22 +103,22 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    fprintf(stderr, "Opened %s : %d channels\n", qPrintable(measName), raw.info.nchan);
+    qInfo("Opened %s : %d channels", qPrintable(measName), raw.info.nchan);
 
     const QList<FiffProj>& projs = raw.info.projs;
 
     if (projs.isEmpty()) {
-        fprintf(stdout, "No SSP projectors found.\n");
+        qInfo("No SSP projectors found.");
         return 0;
     }
 
-    fprintf(stdout, "Found %d SSP projector(s):\n\n", static_cast<int>(projs.size()));
+    qInfo("Found %d SSP projector(s):\n", static_cast<int>(projs.size()));
 
     // Print header
-    fprintf(stdout, "%-6s %-20s %-8s %-8s %s\n",
-            "Index", "Kind", "NVec", "Active", "Description");
-    fprintf(stdout, "%-6s %-20s %-8s %-8s %s\n",
-            "------", "--------------------", "--------", "--------", "--------------------");
+    qInfo("%-6s %-20s %-8s %-8s %s",
+          "Index", "Kind", "NVec", "Active", "Description");
+    qInfo("%-6s %-20s %-8s %-8s %s",
+          "------", "--------------------", "--------", "--------", "--------------------");
 
     for (int k = 0; k < projs.size(); ++k) {
         const FiffProj& proj = projs[k];
@@ -128,12 +128,12 @@ int main(int argc, char* argv[])
             nVec = proj.data->nrow;
         }
 
-        fprintf(stdout, "%-6d %-20s %-8d %-8s %s\n",
-                k + 1,
-                qPrintable(projKindName(proj.kind)),
-                nVec,
-                proj.active ? "Yes" : "No",
-                qPrintable(proj.desc));
+        qInfo("%-6d %-20s %-8d %-8s %s",
+              k + 1,
+              qPrintable(projKindName(proj.kind)),
+              nVec,
+              proj.active ? "Yes" : "No",
+              qPrintable(proj.desc));
     }
 
     return 0;

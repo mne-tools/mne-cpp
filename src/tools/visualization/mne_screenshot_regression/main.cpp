@@ -17,17 +17,19 @@
 #include <QCommandLineParser>
 #include <QImage>
 #include <QDir>
+#include <QDebug>
 
 #include <fs/fs_surface.h>
 #include <fs/fs_annotation.h>
 #include <disp3D/view/brainview.h>
 #include <disp3D/model/braintreemodel.h>
+#include <utils/generics/mne_logger.h>
 
 #include <cmath>
-#include <iostream>
 
 using namespace FSLIB;
 using namespace DISP3DLIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 
@@ -56,6 +58,7 @@ static double imageRmse(const QImage& a, const QImage& b)
 
 int main(int argc, char* argv[])
 {
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QApplication app(argc, argv);
     app.setApplicationName("mne_screenshot_regression");
 
@@ -81,7 +84,7 @@ int main(int argc, char* argv[])
     const int height = parser.value("height").toInt();
 
     if (subjectsDir.isEmpty()) {
-        std::cerr << "Error: --subjects-dir is required.\n";
+        qCritical().noquote().nospace() << "Error: --subjects-dir is required.";
         return 1;
     }
 
@@ -110,48 +113,48 @@ int main(int argc, char* argv[])
     }
 
     if (!anyLoaded) {
-        std::cerr << "Error: No surfaces found in "
-                  << subjectsDir.toStdString() << "/" << subject.toStdString()
-                  << "/surf/\n";
+        qCritical().noquote().nospace() << "Error: No surfaces found in "
+                                        << subjectsDir << "/" << subject
+                                        << "/surf/";
         return 1;
     }
 
     // ── Render offscreen ────────────────────────────────────────────────
 
-    std::cout << "Surfaces loaded, rendering offscreen (" << width << "x" << height << ")...\n";
+    qInfo().noquote().nospace() << "Surfaces loaded, rendering offscreen (" << width << "x" << height << ")...";
 
     if (!view.savePng(outPath, width, height, QStringLiteral("white"))) {
-        std::cerr << "Error: offscreen render failed.\n";
+        qCritical().noquote().nospace() << "Error: offscreen render failed.";
         return 1;
     }
 
-    std::cout << "Saved screenshot: " << outPath.toStdString() << "\n";
+    qInfo().noquote().nospace() << "Saved screenshot: " << outPath;
 
     // ── Optional golden comparison ──────────────────────────────────────
     if (!refPath.isEmpty()) {
         QImage ref(refPath);
         if (ref.isNull()) {
-            std::cerr << "Error: cannot load reference image: "
-                      << refPath.toStdString() << "\n";
+            qCritical().noquote().nospace() << "Error: cannot load reference image: "
+                                            << refPath;
             return 1;
         }
 
         QImage out(outPath);
         if (out.isNull()) {
-            std::cerr << "Error: cannot load rendered image.\n";
+            qCritical().noquote().nospace() << "Error: cannot load rendered image.";
             return 1;
         }
 
         const double rmse = imageRmse(ref, out);
-        std::cout << "RMSE: " << rmse << " (tolerance: " << tolerance << ")\n";
+        qInfo().noquote().nospace() << "RMSE: " << rmse << " (tolerance: " << tolerance << ")";
 
         if (rmse > tolerance) {
-            std::cerr << "FAIL: RMSE " << rmse << " exceeds tolerance "
-                      << tolerance << "\n";
+            qCritical().noquote().nospace() << "FAIL: RMSE " << rmse << " exceeds tolerance "
+                                            << tolerance;
             return 1;
         }
 
-        std::cout << "PASS: screenshot matches reference within tolerance.\n";
+        qInfo().noquote().nospace() << "PASS: screenshot matches reference within tolerance.";
     }
 
     return 0;

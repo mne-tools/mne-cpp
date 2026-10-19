@@ -220,7 +220,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    fprintf(stderr, "Read %lld digitization points from %s\n", pointCount, qPrintable(ctfName));
+    qInfo("Read %lld digitization points from %s", pointCount, qPrintable(ctfName));
 
     // Compute head coordinate transform from fiducials
     Matrix4f headTrans;
@@ -257,7 +257,7 @@ int main(int argc, char* argv[])
         }
         outStream->end_block(FIFFB_ISOTRAK);
         outStream->end_file();
-        fprintf(stderr, "Wrote %lld points to %s\n", pointCount, qPrintable(fifName));
+        qInfo("Wrote %lld points to %s", pointCount, qPrintable(fifName));
     }
 
     // Write hpts output
@@ -285,7 +285,7 @@ int main(int argc, char* argv[])
                 << QString::number(1000.0f * p.r[2], 'f', 1) << "\n";
         }
         hptsFile.close();
-        fprintf(stderr, "Wrote %lld points to %s\n", pointCount, qPrintable(hptsName));
+        qInfo("Wrote %lld points to %s", pointCount, qPrintable(hptsName));
     }
 
     return 0;

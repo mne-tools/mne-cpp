@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
     //
     // Load forward solution
     //
-    fprintf(stderr, "Reading forward solution from %s...\n", fwdFile.toUtf8().constData());
+    qInfo("Reading forward solution from %s...", fwdFile.toUtf8().constData());
     QFile fwdIO(fwdFile);
     MNEForwardSolution fwd(fwdIO);
 
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    fprintf(stderr, "Forward solution: %d channels x %d sources\n", fwd.nchan, fwd.nsource);
+    qInfo("Forward solution: %d channels x %d sources", fwd.nchan, fwd.nsource);
 
     //
     // Get the gain matrix and channel names
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
     QList<FiffProj> projectors;
 
     for (const QString& labelFile : labelFiles) {
-        fprintf(stderr, "Processing label: %s\n", labelFile.toUtf8().constData());
+        qInfo("Processing label: %s", labelFile.toUtf8().constData());
 
         //
         // Read label vertices
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
             return 1;
         }
 
-        fprintf(stderr, "  Label has %td vertices\n", static_cast<ptrdiff_t>(labelVerts.size()));
+        qInfo("  Label has %td vertices", static_cast<ptrdiff_t>(labelVerts.size()));
 
         //
         // Build set of source indices present in the forward solution
@@ -183,11 +183,11 @@ int main(int argc, char* argv[])
         }
 
         if (colIndices.isEmpty()) {
-            fprintf(stderr, "  Warning: no forward solution vertices matched label — skipping.\n");
+            qInfo("  Warning: no forward solution vertices matched label — skipping.");
             continue;
         }
 
-        fprintf(stderr, "  Matched %lld gain-matrix columns\n", static_cast<long long>(colIndices.size()));
+        qInfo("  Matched %lld gain-matrix columns", static_cast<long long>(colIndices.size()));
 
         //
         // Extract restricted gain matrix columns
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
             projectors.append(proj);
         }
 
-        fprintf(stderr, "  Created %d projector(s) from %s\n", nUse, labelFile.toUtf8().constData());
+        qInfo("  Created %d projector(s) from %s", nUse, labelFile.toUtf8().constData());
     }
 
     if (projectors.isEmpty()) {
@@ -236,7 +236,7 @@ int main(int argc, char* argv[])
     //
     // Write projectors to output file
     //
-    fprintf(stderr, "Writing %lld projector(s) to %s...\n", static_cast<long long>(projectors.size()), outFile.toUtf8().constData());
+    qInfo("Writing %lld projector(s) to %s...", static_cast<long long>(projectors.size()), outFile.toUtf8().constData());
 
     QFile outIO(outFile);
     FiffStream::SPtr stream = FiffStream::start_file(outIO);
@@ -249,6 +249,6 @@ int main(int argc, char* argv[])
     stream->write_proj(projectors);
     stream->end_file();
 
-    fprintf(stderr, "Finished.\n");
+    qInfo("Finished.");
     return 0;
 }

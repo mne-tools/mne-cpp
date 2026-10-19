@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
             MNEBem bem;
             if (MNEBem::readFromStream(stream, true, bem) && bem.size() > 0) {
                 vertices = bem[0].rr;
-                fprintf(stderr, "Read FIFF BEM surface: %d vertices\n", static_cast<int>(vertices.rows()));
+                qInfo("Read FIFF BEM surface: %d vertices", static_cast<int>(vertices.rows()));
                 loaded = true;
             }
             stream->close();
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
         FsSurface surf;
         if (FsSurface::read(surfName, surf, false)) {
             vertices = surf.rr();
-            fprintf(stderr, "Read FreeSurfer surface: %d vertices\n", static_cast<int>(vertices.rows()));
+            qInfo("Read FreeSurfer surface: %d vertices", static_cast<int>(vertices.rows()));
             loaded = true;
         }
     }
@@ -128,14 +128,14 @@ int main(int argc, char* argv[])
     }
 
     // Fit sphere using simplex method
-    fprintf(stderr, "Fitting sphere to %d points...\n", static_cast<int>(vertices.rows()));
+    qInfo("Fitting sphere to %d points...", static_cast<int>(vertices.rows()));
     Sphere sphere = Sphere::fit_sphere_simplex(vertices);
 
     Vector3f center = sphere.center();
     float radius = sphere.radius();
 
-    fprintf(stderr, "Sphere center : %10.6f %10.6f %10.6f m\n", center(0), center(1), center(2));
-    fprintf(stderr, "Sphere radius : %10.6f m\n", radius);
+    qInfo("Sphere center : %10.6f %10.6f %10.6f m", center(0), center(1), center(2));
+    qInfo("Sphere radius : %10.6f m", radius);
 
     // Write output
     QFile outFile(outName);
@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
     out << center(0) << " " << center(1) << " " << center(2) << " " << radius << "\n";
     outFile.close();
 
-    fprintf(stderr, "Wrote sphere parameters to %s\n", qPrintable(outName));
+    qInfo("Wrote sphere parameters to %s", qPrintable(outName));
 
     return 0;
 }

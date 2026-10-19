@@ -22,13 +22,13 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QtEndian>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -155,6 +155,6 @@ HeaderChunk FtHeaderParser::getChunkType(QBuffer& buffer)
     buffer.read(cType, sizeof(qint32));
     std::memcpy(&iType, cType, sizeof(qint32));
 
-    std::cout << "Read header of type" << iType << "\n";
+    qInfo().noquote().nospace() << "Read header of type " << iType;
     return static_cast<HeaderChunk>(iType);
 }

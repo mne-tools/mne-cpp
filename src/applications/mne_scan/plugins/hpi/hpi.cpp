@@ -17,7 +17,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 
 #include "hpi.h"
 
@@ -37,6 +36,7 @@
 //=============================================================================================================
 
 #include <QDir>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -593,7 +593,7 @@ void Hpi::run()
         m_mutex.lock();
         if (fittingWindowSize != m_iFittingWindowSize) {
             fittingWindowSize = m_iFittingWindowSize;
-            std::cout << "Fitting window size: " << fittingWindowSize << "\n";
+            qInfo().noquote().nospace() << "Fitting window size: " << fittingWindowSize;
             matDataMerged.resize(m_pFiffInfo->chs.size(), fittingWindowSize);
             iDataIndexCounter = 0;
         }

@@ -185,11 +185,11 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (corDir.isEmpty() && mghFile.isEmpty()) {
-        fprintf(stderr, "Either --dir or --mgh must be specified.\n");
+        qInfo("Either --dir or --mgh must be specified.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        fprintf(stderr, "Output file (--out) is required.\n");
+        qCritical("Output file (--out) is required.");
         return 1;
     }
 
@@ -205,7 +205,7 @@ int main(int argc, char* argv[])
         bool isGz = mghFile.endsWith(".mgz") || mghFile.endsWith(".mgh.gz");
 
         if (!file.open(QIODevice::ReadOnly)) {
-            fprintf(stderr, "Cannot open mgh file: %s\n", mghFile.toUtf8().constData());
+            qCritical("Cannot open mgh file: %s", mghFile.toUtf8().constData());
             return 1;
         }
 
@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
         if (isGz) {
             data = qUncompress(rawData);
             if (data.isEmpty()) {
-                fprintf(stderr, "Failed to decompress mgz file. Try using an uncompressed .mgh file.\n");
+                qCritical("Failed to decompress mgz file. Try using an uncompressed .mgh file.");
                 return 1;
             }
         } else {
@@ -231,7 +231,7 @@ int main(int argc, char* argv[])
         in >> version >> w >> h >> d >> nframes >> type;
 
         if (version != 1) {
-            fprintf(stderr, "Unsupported MGH version: %d\n", version);
+            qInfo("Unsupported MGH version: %d", version);
             return 1;
         }
 
@@ -270,7 +270,7 @@ int main(int argc, char* argv[])
                     slices[k][j] = static_cast<unsigned char>(qBound(0, static_cast<int>(val), 255));
                 }
             } else {
-                fprintf(stderr, "Unsupported MGH data type: %d\n", type);
+                qInfo("Unsupported MGH data type: %d", type);
                 return 1;
             }
         }

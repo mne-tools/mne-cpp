@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
     }
 
     // Load raw data
-    fprintf(stderr, "Loading raw: %s\n", qPrintable(rawFile));
+    qInfo("Loading raw: %s", qPrintable(rawFile));
     QFile fRaw(rawFile);
     FiffRawData raw(fRaw);
     if (raw.info.isEmpty()) {
@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
 
     double sfreq = raw.info.sfreq;
     int nChan = raw.info.nchan;
-    fprintf(stderr, "  %d channels, %.1f Hz\n", nChan, sfreq);
+    qInfo("  %d channels, %.1f Hz", nChan, sfreq);
 
     // Read events
     QList<EventEntry> events = readEvents(eventFile);
@@ -289,15 +289,15 @@ int main(int argc, char* argv[])
         qCritical("No events read from: %s", qPrintable(eventFile));
         return 1;
     }
-    fprintf(stderr, "Read %lld events\n", static_cast<long long>(events.size()));
+    qInfo("Read %lld events", static_cast<long long>(events.size()));
 
     // Compute sample offsets for epoch
     int sminOffset = static_cast<int>(qRound(tmin * sfreq));
     int smaxOffset = static_cast<int>(qRound(tmax * sfreq));
     int epochLen = smaxOffset - sminOffset + 1;
 
-    fprintf(stderr, "Epoch: %.3f to %.3f s (%d samples), event ID = %d\n",
-            tmin, tmax, epochLen, eventId);
+    qInfo("Epoch: %.3f to %.3f s (%d samples), event ID = %d",
+          tmin, tmax, epochLen, eventId);
 
     // Build time vector
     MatrixXd timesMat(1, epochLen);
@@ -316,14 +316,14 @@ int main(int argc, char* argv[])
 
         // Check bounds
         if (fromSamp < raw.first_samp || toSamp > raw.last_samp) {
-            fprintf(stderr, "  Skipping event at sample %d (out of bounds)\n", eventSample);
+            qInfo("  Skipping event at sample %d (out of bounds)", eventSample);
             continue;
         }
 
         MatrixXd data;
         MatrixXd times;
         if (!raw.read_raw_segment(data, times, fromSamp, toSamp)) {
-            fprintf(stderr, "  Warning: cannot read epoch at sample %d\n", eventSample);
+            qInfo("  Warning: cannot read epoch at sample %d", eventSample);
             continue;
         }
 
@@ -352,10 +352,10 @@ int main(int argc, char* argv[])
 
         outF.close();
 
-        fprintf(stderr, "  Wrote epoch %d -> %s (%d x %d)\n",
-                epochCount, qPrintable(matFile), nChan, epochLen);
+        qInfo("  Wrote epoch %d -> %s (%d x %d)",
+              epochCount, qPrintable(matFile), nChan, epochLen);
     }
 
-    fprintf(stderr, "Done. Extracted %d epochs for event ID %d.\n", epochCount, eventId);
+    qInfo("Done. Extracted %d epochs for event ID %d.", epochCount, eventId);
     return 0;
 }

@@ -21,6 +21,7 @@
 #include <mna/mna_recording.h>
 #include <mna/mna_file_ref.h>
 #include <mna/mna_types.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -37,6 +38,7 @@
 //=============================================================================================================
 
 using namespace MNALIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // HELPERS
@@ -59,6 +61,7 @@ static QString humanSize(qint64 bytes)
 
 int main(int argc, char* argv[])
 {
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("mne_show_mna"));
     app.setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));
@@ -86,20 +89,20 @@ int main(int argc, char* argv[])
 
     const QStringList args = parser.positionalArguments();
     if (args.isEmpty()) {
-        fprintf(stderr, "Error: no input file specified.\n\n");
+        qCritical("Error: no input file specified.");
         parser.showHelp(1);
     }
 
     const QString filePath = args.first();
     if (!QFile::exists(filePath)) {
-        fprintf(stderr, "Error: file not found: %s\n", qPrintable(filePath));
+        qCritical("Error: file not found: %s", qPrintable(filePath));
         return 1;
     }
 
     // ── Read the project ────────────────────────────────────────────────
     MnaProject proj = MnaIO::read(filePath);
     if (proj.name.isEmpty() && proj.subjects.isEmpty() && proj.pipeline.isEmpty()) {
-        fprintf(stderr, "Error: failed to read or empty project: %s\n", qPrintable(filePath));
+        qCritical("Error: failed to read or empty project: %s", qPrintable(filePath));
         return 1;
     }
 

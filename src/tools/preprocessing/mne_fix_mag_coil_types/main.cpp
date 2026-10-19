@@ -46,7 +46,7 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 
-static int processFile(const QString& name, bool doMagnes)
+static int processFile(const QString& name, bool doMagnes, QString& summary)
 {
     QFile file(name);
     FiffStream::SPtr stream = FiffStream::open_update(file);
@@ -103,14 +103,12 @@ static int processFile(const QString& name, bool doMagnes)
         }
     }
 
-    if (found)
-        fprintf(stderr, "fixed %d magnetometer coil types ", found);
-    else
-        fprintf(stderr, "no magnetometer coil type fixes ");
+    summary = found ? QString("fixed %1 magnetometer coil types").arg(found)
+                    : QString("no magnetometer coil type fixes");
     if (nCoilNone)
-        fprintf(stderr, "/ fixed %d coil_type fields in non MEG/EEG channels ", nCoilNone);
+        summary += QString(" / fixed %1 coil_type fields in non MEG/EEG channels").arg(nCoilNone);
     if (doMagnes)
-        fprintf(stderr, "/ %d Magnes fixes ", nMagnes);
+        summary += QString(" / %1 Magnes fixes").arg(nMagnes);
 
     stream->close();
     return 0;
@@ -151,12 +149,12 @@ int main(int argc, char* argv[])
 
     int failed = 0;
     for (const QString& fname : files) {
-        fprintf(stderr, "%s ... ", qPrintable(fname));
-        if (processFile(fname, doMagnes) != 0) {
-            fprintf(stderr, "[failed]\n");
+        QString summary;
+        if (processFile(fname, doMagnes, summary) != 0) {
+            qCritical("%s ... [failed]", qPrintable(fname));
             ++failed;
         } else {
-            fprintf(stderr, "[ok]\n");
+            qInfo("%s ... %s [ok]", qPrintable(fname), qPrintable(summary));
         }
     }
 

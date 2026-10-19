@@ -75,8 +75,8 @@ int main(int argc, char* argv[])
         parser.showHelp(1);
     }
 
-    fprintf(stderr, "Source file      : %s\n", qPrintable(addName));
-    fprintf(stderr, "Destination file : %s\n", qPrintable(destName));
+    qInfo("Source file      : %s", qPrintable(addName));
+    qInfo("Destination file : %s", qPrintable(destName));
 
     // Read all tags from the source file
     QFile addFile(addName);
@@ -101,10 +101,10 @@ int main(int argc, char* argv[])
     }
     addStream->close();
 
-    fprintf(stderr, "%d tags to add\n", static_cast<int>(tagsToAdd.size()));
+    qInfo("%d tags to add", static_cast<int>(tagsToAdd.size()));
 
     if (tagsToAdd.empty()) {
-        fprintf(stderr, "No tags to add.\n");
+        qInfo("No tags to add.");
         return 0;
     }
 
@@ -125,8 +125,8 @@ int main(int argc, char* argv[])
 
     destStream->close();
 
-    fprintf(stderr, "%d tags added to %s\n", nAdded, qPrintable(destName));
-    fprintf(stderr, "done.\n");
+    qInfo("%d tags added to %s", nAdded, qPrintable(destName));
+    qInfo("done.");
 
     return 0;
 }

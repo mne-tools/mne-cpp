@@ -137,7 +137,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         qWarning("No data in this range %d ... %d  =  %9.3f ... %9.3f secs...", from, to, (static_cast<float>(from)) / this->info.sfreq, (static_cast<float>(to)) / this->info.sfreq);
         return false;
     }
-    //printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, (static_cast<float>(from))/this->info.sfreq, (static_cast<float>(to))/this->info.sfreq);
     //
     //  Initialize the data and calibration vector
     //
@@ -389,7 +388,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         //  Done?
         //
         if (thisRawDir.last >= to) {
-            //printf(" [done]\n");
+            //qInfo(" [done]");
             break;
         }
     }
@@ -436,10 +435,9 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         to = this->last_samp;
     //
     if (from > to) {
-        qWarning("No data in this range\n");
+        qWarning("No data in this range");
         return false;
     }
-    //printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, (static_cast<float>(from))/this->info.sfreq, (static_cast<float>(to))/this->info.sfreq);
     //
     //  Initialize the data and calibration vector
     //
@@ -692,7 +690,7 @@ bool FiffRawData::read_raw_segment(MatrixXd& data,
         //  Done?
         //
         if (thisRawDir.last >= to) {
-            //printf(" [done]\n");
+            //qInfo(" [done]");
             break;
         }
     }

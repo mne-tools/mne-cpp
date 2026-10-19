@@ -853,7 +853,7 @@ inline QString FiffAnonymizer::subjectHandToString(int handCode) const
 inline void FiffAnonymizer::printIfVerbose(const QString& str) const
 {
     if (m_bVerboseMode) {
-        std::printf("\n%s", str.toUtf8().data());
+        qInfo("%s", qPrintable(str));
     }
 }
 

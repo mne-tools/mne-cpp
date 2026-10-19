@@ -449,11 +449,11 @@ int main(int argc, char* argv[])
     //=========================================================================================================
 
     if (!parser.isSet(inOpt)) {
-        fprintf(stderr, "Error: --in option is required.\n\n");
+        qInfo("Error: --in option is required.\n");
         parser.showHelp(1);
     }
     if (!parser.isSet(invOpt)) {
-        fprintf(stderr, "Error: --inv option is required.\n\n");
+        qInfo("Error: --inv option is required.\n");
         parser.showHelp(1);
     }
 
@@ -466,14 +466,14 @@ int main(int argc, char* argv[])
     QString outName = parser.value(outOpt);
 
     if (!labelDir.isEmpty() && outName.isEmpty()) {
-        fprintf(stderr, "Error: --out option must be specified with --labeldir.\n\n");
+        qInfo("Error: --out option must be specified with --labeldir.\n");
         parser.showHelp(1);
     }
 
     // SNR
     float snr = parser.value(snrOpt).toFloat();
     if (snr <= 0.0f) {
-        fprintf(stderr, "Error: SNR must be positive.\n");
+        qCritical("Error: SNR must be positive.");
         return 1;
     }
     float lambda2 = 1.0f / (snr * snr);
@@ -546,7 +546,7 @@ int main(int argc, char* argv[])
     MNEInverseOperator inverseOperator(invFile);
 
     if (inverseOperator.eigen_leads->data.size() == 0) {
-        fprintf(stderr, "Error: Failed to read inverse operator from %s\n", invName.toUtf8().constData());
+        qCritical("Error: Failed to read inverse operator from %s", invName.toUtf8().constData());
         return 1;
     }
     qInfo("  Inverse operator read successfully.");
@@ -574,7 +574,7 @@ int main(int argc, char* argv[])
                                                     lambda2, method, labelNames);
 
             if (stc.isEmpty()) {
-                fprintf(stderr, "Error: FsLabel directory processing failed.\n");
+                qCritical("Error: FsLabel directory processing failed.");
                 return 1;
             }
 
@@ -587,7 +587,7 @@ int main(int argc, char* argv[])
 
             QFile stcFile(stcOut);
             if (!stc.write(stcFile)) {
-                fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOut.toUtf8().constData());
+                qCritical("Error: Failed to write STC file: %s", stcOut.toUtf8().constData());
                 return 1;
             }
             qInfo("\nWrote %s (%d labels, %d time points)",
@@ -618,7 +618,7 @@ int main(int argc, char* argv[])
                                                      lambda2, method, pickNormal);
 
                 if (stc.isEmpty()) {
-                    fprintf(stderr, "Warning: Skipping label %s (no result).\n", labelFile.toUtf8().constData());
+                    qWarning("Warning: Skipping label %s (no result).", labelFile.toUtf8().constData());
                     continue;
                 }
 
@@ -643,7 +643,7 @@ int main(int argc, char* argv[])
 
                 QFile stcFile(stcOut);
                 if (!stc.write(stcFile)) {
-                    fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOut.toUtf8().constData());
+                    qCritical("Error: Failed to write STC file: %s", stcOut.toUtf8().constData());
                     continue;
                 }
                 qInfo("  Wrote %s (%d sources, %d time points)",
@@ -662,7 +662,7 @@ int main(int argc, char* argv[])
             InvSourceEstimate stc = minimumNorm.calculateInverse(inputData, tmin, tstep, pickNormal);
 
             if (stc.isEmpty()) {
-                fprintf(stderr, "Error: Full source space inverse computation failed.\n");
+                qCritical("Error: Full source space inverse computation failed.");
                 return 1;
             }
 
@@ -691,14 +691,14 @@ int main(int argc, char* argv[])
             int nSrcTotal = (int)stc.data.rows();
 
             if (nSrcLh + nSrcRh != nSrcTotal) {
-                fprintf(stderr, "Warning: Source count mismatch (lh=%d + rh=%d != %d). "
-                                "Writing combined STC to lh file.\n",
-                        nSrcLh, nSrcRh, nSrcTotal);
+                qWarning("Warning: Source count mismatch (lh=%d + rh=%d != %d). "
+                         "Writing combined STC to lh file.",
+                         nSrcLh, nSrcRh, nSrcTotal);
 
                 QString stcOutLh = stcOut + "-lh.stc";
                 QFile stcFileLh(stcOutLh);
                 if (!stc.write(stcFileLh)) {
-                    fprintf(stderr, "Error: Failed to write STC file: %s\n", stcOutLh.toUtf8().constData());
+                    qCritical("Error: Failed to write STC file: %s", stcOutLh.toUtf8().constData());
                     return 1;
                 }
                 qInfo("  Wrote %s (%d sources, %d time points)",
@@ -713,7 +713,7 @@ int main(int argc, char* argv[])
                     QString stcOutLh = stcOut + "-lh.stc";
                     QFile stcFileLh(stcOutLh);
                     if (!stcLh.write(stcFileLh)) {
-                        fprintf(stderr, "Error: Failed to write LH STC file: %s\n", stcOutLh.toUtf8().constData());
+                        qCritical("Error: Failed to write LH STC file: %s", stcOutLh.toUtf8().constData());
                         return 1;
                     }
                     qInfo("  Wrote %s (%d sources, %d time points)",
@@ -729,7 +729,7 @@ int main(int argc, char* argv[])
                     QString stcOutRh = stcOut + "-rh.stc";
                     QFile stcFileRh(stcOutRh);
                     if (!stcRh.write(stcFileRh)) {
-                        fprintf(stderr, "Error: Failed to write RH STC file: %s\n", stcOutRh.toUtf8().constData());
+                        qCritical("Error: Failed to write RH STC file: %s", stcOutRh.toUtf8().constData());
                         return 1;
                     }
                     qInfo("  Wrote %s (%d sources, %d time points)",
@@ -765,7 +765,7 @@ int main(int argc, char* argv[])
 
         RowVectorXi picks = raw.info.pick_channels(invChNames);
         if (picks.size() == 0) {
-            fprintf(stderr, "Error: No matching channels found between raw data and inverse operator.\n");
+            qCritical("Error: No matching channels found between raw data and inverse operator.");
             return 1;
         }
 
@@ -780,7 +780,7 @@ int main(int argc, char* argv[])
         MatrixXd inputData;
         MatrixXd times;
         if (!raw.read_raw_segment(inputData, times, raw.first_samp, raw.last_samp, picks)) {
-            fprintf(stderr, "Error: Failed to read raw data segment.\n");
+            qCritical("Error: Failed to read raw data segment.");
             return 1;
         }
 
@@ -810,12 +810,12 @@ int main(int argc, char* argv[])
 
         FiffEvokedSet evokedSet;
         if (!FiffEvokedSet::read(evokedFile, evokedSet, baseline)) {
-            fprintf(stderr, "Error: Failed to read evoked data from %s\n", inName.toUtf8().constData());
+            qCritical("Error: Failed to read evoked data from %s", inName.toUtf8().constData());
             return 1;
         }
 
         if (evokedSet.evoked.isEmpty()) {
-            fprintf(stderr, "Error: No evoked data sets found in %s\n", inName.toUtf8().constData());
+            qCritical("Error: No evoked data sets found in %s", inName.toUtf8().constData());
             return 1;
         }
 
@@ -829,8 +829,8 @@ int main(int argc, char* argv[])
             }
         } else {
             if (setNo < 0 || setNo >= evokedSet.evoked.size()) {
-                fprintf(stderr, "Error: Set %d out of range (file has %d sets, 0-%d)\n",
-                        setNo, (int)evokedSet.evoked.size(), (int)evokedSet.evoked.size() - 1);
+                qCritical("Error: Set %d out of range (file has %d sets, 0-%d)",
+                          setNo, (int)evokedSet.evoked.size(), (int)evokedSet.evoked.size() - 1);
                 return 1;
             }
             setsToProcess.append(setNo);

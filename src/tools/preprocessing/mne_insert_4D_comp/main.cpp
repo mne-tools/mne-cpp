@@ -206,7 +206,7 @@ int main(int argc, char* argv[])
     QString outFile = parser.value(outOpt);
 
     if (inFile.isEmpty() || refFile.isEmpty() || outFile.isEmpty()) {
-        fprintf(stderr, "Required: --in, --ref, --out\n");
+        qInfo("Required: --in, --ref, --out");
         return 1;
     }
 
@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
         qInfo("Read input: %d channels at %.1f Hz",
               raw.info.nchan, raw.info.sfreq);
     } else {
-        fprintf(stderr, "Failed to read input FIFF: %s\n", inFile.toUtf8().constData());
+        qCritical("Failed to read input FIFF: %s", inFile.toUtf8().constData());
         return 1;
     }
 
@@ -274,7 +274,7 @@ int main(int argc, char* argv[])
     QFile fOut(outFile);
     FiffStream::SPtr outStream = FiffStream::start_file(fOut);
     if (!outStream) {
-        fprintf(stderr, "Cannot create output file.\n");
+        qCritical("Cannot create output file.");
         return 1;
     }
 

@@ -33,6 +33,7 @@
 
 #include <QFile>
 #include <QDebug>
+#include <QStringList>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -416,12 +417,14 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
             eegscale += this->cov[lt_packed_index(k, k)];
             neeg++;
         }
-#ifdef DEBUG
-        fprintf(stdout, "%d ", ch_class[k]);
-#endif
     }
 #ifdef DEBUG
-    fprintf(stdout, "\n");
+    {
+        QStringList classes;
+        for (k = 0; k < ncov; k++)
+            classes << QString::number(ch_class[k]);
+        qDebug("%s", qPrintable(classes.join(' ')));
+    }
 #endif
     if (nmag > 0)
         magscale = magscale > 0.0 ? sqrt(nmag / magscale) : 0.0;
@@ -430,9 +433,9 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
     if (neeg > 0)
         eegscale = eegscale > 0.0 ? sqrt(neeg / eegscale) : 0.0;
 #ifdef DEBUG
-    fprintf(stdout, "%d %g\n", nmag, magscale);
-    fprintf(stdout, "%d %g\n", ngrad, gradscale);
-    fprintf(stdout, "%d %g\n", neeg, eegscale);
+    qInfo("%d %g", nmag, magscale);
+    qInfo("%d %g", ngrad, gradscale);
+    qInfo("%d %g", neeg, eegscale);
 #endif
     scale_vec.resize(ncov);
     for (k = 0; k < ncov; k++) {
@@ -453,9 +456,10 @@ int MNECovMatrix::condition(float rank_threshold, int use_rank)
             cov_local[lt_packed_index(j, k)] = this->cov[lt_packed_index(j, k)] * scale_vec[j] * scale_vec[k];
     if (mne_decompose_eigen(cov_local, lambda_local, local_eigen, ncov) == 0) {
 #ifdef DEBUG
+        QStringList ratios;
         for (k = 0; k < ncov; k++)
-            fprintf(stdout, "%g ", lambda_local[k] / lambda_local[ncov - 1]);
-        fprintf(stdout, "\n");
+            ratios << QString::number(lambda_local[k] / lambda_local[ncov - 1]);
+        qDebug("%s", qPrintable(ratios.join(' ')));
 #endif
         nok = 0;
         for (k = ncov - 1; k >= 0; k--) {

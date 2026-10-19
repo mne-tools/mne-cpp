@@ -22,7 +22,6 @@
 #include "cosinefilter.h"
 
 #include <algorithm>
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -347,7 +346,7 @@ bool FilterKernel::fftTransformCoeffs(int iFftLength)
 #endif
 
     if (m_vecCoeff.cols() > iFftLength) {
-        std::cout << "[FilterKernel::fftTransformCoeffs] The number of filter taps is bigger than the FFT length." << std::endl;
+        qWarning().noquote().nospace() << "[FilterKernel::fftTransformCoeffs] The number of filter taps is bigger than the FFT length.";
         return false;
     }
 

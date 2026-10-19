@@ -60,7 +60,7 @@ namespace INVLIB
 /**
  * @brief Binary-format dipole record for file I/O, storing fitted dipole parameters and error estimates.
  */
-typedef struct
+struct bdipEcdRec
 {
     int dipole;               /* Which dipole in a multi-dipole set */
     float begin, end;         /* Fitting time range */
@@ -76,7 +76,7 @@ typedef struct
     float khi2;               /* The khi^2 value */
     float prob;               /* Probability to exceed khi^2 by chance */
     float noise_est;          /* Total noise estimate */
-} bdipEcdRec;
+};
 using bdipEcd = bdipEcdRec*;
 
 } // Namespace

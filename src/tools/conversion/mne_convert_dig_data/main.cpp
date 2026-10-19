@@ -241,14 +241,14 @@ int main(int argc, char* argv[])
     QList<DigPt> points;
     if (!fifIn.isEmpty()) {
         points = readFifDig(fifIn);
-        fprintf(stderr, "Read %lld points from %s\n",
-                static_cast<long long>(points.size()),
-                qPrintable(fifIn));
+        qInfo("Read %lld points from %s",
+              static_cast<long long>(points.size()),
+              qPrintable(fifIn));
     } else {
         points = readHpts(hptsIn);
-        fprintf(stderr, "Read %lld points from %s\n",
-                static_cast<long long>(points.size()),
-                qPrintable(hptsIn));
+        qInfo("Read %lld points from %s",
+              static_cast<long long>(points.size()),
+              qPrintable(hptsIn));
     }
 
     if (points.isEmpty()) {
@@ -261,14 +261,14 @@ int main(int argc, char* argv[])
     if (!fifOut.isEmpty()) {
         if (!writeFifDig(fifOut, points))
             return 1;
-        fprintf(stderr, "Wrote %lld points to %s\n", pointCount, qPrintable(fifOut));
+        qInfo("Wrote %lld points to %s", pointCount, qPrintable(fifOut));
     }
     if (!hptsOut.isEmpty()) {
         if (!writeHpts(hptsOut, points))
             return 1;
-        fprintf(stderr, "Wrote %lld points to %s\n", pointCount, qPrintable(hptsOut));
+        qInfo("Wrote %lld points to %s", pointCount, qPrintable(hptsOut));
     }
 
-    fprintf(stderr, "done.\n");
+    qInfo("done.");
     return 0;
 }

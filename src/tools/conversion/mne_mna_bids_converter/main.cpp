@@ -26,6 +26,7 @@
 #include <mna/mna_recording.h>
 #include <mna/mna_file_ref.h>
 #include <mna/mna_types.h>
+#include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -39,12 +40,14 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QDateTime>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace MNALIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 // BIDS HELPERS
@@ -147,12 +150,9 @@ static MnaFileRole guessRoleFromBidsDir(const QString& dirName)
 
 static int cmdExtract(const QString& inputPath, const QString& outputDir)
 {
-    QTextStream out(stdout);
-    QTextStream err(stderr);
-
     MnaProject proj = MnaIO::read(inputPath);
     if (proj.subjects.isEmpty()) {
-        err << "Error: failed to read or empty project: " << inputPath << "\n";
+        qCritical().noquote().nospace() << "failed to read or empty project: " << inputPath;
         return 1;
     }
 
@@ -177,10 +177,10 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
                         if (f.open(QIODevice::WriteOnly)) {
                             f.write(ref.data);
                             f.close();
-                            out << "  extracted: " << relPath << "\n";
+                            qInfo().noquote().nospace() << "  extracted: " << relPath;
                             ++extracted;
                         } else {
-                            err << "  FAILED:    " << relPath << "\n";
+                            qCritical().noquote().nospace() << "Failed: " << relPath;
                         }
                     } else if (!ref.embedded) {
                         // Copy from source location relative to the project file
@@ -190,17 +190,17 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
                         if (QFile::exists(srcPath)) {
                             QDir().mkpath(QFileInfo(fullPath).absolutePath());
                             if (QFile::copy(srcPath, fullPath)) {
-                                out << "  copied:    " << relPath << "\n";
+                                qInfo().noquote().nospace() << "  copied:    " << relPath;
                                 ++extracted;
                             } else {
-                                err << "  FAILED:    " << relPath << " (copy error)\n";
+                                qCritical().noquote().nospace() << "Failed: " << relPath << " (copy error)";
                             }
                         } else {
-                            err << "  SKIPPED:   " << ref.path << " (source not found)\n";
+                            qWarning().noquote().nospace() << "Skipped: " << ref.path << " (source not found)";
                             ++skipped;
                         }
                     } else {
-                        err << "  SKIPPED:   " << ref.path << " (empty embedded data)\n";
+                        qWarning().noquote().nospace() << "Skipped: " << ref.path << " (empty embedded data)";
                         ++skipped;
                     }
                 }
@@ -223,9 +223,9 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
     outProj.modified = QDateTime::currentDateTimeUtc();
     const QString sidecarPath = QDir(outputDir).filePath(QStringLiteral("project.mna"));
     MnaIO::write(outProj, sidecarPath);
-    out << "\n  Sidecar written: " << sidecarPath << "\n";
+    qInfo().noquote().nospace() << "  Sidecar written: " << sidecarPath;
 
-    out << "\n  Done. Extracted: " << extracted << "  Skipped: " << skipped << "\n";
+    qInfo().noquote().nospace() << "  Done. Extracted: " << extracted << "  Skipped: " << skipped;
     return 0;
 }
 
@@ -235,16 +235,13 @@ static int cmdExtract(const QString& inputPath, const QString& outputDir)
 
 static int cmdPack(const QString& inputDir, const QString& outputPath, bool embed)
 {
-    QTextStream out(stdout);
-    QTextStream err(stderr);
-
     // Check if there's an existing project.mna sidecar to use as template
     const QString sidecarPath = QDir(inputDir).filePath(QStringLiteral("project.mna"));
     MnaProject proj;
 
     if (QFile::exists(sidecarPath)) {
         proj = MnaIO::read(sidecarPath);
-        out << "  Using existing sidecar: " << sidecarPath << "\n";
+        qInfo().noquote().nospace() << "  Using existing sidecar: " << sidecarPath;
 
         if (embed) {
             // Read file data into each ref
@@ -260,7 +257,7 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
                                 ref.embedded = true;
                                 f.close();
                             } else {
-                                err << "  WARNING: cannot read " << filePath << "\n";
+                                qWarning().noquote().nospace() << "cannot read " << filePath;
                             }
                         }
                     }
@@ -269,7 +266,7 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
         }
     } else {
         // Scan the directory for BIDS structure: sub-*/ses-*/<modality>/*
-        out << "  Scanning BIDS directory: " << inputDir << "\n";
+        qInfo().noquote().nospace() << "  Scanning BIDS directory: " << inputDir;
 
         proj.name = QStringLiteral("BIDS Import");
         proj.description = QStringLiteral("Imported from BIDS directory");
@@ -342,7 +339,7 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
                         }
 
                         rec.files.append(ref);
-                        out << "  + " << mnaFileRoleToString(ref.role) << "  " << ref.path << "\n";
+                        qInfo().noquote().nospace() << "  + " << mnaFileRoleToString(ref.role) << "  " << ref.path;
                     }
                 }
 
@@ -360,10 +357,10 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
     proj.modified = QDateTime::currentDateTimeUtc();
 
     if (MnaIO::write(proj, outputPath)) {
-        out << "\n  Written: " << outputPath << "\n";
+        qInfo().noquote().nospace() << "  Written: " << outputPath;
         return 0;
     } else {
-        err << "Error: failed to write " << outputPath << "\n";
+        qCritical().noquote().nospace() << "failed to write " << outputPath;
         return 1;
     }
 }
@@ -374,12 +371,9 @@ static int cmdPack(const QString& inputDir, const QString& outputPath, bool embe
 
 static int cmdConvert(const QString& inputPath, const QString& outputPath)
 {
-    QTextStream out(stdout);
-    QTextStream err(stderr);
-
     MnaProject proj = MnaIO::read(inputPath);
     if (proj.name.isEmpty() && proj.subjects.isEmpty() && proj.pipeline.isEmpty()) {
-        err << "Error: failed to read project: " << inputPath << "\n";
+        qCritical().noquote().nospace() << "failed to read project: " << inputPath;
         return 1;
     }
 
@@ -402,9 +396,9 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
                                 ref.embedded = true;
                                 ref.path = QFileInfo(ref.path).fileName();
                                 f.close();
-                                out << "  embedded: " << filePath << "\n";
+                                qInfo().noquote().nospace() << "  embedded: " << filePath;
                             } else {
-                                err << "  WARNING: cannot read " << filePath << ", keeping as reference\n";
+                                qWarning().noquote().nospace() << "cannot read " << filePath << ", keeping as reference";
                             }
                         }
                     }
@@ -415,7 +409,7 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
 
     // When converting .mnx → .mna, strip embedded data (files must be extracted first)
     if (outSuffix == QLatin1String("mna") && inSuffix == QLatin1String("mnx")) {
-        out << "  Note: embedded data will be dropped. Use 'extract' first to write files to disk.\n";
+        qInfo().noquote().nospace() << "  Note: embedded data will be dropped. Use 'extract' first to write files to disk.";
         for (MnaSubject& subj : proj.subjects) {
             for (MnaSession& sess : subj.sessions) {
                 for (MnaRecording& rec : sess.recordings) {
@@ -431,10 +425,10 @@ static int cmdConvert(const QString& inputPath, const QString& outputPath)
     proj.modified = QDateTime::currentDateTimeUtc();
 
     if (MnaIO::write(proj, outputPath)) {
-        out << "  Converted: " << inputPath << " -> " << outputPath << "\n";
+        qInfo().noquote().nospace() << "  Converted: " << inputPath << " -> " << outputPath;
         return 0;
     } else {
-        err << "Error: failed to write " << outputPath << "\n";
+        qCritical().noquote().nospace() << "failed to write " << outputPath;
         return 1;
     }
 }
@@ -459,6 +453,7 @@ static void printUsage(QTextStream& out)
 
 int main(int argc, char* argv[])
 {
+    qInstallMessageHandler(MNELogger::customLogWriter);
     QCoreApplication app(argc, argv);
     app.setApplicationName(QStringLiteral("mne_mna_bids_converter"));
     app.setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));
@@ -487,7 +482,7 @@ int main(int argc, char* argv[])
 
     if (cmd == QLatin1String("extract")) {
         if (args.size() < 2) {
-            err << "Error: extract requires <input> <output_dir>\n";
+            qCritical().noquote().nospace() << "extract requires <input> <output_dir>";
             return 1;
         }
         return cmdExtract(args[0], args[1]);
@@ -495,7 +490,7 @@ int main(int argc, char* argv[])
 
     if (cmd == QLatin1String("pack")) {
         if (args.size() < 2) {
-            err << "Error: pack requires <bids_dir> <output.mnx|mna>\n";
+            qCritical().noquote().nospace() << "pack requires <bids_dir> <output.mnx|mna>";
             return 1;
         }
         bool embed;
@@ -510,13 +505,13 @@ int main(int argc, char* argv[])
 
     if (cmd == QLatin1String("convert")) {
         if (args.size() < 2) {
-            err << "Error: convert requires <input> <output>\n";
+            qCritical().noquote().nospace() << "convert requires <input> <output>";
             return 1;
         }
         return cmdConvert(args[0], args[1]);
     }
 
-    err << "Error: unknown command '" << cmd << "'\n\n";
+    qCritical().noquote().nospace() << "unknown command '" << cmd << "'";
     printUsage(err);
     return 1;
 }

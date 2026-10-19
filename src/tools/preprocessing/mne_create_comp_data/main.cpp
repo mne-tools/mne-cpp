@@ -145,15 +145,15 @@ int main(int argc, char* argv[])
     bool calibrated = parser.isSet(calibratedOpt);
 
     if (inFile.isEmpty()) {
-        fprintf(stderr, "Input matrix file (--in) is required.\n");
+        qCritical("Input matrix file (--in) is required.");
         return 1;
     }
     if (!parser.isSet(kindOpt)) {
-        fprintf(stderr, "Compensation kind (--kind) is required.\n");
+        qCritical("Compensation kind (--kind) is required.");
         return 1;
     }
     if (outFile.isEmpty()) {
-        fprintf(stderr, "Output file (--out) is required.\n");
+        qCritical("Output file (--out) is required.");
         return 1;
     }
 
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
     QFile fOut(outFile);
     FiffStream::SPtr stream = FiffStream::start_file(fOut);
     if (!stream) {
-        fprintf(stderr, "Cannot create output FIFF file.\n");
+        qCritical("Cannot create output FIFF file.");
         return 1;
     }
 

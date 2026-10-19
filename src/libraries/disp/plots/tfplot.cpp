@@ -66,8 +66,6 @@ TFplot::TFplot(Eigen::MatrixXd tf_matrix,
     qint32 upper_px = floor(upper_frq / frq_per_px);
 
     Eigen::MatrixXd zoomed_tf_matrix = Eigen::MatrixXd::Zero(upper_px - lower_px, tf_matrix.cols());
-    //How to print to console here
-    //printf(("fff   "+QString::number(zoomed_tf_matrix(12,12))).toUtf8().data());// << ";  " << zoomed_tf_matrix.rows(2) << ";   ";
 
     qint32 pxls = 0;
     for (qint32 it = lower_px; it < upper_px; it++) {

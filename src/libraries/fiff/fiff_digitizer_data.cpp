@@ -21,7 +21,6 @@
 #include "fiff_coord_trans.h"
 #include "fiff_stream.h"
 #include "fiff_dig_point.h"
-#include <iostream>
 #include <QDebug>
 
 #include <stdexcept>
@@ -129,24 +128,24 @@ FiffDigitizerData::FiffDigitizerData(QIODevice& p_IODevice)
 
 void FiffDigitizerData::print() const
 {
-    std::cout << "Number of digitizer points: " << points.size() << "\n";
+    qInfo().noquote().nospace() << "Number of digitizer points: " << points.size();
 
     switch (coord_frame) {
         case FIFFV_COORD_MRI:
-            std::cout << "Coord. Frame: FIFFV_COORD_MRI \n";
+            qInfo().noquote().nospace() << "Coord. Frame: FIFFV_COORD_MRI";
             break;
         case FIFFV_COORD_HEAD:
-            std::cout << "Coord. Frame: FIFFV_COORD_HEAD \n";
+            qInfo().noquote().nospace() << "Coord. Frame: FIFFV_COORD_HEAD";
             break;
     }
 
     for (auto& point : points) {
         if (point.kind == FIFFV_POINT_HPI) {
-            std::cout << "HPI Point " << point.ident << " - " << point.r[0] << ", " << point.r[1] << ", " << point.r[2] << "\n";
+            qInfo().noquote().nospace() << "HPI Point " << point.ident << " - " << point.r[0] << ", " << point.r[1] << ", " << point.r[2];
         }
     }
 
-    std::cout << "Number of MRI fiducials: " << nfids() << "\n";
+    qInfo().noquote().nospace() << "Number of MRI fiducials: " << nfids();
 
     if (head_mri_t) {
     }

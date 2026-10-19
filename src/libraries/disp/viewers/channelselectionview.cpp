@@ -34,7 +34,6 @@
 // STL INCLUDES
 //=============================================================================================================
 
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -49,6 +48,7 @@
 #include <QApplication>
 #include <QKeyEvent>
 #include <QSignalBlocker>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -412,7 +412,7 @@ void ChannelSelectionView::saveSettings()
 
     QSettings settings("MNECPP");
 
-    std::cout << "saveSettings: " << getCurrentLayoutFile().toStdString();
+    qInfo().noquote().nospace() << "saveSettings: " << getCurrentLayoutFile();
 
     settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), getCurrentLayoutFile());
     settings.setValue(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), this->pos());

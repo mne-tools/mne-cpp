@@ -374,15 +374,15 @@ int main(int argc, char* argv[])
     }
 
     if (inputFile.isEmpty()) {
-        fprintf(stderr, "No input file specified.\n");
+        qInfo("No input file specified.");
         return 1;
     }
     if (outputFile.isEmpty()) {
-        fprintf(stderr, "No output file specified.\n");
+        qInfo("No output file specified.");
         return 1;
     }
     if (outputFormat == FORMAT_UNKNOWN) {
-        fprintf(stderr, "Cannot determine output format. Use --outtri, --outfif, --outsurf, or --outsmf.\n");
+        qInfo("Cannot determine output format. Use --outtri, --outfif, --outsurf, or --outsmf.");
         return 1;
     }
 
@@ -421,12 +421,12 @@ int main(int argc, char* argv[])
                 scaleFactor = 0.001f; // smf files are typically in mm
             break;
         default:
-            fprintf(stderr, "Cannot determine input format. Use --surf, --fif, --tri, or --smf.\n");
+            qInfo("Cannot determine input format. Use --surf, --fif, --tri, or --smf.");
             return 1;
     }
 
     if (!ok) {
-        fprintf(stderr, "Failed to read input surface.\n");
+        qCritical("Failed to read input surface.");
         return 1;
     }
 
@@ -450,19 +450,19 @@ int main(int argc, char* argv[])
             ok = writeTriFile(outputFile, rr * 1000.0f, tris);
             break;
         case FORMAT_FREESURFER:
-            fprintf(stderr, "FreeSurfer surface writing not yet supported. Use --outtri or --outfif.\n");
+            qInfo("FreeSurfer surface writing not yet supported. Use --outtri or --outfif.");
             return 1;
         case FORMAT_SMF:
             // smf format uses mm
             ok = writeSmfFile(outputFile, rr * 1000.0f, tris);
             break;
         default:
-            fprintf(stderr, "Unknown output format.\n");
+            qCritical("Unknown output format.");
             return 1;
     }
 
     if (!ok) {
-        fprintf(stderr, "Failed to write output surface.\n");
+        qCritical("Failed to write output surface.");
         return 1;
     }
 

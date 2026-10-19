@@ -119,19 +119,19 @@ int main(int argc, char* argv[])
         parser.showHelp(1);
     }
 
-    fprintf(stderr, "input  file : %s\n", qPrintable(bemName));
-    fprintf(stderr, "output file : %s\n", qPrintable(outName));
-    fprintf(stderr, "surface id  : %d\n", surfId);
+    qInfo("input  file : %s", qPrintable(bemName));
+    qInfo("output file : %s", qPrintable(outName));
+    qInfo("surface id  : %d", surfId);
     if (lengthMult == 1.0f)
-        fprintf(stderr, "output in meters.\n");
+        qInfo("output in meters.");
     else
-        fprintf(stderr, "output in millimeters.\n");
+        qInfo("output in millimeters.");
     if (thomOutput)
-        fprintf(stderr, "output in Oostendorp (xfit) format.\n");
+        qInfo("output in Oostendorp (xfit) format.");
     else if (oldOutput)
-        fprintf(stderr, "output in old stream format.\n");
+        qInfo("output in old stream format.");
     else
-        fprintf(stderr, "output the vertex coordinates only.\n");
+        qInfo("output the vertex coordinates only.");
 
     // Read BEM surfaces
     QFile bemFile(bemName);

@@ -32,6 +32,7 @@
 #include <QSharedPointer>
 #include <QList>
 #include <QString>
+#include <QTextStream>
 
 
 //*************************************************************************************************************
@@ -149,7 +150,7 @@ public:
      *
      * @param[in] out   Stream to write the content to
      */
-    void list_fiff_explanations(FILE* out);
+    void list_fiff_explanations(QTextStream& out);
 
     //=========================================================================================================
     /**
@@ -178,7 +179,7 @@ public:
      *
      * @return true if succeeded
      */
-    bool show_fiff_contents(FILE* out, const MNEShowFiffSettings& settings);
+    bool show_fiff_contents(QTextStream& out, const MNEShowFiffSettings& settings);
 
     //=========================================================================================================
     /**
@@ -195,7 +196,7 @@ public:
      *
      * @return true if succeeded
      */
-    bool show_fiff_contents(FILE* out, const QString& name, bool verbose, const QList<int>& tags, int indent_step, bool long_strings, bool blocks_only);
+    bool show_fiff_contents(QTextStream& out, const QString& name, bool verbose, const QList<int>& tags, int indent_step, bool long_strings, bool blocks_only);
 
 private:
     //=========================================================================================================
@@ -205,15 +206,15 @@ private:
      */
     void sort_fiff_explanations();
 
-    void print_file_id(FILE* out, const FIFFLIB::FiffTag::UPtr& tag);
+    void print_file_id(QTextStream& out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_ch_info(FILE* out, const FIFFLIB::FiffTag::UPtr& tag);
+    void print_ch_info(QTextStream& out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_transform(FILE* out, const FIFFLIB::FiffTag::UPtr& tag);
+    void print_transform(QTextStream& out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_dig_point(FILE* out, const FIFFLIB::FiffTag::UPtr& tag);
+    void print_dig_point(QTextStream& out, const FIFFLIB::FiffTag::UPtr& tag);
 
-    void print_matrix(FILE* out, FIFFLIB::FiffStream::SPtr stream, FIFFLIB::FiffDirEntry::SPtr this_ent);
+    void print_matrix(QTextStream& out, FIFFLIB::FiffStream::SPtr stream, FIFFLIB::FiffDirEntry::SPtr this_ent);
 
 private:
     QList<MNEFiffExp> m_qListExp; /**< List of Explanations. */

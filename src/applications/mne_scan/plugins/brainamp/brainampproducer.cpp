@@ -21,7 +21,6 @@
 #include "brainamp.h"
 #include "brainampdriver.h"
 
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -91,7 +90,7 @@ void BrainAMPProducer::stop()
 void BrainAMPProducer::run()
 {
     while (m_bIsRunning) {
-        //std::cout<<"BrainAMPProducer::run()"<<std::endl;
+        //qInfo().noquote().nospace() <<"BrainAMPProducer::run()";
         //Get the TMSi EEG data out of the device buffer and write received data to a QList
         MatrixXd matRawBuffer;
 
@@ -100,5 +99,5 @@ void BrainAMPProducer::run()
         }
     }
 
-    std::cout << "EXITING - BrainAMPProducer::run()" << std::endl;
+    qInfo().noquote().nospace() << "EXITING - BrainAMPProducer::run()";
 }

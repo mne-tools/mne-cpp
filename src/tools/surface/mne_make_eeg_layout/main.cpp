@@ -144,7 +144,7 @@ int main(int argc, char* argv[])
     }
     const auto eegChannelCount = static_cast<long long>(eegChannels.size());
 
-    fprintf(stderr, "%lld EEG channels found.\n", eegChannelCount);
+    qInfo("%lld EEG channels found.", eegChannelCount);
 
     // Compute center of mass for a simple sphere fit
     Vector3f center = Vector3f::Zero();
@@ -160,8 +160,8 @@ int main(int argc, char* argv[])
     }
     radius /= eegChannels.size();
 
-    fprintf(stderr, "Sphere center: %.3f %.3f %.3f m, radius: %.3f m\n",
-            center(0), center(1), center(2), radius);
+    qInfo("Sphere center: %.3f %.3f %.3f m, radius: %.3f m",
+          center(0), center(1), center(2), radius);
 
     // Project to 2D
     QList<float> xs, ys;
@@ -209,7 +209,7 @@ int main(int argc, char* argv[])
     }
 
     outFile.close();
-    fprintf(stderr, "Layout written to %s (%lld channels)\n", qPrintable(outName), eegChannelCount);
+    qInfo("Layout written to %s (%lld channels)", qPrintable(outName), eegChannelCount);
 
     return 0;
 }

@@ -39,6 +39,7 @@
 #include <QList>
 #include <QThread>
 #include <QtConcurrent>
+#include <QDebug>
 
 // MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
 // so define it here only for the toolchains that do not.
@@ -610,12 +611,12 @@ void FwdBemModel::lin_pot_coeff(const Eigen::Vector3f& from, MNETriangle& to, Ei
         check += omega[k] * z;
     }
     check *= -area2 / triple;
-    fprintf(stderr, "(%g,%g,%g) =? (%g,%g,%g)\n",
-            check[0], check[1], check[2],
-            vec_omega[0], vec_omega[1], vec_omega[2]);
+    qInfo("(%g,%g,%g) =? (%g,%g,%g)",
+          check[0], check[1], check[2],
+          vec_omega[0], vec_omega[1], vec_omega[2]);
     check -= vec_omega;
     double rel2 = sqrt(check.dot(check) / vec_omega.dot(vec_omega));
-    fprintf(stderr, "err1 = %g, err2 = %g\n", 100 * rel1, 100 * rel2);
+    qInfo("err1 = %g, err2 = %g", 100 * rel1, 100 * rel2);
 #endif
     return;
 }
@@ -640,8 +641,8 @@ void FwdBemModel::correct_auto_elements(MNESurface& surf, Eigen::MatrixXf& mat)
         sum = 0.0;
         for (k = 0; k < nnode; k++)
             sum = sum + mat(j, k);
-        fprintf(stderr, "row %d sum = %g missing = %g\n", j + 1, sum / pi2,
-                1.0 - sum / pi2);
+        qInfo("row %d sum = %g missing = %g", j + 1, sum / pi2,
+              1.0 - sum / pi2);
         mat(j, j) = pi2 - sum;
     }
 #else
@@ -679,7 +680,7 @@ void FwdBemModel::correct_auto_elements(MNESurface& surf, Eigen::MatrixXf& mat)
          *
         for (k = 0, sum = 0; k < nnode; k++)
           sum = sum + mat(j,k);
-        fprintf (stderr,"row %d sum = %g\n",j+1,sum/pi2);
+        qInfo("row %d sum = %g",j+1,sum/pi2);
         */
     }
 #endif

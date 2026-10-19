@@ -85,7 +85,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float>>& inputPoints,
     VectorXf yy(nchan);
 
     if (nchan <= 0) {
-        std::cout << "No input points to lay out.\n";
+        qWarning().noquote().nospace() << "No input points to lay out.";
         return false;
     }
 
@@ -96,20 +96,20 @@ bool LayoutMaker::makeLayout(const QList<QVector<float>>& inputPoints,
         rrs(k, 2) = inputPoints.at(k)[2]; //z
     }
 
-    std::cout << "Channels found for layout: " << nchan << "\n";
+    qInfo().noquote().nospace() << "Channels found for layout: " << nchan;
 
     //Fit to sphere if wanted by the user
     if (!do_fit) {
-        std::cout << "Using default origin:" << r0[0] << ", " << r0[1] << ", " << r0[2] << "\n";
+        qInfo().noquote().nospace() << "Using default origin:" << r0[0] << ", " << r0[1] << ", " << r0[2];
     } else {
         Sphere sphere = Sphere::fit_sphere_simplex(rrs, 0.05);
 
         r0 = sphere.center();
         rad = sphere.radius();
 
-        std::cout << "best fitting sphere:\n";
-        std::cout << "torigin: " << r0[0] << ", " << r0[1] << ", " << r0[2] << std::endl
-                  << "; tradius: " << rad << "\n";
+        qInfo().noquote().nospace() << "best fitting sphere:";
+        qInfo().noquote().nospace() << "torigin: " << r0[0] << ", " << r0[1] << ", " << r0[2]
+                                    << "; tradius: " << rad;
     }
 
     /*
@@ -140,7 +140,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float>>& inputPoints,
     }
 
     if (xmin == xmax || ymin == ymax) {
-        std::cout << "Cannot make a layout. All positions are identical\n";
+        qCritical().noquote().nospace() << "Cannot make a layout. All positions are identical";
         return false;
     }
 
@@ -158,7 +158,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float>>& inputPoints,
 
     if (writeFile) {
         if (!outFile.open(QIODevice::WriteOnly)) {
-            std::cout << "Could not open output file!\n";
+            qCritical().noquote().nospace() << "Could not open output file!";
             return false;
         }
 
@@ -196,7 +196,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float>>& inputPoints,
     }
 
     if (writeFile) {
-        std::cout << "Success while wrtiting to output file.\n";
+        qInfo().noquote().nospace() << "Successfully wrote the layout file.";
 
         outFile.close();
     }
@@ -236,7 +236,7 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float>>& inputPoints,
     VectorXf yy(nchan);
 
     if (nchan <= 0) {
-        std::cout << "No input points to lay out.\n";
+        qWarning().noquote().nospace() << "No input points to lay out.";
         return false;
     }
 
@@ -247,20 +247,20 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float>>& inputPoints,
         rrs(k, 2) = inputPoints.at(k)[2]; //z
     }
 
-    std::cout << "Channels found for layout: " << nchan << "\n";
+    qInfo().noquote().nospace() << "Channels found for layout: " << nchan;
 
     //Fit to sphere if wanted by the user
     if (!do_fit) {
-        std::cout << "Using default origin:" << r0[0] << ", " << r0[1] << ", " << r0[2] << "\n";
+        qInfo().noquote().nospace() << "Using default origin:" << r0[0] << ", " << r0[1] << ", " << r0[2];
     } else {
         Sphere sphere = Sphere::fit_sphere_simplex(rrs, 0.05);
 
         r0 = sphere.center();
         rad = sphere.radius();
 
-        std::cout << "best fitting sphere:\n";
-        std::cout << "torigin: " << r0[0] << ", " << r0[1] << ", " << r0[2] << std::endl
-                  << "; tradius: " << rad << "\n";
+        qInfo().noquote().nospace() << "best fitting sphere:";
+        qInfo().noquote().nospace() << "torigin: " << r0[0] << ", " << r0[1] << ", " << r0[2]
+                                    << "; tradius: " << rad;
     }
 
     /*
@@ -291,7 +291,7 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float>>& inputPoints,
     }
 
     if (xmin == xmax || ymin == ymax) {
-        std::cout << "Cannot make a layout. All positions are identical\n";
+        qCritical().noquote().nospace() << "Cannot make a layout. All positions are identical";
         return false;
     }
 
@@ -310,7 +310,7 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float>>& inputPoints,
     if (writeFile) {
         outFile.open(outFilePath);
         if (!outFile.is_open()) {
-            std::cout << "Could not open output file!\n";
+            qCritical().noquote().nospace() << "Could not open output file!";
             return false;
         }
         outFile << "0.000000 0.000000 0.000000 0.000000" << std::endl;
@@ -341,7 +341,7 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float>>& inputPoints,
     }
 
     if (writeFile) {
-        std::cout << "Success while wrtiting to output file.\n";
+        qInfo().noquote().nospace() << "Successfully wrote the layout file.";
     }
 
     return true;

@@ -42,15 +42,15 @@
 // STRUCT DEFINITIONS
 //=============================================================================================================
 
-typedef struct
+struct datadef_t
 {
     qint32 nchans;
     qint32 nsamples;
     qint32 data_type;
     qint32 bufsize; /* size of the buffer in bytes */
-} datadef_t;
+};
 
-typedef struct
+struct headerdef_t
 {
     qint32 nchans;
     qint32 nsamples;
@@ -58,32 +58,32 @@ typedef struct
     float fsample;
     qint32 data_type;
     qint32 bufsize; /* size of the buffer in bytes */
-} headerdef_t;
+};
 
-typedef struct
+struct messagedef_t
 {
     qint16 version; /* see VERSION */
     qint16 command; /* see PUT_xxx, GET_xxx and FLUSH_xxx */
     qint32 bufsize; /* size of the buffer in bytes */
-} messagedef_t;
+};
 
-typedef struct
+struct message_t
 {
     messagedef_t* def;
     void* buf;
-} message_t;
+};
 
-typedef struct
+struct datasel_t
 {
     qint32 begsample; /* indexing starts with 0, should be >=0 */
     qint32 endsample; /* indexing starts with 0, should be <header.nsamples */
-} datasel_t;
+};
 
-typedef struct
+struct samples_events_t
 {
     qint32 nsamples;
     qint32 nevents;
-} samples_events_t;
+};
 
 enum class HeaderChunk : int
 {

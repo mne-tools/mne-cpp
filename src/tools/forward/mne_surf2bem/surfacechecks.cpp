@@ -116,11 +116,11 @@ bool SurfaceChecks::isCompleteSurface(const MNEBemSurface& surf)
     }
     cm /= static_cast<float>(surf.np);
 
-    fprintf(stderr, "%s CM is %6.2f %6.2f %6.2f mm\n",
-            qPrintable(getNameOf(surf.id)),
-            1000.0f * cm(0),
-            1000.0f * cm(1),
-            1000.0f * cm(2));
+    qInfo("%s CM is %6.2f %6.2f %6.2f mm",
+          qPrintable(getNameOf(surf.id)),
+          1000.0f * cm(0),
+          1000.0f * cm(1),
+          1000.0f * cm(2));
 
     //
     // Sum of solid angles from the center should be 4*pi for a complete surface
@@ -168,15 +168,14 @@ bool SurfaceChecks::checkSurfaces(const QVector<MNEBemSurface>& surfs)
     // Then check the topology (each surface inside the previous one)
     //
     for (int j = 0; j < surfs.size() - 1; ++j) {
-        fprintf(stderr, "Checking that %s surface is inside %s surface...",
-                qPrintable(getNameOf(surfs[j + 1].id)),
-                qPrintable(getNameOf(surfs[j].id)));
+        const QString check = QString("Checking that %1 surface is inside %2 surface...")
+                                  .arg(getNameOf(surfs[j + 1].id), getNameOf(surfs[j].id));
 
         if (!isInside(surfs[j + 1], surfs[j])) {
-            fprintf(stderr, "[failed]\n");
+            qCritical("%s [failed]", qPrintable(check));
             return false;
         }
-        fprintf(stderr, "[ok]\n");
+        qInfo("%s [ok]", qPrintable(check));
     }
     return true;
 }
@@ -202,14 +201,14 @@ float SurfaceChecks::minSurfaceDistance(const MNEBemSurface& s1, const MNEBemSur
 bool SurfaceChecks::checkThicknesses(const QVector<MNEBemSurface>& surfs)
 {
     for (int k = 0; k < surfs.size() - 1; ++k) {
-        fprintf(stderr, "Checking distance between %s and %s surfaces...\n",
-                qPrintable(getNameOf(surfs[k].id)),
-                qPrintable(getNameOf(surfs[k + 1].id)));
+        qInfo("Checking distance between %s and %s surfaces...",
+              qPrintable(getNameOf(surfs[k].id)),
+              qPrintable(getNameOf(surfs[k + 1].id)));
         float dist = minSurfaceDistance(surfs[k], surfs[k + 1]);
-        fprintf(stderr, "Minimum distance between the %s and %s surfaces is approximately %6.1f mm\n",
-                qPrintable(getNameOf(surfs[k].id)),
-                qPrintable(getNameOf(surfs[k + 1].id)),
-                1000.0f * dist);
+        qInfo("Minimum distance between the %s and %s surfaces is approximately %6.1f mm",
+              qPrintable(getNameOf(surfs[k].id)),
+              qPrintable(getNameOf(surfs[k + 1].id)),
+              1000.0f * dist);
     }
     return true;
 }
@@ -248,15 +247,15 @@ bool SurfaceChecks::checkSurfaceSize(const MNEBemSurface& surf)
 void SurfaceChecks::reportTriangleAreas(const MNEBemSurface& surf, const QString& name)
 {
     if (surf.tri_area.size() == 0) {
-        fprintf(stderr, "No triangle area data available for %s\n", qPrintable(name));
+        qInfo("No triangle area data available for %s", qPrintable(name));
         return;
     }
 
     double minArea = surf.tri_area.minCoeff();
     double maxArea = surf.tri_area.maxCoeff();
 
-    fprintf(stderr, "Triangle areas on %s surface: %8.3f ... %8.3f mm^2\n",
-            qPrintable(name),
-            1e6 * minArea,
-            1e6 * maxArea);
+    qInfo("Triangle areas on %s surface: %8.3f ... %8.3f mm^2",
+          qPrintable(name),
+          1e6 * minArea,
+          1e6 * maxArea);
 }

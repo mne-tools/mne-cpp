@@ -50,19 +50,21 @@ namespace TMSIPLUGIN
 // Structure Typedefs - structure define as used in the TMSiSDK.dll
 //=============================================================================================================
 
-typedef struct _SP_DEVICE_PATH
+struct SP_DEVICE_PATH
 {
     DWORD dwCbSize;
     TCHAR devicePath[1];
-} SP_DEVICE_PATH, *PSP_DEVICE_PATH;
+};
+using PSP_DEVICE_PATH = SP_DEVICE_PATH*;
 
-typedef struct _FeatureData
+struct FEATURE_DATA
 {
     ULONG FeatureId;
     ULONG Info;
-} FEATURE_DATA, *PFEATURE_DATA;
+};
+using PFEATURE_DATA = FEATURE_DATA*;
 
-typedef struct _SYSTEM_TIME
+struct SYSTEM_TIME
 {
     WORD wYear;
     WORD wMonth;
@@ -72,9 +74,9 @@ typedef struct _SYSTEM_TIME
     WORD wMinute;
     WORD wSecond;
     WORD wMilliseconds;
-} SYSTEM_TIME;
+};
 
-typedef struct _SIGNAL_FORMAT
+struct SIGNAL_FORMAT
 {
     ULONG Size;     // Size of this structure
     ULONG Elements; // Number of elements in list
@@ -94,9 +96,10 @@ typedef struct _SIGNAL_FORMAT
     ULONG Port;
     WCHAR PortName[40];
     ULONG SerialNumber;
-} SIGNAL_FORMAT, *PSIGNAL_FORMAT;
+};
+using PSIGNAL_FORMAT = SIGNAL_FORMAT*;
 
-typedef enum _TMSiConnectionEnum
+enum TMSiConnectionType
 {
     TMSiConnectionUndefined = 0, //Undefined connection, indicates programming error
     TMSiConnectionFiber,         //Obsolete, do not use
@@ -104,9 +107,9 @@ typedef enum _TMSiConnectionEnum
     TMSiConnectionUSB,           //USB 2.0 connection direct
     TMSiConnectionWifi,          //Network connection, Ip-adress and port needed, wireless
     TMSiConnectionNetwork        //Network connection, Ip-adress and port needed, wired
-} TMSiConnectionType;
+};
 
-typedef struct _FRONTENDINFO
+struct FRONTENDINFO
 {
     unsigned short NrOfChannels;      //Current number of channels used
     unsigned short SampleRateSetting; //Current sample rate setting (a.k.a. base sample rate divider )
@@ -123,7 +126,8 @@ typedef struct _FRONTENDINFO
     unsigned short BaseSf;         //Max. sample frequency
     unsigned short Power;
     unsigned short Check;
-} FRONTENDINFO, *PFRONTENDINFO;
+};
+using PFRONTENDINFO = FRONTENDINFO*;
 
 //=============================================================================================================
 // Method Typedefs - method defines as used in the RTINST.DLL
