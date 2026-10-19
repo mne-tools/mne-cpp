@@ -22,6 +22,7 @@
 
 #include <utils/polhemus/polhemus_coregistration.h>
 #include <utils/polhemus/acquired_points.h>
+#include <utils/polhemus/fastrak_parser.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -104,6 +105,8 @@ private slots:
     void opticalCalibration_recoversAxis_data();
     void opticalCalibration_recoversAxis();
     void opticalSession_roundTripAndRestoreReplacesFiducials();
+    void fastrakParser_recordsUnitsAndOrientation();
+    void fastrakParser_streamSkipsBlankAndMalformedLines();
 
 private:
     static void feed(PolhemusConnection& conn, int station, const QVector3D& pos, const QQuaternion& ori);
@@ -867,6 +870,85 @@ void TestPolhemusCoregistration::opticalSession_roundTripAndRestoreReplacesFiduc
 
     QSettings empty(tmpDir.path() + "/empty.ini", QSettings::IniFormat);
     QVERIFY(!second.restoreSessionState(empty));
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::fastrakParser_recordsUnitsAndOrientation()
+{
+    using Units = FastrakParser::Units;
+    FastrakSample s;
+    auto near = [](const QVector3D& a, const QVector3D& b) {
+        return (a - b).length() < 1e-6f;
+    };
+
+    QVERIFY(FastrakParser::parseRecord("1 1.0 2.0 -3.0", Units::Inches, s));
+    QCOMPARE(s.station, 1);
+    QVERIFY(near(s.position, QVector3D(0.0254f, 0.0508f, -0.0762f)));
+    QVERIFY(!s.hasOrientation);
+    QVERIFY(s.orientation.isIdentity());
+
+    QVERIFY(FastrakParser::parseRecord("  2   100 -50  25 ", Units::Centimetres, s));
+    QCOMPARE(s.station, 2);
+    QVERIFY(near(s.position, QVector3D(1.0f, -0.5f, 0.25f)));
+
+    // A minus sign that swallowed the field separator must still split the fields.
+    QVERIFY(FastrakParser::parseRecord("-1 0.8829-0.3055-1.0", Units::Centimetres, s));
+    QCOMPARE(s.station, -1);
+    QVERIFY(near(s.position, QVector3D(0.008829f, -0.003055f, -0.01f)));
+
+    QVERIFY(FastrakParser::parseRecord("3 0 0 0 0 0 0 2", Units::Inches, s));
+    QVERIFY(s.hasOrientation);
+    QVERIFY(qFuzzyCompare(s.orientation, QQuaternion(0.0f, 0.0f, 0.0f, 1.0f)));
+
+    QVERIFY(FastrakParser::parseRecord("4 0 0 0 90 0 0", Units::Inches, s));
+    QVERIFY(s.hasOrientation);
+    QVERIFY(near(s.orientation.rotatedVector(QVector3D(1, 0, 0)), QVector3D(0, 1, 0)));
+
+    // Bad orientation fields keep the position but drop the orientation.
+    QVERIFY(FastrakParser::parseRecord("5 1 0 0 a b c d", Units::Centimetres, s));
+    QVERIFY(near(s.position, QVector3D(0.01f, 0.0f, 0.0f)));
+    QVERIFY(!s.hasOrientation);
+    QVERIFY(FastrakParser::parseRecord("6 0 1 0 x 0 0", Units::Centimetres, s));
+    QVERIFY(!s.hasOrientation);
+    QVERIFY(FastrakParser::parseRecord("7 0 0 1 45 10", Units::Centimetres, s));
+    QVERIFY(!s.hasOrientation);
+
+    s.station = 99;
+    for (const QByteArray& bad : {QByteArray("1 2 3"), QByteArray("a 1 2 3"), QByteArray("1 x 2 3"), QByteArray("1 2 3 z"), QByteArray()}) {
+        QVERIFY2(!FastrakParser::parseRecord(bad, Units::Inches, s), bad.constData());
+    }
+    QCOMPARE(s.station, 99);
+}
+
+//=============================================================================================================
+
+void TestPolhemusCoregistration::fastrakParser_streamSkipsBlankAndMalformedLines()
+{
+    FastrakParser parser;
+    QCOMPARE(parser.units(), FastrakParser::Units::Centimetres);
+    parser.setUnits(FastrakParser::Units::Inches);
+    QCOMPARE(parser.units(), FastrakParser::Units::Inches);
+    parser.setUnits(FastrakParser::Units::Centimetres);
+
+    FastrakSample s;
+    QVERIFY(!parser.nextSample(s));
+    parser.append("\r\n   \n1 100 0 0\r\nbad record\n2 0 ");
+    QVERIFY(parser.nextSample(s));
+    QCOMPARE(s.station, 1);
+    QVERIFY((s.position - QVector3D(1.0f, 0.0f, 0.0f)).length() < 1e-6f);
+    QVERIFY(!parser.nextSample(s));
+
+    parser.append("200 0\n");
+    QVERIFY(parser.nextSample(s));
+    QCOMPARE(s.station, 2);
+    QVERIFY((s.position - QVector3D(0.0f, 2.0f, 0.0f)).length() < 1e-6f);
+
+    parser.append("3 0 0 1");
+    parser.reset();
+    parser.append("\n");
+    QVERIFY(!parser.nextSample(s));
+    QCOMPARE(s.station, 2);
 }
 
 //=============================================================================================================

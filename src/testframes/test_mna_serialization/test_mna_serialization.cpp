@@ -130,6 +130,7 @@ private slots:
     void testParamTreeAllPaths();
     void testParamTreeBindings();
     void testParamTreeEvaluateExpression();
+    void testParamTreeEvaluateBindings();
     void testParamTreeJsonRoundTrip();
 
     // ── MnaOpSchema ──────────────────────────────────────────────────
@@ -1139,6 +1140,64 @@ void TestMnaSerialization::testParamTreeEvaluateExpression()
 
     // An unresolved ref stays unresolved inside functions instead of evaluating as 0
     QVERIFY(!tree.evaluateExpression("clamp(ref('missing::out') * 2, 1, 5)", results).isValid());
+
+    tree.setParam("p/gain", 2.0);
+    results["a::x"] = 3.0;
+    results["zero"] = 0.0;
+    auto eval = [&](const QString& expr) {
+        return tree.evaluateExpression(expr, results);
+    };
+
+    const QList<QPair<QString, bool>> comparisons = {
+        {"1 < 2", true}, {"4 < 3", false}, {"2 <= 2", true}, {"3 >= 4", false}, {"2 == 2", true}, {"2 != 2", false}, {"5 > 4", true}, {"ref('a::x') > 2", true}, {"p/gain >= 2.5", false}, {" true ", true}, {"false", false}};
+    for (const auto& c : comparisons) {
+        const QVariant v = eval(c.first);
+        QCOMPARE(v.typeId(), QMetaType::Bool);
+        QCOMPARE(v.toBool(), c.second);
+    }
+    QVERIFY(!eval("ref('nope') > 1").isValid());
+    QVERIFY(!eval("1 < ref('nope')").isValid());
+
+    const QList<QPair<QString, double>> numeric = {
+        {"ref('p/gain')", 2.0}, {"clamp(ref('a::x'), 0, 1)", 1.0}, {"clamp(-5, 0, 1)", 0.0}, {"clamp(0.5, 0, 1)", 0.5}, {"scale(ref('a::x'), 0.5)", 1.5}, {"threshold(ref('a::x'), 2.5, 10, 20)", 10.0}, {"threshold(ref('a::x'), 3.5, 10, 20)", 20.0}, {"lerp(0, 10, 0.25)", 2.5}, {" 1e-3 ", 1e-3}, {"p/gain", 2.0}, {"a::x", 3.0}, {"ref('a::x') * 4", 12.0}, {"1 / (ref('a::x') + 1)", 0.25}, {"ref('a::x') + 0.5", 3.5}};
+    for (const auto& n : numeric) {
+        const QVariant v = eval(n.first);
+        QVERIFY2(v.isValid(), qPrintable(n.first));
+        QCOMPARE(v.toDouble(), n.second);
+    }
+
+    const QStringList invalid = {"scale(ref('nope'), 2)", "threshold(ref('nope'), 1, 2, 3)", "lerp(0, 10, ref('nope'))", "unknown_name",
+                                 "ref('nope') * 4", "2 / (ref('zero'))", "2 / (ref('nope'))", "ref('nope') + 1", "foo bar"};
+    for (const QString& expr : invalid) {
+        QVERIFY2(!eval(expr).isValid(), qPrintable(expr));
+    }
+}
+
+void TestMnaSerialization::testParamTreeEvaluateBindings()
+{
+    MnaParamTree tree;
+    tree.setParam("out/d", 5.0);
+
+    const QList<QStringList> specs = {{"out/a", "ref('a::x') * 2", "on_change"},
+                                      {"out/b", "ref('nope')", "on_change"},
+                                      {"out/c", "7", "manual"},
+                                      {"out/d", "5", "periodic"}};
+    for (const QStringList& s : specs) {
+        MnaParamBinding b;
+        b.targetPath = s[0];
+        b.expression = s[1];
+        b.trigger = s[2];
+        tree.addBinding(b);
+    }
+
+    QMap<QString, QVariant> results;
+    results["a::x"] = 3.0;
+    QCOMPARE(tree.evaluate(results), QStringList{"out/a"});
+    QCOMPARE(tree.param("out/a").toDouble(), 6.0);
+    QVERIFY(!tree.hasParam("out/b"));
+    QVERIFY(!tree.hasParam("out/c"));
+    QCOMPARE(tree.param("out/d").toDouble(), 5.0);
+    QVERIFY(tree.evaluate(results).isEmpty());
 }
 
 void TestMnaSerialization::testParamTreeJsonRoundTrip()

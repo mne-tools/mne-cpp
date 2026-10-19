@@ -337,6 +337,22 @@ private slots:
         MatrixXd badStart(3, 3);
         QVERIFY(!kmeans.calculate(X, badStart, idx, C, sumD, D));
         QVERIFY(!kmeans.calculate(X.topRows(2), start, idx, C, sumD, D));
+        QVERIFY(!kmeans.calculate(X, MatrixXd(0, 2), idx, C, sumD, D));
+
+        // Unknown names fall back to sqeuclidean / sample / error, and zero replicates to one
+        KMeans fallback("bogus", "bogus", 0, "bogus", false, 100);
+        QVERIFY(fallback.calculate(X, start, idx, C, sumD, D));
+        QCOMPARE(idx, expectedIdx);
+        QVERIFY((C - expectedC).cwiseAbs().maxCoeff() < 1e-12);
+        MatrixXd twoPoints = MatrixXd::Zero(12, 2);
+        twoPoints.bottomRows(6).setConstant(10.0);
+        MatrixXd emptyingStart(3, 2);
+        emptyingStart << 0.0, 0.0, 0.0, 0.0, 10.0, 10.0;
+        QVERIFY(!fallback.calculate(twoPoints, emptyingStart, idx, C, sumD, D));
+
+        // A 'cluster' start whose preliminary clustering empties a cluster fails every replicate under 'error'
+        KMeans clusterStart("sqeuclidean", "cluster", 4, "error", false, 100);
+        QVERIFY(!clusterStart.calculate(twoPoints, 3, idx, C, sumD, D));
     }
 
     void testEmptiedDuringIterations_data()

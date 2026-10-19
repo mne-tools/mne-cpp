@@ -69,7 +69,82 @@ private slots:
     void readsBidsElectrodes();
     void bipolarPairsFollowLeads();
     void surfaceMapMatchesStcNearSensors();
+    void readsBidsUnitsAndDeclarations();
+    void handlesDegenerateInput();
 };
+
+//=============================================================================================================
+
+void TestIeeg::readsBidsUnitsAndDeclarations()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString tsv = dir.filePath(QStringLiteral("sub-01_ses-02_electrodes.tsv"));
+    // seeg type on a grouped lead, grid by type without a shape, depth declared on a contact without group
+    writeFile(tsv,
+              "name\tx\ty\tz\tsize\ttype\tgroup\tdimension\n"
+              "B1\t0\t0\t0\tn/a\tseeg\tB\tn/a\n"
+              "B2\t0\t0\t1\tn/a\tn/a\tB\tn/a\n"
+              "H1\t5\t0\t0\tn/a\tGRID\tH\t3x1\n"
+              "H2\t6\t0\t0\tn/a\tn/a\tH\tn/a\n"
+              "D1\t-5\t0\t0\tn/a\tdepth\tn/a\tn/a\n"
+              "D2\t-5\t0\t2\tn/a\tn/a\tn/a\tn/a\n");
+    // The sidecar sharing the longer prefix (ses-02) wins over another session's
+    writeFile(dir.filePath(QStringLiteral("sub-01_ses-01_coordsystem.json")),
+              R"({"iEEGCoordinateSystem": "Other", "iEEGCoordinateUnits": "mm"})");
+    writeFile(dir.filePath(QStringLiteral("sub-01_ses-02_coordsystem.json")),
+              R"({"iEEGCoordinateSystem": "Other", "iEEGCoordinateUnits": "cm"})");
+    QString error;
+    IeegImplantation implantation = IeegImplantation::readBids(tsv, &error);
+    QVERIFY2(error.isEmpty(), qPrintable(error));
+    QVERIFY(!implantation.isScannerRas());
+    QVERIFY(implantation.contacts()[1].position.isApprox(Eigen::Vector3f(0.0f, 0.0f, 0.01f))); // cm -> m
+    const QVector<IeegLead>& leads = implantation.leads();
+    QCOMPARE(leads.size(), 3);
+    QCOMPARE(leads[0].type, IeegLeadType::Depth); // seeg, although 10 mm apart
+    QCOMPARE(leads[1].type, IeegLeadType::Grid);  // declared by type; 3x1 does not fit two contacts
+    QCOMPARE(leads[1].rows, 0);
+    QCOMPARE(leads[2].name, QStringLiteral("D"));
+    QCOMPARE(leads[2].type, IeegLeadType::Depth);
+
+    writeFile(dir.filePath(QStringLiteral("sub-01_ses-02_coordsystem.json")),
+              R"({"iEEGCoordinateSystem": "ScanRAS", "iEEGCoordinateUnits": "m"})");
+    implantation = IeegImplantation::readBids(tsv);
+    QVERIFY(implantation.isScannerRas());
+    QVERIFY(implantation.contacts()[1].position.isApprox(Eigen::Vector3f(0.0f, 0.0f, 1.0f)));
+
+    // Only contacts without coordinates: nothing to place
+    writeFile(tsv, "name\tx\ty\tz\nA1\tn/a\tn/a\tn/a\nA2\t1\tn/a\t0\n");
+    QVERIFY(IeegImplantation::readBids(tsv, &error).isEmpty());
+    QVERIFY2(error.contains(QLatin1String("no contacts")), qPrintable(error));
+}
+
+//=============================================================================================================
+
+void TestIeeg::handlesDegenerateInput()
+{
+    IeegImplantation implantation({contact("A1", 0, 0, 0), contact("A2", 0, 0, 3), contact("A3", 0, 0, 6), contact("A4", 0, 0, 9)});
+    QVERIFY(!implantation.setLeadType(QStringLiteral("nope"), IeegLeadType::Grid));
+    QVERIFY(implantation.setLeadType(QStringLiteral("A"), IeegLeadType::Grid, 2, 2));
+    QCOMPARE(implantation.leads()[0].rows, 2);
+    // A shape that does not fit the contacts is dropped, so the lead is paired as a single row
+    QVERIFY(implantation.setLeadType(QStringLiteral("A"), IeegLeadType::Grid, 3, 2));
+    QCOMPARE(implantation.leads()[0].cols, 0);
+    QCOMPARE(IeegReference::bipolarPairs(implantation).size(), 3);
+    QCOMPARE(IeegReference::bipolarPairs(IeegImplantation()).size(), 0);
+    QCOMPARE(IeegReference::bipolarMatrix({}, 4).rows(), Eigen::Index(0));
+
+    Eigen::MatrixX3f vertices = Eigen::MatrixX3f::Zero(2, 3);
+    vertices(1, 0) = 0.001f;
+    const Eigen::MatrixX3f contacts = Eigen::MatrixX3f::Zero(1, 3);
+    QCOMPARE(IeegSurfaceMap::weights(contacts, Eigen::MatrixX3f(0, 3), 0.005, IeegSurfaceMapMode::Sum, false).nonZeros(), Eigen::Index(0));
+    QCOMPARE(IeegSurfaceMap::weights(Eigen::MatrixX3f(0, 3), vertices, 0.005, IeegSurfaceMapMode::Sum, false).nonZeros(), Eigen::Index(0));
+    QCOMPARE(IeegSurfaceMap::weights(contacts, vertices, 0.0, IeegSurfaceMapMode::Sum, false).nonZeros(), Eigen::Index(0));
+    // A vertex exactly at the reach gets weight 0 and is left out; normalising cannot divide by zero
+    const Eigen::MatrixXd w = IeegSurfaceMap::weights(contacts, vertices, 0.001, IeegSurfaceMapMode::Weighted, false);
+    QCOMPARE(w(0, 0), 1.0);
+    QCOMPARE(w(1, 0), 0.0);
+}
 
 //=============================================================================================================
 
