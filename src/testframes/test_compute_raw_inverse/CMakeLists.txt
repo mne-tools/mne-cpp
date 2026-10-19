@@ -62,7 +62,7 @@ endif()
 enable_testing()
 mne_add_test(${PROJECT_NAME}
     LABELS integration parity
-    TIMEOUT 300
+    TIMEOUT 600
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample
         mne-cpp-test-data/Result/parity/compute_raw_inverse)

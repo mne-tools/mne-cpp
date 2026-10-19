@@ -35,7 +35,7 @@ endif()
 enable_testing()
 mne_add_test(${PROJECT_NAME}
     LABELS integration gui parity
-    TIMEOUT 120
+    TIMEOUT 300
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample
     ENVIRONMENT QT_QPA_PLATFORM=offscreen)

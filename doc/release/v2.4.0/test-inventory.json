@@ -909,7 +909,7 @@
         "parity",
         "requires-data"
       ],
-      "timeout": 300,
+      "timeout": 600,
       "requirements": [
         "sample-data",
         "test-data"
@@ -5014,7 +5014,7 @@
         "requires-data",
         "slow"
       ],
-      "timeout": 600,
+      "timeout": 900,
       "requirements": [
         "test-data"
       ],
@@ -5981,7 +5981,7 @@
         "parity",
         "requires-data"
       ],
-      "timeout": 120,
+      "timeout": 300,
       "requirements": [
         "test-data"
       ],
@@ -6225,7 +6225,7 @@
         "integration",
         "requires-data"
       ],
-      "timeout": 60,
+      "timeout": 120,
       "requirements": [
         "sample-data",
         "test-data"
@@ -6367,7 +6367,7 @@
         "parity",
         "requires-data"
       ],
-      "timeout": 60,
+      "timeout": 120,
       "requirements": [
         "test-data"
       ],
@@ -8580,7 +8580,7 @@
         "requires-data",
         "slow"
       ],
-      "timeout": 600,
+      "timeout": 900,
       "requirements": [
         "test-data"
       ],

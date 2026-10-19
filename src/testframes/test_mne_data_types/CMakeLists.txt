@@ -46,7 +46,7 @@ endif()
 enable_testing()
 mne_add_test(${PROJECT_NAME}
     LABELS integration
-    TIMEOUT 60
+    TIMEOUT 120
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample
         mne-cpp-test-data/Result

@@ -19,7 +19,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 mne_add_test(${PROJECT_NAME}
     LABELS integration slow
-    TIMEOUT 600
+    TIMEOUT 900
     REQUIRES_DATA
         mne-cpp-test-data/MEG/sample
         mne-cpp-test-data/Result

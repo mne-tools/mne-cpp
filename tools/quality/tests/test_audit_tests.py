@@ -117,6 +117,18 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual([record["name"] for record in report["tests"]], directories)
         self.assertEqual(sum(report["summary"]["registration"].values()), len(directories))
 
+    def test_timeouts_leave_five_times_the_slowest_ci_run(self) -> None:
+        """T1.2 rule: a timeout gives at least 5x the slowest pinned CI duration, so parallel local runs pass."""
+        evidence = audit.load_ci_evidence(audit.CI_EVIDENCE)
+        slowest: dict[str, float] = {}
+        for platform in evidence["platforms"].values():
+            for name, result in platform["results"].items():
+                slowest[name] = max(slowest.get(name, 0.0), result.get("seconds") or 0.0)
+        report = audit.build_inventory(audit.REPO_ROOT, evidence)
+        tight = [f"{r['name']}: {r['timeout']} s < 5 x {slowest[r['name']]} s" for r in report["tests"]
+                 if r["timeout"] and r["timeout"] < 5 * slowest.get(r["name"], 0.0)]
+        self.assertEqual(tight, [])
+
 
 if __name__ == "__main__":
     unittest.main()
