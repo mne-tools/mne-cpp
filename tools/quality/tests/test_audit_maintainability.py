@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import importlib.util
 import sys
 import tempfile
@@ -58,6 +59,10 @@ class PatternTests(unittest.TestCase):
         self.assertEqual(counted("sizeof(int) * 2; foo(int) ;"), {})
         self.assertEqual(counted("if (h == NULL)"), {"null_macro": 1})
         self.assertEqual(counted("typedef struct { int a; } rec;"), {"typedef_struct": 1})
+        self.assertEqual(counted("QObject* o = Q_NULLPTR;"), {"null_macro": 1})
+        self.assertEqual(counted("w->deleteLater(); deleteEvent(id); m.delete_all(); delete p; delete[] q;"),
+                         {"raw_delete": 2})
+        self.assertEqual(counted("typedef enum { A } E;"), {"typedef_struct": 1})
         self.assertEqual(counted("delete[] buf; delete p;"), {"raw_delete": 2})
         self.assertEqual(counted('fprintf(stderr, "x"); std::cout << 1;'), {"console_io": 2})
         self.assertEqual(counted("m.printf();"), {})
@@ -71,7 +76,7 @@ class RatchetTests(unittest.TestCase):
             (root / "src/libraries/a").mkdir(parents=True)
             (root / "src/libraries/a/a.cpp").write_text("int* p = NULL;\n", encoding="utf-8")
             (root / "src/libraries/a/b.cpp").write_text("int* q = NULL;\n", encoding="utf-8")
-            policy = {"scan_roots": ["src/libraries"], "extensions": [".cpp"], "oversized_lines": 1}
+            policy = {"scan_roots": ["src/libraries"], "extensions": [".cpp"]}
             baseline = audit.build_report(root, policy)
             self.assertEqual(baseline["metrics"]["null_macro"]["total"], 2)
             self.assertEqual(audit.check(baseline, baseline), [])
@@ -88,7 +93,7 @@ class RatchetTests(unittest.TestCase):
             root = Path(temp)
             (root / "src/tools/t").mkdir(parents=True)
             (root / "src/tools/t/main.cpp").write_text('fprintf(stderr, "x"); int* p = NULL;\n', encoding="utf-8")
-            policy = {"scan_roots": ["src/tools"], "extensions": [".cpp"], "oversized_lines": 100,
+            policy = {"scan_roots": ["src/tools"], "extensions": [".cpp"],
                       "suppressions": {"console_io": {"src/tools/t/main.cpp": "progress output"}}}
             report = audit.build_report(root, policy)
         self.assertEqual(report["metrics"]["console_io"]["total"], 0)
@@ -104,6 +109,18 @@ class RepositoryTests(unittest.TestCase):
         grown = copy.deepcopy(report)
         grown["metrics"]["null_macro"]["total"] += 1
         self.assertTrue(audit.check(grown, report))
+
+    def test_repository_is_within_ceilings_and_ceilings_are_tight(self) -> None:
+        policy = json.loads(audit.POLICY_FILE.read_text(encoding="utf-8"))
+        report = audit.build_report()
+        self.assertEqual(audit.check_ceilings(report, policy), [])
+        # A ceiling left above the current count would let retired debt creep back unnoticed.
+        loose = {name: (limit, report["metrics"][name]["total"]) for name, limit in policy["ceilings"].items()
+                 if not name.startswith("$") and limit > report["metrics"][name]["total"]}
+        self.assertEqual(loose, {})
+        grown = copy.deepcopy(report)
+        grown["metrics"]["console_io"]["total"] = 1
+        self.assertEqual(audit.check_ceilings(grown, policy), ["console_io: 1 > ceiling 0"])
 
 
 if __name__ == "__main__":

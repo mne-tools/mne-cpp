@@ -89,15 +89,14 @@
     },
     "G5_maintainability": {
       "compiler_warnings": 0,
-      "null_macro": 43,
-      "typedef_struct": 12,
+      "null_macro": 0,
+      "typedef_struct": 0,
       "c_style_cast": 402,
       "raw_new": 168,
-      "raw_delete": 275,
-      "console_io": 341,
+      "raw_delete": 149,
+      "console_io": 0,
       "numeric_define": 847,
-      "qt_new_unparented": 811,
-      "oversized_unit": 8
+      "qt_new_unparented": 811
     },
     "G6_parity": {
       "reference": "1.11.0",

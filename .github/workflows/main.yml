@@ -176,6 +176,10 @@ jobs:
     - name: Audit dependency architecture
       run: python3 tools/quality/audit_dependencies.py --check
 
+    # Gate G5: retired debt (NULL, typedef struct, console I/O) stays at zero; the rest may only shrink.
+    - name: Check maintainability ceilings
+      run: python3 tools/quality/audit_maintainability.py --ceilings
+
     - name: Lint GitHub workflows
       run: |
         tarball="$RUNNER_TEMP/actionlint.tar.gz"

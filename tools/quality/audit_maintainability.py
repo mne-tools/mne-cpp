@@ -14,15 +14,14 @@
 Counts lexical debt candidates in maintained C++ under ``src/libraries``,
 ``src/applications`` and ``src/tools``:
 
-* ``null_macro``        uses of ``NULL`` instead of ``nullptr``
-* ``typedef_struct``    C-style ``typedef struct``
+* ``null_macro``        uses of ``NULL`` or ``Q_NULLPTR`` instead of ``nullptr``
+* ``typedef_struct``    C-style ``typedef struct`` / ``typedef enum`` / ``typedef union``
 * ``c_style_cast``      casts to a builtin/pointer type written as ``(T)expr``
 * ``raw_new``           non-Qt ``new T`` not immediately handed to a smart pointer or a parent
 * ``qt_new_unparented`` ``new QXxx`` with no parent on the same line (often reparented later by a layout)
 * ``raw_delete``        explicit ``delete`` / ``delete[]``
 * ``console_io``        ``printf``/``fprintf``/``std::cout``/``std::cerr`` (T6.6 decides keep-or-convert)
 * ``numeric_define``    ``#define NAME <number>`` constants that could be ``constexpr``
-* ``oversized_unit``    files longer than the policy threshold
 
 Comments and string literals are stripped before matching, so a ``NULL`` in a
 doc comment or a ``"printf"`` in a message is not counted.  Every metric lists
@@ -52,11 +51,11 @@ POLICY_FILE = Path(__file__).resolve().parent / "maintainability_policy.json"
 
 _BUILTIN = r"(?:unsigned\s+|signed\s+|const\s+)?(?:int|float|double|char|long|short|bool|size_t|u?int(?:8|16|32|64)_t|q(?:u)?int(?:8|16|32|64)|qreal|void)"
 PATTERNS: dict[str, re.Pattern[str]] = {
-    "null_macro": re.compile(r"\bNULL\b"),
-    "typedef_struct": re.compile(r"\btypedef\s+struct\b"),
+    "null_macro": re.compile(r"\b(?:NULL|Q_NULLPTR)\b"),
+    "typedef_struct": re.compile(r"\btypedef\s+(?:struct|enum|union)\b"),
     "c_style_cast": re.compile(rf"(?<![\w\]\)>])\(\s*{_BUILTIN}(?:\s*\*+)?\s*\)\s*(?=[\w(\-])"),
     "raw_new": re.compile(r"\bnew\s+(?!\(std::nothrow\))[A-Za-z_][\w:]*(?:<[^;]*?>)?\s*[\[(;{]"),
-    "raw_delete": re.compile(r"\bdelete\s*(?:\[\s*\])?\s*[A-Za-z_(*]"),
+    "raw_delete": re.compile(r"(?<![\w.>:])delete\b\s*(?:\[\s*\])?\s*[A-Za-z_(*]"),
     "console_io": re.compile(r"(?<![\w:.>])(?:std::)?(?:printf|fprintf|puts)\s*\(|\bstd::(?:cout|cerr)\b"),
     "numeric_define": re.compile(r"^\s*#\s*define\s+[A-Z_][A-Z0-9_]*\s+\(?-?\d", re.MULTILINE),
 }
@@ -138,25 +137,24 @@ def scan(repo_root: Path, policy: dict[str, Any]) -> dict[str, dict[str, int]]:
 def build_report(repo_root: Path = REPO_ROOT, policy: dict[str, Any] | None = None) -> dict[str, Any]:
     policy = policy or json.loads(POLICY_FILE.read_text(encoding="utf-8"))
     suppressions = {k: v for k, v in policy.get("suppressions", {}).items() if not k.startswith("$")}
-    threshold = int(policy["oversized_lines"])
     files = scan(repo_root, policy)
 
     metrics: dict[str, Any] = {}
-    for name in [*PATTERNS, "qt_new_unparented", "oversized_unit"]:
+    for name in [*PATTERNS, "qt_new_unparented"]:
         suppressed = suppressions.get(name, {})
         per_file: dict[str, int] = {}
         for path, counts in files.items():
             if path in suppressed:
                 continue
-            value = (1 if counts["lines"] > threshold else 0) if name == "oversized_unit" else counts[name]
+            value = counts[name]
             if value:
-                per_file[path] = counts["lines"] if name == "oversized_unit" else value
+                per_file[path] = value
         by_scope: dict[str, int] = {}
         for path, value in per_file.items():
             scope = path.split("/")[1]
-            by_scope[scope] = by_scope.get(scope, 0) + (1 if name == "oversized_unit" else value)
+            by_scope[scope] = by_scope.get(scope, 0) + value
         metrics[name] = {
-            "total": len(per_file) if name == "oversized_unit" else sum(per_file.values()),
+            "total": sum(per_file.values()),
             "files": len(per_file),
             "by_scope": dict(sorted(by_scope.items())),
             "suppressed": sorted(suppressed),
@@ -169,7 +167,6 @@ def build_report(repo_root: Path = REPO_ROOT, policy: dict[str, Any] | None = No
         "policy": "tools/quality/maintainability_policy.json",
         "scanned_files": len(files),
         "scanned_lines": sum(c["lines"] for c in files.values()),
-        "oversized_threshold": threshold,
         "metrics": metrics,
     }
 
@@ -184,10 +181,17 @@ def check(report: dict[str, Any], baseline: dict[str, Any]) -> list[str]:
         if metric["total"] > previous["total"]:
             failures.append(f"{name}: {metric['total']} > baseline {previous['total']}")
         for path, value in metric["all_files"].items():
-            if value > previous["all_files"].get(path, 0) and name != "oversized_unit":
+            if value > previous["all_files"].get(path, 0):
                 failures.append(f"{name}: {path} has {value}, baseline {previous['all_files'].get(path, 0)}")
-            elif name == "oversized_unit" and path not in previous["all_files"]:
-                failures.append(f"{name}: {path} newly exceeds {report['oversized_threshold']} lines")
+    return failures
+
+
+def check_ceilings(report: dict[str, Any], policy: dict[str, Any]) -> list[str]:
+    """Fail any metric above its committed ceiling; a ceiling of 0 means the debt is retired for good."""
+    ceilings = {k: v for k, v in policy.get("ceilings", {}).items() if not k.startswith("$")}
+    failures = [f"{name}: {report['metrics'][name]['total']} > ceiling {limit}"
+                for name, limit in sorted(ceilings.items()) if report["metrics"][name]["total"] > limit]
+    failures += [f"{name}: no ceiling" for name in report["metrics"] if name not in ceilings]
     return failures
 
 
@@ -213,8 +217,7 @@ def render_markdown(report: dict[str, Any]) -> str:
     for name, metric in report["metrics"].items():
         if not metric["top"]:
             continue
-        unit = "lines" if name == "oversized_unit" else "count"
-        lines += ["", f"## `{name}` — top files", "", f"| {unit} | File |", "|---:|---|"]
+        lines += ["", f"## `{name}` — top files", "", "| count | File |", "|---:|---|"]
         lines += [f"| {value:,} | `{path}` |" for path, value in metric["top"].items()]
     return "\n".join(lines) + "\n"
 
@@ -224,9 +227,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", type=Path, dest="json_path", help="write the JSON report")
     parser.add_argument("--markdown", type=Path, help="write the Markdown summary")
     parser.add_argument("--check", type=Path, metavar="BASELINE", help="fail if any metric grew beyond BASELINE")
+    parser.add_argument("--ceilings", action="store_true", help="fail if any metric exceeds its policy ceiling")
     args = parser.parse_args(argv)
 
     report = build_report()
+    if args.ceilings:
+        failures = check_ceilings(report, json.loads(POLICY_FILE.read_text(encoding="utf-8")))
+        for failure in failures:
+            print(f"ERROR {failure}")
+        print("OK: every maintainability metric is within its ceiling." if not failures else f"{len(failures)} over ceiling")
+        return 1 if failures else 0
     if args.check:
         failures = check(report, json.loads(args.check.read_text(encoding="utf-8")))
         for failure in failures:
