@@ -2111,6 +2111,13 @@ void TestDispViewers2::rtFiffRawViewModel_ringBufferWrap()
         for (int t = iTotal - N; t < iTotal; ++t) {
             QCOMPARE(column(model, 3, t % N), stream(3, t));
         }
+
+        // A channel type that matches no channel leaves the MEG rows unfiltered.
+        model.setFilterChannelType(QStringLiteral("EEG"));
+        model.addData({stream.middleCols(0, nBlock)});
+        for (int s = 0; s < nBlock; ++s) {
+            QCOMPARE(column(model, 0, (iTotal + s) % N), stream(0, s));
+        }
     }
 
     // Triggers: positions are buffer columns of the sweep they belong to.

@@ -22,7 +22,6 @@
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_info.h>
 
-#include <math/numerics.h>
 #include <utils/ioutils.h>
 
 #include <dsp/sphara.h>
@@ -342,27 +341,7 @@ void RtFiffRawViewModel::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo>& p_pFiffI
         //Create the initial Compensator projector
         updateCompensator(0);
 
-        //Initialize filter channel names
-        int visibleInit = 20;
-        QStringList filterChannels;
-
-        if (visibleInit > m_pFiffInfo->chs.size()) {
-            while (visibleInit > m_pFiffInfo->chs.size()) {
-                visibleInit--;
-            }
-        }
-
-        for (qint32 b = 0; b < visibleInit; ++b) {
-            filterChannels.append(m_pFiffInfo->ch_names.at(b));
-        }
-
-        createFilterChannelList(filterChannels);
-
-        //        //Look for trigger channels and initialise detected trigger map
-        //        for(int i = 0; i<m_pFiffInfo->chs.size(); ++i) {
-        //            if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH/* && m_pFiffInfo->chs[i].ch_name == "STI 001"*/)
-        //                m_lTriggerChannelIndices.append(i);
-        //        }
+        setFilterChannelType(m_sFilterChannelType);
 
         //Init the sphara operators
         initSphara();
@@ -780,9 +759,6 @@ void RtFiffRawViewModel::setFilter(QList<FilterKernel> filterData)
     m_matOverlap.setZero();
 
     m_bDrawFilterFront = false;
-
-    //Filter all visible data channels at once
-    //filterDataBlock();
 }
 
 //=============================================================================================================
@@ -804,79 +780,16 @@ void RtFiffRawViewModel::setBackgroundColor(const QColor& color)
 void RtFiffRawViewModel::setFilterChannelType(const QString& channelType)
 {
     m_sFilterChannelType = channelType;
-    m_filterChannelList = m_visibleChannelList;
-
-    //This version is for when all channels of a type are to be filtered (not only the visible ones).
-    //Create channel filter list independent from channelNames
     m_filterChannelList.clear();
 
-    for (int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-        if ((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
-             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-             m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) /* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
-            if (m_sFilterChannelType == "All") {
-                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-            } else if (m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
-                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
+    for (const FiffChInfo& ch : std::as_const(m_pFiffInfo->chs)) {
+        if (ch.kind == FIFFV_MEG_CH || ch.kind == FIFFV_EEG_CH || ch.kind == FIFFV_EOG_CH ||
+            ch.kind == FIFFV_ECG_CH || ch.kind == FIFFV_EMG_CH) {
+            if (m_sFilterChannelType == "All" || ch.ch_name.contains(m_sFilterChannelType)) {
+                m_filterChannelList << ch.ch_name;
             }
         }
     }
-
-    //    if(channelType != "All") {
-    //        QMutableListIterator<QString> i(m_filterChannelList);
-    //        while(i.hasNext()) {
-    //            QString val = i.next();
-    //            if(!val.contains(channelType, Qt::CaseInsensitive)) {
-    //                i.remove();
-    //            }
-    //        }
-    //    }
-
-    //    m_bDrawFilterFront = false;
-
-    //Filter all visible data channels at once
-    //filterDataBlock();
-}
-
-//=============================================================================================================
-
-void RtFiffRawViewModel::createFilterChannelList(QStringList channelNames)
-{
-    m_filterChannelList.clear();
-    m_visibleChannelList = channelNames;
-
-    //    //Create channel fiter list based on channelNames
-    //    for(int i = 0; i<m_pFiffInfo->chs.size(); ++i) {
-    //        if((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
-    //            m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-    //            m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-    //            if(m_sFilterChannelType == "All" && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
-    //                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-    //            else if(m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType) && channelNames.contains(m_pFiffInfo->chs.at(i).ch_name))
-    //                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-    //        }
-    //    }
-
-    //Create channel filter list independent from channelNames
-    for (int i = 0; i < m_pFiffInfo->chs.size(); ++i) {
-        if ((m_pFiffInfo->chs.at(i).kind == FIFFV_MEG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_EEG_CH ||
-             m_pFiffInfo->chs.at(i).kind == FIFFV_EOG_CH || m_pFiffInfo->chs.at(i).kind == FIFFV_ECG_CH ||
-             m_pFiffInfo->chs.at(i).kind == FIFFV_EMG_CH) /* && !m_pFiffInfo->bads.contains(m_pFiffInfo->chs.at(i).ch_name)*/) {
-            if (m_sFilterChannelType == "All") {
-                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-            } else if (m_pFiffInfo->chs.at(i).ch_name.contains(m_sFilterChannelType)) {
-                m_filterChannelList << m_pFiffInfo->chs.at(i).ch_name;
-            }
-        }
-    }
-
-    //    m_bDrawFilterFront = false;
-
-    //    for(int i = 0; i<m_filterChannelList.size(); ++i)
-    //        std::cout<<m_filterChannelList.at(i).toStdString()<<std::endl;
-
-    //Filter all visible data channels at once
-    //filterDataBlock();
 }
 
 //=============================================================================================================
@@ -894,10 +807,6 @@ void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
         m_pFiffInfo->bads.removeAt(index);
         qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as good.";
     }
-
-    //Redefine channels which are to be filtered
-    QStringList channelNames;
-    createFilterChannelList(channelNames);
 
     //Update indeices of bad channels (this vector is needed when creating new ssp operators)
     QStringList emptyExclude;
@@ -981,79 +890,8 @@ void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
 void RtFiffRawViewModel::doFilterPerChannelRTMSA(QPair<QList<FilterKernel>, QPair<int, RowVectorXd>>& channelDataTime)
 {
     for (int i = 0; i < channelDataTime.first.size(); ++i) {
-        //channelDataTime.second.second = channelDataTime.first.at(i).applyConvFilter(channelDataTime.second.second, true);
         channelDataTime.first[i].applyFftFilter(channelDataTime.second.second, true); //FFT Convolution for rt is not suitable. FFT make the signal filtering non causal.
     }
-}
-
-//=============================================================================================================
-
-void RtFiffRawViewModel::filterDataBlock()
-{
-    //std::cout<<"START RtFiffRawViewModel::filterDataBlock"<<std::endl;
-
-    if (m_filterKernel.isEmpty() || !m_bPerformFiltering) {
-        return;
-    }
-
-    //Create temporary filters with higher fft length because we are going to filter all available data at once for one time
-    QList<FilterKernel> tempFilterList;
-
-    int fftLength = m_matDataRaw.row(0).cols() + 4 * m_iMaxFilterLength;
-    int exp = ceil(Numerics::log2(fftLength));
-    fftLength = pow(2, exp) < 512 ? 512 : pow(2, exp);
-
-    for (int i = 0; i < m_filterKernel.size(); ++i) {
-        FilterKernel tempFilter(m_filterKernel.at(i).getName(),
-                                FilterKernel::m_filterTypes.indexOf(m_filterKernel.at(i).getFilterType()),
-                                m_filterKernel.at(i).getFilterOrder(),
-                                m_filterKernel.at(i).getCenterFrequency(),
-                                m_filterKernel.at(i).getBandwidth(),
-                                m_filterKernel.at(i).getParksWidth(),
-                                m_filterKernel.at(i).getSamplingFrequency(),
-                                FilterKernel::m_designMethods.indexOf(m_filterKernel.at(i).getDesignMethod()));
-
-        tempFilterList.append(tempFilter);
-    }
-
-    //Generate QList structure which can be handled by the QConcurrent framework
-    QList<QPair<QList<FilterKernel>, QPair<int, RowVectorXd>>> timeData;
-    QList<int> notFilterChannelIndex;
-
-    //Also append mirrored data in front and back to get rid of edge effects
-    for (qint32 i = 0; i < m_matDataRaw.rows(); ++i) {
-        if (m_filterChannelList.contains(m_pFiffInfo->chs.at(i).ch_name)) {
-            RowVectorXd datTemp(m_matDataRaw.row(i).cols() + 2 * m_iMaxFilterLength);
-            datTemp << m_matDataRaw.row(i).head(m_iMaxFilterLength).reverse(), m_matDataRaw.row(i), m_matDataRaw.row(i).tail(m_iMaxFilterLength).reverse();
-            timeData.append(QPair<QList<FilterKernel>, QPair<int, RowVectorXd>>(tempFilterList, QPair<int, RowVectorXd>(i, datTemp)));
-        } else {
-            notFilterChannelIndex.append(i);
-        }
-    }
-
-    //Do the concurrent filtering
-    if (!timeData.isEmpty()) {
-        QFuture<void> future = QtConcurrent::map(timeData,
-                                                 doFilterPerChannelRTMSA);
-
-        future.waitForFinished();
-
-        for (int r = 0; r < timeData.size(); ++r) {
-            m_matDataFiltered.row(timeData.at(r).second.first) = timeData.at(r).second.second.segment(m_iMaxFilterLength + m_iMaxFilterLength / 2, m_matDataRaw.cols());
-            m_matOverlap.row(timeData.at(r).second.first) = timeData.at(r).second.second.tail(m_iMaxFilterLength);
-        }
-    }
-
-    //Fill filtered data with raw data if the channel was not filtered
-    for (int i = 0; i < notFilterChannelIndex.size(); ++i) {
-        m_matDataFiltered.row(notFilterChannelIndex.at(i)) = m_matDataRaw.row(notFilterChannelIndex.at(i));
-    }
-
-    if (!m_bIsFreezed) {
-        m_vecLastBlockFirstValuesFiltered = m_matDataFiltered.col(0);
-    }
-
-    //std::cout<<"END RtFiffRawViewModel::filterDataBlock"<<std::endl;
 }
 
 //=============================================================================================================

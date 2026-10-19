@@ -359,14 +359,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Create list of channels which are to be filtered based on channel names
-     *
-     * @param[in] channelNames    the channel names which are to be filtered.
-     */
-    void createFilterChannelList(QStringList channelNames);
-
-    //=========================================================================================================
-    /**
      * markChBad marks the selected channels as bad/good in m_chInfolist
      *
      * @param[in] ch index that is selected for marking.
@@ -582,12 +574,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Calculates the filtered version of the channels in m_matDataRaw
-     */
-    void filterDataBlock();
-
-    //=========================================================================================================
-    /**
      * Calculates the filtered version of the raw input data
      *
      * @param[in] data          data which is to be filtered.
@@ -672,7 +658,6 @@ private:
     QMap<qint32, float> m_qMapChScaling;                                 /**< Channel scaling map. */
     QList<UTILSLIB::FilterKernel> m_filterKernel;                        /**< List of currently active filters. */
     QStringList m_filterChannelList;                                     /**< List of channels which are to be filtered.*/
-    QStringList m_visibleChannelList;                                    /**< List of currently visible channels in the view.*/
     QMap<qint32, qint32> m_qMapIdxRowSelection;                          /**< Selection mapping.*/
 
     QColor m_colBackground; /**< The background color.*/

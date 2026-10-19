@@ -714,7 +714,6 @@ void RtFiffRawView::hideSelection()
 
 void RtFiffRawView::resetSelection()
 {
-    // non C++11 alternative
     for (qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i) {
         if (m_qListBadChannels.contains(i)) {
             if (!m_bHideBadChannels) {
@@ -724,9 +723,6 @@ void RtFiffRawView::resetSelection()
             m_pTableView->showRow(i);
         }
     }
-
-    //Update the visible channel list which are to be filtered
-    //visibleRowsChanged();
 }
 
 //=============================================================================================================
@@ -737,29 +733,7 @@ void RtFiffRawView::visibleRowsChanged()
         return;
     }
 
-    int from = m_pTableView->rowAt(0);
-    //    if(from != 0){
-    //        from--;
-
-    int to = m_pTableView->rowAt(m_pTableView->height() - 1);
-    if (to != m_pModel->rowCount() - 1)
-        to++;
-
-    if (from > to)
-        to = m_pModel->rowCount() - 1;
-
-    //    //Update visible rows in order to only filter the visible rows
-    //    QStringList channelNames;
-
-    //    for(int i = from; i<=to; i++) {
-    //        channelNames << m_pModel->data(m_pModel->index(i, 0), Qt::DisplayRole).toString();
-    //    }
-
-    //    m_pModel->createFilterChannelList(channelNames);
-
-    m_pDelegate->setUpperItemIndex(from /*+1*/);
-
-    //qDebug() <<"RtFiffRawView::visibleRowsChanged - from "<< from << " to" << to;
+    m_pDelegate->setUpperItemIndex(m_pTableView->rowAt(0));
 }
 
 //=============================================================================================================
