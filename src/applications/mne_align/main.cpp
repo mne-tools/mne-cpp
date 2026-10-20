@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName(QStringLiteral("MNE-CPP"));
     QCoreApplication::setApplicationName(QStringLiteral("MNE Align"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("2.3.0"));
+    QCoreApplication::setApplicationVersion(QStringLiteral(MNE_CPP_VERSION));
 
     MNEALIGN::MneAlign w;
     w.show();

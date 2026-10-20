@@ -20,7 +20,6 @@ concurrency:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
-  MNE_CPP_VERSION: "2.3.0"
 
 jobs:
   LinuxSDK:

@@ -46,3 +46,6 @@ emit ONNXRUNTIME_VERSION  "${ONNXRUNTIME_VERSION}"
 emit ONNXRUNTIME_VERSION_TOKEN "${ONNXRUNTIME_VERSION//./}"
 emit SKIGEN_RELEASE_REF   "${SKIGEN_RELEASE_REF}"
 emit SKIGEN_DEV_REF       "${SKIGEN_DEV_REF}"
+# The project version, from its single source in src/CMakeLists.txt
+emit MNE_CPP_VERSION      "$(sed -nE 's/^set\(MNE_CPP_VERSION_(MAJOR|MINOR|PATCH) ([0-9]+)\)/\2/p' \
+                             "${SCRIPT_DIR}/../../src/CMakeLists.txt" | paste -sd. -)"

@@ -13,7 +13,7 @@ GitHub Release.
 2. `staging.yml` is green on the latest `staging` commit (all 22 jobs).
 3. Versioned files are bumped to `X.Y.Z` in one commit:
    - [`src/CMakeLists.txt`](https://github.com/mne-tools/mne-cpp/blob/main/src/CMakeLists.txt) — `MNE_CPP_VERSION_MAJOR/MINOR/PATCH`
-   - [`doc/Doxyfile`](https://github.com/mne-tools/mne-cpp/blob/main/doc/Doxyfile) — `PROJECT_NUMBER`
+   - [`doc/Doxyfile`](https://github.com/mne-tools/mne-cpp/blob/main/doc/Doxyfile) and `doc/Doxyfile.internal` — `PROJECT_NUMBER`
    - [`CITATION.cff`](https://github.com/mne-tools/mne-cpp/blob/main/CITATION.cff) — `version:` and `date-released:`
    - [`README.md`](https://github.com/mne-tools/mne-cpp/blob/main/README.md) — version badge
    - [`CHANGELOG.md`](https://github.com/mne-tools/mne-cpp/blob/main/CHANGELOG.md) — new section with highlights

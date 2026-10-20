@@ -29,6 +29,7 @@ VERSIONED_FILES = {
     "CITATION.cff": r"^version:\s*([0-9.]+)\s*$",
     "doc/website/docusaurus.config.ts": r"const stableVersion = '([^']+)'",
     "doc/Doxyfile": r'^PROJECT_NUMBER\s*=\s*"([^"]+)"',
+    "doc/Doxyfile.internal": r'^PROJECT_NUMBER\s*=\s*"([^"]+)"',
 }
 
 

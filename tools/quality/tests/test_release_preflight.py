@@ -19,6 +19,7 @@ FILES = {
     "CITATION.cff": 'version: 2.4.0\ndate-released: "2026-10-20"\n',
     "doc/website/docusaurus.config.ts": "const stableVersion = '2.4.0';\n",
     "doc/Doxyfile": 'PROJECT_NUMBER         = "2.4.0"\n',
+    "doc/Doxyfile.internal": 'PROJECT_NUMBER         = "2.4.0"\n',
     "CHANGELOG.md": "# Changelog\n\n## [2.4.0] - 2026-10-20\n",
 }
 

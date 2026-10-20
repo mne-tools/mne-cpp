@@ -504,7 +504,7 @@ void MneAlign::onAbout()
                            "<h3>MNE Align</h3>"
                            "<p>Stripped-down <b>mne_inspect</b> variant for Polhemus Fastrak "
                            "digitisation against a head BEM and an EEG cap.</p>"
-                           "<p>v2.3.0</p>"));
+                           "<p>v" MNE_CPP_VERSION "</p>"));
 }
 
 void MneAlign::onIcpFit()
