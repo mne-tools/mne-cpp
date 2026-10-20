@@ -1,29 +1,53 @@
 {
-  "run": "https://github.com/mne-tools/mne-cpp/actions/runs/39109986985",
+  "run": "https://github.com/mne-tools/mne-cpp/actions/runs/39457174548",
   "results": {
     "linux": {
       "ok": true,
       "failed_step": null,
-      "total_seconds": 987.4,
-      "checkout_bytes": 877641793,
+      "total_seconds": 1857.4,
+      "checkout_bytes": 879453533,
       "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
-      "dependencies": null
+      "dependencies": {
+        "SKIGEN_RELEASE_REF": "v1.1.0",
+        "SKIGEN_DEV_REF": "staging",
+        "QT_MIN_VERSION": "6.10.0",
+        "QT_VERSION": "6.12.0",
+        "EMSCRIPTEN_VERSION": "6.0.12",
+        "EIGEN_VERSION": "5.0.1",
+        "ONNXRUNTIME_VERSION": "1.31.0"
+      }
     },
     "macos": {
       "ok": true,
       "failed_step": null,
-      "total_seconds": 1732.5,
-      "checkout_bytes": 1019192161,
+      "total_seconds": 1587.5,
+      "checkout_bytes": 1021304402,
       "platform": "macOS-26.6.2-arm64-arm-64bit",
-      "dependencies": null
+      "dependencies": {
+        "SKIGEN_RELEASE_REF": "v1.1.0",
+        "SKIGEN_DEV_REF": "staging",
+        "QT_MIN_VERSION": "6.10.0",
+        "QT_VERSION": "6.12.0",
+        "EMSCRIPTEN_VERSION": "6.0.12",
+        "EIGEN_VERSION": "5.0.1",
+        "ONNXRUNTIME_VERSION": "1.31.0"
+      }
     },
     "windows": {
-      "ok": false,
-      "failed_step": "cmake --build build\\developer-dynamic --config Release --parallel 4",
-      "total_seconds": 61.3,
-      "checkout_bytes": 565537394,
+      "ok": true,
+      "failed_step": null,
+      "total_seconds": 3829.1,
+      "checkout_bytes": 1609897988,
       "platform": "Windows-10-10.0.26100-SP0",
-      "dependencies": null
+      "dependencies": {
+        "SKIGEN_RELEASE_REF": "v1.1.0",
+        "SKIGEN_DEV_REF": "staging",
+        "QT_MIN_VERSION": "6.10.0",
+        "QT_VERSION": "6.12.0",
+        "EMSCRIPTEN_VERSION": "6.0.12",
+        "EIGEN_VERSION": "5.0.1",
+        "ONNXRUNTIME_VERSION": "1.31.0"
+      }
     }
   },
   "history": [
@@ -54,6 +78,13 @@
       "linux": 987.4,
       "macos": 1732.5,
       "windows": 61.3
+    },
+    {
+      "run": "https://github.com/mne-tools/mne-cpp/actions/runs/39457174548",
+      "date": "2026-10-20",
+      "linux": 1857.4,
+      "macos": 1587.5,
+      "windows": 3829.1
     }
   ]
 }
