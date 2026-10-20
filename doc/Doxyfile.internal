@@ -26,7 +26,7 @@
 # Project
 # ---------------------------------------------------------------------------
 PROJECT_NAME           = "MNE-CPP — Internal / Maintainer Docs"
-PROJECT_NUMBER         = "2.3.0-dev"
+PROJECT_NUMBER         = "2.4.0"
 PROJECT_BRIEF          = "Application & plugin internals (not the public API)"
 
 # ---------------------------------------------------------------------------

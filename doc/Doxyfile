@@ -15,7 +15,7 @@
 # Project
 # ---------------------------------------------------------------------------
 PROJECT_NAME           = "MNE-CPP"
-PROJECT_NUMBER         = "2.3.0-dev"
+PROJECT_NUMBER         = "2.4.0"
 PROJECT_BRIEF          = "MEG/EEG real-time analysis library (C++17 / Qt)"
 
 # ---------------------------------------------------------------------------

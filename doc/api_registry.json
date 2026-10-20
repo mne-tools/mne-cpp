@@ -3,7 +3,7 @@
   "meta": {
     "version": "1.1.0",
     "last_updated": "2026-07-11",
-    "mne_cpp_version": "2.4.0-dev",
+    "mne_cpp_version": "2.4.0",
     "mne_python_ref": "1.11.0",
     "mne_c_ref": "SVN r12960"
   },
