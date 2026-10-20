@@ -95,7 +95,7 @@ Size of the old struct (fiffChPosRec) 13*int = 13*4 = 52.
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 115"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 117"
              "FiffInfo: 376 channels at 300.307 Hz, 2 bads, 4 projectors, 305 good MEG channels");
 // ch 0: MEG 0113, planar gradiometer 3012 at (-0.1066, 0.0464, -0.0604) m, cal 3.16e-9
 ok &= expect(first.ch_name == "MEG0113" && first.kind == FIFFV_MEG_CH && first.chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 && (first.chpos.r0 - Vector3f(-0.1066f, 0.0464f, -0.0604f)).norm() < 1e-6f && near(first.cal, 3.1600000394149674e-09),

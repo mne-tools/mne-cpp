@@ -31,6 +31,7 @@
 #include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_events.h>
+#include <fiff/fiff_explain.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_id.h>
 #include <fiff/fiff_info.h>
@@ -51,6 +52,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QTemporaryDir>
+#include <QTextStream>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -215,6 +217,24 @@ int main(int argc, char* argv[])
     //! [fiff_stream_usage]
     ok &= expect(opened && measNodes.size() == 1 && hasNchan && nchanTag == 376 && !fileId.isEmpty() && fileId.version > 0,
                  "FiffStream/FiffDirNode/FiffTag/FiffId: the FIFF_NCHAN tag of the measurement block reads 376");
+
+    //! [fiff_explain_usage]
+    // The block tree of a transform file, as MNE-C fiff_dir_tree prints it, with the names of tags and units
+    QFile transFile(dir + "/all-trans.fif");
+    FiffStream transStream(&transFile);
+    transStream.open();
+    QString tree;
+    QTextStream treeOut(&tree);
+    transStream.dirtree()->print(treeOut);
+    transStream.close();
+    const QString transformTag = FiffExplain::tag(FIFF_COORD_TRANS);                                              // "transform"
+    const QString gradiometerUnit = FiffExplain::unitMultiplier(FIFF_UNITM_F) + FiffExplain::unit(FIFF_UNIT_T_M); // "fT/m"
+    //! [fiff_explain_usage]
+    // mne.io.show_fiff(all-trans.fif): FIFFB_ROOT holding file ID (printed as the block id), dir pointer, free list,
+    // 2 transforms and a NOP
+    const QStringList treeLines = tree.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    ok &= expect(treeLines.size() == 6 && treeLines[0].startsWith("999 = root") && treeLines[3] == "  222 = transform       [2]" && treeLines[5] == "}" && transformTag == "transform" && gradiometerUnit == "fT/m",
+                 "FiffExplain/FiffDirNode::print: the tree of all-trans.fif lists the blocks and tags mne.io.show_fiff shows");
 
     //! [fiff_digitizer_data_usage]
     FiffDigitizerData digData;

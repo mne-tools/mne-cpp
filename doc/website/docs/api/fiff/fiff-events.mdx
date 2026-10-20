@@ -367,7 +367,7 @@ Events at regular intervals, like mne.make_fixed_length_events.
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 172"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 174"
 FiffEvents events;
 FiffEvents::detect_from_raw(raw, events, "STI 014"); // rising edges of the trigger channel
 QFile eventFile(tmp.filePath("sample-eve.fif"));

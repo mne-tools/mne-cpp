@@ -64,7 +64,7 @@ Size of the old struct (`fiffDigPointRec`) 5*int = 5*4 = 20.
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 124"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 126"
 // mne: 146 points; dig[0] = LPA at (-0.0713766, 0, 5.1e-9)
 ok &= expect(digitizer.size() == 146 && cardinal.size() == 3 && cardinal[0].ident == FIFFV_POINT_LPA && std::fabs(cardinal[0].r[0] + 0.07137661f) < 1e-7f,
              "FiffDigPointSet/FiffDigPoint: 146 points, LPA at x = -71.38 mm");

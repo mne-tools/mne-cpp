@@ -18,7 +18,7 @@
 //=============================================================================================================
 
 #include "mne_show_fiff_settings.h"
-#include "mne_fiff_exp_set.h"
+#include "mne_fiff_contents.h"
 
 #include <utils/generics/mne_logger.h>
 
@@ -69,9 +69,8 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationVersion(PROGRAM_VERSION);
 
     MNEShowFiffSettings settings(&argc, argv);
-    MNEFiffExpSet expSet = MNEFiffExpSet::read_fiff_explanations(QCoreApplication::applicationDirPath() + "/resources/general/explanations/fiff_explanations.txt");
     QTextStream out(stdout);
-    if (!expSet.show_fiff_contents(out, settings)) {
+    if (!MNEFiffContents::show_fiff_contents(out, settings)) {
         qCritical("Cannot read %s", qPrintable(settings.inname));
         return 1;
     }

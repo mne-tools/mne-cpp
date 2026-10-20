@@ -450,7 +450,7 @@ Reads a Neuroscan .dat electrode file ("name number x y z" per line), as mne.cha
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 121"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 123"
 FiffDigPointSet digitizer(info.dig);                                    // 146 points in head coordinates
 FiffDigPointSet cardinal = digitizer.pickTypes({FIFFV_POINT_CARDINAL}); // LPA, nasion, RPA
 // mne: 146 points; dig[0] = LPA at (-0.0713766, 0, 5.1e-9)

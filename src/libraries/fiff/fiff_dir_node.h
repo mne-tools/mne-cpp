@@ -49,6 +49,7 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QStringList>
+#include <QTextStream>
 #include <memory>
 
 //=============================================================================================================
@@ -76,6 +77,8 @@ class FiffTag;
  * the source recording.
  *
  * @snippet ex_fiff_api/main.cpp fiff_stream_usage
+ *
+ * @snippet ex_fiff_api/main.cpp fiff_explain_usage
  */
 class FIFFSHARED_EXPORT FiffDirNode
 {
@@ -193,47 +196,13 @@ public:
 
     //=========================================================================================================
     /**
-     * Prints elements of a tree.
+     * Prints this block and its sub-blocks like MNE-C's fiff_dir_tree: one line per block with its id, one
+     * line per run of equal tag kinds with the run length in brackets, sub-blocks indented by five.
      *
-     * @param[in] indent     number of intendations.
+     * @param[in] out        Stream to print to.
+     * @param[in] indent     Indentation of this block.
      */
-    void print(int indent) const;
-
-    //=========================================================================================================
-    /**
-     * Try to explain a block...
-     *
-     * @param[in] kind   Block kind.
-     */
-    static void explain_block(int kind);
-
-    //=========================================================================================================
-    /**
-     * Try to explain...
-     *
-     * @param[in] kind   directory kind.
-     */
-    static void explain(int kind);
-
-    //=========================================================================================================
-    /**
-     * Get textual explanation of a tag
-     *
-     * @param[in] kind   directory kind.
-     *
-     * @return Pointer to the static string explaining the tag, or nullptr if not found.
-     */
-    static const char* get_tag_explanation(int kind);
-
-    //=========================================================================================================
-    /**
-     * Get the SI symbol of a FIFF unit, e.g. "T" for FIFF_UNIT_T, "T/m" for FIFF_UNIT_T_M.
-     *
-     * @param[in] unit   FIFF unit (FIFF_UNIT_*).
-     *
-     * @return The symbol, or "NA" for FIFF_UNIT_NONE and unknown units (as in MNE-Python).
-     */
-    static const char* get_unit_name(int unit);
+    void print(QTextStream& out, int indent = 0) const;
 
     //=========================================================================================================
     /**

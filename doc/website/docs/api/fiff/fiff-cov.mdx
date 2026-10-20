@@ -312,7 +312,7 @@ Compute a weighted grand-average covariance from multiple covariance matrices, w
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 163"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 165"
 QFile covFile(dir + "/sample_audvis-cov.fif");
 FiffCov cov(covFile);
 const FiffCov megCov = cov.pick_channels(info.ch_names.mid(0, 306), cov.bads); // good MEG channels only

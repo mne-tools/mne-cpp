@@ -43,7 +43,7 @@ const MatrixXi eventsAgain = eventsFromAnnotations(annotationsBack.select("audit
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 184"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 186"
 MatrixXi firstThree = events.events.topRows(3);
 FiffAnnotations annotations = annotationsFromEvents(firstThree, info.sfreq, {{1, "auditory/left"}, {2, "auditory/right"}}, raw.first_samp);
 const FiffAnnotation blink{0.5, 1.0, "BAD_blink", {}, {}, {}}; // onset s, duration s, description, channels, ...

@@ -211,93 +211,41 @@ bool FiffDirNode::has_kind(fiff_int_t p_kind) const
 
 //=============================================================================================================
 
-void FiffDirNode::print(int indent) const
+// MNE-C fiff_explain / fiff_explain_block: names padded to a fixed column
+static QString explained(int kind, const QString& name, int width)
 {
-    int j, prev_kind, count;
-    QList<FiffDirEntry::SPtr> dentry = this->dir;
-
-    for (int k = 0; k < indent; k++)
-        putchar(' ');
-    explain_block(this->type);
-    qDebug(" { ");
-    if (!this->id.isEmpty())
-        this->id.print();
-    qDebug("\n");
-
-    for (j = 0, prev_kind = -1, count = 0; j < this->nent(); j++) {
-        if (dentry[j]->kind != prev_kind) {
-            if (count > 1)
-                qDebug(" [%d]\n", count);
-            else if (j > 0)
-                putchar('\n');
-            for (int k = 0; k < indent + 2; k++)
-                putchar(' ');
-            explain(dentry[j]->kind);
-            prev_kind = dentry[j]->kind;
-            count = 1;
-        } else
-            count++;
-        prev_kind = dentry[j]->kind;
-    }
-    if (count > 1)
-        qDebug(" [%d]\n", count);
-    else if (j > 0)
-        putchar('\n');
-    for (j = 0; j < this->nchild(); j++)
-        this->children[j]->print(indent + 5);
-    for (int k = 0; k < indent; k++)
-        putchar(' ');
-    qDebug("}\n");
+    return name.isEmpty() ? QStringLiteral("Cannot explain: %1").arg(kind)
+                          : QStringLiteral("%1 = %2").arg(kind).arg(name, -width);
 }
 
 //=============================================================================================================
 
-void FiffDirNode::explain_block(int kind)
+void FiffDirNode::print(QTextStream& out, int indent) const
 {
-    for (int k = 0; _fiff_block_explanations[k].kind >= 0; k++) {
-        if (_fiff_block_explanations[k].kind == kind) {
-            qDebug("%d = %s", kind, _fiff_block_explanations[k].text);
-            return;
+    const QString pad(indent, QLatin1Char(' '));
+    out << pad << explained(type, FiffExplain::block(type), 14) << " { ";
+    if (!id.isEmpty()) {
+        out << QString::asprintf("\t%d.%d 0x%x%x %d %d ", id.version >> 16, id.version & 0xFFFF, id.machid[0], id.machid[1], id.time.secs, id.time.usecs);
+    }
+    out << '\n';
+
+    for (int j = 0; j < nent();) {
+        const int kind = dir[j]->kind;
+        int count = 1;
+        while (j + count < nent() && dir[j + count]->kind == kind) {
+            ++count;
         }
-    }
-    qWarning("Cannot explain: %d", kind);
-}
-
-//=============================================================================================================
-
-void FiffDirNode::explain(int kind)
-{
-    int k;
-    for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
-        if (_fiff_explanations[k].kind == kind) {
-            qDebug("%d = %s", kind, _fiff_explanations[k].text);
-            return;
+        out << pad << "  " << explained(kind, FiffExplain::tag(kind), 15);
+        if (count > 1) {
+            out << " [" << count << ']';
         }
+        out << '\n';
+        j += count;
     }
-    qWarning("Cannot explain: %d", kind);
-}
-
-//=============================================================================================================
-
-const char* FiffDirNode::get_tag_explanation(int kind)
-{
-    int k;
-    for (k = 0; _fiff_explanations[k].kind >= 0; k++) {
-        if (_fiff_explanations[k].kind == kind)
-            return _fiff_explanations[k].text;
+    for (const FiffDirNode::SPtr& child : children) {
+        child->print(out, indent + 5);
     }
-    return "unknown";
-}
-
-//=============================================================================================================
-
-const char* FiffDirNode::get_unit_name(int unit)
-{
-    for (int k = 0; _fiff_unit_explanations[k].kind >= 0; k++) {
-        if (_fiff_unit_explanations[k].kind == unit)
-            return _fiff_unit_explanations[k].text;
-    }
-    return "NA";
+    out << pad << "}\n";
 }
 
 //=============================================================================================================

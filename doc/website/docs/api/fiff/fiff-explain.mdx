@@ -1,0 +1,155 @@
+---
+id: fiff-explain
+title: "FIFFLIB::FiffExplain"
+sidebar_label: FiffExplain
+sidebar_position: 37
+---
+
+# FiffExplain
+
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+
+`#include <fiff/fiff_explain.h>`
+
+```cpp
+class FIFFLIB::FiffExplain
+```
+
+Names of FIFF tag kinds, block kinds, units, unit multipliers and channel kinds.
+
+Every lookup returns an empty string for a value the table does not know.
+
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+// The block tree of a transform file, as MNE-C fiff_dir_tree prints it, with the names of tags and units
+QFile transFile(dir + "/all-trans.fif");
+FiffStream transStream(&transFile);
+transStream.open();
+QString tree;
+QTextStream treeOut(&tree);
+transStream.dirtree()->print(treeOut);
+transStream.close();
+const QString transformTag = FiffExplain::tag(FIFF_COORD_TRANS);                                              // "transform"
+const QString gradiometerUnit = FiffExplain::unitMultiplier(FIFF_UNITM_F) + FiffExplain::unit(FIFF_UNIT_T_M); // "fT/m"
+```
+
+---
+
+## Static Methods
+
+### tag(kind)
+
+Name of a tag kind (FIFF_*), e.g.
+
+"channel" for FIFF_CH_INFO.
+
+**Parameters:**
+
+- **kind** : *int*
+  Tag kind.
+
+**Returns:**
+
+- *QString* — The name, or an empty string.
+
+---
+
+### block(kind)
+
+Name of a block kind (FIFFB_*), e.g.
+
+"meas. info" for FIFFB_MEAS_INFO.
+
+**Parameters:**
+
+- **kind** : *int*
+  Block kind.
+
+**Returns:**
+
+- *QString* — The name, or an empty string.
+
+---
+
+### unit(unit)
+
+SI symbol of a unit (FIFF_UNIT_*), e.g.
+
+"T/m" for FIFF_UNIT_T_M; FIFF_UNIT_NONE has an empty symbol.
+
+**Parameters:**
+
+- **unit** : *int*
+  Unit.
+
+**Returns:**
+
+- *QString* — The symbol, or an empty string.
+
+---
+
+### unitMultiplier(unitMul)
+
+SI prefix of a unit multiplier (FIFF_UNITM_*), e.g.
+
+"f" for FIFF_UNITM_F.
+
+**Parameters:**
+
+- **unitMul** : *int*
+  Unit multiplier.
+
+**Returns:**
+
+- *QString* — The prefix, or an empty string.
+
+---
+
+### channelKind(kind)
+
+Name of a channel kind (FIFFV_*_CH), e.g.
+
+"EEG" for FIFFV_EEG_CH.
+
+**Parameters:**
+
+- **kind** : *int*
+  Channel kind.
+
+**Returns:**
+
+- *QString* — The name, or an empty string.
+
+---
+
+## Example
+
+- Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
+- Build target: `ex_fiff_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
+
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 227"
+QTextStream treeOut(&tree);
+transStream.dirtree()->print(treeOut);
+transStream.close();
+const QString transformTag = FiffExplain::tag(FIFF_COORD_TRANS);                                              // "transform"
+const QString gradiometerUnit = FiffExplain::unitMultiplier(FIFF_UNITM_F) + FiffExplain::unit(FIFF_UNIT_T_M); // "fT/m"
+// mne.io.show_fiff(all-trans.fif): FIFFB_ROOT holding file ID (printed as the block id), dir pointer, free list,
+// 2 transforms and a NOP
+const QStringList treeLines = tree.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+ok &= expect(treeLines.size() == 6 && treeLines[0].startsWith("999 = root") && treeLines[3] == "  222 = transform       [2]" && treeLines[5] == "}" && transformTag == "transform" && gradiometerUnit == "fT/m",
+             "FiffExplain/FiffDirNode::print: the tree of all-trans.fif lists the blocks and tags mne.io.show_fiff shows");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
+- Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;
+- Ruben Doerfel &lt;doerfelruben@aol.com&gt;
+- Andreas Griesshammer &lt;ag@fieldlineinc.com&gt;
+- Gabriel Motta &lt;gabrielbenmotta@gmail.com&gt;

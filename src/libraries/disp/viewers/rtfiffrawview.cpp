@@ -24,7 +24,7 @@
 
 #include <dsp/filterkernel.h>
 #include <fiff/fiff_info.h>
-#include <fiff/fiff_dir_node.h>
+#include <fiff/fiff_explain.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -273,10 +273,12 @@ void RtFiffRawView::updateCrosshair(const QPoint& position)
         return;
     }
 
+    // "NA" for unitless channels, as MNE-Python labels them
+    const QString unit = FiffExplain::unit(m_pModel->getUnit(iRow));
     emit cursorDataChanged(static_cast<float>(iSample / static_cast<double>(m_fSamplingRate)),
                            static_cast<float>(m_pModel->getValueAtColumn(iRow, iColumn)),
                            m_pModel->data(m_pModel->index(iRow, 0)).toString(),
-                           QString::fromLatin1(FiffDirNode::get_unit_name(m_pModel->getUnit(iRow))));
+                           unit.isEmpty() ? QStringLiteral("NA") : unit);
 }
 
 //=============================================================================================================

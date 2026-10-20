@@ -38,6 +38,7 @@
 #include "fiff_constants.h"
 #include "fiff_coord_trans.h"
 #include "fiff_dir_node.h"
+#include "fiff_explain.h"
 #include "fiff_dir_entry.h"
 #include "fiff_named_matrix.h"
 #include "fiff_tag.h"

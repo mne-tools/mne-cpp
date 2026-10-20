@@ -481,7 +481,7 @@ This corresponds to the old sizeof(fiffTagRec) - sizeof(fiff_data_t *).
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 207"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 209"
 FiffStream::SPtr stream(new FiffStream(&structureFile));
 const bool opened = stream->open();
 const QList<FiffDirNode::SPtr> measNodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);

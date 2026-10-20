@@ -137,7 +137,7 @@ Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI ``.xfm f
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 140"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 142"
 // Head -> MRI -> RAS -> MNI Talairach -> Talairach, as mne_analyze reports a picked location
 FiffCoordTransSet chain;
 chain.read(dir + "/../../subjects/sample/mri/brain-neuromag/sets/COR.fif"); // surface RAS -> RAS of the MRI set

@@ -1146,7 +1146,7 @@ Opens the source file, locates the FIFFB_PROCESSING_HISTORY block, reads all tag
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 206"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 208"
 QFile structureFile(dir + "/sample_audvis-ave.fif");
 FiffStream::SPtr stream(new FiffStream(&structureFile));
 const bool opened = stream->open();

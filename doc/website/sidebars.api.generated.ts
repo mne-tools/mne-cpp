@@ -62,7 +62,7 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/fiff/average-description',
         'api/fiff/fiff-annotation',
         'api/fiff/fiff-epoch-data',
-        'api/fiff/fiff-explain-entry',
+        'api/fiff/fiff-explain',
         'api/fiff/rejection-params'
       ],
     },

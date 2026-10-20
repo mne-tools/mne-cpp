@@ -4858,7 +4858,8 @@
       "test": null,
       "example": "ex_fiff_api",
       "example_snippet": [
-        "ex_fiff_api/main.cpp#fiff_stream_usage"
+        "ex_fiff_api/main.cpp#fiff_stream_usage",
+        "ex_fiff_api/main.cpp#fiff_explain_usage"
       ],
       "example_mode": "run",
       "required_data": [
@@ -8804,15 +8805,15 @@
       "python_url": null
     },
     {
-      "name": "FiffExplainEntry",
+      "name": "FiffExplain",
       "module": "fiff",
       "header": "fiff/fiff_explain.h",
       "origin": "mne-c",
-      "mne_c_tool": null,
+      "mne_c_tool": "mne_show_fiff",
       "mne_python": null,
       "sklearn": null,
-      "test": null,
-      "example": null,
+      "test": "test_fiff_stream_python",
+      "example": "ex_fiff_api",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -8820,8 +8821,13 @@
       "guide": null,
       "python_equiv": null,
       "python_url": null,
-      "example_exempt": true,
-      "example_exempt_reason": "Row type of the static tag-name tables behind the show_fiff tool; not used outside fiff_explain."
+      "example_snippet": [
+        "ex_fiff_api/main.cpp#fiff_explain_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "RejectionParams",

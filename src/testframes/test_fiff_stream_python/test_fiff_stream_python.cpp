@@ -32,6 +32,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dir_node.h>
+#include <fiff/fiff_explain.h>
 #include <fiff/fiff_proj.h>
 #include <fiff/fiff_named_matrix.h>
 #include <fiff/fiff_coord_trans.h>
@@ -560,15 +561,6 @@ void TestFiffStreamPython::readsTagTypes()
 
 //=============================================================================================================
 
-namespace
-{
-QStringList g_messages;
-void collectMessages(QtMsgType, const QMessageLogContext&, const QString& msg)
-{
-    g_messages << msg;
-}
-} // namespace
-
 void TestFiffStreamPython::printsDirectoryTree()
 {
     // mne-python fiff_open on test_mne_ctf_comp_python/data/ctf_grade0_raw.fif: blocks depth-first (its root 0 is
@@ -577,40 +569,49 @@ void TestFiffStreamPython::printsDirectoryTree()
     FiffStream stream(&file);
     QVERIFY(stream.open());
 
-    g_messages.clear();
-    const QtMessageHandler previous = qInstallMessageHandler(collectMessages);
-    stream.dirtree()->print(0);
-    qInstallMessageHandler(previous);
+    QString text;
+    QTextStream out(&text);
+    stream.dirtree()->print(out);
+    out.flush();
 
+    // Every line is whole: a block with its id, one run of equal tag kinds, or a closing brace (MNE-C fiff_dir_tree)
+    const QRegularExpression blockLine(QStringLiteral(R"(^( *)(\d+) = (.+?) +\{ (\t\d+\.\d+ 0x[0-9a-f]+ -?\d+ -?\d+ )?$)"));
+    const QRegularExpression tagLine(QStringLiteral(R"(^( *)(\d+) = (.+?) *( \[(\d+)\])?$)"));
     const QList<int> blocks{FIFFB_ROOT, 100, 101, 109, 107, 106, 370, 371, 357, 371, 357, 371, 357, 371, 357, 371, 357, 102};
     QList<int> printedBlocks;
     int printedTags = 0;
-    // Blocks without a description (the CTF compensation 370/371/357) are reported as "Cannot explain".
-    const QRegularExpression entry(QStringLiteral("^(?:(\\d+) = |Cannot explain: (\\d+)$)"));
-    for (int i = 0; i < g_messages.size(); ++i) {
-        const QRegularExpressionMatch m = entry.match(g_messages[i]);
-        // A block line is the one followed by " { ".
-        if (i + 1 < g_messages.size() && g_messages[i + 1] == QStringLiteral(" { "))
-            printedBlocks << (m.captured(1).isEmpty() ? m.captured(2) : m.captured(1)).toInt();
-        else if (m.hasMatch())
+    int depth = 0;
+    const QStringList lines = text.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    for (const QString& line : lines) {
+        const QRegularExpressionMatch block = blockLine.match(line);
+        const QRegularExpressionMatch tag = tagLine.match(line);
+        if (block.hasMatch()) {
+            QCOMPARE(block.captured(1).size(), 5 * depth++);
+            QCOMPARE(block.captured(3), FiffExplain::block(block.captured(2).toInt()));
+            printedBlocks << block.captured(2).toInt();
+        } else if (tag.hasMatch()) {
+            QCOMPARE(tag.captured(1).size(), 5 * (depth - 1) + 2);
+            QCOMPARE(tag.captured(3), FiffExplain::tag(tag.captured(2).toInt()));
             ++printedTags;
+        } else {
+            QCOMPARE(line, QString(5 * --depth, QLatin1Char(' ')) + QLatin1Char('}'));
+        }
     }
+    QCOMPARE(depth, 0);
     QCOMPARE(printedBlocks, blocks);
-    QVERIFY(g_messages.contains(QStringLiteral("203 = %1").arg(QString::fromLatin1(FiffDirNode::get_tag_explanation(FIFF_CH_INFO)))));
-    QVERIFY(g_messages.contains(QStringLiteral(" [36]\n")));
-    QCOMPARE(QString::fromLatin1(FiffDirNode::get_tag_explanation(-5)), QStringLiteral("unknown"));
-    QCOMPARE(QString::fromLatin1(FiffDirNode::get_unit_name(FIFF_UNIT_T)), QStringLiteral("T"));
-    QCOMPARE(QString::fromLatin1(FiffDirNode::get_unit_name(FIFF_UNIT_T_M)), QStringLiteral("T/m"));
-    QCOMPARE(QString::fromLatin1(FiffDirNode::get_unit_name(FIFF_UNIT_V)), QStringLiteral("V"));
-    QCOMPARE(QString::fromLatin1(FiffDirNode::get_unit_name(FIFF_UNIT_NONE)), QStringLiteral("NA"));
-    g_messages.clear();
-    qInstallMessageHandler(collectMessages);
-    FiffDirNode::explain(-5);
-    FiffDirNode::explain_block(-5);
-    qInstallMessageHandler(previous);
-    QCOMPARE(g_messages, QStringList({QStringLiteral("Cannot explain: -5"), QStringLiteral("Cannot explain: -5")}));
+    QVERIFY(lines.filter(QRegularExpression(QStringLiteral(R"(^ +203 = channel +\[36\]$)"))).size() == 1);
     // One line per run of equal tag kinds: mne-python's tree has 50; the root's FIFF_FILE_ID entry is its id here.
     QCOMPARE(printedTags, 49);
+
+    QCOMPARE(FiffExplain::tag(FIFF_CH_INFO), QStringLiteral("channel"));
+    QCOMPARE(FiffExplain::block(FIFFB_XFIT_AUX), QStringLiteral("xfit aux"));
+    QCOMPARE(FiffExplain::tag(FIFF_CH_POS), QStringLiteral("channel pos"));
+    QCOMPARE(FiffExplain::tag(-5), QString());
+    QCOMPARE(FiffExplain::unit(FIFF_UNIT_T), QStringLiteral("T"));
+    QCOMPARE(FiffExplain::unit(FIFF_UNIT_T_M), QStringLiteral("T/m"));
+    QCOMPARE(FiffExplain::unit(FIFF_UNIT_NONE), QString());
+    QCOMPARE(FiffExplain::unitMultiplier(FIFF_UNITM_F), QStringLiteral("f"));
+    QCOMPARE(FiffExplain::channelKind(FIFFV_EEG_CH), QStringLiteral("EEG"));
 }
 
 //=============================================================================================================

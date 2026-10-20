@@ -3,25 +3,25 @@
   "generated_by": "tools/quality/audit_api_evidence.py",
   "policy": "tools/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 467,
+    "exported_classes": 468,
     "exported_free_functions": 119,
     "registered_classes": 518,
     "exported_not_registered": 0,
     "registered_function_modules": 13,
-    "registered_header_only": 38,
+    "registered_header_only": 37,
     "registered_stale": 0,
-    "registered_with_test": 161,
+    "registered_with_test": 162,
     "registered_test_unresolved": 0,
-    "registered_with_example": 373,
+    "registered_with_example": 374,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 93,
     "registered_without_api_page": 0,
-    "with_snippet": 394,
+    "with_snippet": 395,
     "public_api_units": 518,
-    "example_eligible": 373,
-    "example_exempt": 145,
-    "eligible_backed_by_registry_example": 373,
-    "eligible_used_by_some_example": 351,
+    "example_eligible": 374,
+    "example_exempt": 144,
+    "eligible_backed_by_registry_example": 374,
+    "eligible_used_by_some_example": 352,
     "examples_on_disk": 69,
     "examples_built": 69
   },
@@ -92,11 +92,11 @@
     "fiff": {
       "public": 38,
       "registered": 38,
-      "with_test": 10,
-      "eligible": 37,
-      "eligible_with_registry_example": 37,
-      "eligible_used_by_example": 35,
-      "with_snippet": 37
+      "with_test": 11,
+      "eligible": 38,
+      "eligible_with_registry_example": 38,
+      "eligible_used_by_example": 36,
+      "with_snippet": 38
     },
     "fs": {
       "public": 8,
@@ -6808,7 +6808,8 @@
         "ex_fiff_api"
       ],
       "snippets": [
-        "ex_fiff_api/main.cpp#fiff_stream_usage"
+        "ex_fiff_api/main.cpp#fiff_stream_usage",
+        "ex_fiff_api/main.cpp#fiff_explain_usage"
       ],
       "api_page": "doc/website/docs/api/fiff/fiff-dir-node.mdx",
       "python_equiv": null,
@@ -7045,23 +7046,27 @@
       "exempt_reason": null
     },
     {
-      "name": "FiffExplainEntry",
+      "name": "FiffExplain",
       "header": "fiff/fiff_explain.h",
       "library": "fiff",
-      "kind": "header-only",
-      "exported": false,
+      "kind": "exported-class",
+      "exported": true,
       "registered": true,
       "registry_status": "documented",
-      "test": null,
-      "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
-      "api_page": "doc/website/docs/api/fiff/fiff-explain-entry.mdx",
+      "test": "test_fiff_stream_python",
+      "test_resolves": true,
+      "example": "ex_fiff_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_fiff_api"
+      ],
+      "snippets": [
+        "ex_fiff_api/main.cpp#fiff_explain_usage"
+      ],
+      "api_page": "doc/website/docs/api/fiff/fiff-explain.mdx",
       "python_equiv": null,
-      "example_eligible": false,
-      "exempt_reason": "registry: Row type of the static tag-name tables behind the show_fiff tool; not used outside fiff_explain."
+      "example_eligible": true,
+      "exempt_reason": null
     },
     {
       "name": "FiffFileSharer",

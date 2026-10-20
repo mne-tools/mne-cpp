@@ -73,6 +73,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
 ### New APIs
 
 **Reading and writing data**
+- `FiffExplain` names FIFF tag kinds, block kinds, units, unit multipliers
+  and channel kinds; `FiffDirNode::print` writes the block tree to a stream.
 - Digitizer readers on `FiffDigPointSet`:
   - Polhemus Isotrak (`.elp`/`.hsp`/`.eeg`) and Polhemus FastSCAN.
   - BrainProducts CapTrak (`.bvct`).
@@ -274,6 +276,7 @@ desktop, and signed installers. 915 commits since v2.3.0.
   from the wrong channel.
 
 **Files**
+- `FiffDirNode::print` split every fragment into its own log line.
 - EDF/BDF:
   - Every EDF channel was divided by 1e6.
   - Padded header fields read as 0.
@@ -375,6 +378,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
     `IeegImplantation`).
   - `EDFReader` scale factor and `mne_edf2fiff --scaleFactor`.
   - `MNEHemisphere::getTriCoords`.
+  - `FiffDirNode::explain`/`explain_block`/`get_tag_explanation`/
+    `get_unit_name` and `FiffExplainEntry` (use `FiffExplain`).
   - mne_browse `MnxProject` (use the MNA project container).
   - Several unused internals.
 - MNE Scan's bad-channel resource is renamed `babymeg_bad_channels.txt`. The

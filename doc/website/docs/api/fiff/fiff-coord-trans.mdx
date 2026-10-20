@@ -595,7 +595,7 @@ Performs a Procrustes alignment between two sets of corresponding 3D points.
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 129"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 131"
 const FiffCoordTrans headToMri = FiffCoordTrans::readTransform(dir + "/all-trans.fif", FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
 const FiffCoordTrans devHead = info.dev_head_t; // device -> head, from the measurement info
 FiffCoordTrans back = devHead.inverted();

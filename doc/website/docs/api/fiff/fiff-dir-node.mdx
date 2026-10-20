@@ -31,6 +31,19 @@ const FiffId fileId = stream->id();
 stream->close();
 ```
 
+```cpp title="src/examples/ex_fiff_api/main.cpp"
+// The block tree of a transform file, as MNE-C fiff_dir_tree prints it, with the names of tags and units
+QFile transFile(dir + "/all-trans.fif");
+FiffStream transStream(&transFile);
+transStream.open();
+QString tree;
+QTextStream treeOut(&tree);
+transStream.dirtree()->print(treeOut);
+transStream.close();
+const QString transformTag = FiffExplain::tag(FIFF_COORD_TRANS);                                              // "transform"
+const QString gradiometerUnit = FiffExplain::unitMultiplier(FIFF_UNITM_F) + FiffExplain::unit(FIFF_UNIT_T_M); // "fT/m"
+```
+
 ---
 
 ## Public Methods
@@ -163,14 +176,17 @@ Checks whether a [`FiffDirNode`](/docs/api/fiff/fiff-dir-node) has a specific ki
 
 ---
 
-### print(indent)
+### print(out, indent)
 
-Prints elements of a tree.
+Prints this block and its sub-blocks like MNE-C's fiff_dir_tree: one line per block with its id, one line per run of equal tag kinds with the run length in brackets, sub-blocks indented by five.
 
 **Parameters:**
 
+- **out** : *QTextStream &*
+  Stream to print to.
+
 - **indent** : *int*
-  number of intendations.
+  Indentation of this block.
 
 ---
 
@@ -220,60 +236,6 @@ Copies directory subtrees from fidin to fidout.
 
 ---
 
-### explain_block(kind)
-
-Try to explain a block...
-
-**Parameters:**
-
-- **kind** : *int*
-  Block kind.
-
----
-
-### explain(kind)
-
-Try to explain...
-
-**Parameters:**
-
-- **kind** : *int*
-  directory kind.
-
----
-
-### get_tag_explanation(kind)
-
-Get textual explanation of a tag.
-
-**Parameters:**
-
-- **kind** : *int*
-  directory kind.
-
-**Returns:**
-
-- *const char ** — Pointer to the static string explaining the tag, or nullptr if not found.
-
----
-
-### get_unit_name(unit)
-
-Get the SI symbol of a FIFF unit, e.g.
-
-"T" for FIFF_UNIT_T, "T/m" for FIFF_UNIT_T_M.
-
-**Parameters:**
-
-- **unit** : *int*
-  FIFF unit (FIFF_UNIT_*).
-
-**Returns:**
-
-- *const char ** — The symbol, or "NA" for FIFF_UNIT_NONE and unknown units (as in MNE-Python).
-
----
-
 ## Example
 
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
@@ -286,7 +248,7 @@ Get the SI symbol of a FIFF unit, e.g.
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 206"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 208"
 QFile structureFile(dir + "/sample_audvis-ave.fif");
 FiffStream::SPtr stream(new FiffStream(&structureFile));
 const bool opened = stream->open();

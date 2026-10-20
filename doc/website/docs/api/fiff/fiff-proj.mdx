@@ -216,7 +216,7 @@ For each of gradiometers, magnetometers and EEG (bad channels excluded) the lead
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 155"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 157"
 const FiffProj& pca = info.projs[0]; // "PCA-v1", 1 vector over 102 magnetometers, inactive
 QList<FiffProj> projs = info.projs;
 FiffProj::activate_projs(projs);

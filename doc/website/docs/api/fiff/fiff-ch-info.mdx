@@ -163,7 +163,7 @@ DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine c
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 107"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 109"
 QFile rawFile(dir + "/sample_audvis_trunc_raw.fif");
 FiffRawData raw(rawFile);        // reads the measurement info, raw data is read on demand
 const FiffInfo& info = raw.info; // channels, sampling rate, bads, projectors, digitizer, transforms

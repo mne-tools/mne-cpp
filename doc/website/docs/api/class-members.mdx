@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6335 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6334 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -317,6 +317,7 @@ Index of 6335 public class members (functions, variables, typedefs, enums) acros
 - **bipolarMatrix** `[fn]` in [IeegReference](/docs/api/ieeg/ieeg-reference) — Montage matrix of the derivations: bipolar data = M * contact data.
 - **bipolarPairs** `[fn]` in [IeegReference](/docs/api/ieeg/ieeg-reference) — Pair each contact with its next neighbour on the same lead: along a depth lead or strip, and along the rows and then the columns of a grid with a known shape.
 - **bIsLargeHeadMovement** `[var]` in [HpiFitResult](/docs/api/inv/hpi-fit-result)
+- **block** `[fn]` in [FiffExplain](/docs/api/fiff/fiff-explain) — Name of a block kind (FIFFB_*), e.g.
 - **bmax** `[var]` in [AverageCategory](/docs/api/fiff/average-category) — Baseline max (s).
 - **bmax** `[var]` in [CovDefinition](/docs/api/mne/cov-definition) — Baseline max (s).
 - **bmax** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Baseline end time (s).
@@ -475,6 +476,7 @@ Index of 6335 public class members (functions, variables, typedefs, enums) acros
 - **channelInfo** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Display metadata for the given channel.
 - **ChannelInfoModel** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model)
 - **ChannelInfoModel** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model)
+- **channelKind** `[fn]` in [FiffExplain](/docs/api/fiff/fiff-explain) — Name of a channel kind (FIFFV_*_CH), e.g.
 - **ChannelLabelPanel** `[fn]` in [ChannelLabelPanel](/docs/api/disp/channel-label-panel)
 - **channelMarkingChanged** `[signal]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Emmited when marking of bad channels is changed.
 - **channelNames** `[var]` in [FiffAnnotation](/docs/api/fiff/fiff-annotation) — Empty = global annotation.
@@ -1581,8 +1583,6 @@ Index of 6335 public class members (functions, variables, typedefs, enums) acros
 - **exists** `[fn]` in [CommandParser](/docs/api/com/command-parser) — Checks if a command exists.
 - **exitCode** `[var]` in [PythonRunnerResult](/docs/api/utils/python-runner-result) — Process exit code (-1 if never started).
 - **experimenter** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — Experimenter name.
-- **explain** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Try to explain...
-- **explain_block** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Try to explain a block...
 - **explain_comp** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Return a human-readable description string for a compensation kind constant.
 - **explanation** `[var]` in [MnaVerification](/docs/api/mna/mna-verification) — Human-readable explanation of what this node does and why.
 - **expression** `[var]` in [MnaParamBinding](/docs/api/mna/mna-param-binding) — Formula string, e.g. "clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)".
@@ -2067,8 +2067,6 @@ Index of 6335 public class members (functions, variables, typedefs, enums) acros
 - **get_machid** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Returns the machine ID consisting of a two integer number.
 - **get_meas_info** `[fn]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Reads measurement information from the nearest FIFFB_MEAS_INFO parent of a node.
 - **get_meas_info** `[fn]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Overload that does not return the measurement start time.
-- **get_tag_explanation** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Get textual explanation of a tag.
-- **get_unit_name** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Get the SI symbol of a FIFF unit, e.g.
 - **get_vertno** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces) — Returns the Zero based (different to MATLAB) indices of the used vertices of both hemispheres.
 - **get_whitener** `[fn]` in [Linalg](/docs/api/math/linalg) — Returns the whitener of a given matrix.
 - **get_whitener** `[fn]` in [Linalg](/docs/api/math/linalg) — Returns the whitener of a given matrix.
@@ -2838,7 +2836,6 @@ Index of 6335 public class members (functions, variables, typedefs, enums) acros
 - **kind** `[var]` in [FiffCtfComp](/docs/api/fiff/fiff-ctf-comp) — [`Fiff`](/docs/api/fiff/fiff-class) kind -&gt; `fiff_constants.h`.
 - **kind** `[var]` in [FiffDigPoint](/docs/api/fiff/fiff-dig-point) — FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG.
 - **kind** `[var]` in [FiffDirEntry](/docs/api/fiff/fiff-dir-entry) — Tag number.
-- **kind** `[var]` in [FiffExplainEntry](/docs/api/fiff/fiff-explain-entry)
 - **kind** `[var]` in [FiffProj](/docs/api/fiff/fiff-proj) — [`Fiff`](/docs/api/fiff/fiff-class) kind.
 - **kind** `[var]` in [FiffTag](/docs/api/fiff/fiff-tag) — Tag number.
 - **kind** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — "LCMV" or "DICS".
@@ -4065,7 +4062,7 @@ Index of 6335 public class members (functions, variables, typedefs, enums) acros
 - **prevIgnore** `[var]` in [AverageCategory](/docs/api/fiff/average-category) — Ignore mask for previous event.
 - **print** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Prints the coordinate transform.
 - **print** `[fn]` in [FiffDigitizerData](/docs/api/fiff/fiff-digitizer-data) — Prints class contents.
-- **print** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Prints elements of a tree.
+- **print** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Prints this block and its sub-blocks like MNE-C's fiff_dir_tree: one line per block with its id, one line per run of equal tag kinds with the run length in brackets, sub-blocks indented by five.
 - **print** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Prints the id.
 - **print** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Prints class contents.
 - **print** `[fn]` in [InvEcd](/docs/api/inv/inv-ecd) — Prints the [`InvEcd`](/docs/api/inv/inv-ecd) dipole information to the debug output.
@@ -5710,6 +5707,7 @@ Index of 6335 public class members (functions, variables, typedefs, enums) acros
 - **t** `[var]` in `VelocitySample`
 - **t_Observers** `[type]` in [Subject](/docs/api/utils/subject) — Defines a new [`IObserver`](/docs/api/utils/i-observer) set type.
 - **table** `[var]` in [FsColortable](/docs/api/fs/fs-colortable) — labels and corresponing colorcode.
+- **tag** `[fn]` in [FiffExplain](/docs/api/fiff/fiff-explain) — Name of a tag kind (FIFF_*), e.g.
 - **tag** `[var]` in [MNEMghTag](/docs/api/mne/mne-mgh-tag) — Tag identifier code.
 - **tags** `[var]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group) — Owned tag entries.
 - **takeScreenshot** `[fn]` in [AverageLayoutView](/docs/api/disp/average-layout-view) — Renders a screenshot of the scene and saves it to the passed path.
@@ -5729,7 +5727,6 @@ Index of 6335 public class members (functions, variables, typedefs, enums) acros
 - **tCdf** `[fn]` in [StatsTtest](/docs/api/sts/stats-ttest) — Compute the CDF of the t-distribution using the regularized incomplete beta function.
 - **TE** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Echo time (ms).
 - **testDataPath** `[fn]` in [PythonTestHelper](/docs/api/utils/python-test-helper) — Get the standard path to mne-cpp-test-data from the test binary location.
-- **text** `[var]` in [FiffExplainEntry](/docs/api/fiff/fiff-explain-entry)
 - **text_color** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Text color (RGB).
 - **tfce** `[fn]` in [StatsCluster](/docs/api/sts/stats-cluster) — Threshold-Free Cluster Enhancement (TFCE).
 - **tfCoefficients** `[var]` in [InvTfMxneResult](/docs/api/inv/inv-tf-mxne-result) — Time-frequency coefficients of active sources (n_active*n_freqs × n_times).
@@ -5978,7 +5975,9 @@ Index of 6335 public class members (functions, variables, typedefs, enums) acros
 - **undoLast** `[fn]` in [AcquiredPoints](/docs/api/utils/acquired-points) — Remove the most recently captured point matching `kind`, if any.
 - **unit** `[var]` in [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info) — Physical unit string (e.g.
 - **unit** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Unit of measurement.
+- **unit** `[fn]` in [FiffExplain](/docs/api/fiff/fiff-explain) — SI symbol of a unit (FIFF_UNIT_*), e.g.
 - **unit_mul** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Unit multiplier exponent.
+- **unitMultiplier** `[fn]` in [FiffExplain](/docs/api/fiff/fiff-explain) — SI prefix of a unit multiplier (FIFF_UNITM_*), e.g.
 - **units** `[var]` in [BidsChannel](/docs/api/bids/bids-channel) — Unit of measurement: V, uV, mV (REQUIRED).
 - **units** `[var]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — "m", "mm", or "cm" (REQUIRED for iEEG).
 - **units** `[fn]` in [FastrakParser](/docs/api/utils/fastrak-parser)

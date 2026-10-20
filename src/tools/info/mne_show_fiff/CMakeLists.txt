@@ -18,14 +18,12 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED
 
 set(SOURCES
     main.cpp
-    mne_fiff_exp.cpp
-    mne_fiff_exp_set.cpp
+    mne_fiff_contents.cpp
     mne_show_fiff_settings.cpp
 )
 
 set(HEADERS
-    mne_fiff_exp.h
-    mne_fiff_exp_set.h
+    mne_fiff_contents.h
     mne_show_fiff_settings.h
 )
 
@@ -62,27 +60,6 @@ install(TARGETS ${PROJECT_NAME}
     BUNDLE DESTINATION . COMPONENT applications
     RUNTIME DESTINATION bin COMPONENT applications
     LIBRARY DESTINATION lib COMPONENT applications
-)
-
-# Copy resource files
-set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources/general/explanations)
-file(MAKE_DIRECTORY ${RESOURCE_DIR})
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    ${PROJECT_RESOURCES_DIR}/general/explanations/fiff_explanations.txt
-    ${RESOURCE_DIR}/fiff_explanations.txt
-    COMMENT "Copying fiff_explanations.txt to build directory"
-)
-
-if(APPLE)
-    set_source_files_properties(${PROJECT_RESOURCES_DIR}/general/explanations/fiff_explanations.txt
-        PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/general/explanations")
-    target_sources(${PROJECT_NAME} PRIVATE ${PROJECT_RESOURCES_DIR}/general/explanations/fiff_explanations.txt)
-endif()
-
-install(FILES ${PROJECT_RESOURCES_DIR}/general/explanations/fiff_explanations.txt
-    DESTINATION bin/resources/general/explanations
-    COMPONENT applications
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)

@@ -41,6 +41,7 @@ set(SOURCES
     fiff_io.cpp
     fiff_dig_point_set.cpp
     fiff_dir_node.cpp
+    fiff_explain.cpp
     fiff_sparse_matrix.cpp
     fiff_digitizer_data.cpp
     fiff_coord_trans_set.cpp
@@ -97,6 +98,13 @@ list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+
+# MNE-C's tag, block, unit and channel-kind names, behind FiffExplain
+qt_add_resources(${PROJECT_NAME} "fiff_explanations"
+  PREFIX "/fiff"
+  BASE resources
+  FILES resources/fiff_explanations.txt
+)
 
 set(FFTW_LIBS "")
 

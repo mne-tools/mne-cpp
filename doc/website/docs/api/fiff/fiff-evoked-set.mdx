@@ -344,7 +344,7 @@ ok &= expect(synthetic.save(tmp.filePath("synthetic-ave.fif")), "FiffEvokedSet w
 
 FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
 
-````cpp title="src/examples/ex_fiff_api/main.cpp, line 197"
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 199"
 QFile aveFile(dir + "/sample_audvis-ave.fif");
 FiffEvokedSet evokedSet(aveFile); // all conditions of an -ave.fif file
 const FiffEvoked& leftAuditory = evokedSet.evoked[0];
