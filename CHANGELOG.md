@@ -248,6 +248,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
 - SSP vectors from raw data spanned the wrong subspace. Covariance removed the
   grand mean instead of the evoked response, and ignored rejection limits.
 - Epochs started one sample early. Baselines dropped the stimulus sample.
+- Epoch rejection with a limit for only some channel types (e.g. gradiometers)
+  rejected every epoch.
 - Averages dropped their last sample, and the real-time average mixed stale
   pre-stimulus data across trigger codes (12 % error).
 - Saved filtered raw files were shifted by half the filter length, and trigger
@@ -410,7 +412,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
 ### Documentation
 
 - 29 new example programs, compiled and run by CI. Every public class has an
-  example snippet in its API page.
+  example snippet in its API page; internal types show the examples that
+  exercise them.
 - The API reference builds with zero Doxygen warnings (1,726 fixed).
 - Manual screenshots are generated from the current build in CI and compared
   against reference images.
