@@ -28,6 +28,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 COMMANDS_JSON = Path(__file__).with_name("setup_commands.json")
+DEPENDENCY_PINS = REPO_ROOT / "src" / "external" / "external_deps.env"
 # Documented blocks a contributor on each OS follows, in order
 SECTIONS = {"linux": ["linux", "unix"], "macos": ["unix"], "windows": ["windows"]}
 _MARK = "__ONBOARDING_STEP__"
@@ -38,6 +39,9 @@ def script_for(os_name: str, commands: list[str]) -> tuple[str, list[str]]:
     if os_name == "windows":
         lines = ["@echo off"]
         for k, command in enumerate(commands):
+            # Without `call`, cmd.exe hands the session to a batch file and never returns
+            if command.split()[0].lower().endswith((".bat", ".cmd")):
+                command = f"call {command}"
             lines += [f"echo {_MARK} {k}", command, f"if errorlevel 1 exit /b 1"]
         return "\r\n".join(lines) + "\r\n", ["cmd.exe", "/d", "/c"]
     lines = ["set -e"]
@@ -55,6 +59,16 @@ def disk_usage(path: Path) -> int:
             if not os.path.islink(full):
                 total += os.path.getsize(full)
     return total
+
+
+def dependency_pins() -> dict[str, str]:
+    """The external dependency versions the documented setup resolves."""
+    pins = {}
+    for line in DEPENDENCY_PINS.read_text(encoding="utf-8").splitlines():
+        key, sep, value = line.partition("=")
+        if sep and not key.startswith("#"):
+            pins[key.strip()] = value.strip()
+    return pins
 
 
 def run(os_name: str, commands: list[str], cwd: Path = REPO_ROOT) -> dict:
@@ -90,10 +104,11 @@ def run(os_name: str, commands: list[str], cwd: Path = REPO_ROOT) -> dict:
     return {
         "os": os_name,
         "platform": platform.platform(),
-        "ok": code == 0,
+        "ok": code == 0 and failed is None,
         "failed_step": failed,
         "total_seconds": round(time.monotonic() - started, 1),
         "checkout_bytes": disk_usage(cwd),
+        "dependencies": dependency_pins(),
         "steps": steps,
     }
 
@@ -102,7 +117,9 @@ def summary_markdown(result: dict) -> str:
     """Markdown table of the steps for the job summary."""
     rows = [f"### Onboarding on {result['os']}: {'passed' if result['ok'] else 'FAILED'}", "",
             f"Total {result['total_seconds']} s, checkout {result['checkout_bytes'] / 2**30:.2f} GiB "
-            f"({result['platform']})", "", "| Step | Time (s) | Result |", "|---|---:|---|"]
+            f"({result['platform']})", "",
+            "Pinned: " + ", ".join(f"{k} {v}" for k, v in result.get("dependencies", {}).items()), "",
+            "| Step | Time (s) | Result |", "|---|---:|---|"]
     for step in result["steps"]:
         state = "ok" if step["ok"] else ("failed" if step["seconds"] is not None else "not run")
         rows.append(f"| `{step['command']}` | {step['seconds'] if step['seconds'] is not None else ''} | {state} |")

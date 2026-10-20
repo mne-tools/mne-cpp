@@ -125,6 +125,25 @@ class RunSetupCommandsTest(unittest.TestCase):
         self.assertEqual([s["ok"] for s in result["steps"]], [True, True, False, False])
         self.assertIsNone(result["steps"][3]["seconds"])
         self.assertIn("| `false` |", runner.summary_markdown(result))
+        # The pinned dependency versions go into the report, so a failure can be traced to them
+        self.assertEqual(result["dependencies"]["QT_VERSION"],
+                         runner.dependency_pins()["QT_VERSION"])
+        self.assertRegex(result["dependencies"]["QT_VERSION"], r"^\d+\.\d+\.\d+$")
+
+    @unittest.skipIf(sys.platform == "win32", "runs a bash session")
+    def test_a_session_that_ends_early_is_a_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp, contextlib.redirect_stdout(io.StringIO()):
+            result = runner.run("macos", ["true", "exit 0", "echo never"], Path(tmp))
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["failed_step"], "echo never")
+
+    def test_windows_batch_files_return_to_the_session(self) -> None:
+        # Without `call`, cmd.exe hands the session to init.bat and never runs the following steps
+        script, _ = runner.script_for("windows", [".\\init.bat", "cmake --version", "scripts\\x.cmd --y"])
+        lines = script.splitlines()
+        self.assertIn("call .\\init.bat", lines)
+        self.assertIn("cmake --version", lines)
+        self.assertIn("call scripts\\x.cmd --y", lines)
 
 
 if __name__ == "__main__":
