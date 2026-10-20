@@ -175,12 +175,13 @@ class TestQualityPage(unittest.TestCase):
 class TestVersionRouting(unittest.TestCase):
     VERSION = "9.8.7"
 
-    def build(self, base: str, label: str, site_base: str | None = None) -> Path:
+    def build(self, base: str, label: str, site_base: str | None = None, css: str | None = None) -> Path:
         root = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, root)
         url = f"https://mne-cpp.github.io{site_base or base}"
+        css = css or f"{base}katex.min.css"
         (root / "index.html").write_text(
-            f'<link rel="canonical" href="{url}">'
+            f'<link rel="canonical" href="{url}"><link rel="stylesheet" href="{css}">'
             f'<link href="{base}assets/css/styles.css"><script src="{base}assets/js/main.js"></script>'
             f'<a class="navbar__link">{label}</a><a>v{self.VERSION} (Stable)</a>', encoding="utf-8")
         (root / "sitemap.xml").write_text(f"<urlset><url><loc>{url}download</loc></url></urlset>", encoding="utf-8")
@@ -198,6 +199,9 @@ class TestVersionRouting(unittest.TestCase):
         stale = build_check.check(self.build("/dev/", "dev (latest)", site_base="/"), "dev", self.VERSION)
         self.assertIn("canonical URL https://mne-cpp.github.io/ is outside https://mne-cpp.github.io/dev/", stale)
         self.assertIn("sitemap lists 1 URLs outside https://mne-cpp.github.io/dev/", stale)
+        # A config stylesheet is not prefixed with the base URL by Docusaurus
+        root_css = build_check.check(self.build("/dev/", "dev (latest)", css="/katex.min.css"), "dev", self.VERSION)
+        self.assertIn("local links outside base URL '/dev/': /katex.min.css", root_css)
 
     def test_download_page_has_no_hard_coded_release(self) -> None:
         page = (_WEBSITE / "src" / "pages" / "download.tsx").read_text(encoding="utf-8")

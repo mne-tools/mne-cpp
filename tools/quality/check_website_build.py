@@ -50,6 +50,10 @@ def check(build: Path, channel: str, version: str) -> list[str]:
     assets = set(re.findall(r'(?:href|src)="(/[^"]*?/?)assets/', html))
     if assets != {base}:
         problems.append(f"assets are served from {sorted(assets) or 'nowhere'}, expected base URL '{base}'")
+    outside = sorted({u for u in re.findall(r'<(?:link|script)[^>]*(?:href|src)="(/[^/"][^"]*)"', html)
+                      if not u.startswith(base)})
+    if outside:
+        problems.append(f"local links outside base URL '{base}': {', '.join(outside)}")
     if f">{label}<" not in html:
         problems.append(f"navbar version label '{label}' not found")
     if channel == "dev" and f">v{version}<" in html:

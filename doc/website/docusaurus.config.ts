@@ -10,6 +10,8 @@ const isDev = siteEnv === 'dev';
 // Latest release; tools/quality/tests/test_website_config.py keeps it equal to src/CMakeLists.txt.
 const stableVersion = '2.3.0';
 const versionLabel = isDev ? 'dev (latest)' : `v${stableVersion}`;
+// CI deploys dev builds under /dev/.
+const baseUrl = process.env.DOCUSAURUS_BASE_URL || '/';
 
 const config: Config = {
     title: 'MNE-CPP',
@@ -17,8 +19,7 @@ const config: Config = {
     favicon: 'img/favicon.ico',
 
     url: 'https://mne-cpp.github.io',
-    // Allow CI to override baseUrl for dev builds (deployed under /dev/)
-    baseUrl: process.env.DOCUSAURUS_BASE_URL || '/',
+    baseUrl,
 
     organizationName: 'mne-cpp',
     projectName: 'mne-cpp.github.io',
@@ -84,8 +85,9 @@ const config: Config = {
         },
     },
 
+    // Docusaurus does not prefix config stylesheets with baseUrl.
     stylesheets: [
-        '/katex.min.css',
+        `${baseUrl}katex.min.css`,
     ],
 
     themeConfig: {
