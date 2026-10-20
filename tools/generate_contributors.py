@@ -4,10 +4,11 @@
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 """Write doc/website/src/data/contributors.json from the git history.
 
-Commits are counted over the whole history of the checked-out branch, with
-every author's identities merged by ``.mailmap``, so the website ranks people
-by their actual commits rather than by the GitHub accounts that happen to be
-linked to their e-mail addresses. Needs a full clone (``fetch-depth: 0``)::
+Commits, merges included as on GitHub's contributor graph, are counted over the
+whole history of the checked-out branch, with every author's identities merged
+by ``.mailmap``, so the website ranks people by their actual commits rather
+than by the GitHub accounts that happen to be linked to their e-mail addresses.
+Needs a full clone (``fetch-depth: 0``)::
 
     python3 tools/generate_contributors.py [--out FILE]
 """
@@ -72,7 +73,7 @@ EXCLUDED = re.compile(r"\[bot\]|^MNE CPP$|^GitHub$|^web-flow$")
 
 
 def contributors(repo: Path, rev: str = "HEAD") -> list[dict]:
-    log = subprocess.run(["git", "shortlog", "-sn", "--no-merges", rev], cwd=repo, capture_output=True,
+    log = subprocess.run(["git", "shortlog", "-sn", rev], cwd=repo, capture_output=True,
                          text=True, check=True).stdout
     people = []
     for line in log.splitlines():

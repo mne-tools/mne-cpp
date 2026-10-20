@@ -2,12 +2,12 @@
   {
     "name": "Christoph Dinh",
     "login": "chdinh",
-    "contributions": 4019
+    "contributions": 4448
   },
   {
     "name": "Lorenz Esch",
     "login": "LorenzE",
-    "contributions": 3376
+    "contributions": 3837
   },
   {
     "name": "Gabriel Motta",
@@ -27,52 +27,57 @@
   {
     "name": "Lars Debor",
     "login": "1DIce",
-    "contributions": 253
-  },
-  {
-    "name": "Viktor Klüber",
-    "login": "ViktorKL",
-    "contributions": 148
-  },
-  {
-    "name": "Ricky Tjen",
-    "login": "rickytjen",
-    "contributions": 117
-  },
-  {
-    "name": "Jana Kiesel",
-    "login": "JanaKiesel",
-    "contributions": 112
+    "contributions": 267
   },
   {
     "name": "Martin Henfling",
     "login": "LostSign",
-    "contributions": 105
+    "contributions": 194
   },
   {
-    "name": "Simon Heinke",
-    "login": "sheinke",
-    "contributions": 91
-  },
-  {
-    "name": "Limin Sun",
-    "login": "limin-sun",
-    "contributions": 89
-  },
-  {
-    "name": "Florian Schlembach",
-    "login": "floschl",
-    "contributions": 74
+    "name": "Viktor Klüber",
+    "login": "ViktorKL",
+    "contributions": 178
   },
   {
     "name": "Daniel Knobl",
     "login": "GBeret",
-    "contributions": 71
+    "contributions": 169
+  },
+  {
+    "name": "Ricky Tjen",
+    "login": "rickytjen",
+    "contributions": 169
+  },
+  {
+    "name": "Jana Kiesel",
+    "login": "JanaKiesel",
+    "contributions": 143
+  },
+  {
+    "name": "Limin Sun",
+    "login": "limin-sun",
+    "contributions": 114
+  },
+  {
+    "name": "Simon Heinke",
+    "login": "sheinke",
+    "contributions": 93
+  },
+  {
+    "name": "Florian Schlembach",
+    "login": "floschl",
+    "contributions": 80
   },
   {
     "name": "Daniel Strohmeier",
     "login": "joewalter",
-    "contributions": 62
+    "contributions": 65
+  },
+  {
+    "name": "Seok Lew",
+    "login": null,
+    "contributions": 50
   },
   {
     "name": "Andrey Parfenov",
@@ -80,14 +85,19 @@
     "contributions": 45
   },
   {
-    "name": "Christof Pieloth",
-    "login": "cpieloth",
-    "contributions": 38
+    "name": "Felix Arndt",
+    "login": "farndt",
+    "contributions": 41
   },
   {
     "name": "Tim Kunze",
     "login": "TiKunze",
-    "contributions": 35
+    "contributions": 41
+  },
+  {
+    "name": "Christof Pieloth",
+    "login": "cpieloth",
+    "contributions": 38
   },
   {
     "name": "Wayne Mead",
@@ -95,14 +105,14 @@
     "contributions": 35
   },
   {
-    "name": "Felix Arndt",
-    "login": "farndt",
-    "contributions": 28
-  },
-  {
     "name": "Louis Eichhorst",
     "login": "louiseichhorst",
-    "contributions": 16
+    "contributions": 20
+  },
+  {
+    "name": "Felix Griesau",
+    "login": "femigr",
+    "contributions": 17
   },
   {
     "name": "Johannes Vorwerk",
@@ -110,9 +120,9 @@
     "contributions": 13
   },
   {
-    "name": "Seok Lew",
-    "login": null,
-    "contributions": 13
+    "name": "Chiran Doshi",
+    "login": "cdoshi",
+    "contributions": 12
   },
   {
     "name": "Johannes Behrens",
@@ -120,13 +130,8 @@
     "contributions": 12
   },
   {
-    "name": "Chiran Doshi",
-    "login": "cdoshi",
-    "contributions": 9
-  },
-  {
-    "name": "Felix Griesau",
-    "login": "femigr",
+    "name": "Robert Dicamillo",
+    "login": "buildqa",
     "contributions": 9
   },
   {
@@ -135,13 +140,13 @@
     "contributions": 8
   },
   {
-    "name": "Robert Dicamillo",
-    "login": "buildqa",
-    "contributions": 8
-  },
-  {
     "name": "Alex Rockhill",
     "login": "alexrockhill",
+    "contributions": 7
+  },
+  {
+    "name": "Sugandha Sachdeva",
+    "login": "SachdevaS",
     "contributions": 7
   },
   {
@@ -150,14 +155,9 @@
     "contributions": 6
   },
   {
-    "name": "Sugandha Sachdeva",
-    "login": "SachdevaS",
-    "contributions": 6
-  },
-  {
     "name": "Faris Yahya",
     "login": "mfarisyahya",
-    "contributions": 5
+    "contributions": 6
   },
   {
     "name": "Blerta Hamzallari",
@@ -167,6 +167,11 @@
   {
     "name": "Eric Larson",
     "login": "larsoner",
+    "contributions": 4
+  },
+  {
+    "name": "Franco Polo",
+    "login": "fjpolo",
     "contributions": 4
   },
   {
@@ -187,11 +192,6 @@
   {
     "name": "Benjamin Kay",
     "login": "benkay86",
-    "contributions": 3
-  },
-  {
-    "name": "Franco Polo",
-    "login": "fjpolo",
     "contributions": 3
   },
   {

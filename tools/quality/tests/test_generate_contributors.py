@@ -34,10 +34,18 @@ class ContributorsTest(unittest.TestCase):
             commit("Lorenz Esch", "lorenz.esch@tu-ilmenau.de")
             commit("dependabot[bot]", "bot@users.noreply.github.com")
             commit("Someone New", "new@example.org")
+            # A merge counts, as on GitHub's contributor graph
+            base = subprocess.run(["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True,
+                                  check=True).stdout.strip()
+            subprocess.run(["git", "checkout", "-q", "-b", "side"], cwd=repo, check=True)
+            commit("Someone New", "new@example.org")
+            subprocess.run(["git", "checkout", "-q", base], cwd=repo, check=True)
+            subprocess.run(["git", "-c", "user.name=Christoph Dinh", "-c", "user.email=christoph.dinh@mne-cpp.org",
+                            "merge", "-q", "--no-ff", "-m", "merge", "side"], cwd=repo, check=True)
             self.assertEqual(generate.contributors(repo), [
+                {"name": "Christoph Dinh", "login": "chdinh", "contributions": 3},
                 {"name": "Lorenz Esch", "login": "LorenzE", "contributions": 3},
-                {"name": "Christoph Dinh", "login": "chdinh", "contributions": 2},
-                {"name": "Someone New", "login": None, "contributions": 1},
+                {"name": "Someone New", "login": None, "contributions": 2},
             ])
 
     def test_every_github_login_belongs_to_a_mailmap_name(self) -> None:
