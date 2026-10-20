@@ -44,7 +44,7 @@ class ContributorsTest(unittest.TestCase):
         mailmap = (REPO_ROOT / ".mailmap").read_text(encoding="utf-8")
         canonical = {line.split(" <", 1)[0] for line in mailmap.splitlines() if line and not line.startswith("#")}
         # Names that need no .mailmap entry because they never committed under another identity
-        single_identity = {"Jana Kiesel", "Andrey Parfenov", "Tim Kunze", "Johannes Behrens", "buildqa",
+        single_identity = {"Jana Kiesel", "Andrey Parfenov", "Tim Kunze", "Johannes Behrens",
                            "Blerta Hamzallari", "Eric Larson", "Benjamin Kay", "Mainak Jas", "Martin Luessi"}
         self.assertEqual(set(generate.GITHUB_LOGINS) - canonical - single_identity, set())
 
