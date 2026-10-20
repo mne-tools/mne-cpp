@@ -2,6 +2,74 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
+## [2.4.0] - 2026-10-20
+
+Theme: **Quality, Evidence, Parity.** Every release claim is now generated from
+the tree and the CI run it was measured on; the dashboard is
+`doc/release/v2.4.0/quality-baseline.md`.
+
+### Highlights
+
+- **Blocking release gates (G1-G8)** — tests, coverage, API documentation,
+  screenshots, maintainability, MNE-Python parity, signed artifacts and
+  clean-machine onboarding each have a generated report and a CI check.
+- **Executable examples as API documentation** — every eligible public API has
+  a built and run example; Doxygen `@snippet`s feed the generated API pages
+  (zero Doxygen warnings).
+- **Evidence-based MNE-Python parity** — a versioned inventory of 443
+  MNE-Python 1.11.0 APIs with status per API; "equivalent" claims require a
+  cross-validation test against pinned MNE-Python values.
+- **sEEG/ECoG** — new `ieeg` library (`IeegImplantation`, `IeegReference`,
+  `IeegSurfaceMap`) and electrode drawing, picking and cortex painting in
+  `BrainView` and MNE Inspect (desktop and WebAssembly).
+- **Release hardening** — release-candidate gate, checksummed evidence bundle,
+  release preflight, post-release verification on all three platforms, and
+  Authenticode (SignPath) / Developer ID notarization for tagged releases.
+
+### Quality and testing
+
+- CTest-centred test architecture: every test labelled, timed and registered;
+  no retry-to-pass path; JUnit results imported per platform.
+- Coverage gates: libraries 89% line / 65% branch, applications above 50%,
+  tools above 50%, combined above 60%.
+- CI-generated documentation screenshots (`mne_doc_shots`) with golden-image
+  regression.
+- Whole-project `-Werror`, pinned clang-format 21.1.8 (one bulk reformat),
+  clang-tidy 22.1.8 ratchet, dependency-layer audit with zero cycles.
+- Maintainability: `NULL`, `typedef struct`, C-style casts, raw `new`, console
+  I/O and numeric `#define` all at zero (from 43 / 12 / 402 / 168 / 349 / 847);
+  explicit `delete` down from 275 to 50; per-metric ceilings block regressions.
+
+### New features
+
+- `ieeg` library: lead grouping from BIDS `*_electrodes.tsv` (`group`,
+  `dimension`), bipolar montages along leads, `stc_near_sensors`-style surface
+  weights.
+- `BrainView::setElectrodeValues`; MNE Inspect **File ▸ Load Electrode
+  Values…**.
+- Qt-owned logging throughout: `MNELogger` routes debug/info to stdout and
+  warnings and above to stderr for every tool and application.
+
+### Fixed
+
+- `FiffStream::open_update` created an empty file when the target did not exist.
+- `mne_fix_mag_coil_types` exited 0 when every file failed.
+- `FsSurfaceSet` returned garbage or crashed for a hemisphere that was not loaded.
+- `MNESourceSpace::make_guesses` cast between the sibling classes
+  `MNESourceSpace` and `MNESurface`; MGH tag buffers were freed with the wrong
+  array type; several Designer UI objects leaked.
+- MNE Scan drivers: FieldTrip buffer used an uninitialised matrix pointer;
+  g.USBamp reused a freed channel list; TMSi leaked its signal buffer and its
+  debug dump never ran.
+- The Windows onboarding check stopped after `init.bat` and still reported
+  success.
+
+### Removed
+
+- Dead `RtFiffRawViewModel::filterDataBlock()`, orphan `IServer.h`,
+  `view3d/3dview.cpp` and mne_browse `MnxProject` (superseded by the MNA
+  project container).
+
 ## [2.3.0] - 2026-06-13
 
 ### Highlights

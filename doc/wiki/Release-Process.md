@@ -23,17 +23,41 @@ GitHub Release.
 
 ## Cut the release
 
+1. Run **Release Candidate** (`release-candidate.yml`, *Run workflow* on
+   `staging`). It is GO only when the Staging run of that commit is green,
+   `tools/release/preflight.py` passes, every dashboard criterion is met
+   (`generate_quality_report.py --gates`), the signing credentials are set and
+   the evidence bundle verifies. Approve the `release` environment; the bundle
+   stays attached to the run for 90 days.
+2. Release exactly the approved commit `<SHA>`; `main.yml` refuses a tag whose
+   commit has no successful candidate run:
+
 ```bash
-# 1. Fast-forward main to staging
+python3 tools/release/preflight.py --commit <SHA> --remote origin
 git checkout main
 git pull --ff-only origin main
-git merge --ff-only staging
+git merge --ff-only <SHA>
 git push origin main
-
-# 2. Tag (annotated)
-git tag -a vX.Y.Z -m "Release vX.Y.Z — <codename>"
+git tag -a vX.Y.Z -m "Release vX.Y.Z — <codename>" <SHA>
 git push origin vX.Y.Z
 ```
+
+## Rerun and recovery
+
+Every release step can be rerun: assets are uploaded with `--clobber`, the
+evidence job rewrites `SHA256SUMS`, `release-evidence.json` and its section of
+the release notes in place, and the website deploy replaces the site.
+
+| Situation | Action |
+|-----------|--------|
+| A platform/installer job failed | *Re-run failed jobs* on the tag's `main.yml` run, then re-run `ReleaseEvidence` and `VerifyRelease`. |
+| An asset is missing or corrupt on the release page | Re-run the job that uploads it; `VerifyRelease` fails until `SHA256SUMS` and the asset agree. |
+| Website deploy failed | Re-run the `Website` job; nothing else depends on it. |
+| `dev_build` is broken or deleted | Run `staging.yml` manually; it recreates the pre-release from the last commit whose builds all compiled. |
+| A wrong commit was tagged | Do not move the tag. Fix forward with `vX.Y.(Z+1)`; deleting a published tag needs the maintainers' explicit approval because downstream mirrors and Zenodo have already archived it. |
+
+Recovery never needs credentials on a local machine: signing, notarization
+and uploads run only in CI from repository secrets.
 
 ## What CI does on a `v*` tag (automatic)
 
