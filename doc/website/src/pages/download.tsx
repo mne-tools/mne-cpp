@@ -46,6 +46,9 @@ function fmtSize(bytes: number): string {
 }
 
 function fmtDate(iso: string): string {
+    if (!iso) {
+        return '';
+    }
     return new Date(iso).toLocaleDateString('en-US', {
         year: 'numeric', month: 'short', day: 'numeric',
     });
@@ -284,11 +287,11 @@ const FALLBACK_DEV: GitHubRelease = {
 };
 
 const FALLBACK_STABLE: GitHubRelease = {
-    tag_name: 'v0.1.9',
-    name: 'v0.1.9',
-    published_at: '2021-03-02T00:00:00Z',
-    html_url: 'https://github.com/mne-tools/mne-cpp/releases/tag/v0.1.9',
-    target_commitish: 'b00fbba',
+    tag_name: 'latest',
+    name: 'Latest release',
+    published_at: '',
+    html_url: 'https://github.com/mne-tools/mne-cpp/releases/latest',
+    target_commitish: '',
     assets: [],
 };
 

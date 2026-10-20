@@ -30,6 +30,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+SITE_URL = "https://mne-cpp.github.io"
 
 
 def project_version(repo_root: Path = REPO_ROOT) -> str:
@@ -55,6 +56,18 @@ def check(build: Path, channel: str, version: str) -> list[str]:
         problems.append(f"dev build is labelled as release v{version}")
     if f"v{version} (Stable)" not in html:
         problems.append(f"version menu does not offer 'v{version} (Stable)'")
+    site = SITE_URL + base
+    canonical = re.search(r'rel="canonical" href="([^"]+)"', html)
+    if not canonical or not canonical.group(1).startswith(site):
+        problems.append(f"canonical URL {canonical.group(1) if canonical else 'missing'} is outside {site}")
+    sitemap = build / "sitemap.xml"
+    if not sitemap.is_file():
+        problems.append("sitemap.xml is missing")
+    else:
+        outside = [u for u in re.findall(r"<loc>([^<]+)</loc>", sitemap.read_text(encoding="utf-8"))
+                   if not u.startswith(site)]
+        if outside:
+            problems.append(f"sitemap lists {len(outside)} URLs outside {site}")
     return problems
 
 
