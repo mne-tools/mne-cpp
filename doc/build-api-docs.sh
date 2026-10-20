@@ -67,6 +67,8 @@ python3 tools/doxy2mdx/doxy2mdx.py \
     --registry doc/api_registry.json \
     --generate-sidebars \
     --strict
+# The gallery lists the API pages that quote each example, so it follows them.
+python3 tools/doxy2mdx/generate_examples.py
 
 if $BUILD_SITE; then
   ( cd doc/website && npm ci && npm run build )

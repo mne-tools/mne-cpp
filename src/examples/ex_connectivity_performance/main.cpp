@@ -11,7 +11,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     April, 2019
- * @brief    Example of using the MNE-CPP Connectivity library
+ * @brief    Benchmark the run time of connectivity methods over channel and sample counts
  */
 
 //=============================================================================================================

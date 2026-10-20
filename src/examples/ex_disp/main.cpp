@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     February, 2013
- * @brief    Implements the main() application function.
+ * @brief    Disp library widgets: image map, line plot and time-frequency plot of raw data
  */
 
 //=============================================================================================================

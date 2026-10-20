@@ -9,7 +9,7 @@
  *           Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.5
  * @date     July, 2020
- * @brief     Examplethat shows the coregistration workflow.
+ * @brief    Coregistration workflow: fit digitizer points to the head surface with ICP
  */
 
 //=============================================================================================================

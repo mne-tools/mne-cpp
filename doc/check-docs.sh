@@ -49,6 +49,9 @@ step() { printf '\n== %s\n' "$1"; }
 step "API docs (Doxygen, registry, generated pages)"
 doc/build-api-docs.sh --check
 
+step "Examples gallery"
+python3 tools/doxy2mdx/generate_examples.py --check
+
 step "Doxygen @snippet contract"
 MNE_REQUIRE_DOXYGEN=1 python3 -m unittest tools/quality/tests/test_doxygen_snippets.py
 

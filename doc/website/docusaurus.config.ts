@@ -124,6 +124,12 @@ const config: Config = {
                     label: 'API',
                 },
                 {
+                    type: 'docSidebar',
+                    sidebarId: 'examplesSidebar',
+                    position: 'left',
+                    label: 'Examples',
+                },
+                {
                     to: '/download',
                     label: 'Download',
                     position: 'left',
@@ -169,6 +175,7 @@ const config: Config = {
                         { label: 'Build from Source', to: '/docs/development/buildguide-cmake' },
                         { label: 'Contribute', to: '/docs/development/contribute' },
                         { label: 'API Reference', to: '/docs/api' },
+                        { label: 'Examples', to: '/docs/examples' },
                     ],
                 },
                 {

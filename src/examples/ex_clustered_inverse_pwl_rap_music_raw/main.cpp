@@ -10,7 +10,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2013
- * @brief    Example of the computation of a raw clustered inverse rap music
+ * @brief    Example of the computation of a raw clustered inverse Powell RAP-MUSIC
  */
 
 //=============================================================================================================

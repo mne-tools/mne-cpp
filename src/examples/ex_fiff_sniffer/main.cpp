@@ -1,7 +1,13 @@
-// SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2010-2026 MNE-CPP Authors
-//   Gabriel Motta <gabrielbenmotta@gmail.com>
-//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+//=============================================================================================================
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2010-2026 MNE-CPP Authors
+ *
+ * @file     main.cpp
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
+ *           Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @brief    Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents
+ */
 
 
 //=============================================================================================================
@@ -55,7 +61,7 @@ int main(int argc, char* argv[])
     QCoreApplication a(argc, argv);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("Disp Example");
+    parser.setApplicationDescription("Fiff Sniffer Example");
     parser.addHelpOption();
 
     QCommandLineOption inputOption({"file", "f"}, "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
