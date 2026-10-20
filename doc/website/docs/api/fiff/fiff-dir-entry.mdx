@@ -81,6 +81,22 @@ Size of the old struct (`fiffDirEntryRec`) 4*int = 4*4 = 16.
 - Build target: `ex_fiff_structure` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
+
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+
+````cpp title="src/examples/ex_fiff_structure/main.cpp, line 110"
+int samples = 0;
+for (const FiffRawDir& buffer : raw.rawdir)
+    samples += buffer.nsamp;
+const FiffDirEntry::SPtr firstBuffer = raw.rawdir.first().ent;
+// mne.io.read_raw_fif: 2 buffers, 6007 samples from first_samp 12900; fiff_open lists 640 directory entries
+ok &= expect(raw.rawdir.size() == 2 && samples == 6007 && raw.rawdir.first().first == 12900 && firstBuffer->kind == FIFF_DATA_BUFFER,
+             "FiffRawDir/FiffDirEntry: 2 data buffers cover the 6007 samples from sample 12900");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

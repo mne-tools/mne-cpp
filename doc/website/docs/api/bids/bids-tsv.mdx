@@ -95,6 +95,20 @@ Writes rows to a TSV file.
 - Build target: `ex_bids` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_bids](../../examples/bids/ex_bids.mdx)
+
+BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
+
+````cpp title="src/examples/ex_bids/main.cpp, line 101"
+QStringList headers;
+const QList<BidsTsvRow> rows = BidsTsv::readTsv(ieeg.eventsTsvPath().filePath(), headers);
+// each row maps column name -> cell text, e.g. rows[1]["trial_type"] == "response"
+ok &= expect(headers == QStringList({"onset", "duration", "sample", "value", "trial_type"}) && rows.size() == 4 && rows[1]["trial_type"] == "response" && rows[3]["onset"] == "5.250000",
+             "BidsTsv reads the 5 event columns and 4 rows");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

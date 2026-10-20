@@ -175,6 +175,23 @@ Reads an MNE-C ``.lout file.
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 484"
+// The Neuromag Vectorview layout: one viewport per channel
+auto layout = MNELayout::read(layoutDir + "/Vectorview-all.lout");
+const QMap<QString, QPointF> positions = layout->channelPositions();                     // lower-left corners, keyed "MEG 0113"
+const int leftHalf = layout->confine(QRectF(QPointF(-85.0, -83.0), QPointF(0.0, 75.0))); // zoom to the left half
+const int shownTriplet = layout->matchPorts(QStringList({"MEG0113", "MEG0112", "MEG0111"}));
+// mne.channels.read_layout("Vectorview-all.lout", scale=False): 306 viewports in -85 ... 90 x -83 ... 75, MEG 0113 at (-73.4162, 33.4167); 138 boxes left of x = 0
+ok &= expect(layout && layout->ports.size() == 306 && (positions.value("MEG 0113") - QPointF(-73.416206, 33.416687)).manhattanLength() < 1e-4 && leftHalf == 138 && shownTriplet == 3,
+             "MNELayout/MNELayoutPort: Vectorview layout like mne.channels.read_layout, zoom and channel matching");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

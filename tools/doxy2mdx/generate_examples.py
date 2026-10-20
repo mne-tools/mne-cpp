@@ -31,10 +31,12 @@ Exit codes
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import re
 import sys
 import tempfile
+import textwrap
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -52,6 +54,10 @@ LIBRARIES = {
 }
 INCLUDE = re.compile(r"^#include\s*<(\w+)/", re.M)
 BRIEF = re.compile(r"@brief\s+(.+?)\s*(?:\*/)?$", re.M)
+NOT_CODE = re.compile(r"^\s*(#|using\b|//|\*|/\*)")
+SNIPPET_MARKER = re.compile(r"^\s*//! \[\w+\]\s*$")
+EXCERPT_CONTEXT = 3
+EXCERPT_LINES = 14
 OPTION = re.compile(r'QCommandLineOption\s+\w+\(\s*(\{[^}]*\}|"[^"]*")\s*,\s*"((?:[^"\\]|\\.)*)"')
 
 
@@ -78,13 +84,55 @@ def quoted_by(api_dir: Path) -> dict[str, list[tuple[str, str]]]:
     return refs
 
 
+@functools.lru_cache(maxsize=None)
+def example_info(src: Path) -> tuple[list[str], str, dict[str, list[str]]]:
+    """(libraries most specific first, brief, {file name: lines}) of one example directory."""
+    texts = {p.name: p.read_text(encoding="utf-8") for p in sorted(src.iterdir()) if p.suffix in {".cpp", ".h"}}
+    match = BRIEF.search(texts["main.cpp"])
+    brief = match.group(1).strip().rstrip(".") if match else src.name
+    used = {m for text in texts.values() for m in INCLUDE.findall(text)}
+    return [lib for lib in LIBRARIES if lib in used], brief, {n: t.splitlines() for n, t in texts.items()}
+
+
+def _excerpt(lines: list[str], hit: int) -> tuple[int, list[str]]:
+    """0-based start and dedented lines of the statement block around line *hit*."""
+    start = hit
+    while start > 0 and hit - start < EXCERPT_CONTEXT and lines[start - 1].strip() \
+            and not lines[start - 1].rstrip().endswith(("{", "}")):
+        start -= 1
+    while start < hit and SNIPPET_MARKER.match(lines[start]):
+        start += 1
+    end = hit + 1
+    while end < len(lines) and end - start < EXCERPT_LINES and lines[end].strip():
+        end += 1
+    block = [line for line in lines[start:end] if not SNIPPET_MARKER.match(line)]
+    return start, textwrap.dedent("\n".join(block)).splitlines()
+
+
+def usages(name: str, library: str, root: Path = REPO_ROOT) -> list[dict]:
+    """Examples using class *name* of *library*, most uses first, each with an excerpt of the first use."""
+    word = re.compile(rf"(?<!\w){re.escape(name)}\b")
+    found = []
+    for src in sorted((root / EXAMPLES).glob("ex_*/")):
+        libs, brief, files = example_info(src)
+        if library not in libs:
+            continue
+        hits = {f: [i for i, line in enumerate(lines) if word.search(line) and not NOT_CODE.match(line)]
+                for f, lines in files.items()}
+        count = sum(map(len, hits.values()))
+        if not count:
+            continue
+        file = next(f for f in files if hits[f])
+        start, excerpt = _excerpt(files[file], hits[file][0])
+        found.append({"name": src.name, "group": libs[0], "brief": brief, "uses": count,
+                      "file": f"{EXAMPLES.as_posix()}/{src.name}/{file}", "line": start + 1, "code": excerpt})
+    return sorted(found, key=lambda u: (-u["uses"], u["name"]))
+
+
 def render(name: str, src: Path, refs: list[tuple[str, str]]) -> tuple[str, str, str]:
     """Return (library, brief, page text) for one example directory."""
-    main = (src / "main.cpp").read_text(encoding="utf-8")
-    brief = BRIEF.search(main).group(1).strip().rstrip(".")
-    sources = sorted(p for p in src.iterdir() if p.suffix in {".cpp", ".h"})
-    used = {m for p in sources for m in INCLUDE.findall(p.read_text(encoding="utf-8"))}
-    libs = [lib for lib in LIBRARIES if lib in used]
+    libs, brief, files = example_info(src)
+    main = "\n".join(files["main.cpp"])
     group = libs[0]
     lines = [
         "---", f"title: {json.dumps(name)}", f"description: {json.dumps(brief)}", "---", "",
@@ -104,8 +152,8 @@ def render(name: str, src: Path, refs: list[tuple[str, str]]) -> tuple[str, str,
     if refs:
         lines += ["## Used in the API reference", ""] + [f"- [{label}](../../{path})" for label, path in refs] + [""]
     lines += ["## Source", ""]
-    for path in sources:
-        lines += [f"````cpp title=\"{EXAMPLES.as_posix()}/{name}/{path.name}\"", path.read_text(encoding="utf-8").rstrip("\n"), "````", ""]
+    for file, code in files.items():
+        lines += [f"````cpp title=\"{EXAMPLES.as_posix()}/{name}/{file}\"", "\n".join(code).rstrip("\n"), "````", ""]
     return group, brief, "\n".join(lines)
 
 

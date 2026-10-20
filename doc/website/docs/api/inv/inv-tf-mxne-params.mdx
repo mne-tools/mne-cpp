@@ -37,6 +37,26 @@ const InvTfMxneResult tfMxne = InvTfMxne::compute(gain, measured, tfParams);
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 246"
+// TF-MxNE: sparse in space and in a Gabor time-frequency dictionary; 40 samples at 150 Hz.
+InvTfMxneParams tfParams;
+tfParams.dAlphaSpace = 0.5 * alphaMax;
+tfParams.dAlphaTime = 0.05 * alphaMax;
+tfParams.dSFreq = evoked.info.sfreq;
+tfParams.iNFreqs = 4;
+tfParams.dFMin = 5.0;
+tfParams.dFMax = 40.0;
+const InvTfMxneResult tfMxne = InvTfMxne::compute(gain, measured, tfParams);
+ok &= expect(!tfMxne.activeVertices.isEmpty() && tfMxne.activeVertices.size() <= 5 && tfMxne.activeVertices.contains(8),
+             QString("InvTfMxne: %1 V1 sources, including the strongest MxNE source 8").arg(tfMxne.activeVertices.size()));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

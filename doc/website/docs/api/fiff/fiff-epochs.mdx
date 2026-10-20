@@ -128,6 +128,23 @@ Convenience method to get a list of data matrices from epoch structures, suitabl
 - Build target: `ex_fiff_structure` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
+
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+
+````cpp title="src/examples/ex_fiff_structure/main.cpp, line 98"
+MatrixXd times;
+ok &= raw.read_raw_segment(data, times); // all 6007 samples
+const double sfreq = raw.info.sfreq;
+const QList<FiffEpochData> epochs = FiffEpochs::makeFixedLengthEpochs(data, sfreq, 2.0, 0.5); // 2 s, 0.5 s overlap
+const FiffEvoked average = FiffEpochs::averageEpochs(epochs, sfreq);
+// mne.make_fixed_length_epochs(raw, duration=2, overlap=0.5): 13 epochs of 601 samples, 450 samples apart
+ok &= expect(epochs.size() == 13 && epochs[0].data.cols() == 601 && std::lround((epochs[1].tmin - epochs[0].tmin) * sfreq) == 450 && average.nave == 13,
+             "FiffEpochs/FiffEpochData: 13 fixed-length epochs like mne.make_fixed_length_epochs, averaged over 13");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

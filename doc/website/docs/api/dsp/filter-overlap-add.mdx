@@ -123,6 +123,28 @@ Reset the stored overlap matrices.
 - Full source: [`src/examples/ex_dsp_filter/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_filter/main.cpp)
 - Build target: `ex_dsp_filter` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_filter](../../examples/dsp/ex_dsp_filter.mdx)
+
+FIR filter design, application and storage with the dsp library.
+
+````cpp title="src/examples/ex_dsp_filter/main.cpp, line 154"
+FilterOverlapAdd overlapAdd; // keeps the filter tail between calls
+const int block = 1000;
+MatrixXd streamed(2, n);
+for (int start = 0; start < n; start += block) {
+    streamed.middleCols(start, block) = overlapAdd.calculate(data.middleCols(start, block), lowPass);
+}
+// Streaming output is delayed by half the filter length; compare the steady state with the causal tone
+const int delay = lowPass.getFilterOrder() / 2;
+RowVectorXd delayedTone(n);
+for (int t = 0; t < n; ++t) {
+    delayedTone(t) = std::sin(2.0 * kPi * 10.0 * (t - delay) / kSFreq);
+}
+const double streamErr = (streamed.row(0) - delayedTone).segment(1000, n - 1500).cwiseAbs().maxCoeff();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

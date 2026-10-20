@@ -140,6 +140,34 @@ filterBadChannels Filters bad channels from distance table.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 115"
+MatrixX3f sensors(2, 3);
+sensors << -0.2f, 0.1f, 0.5f,                                                            // above vertex 0
+    3.1f, 2.9f, 0.4f;                                                                    // above vertex 15
+VectorXi projected = GeometryInfo::projectSensors(vertices, sensors);                    // nearest vertex per sensor
+QSharedPointer<MatrixXd> distances = GeometryInfo::scdc(vertices, neighbors, projected); // geodesic: n_vertices x n_sensors
+// scipy.sparse.csgraph.dijkstra on the same graph: Manhattan distances to vertices 0 and 15
+ok &= expect(projected == Vector2i(0, 15) && distances->rows() == 16 && (*distances)(5, 0) == 2.0 && (*distances)(5, 1) == 4.0 && (*distances)(3, 0) == 3.0 && (*distances)(3, 1) == 3.0,
+             "GeometryInfo projects the sensors onto vertices 0 and 15; geodesic distances match scipy");
+````
+
+### [ex_interpolation](../../examples/inv/ex_interpolation.mdx)
+
+Example of using the interpolation library and geometryInfo library.
+
+````cpp title="src/examples/ex_interpolation/main.cpp, line 130"
+//projecting with MEG
+qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
+VectorXi mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0].rr, megSensors);
+std::cout << "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting << " ms " << std::endl;
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

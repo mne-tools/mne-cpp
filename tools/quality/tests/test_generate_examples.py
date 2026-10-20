@@ -45,6 +45,25 @@ class GenerateExamplesTest(unittest.TestCase):
         self.assertIn("- [InvDipole](../../api/inv/inv-dipole.mdx)", page)
         self.assertIn("| [ex_demo](./inv/ex_demo.mdx) |", index)
 
+    def test_usages_rank_examples_and_cut_excerpts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name, body in {
+                "ex_one": "    // InvDipole in a comment\n    int a = 0;\n\n    //! [demo]\n    InvDipole d;\n"
+                          "    d.fit();\n    //! [demo]\n",
+                "ex_two": "    InvDipole x;\n    InvDipole y;\n",
+                "ex_other_lib": "    InvDipole z;\n",
+                "ex_prefix": "    MyInvDipole w;\n",
+            }.items():
+                ex = root / gen.EXAMPLES / name
+                ex.mkdir(parents=True)
+                lib = "fiff" if name == "ex_other_lib" else "inv"
+                (ex / "main.cpp").write_text(f"/** @brief {name} */\n#include <{lib}/x.h>\n{body}")
+            found = gen.usages("InvDipole", "inv", root)
+        self.assertEqual([(u["name"], u["uses"]) for u in found], [("ex_two", 2), ("ex_one", 1)])
+        self.assertEqual(found[1]["code"], ["InvDipole d;", "d.fit();"])
+        self.assertEqual(found[1]["line"], 7)
+
     def test_committed_gallery_is_current(self) -> None:
         self.assertEqual(gen.main(["--check"]), 0)
 

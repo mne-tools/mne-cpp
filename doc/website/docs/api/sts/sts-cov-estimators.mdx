@@ -186,6 +186,27 @@ Computes: -0.5 * (p * log(2π) + log|Σ| + trace(Σ^\{-1\} * S_test)) where S_te
 - Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
 - Build target: `ex_sts_statistics` (runs under CTest)
 
+## Used in examples
+
+### [ex_sts_statistics](../../examples/sts/ex_sts_statistics.mdx)
+
+Statistics library on small literal data sets with known answers.
+
+````cpp title="src/examples/ex_sts_statistics/main.cpp, line 132"
+    0.4, -1.0, 0.1, 0.9, -0.2, 0.8, -1.1, 0.3,
+    -0.3, 0.2, 0.7, -0.5, 0.4, -0.1, 0.1, 0.6;
+data = data.colwise() - data.rowwise().mean(); // the estimators expect zero-mean data
+const auto [covLw, shrinkLw] = StsCovEstimators::ledoitWolf(data);
+const auto [covOas, shrinkOas] = StsCovEstimators::oas(data);
+const auto [covBest, method] = StsCovEstimators::autoSelect(data); // cross-validated choice
+// sklearn.covariance.ledoit_wolf / oas with assume_centered=True
+ok &= expect(std::fabs(shrinkLw - 0.201822477072047) < 1e-12 && std::fabs(shrinkOas - 0.4393235385375307) < 1e-12,
+             QString("shrinkage LW %1, OAS %2 = sklearn").arg(shrinkLw).arg(shrinkOas));
+ok &= expectRow(covLw.row(0), {0.5436421771536946, 0.4140545900188756, -0.08730066657024485}, 1e-12, "LW covariance row 0 = sklearn");
+ok &= expectRow(covOas.row(0), {0.5037989001234694, 0.29085091438365596, -0.06132398797245758}, 1e-12, "OAS covariance row 0 = sklearn");
+ok &= expect(method >= 0 && method <= 5 && covBest.rows() == 3, "autoSelect returns a 3 x 3 covariance and a method index 0-5");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

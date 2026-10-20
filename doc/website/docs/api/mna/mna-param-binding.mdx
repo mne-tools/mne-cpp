@@ -55,6 +55,21 @@ graph.paramTree.addBinding(binding);
 - Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
 - Build target: `ex_mna` (runs under CTest)
 
+## Used in examples
+
+### [ex_mna](../../examples/mna/ex_mna.mdx)
+
+MNA library: register operations, build and run a graph, bind parameters and save a project.
+
+````cpp title="src/examples/ex_mna/main.cpp, line 150"
+graph.paramTree.setParam("shift/offset", 0.5);
+MnaParamBinding binding;
+binding.targetPath = "scale/gain";
+binding.expression = "clamp(ref('source::out') * 2, 0, 5)"; // evaluated against node results
+binding.trigger = "on_change";
+graph.paramTree.addBinding(binding);
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

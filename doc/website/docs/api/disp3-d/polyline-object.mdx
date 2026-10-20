@@ -155,6 +155,21 @@ Sets whether the polyline is drawn.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 294"
+// Head-position track: N points draw N - 1 tube segments; repeated positions are skipped
+PolylineObject track;
+track.setPoints({Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.0f, 0.0f, 0.0f), Vector3f(0.001f, 0.0f, 0.0f), Vector3f(0.002f, 0.001f, 0.0f)});
+track.setRadius(0.0005f);
+track.setGradient(Qt::blue, Qt::red); // oldest to newest
+ok &= expect(track.hasData() && track.instanceCount() == 2, "PolylineObject: four positions with one repeat give two segments");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

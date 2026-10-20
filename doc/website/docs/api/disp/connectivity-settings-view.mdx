@@ -168,6 +168,28 @@ Clears the view.
 
 ---
 
+## Used in examples
+
+### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
+
+Example of using the MNE-CPP Connectivity library.
+
+````cpp title="src/examples/ex_connectivity/main.cpp, line 401"
+// Create ConnectivitySettingsView as standalone widget
+QSharedPointer<ConnectivitySettingsView> pConnSettingsView = QSharedPointer<ConnectivitySettingsView>::create("EX_CONNECTIVITY");
+````
+
+### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
+
+Example to compare connectivity methods.
+
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 379"
+// Create ConnectivitySettingsView as standalone widget
+QSharedPointer<ConnectivitySettingsView> pConnSettingsView = QSharedPointer<ConnectivitySettingsView>::create("EX_CONNECTIVITY_COMP");
+pConnSettingsView->setNumberTrials(iNumTrials);
+pConnSettingsView->setFrequencyBand(dFreqMin, dFreqMax);
+````
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

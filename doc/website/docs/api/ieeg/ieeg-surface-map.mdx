@@ -69,6 +69,24 @@ Equivalent to MNE-Python's `stc_near_sensors` for a surface. Contacts with a non
 - Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
 - Build target: `ex_ieeg` (runs under CTest)
 
+## Used in examples
+
+### [ex_ieeg](../../examples/ieeg/ex_ieeg.mdx)
+
+IEEG library: group sEEG contacts into a lead, derive a bipolar montage and paint contact values onto a surface.
+
+````cpp title="src/examples/ex_ieeg/main.cpp, line 90"
+// Depth contacts lie inside the brain, so they are not projected onto the surface first.
+Eigen::MatrixX3f vertices(2, 3);
+vertices << -0.03f, 0.0f, 0.0f, -0.03f, 0.0f, 0.02f;
+const Eigen::SparseMatrix<double> weights = IeegSurfaceMap::weights(implantation.positions(), vertices, 0.01,
+                                                                    IeegSurfaceMapMode::Sum, false);
+const Eigen::MatrixXd vertexData = weights * data; // vertices x samples
+// Vertex 0 is at LA1 (weight 1), LA2 3.5 mm (0.65) and LA3 7 mm (0.3) away; vertex 1 is beyond reach
+ok &= expect(std::fabs(vertexData(0, 0) - (10.0 + 0.65 * 15.0 + 0.3 * 30.0)) < 1e-4 && vertexData(1, 0) == 0.0,
+             QString("IeegSurfaceMap: vertex 0 = %1, vertex 1 = %2").arg(vertexData(0, 0)).arg(vertexData(1, 0)));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

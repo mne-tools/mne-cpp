@@ -210,6 +210,50 @@ For each of gradiometers, magnetometers and EEG (bad channels excluded) the lead
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 155"
+const FiffProj& pca = info.projs[0]; // "PCA-v1", 1 vector over 102 magnetometers, inactive
+QList<FiffProj> projs = info.projs;
+FiffProj::activate_projs(projs);
+ok &= expect(pca.desc == "PCA-v1" && !pca.active && pca.data->nrow == 1 && pca.data->ncol == 102 && projs[0].active,
+             "FiffProj/FiffNamedMatrix: PCA-v1 is 1 x 102 and inactive until activated");
+````
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 413"
+MatrixXi eventsBack;
+MNE::read_events(eveName, rawFile.fileName(), eventsBack);
+QList<FiffProj> projs = raw.info.projs; // stored inactive in the raw file
+FiffProj::activate_projs(projs);
+MatrixXd ssp; // like mne._fiff.proj.make_projector(info['projs'], ch_names, bads)
+const int nProj = MNE::make_projector(projs, raw.info.ch_names, ssp, raw.info.bads);
+// mne.find_events: 25 events, first at sample 13988 with code 2; make_projector: 4 vectors, trace 372 of 376
+ok &= expect(eventsBack.rows() == 25 && eventsBack(0, 0) == 13988 && eventsBack(0, 2) == 2 && nProj == 4 && near(ssp.trace(), 372.0, 1e-9) && near(ssp.norm(), 19.28730152198591, 1e-9),
+             "MNE: event file round trip and SSP projector like mne.find_events / make_projector");
+````
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 281"
+ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first_samp + 399);
+MatrixXd projectors = MatrixXd::Identity(hpiInfo->nchan, hpiInfo->nchan);
+FiffInfo projInfo = *hpiInfo;
+for (FiffProj& proj : projInfo.projs) {
+    proj.active = true;
+}
+projInfo.make_projector(projectors);
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -104,6 +104,28 @@ Stops the thread by interrupting its computation queue, quitting and waiting.
 - Build target: `ex_dsp_rt` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 318"
+RtInvOp rtInvOp(rawInfo, fwd); // MEG-only operator, loose 0.2, depth 0.8
+MNEInverseOperator inverse;
+bool inverseDone = false;
+QObject::connect(&rtInvOp, &RtInvOp::invOperatorCalculated, [&](const MNEInverseOperator& op) {
+    inverse = op;
+    inverseDone = true;
+});
+rtInvOp.append(noiseCov); // e.g. each new RtCov estimate
+const bool inverseArrived = waitFor(inverseDone, 60000);
+// 306 MEG channels in the forward solution, minus the bad MEG2443
+ok &= expect(inverseArrived && inverse.nsource == fwd->nsource && inverse.nchan == 305 && rawInfo->bads.contains("MEG2443"),
+             QString("RtInvOp builds a %1-channel operator for %2 sources").arg(inverse.nchan).arg(inverse.nsource));
+rtInvOp.stop();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

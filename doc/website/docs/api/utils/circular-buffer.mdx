@@ -143,6 +143,23 @@ Returns the number of free elements for thread safe reading.
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 157"
+CircularBuffer<double> buffer(4); // single producer, single consumer
+const double block[3] = {1.0, 2.0, 3.0};
+buffer.push(block, 3);
+double first = 0.0;
+double second = 0.0;
+buffer.pop(first);
+buffer.pop(second);
+ok &= expect(first == 1.0 && second == 2.0 && buffer.getFreeElementsRead() == 1, "CircularBuffer pops in FIFO order, one element left");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

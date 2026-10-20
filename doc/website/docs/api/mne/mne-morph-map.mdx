@@ -149,6 +149,28 @@ Writes maps as `FIFFB_MNE_MORPH_MAP` blocks (MNE-C `mne_save_morph_map_matrices`
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 499"
+FsSurface largeSphere;
+FsSurface::read(subjectsDir + "/small/surf/lh.sphere.reg", smallSphere, false);
+FsSurface::read(subjectsDir + "/large/surf/lh.sphere.reg", largeSphere, false);
+MNEMorphMap smallToLarge = MNEMorphMap::compute(smallSphere.rr(), smallSphere.tris(), largeSphere.rr());
+smallToLarge.from_subj = "small";
+smallToLarge.to_subj = "large";
+smallToLarge.hemi = 0;
+const QString mapFile = tmp.filePath("small-large-morph.fif");
+MNEMorphMap::write(mapFile, {&smallToLarge});
+const auto reread = MNEMorphMap::read(mapFile, "small", "large", 0);
+const Eigen::SparseMatrix<double> weights = reread->toEigen(); // 642 x 162, feeds INVLIB::SourceMorph
+// mne.read_morph_map("small", "large"): vertex 0 of "large" = 0.4372 * v0 + 0.3726 * v42 + 0.1902 * v51 of "small"
+ok &= expect(weights.rows() == 642 && weights.cols() == 162 && std::abs(weights.coeff(0, 0) - 0.43720984) < 1e-5 && std::abs(weights.coeff(0, 42) - 0.37262118) < 1e-5 && std::abs(weights.coeff(0, 51) - 0.19016896) < 1e-5,
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

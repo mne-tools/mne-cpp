@@ -35,6 +35,19 @@ const VectorXd lofScores = computeLofScores(features, 3);
 - Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
 - Build target: `ex_dsp_artifacts` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_artifacts](../../examples/dsp/ex_dsp_artifacts.mdx)
+
+Artifact detection and repair with the dsp library on a recording with planted defects.
+
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 157"
+LofBadChannelParams lofParams;
+lofParams.iNNeighbors = 4;
+lofParams.bEegOnly = true;
+const QStringList lofBad = findBadChannelsLof(data, info, lofParams); // features: std, kurtosis, max |x|
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

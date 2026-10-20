@@ -317,6 +317,22 @@ Replicates MNE-Python's `fit_sphere_to_headshape` (linear least- squares sphere 
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 314"
+// Contour spacing for a field map spanning +-120 fT with about 10 lines
+const float contourSpacing = SensorFieldMapper::contourStep(-120e-15f, 120e-15f, 10);
+QMap<QString, std::shared_ptr<BrainSurface>> sceneSurfaces;
+sceneSurfaces.insert("bem_inner_skull", std::make_shared<BrainSurface>());
+sceneSurfaces.insert("bem_head", std::make_shared<BrainSurface>());
+const QString headKey = SensorFieldMapper::findHeadSurfaceKey(sceneSurfaces); // where EEG maps are drawn
+ok &= expect(std::abs(contourSpacing - 50e-15f) < 1e-20f && headKey == "bem_head", "SensorFieldMapper: 50 fT contours, EEG map on bem_head");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -97,6 +97,22 @@ Sets the label of the y axes.
 - Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
 - Build target: `ex_disp_plots` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx)
+
+Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 184"
+VectorXd samples = VectorXd::LinSpaced(50, -1.0, 1.0);
+Plot plot(samples); // Plot is a Graph with title and axis labels
+plot.setTitle("ramp");
+plot.setXLabel("sample");
+plot.setYLabel("value");
+const QImage plotImage = render(plot);
+ok &= expect(countColor(plotImage, qRgb(255, 255, 255), 0) < plotImage.width() * plotImage.height(), "Plot renders axes and data");
+````
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

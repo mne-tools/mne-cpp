@@ -119,6 +119,27 @@ Convenience: fit and apply in one step.
 - Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
 - Build target: `ex_dsp_artifacts` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_artifacts](../../examples/dsp/ex_dsp_artifacts.mdx)
+
+Artifact detection and repair with the dsp library on a recording with planted defects.
+
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 180"
+MatrixXd cleaned = data;
+EogRegression regression;
+regression.fit(cleaned, info); // EOG channels are found by kind
+regression.apply(cleaned, info);
+// Deflection around the second blink peak against the channel mean; averaging 21 samples keeps the noise small
+const auto blinkDeflection = [](const RowVectorXd& row) {
+    return row.segment(1115, 21).mean() - row.mean();
+};
+const double beforeBlink = blinkDeflection(data.row(0));
+const double afterBlink = blinkDeflection(cleaned.row(0));
+ok &= expect(std::fabs(regression.coefficients()(0, 0) - 0.4) < 0.02 && std::fabs(afterBlink) < 0.1 * std::fabs(beforeBlink),
+             QString("EOG regression: beta %1 (0.4), blink on EEG0 %2 -> %3 V").arg(regression.coefficients()(0, 0)).arg(beforeBlink).arg(afterBlink));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

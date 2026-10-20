@@ -113,6 +113,22 @@ Once the guess locations have been set up we can compute the fields Refactored: 
 - Build target: `ex_inv_dipole_fit` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx)
+
+Inverse library: equivalent current dipole fitting in a sphere model.
+
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 106"
+InvGuessData guesses(QString(), QString(), 0.0f, 0.02f, 0.015f, fitData.get(), 0.08f); // 15 mm grid in an 80 mm sphere
+std::unique_ptr<InvDipoleForward> atTruth(InvDipoleFitData::dipole_forward_one(fitData.get(), truePos, nullptr));
+InvEcd dipole;
+VectorXf b = field; // fit_one projects and whitens in place
+const bool fitted = InvDipoleFitData::fit_one(fitData.get(), &guesses, 0.0f, b, false, dipole);
+ok &= expect(fieldOk && fitted && fitData->nmeg == 305 && guesses.nguess == 627 && atTruth && atTruth->sing.size() == 3 && dipole.valid && (dipole.rd - truePos).norm() < 1e-3f && (1e9 * dipole.Q.cast<double>() - mneMomentNAm).norm() < 0.02 * mneMomentNAm.norm() && dipole.good > 0.9999f,
+             "InvDipoleFitData/InvGuessData/InvDipoleForward/InvEcd: one sample fits the dipole like mne.fit_dipole");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

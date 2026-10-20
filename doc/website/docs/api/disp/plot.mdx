@@ -92,6 +92,53 @@ Updates the plot using a given double vector without given X data.
 - Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
 - Build target: `ex_disp_plots` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
+
+Example of using the MNE-CPP Connectivity library.
+
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 109"
+DISPLIB::Plot* m_pSignalCoursePlot = nullptr;
+DISPLIB::Plot* m_pSpectrumPlot = nullptr;
+DISPLIB::Plot* m_pEvokedSignalCoursePlot = nullptr;
+DISPLIB::Plot* m_pEpochSignalCoursePlot = nullptr;
+DISPLIB::Plot* m_pEvokedSourceSignalCoursePlot = nullptr;
+DISPLIB::ImageSc* m_pImageConnWeights = nullptr;
+````
+
+### [ex_spectral](../../examples/disp/ex_spectral.mdx)
+
+Example of the computation of spectra, PSD and CSD.
+
+````cpp title="src/examples/ex_spectral/main.cpp, line 84"
+//Plot hanning window
+VectorXd hann = matTaps.row(0).transpose();
+Plot plotWindow(hann);
+plotWindow.setTitle("Hanning window");
+plotWindow.setXLabel("X Axes");
+plotWindow.setYLabel("Y Axes");
+plotWindow.setWindowTitle("Corresponding function to MATLABs plot");
+plotWindow.show();
+````
+
+### [ex_disp](../../examples/disp/ex_disp.mdx)
+
+Disp library widgets: image map, line plot and time-frequency plot of raw data.
+
+````cpp title="src/examples/ex_disp/main.cpp, line 207"
+//Plot example
+VectorXd dataCol = data.col(0);
+Plot plot(dataCol);
+plot.setTitle("Data Row 0 Plot");
+plot.setXLabel("X Axes");
+plot.setYLabel("Y Axes");
+plot.setWindowTitle("Corresponding function to MATLABs plot");
+plot.show();
+````
+
+Also used in [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx), [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx).
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

@@ -133,6 +133,21 @@ Compute the centre of mass of the activity at a given time point.
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 193"
+// A volume estimate keeps the grid shape, so a time slice can be written back into the full grid.
+InvVolumeSourceEstimate volumeStc(stc.data.topRows(4), VectorXi::LinSpaced(4, 0, 6), stc.tmin, stc.tstep);
+volumeStc.setShape({2, 2, 2}); // 8 voxels, 4 of them sources
+const VectorXd grid = volumeStc.toVolume(200);
+ok &= expect(grid.size() == 8 && grid(0) == stc.data(0, 200) && grid(6) == stc.data(3, 200) && grid(1) == 0.0,
+             "InvVolumeSourceEstimate: source values land on their voxels, the rest of the grid is zero");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -72,6 +72,21 @@ mne_read_forward_solution
 - Build target: `ex_fwd_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx)
+
+Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
+
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 196"
+MNEForwardSolution back;
+Fwd::read_forward_solution(solFile, back); // all 366 rows, like mne.read_forward_solution
+MNEForwardSolution good;
+MNEForwardSolution::read(solFile, good, false, false, {}, {}, true); // without the channels marked bad
+ok &= expect(back.nsource == 78 && back.nchan == 366 && good.nchan == 364 && (back.sol->data - fwd->sol->data).norm() <= 1e-6 * fwd->sol->data.norm(),
+             "Fwd::read_forward_solution reads all 366 rows back; bExcludeBads drops the 2 bads");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

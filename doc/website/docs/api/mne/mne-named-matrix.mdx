@@ -168,6 +168,18 @@ Reads a two-dimensional tagged matrix of the given `kind` from `node` (or its fi
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 324"
+// raw.apply_gradient_compensation(0): sum |MEG| over the 7 MEG channels 2.45885e-10 (1.47942e-11 as stored)
+ok &= expect(comp.ncomp == 5 && grade == 0 && third && MNECTFCompDataSet::explain_comp(third->kind) == "third order gradiometer" && third->data->nrow == 7 && near(ctf.topRows(7).cast<double>().cwiseAbs().sum(), 2.4588499274586883e-10, 1e-5),
+             "MNECTFCompDataSet/MNECTFCompData/MNENamedMatrix: grade 3 -> 0 like raw.apply_gradient_compensation");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -71,6 +71,24 @@ Process one data block, accumulate, and emit the spectrum when enough blocks are
 - Build target: `ex_dsp_rt` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 217"
+RtNoiseWorker noiseWorker(64, info200, 10); // 64-point FFT over 10 accumulated blocks
+MatrixXd spectrum;
+QObject::connect(&noiseWorker, &RtNoiseWorker::resultReady, [&](const MatrixXd& psd) { spectrum = psd; });
+for (int b = 0; b < 10; ++b) {
+    noiseWorker.doWork(tones.middleCols(64 * b, 64)); // dB re unit^2/Hz, channels x (fft/2 + 1)
+}
+// scipy.signal.welch(x, 200, window=hann(66)[1:-1], nperseg=64, noverlap=0, detrend=False): 25 Hz -9.6521 dB, 50 Hz -29.6587 dB
+ok &= expect(spectrum.cols() == 33 && std::fabs(spectrum(0, 8) + 9.652129129685868) < 1e-6 && std::fabs(spectrum(0, 16) + 29.658719433796943) < 1e-6,
+             QString("RtNoiseWorker: 25 Hz at %1 dB, 50 Hz at %2 dB match scipy.signal.welch").arg(spectrum(0, 8), 0, 'f', 4).arg(spectrum(0, 16), 0, 'f', 4));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

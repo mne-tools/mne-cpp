@@ -68,6 +68,24 @@ Calculates the Directed Transfer Function between all channel pairs.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
+
+Connectivity metrics on synthetic data with a known coupling.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 263"
+Network granger = GrangerCausality::calculate(settings); // edge j -> i: j Granger-causes i
+Network dtf = DirectedTransferFunction::calculate(settings);
+Network pdc = PartialDirectedCoherence::calculate(settings);
+for (const Network* network : {&granger, &dtf, &pdc}) {
+    const double forward = edgeWeight(*network, 0, 1);
+    const double backward = edgeWeight(*network, 1, 0);
+    ok &= expect(forward > 2.0 * backward,
+                 QString("%1 0->1 %2 > 2 x 1->0 %3").arg(network->getConnectivityMethod()).arg(forward).arg(backward));
+}
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

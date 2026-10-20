@@ -239,6 +239,19 @@ Calculates a hanning window of given length.
 - Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
 - Build target: `ex_math` (runs under CTest)
 
+## Used in examples
+
+### [ex_spectral](../../examples/disp/ex_spectral.mdx)
+
+Example of the computation of spectra, PSD and CSD.
+
+````cpp title="src/examples/ex_spectral/main.cpp, line 79"
+//Generate hanning window
+QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNSamples, QString("hanning"));
+MatrixXd matTaps = tapers.first;
+VectorXd vecTapWeights = tapers.second;
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

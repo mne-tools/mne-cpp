@@ -75,6 +75,23 @@ Dispatches by extension.
 - Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
 - Build target: `ex_mna` (runs under CTest)
 
+## Used in examples
+
+### [ex_mna](../../examples/mna/ex_mna.mdx)
+
+MNA library: register operations, build and run a graph, bind parameters and save a project.
+
+````cpp title="src/examples/ex_mna/main.cpp, line 216"
+project.pipeline = graph.nodes();
+const QString jsonPath = dir.filePath("pipeline.mna"); // UTF-8 JSON
+const QString cborPath = dir.filePath("pipeline.mnx"); // CBOR with an "MNX1" magic
+const bool saved = MnaIO::write(project, jsonPath) && MnaIO::write(project, cborPath);
+const MnaProject fromJson = MnaIO::read(jsonPath);
+const MnaProject fromCbor = MnaIO::read(cborPath);
+ok &= expect(saved && fromJson.name == "ex_mna" && fromCbor.subjects.size() == 1 && fromCbor.subjects[0].sessions[0].recordings[0].files[0].path == raw.path && fromJson.pipeline[2].verification.postResults.first().message == verdict.message && report.language == "python" && fromJson.pipeline.size() == 3 && fromCbor.pipeline.size() == 3 && fromCbor.pipeline[1].inputs[0].sourceNodeId == "source" && fromJson.pipeline[1].attributes.value("gain").toDouble() == 2.0,
+             "MnaIO round-trips the 3-node pipeline through .mna and .mnx");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

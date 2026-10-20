@@ -153,6 +153,51 @@ Read Eigen Matrix from file (std::string path).
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 185"
+MatrixXd matrix(2, 3);
+matrix << 1.5, -2.0, 3.25, 0.0, 1e-6, 42.0;
+const QString matrixPath = dir.filePath("matrix.txt");
+IOUtils::write_eigen_matrix(matrix, matrixPath, "example matrix");
+MatrixXd readBack;
+IOUtils::read_eigen_matrix(readBack, matrixPath);
+ok &= expect(readBack.rows() == 2 && readBack.cols() == 3 && (readBack - matrix).cwiseAbs().maxCoeff() < 1e-12,
+             "IOUtils text matrix round trip");
+````
+
+### [ex_hpiFit](../../examples/inv/ex_hpiFit.mdx)
+
+Example for cHPI fitting on raw data with SSP. The result is written to a .txt file for comparison with MaxFilter's .pos file.
+
+````cpp title="src/examples/ex_hpiFit/main.cpp, line 261"
+        IOUtils::write_eigen_matrix(matPosition, QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + sNameOut));
+    }
+}
+````
+
+### [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx)
+
+Inverse library: continuous head position (HPI) fitting.
+
+````cpp title="src/examples/ex_inv_hpi/main.cpp, line 114"
+// MaxFilter head position at t = 0: translation (-0.814, -11.046, 53.572) mm. One 200 ms window, so allow 1 mm
+// (test_hpiFit_integration holds the mean over the whole recording to 0.3 mm).
+MatrixXd maxfilter;
+IOUtils::read_eigen_matrix(maxfilter, data + "/Result/ref_hpiFit_pos.txt");
+const Vector3d translation = fit.devHeadTrans.trans.block<3, 1>(0, 3).cast<double>();
+const Vector3d reference = maxfilter.block<1, 3>(0, 4).transpose();
+ok &= expect(fit.hpiFreqs == QVector<int>({166, 154, 161, 158}) && fit.GoF.minCoeff() > 0.98 && (translation - reference).norm() < 0.001,
+             QString("InvHpiDataUpdater/InvHpiModelParameters/InvHpiFit: coils ordered 166/154/161/158 Hz, head position within %1 mm of MaxFilter")
+                 .arg(1e3 * (translation - reference).norm(), 0, 'f', 3));
+````
+
+Also used in [ex_read_fwd](../../examples/fs/ex_read_fwd.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

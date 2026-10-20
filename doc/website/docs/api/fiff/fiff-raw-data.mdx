@@ -274,6 +274,59 @@ Ported from save.c (MNE-C).
 - Build target: `ex_read_raw` (compiled in CI)
 - Data: [MNE sample data](https://mne.tools/stable/documentation/datasets.html#sample)
 
+## Used in examples
+
+### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
+
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+
+````cpp title="src/examples/ex_fiff_structure/main.cpp, line 95"
+QFile rawFile(rawPath);
+FiffRawData raw(rawFile);
+MatrixXd data;
+MatrixXd times;
+ok &= raw.read_raw_segment(data, times); // all 6007 samples
+const double sfreq = raw.info.sfreq;
+const QList<FiffEpochData> epochs = FiffEpochs::makeFixedLengthEpochs(data, sfreq, 2.0, 0.5); // 2 s, 0.5 s overlap
+const FiffEvoked average = FiffEpochs::averageEpochs(epochs, sfreq);
+// mne.make_fixed_length_epochs(raw, duration=2, overlap=0.5): 13 epochs of 601 samples, 450 samples apart
+ok &= expect(epochs.size() == 13 && epochs[0].data.cols() == 601 && std::lround((epochs[1].tmin - epochs[0].tmin) * sfreq) == 450 && average.nave == 13,
+             "FiffEpochs/FiffEpochData: 13 fixed-length epochs like mne.make_fixed_length_epochs, averaged over 13");
+````
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 274"
+// ---------------------------------------------------------------------------------------------------------
+// HPI: fit the four coils of the test recording on the worker and directly
+QFile hpiFile(dataDir + "/MEG/sample/test_hpiFit_raw.fif");
+FiffRawData hpiRaw(hpiFile);
+const FiffInfo::SPtr hpiInfo = FiffInfo::SPtr::create(hpiRaw.info);
+MatrixXd hpiData;
+MatrixXd hpiTimes;
+ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first_samp + 399);
+MatrixXd projectors = MatrixXd::Identity(hpiInfo->nchan, hpiInfo->nchan);
+FiffInfo projInfo = *hpiInfo;
+for (FiffProj& proj : projInfo.projs) {
+    proj.active = true;
+}
+projInfo.make_projector(projectors);
+````
+
+### [ex_averaging](../../examples/mne/ex_averaging.mdx)
+
+Average data from a raw data file.
+
+````cpp title="src/examples/ex_averaging/main.cpp, line 115"
+// Setup for reading the raw data
+FiffRawData raw(t_fileRaw);
+MNE::setup_compensators(raw, dest_comp, keep_comp);
+````
+
+Also used in [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_compute_forward](../../examples/fwd/ex_compute_forward.mdx), [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_connectivity_performance](../../examples/connectivity/ex_connectivity_performance.mdx), [ex_disp](../../examples/disp/ex_disp.mdx), [ex_dsp_maxwell](../../examples/dsp/ex_dsp_maxwell.mdx), [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx), [ex_filtering](../../examples/dsp/ex_filtering.mdx), [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx), [ex_hpiFit](../../examples/inv/ex_hpiFit.mdx), [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_make_layout](../../examples/fiff/ex_make_layout.mdx), [ex_mne_api](../../examples/fs/ex_mne_api.mdx), [ex_read_epochs](../../examples/mne/ex_read_epochs.mdx), [ex_read_raw](../../examples/mne/ex_read_raw.mdx), [ex_read_write_raw](../../examples/fiff/ex_read_write_raw.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

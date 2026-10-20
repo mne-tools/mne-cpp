@@ -87,6 +87,24 @@ The ratio is reduced to its lowest terms p/q via GCD, then a polyphase Hamming-w
 - Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
 - Build target: `ex_dsp_spectral` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx)
+
+Spectral and filtering tools of the dsp library on signals with known content.
+
+````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 180"
+const RowVectorXd downsampled = Resample::resample(signal, 100.0, kSFreq); // 200 Hz -> 100 Hz
+// 55 Hz is above the new Nyquist (50 Hz) and must be removed; the 20 Hz sine stays
+RowVectorXd expected20(downsampled.size());
+for (int t = 0; t < downsampled.size(); ++t) {
+    expected20(t) = std::sin(2.0 * kPi * 20.0 * t / 100.0);
+}
+const double resampleErr = (downsampled - expected20).segment(20, downsampled.size() - 40).cwiseAbs().maxCoeff();
+ok &= expect(downsampled.size() == n / 2 && resampleErr < 0.05,
+             QString("resampled to 100 Hz: 20 Hz kept, 55 Hz removed (max error %1)").arg(resampleErr));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

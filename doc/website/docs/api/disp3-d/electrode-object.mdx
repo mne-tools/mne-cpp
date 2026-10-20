@@ -282,6 +282,22 @@ Intersect a ray with the contact spheres.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 139"
+ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
+electrodes.setImplantation(IeegImplantation(shaft));
+electrodes.selectContact("LH3");
+float contactDistance = 0.0f;
+const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
+ok &= expect(electrodes.totalContactCount() == 4 && electrodes.selectedContact() == "LH3" && electrodes.contactStreams().instanceCount == 4 && electrodes.bodyStreams().instanceCount == 1 && electrodes.contactLabel(pickedContact) == "LH3 (depth lead LH)",
+             "ElectrodeObject: 4 contacts on one shaft, a ray through LH3 picks it");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

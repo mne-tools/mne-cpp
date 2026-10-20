@@ -38,6 +38,47 @@ const IeegLead& lead = implantation.leads().first(); // contacts ordered LA1, LA
 - Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
 - Build target: `ex_ieeg` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 134"
+QVector<IeegContact> shaft(4); // LH1..LH4, 3.5 mm apart: grouped into the sEEG depth lead "LH"
+for (int k = 0; k < 4; ++k) {
+    shaft[k].name = QString("LH%1").arg(k + 1);
+    shaft[k].position = Eigen::Vector3f(0.010f + 0.0035f * float(k), -0.020f, 0.005f); // surface RAS, metres
+}
+ElectrodeObject electrodes; // a view of the implantation, drawn by BrainView::setElectrodes()
+electrodes.setImplantation(IeegImplantation(shaft));
+electrodes.selectContact("LH3");
+float contactDistance = 0.0f;
+const int pickedContact = electrodes.intersect(QVector3D(0.017f, -0.020f, 1.0f), QVector3D(0.0f, 0.0f, -1.0f), contactDistance);
+ok &= expect(electrodes.totalContactCount() == 4 && electrodes.selectedContact() == "LH3" && electrodes.contactStreams().instanceCount == 4 && electrodes.bodyStreams().instanceCount == 1 && electrodes.contactLabel(pickedContact) == "LH3 (depth lead LH)",
+             "ElectrodeObject: 4 contacts on one shaft, a ray through LH3 picks it");
+````
+
+### [ex_ieeg](../../examples/ieeg/ex_ieeg.mdx)
+
+IEEG library: group sEEG contacts into a lead, derive a bipolar montage and paint contact values onto a surface.
+
+````cpp title="src/examples/ex_ieeg/main.cpp, line 64"
+// Contacts of one depth lead, 3.5 mm apart, in metres; the lead comes from the names
+QVector<IeegContact> contacts;
+for (int k : {3, 1, 2}) {
+    IeegContact contact;
+    contact.name = QStringLiteral("LA%1").arg(k);
+    contact.position = Eigen::Vector3f(-0.03f, 0.0f, 0.0035f * float(k - 1));
+    contacts.append(contact);
+}
+const IeegImplantation implantation(contacts, QStringLiteral("ACPC"));
+const IeegLead& lead = implantation.leads().first(); // contacts ordered LA1, LA2, LA3
+// IeegImplantation::readBids("sub-01_electrodes.tsv") reads the same from BIDS iEEG
+ok &= expect(implantation.leads().size() == 1 && lead.name == "LA" && lead.type == IeegLeadType::Depth && lead.contacts == QVector<int>({1, 2, 0}),
+             "IeegImplantation: one depth lead LA, ordered by contact number");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

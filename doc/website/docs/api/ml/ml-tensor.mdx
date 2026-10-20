@@ -292,6 +292,23 @@ Copy raw data into a new owning tensor (legacy 2-D helper).
 - Full source: [`src/examples/ex_ml/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ml/main.cpp)
 - Build target: `ex_ml` (runs under CTest)
 
+## Used in examples
+
+### [ex_ml](../../examples/ml/ex_ml.mdx)
+
+ML library: tensors, ONNX inference through the MlModel interface, and the Python trainer.
+
+````cpp title="src/examples/ex_ml/main.cpp, line 75"
+MatrixXf features(2, 3);
+features << 1.0f, 2.0f, 0.5f,
+    0.0f, -1.0f, 1.5f;
+MlTensor batch(features);                          // owning row-major copy, shape {2, 3}
+MlTensor flat = batch.reshape({6});                // shares the buffer
+MlTensor::RowMajorMatrixMap rows = batch.matrix(); // zero-copy Eigen view
+ok &= expect(batch.shape() == std::vector<int64_t>({2, 3}) && flat.ndim() == 1 && flat.data()[4] == -1.0f && rows(1, 2) == 1.5f && batch.toMatrixXd().isApprox(features.cast<double>()),
+             "MlTensor: {2, 3} from Eigen, reshape shares data, matrix() maps it back");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -119,6 +119,26 @@ Pull a chunk of float data (non-template version).
 - Full source: [`src/examples/ex_lsl/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_lsl/main.cpp)
 - Build target: `ex_lsl` (runs under CTest)
 
+## Used in examples
+
+### [ex_lsl](../../examples/lsl/ex_lsl.mdx)
+
+LSL library: publish a stream, discover it and receive its samples over loopback.
+
+````cpp title="src/examples/ex_lsl/main.cpp, line 80"
+stream_info source = outlet.info(); // normally an entry of resolve_stream("name", "ex_lsl_eeg")
+source.set_data_host("127.0.0.1");
+stream_inlet inlet(source);
+inlet.open_stream();
+QElapsedTimer clock;
+clock.start();
+while (!outlet.have_consumers() && clock.elapsed() < 5000) { // samples pushed before the outlet accepts the inlet are not delivered
+    QThread::msleep(5);
+}
+outlet.push_sample({1.0f, 2.0f, 3.0f});
+outlet.push_chunk({{4.0f, 5.0f, 6.0f}, {7.0f, 8.0f, 9.0f}});
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

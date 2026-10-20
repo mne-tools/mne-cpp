@@ -124,6 +124,24 @@ Computes the spectral matrix S(f) = H(f) * Sigma * H(f)^H.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
+
+Connectivity metrics on synthetic data with a known coupling.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 251"
+MvarModel mvar;
+mvar.fit(average, 4);                                       // pass 0 to select the order by BIC
+const QVector<MatrixXd> coefficients = mvar.coefficients(); // A_1 .. A_p
+const QVector<MatrixXcd> transfer = mvar.transferFunction(VectorXd::LinSpaced(5, 0.0, 0.5));
+ok &= expect(mvar.order() == 4 && coefficients.size() == 4 && transfer.size() == 5,
+             "MvarModel stores order 4 and evaluates H(f) at 5 frequencies");
+ok &= expect(std::fabs(coefficients[kDelay - 1](1, 0)) > 0.5,
+             QString("|A_3(1,0)| %1 > 0.5: channel 1 depends on channel 0 three samples back")
+                 .arg(std::fabs(coefficients[kDelay - 1](1, 0))));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

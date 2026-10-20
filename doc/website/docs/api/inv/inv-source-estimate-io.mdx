@@ -101,6 +101,23 @@ No header; pure numeric matrix (n_vertices × n_times).
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 303"
+InvSourceEstimateIO::writeCsv(stc, tmp.filePath("v1-dspm.csv"));
+const InvSourceEstimate fromCsv = InvSourceEstimateIO::readCsv(tmp.filePath("v1-dspm.csv"));
+QFile stcFile(tmp.filePath("v1-dspm-lh.stc"));
+InvSourceEstimate(stc).write(stcFile); // MNE .stc format, readable by mne.read_source_estimate
+QFile stcBack(stcFile.fileName());
+const InvSourceEstimate fromStc(stcBack);
+ok &= expect(fromCsv.data.rows() == 70 && (fromCsv.data - stc.data).norm() <= 1e-6 * stc.data.norm() && fromStc.vertices == stc.vertices && (fromStc.data - stc.data).norm() <= 1e-6 * stc.data.norm(),
+             "InvSourceEstimateIO/InvSourceEstimate: CSV and .stc round trips");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

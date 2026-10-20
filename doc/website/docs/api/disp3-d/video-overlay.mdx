@@ -197,6 +197,25 @@ Push a new monocular depth map (single-channel or RGBA grayscale).
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 163"
+VideoOverlay overlay; // CPU-side state; the renderer uploads frame() when frameGeneration() changes
+overlay.setEnabled(true);
+overlay.setFocusPosition(QVector3D(0.0f, 0.0f, 0.08f));
+overlay.setSizeMeters(0.05f);
+QImage frame(64, 48, QImage::Format_RGB32);
+frame.fill(Qt::darkGreen);
+overlay.setFrame(frame);
+overlay.setFrame(QImage()); // null frames are ignored
+ok &= expect(overlay.isEnabled() && overlay.hasFrame() && overlay.frameGeneration() == 1 && overlay.frame().size() == QSize(64, 48),
+             "VideoOverlay keeps the first frame and ignores the null one");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

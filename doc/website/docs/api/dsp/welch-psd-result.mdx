@@ -31,6 +31,20 @@ const WelchPsdResult welch = WelchPsd::compute(tones, sFreq, 250, 0.5, WelchPsd:
 - Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)
 - Build target: `ex_dsp_analysis` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_analysis](../../examples/inv/ex_dsp_analysis.mdx)
+
+DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation.
+
+````cpp title="src/examples/ex_dsp_analysis/main.cpp, line 107"
+const WelchPsdResult welch = WelchPsd::compute(tones, sFreq, 250, 0.5, WelchPsd::Hann); // 1 Hz bins, 50 % overlap
+// welch.matPsd: n_channels x 126 one-sided PSD (unit^2/Hz); welch.vecFreqs: 0 ... 125 Hz
+// mne.time_frequency.psd_array_welch(x, 250, n_fft=250, n_overlap=125, window="hann")
+ok &= expect(welch.vecFreqs.size() == 126 && std::fabs(welch.matPsd(0, 10) - 0.3333333333333334) < 1e-9 && std::fabs(welch.matPsd(0, 40) - 0.08333333333333323) < 1e-9 && std::fabs(welch.matPsd.sum() - 0.6250000000000001) < 1e-9,
+             QString("WelchPsd: P(10 Hz) = %1, P(40 Hz) = %2 match mne psd_array_welch").arg(welch.matPsd(0, 10)).arg(welch.matPsd(0, 40)));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

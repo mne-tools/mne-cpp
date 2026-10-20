@@ -45,6 +45,38 @@ Check whether Compute Forward Settings are correctly set.
 
 ---
 
+## Used in examples
+
+### [ex_compute_forward](../../examples/fwd/ex_compute_forward.mdx)
+
+This example shows how to compute the forward solution.
+
+````cpp title="src/examples/ex_compute_forward/main.cpp, line 85"
+// specify necessary information for forward computation
+std::shared_ptr<ComputeFwdSettings> pSettings = std::make_shared<ComputeFwdSettings>();
+````
+
+### [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx)
+
+Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
+
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 168"
+// mne_forward_solution --meg --eeg --accurate --label V1-lh.label with sphere models instead of a BEM
+const QString label = tmp.filePath("V1-lh.label"); // the hemisphere is taken from the "-lh.label" suffix
+QFile::copy(data + "/subjects/sample/label/lh.V1.label", label);
+auto settings = std::make_shared<ComputeFwdSettings>();
+settings->include_meg = true;
+settings->include_eeg = true;
+settings->accurate = true;
+settings->srcname = data + "/subjects/sample/bem/sample-oct-6-src.fif";
+settings->measname = rawFile.fileName();
+settings->mriname = data + "/MEG/sample/all-trans.fif";
+settings->r0 = origin;
+settings->eeg_sphere_rad = 0.09f;
+settings->mindist = 0.0f;
+settings->filter_spaces = false;
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

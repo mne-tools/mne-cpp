@@ -113,6 +113,31 @@ This is a port of the original C function update_fids_from_dig_data from mne_ana
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 220"
+FiffDigitizerData digData;
+digData.points = info.dig;
+digData.npoint = info.dig.size();
+digData.coord_frame = FIFFV_COORD_HEAD;
+digData.head_mri_t_adj = std::make_unique<FiffCoordTrans>(headToMri);
+digData.pickCardinalFiducials(); // LPA, nasion and RPA moved into MRI coordinates
+// mne: apply_trans(invert_transform(mri_head_t), dig[0]["r"]) = (-0.06925742, 0.01058946, -0.02500086)
+ok &= expect(digData.nfids() == 3 && (Map<Vector3f>(digData.mri_fids[0].r) - Vector3f(-0.06925742f, 0.01058946f, -0.02500086f)).norm() < 1e-6f, "FiffDigitizerData moves the 3 cardinal fiducials into MRI coordinates");
+````
+
+### [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx)
+
+Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
+
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 136"
+FIFFLIB::FiffDigitizerData digData;
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

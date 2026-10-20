@@ -168,6 +168,22 @@ Compute EEG electrode-to-surface mapping matrix with SSP projection and average 
 - Build target: `ex_fwd_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx)
+
+Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
+
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 158"
+MatrixX3f surfRr(3, 3);
+surfRr << 0.0f, 0.0f, 0.12f, 0.08f, 0.0f, 0.08f, 0.0f, -0.09f, 0.07f;
+const MatrixX3f surfNn = (surfRr.rowwise() - origin.transpose()).rowwise().normalized();
+auto mapping = FwdFieldMap::computeMegMapping(*normalCoils, surfRr, surfNn, origin); // nvert x nchan
+// mne _make_surface_mapping(mode="accurate", origin=(0, 0, 0.04)), no projectors: row norms 10.0598, 1.88928, 0.69807
+ok &= expect(mapping && mapping->rows() == 3 && mapping->cols() == 305 && near(mapping->row(0).norm(), 10.059843, 1e-3) && near(mapping->row(1).norm(), 1.8892755, 1e-3) && near(mapping->row(2).norm(), 0.69807071, 1e-3),
+             "FwdFieldMap maps 305 good MEG channels onto surface points like mne");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

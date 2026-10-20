@@ -78,6 +78,23 @@ Perform one single HPI fit.
 - Build target: `ex_dsp_rt` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 294"
+RtHpiWorker hpiWorker(updater.getSensors());
+HpiFitResult workerFit;
+QObject::connect(&hpiWorker, &RtHpiWorker::resultReady, [&](const HpiFitResult& fit) { workerFit = fit; });
+hpiWorker.doWork(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer());
+HpiFitResult direct;
+InvHpiFit(updater.getSensors()).fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), direct);
+ok &= expect(workerFit.GoF.size() == 4 && workerFit.GoF.minCoeff() > 0.98 && workerFit.devHeadTrans.trans.isApprox(direct.devHeadTrans.trans, 1e-6f),
+             QString("RtHpiWorker fits 4 coils (GoF >= %1) like InvHpiFit").arg(workerFit.GoF.size() ? workerFit.GoF.minCoeff() : 0.0, 0, 'f', 4));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

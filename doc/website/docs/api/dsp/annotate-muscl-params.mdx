@@ -29,6 +29,23 @@ const FiffAnnotations emgBad = annotateMusclZscore(emgData, info.pick_info(RowVe
 - Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
 - Build target: `ex_dsp_artifacts` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_artifacts](../../examples/dsp/ex_dsp_artifacts.mdx)
+
+Artifact detection and repair with the dsp library on a recording with planted defects.
+
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 244"
+AnnotateMusclParams muscle; // mne defaults: z > 4 in the 110-140 Hz envelope, gaps < 0.1 s filled
+const FiffAnnotations emgBad = annotateMusclZscore(emgData, info.pick_info(RowVectorXi::LinSpaced(kEeg, 0, kEeg - 1)), emgSFreq, muscle);
+// mne.preprocessing.annotate_muscle_zscore on the same data: one BAD_muscle, onset 1.563 s, duration 0.875 s
+ok &= expect(emgBad.size() == 1 && std::fabs(emgBad[0].onset - 1.563) < 1e-9 && std::fabs(emgBad[0].duration - 0.875) < 1e-9,
+             QString("annotateMusclZscore marks %1 EMG burst(s), first at %2 s for %3 s (mne: 1.563 s, 0.875 s)")
+                 .arg(emgBad.size())
+                 .arg(emgBad.isEmpty() ? -1.0 : emgBad[0].onset)
+                 .arg(emgBad.isEmpty() ? -1.0 : emgBad[0].duration));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

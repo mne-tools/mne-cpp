@@ -37,6 +37,19 @@ const QList<HeadPosEntry> posBack = MaxwellMovementComp::readHeadPos(posPath);
 - Build target: `ex_dsp_maxwell` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_maxwell](../../examples/dsp/ex_dsp_maxwell.mdx)
+
+DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
+
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 156"
+QList<HeadPosEntry> headPos(1); // one position from t = 0: identity rotation, no translation
+MaxwellMoveCompParams moveParams;
+moveParams.origin = params.origin;
+const MatrixXd compensated = MaxwellMovementComp::apply(data, info, headPos, 1.0, moveParams);
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

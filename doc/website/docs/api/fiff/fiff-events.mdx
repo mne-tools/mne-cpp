@@ -361,6 +361,44 @@ Events at regular intervals, like mne.make_fixed_length_events.
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 172"
+FiffEvents events;
+FiffEvents::detect_from_raw(raw, events, "STI 014"); // rising edges of the trigger channel
+QFile eventFile(tmp.filePath("sample-eve.fif"));
+const bool eventsWritten = eventFile.open(QIODevice::WriteOnly) && events.write_to_fif(eventFile);
+eventFile.close();
+FiffEvents eventsBack(eventFile); // mne.read_events reads this file too
+// mne.find_events(raw, "STI 014"): 25 events, first [13988, 0, 2], [14172, 0, 3], [14385, 0, 1]
+ok &= expect(events.num_events() == 25 && events.events.row(0) == RowVector3i(13988, 0, 2) && events.events.row(2) == RowVector3i(14385, 0, 1) && eventsWritten && eventsBack.events == events.events,
+             "FiffEvents: 25 trigger events match mne.find_events and round-trip through -eve.fif");
+````
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 210"
+QFile rawFile(data + "/MEG/sample/sample_audvis_trunc_raw.fif");
+const FiffRawData raw(rawFile);
+FiffEvents events;
+FiffEvents::detect_from_raw(raw, events); // rising edges on STI 014
+// Epochs of event 1 from -100 to 300 ms, no rejection
+MNEEpochDataList epochs = MNEEpochDataList::readEpochs(raw, events.events, -0.1f, 0.3f, 1, {});
+const MNEEpochData& firstEpoch = *epochs.first();
+FiffEvoked evoked = epochs.average(raw.info, raw.first_samp, raw.last_samp);
+// mne.Epochs(event_id=1, tmin=-0.1, tmax=0.3, baseline=None, proj=False): 6 epochs of 376 x 121, MEG 0113 first sample -7.5857e-15
+ok &= expect(epochs.size() == 6 && firstEpoch.eventSample == 14385 && firstEpoch.epoch.rows() == 376 && firstEpoch.epoch.cols() == 121 && near(firstEpoch.epoch(0, 0), -7.585747577225703e-15, 1e-6) && near(firstEpoch.epoch.topRows(306).norm(), 7.05600718833613e-13, 1e-6),
+             "MNEEpochDataList/MNEEpochData: 6 epochs of event 1 match mne.Epochs");
+// mne Epochs.average(): |MEG| = 6.0801e-13 over 6 epochs, times from -99.898 to 299.693 ms with 0 at sample 30
+ok &= expect(evoked.nave == 6 && near(evoked.data.topRows(306).norm(), 6.080119131626428e-13, 1e-6) && evoked.times.size() == 121 && near(evoked.times[0], -0.09989760657919393, 1e-6) && near(evoked.times[120], 0.2996928197375818, 1e-6) && evoked.times[30] == 0.0f,
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

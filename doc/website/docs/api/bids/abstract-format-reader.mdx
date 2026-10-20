@@ -164,6 +164,22 @@ Check whether this reader can handle the given file extension.
 - Build target: `ex_bids` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_bids](../../examples/bids/ex_bids.mdx)
+
+BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
+
+````cpp title="src/examples/ex_bids/main.cpp, line 136"
+std::unique_ptr<AbstractFormatReader> edf = BidsRawData::createReader(".edf"); // or construct EDFReader directly
+const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").filePath());
+const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
+const MatrixXf edfHead = edf->readRawSegment(0, 201);
+// mne.io.read_raw_edf: 25 channels at 128 Hz, 1228 samples, first channel "EEG Fp1"; data[3, 200] = 0.1757724
+ok &= expect(edfOpen && dynamic_cast<EDFReader*>(edf.get()) != nullptr && edf->formatName() == "EDF" && edfInfo.nchan == 25 && edfInfo.ch_names.first() == "EEG Fp1" && edf->getSampleCount() == 1228 && near(edfHead(0, 0), 0.17594066, 1e-5) && near(edfHead(3, 200), 0.17577240650034331, 1e-5),
+             QString("EDF: %1 channels, %2 samples, (3,200) = %3 match mne").arg(edfInfo.nchan).arg(edf->getSampleCount()).arg(edfHead(3, 200), 0, 'g', 8));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

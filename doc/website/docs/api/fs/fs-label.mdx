@@ -144,6 +144,60 @@ Reads a [`FsLabel`](/docs/api/fs/fs-label) from a FreeSurfer label file. This is
 - Build target: `ex_fs` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fs](../../examples/fs/ex_fs.mdx)
+
+FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
+
+````cpp title="src/examples/ex_fs/main.cpp, line 129"
+FsAnnotation aparc("sample", 0, "aparc", subjectsDir);
+FsColortable& colors = aparc.getColortable();
+QList<FsLabel> regions;
+QList<RowVector4i> regionColors;
+aparc.toLabels(white, regions, regionColors);
+int precentral = -1;
+for (int i = 0; i < regions.size(); ++i) {
+    if (regions[i].name == "precentral-lh") {
+        precentral = i;
+    }
+}
+// nibabel.freesurfer.read_annot: 36 table entries; mne.read_labels_from_annot: 34 labels, precentral-lh 9505 vertices
+ok &= expect(colors.getNames().size() == 36 && regions.size() == 34 && precentral >= 0 && regions[precentral].vertices.size() == 9505,
+````
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 112"
+FsLabel v1;
+FsLabel::read(data + "/subjects/sample/label/lh.V1.label", v1);
+QFile fwdFile(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+const MNEForwardSolution fwd = MNEForwardSolution(fwdFile).pick_regions({v1}); // 70 sources x 3 orientations
+QFile covFile(data + "/MEG/sample/sample_audvis-cov.fif");
+const FiffCov noiseCov(covFile);
+QFile aveFile(data + "/MEG/sample/sample_audvis-ave.fif");
+const FiffEvoked evoked(aveFile, 0); // "Left Auditory"
+````
+
+### [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx)
+
+Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
+
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 111"
+FsLabel v1;
+FsLabel::read(data + "/subjects/sample/label/lh.V1.label", v1);
+QFile fwdFile(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+MNEForwardSolution fwd = MNEForwardSolution(fwdFile).pick_regions({v1}).pick_channels(good);
+FiffEvoked evoked = sample.pick_channels(good);
+const FiffInfo info = evoked.info;
+QFile covFile(data + "/MEG/sample/sample_audvis-cov.fif");
+const FiffCov noiseCov = FiffCov(covFile).pick_channels(good).prepare_noise_cov(info, good);
+````
+
+Also used in [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

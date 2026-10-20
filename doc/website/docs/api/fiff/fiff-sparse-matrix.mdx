@@ -293,6 +293,21 @@ Create a [`FiffSparseMatrix`](/docs/api/fiff/fiff-sparse-matrix) from an Eigen::
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 232"
+eigen.insert(0, 1) = 2.0;
+eigen.insert(2, 3) = -1.5;
+eigen.makeCompressed();
+const FiffSparseMatrix fiffSparse = FiffSparseMatrix::fromEigenSparse(eigen); // FIFF storage layout
+const SparseMatrix<double> backToEigen = fiffSparse.toEigenSparse();
+ok &= expect(backToEigen.coeff(2, 3) == -1.5 && backToEigen.nonZeros() == 2, "FiffSparseMatrix round-trips an Eigen sparse matrix");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

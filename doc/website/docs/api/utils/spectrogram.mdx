@@ -48,6 +48,29 @@ Calculates the spectrogram (tf-representation) of a given signal.
 - Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
 - Build target: `ex_dsp_spectral` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp](../../examples/disp/ex_disp.mdx)
+
+Disp library widgets: image map, line plot and time-frequency plot of raw data.
+
+````cpp title="src/examples/ex_disp/main.cpp, line 216"
+//ToDo: Debug tfplot
+//tf plot example
+dataCol = data.row(0).transpose();
+MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
+````
+
+### [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx)
+
+Read data and perform tf analysis.
+
+````cpp title="src/examples/ex_tf_plot/main.cpp, line 78"
+//tf plot
+VectorXd dataCol = p_FiffEvoked.data.row(83).transpose();
+MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

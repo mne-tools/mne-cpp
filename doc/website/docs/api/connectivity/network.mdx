@@ -449,6 +449,48 @@ Returns the current FFT size.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
+
+Connectivity metrics on synthetic data with a known coupling.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 110"
+/**
+ * Band-averaged weight of the edge start -> end, or -1 if the network has no such edge.
+ */
+double edgeWeight(const Network& network, int start, int end)
+{
+    for (const NetworkEdge::SPtr& edge : network.getFullEdges()) {
+        if (edge->getStartNodeID() == start && edge->getEndNodeID() == end) {
+            return edge->getWeight();
+        }
+    }
+    return -1.0;
+}
+````
+
+### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
+
+Example of using the MNE-CPP Connectivity library.
+
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 97"
+ConnectivitySettings m_settings;
+RtConnectivity::SPtr m_pRtConnectivity;
+QList<Network> m_networkData;
+QMap<QString, Vector4i> mColor;
+````
+
+### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
+
+Example to compare connectivity methods.
+
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 345"
+QList<Network> lNetworks = Connectivity::calculate(conSettings);
+````
+
+Also used in [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx), [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx).
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

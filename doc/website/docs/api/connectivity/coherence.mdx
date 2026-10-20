@@ -72,6 +72,20 @@ Calculates the coherence between the rows of the data matrix.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
+
+Connectivity metrics on synthetic data with a known coupling.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 176"
+Network coherence = Coherence::calculate(settings);
+coherence.setFrequencyRange(8.0f, 12.0f);
+const double coh01 = edgeWeight(coherence, 0, 1);
+const double coh02 = edgeWeight(coherence, 0, 2);
+ok &= expect(coh01 > coh02 + 0.3, QString("COH 0-1 %1 > 0-2 %2 + 0.3").arg(coh01).arg(coh02));
+````
+
 ## Authors of this file
 
 - Daniel Strohmeier &lt;daniel.strohmeier@gmail.com&gt;

@@ -89,6 +89,26 @@ Updates the [`IObserver`](/docs/api/utils/i-observer).
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 97"
+class LastSeen : public IObserver
+{
+public:
+    void update(Subject* pSubject) override
+    {
+        m_seen = static_cast<Counter*>(pSubject)->value();
+    }
+    int seen() const
+    {
+        return m_seen;
+    }
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

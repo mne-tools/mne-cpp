@@ -169,6 +169,28 @@ Public because it is also used by [`StatsFtest`](/docs/api/sts/stats-ftest).
 - Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
 - Build target: `ex_sts_statistics` (runs under CTest)
 
+## Used in examples
+
+### [ex_sts_statistics](../../examples/sts/ex_sts_statistics.mdx)
+
+Statistics library on small literal data sets with known answers.
+
+````cpp title="src/examples/ex_sts_statistics/main.cpp, line 94"
+const StatsTtestResult oneSample = StatsTtest::oneSample(a);        // H0: column mean = 0
+const StatsTtestResult paired = StatsTtest::paired(a, b);           // H0: mean(a - b) = 0
+const StatsTtestResult independent = StatsTtest::independent(a, b); // pooled variance, df = 10
+const StatsTtestResult rightTail = StatsTtest::oneSample(a, 0.0, StatsTailType::Right);
+// scipy.stats.ttest_1samp / ttest_rel / ttest_ind
+ok &= expectRow(oneSample.matTstat, {10.285912696499036, 0.24544034683690788, -0.12327841818038444}, 1e-10, "one-sample t = scipy");
+ok &= expectRow(oneSample.matPval, {0.00014930867649425364, 0.8158714843641037, 0.9066888237538449}, 1e-10, "one-sample p = scipy");
+ok &= expectRow(paired.matTstat, {26.0, 0.0, -0.7254762501100115}, 1e-10, "paired t = scipy");
+ok &= expectRow(paired.matPval, {1.5724552146685355e-06, 1.0, 0.5006803901900951}, 1e-10, "paired p = scipy");
+ok &= expectRow(independent.matTstat, {5.918268896877812, 0.0, -0.34452048127477725}, 1e-10, "independent t = scipy");
+ok &= expectRow(independent.matPval, {0.0001473880425533016, 1.0, 0.7375904333691938}, 1e-10, "independent p = scipy");
+ok &= expect(oneSample.degreesOfFreedom == 5 && independent.degreesOfFreedom == 10, "df 5 and 10");
+ok &= expect(std::fabs(rightTail.matPval(0, 0) - oneSample.matPval(0, 0) / 2.0) < 1e-12, "right-tailed p is half the two-tailed p");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

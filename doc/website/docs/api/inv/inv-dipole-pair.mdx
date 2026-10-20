@@ -42,6 +42,19 @@ pwlRap.calculateInverse(measured, powellPairs);
 - Build target: `ex_inv_beamformer` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx)
+
+Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
+
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 81"
+bool isPair(const InvDipolePair<double>& pair, int a, int b)
+{
+    return std::min(pair.m_iIdx1, pair.m_iIdx2) == std::min(a, b) && std::max(pair.m_iIdx1, pair.m_iIdx2) == std::max(a, b);
+}
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

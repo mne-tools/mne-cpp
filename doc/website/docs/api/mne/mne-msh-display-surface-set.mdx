@@ -178,6 +178,25 @@ Deep-copy a light set including all individual light entries.
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 431"
+// The same surface as an MNE-C viewer display surface
+MNEMshDisplaySurfaceSet display;
+display.add_bem_surface(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, "inner skull", 1, 1); // checks closure
+const MNEMshDisplaySurface& shown = *display.surfs[0];
+// mne.surface._get_solids (which returns the solid angle / 2): 0.5 at the centroid, 0 at (0, 0, 200) mm;
+// bounding box -66.7 ... 105.8 mm, centroid (0.67, -10.01, 44.26) mm
+ok &= expect(near(inside, 1.0, 1e-6) && std::fabs(outside) < 1e-6 && (Map<const Vector3f>(skull->cm) - Vector3f(0.00067339f, -0.01001356f, 0.04426273f)).norm() < 1e-6f,
+             "MNESurface: solid angles show the inner skull is closed, like mne._get_solids");
+ok &= expect(display.nsurf == 1 && shown.np == 2562 && shown.surf_name == "inner skull" && near(shown.fov, 0.10576099902391434, 1e-6) && (shown.minv - Vector3f(-0.0667366f, -0.0880172f, -0.0445037f)).norm() < 1e-6f,
+             "MNEMshDisplaySurfaceSet/MNEMshDisplaySurface: the BEM surface and its extent in the viewer");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

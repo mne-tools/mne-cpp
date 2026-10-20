@@ -175,6 +175,22 @@ Distance between true source location and the location of the maximum of the PSF
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 143"
+mne.doInverseSetup(evoked.nave);
+const MatrixXd& kernel = mne.getKernel(); // 210 source components x 364 good channels
+const MNEForwardSolution goodFwd = fwd.pick_channels(inverse.noise_cov->names);
+const MatrixXd resolution = InvResolutionMatrix::compute(kernel, goodFwd.sol->data);
+// mne.minimum_norm.make_inverse_resolution_matrix(fwd, inv, "MNE", 1/9): 210 x 210, Frobenius norm 6.13353
+ok &= expect(resolution.rows() == 210 && resolution.cols() == 210 && near(resolution.norm(), 6.13352636100184, 1e-4),
+             "InvResolutionMatrix: MNE resolution matrix matches mne.minimum_norm.make_inverse_resolution_matrix");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

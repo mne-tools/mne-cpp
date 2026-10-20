@@ -87,6 +87,28 @@ Project a set of points onto the surface and return the nearest triangle and sig
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 154"
+MNEProjectToSurface projector(innerSkull);
+MatrixXf points(2, 3);
+points << 0.0f, 0.0f, 0.12f, 0.05f, 0.01f, 0.03f; // one point outside, one inside the skull
+MatrixXf onSurface;
+VectorXi triangle;
+VectorXf distance;
+projector.find_closest_on_surface(points, points.rows(), onSurface, triangle, distance);
+// Exact point-to-triangle distance over all 5120 triangles (numpy on mne.read_bem_surfaces):
+// triangle 1037 at 14.6163 mm, and 11.5561 mm on the edge shared by triangles 3143 and 3172.
+// For the first point mne's _project_onto_surface returns a point on the plane of triangle 1038
+// but outside the triangle (barycentric weights 1.2 and -0.39), so it is not on the surface.
+ok &= expect(triangle(0) == 1037 && (triangle(1) == 3143 || triangle(1) == 3172) && (onSurface.row(0) - RowVector3f(-5.97378269e-05f, 1.14249234e-03f, 0.105428493f)).norm() < 1e-6f && (onSurface.row(1) - RowVector3f(0.060674f, 0.01416721f, 0.02850214f)).norm() < 1e-6f && near(distance(0), 0.014616349831736736, 1e-5) && near(distance(1), 0.011556106943744577, 1e-5),
+             "MNEProjectToSurface: closest triangles, points and distances match an exhaustive search");
+````
+
 ## Authors of this file
 
 - Jana Kiesel &lt;jana.kiesel@tu-ilmenau.de&gt;

@@ -88,6 +88,42 @@ Stops the thread by interrupting its computation queue, quitting and waiting.
 - Build target: `ex_dsp_rt` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
+
+Example of using the MNE-CPP Connectivity library.
+
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 73"
+public:
+    ConnectivitySettingsManager(QObject* parent = 0)
+    : QObject(parent)
+    , m_pRtConnectivity(RtConnectivity::SPtr::create())
+    {
+        QObject::connect(m_pRtConnectivity.data(), &RtConnectivity::newConnectivityResultAvailable,
+                         this, &ConnectivitySettingsManager::onNewConnectivityResultAvailable);
+````
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 259"
+RtConnectivity rtConnectivity;
+MatrixXd online;
+bool connectivityDone = false;
+QObject::connect(&rtConnectivity, &RtConnectivity::newConnectivityResultAvailable,
+                 [&](const QList<Network>& networks, const ConnectivitySettings&) {
+                     online = networks.first().getFullConnectivityMatrix();
+                     connectivityDone = true;
+                 });
+rtConnectivity.append(settings); // computed on the worker thread
+const bool connectivityArrived = waitFor(connectivityDone, 10000);
+ok &= expect(connectivityArrived && online.isApprox(offline),
+             QString("RtConnectivity equals Connectivity::calculate (coherence %1)").arg(online.size() ? online(0, 1) : 0.0, 0, 'f', 3));
+rtConnectivity.stop();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

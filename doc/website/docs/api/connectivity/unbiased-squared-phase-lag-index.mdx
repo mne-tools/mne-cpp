@@ -66,6 +66,22 @@ Calculates the USPLI between the rows of the data matrix.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
+
+Connectivity metrics on synthetic data with a known coupling.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 211"
+wpli.setFrequencyRange(8.0f, 12.0f);
+Network uspli = UnbiasedSquaredPhaseLagIndex::calculate(settings);
+uspli.setFrequencyRange(8.0f, 12.0f);
+Network dswpli = DebiasedSquaredWeightedPhaseLagIndex::calculate(settings);
+dswpli.setFrequencyRange(8.0f, 12.0f);
+Network plv = PhaseLockingValue::calculate(settings);
+plv.setFrequencyRange(8.0f, 12.0f);
+````
+
 ## Authors of this file
 
 - Daniel Strohmeier &lt;daniel.strohmeier@gmail.com&gt;

@@ -79,6 +79,28 @@ RGBAs encoded in the colortable.
 - Build target: `ex_fs` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fs](../../examples/fs/ex_fs.mdx)
+
+FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
+
+````cpp title="src/examples/ex_fs/main.cpp, line 129"
+FsAnnotation aparc("sample", 0, "aparc", subjectsDir);
+FsColortable& colors = aparc.getColortable();
+QList<FsLabel> regions;
+QList<RowVector4i> regionColors;
+aparc.toLabels(white, regions, regionColors);
+int precentral = -1;
+for (int i = 0; i < regions.size(); ++i) {
+    if (regions[i].name == "precentral-lh") {
+        precentral = i;
+    }
+}
+// nibabel.freesurfer.read_annot: 36 table entries; mne.read_labels_from_annot: 34 labels, precentral-lh 9505 vertices
+ok &= expect(colors.getNames().size() == 36 && regions.size() == 34 && precentral >= 0 && regions[precentral].vertices.size() == 9505,
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

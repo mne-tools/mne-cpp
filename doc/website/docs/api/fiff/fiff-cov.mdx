@@ -306,6 +306,51 @@ Compute a weighted grand-average covariance from multiple covariance matrices, w
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 163"
+QFile covFile(dir + "/sample_audvis-cov.fif");
+FiffCov cov(covFile);
+const FiffCov megCov = cov.pick_channels(info.ch_names.mid(0, 306), cov.bads); // good MEG channels only
+// mne.read_cov: dim 366, nfree 15972, 2 bads, 4 projectors, C[0, 0] = 2.272355891906954e-23
+ok &= expect(cov.dim == 366 && cov.nfree == 15972 && cov.bads.size() == 2 && cov.projs.size() == 4 && near(cov.data(0, 0), 2.272355891906954e-23) && megCov.dim == 305,
+             "FiffCov: 366 channels, 15972 degrees of freedom, C[0,0] matches mne.read_cov");
+````
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 196"
+RtCov rtCov(info);
+FiffCov cov;
+for (int start = 0; start < covData.cols(); start += 1000) {
+    cov = rtCov.estimateCovariance(covData.middleCols(start, 1000), 4000); // empty until 4000 samples arrived
+}
+// regularize() adds 0.1 x mean MEG variance to the diagonal; the off-diagonal term is untouched
+ok &= expect(cov.dim == 2 && cov.names == QStringList({"MEG0111", "MEG0121"}) && cov.nfree == 4000 && std::fabs(cov.data(0, 1) - numpyCov(0, 1)) < 1e-6 * std::fabs(numpyCov(0, 1)),
+             QString("RtCov: covariance of 4000 samples matches numpy.cov off the diagonal (%1)").arg(cov.data(0, 1), 0, 'g', 6));
+````
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 114"
+QFile fwdFile(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+const MNEForwardSolution fwd = MNEForwardSolution(fwdFile).pick_regions({v1}); // 70 sources x 3 orientations
+QFile covFile(data + "/MEG/sample/sample_audvis-cov.fif");
+const FiffCov noiseCov(covFile);
+QFile aveFile(data + "/MEG/sample/sample_audvis-ave.fif");
+const FiffEvoked evoked(aveFile, 0); // "Left Auditory"
+````
+
+Also used in [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx), [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx), [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_make_inverse_operator](../../examples/inv/ex_make_inverse_operator.mdx), [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

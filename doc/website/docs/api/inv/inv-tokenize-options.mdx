@@ -53,6 +53,25 @@ const InvSourceEstimate fromTokenStream = fromTokens(tokens);
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 290"
+coherence.fmin = 8.0f;
+coherence.fmax = 12.0f;
+layered.connectivity.push_back(coherence);
+InvTokenizeOptions options; // at most 5 sources and 10 samples; values travel as float
+options.maxSources = 5;
+options.maxTimePoints = 10;
+const std::vector<InvToken> tokens = tokenize(layered, options);
+const InvSourceEstimate fromTokenStream = fromTokens(tokens);
+ok &= expect(tokens.front().id == InvTokenId::Bos && tokens.back().id == InvTokenId::Eos && fromTokenStream.data.rows() == 5 && fromTokenStream.data.cols() == 10 && fromTokenStream.focalDipoles.size() == 1 && std::fabs(fromTokenStream.focalDipoles[0].moment.z() - 20e-9f) < 1e-15f && fromTokenStream.couplings.size() == 1 && std::fabs(fromTokenStream.couplings[0].correlations(0, 1) - 0.8) < 1e-7 && fromTokenStream.connectivity.size() == 1 && fromTokenStream.connectivity[0].fmax == 12.0f,
+             QString("tokenize/fromTokens: %1 tokens carry 5 x 10 samples and the dipole, coupling and connectivity layers").arg(tokens.size()));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -166,6 +166,26 @@ Only valid when transformInto == AveragePower.
 - Full source: [`src/examples/ex_decoding/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_decoding/main.cpp)
 - Build target: `ex_decoding` (runs under CTest)
 
+## Used in examples
+
+### [ex_decoding](../../examples/decoding/ex_decoding.mdx)
+
+Spatial decoders and ICA labelling on synthetic mixtures with a known ground truth.
+
+````cpp title="src/examples/ex_decoding/main.cpp, line 129"
+DecodingCsp csp(2); // one filter per class
+csp.fit(cspEpochs, classes);
+const MatrixXd cspFeatures = csp.transform(cspEpochs); // epochs x components, log band power
+// Which component favours which class depends on the eigenvector order; score both assignments
+int agree = 0;
+for (int e = 0; e < 40; ++e) {
+    agree += (cspFeatures(e, 0) > cspFeatures(e, 1)) == (classes(e) == 1);
+}
+const int cspCorrect = std::max(agree, 40 - agree);
+ok &= expect(csp.isFitted() && cspFeatures.rows() == 40 && cspFeatures.cols() == 2 && cspCorrect == 40,
+             QString("CSP log-power features separate %1 of 40 epochs").arg(cspCorrect));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

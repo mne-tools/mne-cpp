@@ -75,6 +75,25 @@ const double eegProj = segment(1, 0);
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 227"
+// MNE-C style reader: buffer directory, channel selection, projection and overlap-add filter
+MNEFilterDef filter; // 40 Hz lowpass, 5 Hz transition, 4096-sample blocks
+filter.filter_on = true;
+filter.size = 4096;
+filter.taper_size = 2048;
+filter.lowpass = filter.eog_lowpass = 40.0f;
+filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
+std::unique_ptr<MNERawData> mneRaw(MNERawData::open_file(rawFile.fileName(), false, false, filter));
+const MNERawInfo& rawInfo = *mneRaw->info;
+const MNERawBufDef& firstBuffer = mneRaw->bufs.front();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

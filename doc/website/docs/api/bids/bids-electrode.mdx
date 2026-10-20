@@ -89,6 +89,22 @@ If a coordinate transform is supplied, the positions are transformed from the BI
 - Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
 - Build target: `ex_bids` (runs under CTest)
 
+## Used in examples
+
+### [ex_bids](../../examples/bids/ex_bids.mdx)
+
+BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
+
+````cpp title="src/examples/ex_bids/main.cpp, line 109"
+const BidsDatasetDescription description = BidsDatasetDescription::read(root + "/dataset_description.json");
+const QList<BidsChannel> channels = BidsChannel::readTsv(channelsTsv);               // one row per channel
+const QList<BidsEvent> events = BidsEvent::readTsv(ieeg.eventsTsvPath().filePath()); // onset, duration, sample, value, trial_type
+const QList<BidsElectrode> electrodes = BidsElectrode::readTsv(ieeg.electrodesTsvPath().filePath());
+const BidsCoordinateSystem coords = BidsCoordinateSystem::readJson(ieeg.coordsystemJsonPath().filePath());
+ok &= expect(description.name == "MNE-CPP Test Dataset" && description.bidsVersion == "1.9.0" && channels.size() == 32 && channels[0].name == "FP1" && channels[0].units == "µV" && events.size() == 4 && events[3].sample == 5250 && events[3].value == 3 && events[3].trialType == "feedback" && electrodes.size() == 10 && electrodes[0].name == "FP1" && electrodes[0].x == "-0.0254" && coords.system == "ACPC" && coords.units == "m",
+             "dataset_description, channels/events/electrodes.tsv and coordsystem.json read as written");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

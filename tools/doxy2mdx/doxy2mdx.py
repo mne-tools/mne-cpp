@@ -40,6 +40,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
+import generate_examples
+
 LOG = logging.getLogger("doxy2mdx")
 
 # ---------------------------------------------------------------------------
@@ -861,6 +863,33 @@ def _render_example_section(reg_entry: dict,
         lines.append("")
 
 
+EMBEDDED_EXAMPLES = 3
+
+
+def _render_example_usages(short_name: str, library: str, repo_root: Path, lines: List[str]) -> None:
+    """Append ``## Used in examples``: the first use in the top examples, links to the rest."""
+    found = generate_examples.usages(short_name, library, repo_root)
+    if not found:
+        return
+    lines.append("## Used in examples")
+    lines.append("")
+    for use in found[:EMBEDDED_EXAMPLES]:
+        link = f"../../examples/{use['group']}/{use['name']}.mdx"
+        lines.append(f"### [{use['name']}]({link})")
+        lines.append("")
+        lines.append(generate_examples.mdx_text(use["brief"]) + ".")
+        lines.append("")
+        lines.append(f"````cpp title=\"{use['file']}, line {use['line']}\"")
+        lines.extend(use["code"])
+        lines.append("````")
+        lines.append("")
+    rest = found[EMBEDDED_EXAMPLES:]
+    if rest:
+        lines.append("Also used in " + ", ".join(
+            f"[{u['name']}](../../examples/{u['group']}/{u['name']}.mdx)" for u in rest) + ".")
+        lines.append("")
+
+
 def _check_registered_snippets(name: str, reg_entry: dict) -> None:
     """Every registry ``example_snippet`` must have been rendered on the page."""
     for ref in reg_entry.get("example_snippet", []):
@@ -1031,6 +1060,7 @@ def generate_class_mdx(compounddef,
 
     # --- Example (sourced from src/examples/<ex_id>/main.cpp) ---
     _render_example_section(reg_entry, repo_root, lines)
+    _render_example_usages(short_name, include_dir, repo_root, lines)
 
     # --- Authors footer (every source file must list its authors;
     #     the generator aborts at the end if any were missed). ---

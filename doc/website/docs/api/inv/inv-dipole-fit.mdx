@@ -216,6 +216,25 @@ Refactored: fit_dipoles_raw (fit_dipoles.c)
 - Build target: `ex_inv_dipole_fit` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx)
+
+Inverse library: equivalent current dipole fitting in a sphere model.
+
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 136"
+settings.tmin = 0.0f;
+settings.dipname = tmp.filePath("fit.dat"); // MNE-C .dat dipole file
+settings.checkIntegrity();
+InvDipoleFit fit(&settings);
+InvEcdSet dipoles = fit.calculateFit();
+const bool saved = dipoles.save_dipoles_dip(tmp.filePath("fit.dip")); // readable by mne.read_dipole
+const InvEcdSet reread = InvEcdSet::read_dipoles_dip(tmp.filePath("fit.dip"));
+const Vector3d posMm = dipoles.size() > 0 ? Vector3d(1e3 * dipoles[0].rd.cast<double>()) : Vector3d::Zero();
+ok &= expect(saved && dipoles.size() == 1 && dipoles[0].valid && (posMm - mnePosMm).norm() < 1.0 && std::abs(100.0 * dipoles[0].good - 99.99996959113513) < 0.01 && dipoles[0].nfree == 297 && reread.size() == 1 && (reread[0].rd - dipoles[0].rd).norm() < 1e-4f,
+             "InvDipoleFitSettings/InvDipoleFit/InvEcdSet: the pipeline fit matches mne.fit_dipole and round-trips through .dip");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

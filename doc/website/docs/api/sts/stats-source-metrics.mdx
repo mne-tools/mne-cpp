@@ -97,6 +97,25 @@ Find the index of the source with maximum absolute amplitude.
 - Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
 - Build target: `ex_sts_statistics` (runs under CTest)
 
+## Used in examples
+
+### [ex_sts_statistics](../../examples/sts/ex_sts_statistics.mdx)
+
+Statistics library on small literal data sets with known answers.
+
+````cpp title="src/examples/ex_sts_statistics/main.cpp, line 188"
+amplitudes << 0.1, 2.0, 0.5, -0.4;
+MatrixXd positions(4, 3); // metres
+positions << 0.00, 0.00, 0.00, 0.01, 0.00, 0.00, 0.02, 0.00, 0.00, 0.01, 0.01, 0.00;
+const int peak = StatsSourceMetrics::findPeakIndex(amplitudes);
+const double localizationError = StatsSourceMetrics::peakLocalizationError(Vector3d(0.01, 0.0, 0.003),
+                                                                           positions.row(peak).transpose());
+const double dispersion = StatsSourceMetrics::spatialDispersion(amplitudes, positions, peak);
+// SD = (0.1 * 0.01 + 0.5 * 0.01 + 0.4 * 0.01) / (0.1 + 2.0 + 0.5 + 0.4)
+ok &= expect(peak == 1 && std::fabs(localizationError - 0.003) < 1e-15 && std::fabs(dispersion - 0.01 / 3.0) < 1e-15,
+             QString("peak 1, PLE 3 mm, SD %1 m = 1/300").arg(dispersion));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

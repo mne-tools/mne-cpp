@@ -63,6 +63,23 @@ const MnaProvenance& provenance = checks.provenance; // versions, host, input SH
 - Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
 - Build target: `ex_mna` (runs under CTest)
 
+## Used in examples
+
+### [ex_mna](../../examples/mna/ex_mna.mdx)
+
+MNA library: register operations, build and run a graph, bind parameters and save a project.
+
+````cpp title="src/examples/ex_mna/main.cpp, line 182"
+graph.node("source").attributes["value"] = -2.0;
+graph.node("source").dirty = true;
+const MnaGraphExecutor::Context checked = MnaGraphExecutor::executeIncremental(graph, ctx);
+const MnaVerificationResult& verdict = checks.postResults.first();
+const MnaProvenance& provenance = checks.provenance; // versions, host, input SHA-256, timing
+// gain is 2 again, so shift::out = 2 * -2 + 0.5 = -3.5 fails the check
+ok &= expect(!verdict.passed && verdict.actualValue == QVariant(false) && checked.abortedNode == "shift" && checked.results.value("shift::out").toDouble() == -3.5 && provenance.mneCppVersion == MNE_CPP_VERSION && provenance.inputHashes.contains("in"),
+             "MnaVerification: " + verdict.message);
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -102,6 +102,24 @@ Compute the MUSIC-type subspace correlation for all source locations.
 - Build target: `ex_inv_beamformer` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx)
+
+Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
+
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 168"
+MatrixX3d positions = fwd.source_rr.cast<double>();
+InvTrapMusic trap(2, 0.85); // at most 2 dipoles, stop below a subspace correlation of 0.85
+const QList<TrapMusicDipole> dipoles = trap.compute(G, measured, positions, 3);
+QVector<int> found;
+for (const TrapMusicDipole& d : dipoles)
+    found << d.sourceIdx;
+std::sort(found.begin(), found.end());
+ok &= expect(found == QVector<int>({10, 50}) && std::abs(dipoles[0].orientation.z()) > 0.999,
+             "InvTrapMusic: TRAP-MUSIC finds both sources one at a time, oriented along z");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -151,6 +151,21 @@ Set the colormap used for edge/node coloring.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 285"
+NetworkObject networkGlyphs;
+networkGlyphs.load(graph, "Viridis"); // spheres for nodes, cylinders for edges
+const int edgesAll = networkGlyphs.edgeInstanceCount();
+networkGlyphs.setThreshold(0.5); // keep only the strong 0-1 link
+ok &= expect(edgesAll == 2 && networkGlyphs.edgeInstanceCount() == 1 && networkGlyphs.nodeInstanceCount() == 2,
+             "NetworkObject: thresholding at 0.5 leaves one edge and its two nodes");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

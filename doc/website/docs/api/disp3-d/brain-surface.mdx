@@ -558,6 +558,27 @@ a single sphere in a batched mesh). Pass start=-1 to clear the vertex range high
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 225"
+patchVertices << 0.0f, 0.0f, 0.0f, 0.02f, 0.0f, 0.0f, 0.02f, 0.02f, 0.0f, 0.0f, 0.02f, 0.0f;
+MatrixX3i patchTriangles(2, 3);
+patchTriangles << 0, 1, 2, 0, 2, 3;
+BrainSurface patch;
+patch.createFromData(patchVertices, patchTriangles, Qt::gray);
+patch.setHemi(0);
+float hitDistance = 0.0f;
+int hitVertex = -1;
+const bool picked = patch.intersects(QVector3D(0.019f, 0.019f, 0.05f), QVector3D(0.0f, 0.0f, -1.0f), hitDistance, hitVertex);
+const VertexData& corner = patch.vertexDataRef().at(2); // interleaved position, normal and packed ABGR colour
+ok &= expect(picked && std::abs(hitDistance - 0.05f) < 1e-6f && hitVertex == 2 && corner.pos == QVector3D(0.02f, 0.02f, 0.0f) && std::abs(std::abs(corner.norm.z()) - 1.0f) < 1e-6f,
+             "BrainSurface: a downward ray hits the patch 5 cm below, nearest vertex 2");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

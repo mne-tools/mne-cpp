@@ -1437,6 +1437,24 @@ Returns one row per cardinal dipole direction (x, y, z).
 - Build target: `ex_fwd_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx)
+
+Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
+
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 130"
+auto bem = FwdBemModel::fwd_bem_load_homog_surface(data + "/subjects/sample/bem/sample-5120-bem.fif");
+bem->fwd_bem_load_recompute_solution(data + "/subjects/sample/bem/sample-5120-bem-sol.fif", FWD_BEM_LINEAR_COLL, 0);
+bem->fwd_bem_set_head_mri_t(FiffCoordTrans::readMriTransform(data + "/MEG/sample/all-trans.fif"));
+bem->fwd_bem_specify_coils(coils.get()); // stores a FwdBemSolution per coil set in coils->user_data
+VectorXf B(coils->ncoil());
+FwdBemModel::fwd_bem_field(rd, Q, *coils, B, bem.get()); // T per A m
+// mne.make_forward_dipole with the same BEM: |B| = 2.3646584e-4, B[0] = -7.2922803e-6
+ok &= expect(coils->user_data && coils->user_data->ncoil == 306 && near(B.norm(), 2.3646584e-4, 1e-3) && near(B[0], -7.2922803e-6, 1e-2),
+             "FwdBemModel/FwdBemSolution: single-layer BEM field matches mne.make_forward_dipole");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

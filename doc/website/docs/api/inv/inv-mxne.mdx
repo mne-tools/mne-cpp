@@ -73,6 +73,22 @@ Compute the MxNE inverse solution.
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 229"
+const MatrixXd gain = whitener * fixedFwd.sol->data * 1e-9;
+const MatrixXd measured = whitener * evoked.pick_channels(inverse.noise_cov->names).data.middleCols(170, 40); // 83-148 ms
+const double alphaMax = (gain.transpose() * measured).rowwise().norm().maxCoeff();
+const InvMxneResult mxne = InvMxne::compute(gain, measured, 0.5 * alphaMax, 1000, 1e-10);
+// mne mixed_norm_solver(M, G, 0.5 * alpha_max, n_orient=1, debias=False): sources 8, 30, 37 with 21.37, 1.019, 4.455 nAm
+ok &= expect(rank == 360 && near(alphaMax, 14.508623946749108, 1e-4) && mxne.activeVertices == QVector<int>({8, 30, 37}) && near(mxne.stc.data.row(0).norm(), 21.373078745157443, 1e-3) && near(mxne.stc.data.row(2).norm(), 4.455019654645694, 1e-3),
+             "computeWhitener/InvMxne: whitened rank 360, MxNE picks the 3 V1 sources mne.inverse_sparse finds");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

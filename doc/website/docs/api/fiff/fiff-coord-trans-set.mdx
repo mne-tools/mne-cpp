@@ -131,6 +131,27 @@ Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI ``.xfm f
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 140"
+// Head -> MRI -> RAS -> MNI Talairach -> Talairach, as mne_analyze reports a picked location
+FiffCoordTransSet chain;
+chain.read(dir + "/../../subjects/sample/mri/brain-neuromag/sets/COR.fif"); // surface RAS -> RAS of the MRI set
+chain.read(dir + "/all-trans.fif");                                         // the coregistration, head -> MRI
+chain.addTalairach(QStringLiteral(MNE_TALAIRACH_XFM));                      // the subject's mri/transforms/talairach.xfm
+MatrixX3f headPoints(1, 3);
+headPoints << 0.03f, -0.02f, 0.12f;
+const MatrixX3f mni = chain.headToMni(headPoints);
+const MatrixX3f talairach = chain.mniToTalairach(mni);
+// mne.head_to_mni([0.03, -0.02, 0.12], "sample", mri_head_t): (36.47, -65.50, 57.83) mm
+ok &= expect(mni.rows() == 1 && (mni.row(0) - RowVector3f(0.036469229f, -0.065504959f, 0.057827104f)).norm() < 1e-6f && (talairach.row(0) - RowVector3f(0.036104536f, -0.060801158f, 0.056314317f)).norm() < 1e-6f,
+             "FiffCoordTransSet: head point at (36.47, -65.50, 57.83) mm MNI like mne.head_to_mni");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

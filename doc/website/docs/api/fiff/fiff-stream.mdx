@@ -1140,6 +1140,57 @@ Opens the source file, locates the FIFFB_PROCESSING_HISTORY block, reads all tag
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 206"
+QFile structureFile(dir + "/sample_audvis-ave.fif");
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+const bool opened = stream->open();
+const QList<FiffDirNode::SPtr> measNodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
+std::unique_ptr<FiffTag> tag;
+const bool hasNchan = measNodes.first()->find_tag(stream, FIFF_NCHAN, tag); // raw tag access
+const int nchanTag = *tag->toInt();
+const FiffId fileId = stream->id();
+stream->close();
+ok &= expect(opened && measNodes.size() == 1 && hasNchan && nchanTag == 376 && !fileId.isEmpty() && fileId.version > 0,
+             "FiffStream/FiffDirNode/FiffTag/FiffId: the FIFF_NCHAN tag of the measurement block reads 376");
+````
+
+### [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx)
+
+Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
+
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 125"
+FIFFLIB::FiffStream stream(&buffer);
+if (littleEndian) {
+    stream.setByteOrder(QDataStream::LittleEndian);
+} else {
+    stream.setByteOrder(QDataStream::BigEndian);
+}
+````
+
+### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
+
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+
+````cpp title="src/examples/ex_fiff_structure/main.cpp, line 120"
+QFile structureFile(rawPath);
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+ok &= stream->open();
+const QList<FiffDirEntry::SPtr>& directory = stream->dir(); // every tag (kind, type, size, position) + a kind -1 end
+const FiffTime created = stream->id().time;                 // seconds and microseconds since 1970
+stream->close();
+// mne fiff_open: 640 entries; file_id secs 1411146352, usecs 0
+ok &= expect(directory.size() == 641 && directory.last()->kind == -1 && created.secs == 1411146352 && created.usecs == 0 && FiffTime::storageSize() == 8 && FiffDirEntry::storageSize() == 16,
+             "FiffDirEntry/FiffTime: the 640 tags of mne fiff_open plus the end entry; the file id was written at 1411146352 s");
+````
+
+Also used in [ex_mne_api](../../examples/fs/ex_mne_api.mdx), [ex_read_write_raw](../../examples/fiff/ex_read_write_raw.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

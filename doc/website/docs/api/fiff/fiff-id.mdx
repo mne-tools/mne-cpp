@@ -172,6 +172,22 @@ Size of the old struct (`fiffIdRec`) 5*int = 5*4 = 20.
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 210"
+std::unique_ptr<FiffTag> tag;
+const bool hasNchan = measNodes.first()->find_tag(stream, FIFF_NCHAN, tag); // raw tag access
+const int nchanTag = *tag->toInt();
+const FiffId fileId = stream->id();
+stream->close();
+ok &= expect(opened && measNodes.size() == 1 && hasNchan && nchanTag == 376 && !fileId.isEmpty() && fileId.version > 0,
+             "FiffStream/FiffDirNode/FiffTag/FiffId: the FIFF_NCHAN tag of the measurement block reads 376");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

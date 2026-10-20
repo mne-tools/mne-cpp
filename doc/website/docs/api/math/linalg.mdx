@@ -353,6 +353,38 @@ Compares triplet second entry (column).
 - Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
 - Build target: `ex_math` (runs under CTest)
 
+## Used in examples
+
+### [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx)
+
+Example of a Clustered Inverse Minimum Norm Estimation application.
+
+````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 230"
+double t_dConditionNumber = Linalg::getConditionNumber(t_Fwd.sol->data, s);
+double t_dConditionNumberClustered = Linalg::getConditionNumber(t_clusteredFwd.sol->data, s);
+````
+
+### [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx)
+
+Example of the computation of a clustered inverse mne raw.
+
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 559"
+double t_dConditionNumber = Linalg::getConditionNumber(t_Fwd.sol->data, s);
+double t_dConditionNumberClustered = Linalg::getConditionNumber(t_clusteredFwd.sol->data, s);
+````
+
+### [ex_math](../../examples/math/ex_math.mdx)
+
+Math library on inputs with known answers.
+
+````cpp title="src/examples/ex_math/main.cpp, line 92"
+MatrixXd tall(3, 2);
+tall << 1, 2, 3, 4, 5, 6;
+const MatrixXd tallPinv = Linalg::pinv(tall); // Moore-Penrose, 2 x 3
+````
+
+Also used in [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

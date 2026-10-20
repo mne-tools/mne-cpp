@@ -195,6 +195,21 @@ Return all channel infos.
 - Build target: `ex_bids` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_bids](../../examples/bids/ex_bids.mdx)
+
+BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
+
+````cpp title="src/examples/ex_bids/main.cpp, line 119"
+BrainVisionReader brainVision;
+const bool bvOpen = brainVision.open(vhdr);
+const MatrixXf bvHead = brainVision.readRawSegment(0, 200); // calibrated, volts
+// mne.io.read_raw_brainvision: 32 channels at 1000 Hz, 7900 samples; data[0, 0] = -23.5 uV, data[5, 100] = 38.5 uV
+ok &= expect(bvOpen && brainVision.getChannelCount() == 32 && brainVision.getSampleCount() == 7900 && brainVision.getFrequency() == 1000.0f && near(bvHead(0, 0), -2.35e-5, 1e-4) && near(bvHead(5, 100), 3.85e-5, 1e-4),
+             QString("BrainVision: %1 x %2 samples, (0,0) = %3 V match mne").arg(brainVision.getChannelCount()).arg(brainVision.getSampleCount()).arg(bvHead(0, 0)));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

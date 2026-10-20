@@ -81,6 +81,43 @@ Constructs [`TFplot`](/docs/api/disp/t-fplot) class.
 - Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
 - Build target: `ex_disp_plots` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx)
+
+Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 194"
+MatrixXd tf = MatrixXd::Zero(50, 40);   // frequency rows x time columns
+tf.middleRows(20, 10).setConstant(1.0); // 20-30 Hz band at 100 Hz sampling
+TFplot tfPlot(tf, 100.0, 0.0, 50.0, Jet);
+const QImage tfImage = render(tfPlot);
+ok &= expect(countColor(tfImage, ColorMap::valueToJet(1.0), 10) > 100 && countColor(tfImage, ColorMap::valueToJet(0.0), 10) > countColor(tfImage, ColorMap::valueToJet(1.0), 10),
+             "TFplot draws the 20-30 Hz band in the top colour over a bottom-colour background");
+````
+
+### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
+
+Example of using the MNE-CPP Connectivity library.
+
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 116"
+TFplot::SPtr m_pTfPlot;
+Eigen::MatrixXd m_matEvoked;
+Eigen::MatrixXd m_matEvokedSource;
+MNELIB::MNEEpochDataList epochs;
+````
+
+### [ex_disp](../../examples/disp/ex_disp.mdx)
+
+Disp library widgets: image map, line plot and time-frequency plot of raw data.
+
+````cpp title="src/examples/ex_disp/main.cpp, line 221"
+TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet);
+tfplot.show();
+````
+
+Also used in [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx).
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

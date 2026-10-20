@@ -79,6 +79,28 @@ Sets member QFileSystemWatcher to watch set directory.
 - Build target: `ex_fiff_structure` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
+
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+
+````cpp title="src/examples/ex_fiff_structure/main.cpp, line 152"
+// Hand a finished recording to another application through a watched directory.
+QDir::setCurrent(tmp.path());
+FiffFileSharer consumer("shared");
+QStringList arrived;
+QObject::connect(&consumer, &FiffFileSharer::newFileAtPath, [&](const QString& path) { arrived << path; });
+consumer.initWatcher();
+FiffFileSharer producer("shared");
+producer.copyRealtimeFile(rawPath); // shared/realtime_file0_raw.fif
+QEventLoop loop;
+QTimer::singleShot(5000, &loop, &QEventLoop::quit);
+QObject::connect(&consumer, &FiffFileSharer::newFileAtPath, &loop, &QEventLoop::quit);
+if (arrived.isEmpty())
+    loop.exec();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

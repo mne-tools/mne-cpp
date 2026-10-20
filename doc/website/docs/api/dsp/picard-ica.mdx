@@ -66,6 +66,17 @@ Run the Picard [`ICA`](/docs/api/dsp/ica) algorithm.
 - Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
 - Build target: `ex_dsp_preprocessing` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_preprocessing](../../examples/dsp/ex_dsp_preprocessing.mdx)
+
+Preprocessing tools of the dsp library on synthetic data with a known ground truth.
+
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 130"
+const IcaResult picard = PicardIca::run(mixed, 3);
+ok &= expect(worstRecovery(picard.matSources, sources) > 0.99, QString("Picard recovers all sources (worst |r| %1)").arg(worstRecovery(picard.matSources, sources)));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

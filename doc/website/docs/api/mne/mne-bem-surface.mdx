@@ -160,6 +160,21 @@ Decimate the outer skin surface to the target vertex counts using iterative edge
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 145"
+QFile bemFile(data + "/subjects/sample/bem/sample-5120-bem.fif");
+MNEBem bem(bemFile); // one MNEBemSurface per BEM layer
+const MNEBemSurface& innerSkull = bem[0];
+// mne.read_bem_surfaces: 1 surface, id 1 (inner skull), 2562 vertices, 5120 triangles
+ok &= expect(bem.size() == 1 && innerSkull.id == FIFFV_BEM_SURF_ID_BRAIN && innerSkull.np == 2562 && innerSkull.ntri == 5120 && (innerSkull.rr.row(0) - RowVector3f(0.0006128f, -0.007984f, 0.103732f)).norm() < 1e-6f && (innerSkull.nn.row(0) - RowVector3f(0.05623665f, -0.1050898f, 0.99287134f)).norm() < 1e-5f && MNEBemSurface::id_name(innerSkull.id) == "Brain",
+             "MNEBem/MNEBemSurface: inner skull with 2562 vertices and normals like mne.read_bem_surfaces");
+````
+
 ## Authors of this file
 
 - Jana Kiesel &lt;jana.kiesel@tu-ilmenau.de&gt;

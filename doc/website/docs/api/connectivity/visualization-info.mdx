@@ -35,6 +35,53 @@ network.setVisualizationInfo(look);
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
+
+Example of using the MNE-CPP Connectivity library.
+
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 200"
+VisualizationInfo visInfo = m_networkData[i].getVisualizationInfo();
+visInfo.sMethod = "Color";
+visInfo.colNodes = mColor[m_networkData[i].getConnectivityMethod()];
+visInfo.colEdges = mColor[m_networkData[i].getConnectivityMethod()];
+m_networkData[i].setVisualizationInfo(visInfo);
+````
+
+### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
+
+Example to compare connectivity methods.
+
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 359"
+    lNetworks[j].setFrequencyRange(dFreqMin, dFreqMax);
+    lNetworks[j].normalize();
+    VisualizationInfo visInfo = lNetworks.at(j).getVisualizationInfo();
+    visInfo.sMethod = "Color";
+    visInfo.colNodes = mColor[lNetworks[j].getConnectivityMethod()];
+    visInfo.colEdges = mColor[lNetworks[j].getConnectivityMethod()];
+    lNetworks[j].setVisualizationInfo(visInfo);
+}
+````
+
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
+
+Connectivity metrics on synthetic data with a known coupling.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 296"
+const MatrixXd adjacency = network.getFullConnectivityMatrix(); // symmetric by default
+const int strongEdges = network.getThresholdedEdges().size();
+const NetworkNode::SPtr hub = network.getNodeAt(1);
+VisualizationInfo look; // how disp3D colours the network: a colormap or fixed node/edge colours
+look.sMethod = "Color";
+look.colEdges = Eigen::Vector4i(0, 0, 255, 255);
+network.setVisualizationInfo(look);
+ok &= expect(adjacency(1, 0) == 0.9 && adjacency(2, 1) == 0.2 && strongEdges == 1 && network.getVisualizationInfo().colEdges(2) == 255,
+             "manual network: mirrored adjacency, one edge above 0.5");
+ok &= expect(hub->getFullDegree() == 2 && hub->getThresholdedDegree() == 1 && std::fabs(hub->getFullStrength() - 1.1) < 1e-12,
+             "node 1: degree 2, thresholded degree 1, strength 1.1");
+````
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

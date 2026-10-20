@@ -210,6 +210,22 @@ Creates a class and frequency distribution from data matrix.
 - Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
 - Build target: `ex_math` (runs under CTest)
 
+## Used in examples
+
+### [ex_histogram](../../examples/inv/ex_histogram.mdx)
+
+Example application of reading raw data and presenting the result in histogram form.
+
+````cpp title="src/examples/ex_histogram/main.cpp, line 204"
+dataSine = sineWaveGenerator(1.0e-6, (1.0 / 1.0e6), 0.0, 1.0); //creates synthetic data using sineWaveGenerator function
+qDebug() << "sourceEstimateData.rows = " << sourceEstimateData.rows();
+qDebug() << "sourceEstaimateData.cols = " << sourceEstimateData.cols();
+Numerics::histcounts(sourceEstimateData, bMakeSymmetrical, classAmount, resultClassLimit, resultFrequency, inputGlobalMin, inputGlobalMax); //user input to normalize and sort the data matrix
+std::cout << "resultClassLimits = " << resultClassLimit << std::endl;
+std::cout << "resultFrequency = " << resultFrequency << std::endl;
+qDebug() << "HistCounts timer:" << myTimerHistCounts.elapsed();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

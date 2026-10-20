@@ -159,6 +159,28 @@ Updates the plot using the given vectors.
 - Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
 - Build target: `ex_disp_plots` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx)
+
+Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 150"
+LinePlot line(x, y, "sin(2 pi t)");
+line.setXLabel("t [s]");
+line.setYLabel("amplitude");
+const QImage lineImage = render(line);
+int top = lineImage.height();
+int bottom = 0;
+for (int py = 0; py < lineImage.height(); ++py) {
+    for (int px = 0; px < lineImage.width(); ++px) {
+        if (close(lineImage.pixel(px, py), steelBlue, 40)) {
+            top = std::min(top, py);
+            bottom = std::max(bottom, py);
+        }
+    }
+````
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

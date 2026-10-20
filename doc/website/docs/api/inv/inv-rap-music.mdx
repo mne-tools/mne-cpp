@@ -145,6 +145,54 @@ Sets the source estimate attributes.
 - Build target: `ex_inv_beamformer` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx)
+
+Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
+
+````cpp title="src/examples/ex_inv_beamformer/main.cpp, line 154"
+for (int t = 0; t < nSamples; ++t)
+    measured.col(t) = g1 * std::sin(0.21 * t) + g2 * std::sin(0.53 * t + 0.4);
+QList<InvDipolePair<double>> pairs;
+InvRapMusic rap(fwd, false, 1, 0.5); // one correlated pair, subspace correlation >= 0.5
+rap.calculateInverse(measured, pairs);
+QList<InvDipolePair<double>> powellPairs;
+InvPwlRapMusic pwlRap(fwd, false, 1, 0.5); // Powell coordinate search: far fewer pairs, may stop at a local optimum
+pwlRap.calculateInverse(measured, powellPairs);
+ok &= expect(pairs.size() == 1 && isPair(pairs[0], 10, 50) && pairs[0].m_vCorrelation > 1.0 - 1e-6 && powellPairs.size() == 1 && powellPairs[0].m_vCorrelation > 0.99,
+             QString("InvRapMusic/InvPwlRapMusic/InvDipolePair: the exhaustive scan finds sources 10 and 50 (correlation 1), Powell a pair at %1")
+                 .arg(powellPairs.isEmpty() ? 0.0 : powellPairs[0].m_vCorrelation, 0, 'f', 4));
+````
+
+### [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx)
+
+Example of MNEForwardSolution and InvRapMusic application.
+
+````cpp title="src/examples/ex_inverse_rap_music/main.cpp, line 87"
+QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
+QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
+QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", ""); //"InvRapMusic.stc");
+QCommandLineOption doMovieOption("doMovie", "Create overlapping movie.", "doMovie", "false");
+QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
+QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");
+QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "orig");
+````
+
+### [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx)
+
+Example of the computation of a raw clustered inverse rap music.
+
+````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 428"
+//
+// Compute inverse solution
+//
+InvRapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
+````
+
+Also used in [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

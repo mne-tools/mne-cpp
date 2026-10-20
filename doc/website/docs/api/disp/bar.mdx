@@ -116,6 +116,28 @@ splitCoefficientAndExponent takes in QVector value of coefficient and exponent a
 - Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
 - Build target: `ex_disp_plots` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx)
+
+Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 116"
+Bar bar("Amplitude histogram");
+VectorXd classLimits(5); // class edges
+classLimits << 0.0, 1.0, 2.0, 3.0, 4.0;
+VectorXi counts(4); // counts per class
+counts << 5, 20, 10, 15;
+bar.setData(classLimits, counts, 2); // 2 digits on the axis labels
+const QImage barImage = render(bar);
+// Plot height 300 - 40 - 100 = 160 px and the tallest bar (20 counts) fills it, so heights follow the counts
+QList<int> heights;
+for (int b = 0; b < 4; ++b) {
+    int h = 0;
+    for (int py = 0; py < barImage.height(); ++py) {
+        h += close(barImage.pixel(60 + 80 * b + 40, py), steelBlue, 2);
+````
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

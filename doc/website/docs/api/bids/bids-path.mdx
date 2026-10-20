@@ -550,6 +550,20 @@ Validates entity values (no forbidden characters: -, _, /).
 - Build target: `ex_bids` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_bids](../../examples/bids/ex_bids.mdx)
+
+BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
+
+````cpp title="src/examples/ex_bids/main.cpp, line 93"
+BIDSPath ieeg(root, "01", "01", "rest", "ieeg", "ieeg", ".vhdr"); // root, sub, ses, task, datatype, suffix, ext
+const QString vhdr = ieeg.filePath();                             // <root>/sub-01/ses-01/ieeg/sub-01_ses-01_task-rest_ieeg.vhdr
+const QString channelsTsv = ieeg.channelsTsvPath().filePath();    // sibling sidecars share the entities
+ok &= expect(ieeg.exists() && ieeg.basename() == "sub-01_ses-01_task-rest_ieeg.vhdr" && channelsTsv.endsWith("sub-01_ses-01_task-rest_channels.tsv"),
+             "BIDSPath builds the entity filename and its channels.tsv sidecar");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

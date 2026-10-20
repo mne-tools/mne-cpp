@@ -72,6 +72,18 @@ Compare two sphere layers by radius for sorting.
 - Build target: `ex_fwd_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx)
+
+Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
+
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 151"
+// mne.make_sphere_model(r0=(0, 0, 0.04), head_radius=0.09): layers at 81, 82.8, 87.3, 90 mm; |V| = 452.86725
+ok &= expect(sphere->nlayer() == 4 && near(sphere->layers[2].rel_rad, 0.97, 1e-6) && near(sphere->layers[2].sigma, 0.004, 1e-6) && near(V.norm(), 452.86725, 1e-3) && near(V[0], 12.079552, 1e-2),
+             "FwdEegSphereModel/FwdEegSphereModelSet/FwdEegSphereLayer: 4-layer sphere potentials match mne");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

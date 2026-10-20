@@ -197,6 +197,44 @@ Read dipoles from the dip format compatible with mrilab.
 - Build target: `ex_inv_dipole_fit` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx)
+
+Inverse library: equivalent current dipole fitting in a sphere model.
+
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 137"
+settings.dipname = tmp.filePath("fit.dat"); // MNE-C .dat dipole file
+settings.checkIntegrity();
+InvDipoleFit fit(&settings);
+InvEcdSet dipoles = fit.calculateFit();
+const bool saved = dipoles.save_dipoles_dip(tmp.filePath("fit.dip")); // readable by mne.read_dipole
+const InvEcdSet reread = InvEcdSet::read_dipoles_dip(tmp.filePath("fit.dip"));
+const Vector3d posMm = dipoles.size() > 0 ? Vector3d(1e3 * dipoles[0].rd.cast<double>()) : Vector3d::Zero();
+ok &= expect(saved && dipoles.size() == 1 && dipoles[0].valid && (posMm - mnePosMm).norm() < 1.0 && std::abs(100.0 * dipoles[0].good - 99.99996959113513) < 0.01 && dipoles[0].nfree == 297 && reread.size() == 1 && (reread[0].rd - dipoles[0].rd).norm() < 1e-4f,
+             "InvDipoleFitSettings/InvDipoleFit/InvEcdSet: the pipeline fit matches mne.fit_dipole and round-trips through .dip");
+````
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 255"
+InvEcdSet dipoles;
+InvEcd strong;
+strong.rd = Vector3f(0.0f, 0.0f, 0.05f);
+strong.Q = Vector3f(0.0f, 0.0f, 20e-9f);
+InvEcd weak;
+weak.rd = Vector3f(0.03f, 0.0f, 0.05f);
+weak.Q = Vector3f(10e-9f, 0.0f, 0.0f);
+dipoles.addEcd(strong);
+dipoles.addEcd(weak);
+DipoleObject dipoleGlyphs;
+dipoleGlyphs.load(dipoles); // one cone per dipole, scaled by moment
+float dipoleDistance = 0.0f;
+const int pickedDipole = dipoleGlyphs.intersect(QVector3D(0.03f, 0.0f, 0.2f), QVector3D(0.0f, 0.0f, -1.0f), dipoleDistance);
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

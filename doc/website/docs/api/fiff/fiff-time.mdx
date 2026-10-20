@@ -78,6 +78,23 @@ Size of the old struct (fiffTimeRec) 2*int = 2*4 = 8.
 - Build target: `ex_fiff_structure` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
+
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+
+````cpp title="src/examples/ex_fiff_structure/main.cpp, line 121"
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+ok &= stream->open();
+const QList<FiffDirEntry::SPtr>& directory = stream->dir(); // every tag (kind, type, size, position) + a kind -1 end
+const FiffTime created = stream->id().time;                 // seconds and microseconds since 1970
+stream->close();
+// mne fiff_open: 640 entries; file_id secs 1411146352, usecs 0
+ok &= expect(directory.size() == 641 && directory.last()->kind == -1 && created.secs == 1411146352 && created.usecs == 0 && FiffTime::storageSize() == 8 && FiffDirEntry::storageSize() == 16,
+             "FiffDirEntry/FiffTime: the 640 tags of mne fiff_open plus the end entry; the file id was written at 1411146352 s");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

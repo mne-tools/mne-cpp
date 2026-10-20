@@ -137,6 +137,27 @@ Load a model from disk.
 - Full source: [`src/examples/ex_ml/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ml/main.cpp)
 - Build target: `ex_ml` (runs under CTest)
 
+## Used in examples
+
+### [ex_ml](../../examples/ml/ex_ml.mdx)
+
+ML library: tensors, ONNX inference through the MlModel interface, and the Python trainer.
+
+````cpp title="src/examples/ex_ml/main.cpp, line 85"
+#ifdef MNE_USE_ONNXRUNTIME
+    std::unique_ptr<MlModel> model = std::make_unique<MlOnnxModel>();
+    const bool loaded = model->load(MNE_EX_ML_DATA_DIR "/affine_softmax.onnx");
+    const MlTensor probabilities = model->predict(batch); // shape {2, 2}, one row per sample
+    const QString classes = static_cast<MlOnnxModel&>(*model).metadata("classes");
+    // NumPy: softmax(x @ W + b) = [[0.6681878, 0.33181223], [0.00235232, 0.9976477]]
+    Matrix2f expected;
+    expected << 0.6681878f, 0.33181223f, 0.00235232f, 0.9976477f;
+    ok &= expect(loaded && model->modelType() == "onnx" && probabilities.shape() == std::vector<int64_t>({2, 2}) && (probabilities.toMatrixXf() - expected).cwiseAbs().maxCoeff() < 1e-6f && classes == "rest,task",
+                 QString("MlOnnxModel: p(task) = %1, %2 match NumPy; classes '%3'").arg(probabilities.matrix()(0, 1)).arg(probabilities.matrix()(1, 1)).arg(classes));
+#else
+    qInfo().noquote() << "  skip  MlOnnxModel (built without ONNX Runtime)";
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

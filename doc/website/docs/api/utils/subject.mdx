@@ -128,6 +128,28 @@ Returns attached observers.
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 79"
+// A subject notifies every attached observer; observers pull the state they need
+class Counter : public Subject
+{
+public:
+    void increment()
+    {
+        ++m_value;
+        notify();
+    }
+    int value() const
+    {
+        return m_value;
+    }
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

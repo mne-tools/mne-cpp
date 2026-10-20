@@ -117,6 +117,34 @@ Returns whether this epoch should be excluded from averaging.
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx)
+
+Example of the computation of a clustered inverse mne raw.
+
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 341"
+MNEEpochData* epoch = NULL;
+````
+
+### [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx)
+
+Example of the computation of a raw clustered inverse Powell RAP-MUSIC.
+
+````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 350"
+MNEEpochData* epoch = NULL;
+````
+
+### [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx)
+
+Example of the computation of a raw clustered inverse rap music.
+
+````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 347"
+MNEEpochData* epoch = NULL;
+````
+
+Also used in [ex_dsp_preprocessing](../../examples/dsp/ex_dsp_preprocessing.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -383,6 +383,26 @@ Compute the linear index into a symmetric lower-triangular packed storage array 
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 293"
+auto noise = MNECovMatrix::read(data + "/MEG/sample/sample_audvis-cov.fif", FIFFV_MNE_NOISE_COV);
+const int ncovFile = noise->ncov;
+auto noiseMeg = noise->pick_chs_omit(megNames, nMeg, false, ave.info.chs);
+aveProj->apply_cov(noiseMeg.get());
+noiseMeg->classify_channels(ave.info.chs, nMeg);
+noiseMeg->decompose_eigen(); // the 3 projected directions become zero eigenvalues
+VectorXf whitened(nMeg);
+noiseMeg->whiten_vector(x, whitened, nMeg);
+// mne.read_cov: 366 channels, nfree 15972; x^T pinv(P C P) x with P the 3 SSP vectors: 1462.05
+ok &= expect(ncovFile == 366 && noise->nfree == 15972 && !noise->is_diag() && noiseMeg->nzero == 3 && near(whitened.cast<double>().squaredNorm(), 1462.0502702959539, 1e-4),
+             "MNECovMatrix: projected noise covariance whitens like mne's pseudo-inverse");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

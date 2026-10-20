@@ -123,6 +123,21 @@ Overload without report function (no reporting).
 - Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
 - Build target: `ex_math` (runs under CTest)
 
+## Used in examples
+
+### [ex_math](../../examples/math/ex_math.mdx)
+
+Math library on inputs with known answers.
+
+````cpp title="src/examples/ex_math/main.cpp, line 154"
+int evaluations = 0;
+const bool converged = SimplexAlgorithm::simplex_minimize<double>(simplex, values, 1e-12, 0.0, rosenbrock, 5000, evaluations);
+Index best = 0;
+values.minCoeff(&best); // vertices are not sorted on return
+ok &= expect(converged && (simplex.row(best) - RowVector2d(1.0, 1.0)).norm() < 1e-3,
+             QString("Rosenbrock minimum (1, 1) after %1 evaluations").arg(evaluations));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

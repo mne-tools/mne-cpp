@@ -203,6 +203,21 @@ Returns a negated Viridis RGB to a given double value [-1,1].
 - Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
 - Build target: `ex_disp_plots` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx)
+
+Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 107"
+const QRgb low = ColorMap::valueToColor(0.0, "Viridis"); // v in [0, 1]
+const QRgb mid = ColorMap::valueToColor(0.5, "Viridis");
+const QRgb jet = ColorMap::valueToJet(0.25);
+// matplotlib.colormaps["viridis"](0, 0.5, 1) and ["jet"](0.25, 0.5), ["cool"](0.5); bone is MNE-C's piecewise ramp, not matplotlib's
+ok &= expect(close(low, qRgb(68, 1, 84), 1) && close(mid, qRgb(33, 145, 140), 1) && close(ColorMap::valueToColor(1.0, "Viridis"), qRgb(253, 231, 37), 1) && close(jet, qRgb(0, 128, 255), 1) && close(ColorMap::valueToJet(0.5), qRgb(125, 255, 122), 5) && close(ColorMap::valueToCool(0.5), qRgb(128, 127, 255), 1),
+             "ColorMap viridis, jet and cool match matplotlib to 1-5 levels");
+````
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

@@ -180,6 +180,25 @@ Build adjacency list from surface triangle mesh.
 - Build target: `ex_fs` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fs](../../examples/fs/ex_fs.mdx)
+
+FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
+
+````cpp title="src/examples/ex_fs/main.cpp, line 161"
+const FsLabel grown = FsLabelUtils::growLabel(v1, white, 1); // add the one-ring neighbours
+const QList<FsLabel> parts = FsLabelUtils::splitLabel(v1, white);
+// Closed form on the mesh graph (scipy.sparse.csgraph): one ring adds 447 vertices; components of 5635, 2 and 1
+QList<int> sizes;
+for (const FsLabel& part : parts) {
+    sizes.append(part.vertices.size());
+}
+std::sort(sizes.begin(), sizes.end(), std::greater<int>());
+ok &= expect(grown.vertices.size() - v1.vertices.size() == 447 && sizes == QList<int>({5635, 2, 1}),
+             QString("growLabel adds %1 vertices (447); splitLabel parts %2").arg(grown.vertices.size() - v1.vertices.size()).arg(sizes.size()));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

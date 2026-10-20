@@ -96,6 +96,24 @@ False Discovery Rate correction as mne.stats.fdr_correction.
 - Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
 - Build target: `ex_sts_statistics` (runs under CTest)
 
+## Used in examples
+
+### [ex_sts_statistics](../../examples/sts/ex_sts_statistics.mdx)
+
+Statistics library on small literal data sets with known answers.
+
+````cpp title="src/examples/ex_sts_statistics/main.cpp, line 118"
+MatrixXd pValues(1, 8);
+pValues << 0.001, 0.008, 0.039, 0.041, 0.042, 0.06, 0.074, 0.205;
+const MatrixXd pBonferroni = StatsMcCorrection::bonferroni(pValues);
+const MatrixXd pHolm = StatsMcCorrection::holmBonferroni(pValues);
+const MatrixXd pFdr = StatsMcCorrection::fdr(pValues); // Benjamini-Hochberg adjusted p-values
+// mne.stats.bonferroni_correction / fdr_correction; Holm step-down closed form
+ok &= expectRow(pBonferroni, {0.008, 0.064, 0.312, 0.328, 0.336, 0.48, 0.592, 1.0}, 1e-12, "Bonferroni = mne");
+ok &= expectRow(pHolm, {0.008, 0.056, 0.234, 0.234, 0.234, 0.234, 0.234, 0.234}, 1e-12, "Holm = closed form");
+ok &= expectRow(pFdr, {0.008, 0.032, 0.0672, 0.0672, 0.0672, 0.08, 0.08457142857142856, 0.205}, 1e-12, "FDR = mne");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

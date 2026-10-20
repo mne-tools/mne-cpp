@@ -36,6 +36,26 @@ filterChpi(chpi, info, sFreq, coilFreqs, chpiParams);
 - Build target: `ex_dsp_maxwell` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_maxwell](../../examples/dsp/ex_dsp_maxwell.mdx)
+
+DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
+
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 193"
+const QVector<double> coilFreqs{83.0};
+FilterChpiParams chpiParams; // +-2 Hz order-4 notches on the MEG channels only
+filterChpi(chpi, info, sFreq, coilFreqs, chpiParams);
+double at10 = 0.0;
+double at83 = 0.0;
+for (int t = 1000; t < 3000; ++t) {
+    at10 += chpi(meg[0], t) * std::sin(2.0 * kPi * 10.0 * t / sFreq);
+    at83 += chpi(meg[0], t) * std::sin(2.0 * kPi * 83.0 * t / sFreq);
+}
+ok &= expect(std::fabs(at10 / 1000.0 - 1.0) < 0.05 && std::fabs(at83 / 1000.0) < 0.05,
+             QString("filterChpi keeps 10 Hz (%1) and removes the 83 Hz coil (%2)").arg(at10 / 1000.0, 0, 'f', 3).arg(at83 / 1000.0, 0, 'f', 3));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -171,6 +171,23 @@ Enhances a statistic map by integrating cluster extent and height over a range o
 - Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
 - Build target: `ex_sts_statistics` (runs under CTest)
 
+## Used in examples
+
+### [ex_sts_statistics](../../examples/sts/ex_sts_statistics.mdx)
+
+Statistics library on small literal data sets with known answers.
+
+````cpp title="src/examples/ex_sts_statistics/main.cpp, line 176"
+const StatsClusterResult clusters = StatsCluster::permutationTest(condA, condB, chain, 500);
+// Cluster ids are negative where A < B; |id| - 1 indexes vecClusterStats and vecClusterPvals
+const int effectCluster = clusters.matClusterIds(3, 0);
+const bool clusterOk = effectCluster < 0 && clusters.matClusterIds(2, 0) == effectCluster && clusters.matClusterIds(4, 0) == effectCluster && clusters.matClusterIds(7, 0) != effectCluster;
+const double clusterP = clusterOk ? clusters.vecClusterPvals[-effectCluster - 1] : -1.0;
+// The observed statistic counts as one permutation, so p >= 1 / (500 + 1) as in MNE-Python
+ok &= expect(clusterOk && clusterP >= 1.0 / 501.0 && clusterP < 0.05,
+             QString("channels 2-4 form one negative cluster, 1/501 <= p %1 < 0.05").arg(clusterP));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

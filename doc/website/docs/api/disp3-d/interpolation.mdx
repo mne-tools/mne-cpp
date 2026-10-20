@@ -162,6 +162,34 @@ cubic Cubic hyperbola interpolation function.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 126"
+QSharedPointer<SparseMatrix<float>> weights = Interpolation::createInterpolationMat(projected, distances, Interpolation::linear); // inverse-distance weights
+const VectorXf atVertices = Interpolation::interpolateSignal(*weights, Vector2f(1.0f, 4.0f));                                     // one value per sensor
+// vertex 5: weights 1/2 and 1/4, normalised to 2/3 and 1/3 -> 1 * 2/3 + 4 * 1/3 = 2; vertex 3 is equidistant -> 2.5
+ok &= expect(std::fabs(atVertices(0) - 1.0f) < 1e-6f && std::fabs(atVertices(15) - 4.0f) < 1e-6f && std::fabs(atVertices(5) - 2.0f) < 1e-6f && std::fabs(atVertices(3) - 2.5f) < 1e-6f,
+             QString("Interpolation: sensors kept, vertex 5 = %1, vertex 3 = %2").arg(atVertices(5)).arg(atVertices(3)));
+````
+
+### [ex_interpolation](../../examples/inv/ex_interpolation.mdx)
+
+Example of using the interpolation library and geometryInfo library.
+
+````cpp title="src/examples/ex_interpolation/main.cpp, line 143"
+//weight matrix
+qint64 startTimeWMat = QDateTime::currentMSecsSinceEpoch();
+QSharedPointer<SparseMatrix<float>> interpolationMatrix = Interpolation::createInterpolationMat(mappedSubSet,
+                                                                                                distanceMatrix,
+                                                                                                Interpolation::linear,
+                                                                                                FLOAT_INFINITY);
+std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat << " ms " << std::endl;
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

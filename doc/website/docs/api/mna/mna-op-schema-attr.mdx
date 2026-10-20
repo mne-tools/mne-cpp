@@ -34,6 +34,21 @@ const MnaOpSchemaAttr affineGain = registry.schema("ex_affine").attributes.first
 - Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
 - Build target: `ex_mna` (runs under CTest)
 
+## Used in examples
+
+### [ex_mna](../../examples/mna/ex_mna.mdx)
+
+MNA library: register operations, build and run a graph, bind parameters and save a project.
+
+````cpp title="src/examples/ex_mna/main.cpp, line 141"
+unset.attributes.clear(); // "value" is required
+const bool unsetValid = registry.schema("ex_constant").validate(unset);
+const MnaOpSchemaPort affineIn = registry.schema("ex_affine").inputPorts.first();   // "in", Matrix, required
+const MnaOpSchemaAttr affineGain = registry.schema("ex_affine").attributes.first(); // "gain", double, default 1
+ok &= expect(nodeValid && problems.isEmpty() && !unsetValid && affineIn.name == "in" && affineIn.required && affineGain.name == "gain" && affineGain.defaultValue.toDouble() == 1.0 && graph.validate() && graph.topologicalSort() == QStringList({"source", "scale", "shift"}),
+             "MnaOpSchema accepts the wired node and rejects a missing required attribute; graph order source -> scale -> shift");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

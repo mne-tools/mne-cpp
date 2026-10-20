@@ -31,6 +31,20 @@ const MatrixXd cleaned = ICA::excludeComponents(mixed, ica, {0}); // drop compon
 - Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
 - Build target: `ex_dsp_preprocessing` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_preprocessing](../../examples/dsp/ex_dsp_preprocessing.mdx)
+
+Preprocessing tools of the dsp library on synthetic data with a known ground truth.
+
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 122"
+const IcaResult ica = ICA::run(mixed, 3);                         // FastICA, logcosh, fixed seed
+const MatrixXd cleaned = ICA::excludeComponents(mixed, ica, {0}); // drop component 0, back-project the rest
+ok &= expect(worstRecovery(ica.matSources, sources) > 0.99, QString("FastICA recovers all sources (worst |r| %1)").arg(worstRecovery(ica.matSources, sources)));
+ok &= expect((mixed - cleaned - ica.matMixing.col(0) * ica.matSources.row(0)).cwiseAbs().maxCoeff() < 1e-9,
+             "excluding a component removes exactly its back-projection");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

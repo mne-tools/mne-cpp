@@ -131,6 +131,27 @@ Refactored: mne_get_values_from_data_ch (mne_get_values.c)
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 385"
+// MNE-C measurement container: data set 1 of the evoked file, MEG and EEG channels, time-major
+std::unique_ptr<MNEMeasData> meas(MNEMeasData::mne_read_meas_data(aveFile.fileName(), 1, nullptr, nullptr, {}, 0));
+const MNEMeasDataSet& left = *meas->current;
+const float meg0113 = left.data(180, 0); // t = 99.9 ms
+meas->adjust_baselines(-0.2f, 0.0f);
+VectorXf at100ms(meas->nchan);
+left.getValuesAtTime(0.1f, 0.0f, meas->nchan, false, at100ms.data()); // linear interpolation between samples
+// mne.read_evokeds(condition=0, baseline=None, proj=False): 366 MEG/EEG channels, 421 samples from -199.8 ms, nave 55;
+// MEG 0113 at sample 180 -4.74022e-12. MNE-C's baseline window stops before the sample at 0 s (120 samples, not mne's 121):
+// EEG 001 baseline -9.38499e-06, at 100 ms (interpolated) -1.45063e-06
+ok &= expect(meas->nchan == 366 && meas->nbad == 2 && left.np == 421 && left.nave == 55 && left.comment == "Left Auditory" && near(left.tmin, -0.19979521315838786, 1e-6) && near(meg0113, -4.740224134628893e-12, 1e-5) && near(at100ms(306), -1.4506279631761285e-06, 1e-4) && near(left.baselines(306), -9.384992481327106e-06, 1e-5),
+             "MNEMeasData/MNEMeasDataSet: evoked set, baseline and interpolated values match mne");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

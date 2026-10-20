@@ -100,6 +100,25 @@ Serialize current registry schemas to a JSON manifest file.
 - Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
 - Build target: `ex_mna` (runs under CTest)
 
+## Used in examples
+
+### [ex_mna](../../examples/mna/ex_mna.mdx)
+
+MNA library: register operations, build and run a graph, bind parameters and save a project.
+
+````cpp title="src/examples/ex_mna/main.cpp, line 102"
+MnaOpRegistry& registry = MnaOpRegistry::instance();
+const int nLoaded = MnaRegistryLoader::loadFile(registryFile.fileName(), registry); // schemas only
+registry.registerOpFunc("ex_constant", [](const QVariantMap&, const QVariantMap& attrs) -> QVariantMap {
+    return {{"out", attrs.value("value").toDouble()}};
+});
+registry.registerOpFunc("ex_affine", [](const QVariantMap& inputs, const QVariantMap& attrs) -> QVariantMap {
+    return {{"out", attrs.value("gain", 1.0).toDouble() * inputs.value("in").toDouble() + attrs.value("offset", 0.0).toDouble()}};
+});
+ok &= expect(nLoaded == 2 && registry.hasOp("ex_affine") && registry.schema("ex_affine").inputPorts.size() == 1 && registry.missingOps({"ex_constant", "ex_affine", "ex_unknown"}) == QStringList({"ex_unknown"}),
+             "MnaRegistryLoader loads 2 ops; missingOps reports the unknown one");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

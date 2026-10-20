@@ -36,6 +36,24 @@ const RowVectorXd lowPassed = IirFilter::applyZeroPhase(signal, sos); // forward
 - Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
 - Build target: `ex_dsp_spectral` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx)
+
+Spectral and filtering tools of the dsp library on signals with known content.
+
+````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 97"
+double gainAt(const QVector<IirBiquad>& sos, double freq)
+{
+    const std::complex<double> z = std::polar(1.0, -2.0 * kPi * freq / kSFreq); // z^-1
+    std::complex<double> h(1.0, 0.0);
+    for (const IirBiquad& s : sos) {
+        h *= (s.b0 + s.b1 * z + s.b2 * z * z) / (1.0 + s.a1 * z + s.a2 * z * z);
+    }
+    return std::abs(h);
+}
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -94,6 +94,19 @@ Check whether any consumers are currently connected.
 - Full source: [`src/examples/ex_lsl/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_lsl/main.cpp)
 - Build target: `ex_lsl` (runs under CTest)
 
+## Used in examples
+
+### [ex_lsl](../../examples/lsl/ex_lsl.mdx)
+
+LSL library: publish a stream, discover it and receive its samples over loopback.
+
+````cpp title="src/examples/ex_lsl/main.cpp, line 73"
+stream_info info("ex_lsl_eeg", "EEG", 3, 250.0, ChannelFormat::Float32, "ex_lsl"); // name, type, channels, Hz
+stream_outlet outlet(info);                                                        // starts serving immediately
+ok &= expect(outlet.info().name() == "ex_lsl_eeg" && outlet.info().channel_count() == 3 && outlet.info().nominal_srate() == 250.0 && outlet.info().data_port() > 0 && !outlet.info().uid().empty(),
+             QString("stream_info: 3 channels at 250 Hz, served on port %1").arg(outlet.info().data_port()));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

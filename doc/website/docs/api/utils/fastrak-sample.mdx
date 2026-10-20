@@ -33,6 +33,23 @@ const bool pending = parser.nextSample(sample);
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 254"
+FastrakParser parser;
+parser.setUnits(FastrakParser::Units::Centimetres);
+parser.append("01   12.50  -3.25   8.00\r\n02  1.0"); // the second record is still incomplete
+FastrakSample sample;
+const bool complete = parser.nextSample(sample);
+const bool pending = parser.nextSample(sample);
+ok &= expect(complete && !pending && sample.station == 1 && std::fabs(sample.position.x() - 0.125f) < 1e-6f && std::fabs(sample.position.y() + 0.0325f) < 1e-6f,
+             "FastrakParser converts centimetres to metres and waits for the partial record");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

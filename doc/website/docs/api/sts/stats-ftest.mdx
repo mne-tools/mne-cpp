@@ -68,6 +68,20 @@ Compute the CDF of the F-distribution using the regularized incomplete beta func
 - Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
 - Build target: `ex_sts_statistics` (runs under CTest)
 
+## Used in examples
+
+### [ex_sts_statistics](../../examples/sts/ex_sts_statistics.mdx)
+
+Statistics library on small literal data sets with known answers.
+
+````cpp title="src/examples/ex_sts_statistics/main.cpp, line 110"
+const StatsFtestResult anova = StatsFtest::oneWay({a, b, c}); // one-way ANOVA per column
+// scipy.stats.f_oneway
+ok &= expectRow(anova.matFstat, {31.736745886654532, 0.5648535564853556, 0.6174200661521498}, 1e-10, "F = scipy");
+ok &= expectRow(anova.matPval, {4.076262200363868e-06, 0.5800772485078302, 0.5524898704594713}, 1e-10, "ANOVA p = scipy");
+ok &= expect(anova.dfBetween == 2 && anova.dfWithin == 15, "df 2 and 15");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

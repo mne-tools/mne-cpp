@@ -297,6 +297,64 @@ For each row (channel), the mean of the samples in [bminSamp, bminSamp+nBase) is
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 155"
+RtAveragingWorker averager(10, 20, 80, 0, 0, 2, info); // up to 10 epochs, 20 pre / 80 post samples, trigger row 2
+FiffEvokedSet evokedSet;
+QObject::connect(&averager, &RtAveragingWorker::resultReady,
+                 [&](const FiffEvokedSet& set, const QStringList&) { evokedSet = set; });
+for (const MatrixXd& block : blocks) {
+    averager.doWork(block); // runs synchronously; RtAveraging moves this worker to a thread
+}
+// Average of k = 1..4 is 2.5 after the trigger and 0 before it; MEG0121 stays at -2
+bool avgOk = evokedSet.evoked.size() == 1;
+if (avgOk) {
+    const FiffEvoked& evoked = evokedSet.evoked.first();
+    avgOk = evoked.nave == nBlocks && evoked.data.cols() == 100 && evoked.comment == "1" && std::fabs(evoked.data(0, 30) - 2.5) < 1e-12 && std::fabs(evoked.data(0, 10)) < 1e-12 && std::fabs(evoked.data(1, 60) + 2.0) < 1e-12 && std::fabs(evoked.times(20)) < 1e-6;
+}
+````
+
+### [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx)
+
+Inverse library: equivalent current dipole fitting in a sphere model.
+
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 115"
+// Hand the field to the pipeline as an evoked file with two samples.
+QFile aveFile(sampleAve);
+FiffEvokedSet evokedSet(aveFile);
+FiffEvoked evoked = evokedSet.evoked[0].pick_channels(fitData->ch_names.mid(0, fitData->nmeg));
+evoked.info.bads.clear();
+evoked.data = field.cast<double>().replicate(1, 2);
+evoked.first = 0;
+evoked.last = 1;
+evoked.times = RowVectorXf::LinSpaced(2, 0.0f, 1.0f / static_cast<float>(evoked.info.sfreq));
+evoked.nave = 1;
+FiffEvokedSet synthetic;
+synthetic.info = evoked.info;
+synthetic.evoked.append(evoked);
+ok &= expect(synthetic.save(tmp.filePath("synthetic-ave.fif")), "FiffEvokedSet writes the synthetic field");
+````
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 197"
+QFile aveFile(dir + "/sample_audvis-ave.fif");
+FiffEvokedSet evokedSet(aveFile); // all conditions of an -ave.fif file
+const FiffEvoked& leftAuditory = evokedSet.evoked[0];
+// mne.read_evokeds: 4 conditions, "Left Auditory" nave 55, 376 x 421 samples starting at -0.1998 s
+ok &= expect(evokedSet.evoked.size() == 4 && leftAuditory.comment == "Left Auditory" && leftAuditory.nave == 55 && leftAuditory.data.cols() == 421 && std::fabs(leftAuditory.times(0) + 0.19979521f) < 1e-6f,
+             "FiffEvokedSet/FiffEvoked: 4 conditions; Left Auditory averages 55 epochs over 421 samples");
+````
+
+Also used in [ex_cancel_noise](../../examples/mne/ex_cancel_noise.mdx), [ex_evoked_grad_amp](../../examples/mne/ex_evoked_grad_amp.mdx), [ex_find_evoked](../../examples/mne/ex_find_evoked.mdx), [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

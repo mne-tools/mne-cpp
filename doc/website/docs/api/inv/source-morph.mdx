@@ -103,6 +103,20 @@ Get the number of target vertices.
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 208"
+SourceMorph morph;
+morph.compute(stc.vertices, VectorXi::LinSpaced(35, 0, 34), pairAverage);
+const InvSourceEstimate morphed = morph.apply(stc);
+ok &= expect(morph.isComputed() && morphed.data.rows() == 35 && near(morphed.data(3, 200), 0.5 * (stc.data(6, 200) + stc.data(7, 200)), 1e-12),
+             "SourceMorph: the morph matrix maps every time sample");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -120,6 +120,28 @@ Apply zero-phase filtering to every row of a matrix (each row = one channel).
 - Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
 - Build target: `ex_dsp_spectral` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx)
+
+Spectral and filtering tools of the dsp library on signals with known content.
+
+````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 192"
+const QVector<IirBiquad> sos = IirFilter::designButterworth(4, IirFilter::LowPass, 30.0, 0.0, kSFreq);
+const RowVectorXd lowPassed = IirFilter::applyZeroPhase(signal, sos); // forward-backward, no phase shift
+// scipy.signal.butter(4, 30, 'low', fs=200, output='sos') and sosfreqz: |H| = 0.99996, 0.70711, 0.01878
+ok &= expect(sos.size() == 2 && std::fabs(gainAt(sos, 10.0) - 0.9999564172449813) < 1e-9 && std::fabs(gainAt(sos, 30.0) - 0.7071067811865477) < 1e-9 && std::fabs(gainAt(sos, 60.0) - 0.018777212012474308) < 1e-9,
+             "Butterworth gain at 10/30/60 Hz = scipy");
+RowVectorXd only20(n);
+for (int t = 0; t < n; ++t) {
+    only20(t) = std::sin(2.0 * kPi * 20.0 * t / kSFreq);
+}
+// scipy.signal.sosfiltfilt deviates from the 20 Hz sine by 0.02593 in the interior (|H(20 Hz)|^2 < 1)
+const double lowPassErr = (lowPassed - only20).segment(50, n - 100).cwiseAbs().maxCoeff();
+ok &= expect(std::fabs(lowPassErr - 0.02592545936305224) < 1e-3,
+             QString("zero-phase low-pass: 55 Hz removed, 20 Hz in phase (deviation %1, scipy 0.02593)").arg(lowPassErr));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

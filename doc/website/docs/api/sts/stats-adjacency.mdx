@@ -131,6 +131,25 @@ Combine the adjacency of several dimensions, as mne.stats.combine_adjacency: poi
 - Full source: [`src/examples/ex_sts_statistics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics/main.cpp)
 - Build target: `ex_sts_statistics` (runs under CTest)
 
+## Used in examples
+
+### [ex_sts_statistics](../../examples/sts/ex_sts_statistics.mdx)
+
+Statistics library on small literal data sets with known answers.
+
+````cpp title="src/examples/ex_sts_statistics/main.cpp, line 147"
+// Two triangles sharing the edge 1-2 form a 4-vertex mesh
+MatrixX3i tris(2, 3);
+tris << 0, 1, 2, 1, 2, 3;
+const SparseMatrix<int> spatial = StatsAdjacency::fromSourceSpace(tris, 4);
+const SparseMatrix<int> spatioTemporal = StatsAdjacency::fromSourceSpaceTemporal(tris, 4, 5); // index = vertex * 5 + time
+const MatrixXi dense = MatrixXi(spatial);
+ok &= expect(dense(0, 1) == 1 && dense(1, 3) == 1 && dense(0, 3) == 0 && dense == dense.transpose(),
+             "mesh adjacency: 0-1 and 1-3 connected, 0-3 not, symmetric");
+ok &= expect(spatioTemporal.rows() == 20 && spatioTemporal.coeff(0 * 5 + 2, 0 * 5 + 3) == 1 && spatioTemporal.coeff(0 * 5 + 2, 1 * 5 + 2) == 1,
+             "spatio-temporal adjacency links (v0,t2) to (v0,t3) and (v1,t2)");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

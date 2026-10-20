@@ -280,6 +280,35 @@ Get the SI symbol of a FIFF unit, e.g.
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 206"
+QFile structureFile(dir + "/sample_audvis-ave.fif");
+FiffStream::SPtr stream(new FiffStream(&structureFile));
+const bool opened = stream->open();
+const QList<FiffDirNode::SPtr> measNodes = stream->dirtree()->dir_tree_find(FIFFB_MEAS_INFO);
+std::unique_ptr<FiffTag> tag;
+const bool hasNchan = measNodes.first()->find_tag(stream, FIFF_NCHAN, tag); // raw tag access
+const int nchanTag = *tag->toInt();
+const FiffId fileId = stream->id();
+stream->close();
+ok &= expect(opened && measNodes.size() == 1 && hasNchan && nchanTag == 376 && !fileId.isEmpty() && fileId.version > 0,
+             "FiffStream/FiffDirNode/FiffTag/FiffId: the FIFF_NCHAN tag of the measurement block reads 376");
+````
+
+### [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx)
+
+Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
+
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 133"
+FIFFLIB::FiffInfo FifInfo;
+FIFFLIB::FiffDirNode::SPtr DirNode;
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

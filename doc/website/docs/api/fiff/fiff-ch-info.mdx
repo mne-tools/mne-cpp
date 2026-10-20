@@ -121,6 +121,64 @@ Formerly mne_check_chinfo ([MNE](/docs/api/mne/mne-class) C).
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx)
+
+Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
+
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 100"
+QFile rawFile(data + "/MEG/sample/sample_audvis_trunc_raw.fif");
+const FiffRawData raw(rawFile);
+QList<FiffChInfo> meg;
+QList<FiffChInfo> goodMeg;
+QList<FiffChInfo> eeg;
+for (const FiffChInfo& ch : raw.info.chs) {
+    if (ch.kind == FIFFV_MEG_CH) {
+        meg << ch;
+        if (!raw.info.bads.contains(ch.ch_name)) {
+            goodMeg << ch;
+        }
+    } else if (ch.kind == FIFFV_EEG_CH) {
+        eeg << ch;
+    }
+````
+
+### [ex_dsp_maxwell](../../examples/dsp/ex_dsp_maxwell.mdx)
+
+DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
+
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 76"
+        const FiffChInfo& ch = info.chs[meg[k]];
+        const Vector3d r = ch.chpos.r0.cast<double>() - pos;
+        const double d = r.norm();
+        const Vector3d dipole = (3.0 * r * r.dot(moment) / (d * d) - moment) / (d * d * d);
+        b(k) = ch.chpos.ez.cast<double>().normalized().dot(dipole + uniform);
+    }
+    return b;
+}
+````
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 107"
+QFile rawFile(dir + "/sample_audvis_trunc_raw.fif");
+FiffRawData raw(rawFile);        // reads the measurement info, raw data is read on demand
+const FiffInfo& info = raw.info; // channels, sampling rate, bads, projectors, digitizer, transforms
+const FiffChInfo& first = info.chs[0];
+const RowVectorXi megPicks = info.pick_types(true, false, false, QStringList(), info.bads); // good MEG channels
+// mne.io.read_raw_fif: 376 channels at 300.307 Hz, bads MEG 2443 + EEG 053, 4 projectors
+ok &= expect(info.nchan == 376 && near(info.sfreq, 300.3074951171875) && info.bads == QStringList({"MEG2443", "EEG053"}) && info.projs.size() == 4 && megPicks.size() == 305 && raw.first_samp == 12900 && raw.last_samp == 18906,
+             "FiffInfo: 376 channels at 300.307 Hz, 2 bads, 4 projectors, 305 good MEG channels");
+// ch 0: MEG 0113, planar gradiometer 3012 at (-0.1066, 0.0464, -0.0604) m, cal 3.16e-9
+ok &= expect(first.ch_name == "MEG0113" && first.kind == FIFFV_MEG_CH && first.chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 && (first.chpos.r0 - Vector3f(-0.1066f, 0.0464f, -0.0604f)).norm() < 1e-6f && near(first.cal, 3.1600000394149674e-09),
+             "FiffChInfo/FiffChPos: MEG0113 is a 3012 planar gradiometer at (-0.1066, 0.0464, -0.0604) m");
+````
+
+Also used in [ex_interpolation](../../examples/inv/ex_interpolation.mdx), [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx), [ex_dsp_artifacts](../../examples/dsp/ex_dsp_artifacts.mdx), [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

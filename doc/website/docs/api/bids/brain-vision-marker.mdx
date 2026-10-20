@@ -29,6 +29,20 @@ const QVector<BrainVisionMarker> markers = brainVision.getMarkers();            
 - Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
 - Build target: `ex_bids` (runs under CTest)
 
+## Used in examples
+
+### [ex_bids](../../examples/bids/ex_bids.mdx)
+
+BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
+
+````cpp title="src/examples/ex_bids/main.cpp, line 128"
+const QVector<BrainVisionChannelInfo> bvChannels = brainVision.getChannelInfos(); // name, resolution, unit per Ch<n>= line
+const QVector<BrainVisionMarker> markers = brainVision.getMarkers();              // Mk<n>= lines: type, description, 0-based position
+// mne.io.read_raw_brainvision annotations: 13 after the "New Segment", first "Stimulus/S253" at 0.486 s
+ok &= expect(bvChannels.size() == 32 && bvChannels[0].name == "FP1" && bvChannels[0].resolution == 0.5f && markers.size() == 14 && markers[1].type == "Stimulus" && markers[1].description == "S253" && markers[1].position == 486,
+             QString("BrainVision metadata: %1 channels, %2 markers, S253 at sample %3 (mne 0.486 s)").arg(bvChannels.size()).arg(markers.size()).arg(markers.value(1).position));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

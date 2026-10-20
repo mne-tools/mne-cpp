@@ -42,6 +42,19 @@ const QVector<EDFChannelInfo> edfChannels = static_cast<EDFReader*>(edf.get())->
 - Full source: [`src/examples/ex_bids/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids/main.cpp)
 - Build target: `ex_bids` (runs under CTest)
 
+## Used in examples
+
+### [ex_bids](../../examples/bids/ex_bids.mdx)
+
+BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
+
+````cpp title="src/examples/ex_bids/main.cpp, line 146"
+const QVector<EDFChannelInfo> edfChannels = static_cast<EDFReader*>(edf.get())->getMeasurementChannelInfos(); // header fields per signal
+// mne.io.read_raw_edf: physical_max of the first two signals 175946, -217624
+ok &= expect(edfChannels.size() == 25 && edfChannels[0].label == "EEG Fp1" && edfChannels[0].physicalMax == 175946.0f && edfChannels[1].physicalMax == -217624.0f && edfChannels[0].frequency == 128.0f,
+             QString("EDF header: %1 signals, %2 physical max %3").arg(edfChannels.size()).arg(edfChannels.value(0).label).arg(edfChannels.value(0).physicalMax));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

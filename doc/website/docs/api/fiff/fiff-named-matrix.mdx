@@ -112,6 +112,18 @@ Transpose a named matrix ([`FiffNamedMatrix`](/docs/api/fiff/fiff-named-matrix))
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 157"
+FiffProj::activate_projs(projs);
+ok &= expect(pca.desc == "PCA-v1" && !pca.active && pca.data->nrow == 1 && pca.data->ncol == 102 && projs[0].active,
+             "FiffProj/FiffNamedMatrix: PCA-v1 is 1 x 102 and inactive until activated");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

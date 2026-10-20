@@ -66,6 +66,24 @@ Calculates the correlation coefficient between the rows of the data matrix.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
+
+Connectivity metrics on synthetic data with a known coupling.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 233"
+Network correlation = Correlation::calculate(settings);
+const double cor01 = edgeWeight(correlation, 0, 1);
+Network crossCorrelation = CrossCorrelation::calculate(settings);
+const double xcor01 = edgeWeight(crossCorrelation, 0, 1);
+// Zero-lag Pearson r of the model: 0.5 cos(2 pi 10 Hz 12 ms) / sqrt(0.75 * 1.0) = 0.42
+ok &= expect(std::fabs(cor01 - 0.42) < 0.05 && std::fabs(edgeWeight(correlation, 0, 2)) < 0.1,
+             QString("COR 0-1 %1 within 0.05 of 0.42, |0-2| < 0.1").arg(cor01));
+ok &= expect(xcor01 > 2.0 * std::fabs(edgeWeight(crossCorrelation, 0, 2)),
+             QString("XCOR 0-1 %1 > 2 x |0-2|").arg(xcor01));
+````
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

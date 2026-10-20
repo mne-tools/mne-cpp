@@ -41,6 +41,24 @@ for (const IcaLabelResult& label : labels) {
 - Full source: [`src/examples/ex_decoding/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_decoding/main.cpp)
 - Build target: `ex_decoding` (runs under CTest)
 
+## Used in examples
+
+### [ex_decoding](../../examples/decoding/ex_decoding.mdx)
+
+Spatial decoders and ICA labelling on synthetic mixtures with a known ground truth.
+
+````cpp title="src/examples/ex_decoding/main.cpp, line 190"
+const QList<IcaLabelResult> labels = MlIcaLabel::classify(icaSources, eog, ecg, kSFreq);
+const QVector<int> reject = MlIcaLabel::findArtifactComponents(labels); // indices to drop before back-projection
+for (const IcaLabelResult& label : labels) {
+    qInfo().noquote() << "component" << label.componentIndex << IcaLabelResult::labelToString(label.label)
+                      << "confidence" << label.confidence;
+}
+ok &= expect(labels.size() == 4 && labels[0].label == IcaComponentLabel::Eog && labels[1].label == IcaComponentLabel::Ecg && labels[2].label == IcaComponentLabel::Muscle && labels[3].label == IcaComponentLabel::Brain,
+             "ICA labels: EOG, ECG, muscle, brain");
+ok &= expect(reject == QVector<int>({0, 1, 2}), "components 0-2 are rejected");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

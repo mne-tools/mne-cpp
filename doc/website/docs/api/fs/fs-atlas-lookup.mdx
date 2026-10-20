@@ -99,6 +99,24 @@ Check whether a parcellation volume has been loaded.
 - Build target: `ex_fs` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fs](../../examples/fs/ex_fs.mdx)
+
+FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
+
+````cpp title="src/examples/ex_fs/main.cpp, line 174"
+QTemporaryDir dir;
+const QString atlasPath = dir.filePath("atlas.mgh"); // normally aparc+aseg.mgz
+writeAtlas(atlasPath);
+FsAtlasLookup atlas;
+atlas.load(atlasPath);
+const QStringList regionsAt = atlas.labelsForPositions({Vector3f(-4.0f, -4.0f, -4.0f), Vector3f(2.0f, 0.0f, -2.0f), Vector3f(0.0f, 0.0f, 0.0f)});
+// nibabel: inv(affine) maps (-4,-4,-4) to voxel (0,0,0) and (2,0,-2) to voxel (3,2,1)
+ok &= expect(atlas.isLoaded() && regionsAt == QStringList({"Left-Hippocampus", "Right-Hippocampus", "Unknown"}),
+             QString("atlas lookup: %1").arg(regionsAt.join(", ")));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -100,6 +100,39 @@ The factors are kept in rowcals and colcals so that write_ctf_comp can undo them
 - Build target: `ex_fiff_structure` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
+
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+
+````cpp title="src/examples/ex_fiff_structure/main.cpp, line 140"
+// CTF third-order gradient compensation: info.comps holds one FiffCtfComp per grade.
+QFile ctfFile(parser.value(ctfOption));
+const FiffRawData ctf(ctfFile);
+FiffCtfComp toGrade1;
+ok &= ctf.info.make_compensator(0, 1, toGrade1); // uncompensated -> grade 1
+// mne._fiff.compensator.make_compensator(info, 0, 1) on ctf_grade0_raw.fif: 36 x 36, ||C - I||_F = 0.1947596520139745
+const MatrixXd& compensator = toGrade1.data->data;
+ok &= expect(ctf.info.comps.size() == 5 && compensator.rows() == 36 && std::abs((compensator - MatrixXd::Identity(36, 36)).norm() - 0.1947596520139745) < 1e-6,
+             "FiffCtfComp: 5 compensation grades; the grade-1 compensator matches mne make_compensator");
+````
+
+### [ex_cancel_noise](../../examples/mne/ex_cancel_noise.mdx)
+
+Example of noise cancellation procedures.
+
+````cpp title="src/examples/ex_cancel_noise/main.cpp, line 86"
+//example for compensator generation
+FiffCtfComp comp;
+if (dest_comp > 0) {
+    qDebug() << "This part needs to be debugged";
+    p_FiffEvokedSet.info.make_compensator(comp_now, dest_comp, comp); //ToDo: make_compensator needs to be debugged
+    printf("Appropriate forward operator compensator created.\n");
+} else
+    printf("No forward operator compensator needed.\n");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

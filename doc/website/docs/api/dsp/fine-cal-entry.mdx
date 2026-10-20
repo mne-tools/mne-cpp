@@ -37,6 +37,26 @@ const FineCalibration calBack = FineCalibration::read(calPath);
 - Build target: `ex_dsp_maxwell` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_maxwell](../../examples/dsp/ex_dsp_maxwell.mdx)
+
+DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
+
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 174"
+FineCalibration calibration;
+FineCalEntry magnetometer;
+magnetometer.chNumber = 111; // numbers ending in 1 are magnetometers
+magnetometer.position = Vector3d(-0.1066, 0.0464, -0.0604);
+magnetometer.imbalance = VectorXd::Constant(1, 0.996645); // calibration factor
+calibration.addEntry(magnetometer);
+const QString calPath = dir.filePath("sss_cal.dat"); // the format of mne.preprocessing.write_fine_calibration
+const bool calWritten = calibration.write(calPath);
+const FineCalibration calBack = FineCalibration::read(calPath);
+ok &= expect(calWritten && calBack.size() == 1 && calBack.gainVector()(0) == 0.996645 && calBack.entries().first().position.isApprox(magnetometer.position),
+             "FineCalibration round-trips a magnetometer line");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

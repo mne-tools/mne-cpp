@@ -105,6 +105,34 @@ Update the head position with a new device-to-head transform and recompute the M
 - Build target: `ex_fwd_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx)
+
+Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
+
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 184"
+settings->solname = tmp.filePath("V1-fwd.fif");
+settings->pFiffInfo = QSharedPointer<FiffInfo>::create(raw.info);
+settings->checkIntegrity();
+auto fwd = std::make_shared<ComputeFwd>(settings)->calculateFwd();
+QFile solFile(settings->solname);
+fwd->write(solFile);
+// mne _compute_forwards_meeg on the 78 V1 sources: |G| of source 0, x component, over 306 MEG channels
+ok &= expect(fwd && fwd->nsource == 78 && fwd->sol->data.rows() == 366 && near(fwd->sol->data.col(0).head(306).norm(), 1.2455023232288232e-3, 1e-4),
+             "ComputeFwd: 78 V1 sources, 366 channels, sphere-model gain matches mne");
+````
+
+### [ex_compute_forward](../../examples/fwd/ex_compute_forward.mdx)
+
+This example shows how to compute the forward solution.
+
+````cpp title="src/examples/ex_compute_forward/main.cpp, line 115"
+timer0.start();
+std::shared_ptr<ComputeFwd> pFwdComputer = std::make_shared<ComputeFwd>(pSettings);
+fTime0 = timer0.elapsed();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

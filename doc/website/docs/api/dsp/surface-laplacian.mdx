@@ -108,6 +108,22 @@ Compute only the CSD transformation matrix (without applying to data).
 - Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
 - Build target: `ex_dsp_preprocessing` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_preprocessing](../../examples/dsp/ex_dsp_preprocessing.mdx)
+
+Preprocessing tools of the dsp library on synthetic data with a known ground truth.
+
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 219"
+const SurfaceLaplacianResult csd = SurfaceLaplacian::compute(eeg, electrodes, 1e-5, 4, 50, 0.09);
+// mne.preprocessing.compute_current_source_density(sphere=(0, 0, 0, 0.09), lambda2=1e-5, stiffness=4), sample 3
+VectorXd mneCsd(8);
+mneCsd << 984.4089021671608, 1280.7679646395302, 457.7070056428769, -775.4476983026417,
+    -977.028371298518, -378.06791643722704, -311.9232346310464, 211.576727857144;
+const double csdErr = (csd.matData.col(3) - mneCsd).cwiseAbs().maxCoeff() / mneCsd.cwiseAbs().maxCoeff();
+ok &= expect(csdErr < 1e-6, QString("surface Laplacian = mne compute_current_source_density (relative error %1)").arg(csdErr));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -68,6 +68,24 @@ Calculates the debiased squared weighted phase lag index between the rows of the
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
+
+Connectivity metrics on synthetic data with a known coupling.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 215"
+uspli.setFrequencyRange(8.0f, 12.0f);
+Network dswpli = DebiasedSquaredWeightedPhaseLagIndex::calculate(settings);
+dswpli.setFrequencyRange(8.0f, 12.0f);
+Network plv = PhaseLockingValue::calculate(settings);
+plv.setFrequencyRange(8.0f, 12.0f);
+for (const Network* network : {&pli, &wpli, &uspli, &dswpli, &plv}) {
+    const double w01 = edgeWeight(*network, 0, 1);
+    const double w02 = edgeWeight(*network, 0, 2);
+    ok &= expect(w01 > w02 + 0.3,
+````
+
 ## Authors of this file
 
 - Daniel Strohmeier &lt;daniel.strohmeier@gmail.com&gt;

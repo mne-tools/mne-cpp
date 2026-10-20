@@ -127,6 +127,50 @@ Constructs a [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settin
 
 ---
 
+## Used in examples
+
+### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
+
+Example of using the MNE-CPP Connectivity library.
+
+````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 97"
+ConnectivitySettings m_settings;
+RtConnectivity::SPtr m_pRtConnectivity;
+QList<Network> m_networkData;
+QMap<QString, Vector4i> mColor;
+````
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 239"
+// ---------------------------------------------------------------------------------------------------------
+// Connectivity: the same network as Connectivity::calculate, computed on a worker thread
+ConnectivitySettings settings;
+for (int trial = 0; trial < 5; ++trial) {
+    MatrixXd data(2, 256);
+    for (int t = 0; t < 256; ++t) {
+        const double alpha = std::sin(2.0 * kPi * 10.0 * t / 256.0 + trial);
+        data(0, t) = alpha + 0.3 * normal(gen) * 1e12;
+        data(1, t) = alpha + 0.3 * normal(gen) * 1e12;
+    }
+    settings.append(data);
+}
+settings.setSamplingFrequency(256);
+settings.setFFTSize(256);
+````
+
+### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
+
+Example to compare connectivity methods.
+
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 195"
+ConnectivitySettings conSettings;
+````
+
+Also used in [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx), [ex_connectivity_performance](../../examples/connectivity/ex_connectivity_performance.mdx).
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

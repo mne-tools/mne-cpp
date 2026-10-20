@@ -98,6 +98,25 @@ Deserialize from QCborMap.
 - Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
 - Build target: `ex_mna` (runs under CTest)
 
+## Used in examples
+
+### [ex_mna](../../examples/mna/ex_mna.mdx)
+
+MNA library: register operations, build and run a graph, bind parameters and save a project.
+
+````cpp title="src/examples/ex_mna/main.cpp, line 200"
+MnaSession session;
+session.id = "ses-01";
+session.recordings.append(recording);
+MnaSubject subject;
+subject.id = "sub-01";
+subject.freeSurferDir = "subjects/sample";
+subject.sessions.append(session);
+MnaScript report; // a script node: inline code run by an interpreter
+report.language = "python";
+report.code = "print({{in}})";
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

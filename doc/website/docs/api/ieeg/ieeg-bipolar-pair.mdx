@@ -31,6 +31,21 @@ const Eigen::MatrixXd bipolar = IeegReference::bipolarMatrix(pairs, int(contacts
 - Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
 - Build target: `ex_ieeg` (runs under CTest)
 
+## Used in examples
+
+### [ex_ieeg](../../examples/ieeg/ex_ieeg.mdx)
+
+IEEG library: group sEEG contacts into a lead, derive a bipolar montage and paint contact values onto a surface.
+
+````cpp title="src/examples/ex_ieeg/main.cpp, line 80"
+const QVector<IeegBipolarPair> pairs = IeegReference::bipolarPairs(implantation); // LA1-LA2, LA2-LA3
+Eigen::MatrixXd data(3, 1);                                                       // contacts x samples, file order
+data << 30.0, 10.0, 15.0;                                                         // LA3, LA1, LA2
+const Eigen::MatrixXd bipolar = IeegReference::bipolarMatrix(pairs, int(contacts.size())) * data;
+ok &= expect(pairs.size() == 2 && pairs[0].name == "LA1-LA2" && bipolar(0, 0) == -5.0 && bipolar(1, 0) == -15.0,
+             "IeegReference: LA1-LA2 = -5, LA2-LA3 = -15");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

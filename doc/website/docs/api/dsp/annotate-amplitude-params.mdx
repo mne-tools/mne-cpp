@@ -31,6 +31,23 @@ const FiffAnnotations flatSpans = annotateAmplitude(loose, info, kSFreq, amplitu
 - Full source: [`src/examples/ex_dsp_artifacts/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts/main.cpp)
 - Build target: `ex_dsp_artifacts` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_artifacts](../../examples/dsp/ex_dsp_artifacts.mdx)
+
+Artifact detection and repair with the dsp library on a recording with planted defects.
+
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp, line 219"
+MatrixXd loose = data;
+loose.row(3).segment(250, 50).setConstant(loose(3, 250));
+AnnotateAmplitudeParams amplitude;
+amplitude.flat = 1e-12; // consecutive samples within 1 pV of each other
+QStringList flatChannels;
+const FiffAnnotations flatSpans = annotateAmplitude(loose, info, kSFreq, amplitude, &flatChannels);
+ok &= expect(flatSpans.size() == 1 && flatSpans[0].description == "BAD_flat" && std::abs(flatSpans[0].onset - 1.0) < 1e-12 && flatChannels == QStringList({"EEG2"}),
+             QString("annotateAmplitude: %1 flat span(s), bad %2").arg(flatSpans.size()).arg(flatChannels.join(", ")));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -299,6 +299,27 @@ Used by the real-time streaming controller to feed data into the queue.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 240"
+// Source estimate on vertices 0 and 2 only; the others stay cortex grey
+MatrixXd activity(2, 1);
+activity << 1.0, 0.1;
+SourceEstimateOverlay sourceOverlay;
+sourceOverlay.setStcData(InvSourceEstimate(activity, (VectorXi(2) << 0, 2).finished(), 0.0f, 0.001f), 0);
+sourceOverlay.setThresholds(0.2f, 0.5f, 1.0f);
+sourceOverlay.applyToSurface(&patch, 0); // no interpolation matrix: values land on their own vertices
+const uint32_t grey = packABGR(0xAA, 0xAA, 0xAA) & 0x00FFFFFFu;
+const uint32_t peak = patch.colorsRef().at(0) & 0x00FFFFFFu;
+ok &= expect(sourceOverlay.numTimePoints() == 1 && peak == (packABGR(255, 255, 255) & 0x00FFFFFFu) && (patch.colorsRef().at(2) & 0x00FFFFFFu) == grey &&
+                 (patch.colorsRef().at(1) & 0x00FFFFFFu) == grey,
+             "SourceEstimateOverlay: the peak is white on Hot, sub-threshold vertices keep the cortex grey");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -70,6 +70,19 @@ Compute the Gamma-MAP inverse solution.
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 239"
+// Gamma-MAP: sparse Bayesian learning with unit (whitened) noise, MacKay updates as in mne.inverse_sparse.gamma_map.
+const InvGammaMapResult gammaMap = InvGammaMap::compute(gain, measured, MatrixXd::Identity(gain.rows(), gain.rows()), 1000, 1e-8);
+ok &= expect(!gammaMap.activeVertices.isEmpty() && gammaMap.activeVertices.size() < 70 && gammaMap.vecGamma.size() == 70,
+             QString("InvGammaMap: %1 of 70 V1 sources keep a nonzero variance").arg(gammaMap.activeVertices.size()));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

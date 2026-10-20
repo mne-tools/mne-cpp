@@ -32,6 +32,43 @@ const VectorXd prominence = peakProminences(wave, {2, 9, 15});
 - Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)
 - Build target: `ex_dsp_analysis` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_analysis](../../examples/inv/ex_dsp_analysis.mdx)
+
+DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation.
+
+````cpp title="src/examples/ex_dsp_analysis/main.cpp, line 138"
+PeakFinderParams params;
+params.dMinHeight = 0.5; // like scipy.signal.find_peaks(height=0.5, distance=30)
+params.iMinDistance = 30;
+const QList<QPair<int, double>> peaks = peakFinder(wave, params); // (sample, value), sorted by sample
+const VectorXd prominence = peakProminences(wave, {2, 9, 15});
+PeakFinderParams byProminence;
+byProminence.dProminence = 0.5;
+PeakFinderParams byDistance;
+byDistance.iMinDistance = 10;
+ok &= expect(indices(peaks) == QList<int>({9, 51, 92, 128, 170}) && indices(peakFinder(wave, byProminence)) == QList<int>({9, 51, 92, 128, 170}) && indices(peakFinder(wave, byDistance)) == QList<int>({9, 22, 37, 51, 64, 79, 92, 114, 128, 141, 156, 170, 183, 198}) && (prominence - Vector3d(0.18086696, 1.298166714, 0.289199146)).cwiseAbs().maxCoeff() < 1e-8,
+             "peakFinder (height, distance, prominence) and peakProminences match scipy");
+````
+
+### [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx)
+
+Spectral and filtering tools of the dsp library on signals with known content.
+
+````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 207"
+VectorXd trace(10);
+trace << 0, 1, 0, 3, 0, 2, 0, 5, 1, 0;
+const QList<QPair<int, double>> allPeaks = peakFinder(trace);
+PeakFinderParams params;
+params.dProminence = 2.5;
+const QList<QPair<int, double>> strongPeaks = peakFinder(trace, params);
+const VectorXd prominences = peakProminences(trace, {1, 3, 5, 7});
+// scipy.signal.find_peaks / peak_prominences
+ok &= expect(allPeaks.size() == 4 && allPeaks[3].first == 7 && strongPeaks.size() == 2 && strongPeaks[0].first == 3 && maxError(prominences, {1.0, 3.0, 2.0, 5.0}) == 0.0,
+             "peaks [1, 3, 5, 7], prominences [1, 3, 2, 5], prominence >= 2.5 keeps [3, 7] (scipy)");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

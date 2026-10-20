@@ -49,6 +49,26 @@ const FiffCov noiseCov = FiffCov::compute_from_epochs(raw, events.events, {1, 2}
 - Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
 - Build target: `ex_mne_api` (runs under CTest)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 371"
+CovDescription covariance;
+MNEDescriptionParser::parseCovarianceFile(covDescPath, covariance);
+covariance.rej.megGradReject = covariance.rej.megMagReject = covariance.rej.eogReject = 0.0f; // EEG limit only
+const CovDefinition& preStim = covariance.defs.first();
+const FiffCov noiseCov = FiffCov::compute_from_epochs(raw, events.events, {1, 2}, preStim.tmin, preStim.tmax, preStim.bmin, preStim.bmax, preStim.doBaseline,
+                                                      covariance.removeSampleMean, preStim.ignore, preStim.delay, &covariance.rej);
+// mne.compute_covariance(mne.Epochs(event_id=[1, 2], tmin=-0.2, tmax=0, baseline=None, reject=dict(eeg=14.23e-9)),
+// keep_sample_mean=False, rank="full"): 6 of 12 epochs kept, nfree 365, C[EEG001, EEG001] = 8.784207369943824e-18
+const int eeg001 = noiseCov.names.indexOf("EEG001");
+ok &= expect(preStim.events == QVector<unsigned int>({1, 2}) && noiseCov.nfree == 365 && near(noiseCov.data(eeg001, eeg001), 8.784207369943824e-18, 1e-6),
+             QString("MNEDescriptionParser: a .cov description with EEG rejection gives nfree %1 like mne.compute_covariance").arg(noiseCov.nfree));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

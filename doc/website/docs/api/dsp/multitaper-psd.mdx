@@ -65,6 +65,23 @@ Compute multitaper PSD for every channel of a data matrix.
 - Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
 - Build target: `ex_dsp_spectral` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx)
+
+Spectral and filtering tools of the dsp library on signals with known content.
+
+````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 134"
+const MultitaperPsdResult psd = MultitaperPsd::compute(signal, kSFreq, 2.0); // NW = 2, i.e. +-1 Hz resolution
+const double binWidth = psd.vecFreqs(1) - psd.vecFreqs(0);
+const double power = psd.matPsd.row(0).sum() * binWidth; // one-sided PSD integrates to the variance
+// mne.time_frequency.psd_array_multitaper(bandwidth=4 Hz, adaptive=False): 20 Hz 0.31659, 55 Hz 0.079135
+const double psd20 = psd.matPsd(0, 40);
+const double psd55 = psd.matPsd(0, 110);
+ok &= expect(frequencyOfMax(psd.matPsd.row(0), psd.vecFreqs) == 20.0 && std::fabs(psd20 - 0.316593412495819) < 1e-3 && std::fabs(psd55 - 0.07913494397010905) < 1e-3 && std::fabs(power - 0.625) < 0.01,
+             QString("multitaper PSD at 20/55 Hz %1/%2 = mne, integral %3").arg(psd20).arg(psd55).arg(power));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

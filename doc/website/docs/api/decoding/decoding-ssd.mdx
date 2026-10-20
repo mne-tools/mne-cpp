@@ -174,6 +174,21 @@ Reconstructs M/EEG signals from which the dynamics described by the excluded com
 - Full source: [`src/examples/ex_decoding/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_decoding/main.cpp)
 - Build target: `ex_decoding` (runs under CTest)
 
+## Used in examples
+
+### [ex_decoding](../../examples/decoding/ex_decoding.mdx)
+
+Spatial decoders and ICA labelling on synthetic mixtures with a known ground truth.
+
+````cpp title="src/examples/ex_decoding/main.cpp, line 168"
+DecodingSsd ssd(2);
+ssd.fit(continuous, kSFreq, 8.0, 12.0, 3.0, 20.0); // signal band, flanking noise band
+const MatrixXd rhythm = ssd.transform(continuous); // components x samples, strongest SNR first
+const double ssdCorr = std::fabs(correlation(rhythm.row(0).transpose(), ssdSources.row(3).transpose()));
+ok &= expect(ssdCorr > 0.9 && ssd.eigenvalues()(0) > ssd.eigenvalues()(1),
+             QString("SSD component 0 recovers the 10 Hz source: |r| %1 > 0.9").arg(ssdCorr));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

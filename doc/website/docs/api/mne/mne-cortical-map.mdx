@@ -69,6 +69,22 @@ K is the inverse operator kernel; G holds the rows of the forward gain for the k
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 157"
+QList<VectorXi> kernelVertices;
+prepared.assemble_kernel(FsLabel(), "MNE", false, surfaceKernel, noNormals, kernelVertices);
+prepared.getKernel() = surfaceKernel;
+const MatrixXd corticalMap = MNECorticalMap::makeCorticalMap(fwd, prepared, evoked.info);
+// mne K (Cartesian) times the Cartesian gain, the same product in one basis: trace 26.1330, Frobenius norm 6.13353
+ok &= expect(corticalMap.rows() == 210 && corticalMap.cols() == 210 && near(corticalMap.trace(), 26.133038866971994, 1e-4) && near(corticalMap.norm(), 6.13352636100184, 1e-4),
+             "MNECorticalMap: K G in the inverse's surface basis matches mne");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -158,6 +158,23 @@ Validate the graph: acyclicity, port connections, data-kind compatibility, op sc
 - Full source: [`src/examples/ex_mna/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna/main.cpp)
 - Build target: `ex_mna` (runs under CTest)
 
+## Used in examples
+
+### [ex_mna](../../examples/mna/ex_mna.mdx)
+
+MNA library: register operations, build and run a graph, bind parameters and save a project.
+
+````cpp title="src/examples/ex_mna/main.cpp, line 115"
+MnaGraph graph;
+MnaNode source;
+source.id = "source";
+source.opType = "ex_constant";
+source.attributes["value"] = 3.0;
+const MnaPort sourceOut = port("out", MnaPortDir::Output); // name, data kind, direction
+source.outputs.append(sourceOut);
+graph.addNode(source);
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

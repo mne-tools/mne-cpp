@@ -982,6 +982,32 @@ Writes a string tag
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
+
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+
+````cpp title="src/examples/ex_fiff_api/main.cpp, line 241"
+QFile facadeFile(dir + "/sample_audvis_trunc_raw.fif");
+FiffStream::SPtr facadeStream;
+const bool facadeOpened = Fiff::open(facadeFile, facadeStream); // static wrappers around FiffStream
+FiffDirNode::SPtr facadeRoot = facadeStream->dirtree();
+const QStringList facadeBads = Fiff::read_bad_channels(facadeStream, facadeRoot);
+facadeStream->close();
+ok &= expect(facadeOpened && facadeBads == info.bads, "Fiff::open and Fiff::read_bad_channels find the same 2 bads as FiffInfo");
+````
+
+### [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx)
+
+Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
+
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp, line 63"
+QCommandLineParser parser;
+parser.setApplicationDescription("Fiff Sniffer Example");
+parser.addHelpOption();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

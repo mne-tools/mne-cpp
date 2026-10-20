@@ -78,6 +78,29 @@ Returns parameter name.
 - Full source: [`src/examples/ex_dsp_filter/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_filter/main.cpp)
 - Build target: `ex_dsp_filter` (runs under CTest)
 
+## Used in examples
+
+### [ex_filtering](../../examples/dsp/ex_filtering.mdx)
+
+Example for filtering data with a user defined FIR filter and writing the result to a file.
+
+````cpp title="src/examples/ex_filtering/main.cpp, line 89"
+printf("Filtering...");
+if (RTPROCESSINGLIB::filterFile(fileOut,
+                                pRaw,
+                                FilterKernel::m_filterTypes.indexOf(FilterParameter("BPF")),
+                                10,
+                                10,
+                                0.1,
+                                pRaw->info.sfreq,
+                                1024,
+                                UTILSLIB::FilterKernel::m_designMethods.indexOf(FilterParameter("Cosine")),
+                                picks)) {
+    printf("[done]\n");
+} else {
+    printf("[failed]\n");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

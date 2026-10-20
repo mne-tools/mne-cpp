@@ -153,6 +153,22 @@ Get the report title.
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 265"
+Report report("Example report");
+report.addText("Summary", "All utilities were exercised.");
+report.addTable("Montage", {"Electrode", "z (m)"}, {{"Cz", "0.087"}, {"Fp1", "0.033"}});
+const QString html = report.toHtml();
+report.save(dir.filePath("report.html"));
+ok &= expect(report.sectionCount() == 2 && html.contains("<table") && html.contains("Fp1") && QFile::exists(dir.filePath("report.html")),
+             "Report renders text and table sections to HTML");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

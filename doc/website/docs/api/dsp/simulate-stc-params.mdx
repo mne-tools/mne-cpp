@@ -37,6 +37,21 @@ const INVLIB::InvSourceEstimate random = simulateStc((VectorXi(1) << 102).finish
 - Full source: [`src/examples/ex_dsp_analysis/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis/main.cpp)
 - Build target: `ex_dsp_analysis` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_analysis](../../examples/inv/ex_dsp_analysis.mdx)
+
+DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation.
+
+````cpp title="src/examples/ex_dsp_analysis/main.cpp, line 190"
+SimulateStcParams gaussians; // one Gaussian bump per active vertex, seeded
+gaussians.sfreq = 200.0f;
+gaussians.duration = 0.5f;
+const INVLIB::InvSourceEstimate random = simulateStc((VectorXi(1) << 102).finished(), vertices, gaussians);
+ok &= expect(stc.data.rows() == 5 && stc.data.row(1) == waveforms.row(0) && stc.data.row(4) == waveforms.row(1) && stc.data.row(0).isZero() && std::fabs(stc.tstep - 0.01f) < 1e-7f && random.data.cols() == 100 && std::fabs(random.data.row(2).maxCoeff() - 1.0) < 0.01 && random.data.row(0).isZero(),
+             "simulateStcFromWaveforms places rows on their vertices; simulateStc draws a unit Gaussian bump");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

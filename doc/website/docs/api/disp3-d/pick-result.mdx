@@ -41,6 +41,28 @@ const PickResult& lastPick = scene.lastPick();
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 205"
+// A picker reports the contact under the cursor; the host reads the most recent pick back
+const bool hitBefore = isHit(scene.lastPick());
+PickResult contactPick;
+contactPick.kind = PickKind::ElectrodeContact;
+contactPick.sourceId = "seeg_LH";
+const IeegContact& first = electrodes.implantation().contacts().first();
+contactPick.world = QVector3D(first.position.x(), first.position.y(), first.position.z());
+contactPick.label = first.name;
+contactPick.value = 3.5f;
+contactPick.timeSample = 120;
+scene.reportPick(contactPick);
+const PickResult& lastPick = scene.lastPick();
+ok &= expect(!hitBefore && isHit(lastPick) && lastPick.sourceId == "seeg_LH" && lastPick.world == QVector3D(0.010f, -0.020f, 0.005f) && lastPick.value == 3.5f &&
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

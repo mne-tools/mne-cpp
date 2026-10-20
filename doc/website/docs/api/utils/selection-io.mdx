@@ -194,6 +194,23 @@ The amount of written files depend on the number of selection groups in selectio
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 197"
+selections.insert("Left-temporal", {"MEG0111", "MEG0112", "MEG0113"});
+selections.insert("Vertex", {"MEG0711"});
+const QString selPath = dir.filePath("groups.sel");
+SelectionIO::writeMNESelFile(selPath, selections);
+QMultiMap<QString, QStringList> reread;
+SelectionIO::readMNESelFile(selPath, reread);
+ok &= expect(reread.size() == 2 && reread.value("Left-temporal") == QStringList({"MEG0111", "MEG0112", "MEG0113"}),
+             "SelectionIO .sel round trip");
+````
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

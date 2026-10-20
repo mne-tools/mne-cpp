@@ -107,6 +107,19 @@ tSSS processes the data in sliding windows and removes the temporal subspace of 
 - Build target: `ex_dsp_maxwell` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_maxwell](../../examples/dsp/ex_dsp_maxwell.mdx)
+
+DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
+
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 112"
+SSS::Params params; // internal order 8, external order 3
+params.origin = Vector3d(0.0, 0.0, 0.04);
+const SSS::Basis basis = SSS::computeBasis(info, params); // geometry only, reusable for every buffer
+const QVector<int>& meg = basis.megChannelIdx;
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

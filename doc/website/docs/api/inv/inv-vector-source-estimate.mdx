@@ -122,6 +122,22 @@ Project the 3D vectors onto surface normals to produce a signed scalar estimate.
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 183"
+// The MNE kernel keeps x, y and z per source: an apply_inverse(..., pick_ori="vector") estimate.
+const MatrixXd goodData = evoked.pick_channels(inverse.noise_cov->names).data;
+const InvVectorSourceEstimate vectorStc(kernel * goodData, stc.vertices, stc.tmin, stc.tstep);
+const InvSourceEstimate magnitude = vectorStc.magnitude(); // 70 x 421 vector lengths
+// mne.minimum_norm.apply_inverse(evoked, inv, 1/9, "MNE", pick_ori="vector"): sum of lengths 4.31370e-4
+ok &= expect(vectorStc.nVertices() == 70 && near(magnitude.data.sum(), 0.0004313698431300483, 1e-4) && near(magnitude.data(0, 200), 3.865084798591962e-09, 1e-4),
+             "InvVectorSourceEstimate: vector MNE lengths match apply_inverse(pick_ori=\"vector\")");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

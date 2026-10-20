@@ -131,6 +131,48 @@ Reads the specified ANT elc-layout file.
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 223"
+QList<QVector<float>> layout2d;
+QFile layoutFile(dir.filePath("1020.lout"));
+LayoutMaker::makeLayout(points3d, layout2d, names, layoutFile, true, 20.0f, 5.0f, 4.0f, true);
+const int iCz = names.indexOf("Cz");
+const int iFp1 = names.indexOf("Fp1");
+const int iO1 = names.indexOf("O1");
+const int iT8 = names.indexOf("T8");
+// Box corners: the box of an electrode at (x, y) starts at (x - w/2, y - h/2)
+const float czX = layout2d[iCz][0] + 2.5f;
+const float czY = layout2d[iCz][1] + 2.0f;
+ok &= expect(layout2d.size() == names.size() && std::hypot(czX, czY) < 1.0f && layout2d[iFp1][1] > layout2d[iCz][1] && layout2d[iO1][1] < layout2d[iCz][1] && layout2d[iFp1][0] < layout2d[iCz][0] && layout2d[iT8][0] > layout2d[iCz][0],
+             QString("LayoutMaker: Cz at (%1, %2), Fp1 front-left, O1 back, T8 right").arg(czX).arg(czY));
+````
+
+### [ex_make_layout](../../examples/fiff/ex_make_layout.mdx)
+
+Builds example for making a 2D layout from 3D points.
+
+````cpp title="src/examples/ex_make_layout/main.cpp, line 142"
+if (!LayoutMaker::makeLayout(inputPoints,
+                             outputPoints,
+                             names,
+                             out,
+                             true,
+                             prad,
+                             width,
+                             height,
+                             true,
+                             (bool)parser.value(mirrorxOption).toInt(),
+                             (bool)parser.value(mirrorxOption).toInt())) {
+    numberTries++;
+} else {
+    numberTries = 11;
+````
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

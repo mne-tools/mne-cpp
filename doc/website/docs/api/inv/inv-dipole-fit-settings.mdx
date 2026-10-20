@@ -61,6 +61,28 @@ Check whether Dipole Fit Settings are correctly set and report them.
 
 ---
 
+## Used in examples
+
+### [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx)
+
+Inverse library: equivalent current dipole fitting in a sphere model.
+
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp, line 131"
+InvDipoleFitSettings settings; // the options of the MNE-C mne_dipole_fit tool
+settings.measname = tmp.filePath("synthetic-ave.fif");
+settings.include_meg = true;
+settings.include_eeg = false;
+settings.guess_mindist = 0.0f;
+settings.tmin = 0.0f;
+settings.dipname = tmp.filePath("fit.dat"); // MNE-C .dat dipole file
+settings.checkIntegrity();
+InvDipoleFit fit(&settings);
+InvEcdSet dipoles = fit.calculateFit();
+const bool saved = dipoles.save_dipoles_dip(tmp.filePath("fit.dip")); // readable by mne.read_dipole
+const InvEcdSet reread = InvEcdSet::read_dipoles_dip(tmp.filePath("fit.dip"));
+const Vector3d posMm = dipoles.size() > 0 ? Vector3d(1e3 * dipoles[0].rd.cast<double>()) : Vector3d::Zero();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

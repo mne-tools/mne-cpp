@@ -151,6 +151,28 @@ Iterates over `list` and checks if any channel name matches a column in the proj
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 257"
+MNEProjOp::makeProjection({rawFile.fileName()}, rawInfo.chInfo, rawInfo.nchan, proj);
+proj->assign_channels(mneRaw->ch_names, rawInfo.nchan);
+proj->make_proj();
+const MNEProjItem& firstItem = proj->items[0];
+mneRaw->proj = std::move(proj);
+mneRaw->pick_data_proj(&sel, mneRaw->first_samp + 2990, ns, rows.data());
+const double eegProj = segment(1, 0);
+// mne.io.read_raw_fif: first_samp 12900, 6007 samples, 376 channels, 2 bads; EEG 001 at offset 2990 -1.01223e-09
+// numpy port of MNE-C's overlap-add 40 Hz lowpass: -1.06402e-09; apply_proj(): -4.10778e-10
+ok &= expect(mneRaw->first_samp == 12900 && mneRaw->nsamp == 6007 && rawInfo.nchan == 376 && mneRaw->nbad == 2 && firstBuffer.firsts == 12900 && mneRaw->bufs.size() > 1,
+             "MNERawData/MNERawInfo/MNERawBufDef: buffer directory of the sample recording like mne.io.read_raw_fif");
+ok &= expect(sel.pick.minCoeff() >= 0 && near(eegRaw, -1.0122332562412516e-09, 1e-5) && near(eegProj, -4.107782047805238e-10, 1e-4) && near(eegFilt, -1.064022285676407e-09, 1e-3),
+             "MNEChSelection/MNEFilterDef: plain, projected and filtered reads match mne");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

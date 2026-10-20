@@ -86,6 +86,26 @@ Writes the cluster info as text, and the centroid vertex numbers to `centroids_<
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 169"
+const FsAnnotationSet aparc(data + "/subjects/sample/label/lh.aparc.annot", data + "/subjects/sample/label/rh.aparc.annot");
+MatrixXd clusterMean; // 3 x 70 sources -> 3 x nClusters, averaging per orientation
+const MNEForwardSolution clustered = fwd.cluster_forward_solution(aparc, 20, clusterMean, FiffCov(), FiffInfo(), "sqeuclidean");
+const MNEClusterInfo& clusters = clustered.src.hemisphereAt(0)->cluster_info;
+int assigned = 0;
+for (const VectorXi& members : clusters.clusterVertnos) {
+    assigned += static_cast<int>(members.size());
+}
+clusters.write(tmp.filePath("v1-clusters.txt")); // plus centroids_v1-clusters.txt
+ok &= expect(clustered.isClustered() && clusters.numClust() == clustered.nsource && assigned == 70 && clusters.numClust() >= 4 && (clustered.sol->data - fwd.sol->data * clusterMean).norm() <= 1e-9 * fwd.sol->data.norm() && QFile::exists(tmp.filePath("centroids_v1-clusters.txt")),
+             "MNEClusterInfo: every V1 source in one cluster, clustered gain is the cluster mean");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

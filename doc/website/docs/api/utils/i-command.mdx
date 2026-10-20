@@ -71,6 +71,28 @@ Executes the [`ICommand`](/docs/api/utils/i-command).
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 115"
+// A command wraps an action so it can be queued or replayed later
+class AppendCommand : public ICommand
+{
+public:
+    AppendCommand(QStringList& target, QString text)
+    : m_target(target)
+    , m_text(std::move(text))
+    {
+    }
+    void execute() override
+    {
+        m_target.append(m_text);
+    }
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

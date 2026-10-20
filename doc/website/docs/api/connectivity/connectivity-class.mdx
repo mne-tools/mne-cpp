@@ -80,6 +80,44 @@ Computes the network based on the current settings.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
+## Used in examples
+
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
+
+Connectivity metrics on synthetic data with a known coupling.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 166"
+settings.setConnectivityMethods({"COH", "PLV", "WPLI"});
+const QList<Network> networks = Connectivity::calculate(settings);
+for (Network network : networks) {
+    network.setFrequencyRange(8.0f, 12.0f); // average the per-bin weights over the alpha band
+    qInfo().noquote() << network.getConnectivityMethod() << "0-1:" << edgeWeight(network, 0, 1);
+}
+ok &= expect(networks.size() == 3, "Connectivity::calculate returns one network per method");
+````
+
+### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
+
+Example of using the MNE-CPP Connectivity library.
+
+````cpp title="src/examples/ex_connectivity/main.cpp, line 107"
+QCommandLineParser parser;
+parser.setApplicationDescription("Connectivity Example");
+parser.addHelpOption();
+````
+
+### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
+
+Example to compare connectivity methods.
+
+````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 100"
+QCommandLineParser parser;
+parser.setApplicationDescription("Connectivity Comparison Example");
+parser.addHelpOption();
+````
+
+Also used in [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx), [ex_connectivity_performance](../../examples/connectivity/ex_connectivity_performance.mdx).
+
 ## Authors of this file
 
 - Lorenz Esch &lt;lorenz.esch@tu-ilmenau.de&gt;

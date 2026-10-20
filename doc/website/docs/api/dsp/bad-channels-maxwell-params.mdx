@@ -34,6 +34,25 @@ const BadChannelsMaxwellResult bads = findBadChannelsMaxwell(broken, info, badPa
 - Build target: `ex_dsp_maxwell` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_maxwell](../../examples/dsp/ex_dsp_maxwell.mdx)
+
+DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
+
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp, line 143"
+MatrixXd broken = data;
+broken.row(meg[40]).array() += 2e-7; // a sensor with a constant offset the multipole model cannot explain
+BadChannelsMaxwellParams badParams;
+badParams.origin = params.origin;
+badParams.dZThreshold = 50.0; // robust z-score of the reconstruction residual
+const BadChannelsMaxwellResult bads = findBadChannelsMaxwell(broken, info, badParams);
+int worst = 0;
+bads.zScores.maxCoeff(&worst);
+ok &= expect(worst == 40 && bads.badIndices.contains(meg[40]) && bads.badChannels.contains(info.ch_names[meg[40]]),
+             QString("findBadChannelsMaxwell ranks %1 worst (z = %2), flagged: %3").arg(info.ch_names[meg[worst]]).arg(bads.zScores(worst), 0, 'f', 0).arg(bads.badChannels.join(", ")));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

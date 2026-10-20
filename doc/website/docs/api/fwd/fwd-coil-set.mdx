@@ -215,6 +215,21 @@ Read a coil definitions from file.
 - Build target: `ex_fwd_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx)
+
+Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
+
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 121"
+auto templates = FwdCoilSet::read_coil_defs(coilDefs); // integration points per coil type
+auto coils = templates->create_meg_coils(meg, meg.size(), FWD_COIL_ACCURACY_ACCURATE, raw.info.dev_head_t);
+const FwdCoil& first = *coils->coils[0]; // MEG 0113 in head coordinates
+// mne _create_meg_coils(accurate): 3012 planar gradiometer, 8 points, r0 (-106.15, 29.14, -14.73) mm
+ok &= expect(coils->ncoil() == 306 && first.type == 3012 && first.np == 8 && coils->is_planar_coil_type(first.type) && (first.r0 - Vector3f(-0.10614990f, 0.02914091f, -0.01472596f)).norm() < 1e-6f,
+             "FwdCoilSet/FwdCoil: 306 accurate MEG coils, MEG0113 a planar gradiometer with 8 points");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

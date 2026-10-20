@@ -140,6 +140,21 @@ Fits a sphere to a point cloud.
 - Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
 - Build target: `ex_math` (runs under CTest)
 
+## Used in examples
+
+### [ex_math](../../examples/math/ex_math.mdx)
+
+Math library on inputs with known answers.
+
+````cpp title="src/examples/ex_math/main.cpp, line 134"
+MatrixX3f points(6, 3); // six points on a sphere of radius 0.09 around (0, 0, 0.04)
+points << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f,
+    0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.0f, 0.0f, -0.05f;
+Sphere sphere = Sphere::fit_sphere(points);
+ok &= expect((sphere.center() - Vector3f(0.0f, 0.0f, 0.04f)).norm() < 1e-5f && std::fabs(sphere.radius() - 0.09f) < 1e-5f,
+             QString("sphere centre (0, 0, 0.04), radius %1").arg(sphere.radius()));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -298,6 +298,24 @@ Compatible with numpy.savetxt() output.
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
+## Used in examples
+
+### [ex_utils](../../examples/utils/ex_utils.mdx)
+
+Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
+
+````cpp title="src/examples/ex_utils/main.cpp, line 315"
+const PythonRunnerResult run = python.runCode("import sys\nprint('[progress] 50% half')\nprint(sum(map(int, sys.argv[1:])))", {"2", "3"});
+PythonTestHelper helper;                                                    // oracle access for tests
+const MatrixXd fromNumpy = helper.evalMatrix("print('1 2'); print('3 4')"); // one line per row
+if (python.isPythonAvailable()) {
+    ok &= expect(run.success && run.stdOut.trimmed().endsWith("5") && progress == QStringList({"50 half"}) && fromNumpy == (Matrix2d() << 1, 2, 3, 4).finished(),
+                 "PythonRunner passes arguments and parses [progress] lines; PythonTestHelper reads a matrix");
+} else {
+    qInfo().noquote() << "  skip  PythonRunner (python3 not found)";
+}
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

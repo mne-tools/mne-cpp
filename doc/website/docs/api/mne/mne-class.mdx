@@ -496,6 +496,56 @@ mne_transpose_named_matrix
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx)
+
+Example of the computation of a clustered inverse mne raw.
+
+````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 95"
+QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+QCommandLineOption surfOption("surfType", "FsSurface type <type>.", "type", "inflated");
+QCommandLineOption annotOption("annotType", "FsAnnotation type <type>.", "type", "aparc.a2009s");
+QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
+QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+QCommandLineOption evokedIndexOption("aveIdx", "The average <index> to choose from the average file.", "index", "1");
+QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+QCommandLineOption hemiOption("hemi", "Selected hemisphere <hemi>.", "hemi", "2");
+QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM"); //"MNE" | "dSPM" | "sLORETA"
+QCommandLineOption snrOption("snr", "The SNR value used for computation <snr>.", "snr", "1.0");                                //3.0;//0.1;//3.0;
+QCommandLineOption invFileOutOption("invOut", "Path to inverse <file>, which is to be written.", "file", "");
+QCommandLineOption stcFileOutOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
+````
+
+### [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx)
+
+Example of a computation of a raw inverse.
+
+````cpp title="src/examples/ex_inverse_mne_raw/main.cpp, line 94"
+// Command Line Parser
+QCommandLineParser parser;
+parser.setApplicationDescription("Compute Raw Inverse MNE Example");
+parser.addHelpOption();
+````
+
+### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
+
+Example of using the MNE-CPP Connectivity library.
+
+````cpp title="src/examples/ex_connectivity/main.cpp, line 111"
+QCommandLineOption rawFileOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+QCommandLineOption fwdOption("fwd", "Path to forwad solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+QCommandLineOption subjectOption("subject", "Selected subject <subject>.", "subject", "sample");
+QCommandLineOption subjectPathOption("subjectPath", "Selected subject path <subjectPath>.", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
+QCommandLineOption covFileOption("cov", "Path to the covariance <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+QCommandLineOption annotOption("annotType", "FsAnnotation <type> (for source level usage only).", "type", "aparc.a2009s");
+````
+
+Also used in [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx), [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_inv_api](../../examples/inv/ex_inv_api.mdx), [ex_mne_api](../../examples/fs/ex_mne_api.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_averaging](../../examples/mne/ex_averaging.mdx), [ex_compute_forward](../../examples/fwd/ex_compute_forward.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_read_epochs](../../examples/mne/ex_read_epochs.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx), [ex_interpolation](../../examples/inv/ex_interpolation.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_disp](../../examples/disp/ex_disp.mdx), [ex_fiff_io](../../examples/mne/ex_fiff_io.mdx), [ex_read_fwd_disp_3D](../../examples/disp3D/ex_read_fwd_disp_3D.mdx), [ex_connectivity_performance](../../examples/connectivity/ex_connectivity_performance.mdx), [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx), [ex_evoked_grad_amp](../../examples/mne/ex_evoked_grad_amp.mdx), [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx), [ex_find_evoked](../../examples/mne/ex_find_evoked.mdx), [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx), [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx), [ex_read_evoked](../../examples/mne/ex_read_evoked.mdx), [ex_read_raw](../../examples/mne/ex_read_raw.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -29,6 +29,20 @@ const MatrixXd component = Xdawn::apply(epochs[0].epoch, xdawn);
 - Full source: [`src/examples/ex_dsp_preprocessing/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing/main.cpp)
 - Build target: `ex_dsp_preprocessing` (runs under CTest)
 
+## Used in examples
+
+### [ex_dsp_preprocessing](../../examples/dsp/ex_dsp_preprocessing.mdx)
+
+Preprocessing tools of the dsp library on synthetic data with a known ground truth.
+
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp, line 186"
+const XdawnResult xdawn = Xdawn::fit(epochs, 1, 1); // enhance the response to event code 1
+const MatrixXd component = Xdawn::apply(epochs[0].epoch, xdawn);
+const VectorXd pattern = xdawn.matPatterns.col(0) / xdawn.matPatterns.col(0).cwiseAbs().maxCoeff();
+ok &= expect(xdawn.bValid && component.rows() == 1 && std::fabs(std::fabs(pattern(1) / pattern(0)) - 0.5) < 0.1 && std::fabs(pattern(2)) < 0.15,
+             QString("xDAWN pattern ratio ch1/ch0 %1 (0.5), ch2 %2 (0)").arg(pattern(1) / pattern(0)).arg(pattern(2)));
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

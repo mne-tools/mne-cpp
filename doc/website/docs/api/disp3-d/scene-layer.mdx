@@ -52,6 +52,29 @@ scene.worldBounds(bbMin, bbMax); // union over visible layers with a bounds func
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
+## Used in examples
+
+### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+
+Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp, line 176"
+MultimodalScene scene;
+scene.registerBoundsFn(SceneLayerKind::Electrode, [](const SceneLayer& layer, QVector3D& bbMin, QVector3D& bbMax) {
+    const auto* object = static_cast<const ElectrodeObject*>(layer.payload.get());
+    const Eigen::MatrixX3f positions = object->implantation().positions();
+    const Eigen::Vector3f lo = positions.colwise().minCoeff().transpose();
+    const Eigen::Vector3f hi = positions.colwise().maxCoeff().transpose();
+    bbMin = QVector3D(lo.x(), lo.y(), lo.z());
+    bbMax = QVector3D(hi.x(), hi.y(), hi.z());
+    return true;
+});
+SceneLayer layer;
+layer.id = "seeg_LH";
+layer.kind = SceneLayerKind::Electrode;
+auto payload = std::make_shared<ElectrodeObject>();
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

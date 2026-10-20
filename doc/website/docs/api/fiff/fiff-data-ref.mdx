@@ -62,6 +62,20 @@ Size of the old struct (`fiffDataRefRec`) 2*int + 2*long = 2*4 + 2*8 = 24.
 - Build target: `ex_fiff_structure` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
+
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+
+````cpp title="src/examples/ex_fiff_structure/main.cpp, line 132"
+// A reference to data in an external file: 2 x 32-bit type and byte order, 2 x 64-bit size and offset.
+FiffDataRef reference;
+reference.size = 3LL << 31; // beyond 2 GiB
+reference.offset = 1024;
+ok &= expect(FiffDataRef::storageSize() == 24 && reference.size > std::numeric_limits<qint32>::max(), "FiffDataRef: 24-byte record with 64-bit size and offset");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

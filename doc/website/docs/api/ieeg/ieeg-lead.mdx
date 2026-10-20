@@ -38,6 +38,20 @@ const IeegLead& lead = implantation.leads().first(); // contacts ordered LA1, LA
 - Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
 - Build target: `ex_ieeg` (runs under CTest)
 
+## Used in examples
+
+### [ex_ieeg](../../examples/ieeg/ex_ieeg.mdx)
+
+IEEG library: group sEEG contacts into a lead, derive a bipolar montage and paint contact values onto a surface.
+
+````cpp title="src/examples/ex_ieeg/main.cpp, line 72"
+const IeegImplantation implantation(contacts, QStringLiteral("ACPC"));
+const IeegLead& lead = implantation.leads().first(); // contacts ordered LA1, LA2, LA3
+// IeegImplantation::readBids("sub-01_electrodes.tsv") reads the same from BIDS iEEG
+ok &= expect(implantation.leads().size() == 1 && lead.name == "LA" && lead.type == IeegLeadType::Depth && lead.contacts == QVector<int>({1, 2, 0}),
+             "IeegImplantation: one depth lead LA, ordered by contact number");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

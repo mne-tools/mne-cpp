@@ -192,6 +192,28 @@ Resets the averaged data stored.
 - Build target: `ex_dsp_rt` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
+## Used in examples
+
+### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+
+DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 155"
+RtAveragingWorker averager(10, 20, 80, 0, 0, 2, info); // up to 10 epochs, 20 pre / 80 post samples, trigger row 2
+FiffEvokedSet evokedSet;
+QObject::connect(&averager, &RtAveragingWorker::resultReady,
+                 [&](const FiffEvokedSet& set, const QStringList&) { evokedSet = set; });
+for (const MatrixXd& block : blocks) {
+    averager.doWork(block); // runs synchronously; RtAveraging moves this worker to a thread
+}
+// Average of k = 1..4 is 2.5 after the trigger and 0 before it; MEG0121 stays at -2
+bool avgOk = evokedSet.evoked.size() == 1;
+if (avgOk) {
+    const FiffEvoked& evoked = evokedSet.evoked.first();
+    avgOk = evoked.nave == nBlocks && evoked.data.cols() == 100 && evoked.comment == "1" && std::fabs(evoked.data(0, 30) - 2.5) < 1e-12 && std::fabs(evoked.data(0, 10)) < 1e-12 && std::fabs(evoked.data(1, 60) + 2.0) < 1e-12 && std::fabs(evoked.times(20)) < 1e-6;
+}
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;
