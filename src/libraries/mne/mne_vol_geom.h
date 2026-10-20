@@ -77,9 +77,9 @@ public:
 public:
     int valid;                          /**< Non-zero if the geometry information below is valid. */
     int width, height, depth;           /**< Dimensions of the volume stack (in voxels). */
-    float xsize, ysize, zsize;          /**< Voxel size in each direction (mm). */
+    float xsize, ysize, zsize;          /**< Voxel size in each direction (m; the file stores mm). */
     float x_ras[3], y_ras[3], z_ras[3]; /**< Direction cosines of the three voxel axes in RAS coordinates. */
-    float c_ras[3];                     /**< Center of the volume in RAS coordinates (mm). */
+    float c_ras[3];                     /**< Center of the volume in RAS coordinates (m; the file stores mm). */
     QString filename;                   /**< Path to the MRI data file this geometry was read from. */
 
     // ### OLD STRUCT ###
