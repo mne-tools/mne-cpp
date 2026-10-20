@@ -299,7 +299,7 @@ const FALLBACK_STABLE: GitHubRelease = {
  *  Page
  * ──────────────────────────────────────────────────────────────── */
 
-export default function Download(): JSX.Element {
+export default function Download(): React.JSX.Element {
     const [devRelease, setDevRelease] = useState<GitHubRelease | null>(null);
     const [stableRelease, setStableRelease] = useState<GitHubRelease | null>(null);
     const [devSha, setDevSha] = useState<string>('');

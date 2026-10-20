@@ -334,6 +334,16 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.contributorInitials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ifm-color-primary);
+    background: var(--ifm-color-emphasis-100);
+}
+
 .contributorLink:hover .contributorAvatar {
     border-color: var(--ifm-color-primary);
     box-shadow: 0 4px 12px rgba(108, 92, 231, 0.25);

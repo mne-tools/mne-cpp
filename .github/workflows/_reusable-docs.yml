@@ -35,6 +35,9 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v5
+      with:
+        # The contributor list counts the whole history
+        fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v6
@@ -59,9 +62,7 @@ jobs:
         sudo install -m 755 doxygen-1.16.1/bin/doxygen /usr/local/bin/doxygen
 
     - name: Generate contributor data
-      env:
-        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-      run: bash tools/generate_contributors.sh
+      run: python3 tools/generate_contributors.py
 
     - name: Download documentation screenshots
       uses: actions/download-artifact@v8

@@ -1,0 +1,65 @@
+# One canonical identity per contributor, used by git shortlog/log and by
+# tools/generate_contributors.py for the website. Names follow the Zenodo
+# record (10.5281/zenodo.593102) and the contributors' GitHub profiles.
+
+Christoph Dinh <christoph.dinh@mne-cpp.org> <chdinh@nmr.mgh.harvard.edu>
+Christoph Dinh <christoph.dinh@mne-cpp.org> <christoph.dinh@tu-ilmenau.de>
+Christoph Dinh <christoph.dinh@mne-cpp.org> <christoph.dinh@live.de>
+Christoph Dinh <christoph.dinh@mne-cpp.org> <christoph.dinh@brain-link.de>
+Christoph Dinh <christoph.dinh@mne-cpp.org> <christoph.dinh@zeiss.com>
+Christoph Dinh <christoph.dinh@mne-cpp.org> <chdinh@megreal.nmr.mgh.harvard.edu>
+Christoph Dinh <christoph.dinh@mne-cpp.org> <chdinh@megmix.nmr.mgh.harvard.edu>
+Christoph Dinh <christoph.dinh@mne-cpp.org> <chdinh@SourceLab.(none)>
+
+Lorenz Esch <lorenzesch@hotmail.com> <Lorenz.Esch@tu-ilmenau.de>
+Lorenz Esch <lorenzesch@hotmail.com> <lorenz.esch@tu-ilmenau.de>
+Lorenz Esch <lorenzesch@hotmail.com> <lorenzesch@outlook.com>
+Lorenz Esch <lorenzesch@hotmail.com> <lorenz.esch@outlook.de>
+Lorenz Esch <lorenzesch@hotmail.com> <lesch@megcon.nmr.mgh.harvard.edu>
+
+Juan Garcia-Prieto <juangpc@gmail.com> <juangpc@users.noreply.github.com>
+Juan Garcia-Prieto <juangpc@gmail.com> <juan@Juans-MacBook-Pro.local>
+
+Gabriel Motta <gabrielbenmotta@gmail.com> <gbmotta@mgh.harvard.edu>
+Gabriel Motta <gabrielbenmotta@gmail.com> <34070103+gabrielbmotta@users.noreply.github.com>
+
+Ruben Dörfel <doerfelruben@aol.com> <rdorfel@mgh.harvard.edu>
+Ruben Dörfel <doerfelruben@aol.com> <40984141+RDoerfel@users.noreply.github.com>
+Ruben Dörfel <doerfelruben@aol.com> <rd454@megatron.nmr.mgh.harvard.edu>
+
+Lars Debor <lars.debor@tu-ilmenau.de>
+Martin Henfling <martin.henfling@tu-ilmenau.de>
+Viktor Klüber <viktor.klueber@tu-ilmenau.de>
+Ricky Tjen <rickytjen@yahoo.com> <ricky270@student.sgu.ac.id>
+Ricky Tjen <rickytjen@yahoo.com>
+Limin Sun <liminsun@nmr.mgh.harvard.edu>
+Florian Schlembach <fschlembach@web.de> <florian.schlembach@tu-ilmenau.de>
+Daniel Strohmeier <daniel.strohmeier@gmail.com> <daniel.strohmeier@googlemail.com>
+Daniel Strohmeier <daniel.strohmeier@gmail.com> <daniel@daniel-ubuntu.(none)>
+Simon Heinke <simon.j.w.heinke@gmail.com> <simon.heinke@tu-ilmenau.de>
+Simon Heinke <simon.j.w.heinke@gmail.com>
+Wayne Mead <wayne.isk@gmail.com> <isk@imsorrykun.com>
+Wayne Mead <wayne.isk@gmail.com>
+Felix Arndt <lix_fa@web.de> <felix.arndt@tu-ilmenau.de>
+Felix Arndt <lix_fa@web.de>
+Christof Pieloth <pieloth@labp.htwk-leipzig.de> <cpieloth@gmx.net>
+Christof Pieloth <pieloth@labp.htwk-leipzig.de>
+Felix Griesau <femigr@gmail.com>
+Louis Eichhorst <louis.eichhorst@tu-ilmenau.de>
+Johannes Vorwerk <j.vorw01@gmail.com>
+Chiran Doshi <chiran.doshi@childrens.harvard.edu>
+Alex Rockhill <aprockhill@mailbox.org>
+Sugandha Sachdeva <sugandha.sachdeva@tu-ilmenau.de>
+Andreas Griesshammer <ag@fieldlineinc.com> <109684729+ag-fieldline@users.noreply.github.com>
+Erik Hornberger <erik.hornberger@shi-g.com>
+Faris Yahya <mfarisyahya@gmail.com>
+Julius Lerm <lerm.ju@googlemail.com>
+Marco Klamke <m.klamke@web.de>
+Franco Polo <franco_j_polo@hotmail.com>
+Petros Simidyan <petogun@gmail.com> <petros.simidyan@tu-ilmenau.de>
+Lorenz Esch <lorenzesch@hotmail.com>
+Juan Garcia-Prieto <juangpc@gmail.com>
+Gabriel Motta <gabrielbenmotta@gmail.com>
+Ruben Dörfel <doerfelruben@aol.com>
+Daniel Strohmeier <daniel.strohmeier@gmail.com>
+GBeret <g-beret@gmx.de> <G-Beret@gmx.de>
