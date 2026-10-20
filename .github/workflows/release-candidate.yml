@@ -1,0 +1,114 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+name: Release Candidate
+
+# GO/NO-GO for releasing the current staging commit (v2.4.0 T10.6). Every gate
+# must pass, there is no skip input: G1-G6 from the green Staging run of this
+# commit and the committed reports, G7 from the configured signing credentials,
+# G8 from the pinned onboarding results. The evidence bundle of a GO is kept as
+# an artifact, and the Approve job records who released which commit. Only then
+# is main fast-forwarded to exactly that commit and tagged (Release-Process.md).
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: release-candidate
+  cancel-in-progress: false
+
+jobs:
+  Gates:
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+
+    - name: Staging CI passed on this commit (G1-G6 builds, tests, coverage, docs, static gates)
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        run=$(gh run list --workflow staging.yml --commit "$GITHUB_SHA" --status success --limit 1 \
+              --json databaseId,url --jq '.[0].url')
+        if [ -z "$run" ]; then
+          echo "::error::No successful Staging run for $GITHUB_SHA"
+          exit 1
+        fi
+        echo "Staging run: $run" | tee -a "$GITHUB_STEP_SUMMARY"
+
+    - name: Release invariants (versions, changelog, untagged)
+      run: python3 tools/release/preflight.py --commit "$GITHUB_SHA" --remote "https://github.com/$GITHUB_REPOSITORY.git"
+
+    - name: Committed reports are current
+      run: python3 tools/quality/generate_quality_report.py --check
+
+    - name: Every measured release criterion is met (G1-G6, G8)
+      run: python3 tools/quality/generate_quality_report.py --gates | tee -a "$GITHUB_STEP_SUMMARY"
+
+    - name: Signing credentials are configured (G7)
+      env:
+        SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
+        SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+        APPLE_DEVELOPER_ID_P12: ${{ secrets.APPLE_DEVELOPER_ID_P12 }}
+        APPLE_DEVELOPER_ID_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        missing=0
+        for name in SIGNPATH_API_TOKEN SIGNPATH_ORGANIZATION_ID APPLE_DEVELOPER_ID_P12 \
+                    APPLE_DEVELOPER_ID_PASSWORD APPLE_ID APPLE_APP_PASSWORD APPLE_TEAM_ID; do
+          if [ -z "${!name}" ]; then
+            echo "::error::$name is not configured"
+            missing=1
+          fi
+        done
+        exit $missing
+
+    - name: Build and verify the evidence bundle
+      run: |
+        python3 tools/release/evidence_bundle.py build --out "$RUNNER_TEMP/evidence" \
+          --ci-run "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+        python3 tools/release/evidence_bundle.py verify "$RUNNER_TEMP/evidence"
+
+    - name: Keep the evidence bundle
+      uses: actions/upload-artifact@v7
+      with:
+        name: release-candidate-${{ github.sha }}
+        path: ${{ runner.temp }}/evidence
+        retention-days: 90
+
+    - name: Result
+      if: always()
+      env:
+        OUTCOME: ${{ job.status }}
+      run: |
+        if [ "$OUTCOME" = success ]; then
+          echo "## GO: release $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+        else
+          echo "## NO-GO: a release gate failed for $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+  Approve:
+    needs: Gates
+    runs-on: ubuntu-24.04
+    environment: release
+    steps:
+    - name: Record the approved commit
+      run: echo "Approved for release $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"

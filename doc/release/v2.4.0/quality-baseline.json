@@ -96,7 +96,7 @@
       "raw_delete": 50,
       "console_io": 0,
       "numeric_define": 0,
-      "qt_new_unparented": 924
+      "qt_new_unparented": 922
     },
     "G6_parity": {
       "reference": "1.11.0",
@@ -124,6 +124,55 @@
         "partial": 95
       },
       "equivalence_without_static_evidence": []
+    },
+    "G8_onboarding": {
+      "run": "https://github.com/mne-tools/mne-cpp/actions/runs/39109986985",
+      "results": {
+        "linux": {
+          "ok": true,
+          "failed_step": null,
+          "total_seconds": 987.4,
+          "checkout_bytes": 877641793,
+          "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+          "dependencies": null
+        },
+        "macos": {
+          "ok": true,
+          "failed_step": null,
+          "total_seconds": 1732.5,
+          "checkout_bytes": 1019192161,
+          "platform": "macOS-26.6.2-arm64-arm-64bit",
+          "dependencies": null
+        },
+        "windows": {
+          "ok": false,
+          "failed_step": "cmake --build build\\developer-dynamic --config Release --parallel 4",
+          "total_seconds": 61.3,
+          "checkout_bytes": 565537394,
+          "platform": "Windows-10-10.0.26100-SP0",
+          "dependencies": null
+        }
+      },
+      "trend": {
+        "linux": [
+          22,
+          20,
+          18,
+          16
+        ],
+        "macos": [
+          27,
+          31,
+          23,
+          29
+        ],
+        "windows": [
+          1,
+          1,
+          2,
+          1
+        ]
+      }
     }
   }
 }

@@ -1,0 +1,70 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+name: Release Verification
+
+# Download a published release on clean runners and check it (v2.4.0 T10.4):
+# every required asset present and matching SHA256SUMS, signing status as
+# required, and the platform's dynamic build unpacks and starts.
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+      prefix:
+        description: Asset name prefix; default mne-cpp-<tag without v>
+        required: false
+        type: string
+        default: ''
+      require_signed:
+        required: true
+        type: boolean
+
+jobs:
+  Verify:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            platform: linux
+          - runner: macos-26
+            platform: macos
+          - runner: windows-2025-vs2026
+            platform: windows
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+      with:
+        persist-credentials: false
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.11'
+
+    - name: Download the release
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+        TAG: ${{ inputs.tag }}
+      run: gh release download "$TAG" -D "$RUNNER_TEMP/assets"
+
+    - name: Verify assets and start the build
+      shell: bash
+      env:
+        PREFIX: ${{ inputs.prefix }}
+        TAG: ${{ inputs.tag }}
+        PLATFORM: ${{ matrix.platform }}
+        REQUIRE_SIGNED: ${{ inputs.require_signed && '--require-signed' || '' }}
+      run: |
+        PREFIX="${PREFIX:-mne-cpp-${TAG#v}}"
+        # shellcheck disable=SC2086
+        python tools/release/verify_release.py "$RUNNER_TEMP/assets" --prefix "$PREFIX" \
+          --platform "$PLATFORM" $REQUIRE_SIGNED

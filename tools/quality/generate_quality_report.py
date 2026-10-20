@@ -163,6 +163,15 @@ def build_dashboard(sections: dict[str, dict[str, Any]]) -> dict[str, Any]:
             "equivalence_without_static_evidence": parity["summary"]["equivalence_without_static_evidence"],
         },
     }
+    onboarding = RELEASE_DIR / "onboarding-results.json"
+    if onboarding.is_file():
+        pinned = json.loads(onboarding.read_text(encoding="utf-8"))
+        gates["G8_onboarding"] = {
+            "run": pinned["run"],
+            "results": pinned["results"],
+            "trend": {os_name: [round(entry[os_name] / 60) for entry in pinned["history"] if os_name in entry]
+                      for os_name in pinned["results"]},
+        }
     return {
         "schema_version": 1,
         "generated_by": "tools/quality/generate_quality_report.py",
@@ -171,7 +180,8 @@ def build_dashboard(sections: dict[str, dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def render_dashboard(report: dict[str, Any]) -> str:
+def dashboard_rows(report: dict[str, Any]) -> list[tuple[str, str, str, str]]:
+    """One (gate, criterion, current value, status) row per release criterion."""
     g = report["gates"]
     t = report["thresholds"]
     g1, g2, g3, g4, g5, g6 = (g[k] for k in (
@@ -225,6 +235,17 @@ def render_dashboard(report: dict[str, Any]) -> str:
          ", ".join(f"{k} {v}" for k, v in g6["claims_by_evidence"].items()),
          status(g6["claims_by_evidence"]["unverified"] == 0 and g6["claims_by_evidence"]["cross-validated-live"] == 0)),
     ]
+    for os_name, run in g.get("G8_onboarding", {}).get("results", {}).items():
+        trend = " -> ".join(f"{m}" for m in g["G8_onboarding"]["trend"].get(os_name, []))
+        rows.append(("G8", f"Documented setup works on {os_name}",
+                     f"{'passed' if run['ok'] else 'failed at `' + str(run['failed_step']) + '`'} in "
+                     f"{run['total_seconds'] / 60:.0f} min, checkout {run['checkout_bytes'] / 2**30:.1f} GiB; "
+                     f"setup minutes over pinned runs: {trend}", status(run["ok"])))
+    return rows
+
+
+def render_dashboard(report: dict[str, Any]) -> str:
+    g2 = report["gates"]["G2_coverage"]
     lines = [
         "# MNE-CPP v2.4.0 quality baseline",
         "",
@@ -234,7 +255,7 @@ def render_dashboard(report: dict[str, Any]) -> str:
         "| Gate | Criterion | Current | Status |",
         "|---|---|---|---|",
     ]
-    lines += [f"| {gate} | {criterion} | {current} | {state} |" for gate, criterion, current, state in rows]
+    lines += [f"| {gate} | {criterion} | {current} | {state} |" for gate, criterion, current, state in dashboard_rows(report)]
     lines += [
         "",
         "Detailed reports: [test inventory](test-inventory.md), [coverage](coverage-baseline.md), "
@@ -242,7 +263,7 @@ def render_dashboard(report: dict[str, Any]) -> str:
         "[maintainability](maintainability-baseline.md), [parity evidence](parity-baseline.md), "
         "[MNE-Python gap](mne-python-gap.md).",
         "",
-        "G7 (signed artifacts) and G8 (clean-machine onboarding) are not measurable from the tree; they are tracked in TASK 10.",
+        "G7 (signed artifacts) is verified on the tagged release; see `release-evidence.json` on the release page.",
     ]
     return "\n".join(lines) + "\n"
 
@@ -263,9 +284,18 @@ def expected_outputs(out_dir: Path = RELEASE_DIR) -> dict[Path, str]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--check", action="store_true", help="fail if a committed report differs from a fresh one")
+    parser.add_argument("--gates", action="store_true", help="fail if a release criterion of the dashboard is open")
     parser.add_argument("--out-dir", type=Path, default=RELEASE_DIR,
                         help="write reports here instead of the committed baseline (e.g. for a CI artifact)")
     args = parser.parse_args(argv)
+
+    if args.gates:
+        report = json.loads((RELEASE_DIR / "quality-baseline.json").read_text(encoding="utf-8"))
+        open_rows = [row for row in dashboard_rows(report) if row[3] == "**open**"]
+        for gate, criterion, current, _ in open_rows:
+            print(f"OPEN {gate}: {criterion} ({current})")
+        print("NO-GO" if open_rows else "GO: every measured release criterion is met.")
+        return 1 if open_rows else 0
 
     out_dir = args.out_dir.resolve()
     outputs = expected_outputs(out_dir)

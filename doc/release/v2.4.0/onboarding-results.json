@@ -1,0 +1,59 @@
+{
+  "run": "https://github.com/mne-tools/mne-cpp/actions/runs/39109986985",
+  "results": {
+    "linux": {
+      "ok": true,
+      "failed_step": null,
+      "total_seconds": 987.4,
+      "checkout_bytes": 877641793,
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "dependencies": null
+    },
+    "macos": {
+      "ok": true,
+      "failed_step": null,
+      "total_seconds": 1732.5,
+      "checkout_bytes": 1019192161,
+      "platform": "macOS-26.6.2-arm64-arm-64bit",
+      "dependencies": null
+    },
+    "windows": {
+      "ok": false,
+      "failed_step": "cmake --build build\\developer-dynamic --config Release --parallel 4",
+      "total_seconds": 61.3,
+      "checkout_bytes": 565537394,
+      "platform": "Windows-10-10.0.26100-SP0",
+      "dependencies": null
+    }
+  },
+  "history": [
+    {
+      "run": "https://github.com/mne-tools/mne-cpp/actions/runs/38903076923",
+      "date": "2026-10-16",
+      "linux": 1328.5,
+      "macos": 1644.1,
+      "windows": 44.2
+    },
+    {
+      "run": "https://github.com/mne-tools/mne-cpp/actions/runs/39059261700",
+      "date": "2026-10-17",
+      "linux": 1183.3,
+      "macos": 1844.1,
+      "windows": 43.6
+    },
+    {
+      "run": "https://github.com/mne-tools/mne-cpp/actions/runs/39095029569",
+      "date": "2026-10-18",
+      "linux": 1085.1,
+      "macos": 1395.7,
+      "windows": 90.2
+    },
+    {
+      "run": "https://github.com/mne-tools/mne-cpp/actions/runs/39109986985",
+      "date": "2026-10-18",
+      "linux": 987.4,
+      "macos": 1732.5,
+      "windows": 61.3
+    }
+  ]
+}

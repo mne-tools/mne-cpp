@@ -281,6 +281,20 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v5
 
+    # T10.6: only a commit that passed the Release Candidate gates and its approval is released
+    - name: Tagged commit passed the release candidate
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        run=$(gh run list --workflow release-candidate.yml --commit "$GITHUB_SHA" --status success --limit 1 \
+              --json url --jq '.[0].url')
+        if [ -z "$run" ]; then
+          echo "::error::$GITHUB_SHA has no successful Release Candidate run; release from the verified commit"
+          exit 1
+        fi
+        echo "Release candidate: $run" >> "$GITHUB_STEP_SUMMARY"
+
     - name: Create version branch for new minor releases
       run: |
         TAG="${GITHUB_REF#refs/tags/}"
@@ -524,3 +538,12 @@ jobs:
     with:
       tag: ${{ github.ref_name }}
     secrets: inherit
+
+  # ── Clean-machine verification of the published release (T10.4) ────
+  VerifyRelease:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: ReleaseEvidence
+    uses: ./.github/workflows/_reusable-release-verify.yml
+    with:
+      tag: ${{ github.ref_name }}
+      require_signed: true

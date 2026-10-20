@@ -18,11 +18,14 @@ Coverage from `2feea06a7` (https://github.com/mne-tools/mne-cpp/actions/runs/388
 | G4 | Documentation images generated in CI | 19 referenced, 0 without producer, placeholders in 0 workflows | met |
 | G4 | Visual regression compares to goldens | 19 golden comparisons | met |
 | G5 | Zero compiler warnings | enforced by -Werror on every matrix entry | met |
-| G5 | Debt metrics ratcheted | null_macro 0, typedef_struct 0, c_style_cast 0, raw_new 0, raw_delete 50, console_io 0, numeric_define 0, qt_new_unparented 924 | baseline recorded |
+| G5 | Debt metrics ratcheted | null_macro 0, typedef_struct 0, c_style_cast 0, raw_new 0, raw_delete 50, console_io 0, numeric_define 0, qt_new_unparented 922 | baseline recorded |
 | G6 | Pinned reference environment | MNE-Python 1.11.0; lock `tools/parity/reference_lock.json`; CI installs exactly the lock | met |
 | G6 | Equivalent/exceeds claims are cross-validated | equivalent 139, exceeds 0, implemented 122, partial 95; 0 without embedded MNE-Python values | met |
 | G6 | Every claim has evidence, none compares live | cross-validated-static 174, cross-validated-live 0, tested 182, unverified 0 | met |
+| G8 | Documented setup works on linux | passed in 16 min, checkout 0.8 GiB; setup minutes over pinned runs: 22 -> 20 -> 18 -> 16 | met |
+| G8 | Documented setup works on macos | passed in 29 min, checkout 0.9 GiB; setup minutes over pinned runs: 27 -> 31 -> 23 -> 29 | met |
+| G8 | Documented setup works on windows | failed at `cmake --build build\developer-dynamic --config Release --parallel 4` in 1 min, checkout 0.5 GiB; setup minutes over pinned runs: 1 -> 1 -> 2 -> 1 | **open** |
 
 Detailed reports: [test inventory](test-inventory.md), [coverage](coverage-baseline.md), [API evidence](api-evidence-baseline.md), [visual](visual-baseline.md), [maintainability](maintainability-baseline.md), [parity evidence](parity-baseline.md), [MNE-Python gap](mne-python-gap.md).
 
-G7 (signed artifacts) and G8 (clean-machine onboarding) are not measurable from the tree; they are tracked in TASK 10.
+G7 (signed artifacts) is verified on the tagged release; see `release-evidence.json` on the release page.

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
-  "scanned_files": 1507,
-  "scanned_lines": 395212,
+  "scanned_files": 1504,
+  "scanned_lines": 394573,
   "metrics": {
     "null_macro": {
       "total": 0,
@@ -108,10 +108,10 @@
       "all_files": {}
     },
     "qt_new_unparented": {
-      "total": 924,
-      "files": 107,
+      "total": 922,
+      "files": 106,
       "by_scope": {
-        "applications": 786,
+        "applications": 784,
         "libraries": 138
       },
       "suppressed": [],
@@ -154,7 +154,6 @@
         "src/applications/mne_analyze/plugins/rawdataviewer/fiffrawview.cpp": 2,
         "src/applications/mne_analyze/plugins/rawdataviewer/rawdataviewer.cpp": 1,
         "src/applications/mne_analyze/plugins/sampleplugin/sampleplugin.cpp": 5,
-        "src/applications/mne_analyze/plugins/view3d/3dview.cpp": 2,
         "src/applications/mne_analyze/plugins/view3d/view3d.cpp": 1,
         "src/applications/mne_analyze_studio/extensions/analysis_results_extension/analysisresultswidget.cpp": 17,
         "src/applications/mne_analyze_studio/extensions/dummy_3d_extension/dummy3dhostedviewwidget.cpp": 4,
