@@ -55,6 +55,3 @@ the host needs to:
   decision is made, the entry point of every new `mne_inspect` plugin is the
   C++ class itself — there are no plugin metadata files, JSON manifests, or
   `Q_PLUGIN_METADATA` macros in this directory.
-- **NIfTI loading.** `MriSlicesPlugin::loadVolume` currently rejects
-  non-MGH/MGZ paths because `MRILIB::MriVolData` only ships MGH/MGZ IO at
-  v2.3.0. Wiring NIfTI is tracked separately.

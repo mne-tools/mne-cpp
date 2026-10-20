@@ -1,7 +1,7 @@
 {
   "mna_format_version": "1.0",
   "name": "MNE-CPP default workflow (sensor \u2192 filter \u2192 display)",
-  "description": "Minimal demonstration workflow shipped with the v2.3.0 installer. Loads a raw FIFF recording, applies a band-pass temporal filter, and exposes the filtered stream for the host application (MNE Scan / MNE Analyze Studio) to display. Replace 'raw_path' below with the path to any FIFF raw recording on disk \u2014 e.g. the MNE sample dataset's 'sample_audvis_raw.fif'.",
+  "description": "Minimal demonstration workflow shipped with the installer. Loads a raw FIFF recording, applies a band-pass temporal filter, and exposes the filtered stream for the host application (MNE Scan / MNE Analyze Studio) to display. Replace 'raw_path' below with the path to any FIFF raw recording on disk \u2014 e.g. the MNE sample dataset's 'sample_audvis_raw.fif'.",
   "resources": [
     {
       "uid": "raw_in",

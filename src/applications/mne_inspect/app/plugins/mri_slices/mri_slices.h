@@ -63,9 +63,7 @@ namespace MRISLICESPLUGIN
  * @brief mne_inspect plugin: load an MRI volume and render ortho slices.
  *
  * Responsibilities:
- *   - Load a 3-D volume from MGH / MGZ via `MRILIB::MriVolData::read`. NIfTI
- *     is not yet wired (the codebase ships only MGH/MGZ IO at v2.3.0); see
- *     plugins/README.md for the open question.
+ *   - Load a 3-D volume from MGH / MGZ / NIfTI via `MRILIB::MriVolData::read`.
  *   - Maintain a crosshair in MRI RAS coordinates and (re-)materialise three
  *     `DISP3DLIB::SliceObject` payloads (axial, coronal, sagittal) that
  *     intersect that crosshair.
