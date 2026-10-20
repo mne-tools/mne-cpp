@@ -178,6 +178,39 @@ Calculate the compensated field and gradient for one dipole component.
 
 ---
 
+## Example
+
+No example of its own: CTF compensation wrapper that FwdBemModel builds for compensated coil sets during ComputeFwd; callers reach it through ComputeFwd.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_fwd_api/main.cpp"
+// mne_forward_solution --meg --eeg --accurate --label V1-lh.label with sphere models instead of a BEM
+const QString label = tmp.filePath("V1-lh.label"); // the hemisphere is taken from the "-lh.label" suffix
+QFile::copy(data + "/subjects/sample/label/lh.V1.label", label);
+auto settings = std::make_shared<ComputeFwdSettings>();
+settings->include_meg = true;
+settings->include_eeg = true;
+settings->accurate = true;
+settings->srcname = data + "/subjects/sample/bem/sample-oct-6-src.fif";
+settings->measname = rawFile.fileName();
+settings->mriname = data + "/MEG/sample/all-trans.fif";
+settings->r0 = origin;
+settings->eeg_sphere_rad = 0.09f;
+settings->mindist = 0.0f;
+settings->filter_spaces = false;
+settings->labels = {label};
+settings->nlabel = 1;
+settings->solname = tmp.filePath("V1-fwd.fif");
+settings->pFiffInfo = QSharedPointer<FiffInfo>::create(raw.info);
+settings->checkIntegrity();
+auto fwd = std::make_shared<ComputeFwd>(settings)->calculateFwd();
+QFile solFile(settings->solname);
+fwd->write(solFile);
+````
+
+From [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

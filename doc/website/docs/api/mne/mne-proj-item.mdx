@@ -157,7 +157,7 @@ Iterates over `list` and checks if any channel name matches a column in the proj
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 257"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 295"
 MNEProjOp::makeProjection({rawFile.fileName()}, rawInfo.chInfo, rawInfo.nchan, proj);
 proj->assign_channels(mneRaw->ch_names, rawInfo.nchan);
 proj->make_proj();

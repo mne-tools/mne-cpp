@@ -139,7 +139,7 @@ Compute the centre of mass of the activity at a given time point.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 193"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 204"
 // A volume estimate keeps the grid shape, so a time slice can be written back into the full grid.
 InvVolumeSourceEstimate volumeStc(stc.data.topRows(4), VectorXi::LinSpaced(4, 0, 6), stc.tmin, stc.tstep);
 volumeStc.setShape({2, 2, 2}); // 8 voxels, 4 of them sources

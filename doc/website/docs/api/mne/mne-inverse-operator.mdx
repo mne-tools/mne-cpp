@@ -39,6 +39,14 @@ InvMinimumNorm dspm(inverse, lambda2, "dSPM");
 const InvSourceEstimate stc = dspm.calculateInverse(evoked); // one row per source, combined over orientations
 ```
 
+```cpp title="src/examples/ex_inv_api/main.cpp"
+// The same clustering on the inverse kernel: one x/y/z column triple per cluster of the transposed kernel
+InvMinimumNorm clusteredMne(inverse, lambda2, "MNE");
+clusteredMne.doInverseSetup(evoked.nave);
+MatrixXd kernelMean; // 3 x 70 source components -> 3 x nClusters, averaging per orientation
+const MatrixXd clusteredKernelT = clusteredMne.getPreparedInverseOperator().cluster_kernel(aparc, 20, kernelMean, "sqeuclidean");
+```
+
 ---
 
 ## Public Methods
@@ -341,6 +349,20 @@ Read an inverse operator from a FIFF file.
 
 ## Used in examples
 
+### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+
+````cpp title="src/examples/ex_inv_api/main.cpp, line 121"
+const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
+const float lambda2 = 1.0f / 9.0f; // SNR 3
+InvMinimumNorm dspm(inverse, lambda2, "dSPM");
+const InvSourceEstimate stc = dspm.calculateInverse(evoked); // one row per source, combined over orientations
+// mne.minimum_norm.apply_inverse(evoked, inv, 1/9, "dSPM"): 70 x 421, sum |stc| = 372483.6, stc[0, 0] = 5.00927
+ok &= expect(stc.data.rows() == 70 && stc.data.cols() == 421 && near(stc.data.cwiseAbs().sum(), 372483.6177246599, 1e-4) && near(stc.data(0, 0), 5.0092691144321755, 1e-4) && near(stc.tmin, -0.19979521, 1e-6),
+             "InvMinimumNorm/InvSourceEstimate: dSPM on 70 V1 sources matches mne.minimum_norm.apply_inverse");
+````
+
 ### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
@@ -359,20 +381,6 @@ const bool inverseArrived = waitFor(inverseDone, 60000);
 ok &= expect(inverseArrived && inverse.nsource == fwd->nsource && inverse.nchan == 305 && rawInfo->bads.contains("MEG2443"),
              QString("RtInvOp builds a %1-channel operator for %2 sources").arg(inverse.nchan).arg(inverse.nsource));
 rtInvOp.stop();
-````
-
-### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
-
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
-
-````cpp title="src/examples/ex_inv_api/main.cpp, line 121"
-const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
-const float lambda2 = 1.0f / 9.0f; // SNR 3
-InvMinimumNorm dspm(inverse, lambda2, "dSPM");
-const InvSourceEstimate stc = dspm.calculateInverse(evoked); // one row per source, combined over orientations
-// mne.minimum_norm.apply_inverse(evoked, inv, 1/9, "dSPM"): 70 x 421, sum |stc| = 372483.6, stc[0, 0] = 5.00927
-ok &= expect(stc.data.rows() == 70 && stc.data.cols() == 421 && near(stc.data.cwiseAbs().sum(), 372483.6177246599, 1e-4) && near(stc.data(0, 0), 5.0092691144321755, 1e-4) && near(stc.tmin, -0.19979521, 1e-6),
-             "InvMinimumNorm/InvSourceEstimate: dSPM on 70 V1 sources matches mne.minimum_norm.apply_inverse");
 ````
 
 ### [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx)

@@ -19,6 +19,27 @@ Per-row input bundle for parallel multi-taper spectral estimation (data row, tap
 
 ---
 
+## Example
+
+No example of its own: Per-row work item of the parallel tapered-spectra computation in Spectral; built and consumed only there.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_math/main.cpp"
+const int nSamples = 200;
+const double sFreq = 100.0;
+RowVectorXd signal(nSamples);
+for (int t = 0; t < nSamples; ++t) {
+    signal(t) = 2.0 * std::sin(2.0 * kPi * 10.0 * t / sFreq); // 10 Hz, amplitude 2
+}
+const auto [tapers, weights] = Spectral::generateTapers(nSamples, std::string("hanning"));
+const MatrixXcd spectra = Spectral::computeTaperedSpectraRow(signal, tapers, nSamples);
+const RowVectorXd psd = Spectral::psdFromTaperedSpectra(spectra, weights, nSamples, sFreq);
+const VectorXd freqs = Spectral::calculateFFTFreqs(nSamples, sFreq);
+````
+
+From [ex_math](../../examples/math/ex_math.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

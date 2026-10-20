@@ -19,6 +19,25 @@ Input bundle for the real-time inverse operator worker containing noise covarian
 
 ---
 
+## Example
+
+No example of its own: Queue item RtInvOp hands to its RtInvOpWorker thread; built by RtInvOp::append, never by callers.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp"
+RtInvOp rtInvOp(rawInfo, fwd); // MEG-only operator, loose 0.2, depth 0.8
+MNEInverseOperator inverse;
+bool inverseDone = false;
+QObject::connect(&rtInvOp, &RtInvOp::invOperatorCalculated, [&](const MNEInverseOperator& op) {
+    inverse = op;
+    inverseDone = true;
+});
+rtInvOp.append(noiseCov); // e.g. each new RtCov estimate
+````
+
+From [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

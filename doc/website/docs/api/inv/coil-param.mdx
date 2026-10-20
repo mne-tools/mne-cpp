@@ -27,6 +27,24 @@ Estimated dipole parameters (position, moment, goodness-of-fit) for a single HPI
 
 ---
 
+## Example
+
+No example of its own: Per-coil dipole record InvHpiFit passes between its private fit steps; callers read HpiFitResult.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_inv_hpi/main.cpp"
+InvHpiDataUpdater updater(info); // good MEG channels, their sensors and the digitised coil positions
+updater.prepareDataAndProjectors(segment, MatrixXd::Identity(info->nchan, info->nchan));
+// The coil frequencies are known but not their order; the first fit with bOrderFrequencies finds it.
+const InvHpiModelParameters model(QVector<int>({154, 158, 161, 166}), info->sfreq, info->linefreq, true);
+InvHpiFit hpi(updater.getSensors());
+HpiFitResult fit;
+hpi.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getHpiDigitizer(), true, fit);
+````
+
+From [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

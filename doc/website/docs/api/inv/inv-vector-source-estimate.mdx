@@ -128,7 +128,7 @@ Project the 3D vectors onto surface normals to produce a signed scalar estimate.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 183"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 194"
 // The MNE kernel keeps x, y and z per source: an apply_inverse(..., pick_ori="vector") estimate.
 const MatrixXd goodData = evoked.pick_channels(inverse.noise_cov->names).data;
 const InvVectorSourceEstimate vectorStc(kernel * goodData, stc.vertices, stc.tmin, stc.tstep);

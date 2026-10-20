@@ -137,6 +137,20 @@ class TestSnippetRendering(SnippetRenderingTestCase):
         self.assertNotIn("return 0;", page)
 
 
+    def test_exempt_type_shows_reason_and_the_examples_using_it(self) -> None:
+        entry = {key: value for key, value in self.entry.items()
+                 if key not in ("example", "example_snippet", "example_mode", "required_data", "screenshots")}
+        entry.update(example_exempt=True, example_exempt_reason="Built inside Gadget.",
+                     example_used_in=["ex_widget/main.cpp#widget_use"])
+        code, page = self.run_generator("", entry)
+        self.assertEqual(0, code, page)
+        example = page[page.index("## Example"):page.index("## Authors")]
+        self.assertIn("No example of its own: Built inside Gadget.", example)
+        expected = textwrap.dedent("\n".join(REGION))
+        self.assertIn(f'````cpp title="src/examples/ex_widget/main.cpp"\n{expected}\n````', example)
+        self.assertIn("From [ex_widget](", example)
+
+
 class TestStrictErrors(SnippetRenderingTestCase):
     def assert_fails(self, detail: str, fragment: str, entry: dict | None = None) -> None:
         code, _ = self.run_generator(detail, entry)

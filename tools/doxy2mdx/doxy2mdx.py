@@ -40,7 +40,9 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
-import generate_examples
+# Importable when this file is loaded by path, as the quality tests do
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import generate_examples  # noqa: E402
 
 LOG = logging.getLogger("doxy2mdx")
 
@@ -835,6 +837,8 @@ def _render_example_section(reg_entry: dict,
     in the class description.
     """
     example = reg_entry.get("example")
+    if reg_entry.get("example_exempt"):
+        _render_exempt_example_section(reg_entry, repo_root, lines)
     if not example:
         return
     ex_dir = repo_root / "src" / "examples" / example
@@ -863,12 +867,55 @@ def _render_example_section(reg_entry: dict,
         lines.append("")
 
 
+def _example_region(repo_root: Path, ref: str) -> List[str]:
+    """Dedented lines of the ``//! [region]`` block named by ``<example>/<file>#<region>``."""
+    path, _, region = ref.partition("#")
+    source = repo_root / "src" / "examples" / path
+    if not source.is_file():
+        raise SystemExit(f"example_used_in '{ref}': no such file src/examples/{path}")
+    marker = f"//! [{region}]"
+    found = [i for i, line in enumerate(source.read_text(encoding="utf-8").splitlines()) if line.strip() == marker]
+    if len(found) != 2:
+        raise SystemExit(f"example_used_in '{ref}': marker {marker} appears {len(found)} times")
+    body = source.read_text(encoding="utf-8").splitlines()[found[0] + 1:found[1]]
+    return textwrap.dedent("\n".join(body)).splitlines()
+
+
+def _render_exempt_example_section(reg_entry: dict, repo_root: Path, lines: List[str]) -> None:
+    """``## Example`` for a type callers never build: the reason and the examples that exercise it."""
+    lines.append("## Example")
+    lines.append("")
+    lines.append("No example of its own: " + generate_examples.mdx_text(reg_entry["example_exempt_reason"]))
+    lines.append("")
+    refs = reg_entry.get("example_used_in", [])
+    if not refs:
+        return
+    lines.append("It is exercised by:")
+    lines.append("")
+    for ref in refs:
+        path = ref.partition("#")[0]
+        name = path.split("/")[0]
+        libraries = generate_examples.example_info(repo_root / "src" / "examples" / name)[0]
+        lines.append(f"````cpp title=\"src/examples/{path}\"")
+        lines.extend(_example_region(repo_root, ref))
+        lines.append("````")
+        lines.append("")
+        target = (f"../../examples/{libraries[0]}/{name}.mdx" if libraries
+                  else f"{GITHUB_TREE}/src/examples/{path}")
+        lines.append(f"From [{name}]({target}).")
+        lines.append("")
+
+
 EMBEDDED_EXAMPLES = 3
 
 
-def _render_example_usages(short_name: str, library: str, repo_root: Path, lines: List[str]) -> None:
-    """Append ``## Used in examples``: the first use in the top examples, links to the rest."""
-    found = generate_examples.usages(short_name, library, repo_root)
+def _render_example_usages(short_name: str, library: str, repo_root: Path, lines: List[str],
+                           shown: Iterable[str] = ()) -> None:
+    """Append ``## Used in examples``: the first use in the top examples, links to the rest.
+
+    Examples in *shown* are already quoted on the page and are left out.
+    """
+    found = [use for use in generate_examples.usages(short_name, library, repo_root) if use["name"] not in shown]
     if not found:
         return
     lines.append("## Used in examples")
@@ -1060,7 +1107,8 @@ def generate_class_mdx(compounddef,
 
     # --- Example (sourced from src/examples/<ex_id>/main.cpp) ---
     _render_example_section(reg_entry, repo_root, lines)
-    _render_example_usages(short_name, include_dir, repo_root, lines)
+    _render_example_usages(short_name, include_dir, repo_root, lines,
+                           {ref.split("/")[0] for ref in reg_entry.get("example_used_in", [])})
 
     # --- Authors footer (every source file must list its authors;
     #     the generator aborts at the end if any were missed). ---

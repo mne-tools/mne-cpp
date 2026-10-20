@@ -330,7 +330,9 @@ def validate_examples(repo_root: Path, registry: Dict[str, Any],
     Optional per-class fields: ``example`` (directory under src/examples),
     ``example_snippet`` (list of ``<example>/<file>#<region>``), ``example_mode``
     (run|compile), ``required_data`` (dataset names), ``example_exempt`` with
-    ``example_exempt_reason``, and ``screenshots`` (manifest ids).
+    ``example_exempt_reason`` and optional ``example_used_in`` (snippet refs of
+    the examples whose calls exercise the exempt type), and ``screenshots``
+    (manifest ids).
     """
     examples_dir = repo_root / "src" / "examples"
     markers, issues = example_markers(examples_dir)
@@ -363,6 +365,13 @@ def validate_examples(repo_root: Path, registry: Dict[str, Any],
             issues.append(f"{where}: 'example_exempt_reason' without 'example_exempt: true'")
         if exempt and example:
             issues.append(f"{where}: exempt but names example '{example}'")
+        used_in = cls.get("example_used_in", [])
+        if used_in and not exempt:
+            issues.append(f"{where}: 'example_used_in' without 'example_exempt: true'")
+        for ref in used_in if isinstance(used_in, list) else [used_in]:
+            path, _, region = str(ref).partition("#")
+            if not region or markers.get(path, Counter())[region] != 2:
+                issues.append(f"{where}: example_used_in '{ref}' has no balanced region in src/examples")
 
         if example:
             if example not in targets:

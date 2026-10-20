@@ -19,6 +19,22 @@ A section in the report (title + HTML content).
 
 ---
 
+## Example
+
+No example of its own: Private storage record of Report; sections are created through the Report::add* methods.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_utils/main.cpp"
+Report report("Example report");
+report.addText("Summary", "All utilities were exercised.");
+report.addTable("Montage", {"Electrode", "z (m)"}, {{"Cz", "0.087"}, {"Fp1", "0.033"}});
+const QString html = report.toHtml();
+report.save(dir.filePath("report.html"));
+````
+
+From [ex_utils](../../examples/utils/ex_utils.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

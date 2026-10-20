@@ -41,6 +41,20 @@ Compute derived geometry (edge vectors, normal, area, centroid, auxiliary unit v
 
 ---
 
+## Example
+
+No example of its own: Per-triangle cache (centroid, area, normal) filled by MNESurfaceOrVolume::add_triangle_data; read through MNEBemSurface/MNESourceSpaces.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_mne_api/main.cpp"
+QFile bemFile(data + "/subjects/sample/bem/sample-5120-bem.fif");
+MNEBem bem(bemFile); // one MNEBemSurface per BEM layer
+const MNEBemSurface& innerSkull = bem[0];
+````
+
+From [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -40,6 +40,24 @@ Destroys the [`MNEProjData`](/docs/api/mne/mne-proj-data).
 
 ---
 
+## Example
+
+No example of its own: Search-acceleration record (triangle activity mask) internal to MNESurface::project_to_surface; callers use MNEProjectToSurface.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_mne_api/main.cpp"
+MNEProjectToSurface projector(innerSkull);
+MatrixXf points(2, 3);
+points << 0.0f, 0.0f, 0.12f, 0.05f, 0.01f, 0.03f; // one point outside, one inside the skull
+MatrixXf onSurface;
+VectorXi triangle;
+VectorXf distance;
+projector.find_closest_on_surface(points, points.rows(), onSurface, triangle, distance);
+````
+
+From [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

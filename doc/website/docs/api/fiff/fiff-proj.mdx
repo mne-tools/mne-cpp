@@ -228,7 +228,7 @@ ok &= expect(pca.desc == "PCA-v1" && !pca.active && pca.data->nrow == 1 && pca.d
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 413"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 451"
 MatrixXi eventsBack;
 MNE::read_events(eveName, rawFile.fileName(), eventsBack);
 QList<FiffProj> projs = raw.info.projs; // stored inactive in the raw file

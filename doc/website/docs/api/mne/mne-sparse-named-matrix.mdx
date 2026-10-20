@@ -99,7 +99,7 @@ Reads a sparse named matrix (MNE-C `mne_read_sparse_named_matrix`).
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 479"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 517"
 // The derived channel is the difference of its inputs, read in one pass
 ok &= expect(derivations->count() == 2 && fromFif->count() == 2 && usable == 1 && mneRaw->deriv_matched->deriv_data->nrow == 1 && segment.row(0).isApprox(segment.row(1) - segment.row(2), 1e-6f),
              "MNEDerivSet/MNEDeriv/MNESparseNamedMatrix: MNE-C montage file, matched to the recording and read by MNERawData");

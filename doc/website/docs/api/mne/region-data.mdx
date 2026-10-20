@@ -27,6 +27,28 @@ Input parameters for cluster-based forward solution computation on a single cort
 
 ---
 
+## Example
+
+No example of its own: Per-region work item of the parallel clustering in MNEForwardSolution::cluster_forward_solution; built and consumed only there.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_inv_api/main.cpp"
+// Cluster the V1 sources within their aparc regions into groups of about 20 (k-means on the gain columns;
+// squared Euclidean distance makes each centroid the mean of its sources)
+const FsAnnotationSet aparc(data + "/subjects/sample/label/lh.aparc.annot", data + "/subjects/sample/label/rh.aparc.annot");
+MatrixXd clusterMean; // 3 x 70 sources -> 3 x nClusters, averaging per orientation
+const MNEForwardSolution clustered = fwd.cluster_forward_solution(aparc, 20, clusterMean, FiffCov(), FiffInfo(), "sqeuclidean");
+const MNEClusterInfo& clusters = clustered.src.hemisphereAt(0)->cluster_info;
+int assigned = 0;
+for (const VectorXi& members : clusters.clusterVertnos) {
+    assigned += static_cast<int>(members.size());
+}
+clusters.write(tmp.filePath("v1-clusters.txt")); // plus centroids_v1-clusters.txt
+````
+
+From [ex_inv_api](../../examples/inv/ex_inv_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

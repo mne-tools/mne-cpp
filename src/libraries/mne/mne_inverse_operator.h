@@ -125,6 +125,8 @@ struct RegionMT
  * (regularisation, whitening, noise normalisation), and gain-matrix clustering.
  *
  * @snippet ex_inv_api/main.cpp inv_minimum_norm_usage
+ *
+ * @snippet ex_inv_api/main.cpp mne_inverse_cluster_kernel
  */
 class MNESHARED_EXPORT MNEInverseOperator
 {

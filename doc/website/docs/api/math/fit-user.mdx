@@ -19,6 +19,21 @@ Cost-function workspace for `Sphere::fit_sphere_simplex`: holds the `nx3` point 
 
 ---
 
+## Example
+
+No example of its own: Cost-function workspace of Sphere::fit_sphere_simplex; built and consumed only there.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_math/main.cpp"
+MatrixX3f points(6, 3); // six points on a sphere of radius 0.09 around (0, 0, 0.04)
+points << 0.09f, 0.0f, 0.04f, -0.09f, 0.0f, 0.04f, 0.0f, 0.09f, 0.04f,
+    0.0f, -0.09f, 0.04f, 0.0f, 0.0f, 0.13f, 0.0f, 0.0f, -0.05f;
+Sphere sphere = Sphere::fit_sphere(points);
+````
+
+From [ex_math](../../examples/math/ex_math.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

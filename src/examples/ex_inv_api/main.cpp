@@ -179,6 +179,17 @@ int main(int argc, char* argv[])
     ok &= expect(clustered.isClustered() && clusters.numClust() == clustered.nsource && assigned == 70 && clusters.numClust() >= 4 && (clustered.sol->data - fwd.sol->data * clusterMean).norm() <= 1e-9 * fwd.sol->data.norm() && QFile::exists(tmp.filePath("centroids_v1-clusters.txt")),
                  "MNEClusterInfo: every V1 source in one cluster, clustered gain is the cluster mean");
 
+    //! [mne_inverse_cluster_kernel]
+    // The same clustering on the inverse kernel: one x/y/z column triple per cluster of the transposed kernel
+    InvMinimumNorm clusteredMne(inverse, lambda2, "MNE");
+    clusteredMne.doInverseSetup(evoked.nave);
+    MatrixXd kernelMean; // 3 x 70 source components -> 3 x nClusters, averaging per orientation
+    const MatrixXd clusteredKernelT = clusteredMne.getPreparedInverseOperator().cluster_kernel(aparc, 20, kernelMean, "sqeuclidean");
+    //! [mne_inverse_cluster_kernel]
+    const MatrixXd kernelT = clusteredMne.getKernel().transpose();
+    ok &= expect(clusteredKernelT.rows() == kernelT.rows() && clusteredKernelT.cols() == kernelMean.cols() && kernelMean.cols() >= 12 && (clusteredKernelT - kernelT * kernelMean).norm() <= 1e-9 * kernelT.norm(),
+                 "MNEInverseOperator::cluster_kernel: every clustered kernel column is the mean of its sources");
+
     //! [inv_vector_source_estimate_usage]
     // The MNE kernel keeps x, y and z per source: an apply_inverse(..., pick_ori="vector") estimate.
     const MatrixXd goodData = evoked.pick_channels(inverse.noise_cov->names).data;

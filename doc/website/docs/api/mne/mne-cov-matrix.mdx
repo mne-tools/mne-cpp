@@ -389,7 +389,7 @@ Compute the linear index into a symmetric lower-triangular packed storage array 
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 293"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 331"
 auto noise = MNECovMatrix::read(data + "/MEG/sample/sample_audvis-cov.fif", FIFFV_MNE_NOISE_COV);
 const int ncovFile = noise->ncov;
 auto noiseMeg = noise->pick_chs_omit(megNames, nMeg, false, ave.info.chs);

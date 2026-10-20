@@ -59,6 +59,7 @@
 #include <mne/mne_raw_buf_def.h>
 #include <mne/mne_raw_data.h>
 #include <mne/mne_raw_info.h>
+#include <mne/mne_source_space.h>
 #include <mne/mne_source_spaces.h>
 #include <mne/mne_sparse_named_matrix.h>
 #include <mne/mne_sss_data.h>
@@ -206,6 +207,27 @@ int main(int argc, char* argv[])
     ok &= expect(src.size() == 2 && lh.np == 155407 && lh.nuse == 4098 && lh.nuse_tri == 8192 && lh.coord_frame == FIFFV_COORD_MRI && vertno[0].head(3) == Vector3i(14, 54, 59) && src[1].np == 156866 && vertno[1].size() == 4098 && lh.pinfo.size() == 4098,
                  "MNESourceSpaces/MNEHemisphere: oct-6 source space with patches like mne.read_source_spaces");
 
+    //! [mne_source_space_load_surface]
+    // A FreeSurfer surface with its curvature and the volume geometry from the file footer
+    const auto white = MNESourceSpace::load_surface(data + "/subjects/sample/surf/lh.white", data + "/subjects/sample/surf/lh.curv");
+    const MNEVolGeom& geometry = *white->vol_geom; // sizes and centre converted to metres
+    //! [mne_source_space_load_surface]
+    // nibabel.freesurfer.read_geometry(read_metadata=True): 155407 vertices, 310810 triangles, volume 256^3,
+    // cras (-5.27361, 9.03909, -27.288) mm; read_morph_data(lh.curv).sum() = -5976.48
+    ok &= expect(white && white->np == 155407 && white->ntri == 310810 && geometry.valid && geometry.width == 256 && geometry.depth == 256 && near(geometry.c_ras[0], -5.27361298e-3, 1e-6) && near(geometry.c_ras[2], -27.28796387e-3, 1e-6) && near(white->curv.cast<double>().sum(), -5976.4834, 1e-5),
+                 "MNESourceSpace::load_surface reads lh.white like nibabel read_geometry");
+
+    //! [mne_source_space_filter]
+    // Drop sources outside the inner skull or closer than 5 mm to it (mne make_forward_solution(mindist=5))
+    std::vector<std::unique_ptr<MNESourceSpace>> spaces;
+    MNESourceSpace::read_source_spaces(srcFile.fileName(), spaces);
+    const FiffCoordTrans mriHeadT = FiffCoordTrans::readTransform(data + "/MEG/sample/all-trans.fif", FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
+    MNESourceSpace::filter_source_spaces(0.005f, data + "/subjects/sample/bem/sample-5120-bem.fif", mriHeadT, spaces, nullptr, true);
+    //! [mne_source_space_filter]
+    // mne.source_space._source_space._filter_source_spaces(inner skull, limit=5.0): 3732 and 3766 sources left
+    ok &= expect(spaces.size() == 2 && spaces[0]->nuse == 3732 && spaces[1]->nuse == 3766,
+                 "MNESourceSpace::filter_source_spaces keeps the sources mne keeps at mindist 5 mm");
+
     //! [mne_epoch_data_list_usage]
     QFile rawFile(data + "/MEG/sample/sample_audvis_trunc_raw.fif");
     const FiffRawData raw(rawFile);
@@ -222,6 +244,22 @@ int main(int argc, char* argv[])
     // mne Epochs.average(): |MEG| = 6.0801e-13 over 6 epochs, times from -99.898 to 299.693 ms with 0 at sample 30
     ok &= expect(evoked.nave == 6 && near(evoked.data.topRows(306).norm(), 6.080119131626428e-13, 1e-6) && evoked.times.size() == 121 && near(evoked.times[0], -0.09989760657919393, 1e-6) && near(evoked.times[120], 0.2996928197375818, 1e-6) && evoked.times[30] == 0.0f,
                  "MNEEpochDataList::average matches mne Epochs.average");
+
+    //! [mne_epoch_rejection_usage]
+    // Peak-to-peak rejection like mne.Epochs(reject=...): flagged epochs stay in the list with bReject set
+    const QMap<QString, double> reject{{"grad", 1.6e-14}, {"eeg", 1.6e-8}};
+    MNEEpochDataList checked = MNEEpochDataList::readEpochs(raw, events.events, -0.1f, 0.3f, 1, reject);
+    QList<int> keptEpochs;
+    for (int i = 0; i < checked.size(); ++i) {
+        if (!checked.at(i)->bReject) {
+            keptEpochs << i;
+        }
+    }
+    const bool firstIsClean = !MNEEpochDataList::checkForArtifact(firstEpoch.epoch, raw.info, reject);
+    //! [mne_epoch_rejection_usage]
+    // mne.Epochs(reject=dict(grad=1.6e-14, eeg=1.6e-8)).selection = events 2, 10, 14 = epochs 0, 2, 3 of 6
+    ok &= expect(keptEpochs == QList<int>({0, 2, 3}) && firstIsClean,
+                 "MNEEpochDataList rejection keeps the epochs mne.Epochs(reject=...) keeps");
 
     //! [mne_raw_data_usage]
     // MNE-C style reader: buffer directory, channel selection, projection and overlap-add filter

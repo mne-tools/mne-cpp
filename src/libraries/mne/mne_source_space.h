@@ -60,6 +60,10 @@ class MNEHemisphere;
  * Implements the MNE Source Space (Replaces typedef mneSurfaceOrVolume mneSourceSpace; struct of MNE-C mne_types.h).
  *
  * @brief This defines a source space
+ *
+ * @snippet ex_mne_api/main.cpp mne_source_space_load_surface
+ *
+ * @snippet ex_mne_api/main.cpp mne_source_space_filter
  */
 class MNESHARED_EXPORT MNESourceSpace : public MNESurfaceOrVolume
 {

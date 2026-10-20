@@ -195,7 +195,7 @@ This is a convenience wrapper that calls `scripts/ml/training/train_cmne_lstm.py
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 264"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 275"
 cmneSettings.lookBack = 20;
 const MatrixXd fixedGain = fixedFwd.sol->data;
 const MatrixXd sourceCov = MatrixXd::Identity(fixedGain.cols(), fixedGain.cols());

@@ -19,6 +19,18 @@ Lightweight filter configuration holding kernel coefficients and overlap-add sta
 
 ---
 
+## Example
+
+No example of its own: Per-channel work item of the parallel overlap-add filter in filterDataBlock; built and consumed only there.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_dsp_filter/main.cpp"
+const MatrixXd filtered = filterData(data, lowPass); // zero-phase: the filter delay is removed
+````
+
+From [ex_dsp_filter](../../examples/dsp/ex_dsp_filter.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

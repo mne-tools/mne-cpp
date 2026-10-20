@@ -490,6 +490,26 @@ End any render pass (clearing or preserving).
 
 ---
 
+## Example
+
+No example of its own: QRhi draw backend owned privately by BrainView; it needs a live GPU device and is driven only through BrainView.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp"
+BrainView view; // QRhi widget; nothing is rendered until it is shown
+view.setViewCount(2);
+const bool twoPanes = view.viewCount() == 2 && view.viewMode() == BrainView::MultiView;
+LiveMarker trackerTip;
+trackerTip.position = QVector3D(0.0f, 0.08f, 0.04f);
+trackerTip.color = Qt::yellow;
+view.setLiveMarkers({trackerTip}); // transient, does not move the camera
+view.clearLiveMarkers();
+view.setViewCount(1);
+````
+
+From [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

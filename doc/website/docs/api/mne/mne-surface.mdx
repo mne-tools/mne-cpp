@@ -395,7 +395,7 @@ Read a BEM surface from a FIFF file.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 425"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 463"
 // Total solid angle seen from a point: 4 pi inside a closed surface, 0 outside
 auto skull = MNESurface::read_bem_surface2(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, true);
 skull->compute_surface_cm();

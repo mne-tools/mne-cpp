@@ -261,7 +261,7 @@ Opens the specified FIFF file, locates the raw data block (or MaxShield data blo
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 232"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 270"
 filter.lowpass = filter.eog_lowpass = 40.0f;
 filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
 std::unique_ptr<MNERawData> mneRaw(MNERawData::open_file(rawFile.fileName(), false, false, filter));

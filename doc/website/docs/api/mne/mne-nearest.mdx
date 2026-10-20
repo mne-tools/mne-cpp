@@ -35,6 +35,25 @@ Destroys the [`MNE`](/docs/api/mne/mne-class) Nearest Refactored: (.c).
 
 ---
 
+## Example
+
+No example of its own: Per-vertex nearest-source record stored in MNESurfaceOrVolume::nearest; filled while reading a source space.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_mne_api/main.cpp"
+QFile srcFile(data + "/subjects/sample/bem/sample-oct-6-src.fif");
+FiffStream::SPtr stream(new FiffStream(&srcFile));
+MNESourceSpaces src;
+stream->open();
+MNESourceSpaces::readFromStream(stream, true, src); // add_geom: normals, triangle data and patches
+stream->close();
+const auto& lh = dynamic_cast<const MNEHemisphere&>(src[0]);
+QList<VectorXi> vertno = src.get_vertno(); // used vertices per hemisphere
+````
+
+From [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

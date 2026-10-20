@@ -112,7 +112,7 @@ Read the [SSS](/docs/api/dsp/sss) data from the given node of an open fiff strea
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 400"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 438"
 auto sss = MNESssData::read(sssPath); // the SSS block written by mne.preprocessing.maxwell_filter
 // maxwell_filter(origin=(0, 0, 0.04), int_order=8, ext_order=3): head frame, 306 channels, 70 of 80 internal and 15 external components
 ok &= expect(sss && sss->job == FIFFV_SSS_JOB_FILTER && sss->coord_frame == FIFFV_COORD_HEAD && sss->nchan == 306 && sss->in_order == 8 && sss->out_order == 3 && sss->in_nuse == 70 && sss->out_nuse == 15 && std::fabs(sss->origin[2] - 0.04f) < 1e-7f,

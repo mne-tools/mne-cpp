@@ -61,6 +61,20 @@ Returns the number of tags in the group.
 
 ---
 
+## Example
+
+No example of its own: Container of MNEMghTag records filled by the surface reader inside MNESourceSpace; never constructed by callers.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_mne_api/main.cpp"
+// A FreeSurfer surface with its curvature and the volume geometry from the file footer
+const auto white = MNESourceSpace::load_surface(data + "/subjects/sample/surf/lh.white", data + "/subjects/sample/surf/lh.curv");
+const MNEVolGeom& geometry = *white->vol_geom; // sizes and centre converted to metres
+````
+
+From [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -30,6 +30,19 @@ const MNEEpochData& firstEpoch = *epochs.first();
 FiffEvoked evoked = epochs.average(raw.info, raw.first_samp, raw.last_samp);
 ```
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Peak-to-peak rejection like mne.Epochs(reject=...): flagged epochs stay in the list with bReject set
+const QMap<QString, double> reject{{"grad", 1.6e-14}, {"eeg", 1.6e-8}};
+MNEEpochDataList checked = MNEEpochDataList::readEpochs(raw, events.events, -0.1f, 0.3f, 1, reject);
+QList<int> keptEpochs;
+for (int i = 0; i < checked.size(); ++i) {
+    if (!checked.at(i)->bReject) {
+        keptEpochs << i;
+    }
+}
+const bool firstIsClean = !MNEEpochDataList::checkForArtifact(firstEpoch.epoch, raw.info, reject);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -270,7 +283,7 @@ Convenience function: reads epochs, optionally applies baseline correction and a
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 212"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 234"
 FiffEvents events;
 FiffEvents::detect_from_raw(raw, events); // rising edges on STI 014
 // Epochs of event 1 from -100 to 300 ms, no rejection

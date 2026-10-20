@@ -65,6 +65,8 @@ struct ArtifactRejectionData
  * @brief Ordered list of @ref MNEEpochData objects sharing a common measurement info.
  *
  * @snippet ex_mne_api/main.cpp mne_epoch_data_list_usage
+ *
+ * @snippet ex_mne_api/main.cpp mne_epoch_rejection_usage
  */
 class MNESHARED_EXPORT MNEEpochDataList : public QList<MNEEpochData::SPtr>
 {

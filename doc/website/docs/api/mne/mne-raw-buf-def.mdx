@@ -87,7 +87,7 @@ Destructor.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 233"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 271"
 filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
 std::unique_ptr<MNERawData> mneRaw(MNERawData::open_file(rawFile.fileName(), false, false, filter));
 const MNERawInfo& rawInfo = *mneRaw->info;

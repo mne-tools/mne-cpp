@@ -19,6 +19,22 @@ Bundled output of a real-time covariance computation step containing the covaria
 
 ---
 
+## Example
+
+No example of its own: Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp"
+RtCov rtCov(info);
+FiffCov cov;
+for (int start = 0; start < covData.cols(); start += 1000) {
+    cov = rtCov.estimateCovariance(covData.middleCols(start, 1000), 4000); // empty until 4000 samples arrived
+}
+````
+
+From [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

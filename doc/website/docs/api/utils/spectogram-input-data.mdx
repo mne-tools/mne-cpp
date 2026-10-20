@@ -19,6 +19,18 @@ Input parameters for short-time Fourier transform spectrogram computation.
 
 ---
 
+## Example
+
+No example of its own: Per-window work item of the parallel Spectrogram map-reduce; built and consumed only there.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_dsp_spectral/main.cpp"
+const MatrixXd spectrogram = Spectrogram::makeSpectrogram(signal.transpose(), 64); // frequency bins x samples
+````
+
+From [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

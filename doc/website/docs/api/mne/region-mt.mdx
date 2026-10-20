@@ -31,6 +31,22 @@ Run [KMeans](/docs/api/math/k-means) clustering on this region.
 
 ---
 
+## Example
+
+No example of its own: Per-region work item of the parallel KMeans clustering in MNEInverseOperator::cluster_kernel; built and consumed only there.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_inv_api/main.cpp"
+// The same clustering on the inverse kernel: one x/y/z column triple per cluster of the transposed kernel
+InvMinimumNorm clusteredMne(inverse, lambda2, "MNE");
+clusteredMne.doInverseSetup(evoked.nave);
+MatrixXd kernelMean; // 3 x 70 source components -> 3 x nClusters, averaging per orientation
+const MatrixXd clusteredKernelT = clusteredMne.getPreparedInverseOperator().cluster_kernel(aparc, 20, kernelMean, "sqeuclidean");
+````
+
+From [ex_inv_api](../../examples/inv/ex_inv_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

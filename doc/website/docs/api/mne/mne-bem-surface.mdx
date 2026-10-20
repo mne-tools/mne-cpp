@@ -166,7 +166,7 @@ Decimate the outer skin surface to the target vertex counts using iterative edge
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 145"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 146"
 QFile bemFile(data + "/subjects/sample/bem/sample-5120-bem.fif");
 MNEBem bem(bemFile); // one MNEBemSurface per BEM layer
 const MNEBemSurface& innerSkull = bem[0];

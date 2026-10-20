@@ -155,6 +155,14 @@ class TestExemptions(ExampleEvidenceTestCase):
                   "example_exempt": True, "example_exempt_reason": "Needs a running server."}
         self.assertEqual([], self.check(record))
 
+    def test_used_in_must_name_an_example_region(self) -> None:
+        record = {"name": "Widget", "module": "demo", "header": "demo/widget.h",
+                  "example_exempt": True, "example_exempt_reason": "Internal."}
+        self.assertEqual([], self.check({**record, "example_used_in": ["ex_widget/main.cpp#widget_use"]}))
+        self.assert_issue("has no balanced region", self.check({**record, "example_used_in": ["ex_widget/main.cpp#gone"]}))
+        self.assert_issue("'example_used_in' without 'example_exempt: true'",
+                          self.check(self.with_(example_used_in=["ex_widget/main.cpp#widget_use"])))
+
     def test_inconsistent_exemption_fields_fail(self) -> None:
         self.assert_issue("without 'example_exempt: true'", self.check(
             {"name": "Widget", "module": "demo", "header": "demo/widget.h", "example_exempt_reason": "x"}))

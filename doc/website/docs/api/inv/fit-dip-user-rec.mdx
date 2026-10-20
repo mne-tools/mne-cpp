@@ -19,6 +19,29 @@ Workspace for the dipole fitting objective function, holding forward model, meas
 
 ---
 
+## Example
+
+No example of its own: Objective-function workspace of the dipole fit inside InvDipoleFit; built and consumed only there.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp"
+InvDipoleFitSettings settings; // the options of the MNE-C mne_dipole_fit tool
+settings.measname = tmp.filePath("synthetic-ave.fif");
+settings.include_meg = true;
+settings.include_eeg = false;
+settings.guess_mindist = 0.0f;
+settings.tmin = 0.0f;
+settings.dipname = tmp.filePath("fit.dat"); // MNE-C .dat dipole file
+settings.checkIntegrity();
+InvDipoleFit fit(&settings);
+InvEcdSet dipoles = fit.calculateFit();
+const bool saved = dipoles.save_dipoles_dip(tmp.filePath("fit.dip")); // readable by mne.read_dipole
+const InvEcdSet reread = InvEcdSet::read_dipoles_dip(tmp.filePath("fit.dip"));
+````
+
+From [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

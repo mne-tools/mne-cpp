@@ -271,6 +271,33 @@ Compute the center of mass (mean position) of a set of points.
 
 ---
 
+## Example
+
+No example of its own: Common base of MNESurface, MNESourceSpace and MNEBemSurface; used through those.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_mne_api/main.cpp"
+QFile bemFile(data + "/subjects/sample/bem/sample-5120-bem.fif");
+MNEBem bem(bemFile); // one MNEBemSurface per BEM layer
+const MNEBemSurface& innerSkull = bem[0];
+````
+
+From [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
+````cpp title="src/examples/ex_mne_api/main.cpp"
+QFile srcFile(data + "/subjects/sample/bem/sample-oct-6-src.fif");
+FiffStream::SPtr stream(new FiffStream(&srcFile));
+MNESourceSpaces src;
+stream->open();
+MNESourceSpaces::readFromStream(stream, true, src); // add_geom: normals, triangle data and patches
+stream->close();
+const auto& lh = dynamic_cast<const MNEHemisphere&>(src[0]);
+QList<VectorXi> vertno = src.get_vertno(); // used vertices per hemisphere
+````
+
+From [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

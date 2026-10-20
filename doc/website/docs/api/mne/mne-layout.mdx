@@ -181,7 +181,7 @@ Reads an MNE-C ``.lout file.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 484"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 522"
 // The Neuromag Vectorview layout: one viewport per channel
 auto layout = MNELayout::read(layoutDir + "/Vectorview-all.lout");
 const QMap<QString, QPointF> positions = layout->channelPositions();                     // lower-left corners, keyed "MEG 0113"

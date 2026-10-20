@@ -484,7 +484,8 @@
       "test": "test_tool_inverse_operator",
       "example": "ex_inv_api",
       "example_snippet": [
-        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage",
+        "ex_inv_api/main.cpp#mne_inverse_cluster_kernel"
       ],
       "example_mode": "run",
       "required_data": [
@@ -507,16 +508,22 @@
       "mne_python": "mne.SourceSpaces",
       "sklearn": null,
       "test": "test_mne_source_data",
-      "example": null,
-      "example_exempt": true,
-      "example_exempt_reason": "Abstract base of MNEHemisphere and volume source spaces; used through MNESourceSpaces (ex_mne_api mne_source_spaces_usage).",
+      "example": "ex_mne_api",
       "status": "done",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 3,
       "guide": null,
       "python_equiv": "mne.SourceSpaces",
-      "python_url": null
+      "python_url": null,
+      "example_snippet": [
+        "ex_mne_api/main.cpp#mne_source_space_load_surface",
+        "ex_mne_api/main.cpp#mne_source_space_filter"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ]
     },
     {
       "name": "MNEBem",
@@ -5319,14 +5326,17 @@
       "test": null,
       "example": null,
       "example_exempt": true,
-      "example_exempt_reason": "CTF compensation wrapper that FwdBemModel builds for compensated coil sets during ComputeFwd; callers reach it through ComputeFwd (ex_fwd_api compute_fwd_usage).",
+      "example_exempt_reason": "CTF compensation wrapper that FwdBemModel builds for compensated coil sets during ComputeFwd; callers reach it through ComputeFwd.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 9,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_fwd_api/main.cpp#compute_fwd_usage"
+      ]
     },
     {
       "name": "FwdEegSphereLayer",
@@ -5421,7 +5431,10 @@
       "sidebar_position": 13,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_fwd_api/main.cpp#compute_fwd_usage"
+      ]
     },
     {
       "name": "stream_info",
@@ -5684,7 +5697,10 @@
       "sidebar_position": 6,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_source_space_filter"
+      ]
     },
     {
       "name": "MNE",
@@ -5997,7 +6013,8 @@
       "test": null,
       "example": "ex_mne_api",
       "example_snippet": [
-        "ex_mne_api/main.cpp#mne_epoch_data_list_usage"
+        "ex_mne_api/main.cpp#mne_epoch_data_list_usage",
+        "ex_mne_api/main.cpp#mne_epoch_rejection_usage"
       ],
       "example_mode": "run",
       "required_data": [
@@ -6129,7 +6146,10 @@
       "sidebar_position": 28,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_source_space_load_surface"
+      ]
     },
     {
       "name": "MNEMghTagGroup",
@@ -6149,7 +6169,10 @@
       "sidebar_position": 29,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_source_space_load_surface"
+      ]
     },
     {
       "name": "MNEMorphMap",
@@ -6194,7 +6217,10 @@
       "sidebar_position": 32,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ]
     },
     {
       "name": "MNEMshDisplaySurface",
@@ -6264,7 +6290,10 @@
       "sidebar_position": 35,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ]
     },
     {
       "name": "MNEMshLight",
@@ -6284,7 +6313,10 @@
       "sidebar_position": 36,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ]
     },
     {
       "name": "MNEMshLightSet",
@@ -6304,7 +6336,10 @@
       "sidebar_position": 37,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ]
     },
     {
       "name": "MNEMshPicked",
@@ -6324,7 +6359,10 @@
       "sidebar_position": 38,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ]
     },
     {
       "name": "MNENamedMatrix",
@@ -6362,14 +6400,17 @@
       "test": null,
       "example": null,
       "example_exempt": true,
-      "example_exempt_reason": "Scratch record inside MNEProjOp::make_proj_bad that picks one projection vector onto the channel list; callers use MNEProjOp (ex_mne_api mne_raw_data_usage).",
+      "example_exempt_reason": "Scratch record inside MNEProjOp::make_proj_bad that picks one projection vector onto the channel list; callers use MNEProjOp.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 40,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_raw_data_usage"
+      ]
     },
     {
       "name": "MNENearest",
@@ -6382,14 +6423,17 @@
       "test": null,
       "example": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-vertex nearest-source record stored in MNESurfaceOrVolume::nearest; filled while reading a source space (ex_mne_api mne_source_spaces_usage).",
+      "example_exempt_reason": "Per-vertex nearest-source record stored in MNESurfaceOrVolume::nearest; filled while reading a source space.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 41,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_source_spaces_usage"
+      ]
     },
     {
       "name": "MNEPatchInfo",
@@ -6402,14 +6446,17 @@
       "test": null,
       "example": null,
       "example_exempt": true,
-      "example_exempt_reason": "Patch statistics computed while reading a source space with patches; reached through MNEHemisphere::pinfo (ex_mne_api mne_source_spaces_usage).",
+      "example_exempt_reason": "Patch statistics computed while reading a source space with patches; reached through MNEHemisphere::pinfo.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 42,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_source_spaces_usage"
+      ]
     },
     {
       "name": "MNEProjData",
@@ -6422,14 +6469,17 @@
       "test": null,
       "example": null,
       "example_exempt": true,
-      "example_exempt_reason": "Search-acceleration record (triangle activity mask) internal to MNESurface::project_to_surface; callers use MNEProjectToSurface (ex_mne_api mne_project_to_surface_usage).",
+      "example_exempt_reason": "Search-acceleration record (triangle activity mask) internal to MNESurface::project_to_surface; callers use MNEProjectToSurface.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 43,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_project_to_surface_usage"
+      ]
     },
     {
       "name": "MNEProjItem",
@@ -6692,14 +6742,18 @@
       "test": null,
       "example": null,
       "example_exempt": true,
-      "example_exempt_reason": "Common base of MNESurface, MNESourceSpace and MNEBemSurface; used through those (ex_mne_api mne_bem_usage, mne_source_spaces_usage).",
+      "example_exempt_reason": "Common base of MNESurface, MNESourceSpace and MNEBemSurface; used through those.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 54,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_bem_usage",
+        "ex_mne_api/main.cpp#mne_source_spaces_usage"
+      ]
     },
     {
       "name": "MNESurfacePatch",
@@ -6719,7 +6773,10 @@
       "sidebar_position": 55,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_surface_usage"
+      ]
     },
     {
       "name": "MNETriangle",
@@ -6732,14 +6789,17 @@
       "test": null,
       "example": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-triangle cache (centroid, area, normal) filled by MNESurfaceOrVolume::add_triangle_data; read through MNEBemSurface/MNESourceSpaces, shown in ex_mne_api mne_bem_usage.",
+      "example_exempt_reason": "Per-triangle cache (centroid, area, normal) filled by MNESurfaceOrVolume::add_triangle_data; read through MNEBemSurface/MNESourceSpaces.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 56,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_bem_usage"
+      ]
     },
     {
       "name": "MNEVolGeom",
@@ -6759,7 +6819,10 @@
       "sidebar_position": 57,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_source_space_load_surface"
+      ]
     },
     {
       "name": "MriCorFifIO",
@@ -7683,14 +7746,18 @@
       "test": null,
       "example": null,
       "example_exempt": true,
-      "example_exempt_reason": "Static numerical core (filter weights, power, regularised inverses) shared by InvLCMV and InvDICS; callers use those (ex_inv_beamformer inv_lcmv_usage).",
+      "example_exempt_reason": "Static numerical core (filter weights, power, regularised inverses) shared by InvLCMV and InvDICS; callers use those.",
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
       "sidebar_position": 21,
       "guide": null,
       "python_equiv": null,
-      "python_url": null
+      "python_url": null,
+      "example_used_in": [
+        "ex_inv_beamformer/main.cpp#inv_lcmv_usage",
+        "ex_inv_beamformer/main.cpp#inv_dics_usage"
+      ]
     },
     {
       "name": "InvDipole",
@@ -8799,7 +8866,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Workspace of the Berg-Scherg least-squares fit inside FwdEegSphereModel::fwd_eeg_fit_berg_scherg; built and consumed only there (ex_fwd_api fwd_eeg_sphere_model_usage)."
+      "example_exempt_reason": "Workspace of the Berg-Scherg least-squares fit inside FwdEegSphereModel::fwd_eeg_fit_berg_scherg; built and consumed only there.",
+      "example_used_in": [
+        "ex_fwd_api/main.cpp#fwd_eeg_sphere_model_usage"
+      ]
     },
     {
       "name": "CoilParam",
@@ -8819,7 +8889,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-coil dipole record InvHpiFit passes between its private fit steps; callers read HpiFitResult (ex_inv_hpi inv_hpi_usage)."
+      "example_exempt_reason": "Per-coil dipole record InvHpiFit passes between its private fit steps; callers read HpiFitResult.",
+      "example_used_in": [
+        "ex_inv_hpi/main.cpp#inv_hpi_usage"
+      ]
     },
     {
       "name": "DipFitError",
@@ -8839,7 +8912,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-iteration residual record of the HPI dipole fit inside InvHpiFitData; internal to the fit (ex_inv_hpi inv_hpi_fit_data_usage)."
+      "example_exempt_reason": "Per-iteration residual record of the HPI dipole fit inside InvHpiFitData; internal to the fit.",
+      "example_used_in": [
+        "ex_inv_hpi/main.cpp#inv_hpi_fit_data_usage"
+      ]
     },
     {
       "name": "FitDipUserRec",
@@ -8859,7 +8935,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Objective-function workspace of the dipole fit inside InvDipoleFit; built and consumed only there (ex_inv_dipole_fit inv_dipole_fit_usage)."
+      "example_exempt_reason": "Objective-function workspace of the dipole fit inside InvDipoleFit; built and consumed only there.",
+      "example_used_in": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_usage"
+      ]
     },
     {
       "name": "HPISortStruct",
@@ -8879,7 +8958,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Sort key InvHpiFitData uses to match coil fits to expected positions; internal to the HPI fit (ex_inv_hpi inv_hpi_fit_data_usage)."
+      "example_exempt_reason": "Sort key InvHpiFitData uses to match coil fits to expected positions; internal to the HPI fit.",
+      "example_used_in": [
+        "ex_inv_hpi/main.cpp#inv_hpi_fit_data_usage"
+      ]
     },
     {
       "name": "HpiFitResult",
@@ -9202,7 +9284,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Internal index pair of the RAP-MUSIC source-pair search; only appears in protected InvRapMusic helpers."
+      "example_exempt_reason": "Internal index pair of the RAP-MUSIC source-pair search; only appears in protected InvRapMusic helpers.",
+      "example_used_in": [
+        "ex_inv_beamformer/main.cpp#inv_rap_music_usage"
+      ]
     },
     {
       "name": "TrapMusicDipole",
@@ -9247,7 +9332,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Forward-field function table set up by InvDipoleFitData::setup_dipole_fit_data, never by callers (ex_inv_dipole_fit inv_dipole_fit_data_usage)."
+      "example_exempt_reason": "Forward-field function table set up by InvDipoleFitData::setup_dipole_fit_data, never by callers.",
+      "example_used_in": [
+        "ex_inv_dipole_fit/main.cpp#inv_dipole_fit_data_usage"
+      ]
     },
     {
       "name": "MnaFileRef",
@@ -9575,7 +9663,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Internal per-channel scratch record of MNEEpochDataList::checkForArtifact; never part of a public signature."
+      "example_exempt_reason": "Internal per-channel scratch record of MNEEpochDataList::checkForArtifact; never part of a public signature.",
+      "example_used_in": [
+        "ex_mne_api/main.cpp#mne_epoch_rejection_usage"
+      ]
     },
     {
       "name": "CovDefinition",
@@ -9675,7 +9766,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-region work item of the parallel clustering in MNEForwardSolution::cluster_forward_solution; built and consumed only there (ex_inv_api mne_cluster_info_usage)."
+      "example_exempt_reason": "Per-region work item of the parallel clustering in MNEForwardSolution::cluster_forward_solution; built and consumed only there.",
+      "example_used_in": [
+        "ex_inv_api/main.cpp#mne_cluster_info_usage"
+      ]
     },
     {
       "name": "RegionDataOut",
@@ -9695,7 +9789,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-region result of the parallel clustering in MNEForwardSolution::cluster_forward_solution; consumed only there (ex_inv_api mne_cluster_info_usage)."
+      "example_exempt_reason": "Per-region result of the parallel clustering in MNEForwardSolution::cluster_forward_solution; consumed only there.",
+      "example_used_in": [
+        "ex_inv_api/main.cpp#mne_cluster_info_usage"
+      ]
     },
     {
       "name": "RegionMT",
@@ -9715,7 +9812,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-region work item of the parallel KMeans clustering in MNEInverseOperator::cluster_kernel; built and consumed only there."
+      "example_exempt_reason": "Per-region work item of the parallel KMeans clustering in MNEInverseOperator::cluster_kernel; built and consumed only there.",
+      "example_used_in": [
+        "ex_inv_api/main.cpp#mne_inverse_cluster_kernel"
+      ]
     },
     {
       "name": "RegionMTOut",
@@ -9735,7 +9835,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-region result of the parallel KMeans clustering in MNEInverseOperator::cluster_kernel; consumed only there."
+      "example_exempt_reason": "Per-region result of the parallel KMeans clustering in MNEInverseOperator::cluster_kernel; consumed only there.",
+      "example_used_in": [
+        "ex_inv_api/main.cpp#mne_inverse_cluster_kernel"
+      ]
     },
     {
       "name": "MriSlice",
@@ -9799,7 +9902,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-channel work item of the parallel overlap-add filter in filterDataBlock; built and consumed only there (ex_dsp_filter filter_data_usage)."
+      "example_exempt_reason": "Per-channel work item of the parallel overlap-add filter in filterDataBlock; built and consumed only there.",
+      "example_used_in": [
+        "ex_dsp_filter/main.cpp#filter_data_usage"
+      ]
     },
     {
       "name": "RtCovComputeResult",
@@ -9819,7 +9925,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov (ex_dsp_rt rt_cov_usage)."
+      "example_exempt_reason": "Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov.",
+      "example_used_in": [
+        "ex_dsp_rt/main.cpp#rt_cov_usage"
+      ]
     },
     {
       "name": "RtInvOpInput",
@@ -9839,7 +9948,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Queue item RtInvOp hands to its RtInvOpWorker thread; built by RtInvOp::append, never by callers (ex_dsp_rt rt_inv_op_usage)."
+      "example_exempt_reason": "Queue item RtInvOp hands to its RtInvOpWorker thread; built by RtInvOp::append, never by callers.",
+      "example_used_in": [
+        "ex_dsp_rt/main.cpp#rt_inv_op_usage"
+      ]
     },
     {
       "name": "StatsClusterResult",
@@ -10334,7 +10446,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Cost-function workspace of Sphere::fit_sphere_simplex; built and consumed only there (ex_math sphere_fit)."
+      "example_exempt_reason": "Cost-function workspace of Sphere::fit_sphere_simplex; built and consumed only there.",
+      "example_used_in": [
+        "ex_math/main.cpp#sphere_fit"
+      ]
     },
     {
       "name": "HeadPosEntry",
@@ -10646,7 +10761,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Private storage record of Report; sections are created through the Report::add* methods covered by the report example."
+      "example_exempt_reason": "Private storage record of Report; sections are created through the Report::add* methods.",
+      "example_used_in": [
+        "ex_utils/main.cpp#report_usage"
+      ]
     },
     {
       "name": "SSSParams",
@@ -10713,7 +10831,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-window work item of the parallel Spectrogram map-reduce; built and consumed only there (ex_dsp_spectral spectrogram_make)."
+      "example_exempt_reason": "Per-window work item of the parallel Spectrogram map-reduce; built and consumed only there.",
+      "example_used_in": [
+        "ex_dsp_spectral/main.cpp#spectrogram_make"
+      ]
     },
     {
       "name": "SurfaceLaplacianResult",
@@ -10755,7 +10876,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Per-row work item of the parallel tapered-spectra computation in Spectral; built and consumed only there (ex_math spectral_psd)."
+      "example_exempt_reason": "Per-row work item of the parallel tapered-spectra computation in Spectral; built and consumed only there.",
+      "example_used_in": [
+        "ex_math/main.cpp#spectral_psd"
+      ]
     },
     {
       "name": "WelchPsdResult",
@@ -10852,7 +10976,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "QRhi draw backend owned privately by BrainView; it needs a live GPU device and is driven only through BrainView, whose example covers it."
+      "example_exempt_reason": "QRhi draw backend owned privately by BrainView; it needs a live GPU device and is driven only through BrainView.",
+      "example_used_in": [
+        "ex_disp3d_scene/main.cpp#brain_view_usage"
+      ]
     },
     {
       "name": "BrainSurface",
@@ -11229,7 +11356,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Real-time sensor streaming state owned privately by BrainView; exercised through BrainView's streaming API (test_disp3d_brainview, test_sensor_streaming)."
+      "example_exempt_reason": "Real-time sensor streaming state owned privately by BrainView; exercised through BrainView's streaming API (test_disp3d_brainview, test_sensor_streaming).",
+      "example_used_in": [
+        "ex_disp3d_scene/main.cpp#brain_view_usage"
+      ]
     },
     {
       "name": "RtSourceDataController",
@@ -11304,7 +11434,10 @@
       "python_equiv": null,
       "python_url": null,
       "example_exempt": true,
-      "example_exempt_reason": "Source-estimate loading and playback state owned privately by BrainView; exercised through BrainView (test_disp3d_brainview)."
+      "example_exempt_reason": "Source-estimate loading and playback state owned privately by BrainView; exercised through BrainView (test_disp3d_brainview).",
+      "example_used_in": [
+        "ex_disp3d_scene/main.cpp#brain_view_usage"
+      ]
     },
     {
       "name": "SourceEstimateOverlay",

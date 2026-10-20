@@ -59,6 +59,27 @@ Returns the number of lights in the set.
 
 ---
 
+## Example
+
+No example of its own: Lighting rig of the legacy MNE-C mesh viewer held by MNEMshDisplaySurfaceSet; UI state with no computation to demonstrate.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_mne_api/main.cpp"
+// Total solid angle seen from a point: 4 pi inside a closed surface, 0 outside
+auto skull = MNESurface::read_bem_surface2(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, true);
+skull->compute_surface_cm();
+const double inside = skull->sum_solids(Map<const Vector3f>(skull->cm)) / (4.0 * M_PI);
+const double outside = skull->sum_solids(Vector3f(0.0f, 0.0f, 0.2f)) / (4.0 * M_PI);
+
+// The same surface as an MNE-C viewer display surface
+MNEMshDisplaySurfaceSet display;
+display.add_bem_surface(bemFile.fileName(), FIFFV_BEM_SURF_ID_BRAIN, "inner skull", 1, 1); // checks closure
+const MNEMshDisplaySurface& shown = *display.surfs[0];
+````
+
+From [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

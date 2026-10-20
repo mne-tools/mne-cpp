@@ -209,7 +209,7 @@ Builds one derivation from definitions such as those of dsp::[ChannelDerivation]
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 463"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 501"
 ok &= montageFile.open(QIODevice::WriteOnly | QIODevice::Text);
 montageFile.write("\"EEG001-EEG002\" = \"EEG001\" - \"EEG002\"\n\"FRONT\" = 0.5 * \"EEG001\" + 0.5 * \"EEG002\" - \"EEG999\"\n");
 montageFile.close();

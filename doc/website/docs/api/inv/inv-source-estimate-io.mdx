@@ -107,7 +107,7 @@ No header; pure numeric matrix (n_vertices × n_times).
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 303"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 314"
 InvSourceEstimateIO::writeCsv(stc, tmp.filePath("v1-dspm.csv"));
 const InvSourceEstimate fromCsv = InvSourceEstimateIO::readCsv(tmp.filePath("v1-dspm.csv"));
 QFile stcFile(tmp.filePath("v1-dspm-lh.stc"));

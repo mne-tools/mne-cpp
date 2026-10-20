@@ -76,7 +76,7 @@ Compute the Gamma-MAP inverse solution.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 239"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 250"
 // Gamma-MAP: sparse Bayesian learning with unit (whitened) noise, MacKay updates as in mne.inverse_sparse.gamma_map.
 const InvGammaMapResult gammaMap = InvGammaMap::compute(gain, measured, MatrixXd::Identity(gain.rows(), gain.rows()), 1000, 1e-8);
 ok &= expect(!gammaMap.activeVertices.isEmpty() && gammaMap.activeVertices.size() < 70 && gammaMap.vecGamma.size() == 70,

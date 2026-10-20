@@ -19,6 +19,27 @@ Per-channel peak-to-peak check record used internally by `MNEEpochDataList::chec
 
 ---
 
+## Example
+
+No example of its own: Internal per-channel scratch record of MNEEpochDataList::checkForArtifact; never part of a public signature.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_mne_api/main.cpp"
+// Peak-to-peak rejection like mne.Epochs(reject=...): flagged epochs stay in the list with bReject set
+const QMap<QString, double> reject{{"grad", 1.6e-14}, {"eeg", 1.6e-8}};
+MNEEpochDataList checked = MNEEpochDataList::readEpochs(raw, events.events, -0.1f, 0.3f, 1, reject);
+QList<int> keptEpochs;
+for (int i = 0; i < checked.size(); ++i) {
+    if (!checked.at(i)->bReject) {
+        keptEpochs << i;
+    }
+}
+const bool firstIsClean = !MNEEpochDataList::checkForArtifact(firstEpoch.epoch, raw.info, reject);
+````
+
+From [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

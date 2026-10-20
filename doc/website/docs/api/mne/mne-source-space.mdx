@@ -23,6 +23,20 @@ Implements the [`MNE`](/docs/api/mne/mne-class) Source Space (Replaces typedef m
 
 This defines a source space
 
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// A FreeSurfer surface with its curvature and the volume geometry from the file footer
+const auto white = MNESourceSpace::load_surface(data + "/subjects/sample/surf/lh.white", data + "/subjects/sample/surf/lh.curv");
+const MNEVolGeom& geometry = *white->vol_geom; // sizes and centre converted to metres
+```
+
+```cpp title="src/examples/ex_mne_api/main.cpp"
+// Drop sources outside the inner skull or closer than 5 mm to it (mne make_forward_solution(mindist=5))
+std::vector<std::unique_ptr<MNESourceSpace>> spaces;
+MNESourceSpace::read_source_spaces(srcFile.fileName(), spaces);
+const FiffCoordTrans mriHeadT = FiffCoordTrans::readTransform(data + "/MEG/sample/all-trans.fif", FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
+MNESourceSpace::filter_source_spaces(0.005f, data + "/subjects/sample/bem/sample-5120-bem.fif", mriHeadT, spaces, nullptr, true);
+```
+
 ### Inheritance
 
 ```mermaid
@@ -301,6 +315,28 @@ Vertices of a subject's surfaces nearest to an icosahedron of the given grade (m
 - *QList&lt; Eigen::VectorXi &gt;* — Sorted vertex numbers for lh and rh, or an empty list if a sphere cannot be read or the grade maps two icosahedron vertices onto the same surface vertex.
 
 ---
+
+## Example
+
+- Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
+- Build target: `ex_mne_api` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
+
+## Used in examples
+
+### [ex_mne_api](../../examples/fs/ex_mne_api.mdx)
+
+MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+
+````cpp title="src/examples/ex_mne_api/main.cpp, line 211"
+// A FreeSurfer surface with its curvature and the volume geometry from the file footer
+const auto white = MNESourceSpace::load_surface(data + "/subjects/sample/surf/lh.white", data + "/subjects/sample/surf/lh.curv");
+const MNEVolGeom& geometry = *white->vol_geom; // sizes and centre converted to metres
+// nibabel.freesurfer.read_geometry(read_metadata=True): 155407 vertices, 310810 triangles, volume 256^3,
+// cras (-5.27361, 9.03909, -27.288) mm; read_morph_data(lh.curv).sum() = -5976.48
+ok &= expect(white && white->np == 155407 && white->ntri == 310810 && geometry.valid && geometry.width == 256 && geometry.depth == 256 && near(geometry.c_ras[0], -5.27361298e-3, 1e-6) && near(geometry.c_ras[2], -27.28796387e-3, 1e-6) && near(white->curv.cast<double>().sum(), -5976.4834, 1e-5),
+             "MNESourceSpace::load_surface reads lh.white like nibabel read_geometry");
+````
 
 ## Authors of this file
 

@@ -21,6 +21,28 @@ Index pair representing two grid points evaluated together in the RAP MUSIC subs
 
 ---
 
+## Example
+
+No example of its own: Internal index pair of the RAP-MUSIC source-pair search; only appears in protected InvRapMusic helpers.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_inv_beamformer/main.cpp"
+// Noise-free data from the two sources with different time courses; RAP-MUSIC scans source pairs.
+const int nSamples = 60;
+MatrixXd measured(G.rows(), nSamples);
+for (int t = 0; t < nSamples; ++t)
+    measured.col(t) = g1 * std::sin(0.21 * t) + g2 * std::sin(0.53 * t + 0.4);
+QList<InvDipolePair<double>> pairs;
+InvRapMusic rap(fwd, false, 1, 0.5); // one correlated pair, subspace correlation >= 0.5
+rap.calculateInverse(measured, pairs);
+QList<InvDipolePair<double>> powellPairs;
+InvPwlRapMusic pwlRap(fwd, false, 1, 0.5); // Powell coordinate search: far fewer pairs, may stop at a local optimum
+pwlRap.calculateInverse(measured, powellPairs);
+````
+
+From [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

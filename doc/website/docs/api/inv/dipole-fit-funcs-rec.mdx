@@ -19,6 +19,32 @@ Forward field computation function pointers and client data for MEG and EEG dipo
 
 ---
 
+## Example
+
+No example of its own: Forward-field function table set up by InvDipoleFitData::setup_dipole_fit_data, never by callers.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp"
+// MEG channels and SSP projectors from the sample file, sphere at (0, 0, 40) mm, ad-hoc noise
+// (5e-13 T/m gradiometers, 20 fT magnetometers).
+Vector3f r0(0.0f, 0.0f, 0.04f);
+std::unique_ptr<InvDipoleFitData> fitData(InvDipoleFitData::setup_dipole_fit_data(
+    QString(), sampleAve, QString(), &r0, nullptr, false, QString(), QString(),
+    5e-13f, 20e-15f, 0.2e-6f, 0.1f, 0.1f, 0.1f, false, {sampleAve}, true, false));
+MatrixXf gain(fitData->nmeg, 3);
+const bool fieldOk = InvDipoleFitData::compute_dipole_field(*fitData, truePos, false, gain) == 0; // projected, not whitened
+VectorXf field = gain * trueMoment;
+
+InvGuessData guesses(QString(), QString(), 0.0f, 0.02f, 0.015f, fitData.get(), 0.08f); // 15 mm grid in an 80 mm sphere
+std::unique_ptr<InvDipoleForward> atTruth(InvDipoleFitData::dipole_forward_one(fitData.get(), truePos, nullptr));
+InvEcd dipole;
+VectorXf b = field; // fit_one projects and whitens in place
+const bool fitted = InvDipoleFitData::fit_one(fitData.get(), &guesses, 0.0f, b, false, dipole);
+````
+
+From [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

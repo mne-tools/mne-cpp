@@ -98,7 +98,7 @@ Apply or remove channel calibration to/from the compensation matrix by scaling e
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 307"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 345"
 // Open a third-order gradiometer recording and read it uncompensated (grade 0)
 std::unique_ptr<MNERawData> ctfRaw(MNERawData::open_file_comp(ctfPath, false, false, MNEFilterDef(), 0));
 const MNECTFCompDataSet& comp = *ctfRaw->comp; // grades 1, 2, 3 and two 4D kinds

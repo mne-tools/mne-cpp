@@ -187,7 +187,7 @@ Builds a list from rows of sample, value before and value after.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 444"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 482"
 // Annotate the detected onsets, save them with their comments and read them back relative to the first sample
 MNEEventList annotated = MNEEventList::fromMatrix(events.events).selectOnsets();
 annotated.sort();

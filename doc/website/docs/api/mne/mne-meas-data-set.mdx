@@ -137,7 +137,7 @@ Refactored: mne_get_values_from_data_ch (mne_get_values.c)
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 385"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 423"
 // MNE-C measurement container: data set 1 of the evoked file, MEG and EEG channels, time-major
 std::unique_ptr<MNEMeasData> meas(MNEMeasData::mne_read_meas_data(aveFile.fileName(), 1, nullptr, nullptr, {}, 0));
 const MNEMeasDataSet& left = *meas->current;

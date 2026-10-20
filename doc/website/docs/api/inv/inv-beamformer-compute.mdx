@@ -132,6 +132,32 @@ Symmetric matrix power: X^p via eigendecomposition.
 
 ---
 
+## Example
+
+No example of its own: Static numerical core (filter weights, power, regularised inverses) shared by InvLCMV and InvDICS; callers use those.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_inv_beamformer/main.cpp"
+FiffCov dataCov = noiseCov; // noise plus the two sources
+dataCov.data += g1 * g1.transpose() + g2 * g2.transpose();
+const InvBeamformer lcmv = InvLCMV::makeLCMV(info, fwd, dataCov, 0.05, noiseCov,
+                                             BeamformerPickOri::MaxPower, BeamformerWeightNorm::UnitNoiseGain);
+const VectorXd lcmvPower = InvLCMV::applyLCMVCov(dataCov, lcmv).data.col(0); // one value per source
+````
+
+From [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx).
+
+````cpp title="src/examples/ex_inv_beamformer/main.cpp"
+// A single real cross-spectral density at 10 Hz equal to the data covariance gives the LCMV power.
+const VectorXd frequencies = VectorXd::Constant(1, 10.0);
+const InvBeamformer dics = InvDICS::makeDICS(info, fwd, {dataCov.data}, frequencies, 0.05, true, noiseCov,
+                                             BeamformerPickOri::MaxPower, BeamformerWeightNorm::UnitNoiseGain);
+const VectorXd dicsPower = InvDICS::applyDICSCsd({dataCov.data}, frequencies, dics).data.col(0);
+````
+
+From [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

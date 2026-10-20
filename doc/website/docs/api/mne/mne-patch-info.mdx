@@ -63,6 +63,25 @@ Computes the mean normal direction (ave_nn) by summing the normals of all member
 
 ---
 
+## Example
+
+No example of its own: Patch statistics computed while reading a source space with patches; reached through MNEHemisphere::pinfo.
+
+It is exercised by:
+
+````cpp title="src/examples/ex_mne_api/main.cpp"
+QFile srcFile(data + "/subjects/sample/bem/sample-oct-6-src.fif");
+FiffStream::SPtr stream(new FiffStream(&srcFile));
+MNESourceSpaces src;
+stream->open();
+MNESourceSpaces::readFromStream(stream, true, src); // add_geom: normals, triangle data and patches
+stream->close();
+const auto& lh = dynamic_cast<const MNEHemisphere&>(src[0]);
+QList<VectorXi> vertno = src.get_vertno(); // used vertices per hemisphere
+````
+
+From [ex_mne_api](../../examples/fs/ex_mne_api.mdx).
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

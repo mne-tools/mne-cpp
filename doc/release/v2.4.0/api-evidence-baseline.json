@@ -12,16 +12,16 @@
     "registered_stale": 0,
     "registered_with_test": 161,
     "registered_test_unresolved": 0,
-    "registered_with_example": 372,
+    "registered_with_example": 373,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 93,
     "registered_without_api_page": 0,
-    "with_snippet": 393,
+    "with_snippet": 394,
     "public_api_units": 518,
-    "example_eligible": 372,
-    "example_exempt": 146,
-    "eligible_backed_by_registry_example": 372,
-    "eligible_used_by_some_example": 350,
+    "example_eligible": 373,
+    "example_exempt": 145,
+    "eligible_backed_by_registry_example": 373,
+    "eligible_used_by_some_example": 351,
     "examples_on_disk": 69,
     "examples_built": 69
   },
@@ -174,10 +174,10 @@
       "public": 66,
       "registered": 66,
       "with_test": 6,
-      "eligible": 42,
-      "eligible_with_registry_example": 42,
-      "eligible_used_by_example": 38,
-      "with_snippet": 49
+      "eligible": 43,
+      "eligible_with_registry_example": 43,
+      "eligible_used_by_example": 39,
+      "with_snippet": 50
     },
     "mri": {
       "public": 8,
@@ -4106,7 +4106,7 @@
       "api_page": "doc/website/docs/api/disp3-d/brain-renderer.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: QRhi draw backend owned privately by BrainView; it needs a live GPU device and is driven only through BrainView, whose example covers it."
+      "exempt_reason": "registry: QRhi draw backend owned privately by BrainView; it needs a live GPU device and is driven only through BrainView."
     },
     {
       "name": "BrainView",
@@ -5846,7 +5846,7 @@
       "api_page": "doc/website/docs/api/dsp/rt-cov-compute-result.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov (ex_dsp_rt rt_cov_usage)."
+      "exempt_reason": "registry: Map-reduce partial result of the RtCov worker; callers receive the finished FiffCov."
     },
     {
       "name": "FilterObject",
@@ -5870,7 +5870,7 @@
       "api_page": "doc/website/docs/api/dsp/filter-object.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Per-channel work item of the parallel overlap-add filter in filterDataBlock; built and consumed only there (ex_dsp_filter filter_data_usage)."
+      "exempt_reason": "registry: Per-channel work item of the parallel overlap-add filter in filterDataBlock; built and consumed only there."
     },
     {
       "name": "FilterOverlapAdd",
@@ -5990,7 +5990,7 @@
       "api_page": "doc/website/docs/api/dsp/rt-inv-op-input.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Queue item RtInvOp hands to its RtInvOpWorker thread; built by RtInvOp::append, never by callers (ex_dsp_rt rt_inv_op_usage)."
+      "exempt_reason": "registry: Queue item RtInvOp hands to its RtInvOpWorker thread; built by RtInvOp::append, never by callers."
     },
     {
       "name": "RtInvOpWorker",
@@ -6136,7 +6136,7 @@
       "api_page": "doc/website/docs/api/utils/spectogram-input-data.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Per-window work item of the parallel Spectrogram map-reduce; built and consumed only there (ex_dsp_spectral spectrogram_make)."
+      "exempt_reason": "registry: Per-window work item of the parallel Spectrogram map-reduce; built and consumed only there."
     },
     {
       "name": "Spectrogram",
@@ -7796,7 +7796,7 @@
       "api_page": "doc/website/docs/api/fwd/fwd-comp-data.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: CTF compensation wrapper that FwdBemModel builds for compensated coil sets during ComputeFwd; callers reach it through ComputeFwd (ex_fwd_api compute_fwd_usage)."
+      "exempt_reason": "registry: CTF compensation wrapper that FwdBemModel builds for compensated coil sets during ComputeFwd; callers reach it through ComputeFwd."
     },
     {
       "name": "FwdEegSphereLayer",
@@ -7863,7 +7863,7 @@
       "api_page": "doc/website/docs/api/fwd/fit-user-rec.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Workspace of the Berg-Scherg least-squares fit inside FwdEegSphereModel::fwd_eeg_fit_berg_scherg; built and consumed only there (ex_fwd_api fwd_eeg_sphere_model_usage)."
+      "exempt_reason": "registry: Workspace of the Berg-Scherg least-squares fit inside FwdEegSphereModel::fwd_eeg_fit_berg_scherg; built and consumed only there."
     },
     {
       "name": "FwdEegSphereModelSet",
@@ -8119,7 +8119,7 @@
       "api_page": "doc/website/docs/api/inv/inv-beamformer-compute.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Static numerical core (filter weights, power, regularised inverses) shared by InvLCMV and InvDICS; callers use those (ex_inv_beamformer inv_lcmv_usage)."
+      "exempt_reason": "registry: Static numerical core (filter weights, power, regularised inverses) shared by InvLCMV and InvDICS; callers use those."
     },
     {
       "name": "InvDICS",
@@ -8211,7 +8211,7 @@
       "api_page": "doc/website/docs/api/inv/fit-dip-user-rec.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Objective-function workspace of the dipole fit inside InvDipoleFit; built and consumed only there (ex_inv_dipole_fit inv_dipole_fit_usage)."
+      "exempt_reason": "registry: Objective-function workspace of the dipole fit inside InvDipoleFit; built and consumed only there."
     },
     {
       "name": "InvDipoleFitData",
@@ -8257,7 +8257,7 @@
       "api_page": "doc/website/docs/api/inv/dipole-fit-funcs-rec.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Forward-field function table set up by InvDipoleFitData::setup_dipole_fit_data, never by callers (ex_inv_dipole_fit inv_dipole_fit_data_usage)."
+      "exempt_reason": "registry: Forward-field function table set up by InvDipoleFitData::setup_dipole_fit_data, never by callers."
     },
     {
       "name": "InvDipoleFitSettings",
@@ -8422,7 +8422,7 @@
       "api_page": "doc/website/docs/api/inv/coil-param.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Per-coil dipole record InvHpiFit passes between its private fit steps; callers read HpiFitResult (ex_inv_hpi inv_hpi_usage)."
+      "exempt_reason": "registry: Per-coil dipole record InvHpiFit passes between its private fit steps; callers read HpiFitResult."
     },
     {
       "name": "HpiFitResult",
@@ -8497,7 +8497,7 @@
       "api_page": "doc/website/docs/api/inv/dip-fit-error.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Per-iteration residual record of the HPI dipole fit inside InvHpiFitData; internal to the fit (ex_inv_hpi inv_hpi_fit_data_usage)."
+      "exempt_reason": "registry: Per-iteration residual record of the HPI dipole fit inside InvHpiFitData; internal to the fit."
     },
     {
       "name": "HPISortStruct",
@@ -8520,7 +8520,7 @@
       "api_page": "doc/website/docs/api/inv/hpi-sort-struct.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Sort key InvHpiFitData uses to match coil fits to expected positions; internal to the HPI fit (ex_inv_hpi inv_hpi_fit_data_usage)."
+      "exempt_reason": "registry: Sort key InvHpiFitData uses to match coil fits to expected positions; internal to the HPI fit."
     },
     {
       "name": "InvHpiFitData",
@@ -9606,7 +9606,7 @@
       "api_page": "doc/website/docs/api/utils/tapered-spectra-input-data.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Per-row work item of the parallel tapered-spectra computation in Spectral; built and consumed only there (ex_math spectral_psd)."
+      "exempt_reason": "registry: Per-row work item of the parallel tapered-spectra computation in Spectral; built and consumed only there."
     },
     {
       "name": "FitUser",
@@ -9629,7 +9629,7 @@
       "api_page": "doc/website/docs/api/math/fit-user.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Cost-function workspace of Sphere::fit_sphere_simplex; built and consumed only there (ex_math sphere_fit)."
+      "exempt_reason": "registry: Cost-function workspace of Sphere::fit_sphere_simplex; built and consumed only there."
     },
     {
       "name": "Sphere",
@@ -10652,7 +10652,8 @@
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
       "snippets": [
-        "ex_mne_api/main.cpp#mne_epoch_data_list_usage"
+        "ex_mne_api/main.cpp#mne_epoch_data_list_usage",
+        "ex_mne_api/main.cpp#mne_epoch_rejection_usage"
       ],
       "api_page": "doc/website/docs/api/mne/artifact-rejection-data.mdx",
       "python_equiv": null,
@@ -10685,7 +10686,8 @@
         "ex_st_clustered_inverse_pwl_rap_music"
       ],
       "snippets": [
-        "ex_mne_api/main.cpp#mne_epoch_data_list_usage"
+        "ex_mne_api/main.cpp#mne_epoch_data_list_usage",
+        "ex_mne_api/main.cpp#mne_epoch_rejection_usage"
       ],
       "api_page": "doc/website/docs/api/mne/mne-epoch-data-list.mdx",
       "python_equiv": null,
@@ -10817,7 +10819,7 @@
       "api_page": "doc/website/docs/api/mne/region-data.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Per-region work item of the parallel clustering in MNEForwardSolution::cluster_forward_solution; built and consumed only there (ex_inv_api mne_cluster_info_usage)."
+      "exempt_reason": "registry: Per-region work item of the parallel clustering in MNEForwardSolution::cluster_forward_solution; built and consumed only there."
     },
     {
       "name": "RegionDataOut",
@@ -10846,7 +10848,7 @@
       "api_page": "doc/website/docs/api/mne/region-data-out.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Per-region result of the parallel clustering in MNEForwardSolution::cluster_forward_solution; consumed only there (ex_inv_api mne_cluster_info_usage)."
+      "exempt_reason": "registry: Per-region result of the parallel clustering in MNEForwardSolution::cluster_forward_solution; consumed only there."
     },
     {
       "name": "MNEHemisphere",
@@ -10914,7 +10916,8 @@
         "ex_inverse_mne"
       ],
       "snippets": [
-        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage",
+        "ex_inv_api/main.cpp#mne_inverse_cluster_kernel"
       ],
       "api_page": "doc/website/docs/api/mne/mne-inverse-operator.mdx",
       "python_equiv": "mne.InverseOperator",
@@ -10939,7 +10942,8 @@
         "ex_inverse_mne"
       ],
       "snippets": [
-        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage",
+        "ex_inv_api/main.cpp#mne_inverse_cluster_kernel"
       ],
       "api_page": "doc/website/docs/api/mne/region-mt.mdx",
       "python_equiv": null,
@@ -10964,7 +10968,8 @@
         "ex_inverse_mne"
       ],
       "snippets": [
-        "ex_inv_api/main.cpp#inv_minimum_norm_usage"
+        "ex_inv_api/main.cpp#inv_minimum_norm_usage",
+        "ex_inv_api/main.cpp#mne_inverse_cluster_kernel"
       ],
       "api_page": "doc/website/docs/api/mne/region-mt-out.mdx",
       "python_equiv": null,
@@ -11325,7 +11330,7 @@
       "api_page": "doc/website/docs/api/mne/mne-named-vector.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Scratch record inside MNEProjOp::make_proj_bad that picks one projection vector onto the channel list; callers use MNEProjOp (ex_mne_api mne_raw_data_usage)."
+      "exempt_reason": "registry: Scratch record inside MNEProjOp::make_proj_bad that picks one projection vector onto the channel list; callers use MNEProjOp."
     },
     {
       "name": "MNENearest",
@@ -11344,7 +11349,7 @@
       "api_page": "doc/website/docs/api/mne/mne-nearest.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Per-vertex nearest-source record stored in MNESurfaceOrVolume::nearest; filled while reading a source space (ex_mne_api mne_source_spaces_usage)."
+      "exempt_reason": "registry: Per-vertex nearest-source record stored in MNESurfaceOrVolume::nearest; filled while reading a source space."
     },
     {
       "name": "MNEPatchInfo",
@@ -11363,7 +11368,7 @@
       "api_page": "doc/website/docs/api/mne/mne-patch-info.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Patch statistics computed while reading a source space with patches; reached through MNEHemisphere::pinfo (ex_mne_api mne_source_spaces_usage)."
+      "exempt_reason": "registry: Patch statistics computed while reading a source space with patches; reached through MNEHemisphere::pinfo."
     },
     {
       "name": "CovDefinition",
@@ -11470,7 +11475,7 @@
       "api_page": "doc/website/docs/api/mne/mne-proj-data.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Search-acceleration record (triangle activity mask) internal to MNESurface::project_to_surface; callers use MNEProjectToSurface (ex_mne_api mne_project_to_surface_usage)."
+      "exempt_reason": "registry: Search-acceleration record (triangle activity mask) internal to MNESurface::project_to_surface; callers use MNEProjectToSurface."
     },
     {
       "name": "MNEProjItem",
@@ -11621,14 +11626,19 @@
       "registry_status": "done",
       "test": "test_mne_source_data",
       "test_resolves": true,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_mne_api",
+      "example_state": "built",
+      "including_examples": [
+        "ex_mne_api"
+      ],
+      "snippets": [
+        "ex_mne_api/main.cpp#mne_source_space_load_surface",
+        "ex_mne_api/main.cpp#mne_source_space_filter"
+      ],
       "api_page": "doc/website/docs/api/mne/mne-source-space.mdx",
       "python_equiv": "mne.SourceSpaces",
-      "example_eligible": false,
-      "exempt_reason": "registry: Abstract base of MNEHemisphere and volume source spaces; used through MNESourceSpaces (ex_mne_api mne_source_spaces_usage)."
+      "example_eligible": true,
+      "exempt_reason": null
     },
     {
       "name": "MNESourceSpaces",
@@ -11741,7 +11751,7 @@
       "api_page": "doc/website/docs/api/mne/mne-surface-or-volume.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Common base of MNESurface, MNESourceSpace and MNEBemSurface; used through those (ex_mne_api mne_bem_usage, mne_source_spaces_usage)."
+      "exempt_reason": "registry: Common base of MNESurface, MNESourceSpace and MNEBemSurface; used through those."
     },
     {
       "name": "MNESurfacePatch",
@@ -11779,7 +11789,7 @@
       "api_page": "doc/website/docs/api/mne/mne-triangle.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Per-triangle cache (centroid, area, normal) filled by MNESurfaceOrVolume::add_triangle_data; read through MNEBemSurface/MNESourceSpaces, shown in ex_mne_api mne_bem_usage."
+      "exempt_reason": "registry: Per-triangle cache (centroid, area, normal) filled by MNESurfaceOrVolume::add_triangle_data; read through MNEBemSurface/MNESourceSpaces."
     },
     {
       "name": "MNEVolGeom",
@@ -12812,7 +12822,7 @@
       "api_page": "doc/website/docs/api/utils/report-section.mdx",
       "python_equiv": null,
       "example_eligible": false,
-      "exempt_reason": "registry: Private storage record of Report; sections are created through the Report::add* methods covered by the report example."
+      "exempt_reason": "registry: Private storage record of Report; sections are created through the Report::add* methods."
     },
     {
       "name": "SelectionIO",
