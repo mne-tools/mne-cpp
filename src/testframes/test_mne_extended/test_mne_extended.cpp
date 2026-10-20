@@ -330,6 +330,10 @@ private slots:
         dataBad(0, 99) = 1e-10;
         hasArtifact = MNEEpochDataList::checkForArtifact(dataBad, info, mapReject);
         QCOMPARE(hasArtifact, true);
+
+        // A limit for gradiometers only leaves the magnetometer unchecked, like mne.Epochs(reject=dict(grad=...))
+        QTest::ignoreMessage(QtWarningMsg, QRegularExpression("No channels found"));
+        QCOMPARE(MNEEpochDataList::checkForArtifact(dataBad, info, {{"grad", 5e-12}}), false);
     }
 
     void epochDataList_average()

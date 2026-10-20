@@ -272,51 +272,31 @@ bool MNEEpochDataList::checkForArtifact(const MatrixXd& data,
 
     //Prepare concurrent data handling
     QList<ArtifactRejectionData> lchData;
-    QList<int> lChTypes;
-
-    if (mapReject.contains("grad") ||
-        mapReject.contains("mag")) {
-        lChTypes << FIFFV_MEG_CH;
-    }
-
-    if (mapReject.contains("eeg")) {
-        lChTypes << FIFFV_EEG_CH;
-    }
-
-    if (mapReject.contains("eog")) {
-        lChTypes << FIFFV_EOG_CH;
-    }
-
-    if (lChTypes.isEmpty()) {
+    if (mapReject.isEmpty()) {
         return bReject;
     }
 
     for (int i = 0; i < pFiffInfo.chs.size(); ++i) {
-        if (lChTypes.contains(pFiffInfo.chs.at(i).kind) && !lExcludeChs.contains(pFiffInfo.chs.at(i).ch_name) && !pFiffInfo.bads.contains(pFiffInfo.chs.at(i).ch_name) && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG && pFiffInfo.chs.at(i).chpos.coil_type != FIFFV_COIL_BABY_REF_MAG2) {
-            ArtifactRejectionData tempData;
-            tempData.data = data.row(i);
-
-            switch (pFiffInfo.chs.at(i).kind) {
-                case FIFFV_MEG_CH:
-                    if (pFiffInfo.chs.at(i).unit == FIFF_UNIT_T) {
-                        tempData.dThreshold = mapReject["mag"];
-                    } else if (pFiffInfo.chs.at(i).unit == FIFF_UNIT_T_M) {
-                        tempData.dThreshold = mapReject["grad"];
-                    }
-                    break;
-
-                case FIFFV_EEG_CH:
-                    tempData.dThreshold = mapReject["eeg"];
-                    break;
-
-                case FIFFV_EOG_CH:
-                    tempData.dThreshold = mapReject["eog"];
-                    break;
-            }
-
-            tempData.sChName = pFiffInfo.chs.at(i).ch_name;
-            lchData.append(tempData);
+        const FiffChInfo& ch = pFiffInfo.chs.at(i);
+        QString key;
+        if (ch.kind == FIFFV_MEG_CH && ch.unit == FIFF_UNIT_T) {
+            key = QStringLiteral("mag");
+        } else if (ch.kind == FIFFV_MEG_CH && ch.unit == FIFF_UNIT_T_M) {
+            key = QStringLiteral("grad");
+        } else if (ch.kind == FIFFV_EEG_CH) {
+            key = QStringLiteral("eeg");
+        } else if (ch.kind == FIFFV_EOG_CH) {
+            key = QStringLiteral("eog");
         }
+        // Like mne.Epochs(reject=...): only channel types with a limit are checked
+        if (!mapReject.contains(key) || lExcludeChs.contains(ch.ch_name) || pFiffInfo.bads.contains(ch.ch_name) || ch.chpos.coil_type == FIFFV_COIL_BABY_REF_MAG || ch.chpos.coil_type == FIFFV_COIL_BABY_REF_MAG2) {
+            continue;
+        }
+        ArtifactRejectionData tempData;
+        tempData.data = data.row(i);
+        tempData.dThreshold = mapReject.value(key);
+        tempData.sChName = ch.ch_name;
+        lchData.append(tempData);
     }
 
     if (lchData.isEmpty()) {
