@@ -50,8 +50,8 @@ def file_problems(root: Path, version: str) -> list[str]:
     if not re.search(r'^date-released:\s*"\d{4}-\d{2}-\d{2}"\s*$', citation, re.M):
         problems.append("CITATION.cff has no date-released in YYYY-MM-DD form")
     changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
-    if not re.search(rf"^## \[{re.escape(version)}\]", changelog, re.M):
-        problems.append(f"CHANGELOG.md has no '## [{version}]' section")
+    if not re.search(rf"^## \[{re.escape(version)}\] - \d{{4}}-\d{{2}}-\d{{2}}\s*$", changelog, re.M):
+        problems.append(f"CHANGELOG.md has no dated '## [{version}] - YYYY-MM-DD' section")
     return problems
 
 

@@ -51,10 +51,10 @@ class PreflightTest(unittest.TestCase):
     def test_every_invariant_is_enforced(self):
         self.assertEqual(preflight.file_problems(self.root, "2.4.0"), [])
         (self.root / "doc/Doxyfile").write_text('PROJECT_NUMBER         = "2.4.0-dev"\n')
-        (self.root / "CHANGELOG.md").write_text("## [2.3.0] - 2026-06-13\n")
+        (self.root / "CHANGELOG.md").write_text("## [2.4.0] - Unreleased\n## [2.3.0] - 2026-06-13\n")
         self.assertEqual(preflight.file_problems(self.root, "2.4.0"),
                          ["doc/Doxyfile carries 2.4.0-dev, expected 2.4.0",
-                          "CHANGELOG.md has no '## [2.4.0]' section"])
+                          "CHANGELOG.md has no dated '## [2.4.0] - YYYY-MM-DD' section"])
         self.assertEqual(preflight.git_problems(self.root, "2.4.0", None, None),
                          ["working tree has uncommitted changes"])
         self.git("checkout", "--", ".")
