@@ -1,56 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  config.xml
-  MNE-CPP Qt Installer Framework Configuration
-
-  This file describes the overall installer appearance and behaviour.
-  Component-specific metadata lives in packages/*/meta/package.xml.
-
-  The directory layout mirrors Qt's own installation structure:
-      ~/MNE-CPP/
-      ├── @MNE_CPP_VERSION@/
-      │   ├── bin/
-      │   ├── lib/
-      │   └── include/
-      ├── data/
-      ├── Tools/
-      └── scripts/
--->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+<!-- Copyright (c) 2026 MNE-CPP Authors, Christoph Dinh <christoph.dinh@mne-cpp.org> -->
+<!-- Placeholders @...@ are filled in by scripts/deploy/stage_installer.py. -->
 <Installer>
     <Name>MNE-CPP</Name>
     <Version>@MNE_CPP_VERSION@</Version>
-    <Title>MNE-CPP Installer</Title>
-    <Publisher>MNE-CPP Developers</Publisher>
-    <StartMenuDir>MNE-CPP</StartMenuDir>
+    <Title>MNE-CPP @MNE_CPP_VERSION@</Title>
+    <Publisher>MNE-CPP</Publisher>
+    <ProductUrl>https://mne-cpp.github.io/</ProductUrl>
     <TargetDir>@HomeDir@/MNE-CPP</TargetDir>
-
-    <!-- Allow the user to change the target directory -->
-    <AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
+    <AdminTargetDir>@ApplicationsDir@/MNE-CPP</AdminTargetDir>
+    <StartMenuDir>MNE-CPP</StartMenuDir>
+    <MaintenanceToolName>MNE-CPP Maintenance Tool</MaintenanceToolName>
     <AllowSpaceInPath>true</AllowSpaceInPath>
+    <AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
+    <!-- A translation that does not exist keeps every page in English whatever the system language -->
+    <Translations>
+        <Translation>ifw_en</Translation>
+    </Translations>
 
-    <!-- Maintenance tool for add / remove / update -->
-    <MaintenanceToolName>MNE-CPP-MaintenanceTool</MaintenanceToolName>
-    <CreateLocalRepository>false</CreateLocalRepository>
-
-    <!-- Wizard style -->
+    <InstallerApplicationIcon>installer</InstallerApplicationIcon>
+    <InstallerWindowIcon>installer.png</InstallerWindowIcon>
     <WizardStyle>Modern</WizardStyle>
-    <WizardDefaultWidth>900</WizardDefaultWidth>
-    <WizardDefaultHeight>600</WizardDefaultHeight>
-
-    <!-- Branding -->
-    <Logo>MNE-CPP_Logo.png</Logo>
-    <Banner>banner.png</Banner>
-    <Watermark>watermark.png</Watermark>
+    <WizardDefaultWidth>960</WizardDefaultWidth>
+    <WizardDefaultHeight>700</WizardDefaultHeight>
+    <WizardMinimumWidth>860</WizardMinimumWidth>
+    <WizardMinimumHeight>660</WizardMinimumHeight>
+    <WizardShowPageList>true</WizardShowPageList>
+    <PageListPixmap>sidebar.png</PageListPixmap>
+    <TitleColor>#1a1a2e</TitleColor>
     <StyleSheet>style.qss</StyleSheet>
 
-    <!-- URLs -->
-    <ProductUrl>https://mne-cpp.github.io/</ProductUrl>
-
-    <!-- Interactive UI enhancements (does NOT auto-click) -->
-    <ControlScript>uiscript.qs</ControlScript>
-
-    <!--
-      For headless installs, run the installer binary with the
-      controlscript.qs file passed via the script flag.
-    -->
+    <ControlScript>controller.qs</ControlScript>
 </Installer>

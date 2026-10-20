@@ -1,165 +1,231 @@
 /*
- * MNE-CPP Installer Stylesheet
- *
- * The installer keeps native controls where possible, but adds a cohesive
- * visual language around the custom variant, download, and installation
- * status panels.
+ * MNE-CPP installer stylesheet, matching the website: a white window, the soft
+ * website grey (#f6f7fb) for the step panel, hairline borders (#e6e8f0) and the
+ * purple accent (#6c5ce7).
  */
 
-QWidget {
-    color: #102a43;
-}
-
-QLabel {
-    qproperty-wordWrap: true;
-}
-
-QFrame#MneHeroCard,
-QFrame#MneOptionPanel {
+QWizard {
     background: #ffffff;
-    border: 1px solid #d9e2ec;
-    border-radius: 18px;
 }
 
-QFrame#MneHeroCard {
-    padding: 12px;
+QWidget {
+    color: #1a1a2e;
+    font-size: 13px;
 }
 
-QFrame#MneOptionPanel {
-    padding: 10px;
+QWizardPage, QLabel {
+    background: transparent;
 }
 
-QLabel#MneKicker {
-    color: #0f766e;
+/* Step panel: a soft rounded card with the purple traces at its foot, the current step is a pill */
+#SideWidget {
+    background-color: #f6f7fb;
+    background-image: url(:/mnecpp/hero/side.png);
+    background-repeat: no-repeat;
+    background-position: bottom center;
+    border: 1px solid #eceef5;
+    border-radius: 14px;
+}
+
+#PageListPixmapLabel {
+    padding: 20px 0 22px 0;
+}
+
+#PageListWidget {
+    background: transparent;
+    border: none;
+    padding: 0 14px;
+    outline: none;
+}
+
+#PageListWidget::item {
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #9a9cb0;
+}
+
+#PageListWidget::item:enabled {
+    color: #5a48e0;
+    background: #ebe8fd;
+}
+
+/* Buttons: neutral outline, the default one (Next, Install, Finish) is filled */
+QPushButton {
+    min-width: 88px;
+    padding: 7px 20px;
+    border: 1px solid #d9dce8;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1a1a2e;
+}
+
+QPushButton:hover {
+    border-color: #a29bfe;
+}
+
+QPushButton:pressed {
+    background: #ebe8fd;
+}
+
+QPushButton:default {
+    color: #ffffff;
+    font-weight: 600;
+    border: 1px solid #6c5ce7;
+    background: #6c5ce7;
+}
+
+QPushButton:default:hover {
+    border-color: #5a48e0;
+    background: #5a48e0;
+}
+
+QPushButton:disabled {
+    color: #b4b6c6;
+    border: 1px solid #e6e8f0;
+    background: #f6f7fb;
+    font-weight: normal;
+}
+
+/* Setup type cards */
+/* QCommandLinkButton's height-for-width ignores the stylesheet padding, so the cards would overlap */
+QCommandLinkButton {
+    min-width: 0;
+    min-height: 36px;
+    padding: 12px 16px;
+    border: 1px solid #e6e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #1a1a2e;
+}
+
+QCommandLinkButton:hover {
+    border-color: #a29bfe;
+}
+
+QCommandLinkButton:checked {
+    border: 2px solid #6c5ce7;
+    background: #f4f2ff;
+}
+
+QLabel#Included {
+    padding: 12px 10px;
+    border: 1px solid #e6e8f0;
+    border-radius: 12px;
+    background: #f9fafc;
+}
+
+QLabel#Hint, QLabel[role="hint"] {
+    color: #8a8ca0;
+}
+
+QLabel[role="section"] {
+    color: #6c5ce7;
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 1px;
+    margin-top: 10px;
     text-transform: uppercase;
 }
 
-QLabel#MneTitle {
-    color: #102a43;
-    font-size: 24px;
-    font-weight: 700;
+QLineEdit {
+    min-height: 20px;
+    padding: 6px 10px;
+    border: 1px solid #d9dce8;
+    border-radius: 8px;
+    background: #ffffff;
+    selection-background-color: #a29bfe;
 }
 
-QLabel#MneBody {
-    color: #486581;
-    font-size: 13px;
-    line-height: 1.45;
+QLineEdit:focus {
+    border: 1px solid #6c5ce7;
 }
 
-QLabel#MneDetail {
-    color: #627d98;
+QCheckBox {
+    spacing: 8px;
+    padding: 3px 0;
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #c9ccda;
+    border-radius: 5px;
+    background: #ffffff;
+}
+
+QCheckBox::indicator:hover {
+    border-color: #6c5ce7;
+}
+
+QCheckBox::indicator:checked {
+    border-color: #6c5ce7;
+    background: #6c5ce7;
+    image: url(:/mnecpp/hero/check.png);
+}
+
+QPlainTextEdit#SdkSnippet {
+    font-family: "Menlo", "Consolas", "DejaVu Sans Mono", monospace;
     font-size: 12px;
-}
-
-QLabel#MneMetric {
-    color: #0b7285;
-    font-size: 20px;
-    font-weight: 700;
-}
-
-QLabel#MneStatusText {
-    color: #102a43;
-    font-size: 15px;
-    font-weight: 600;
-}
-
-QLabel#MneStepItem {
-    color: #627d98;
-    font-size: 12px;
-    padding: 2px 0;
-}
-
-QLabel#MneStepItem[state="active"] {
-    color: #0f766e;
-    font-weight: 600;
-}
-
-QLabel#MneStepItem[state="done"] {
-    color: #0b7285;
-    font-weight: 600;
-}
-
-QLabel#MneStepItem[state="error"] {
-    color: #b42318;
-    font-weight: 600;
+    border: 1px solid #e6e8f0;
+    border-radius: 10px;
+    padding: 8px;
+    background: #f9fafc;
 }
 
 QProgressBar {
-    background-color: #e8f1f2;
     border: none;
-    border-radius: 8px;
-    min-height: 12px;
-    text-align: center;
-    font-size: 11px;
-    color: #486581;
-}
-
-QProgressBar#MneDownloadProgress {
-    min-height: 14px;
+    border-radius: 4px;
+    min-height: 8px;
+    max-height: 8px;
+    background: #ebe8fd;
+    color: transparent;
 }
 
 QProgressBar::chunk {
-    background: qlineargradient(
-        x1: 0, y1: 0, x2: 1, y2: 0,
-        stop: 0 #0f766e,
-        stop: 1 #2cb1bc
-    );
-    border-radius: 8px;
+    border-radius: 4px;
+    background: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #6c5ce7, stop: 1 #a29bfe);
 }
 
-QTreeView, QTreeWidget {
-    background-color: #ffffff;
-    alternate-background-color: #f8fbfc;
+QTreeView, QTextBrowser, QListWidget#LicenseListWidget {
+    border: 1px solid #e6e8f0;
+    border-radius: 10px;
+    background: #ffffff;
     outline: none;
-    border: 1px solid #d9e2ec;
-    border-radius: 12px;
 }
 
 QTreeView::item {
-    padding: 5px 4px;
-}
-
-QTreeView::item:hover {
-    background-color: rgba(15, 118, 110, 0.08);
+    padding: 5px 2px;
 }
 
 QTreeView::item:selected {
-    background-color: rgba(15, 118, 110, 0.14);
-    color: #102a43;
+    color: #1a1a2e;
+    background: #ebe8fd;
 }
 
-QHeaderView::section {
-    background-color: #f0f4f8;
-    border: none;
-    border-bottom: 1px solid #d9e2ec;
-    padding: 6px 8px;
-    font-weight: 600;
-    font-size: 12px;
-    color: #486581;
-}
-
-QTextBrowser, QTextEdit {
-    background-color: #ffffff;
+QTextBrowser {
     padding: 10px;
-    font-size: 12px;
-    color: #243b53;
-    border: 1px solid #d9e2ec;
-    border-radius: 12px;
-    selection-background-color: rgba(15, 118, 110, 0.18);
 }
 
-QGroupBox::title {
-    color: #0f766e;
+QScrollBar:vertical {
+    width: 10px;
+    background: transparent;
+}
+
+QScrollBar::handle:vertical {
+    min-height: 30px;
+    border-radius: 4px;
+    margin: 2px;
+    background: #d9dce8;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
 }
 
 QToolTip {
-    background-color: #102a43;
     color: #ffffff;
+    background: #1a1a2e;
     border: none;
     border-radius: 6px;
     padding: 6px 10px;
-    font-size: 12px;
 }

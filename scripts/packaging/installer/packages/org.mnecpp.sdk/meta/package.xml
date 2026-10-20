@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-    <DisplayName>Development SDK (C++ Headers &amp; CMake Config)</DisplayName>
-    <Description>C++ headers and CMake package configuration files for building your own applications on top of the MNE-CPP libraries. After installation, use find_package(MNE-CPP) in your CMakeLists.txt.</Description>
-    <Version>2.0.0</Version>
-    <ReleaseDate>2026-02-17</ReleaseDate>
+    <DisplayName>C++ SDK</DisplayName>
+    <Description>Headers and the CMake package to build your own software with find_package(MNE-CPP).</Description>
+    <Version>@MNE_CPP_VERSION@</Version>
+    <ReleaseDate>@MNE_CPP_RELEASE_DATE@</ReleaseDate>
     <Default>false</Default>
     <SortingPriority>80</SortingPriority>
+    <Dependencies>org.mnecpp.runtime</Dependencies>
 </Package>

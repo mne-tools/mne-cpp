@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
     <DisplayName>Add to PATH</DisplayName>
-    <Description>Makes MNE-CPP command-line tools available in any terminal window. On macOS/Linux this adds the MNE-CPP bin/ directory to your shell profile (~/.zshrc or ~/.bashrc). On Windows it updates the user PATH environment variable. After installation, you can run tools like mne_anonymize or mne_show_fiff directly from the command line.</Description>
+    <Description>Run the tools from any new terminal. Removed again on uninstall.</Description>
     <Version>@MNE_CPP_VERSION@</Version>
     <ReleaseDate>@MNE_CPP_RELEASE_DATE@</ReleaseDate>
     <Default>true</Default>
-    <SortingPriority>40</SortingPriority>
+    <SortingPriority>70</SortingPriority>
+    <Dependencies>org.mnecpp.tools</Dependencies>
     <Script>installscript.qs</Script>
+    <TreeName>org.mnecpp.tools.path</TreeName>
 </Package>

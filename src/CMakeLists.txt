@@ -436,11 +436,6 @@ if(BUILD_TESTS)
   add_subdirectory(testframes)
 endif()
 
-option(MNE_ENABLE_INSTALLER "Enable building the installer" OFF)
-if(MNE_ENABLE_INSTALLER)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/../scripts/packaging/Installer.cmake)
-endif()
-
 ##==============================================================================
 ## CMake package config for find_package(MNE-CPP) — SDK discovery
 ## (Not applicable for WASM builds which use a bundled Eigen target and

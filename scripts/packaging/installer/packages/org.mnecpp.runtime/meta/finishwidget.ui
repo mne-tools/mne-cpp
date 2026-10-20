@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FinishWidget</class>
+ <widget class="QWidget" name="FinishWidget">
+  <layout class="QVBoxLayout" name="finishLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="launchTitle">
+     <property name="text">
+      <string>Start now</string>
+     </property>
+     <property name="role" stdset="0">
+      <string>section</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="launchInspect">
+     <property name="text">
+      <string>Open MNE Inspect, the 3-D viewer for brain surfaces and source estimates</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="launchScan">
+     <property name="text">
+      <string>Open MNE Scan for real-time acquisition and processing</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="launchBrowse">
+     <property name="text">
+      <string>Open MNE Browse to look through raw recordings</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="launchAnalyze">
+     <property name="text">
+      <string>Open MNE Analyze for offline analysis</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="learnTitle">
+     <property name="text">
+      <string>Learn</string>
+     </property>
+     <property name="role" stdset="0">
+      <string>section</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="openGuide">
+     <property name="text">
+      <string>Read the Getting Started guide</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="openExamples">
+     <property name="text">
+      <string>Browse the C++ examples</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="sdkTitle">
+     <property name="text">
+      <string>Use the SDK in your CMake project</string>
+     </property>
+     <property name="role" stdset="0">
+      <string>section</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPlainTextEdit" name="SdkSnippet">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="maximumHeight">
+      <number>74</number>
+     </property>
+     <property name="lineWrapMode">
+      <enum>QPlainTextEdit::NoWrap</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="pathHint">
+     <property name="text">
+      <string>Open a new terminal to use mne_show_fiff and the other command-line tools.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+     <property name="role" stdset="0">
+      <string>hint</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

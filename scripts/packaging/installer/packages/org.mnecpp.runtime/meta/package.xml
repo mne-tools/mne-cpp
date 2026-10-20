@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-    <DisplayName>Runtime Libraries</DisplayName>
-    <Description>Shared libraries required by MNE-CPP applications</Description>
-    <Version>2.0.0</Version>
-    <ReleaseDate>2026-02-17</ReleaseDate>
-    <ForcedInstallation>true</ForcedInstallation>
+    <DisplayName>MNE-CPP libraries</DisplayName>
+    <Description>The MNE-CPP and Qt libraries shared by every application and tool.</Description>
+    <Version>@MNE_CPP_VERSION@</Version>
+    <ReleaseDate>@MNE_CPP_RELEASE_DATE@</ReleaseDate>
     <Virtual>true</Virtual>
-    <SortingPriority>99</SortingPriority>
+    <ForcedInstallation>true</ForcedInstallation>
+    <Script>installscript.qs</Script>
+    <UserInterfaces>
+        <UserInterface>setuptypepage.ui</UserInterface>
+        <UserInterface>finishwidget.ui</UserInterface>
+    </UserInterfaces>
     <Licenses>
-        <License name="BSD 3-Clause License" file="license.txt" />
+        <License name="MNE-CPP (BSD 3-Clause License)" file="license.txt" />
     </Licenses>
 </Package>

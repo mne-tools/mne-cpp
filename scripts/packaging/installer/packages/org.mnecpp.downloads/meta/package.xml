@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+<!-- Copyright (c) 2026 MNE-CPP Authors, Christoph Dinh <christoph.dinh@mne-cpp.org> -->
+<Package>
+    <DisplayName>Additional downloads</DisplayName>
+    <Description>Data and Python packages fetched from the internet during installation.</Description>
+    <Version>@MNE_CPP_VERSION@</Version>
+    <ReleaseDate>@MNE_CPP_RELEASE_DATE@</ReleaseDate>
+    <Default>false</Default>
+    <SortingPriority>40</SortingPriority>
+</Package>

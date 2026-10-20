@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Command-line tools</DisplayName>
+    <Description>Over 100 tools for forward and inverse modelling, conversion and preprocessing, for scripts and batch jobs.</Description>
+    <Version>@MNE_CPP_VERSION@</Version>
+    <ReleaseDate>@MNE_CPP_RELEASE_DATE@</ReleaseDate>
+    <Default>true</Default>
+    <SortingPriority>90</SortingPriority>
+    <Dependencies>org.mnecpp.runtime</Dependencies>
+</Package>

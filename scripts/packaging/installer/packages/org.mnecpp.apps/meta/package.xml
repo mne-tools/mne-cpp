@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Applications</DisplayName>
+    <Description>MNE Scan, MNE Analyze, MNE Browse, MNE Inspect, MNE Align and MNE Anonymize, with menu entries.</Description>
+    <Version>@MNE_CPP_VERSION@</Version>
+    <ReleaseDate>@MNE_CPP_RELEASE_DATE@</ReleaseDate>
+    <Default>true</Default>
+    <SortingPriority>100</SortingPriority>
+    <Dependencies>org.mnecpp.runtime</Dependencies>
+    <Script>installscript.qs</Script>
+</Package>
