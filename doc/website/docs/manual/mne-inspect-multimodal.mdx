@@ -5,12 +5,8 @@ sidebar_label: MNE Inspect Multimodal
 
 # MNE Inspect — Multimodal Workflow
 
-:::note
-Screenshots will be captured against the v2.3.0 release build.
-:::
-
-This page walks through the intracranial multimodal workflow added in
-mne-cpp v2.3.0: loading an MRI volume, a FreeSurfer cortical surface and
+This page walks through the intracranial multimodal workflow of MNE Inspect
+(added in v2.3.0): loading an MRI volume, a FreeSurfer cortical surface and
 an intracranial electrode set (sEEG depths + ECoG grids) into a single
 3-D scene, then driving the **Layers**, **Pick** and **Overlay** docks
 to inspect contact-by-contact data on top of the anatomy.
@@ -257,7 +253,7 @@ honour the volume's own affine; they are not silently re-aligned.
 **Layers** dock to drop opacity on the surface to ~0.6 so the GPU can
 early-out occluded contacts, hide the hemisphere you are not currently
 inspecting, or switch the surface from `pial` to `inflated`. As a
-reference, the v2.3.0 target is ≥ 30 FPS on a 2024-class laptop for a
+reference, the target is ≥ 30 FPS on a 2024-class laptop for a
 327 k-triangle cortex + 120 sEEG contacts + 64-contact ECoG grid + 3
 MRI slices.
 

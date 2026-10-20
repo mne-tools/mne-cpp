@@ -4,7 +4,7 @@ sidebar_label: MNE Align
 ---
 # MNE Align
 
-`mne_align` is the standalone coregistration helper that ships with mne-cpp v2.3.0. It walks an operator through a seven-step wizard that takes a subject's head BEM, the corresponding live or recorded digitisation, and produces a `-trans.fif` head→MRI transform suitable for downstream forward / inverse modelling.
+`mne_align` is the standalone coregistration helper that ships with mne-cpp (since v2.3.0). It walks an operator through a seven-step wizard that takes a subject's head BEM, the corresponding live or recorded digitisation, and produces a `-trans.fif` head→MRI transform suitable for downstream forward / inverse modelling.
 
 The app is built on the same `MultimodalScene` foundation as `mne_inspect`, and integrates direct serial capture from a Polhemus FASTRAK digitiser via the shared `UTILSLIB::PolhemusConnection` driver. It also accepts a previously recorded digitisation FIFF file when no hardware is available.
 
