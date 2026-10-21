@@ -426,6 +426,9 @@ desktop, and signed installers. 915 commits since v2.3.0.
 - The API reference builds with zero Doxygen warnings (1,726 fixed).
 - Manual screenshots are generated from the current build in CI and compared
   against reference images.
+- The website build uses a patched `braces` (nesting-depth bound for
+  GHSA-vfj7-8cjw-p6xm, which upstream has not fixed) and `follow-redirects`
+  1.16.1.
 - The website fails to build on broken links or missing images, and has a
   generated quality page.
 - The build guide is complete for all three platforms; CI runs exactly the

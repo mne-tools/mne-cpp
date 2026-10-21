@@ -1,0 +1,54 @@
+{
+  "name": "braces",
+  "description": "braces 3.0.3 with a nesting-depth bound (GHSA-vfj7-8cjw-p6xm), vendored for the MNE-CPP website until upstream releases a fix.",
+  "version": "3.0.4-mne.1",
+  "homepage": "https://github.com/micromatch/braces",
+  "author": "Jon Schlinkert (https://github.com/jonschlinkert)",
+  "contributors": [
+    "Brian Woodward (https://twitter.com/doowb)",
+    "Elan Shanker (https://github.com/es128)",
+    "Eugene Sharygin (https://github.com/eush77)",
+    "hemanth.hm (http://h3manth.com)",
+    "Jon Schlinkert (http://twitter.com/jonschlinkert)"
+  ],
+  "repository": "micromatch/braces",
+  "bugs": {
+    "url": "https://github.com/micromatch/braces/issues"
+  },
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "lib"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "fill-range": "^7.1.1"
+  },
+  "keywords": [
+    "alpha",
+    "alphabetical",
+    "bash",
+    "brace",
+    "braces",
+    "expand",
+    "expansion",
+    "filepath",
+    "fill",
+    "fs",
+    "glob",
+    "globbing",
+    "letter",
+    "match",
+    "matches",
+    "matching",
+    "number",
+    "numerical",
+    "path",
+    "range",
+    "ranges",
+    "sh"
+  ]
+}
