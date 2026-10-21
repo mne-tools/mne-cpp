@@ -69,6 +69,7 @@ runs:
     env:
       FILE: ${{ inputs.file }}
       SIGNED_DIR: ${{ runner.temp }}/signed
+      POLICY: ${{ inputs.signing-policy-slug }}
     run: |
       $ErrorActionPreference = 'Stop'
       $signed = Join-Path $env:SIGNED_DIR (Split-Path $env:FILE -Leaf)
@@ -80,13 +81,21 @@ runs:
       if ($env:FILE -like '*.zip') {
         $dir = Join-Path $env:RUNNER_TEMP ('verify-' + [IO.Path]::GetFileNameWithoutExtension($env:FILE))
         Expand-Archive $env:FILE -DestinationPath $dir -Force
-        $targets = Get-ChildItem $dir -Recurse -Include 'mne_*.exe', 'mne_*.dll'
+        $targets = @(Get-ChildItem $dir -Recurse -Include 'mne_*.exe', 'mne_*.dll') +
+          @(Get-ChildItem $dir -Recurse -Filter '*.dll' | Where-Object { $_.Directory.Name -like 'mne_*_plugins' })
       } else {
-        $targets = Get-Item $env:FILE
+        $targets = @(Get-Item $env:FILE)
       }
       if ($targets.Count -eq 0) { throw "No MNE-CPP executables found in $env:FILE" }
       foreach ($t in $targets) {
-        & $signtool.FullName verify /pa /all /tw $t.FullName
-        if ($LASTEXITCODE -ne 0) { throw "Signature verification failed: $($t.Name)" }
+        if ($env:POLICY -eq 'release-signing') {
+          & $signtool.FullName verify /pa /all /tw $t.FullName
+          if ($LASTEXITCODE -ne 0) { throw "Signature verification failed: $($t.Name)" }
+        } else {
+          # The test certificate is not trusted on the runner, so only require a signature.
+          $sig = Get-AuthenticodeSignature $t.FullName
+          if (-not $sig.SignerCertificate) { throw "Not signed: $($t.Name)" }
+          Write-Host "$($t.Name): $($sig.SignerCertificate.Subject) ($($sig.Status))"
+        }
       }
       Write-Host "Verified $($targets.Count) signed file(s) in $env:FILE"

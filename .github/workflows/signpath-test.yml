@@ -1,0 +1,58 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+name: SignPath Test Signing
+
+# Signs the current dev_build Windows packages with the untrusted test
+# certificate to check the SignPath chain before a release tag.
+on:
+  workflow_dispatch:
+  # Dispatch needs the file on main; until then, changes on staging trigger it.
+  push:
+    branches: [staging]
+    paths:
+    - .github/workflows/signpath-test.yml
+    - .github/actions/signpath-sign/**
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: signpath-test
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
+jobs:
+  Sign:
+    runs-on: windows-2025
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - asset: mne-cpp-dev-windows-dynamic-x86_64.zip
+          configuration: windows-archive
+        - asset: mne-cpp-dev-windows-installer-x86_64.exe
+          configuration: windows-installer
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+
+    - name: Download dev_build package
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: gh release download dev_build -p "${{ matrix.asset }}"
+
+    - name: Test-sign the package
+      uses: ./.github/actions/signpath-sign
+      with:
+        file: ${{ matrix.asset }}
+        artifact-configuration-slug: ${{ matrix.configuration }}
+        signing-policy-slug: test-signing
+        api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+        organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
