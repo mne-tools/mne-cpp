@@ -149,7 +149,7 @@ The tag triggers the release jobs in [main.yml](https://github.com/mne-tools/mne
 
 - Builds **dynamically linked** binaries for Linux, macOS, and Windows via the platform-specific release workflows
 - Builds **statically linked** binaries for all platforms
-- Runs the deployment scripts (`scripts/deploy/deploy.bat`) to bundle Qt dependencies
+- Runs the deployment scripts (`scripts/deploy/deploy.sh`, `deploy.bat` on Windows) to bundle Qt dependencies
 - Packages the output into `.zip` (Windows) or `.tar.gz` (Linux/macOS) archives and uploads them as release assets
 - Builds platform installers (`.run`, `.dmg`, `.exe`) via the installer workflow
 - Builds and deploys WebAssembly applications

@@ -99,7 +99,7 @@ jobs:
           QT_PREFIX="$(cd "${Qt6_DIR}/../../.." 2>/dev/null && pwd)"
         fi
         find "$QT_PREFIX/lib" -maxdepth 1 -name 'libQt6*.so*' 2>/dev/null | head -5 || echo "  No Qt .so files found at $QT_PREFIX/lib"
-        ./scripts/deploy/deploy.bat dynamic pack
+        ./scripts/deploy/deploy.sh dynamic pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:
@@ -205,7 +205,7 @@ jobs:
         ./scripts/build/build_project.sh static -- -DUSE_ONNXRUNTIME=ON
     - name: Deploy binaries
       run: |
-        ./scripts/deploy/deploy.bat static pack
+        ./scripts/deploy/deploy.sh static pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:

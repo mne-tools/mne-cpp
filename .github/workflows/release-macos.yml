@@ -101,7 +101,7 @@ jobs:
         certificate-password: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
     - name: Deploy binaries (MacOS)
       env:
-        # With CODESIGN_IDENTITY set (tagged releases), deploy.bat signs the apps and notarizes the .dmg.
+        # With CODESIGN_IDENTITY set (tagged releases), deploy.sh signs the apps and notarizes the .dmg.
         APPLE_ID: ${{ secrets.APPLE_ID }}
         APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
@@ -110,7 +110,7 @@ jobs:
         echo "  QT_ROOT_DIR=${QT_ROOT_DIR:-<not set>}"
         echo "  Qt6_DIR=${Qt6_DIR:-<not set>}"
         which macdeployqt || echo "WARNING: macdeployqt not on PATH"
-        ./scripts/deploy/deploy.bat dynamic pack
+        ./scripts/deploy/deploy.sh dynamic pack
         # Verify archive contains Qt frameworks
         echo ""
         echo "=== Archive verification ==="
@@ -134,7 +134,7 @@ jobs:
       run: |
         cp mne-cpp-macos-dynamic-arm64.tar.gz "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.tar.gz"
         gh release upload "${{ steps.release-info.outputs.tag }}" "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.tar.gz" --clobber
-        # Upload the .dmg too when it was produced (deploy.bat only generates
+        # Upload the .dmg too when it was produced (deploy.sh only generates
         # it if create-dmg is available; missing file = silent skip).
         if [ -f mne-cpp-macos-dynamic-arm64.dmg ]; then
           cp mne-cpp-macos-dynamic-arm64.dmg "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg"
@@ -249,7 +249,7 @@ jobs:
         ./scripts/build/build_project.sh static -- -DUSE_ONNXRUNTIME=ON
     - name: Deploy binaries (MacOS)
       run: |
-        ./scripts/deploy/deploy.bat static pack
+        ./scripts/deploy/deploy.sh static pack
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:

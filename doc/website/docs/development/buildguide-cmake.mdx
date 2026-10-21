@@ -214,11 +214,16 @@ ctest --output-on-failure
 
 ## Deploy Qt Dependencies
 
-To run compiled applications outside of Qt Creator (e.g. from the terminal or file manager), Qt runtime libraries must be bundled. MNE-CPP provides a cross-platform deployment script:
+To run compiled applications outside of Qt Creator (e.g. from the terminal or file manager), Qt runtime libraries must be bundled. MNE-CPP provides a deployment script for each platform:
 
 ```bash
-./scripts/deploy/deploy.bat dynamic pack    # dynamic linking (recommended for development)
-./scripts/deploy/deploy.bat static pack     # static linking
+./scripts/deploy/deploy.sh dynamic pack    # macOS/Linux, dynamic linking (recommended for development)
+./scripts/deploy/deploy.sh static pack     # macOS/Linux, static linking
+```
+
+```bat
+.\scripts\deploy\deploy.bat dynamic pack
+.\scripts\deploy\deploy.bat static pack
 ```
 
 The dynamically linked version is recommended for development. For more details, see the [Deployment](ci-deployment.mdx) page.

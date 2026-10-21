@@ -46,7 +46,7 @@ The information above corresponds to deploying the dynamically built version of 
 
 ## Deployment Scripts
 
-The deployment scripts live in `scripts/deploy/`. The cross-platform `deploy.bat` script handles dependency resolution and packaging.
+The deployment scripts live in `scripts/deploy/`. `deploy.sh` (macOS and Linux) and `deploy.bat` (Windows) handle dependency resolution and packaging.
 
 Each script accepts two arguments:
 
@@ -59,8 +59,8 @@ Example:
 
 ```bash
 # Resolve Qt dependencies for development (no archive)
-./scripts/deploy/deploy.bat dynamic
+./scripts/deploy/deploy.sh dynamic
 
 # Create a distributable archive
-./scripts/deploy/deploy.bat dynamic pack
+./scripts/deploy/deploy.sh dynamic pack
 ```
