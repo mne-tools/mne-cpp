@@ -54,6 +54,12 @@ class ScopeTests(unittest.TestCase):
         self.assertFalse(fmt.in_scope("src/libraries/fiff/CMakeLists.txt"))
         self.assertFalse(fmt.in_scope("doc/snippet.cpp"))
 
+    def test_changed_files_include_new_untracked_sources(self) -> None:
+        new = _REPO_ROOT / "src" / "libraries" / "fiff" / "zz_untracked_format_probe.cpp"
+        new.write_text("int x;\n", encoding="utf-8")
+        self.addCleanup(new.unlink)
+        self.assertIn("src/libraries/fiff/zz_untracked_format_probe.cpp", fmt.changed_files("HEAD"))
+
     def test_all_files_are_tracked_sources(self) -> None:
         files = fmt.all_files()
         self.assertGreater(len(files), 1000)

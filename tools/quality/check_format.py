@@ -71,9 +71,10 @@ def default_base() -> str:
 
 
 def changed_files(base: str) -> list[str]:
-    """In-scope files that differ from *base* in the working tree (added, copied, modified, renamed)."""
+    """In-scope files that differ from *base* in the working tree (added, copied, modified, renamed), new untracked ones included."""
     names = git("diff", "--name-only", "--diff-filter=ACMR", base, "--").split()
-    return sorted(name for name in names if in_scope(name))
+    names += git("ls-files", "--others", "--exclude-standard", "--", INCLUDE_PREFIX).split()
+    return sorted({name for name in names if in_scope(name)})
 
 
 def all_files() -> list[str]:
