@@ -311,6 +311,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
   frames were wrong.
 
 **Applications**
+- macOS (Apple silicon): the apps of the dynamic package and the installer were
+  killed at launch because packaging invalidated their signatures.
 - MNE Browse:
   - Saved EEG/EOG/STI channels 3276.8 times too large.
   - Could overwrite its own input.
@@ -355,6 +357,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
 
 **Breaking changes**
 - Renamed:
+  - macOS and Linux deploy with `scripts/deploy/deploy.sh`; `deploy.bat` is
+    Windows only.
   - disp3D types live in the `DISP3DLIB` namespace; `PickResult` is now
     `RayHit`.
   - MNE Scan plugin `rtcmne` is now `rtclustmne` (`RtClustMne`).
