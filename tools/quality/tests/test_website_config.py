@@ -199,6 +199,10 @@ class TestVersionRouting(unittest.TestCase):
         stale = build_check.check(self.build("/dev/", "dev (latest)", site_base="/"), "dev", self.VERSION)
         self.assertIn("canonical URL https://mne-cpp.github.io/ is outside https://mne-cpp.github.io/dev/", stale)
         self.assertIn("sitemap lists 1 URLs outside https://mne-cpp.github.io/dev/", stale)
+        redirected = self.build("/dev/", "dev (latest)")
+        (redirected / "sitemap.xml").write_text("<urlset><url><loc>https://mne-cpp.github.io/dev/download</loc></url></urlset>")
+        self.assertIn("sitemap lists 1 URLs without a trailing slash, which GitHub Pages redirects",
+                      build_check.check(redirected, "dev", self.VERSION))
         # A config stylesheet is not prefixed with the base URL by Docusaurus
         root_css = build_check.check(self.build("/dev/", "dev (latest)", css="/katex.min.css"), "dev", self.VERSION)
         self.assertIn("local links outside base URL '/dev/': /katex.min.css", root_css)

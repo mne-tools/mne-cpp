@@ -20,6 +20,8 @@ const config: Config = {
 
     url: 'https://mne-cpp.github.io',
     baseUrl,
+    // GitHub Pages serves page/index.html at page/ and 301-redirects page
+    trailingSlash: true,
 
     organizationName: 'mne-cpp',
     projectName: 'mne-cpp.github.io',

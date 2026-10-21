@@ -72,6 +72,10 @@ def check(build: Path, channel: str, version: str) -> list[str]:
                    if not u.startswith(site)]
         if outside:
             problems.append(f"sitemap lists {len(outside)} URLs outside {site}")
+        redirected = [u for u in re.findall(r"<loc>([^<]+)</loc>", sitemap.read_text(encoding="utf-8"))
+                      if not u.endswith(("/", ".html", ".xml"))]
+        if redirected:
+            problems.append(f"sitemap lists {len(redirected)} URLs without a trailing slash, which GitHub Pages redirects")
     return problems + content_problems(build)
 
 
