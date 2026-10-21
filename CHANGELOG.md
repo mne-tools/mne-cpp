@@ -313,6 +313,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
 **Applications**
 - macOS (Apple silicon): the apps of the dynamic package and the installer were
   killed at launch because packaging invalidated their signatures.
+- macOS and Linux dynamic packages: `resources` (layouts, styles, server
+  configuration) was a link to the build machine instead of the files.
 - MNE Browse:
   - Saved EEG/EOG/STI channels 3276.8 times too large.
   - Could overwrite its own input.

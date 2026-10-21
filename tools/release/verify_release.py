@@ -83,6 +83,11 @@ def smoke(archive: Path, workdir: Path) -> list[str]:
             z.extractall(workdir)
     else:
         with tarfile.open(archive) as t:
+            escaping = [f"{archive.name}: {m.name} links outside the archive ({m.linkname})" for m in t.getmembers()
+                        if m.issym() and (os.path.isabs(m.linkname) or os.path.normpath(
+                            os.path.join(os.path.dirname(m.name), m.linkname)).startswith(".."))]
+            if escaping:
+                return escaping
             t.extractall(workdir, filter="tar")
     tools = [p for p in workdir.rglob(f"{SMOKE_TOOL}*") if p.is_file() and p.stem == SMOKE_TOOL]
     if not tools:

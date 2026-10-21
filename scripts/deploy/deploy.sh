@@ -105,6 +105,13 @@ fi
 
 doPrintConfiguration
 
+# The build links out/<build>/resources to the source tree; ship a real copy.
+if [ -L "${OutFolder}/resources" ]; then
+    ResourcesSource="$(cleanAbsPath "${OutFolder}/resources")"
+    ${MockText}rm "${OutFolder}/resources"
+    ${MockText}cp -R "${ResourcesSource}" "${OutFolder}/resources"
+fi
+
 if [[ ${LinkOption} == "dynamic" ]]; then
 
     # ---------------------------------------------------------------
@@ -588,6 +595,13 @@ if [ "${PrintHelp}" == "true" ]; then
 fi
 
 doPrintConfiguration
+
+# The build links out/<build>/resources to the source tree; ship a real copy.
+if [ -L "${OutFolder}/resources" ]; then
+    ResourcesSource="$(cleanAbsPath "${OutFolder}/resources")"
+    ${MockText}rm "${OutFolder}/resources"
+    ${MockText}cp -R "${ResourcesSource}" "${OutFolder}/resources"
+fi
 
 if [[ ${LinkOption} == "dynamic" ]]; then
 

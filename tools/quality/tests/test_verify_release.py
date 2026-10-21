@@ -74,6 +74,19 @@ class VerifyReleaseTest(unittest.TestCase):
         work.mkdir()
         self.assertEqual(verify_release.smoke(archive, work), [f"empty.tar.gz contains no {verify_release.SMOKE_TOOL}"])
 
+    def test_smoke_reports_links_to_the_build_machine(self):
+        archive = self.assets / "linked.tar.gz"
+        with tarfile.open(archive, "w:gz") as t:
+            for name, target in (("mne-cpp/resources", "/home/runner/work/mne-cpp/mne-cpp/resources"),
+                                 ("mne-cpp/lib/QtCore.framework/Versions/Current", "A")):
+                info = tarfile.TarInfo(name)
+                info.type, info.linkname = tarfile.SYMTYPE, target
+                t.addfile(info)
+        work = self.assets / "work"
+        work.mkdir()
+        self.assertEqual(verify_release.smoke(archive, work), [
+            "linked.tar.gz: mne-cpp/resources links outside the archive (/home/runner/work/mne-cpp/mne-cpp/resources)"])
+
 
 if __name__ == "__main__":
     unittest.main()
