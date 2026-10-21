@@ -24,7 +24,7 @@ A reference of key terms, abbreviations, and concepts used throughout the MNE-CP
 | **Gamma-MAP** | Gamma Maximum a Posteriori. A sparse Bayesian inverse method using an EM algorithm with a Gamma hyperprior on source variances to promote focal source distributions. |
 | **Inverse operator** | A matrix that maps measured sensor data to estimated source activity on the cortex or in a volume. Computed from the forward solution and noise-covariance matrix. |
 | **LCMV** | Linearly Constrained Minimum Variance beamformer. A spatial filter that passes signals from a target location while minimizing output power from other sources. |
-| **MNA** | MNE Node-graph for Analysis. A portable project file format (`.mna` JSON / `.mnx` CBOR) that bundles data references, processing parameters, and an executable computational graph into a single manifest. See [MNA Format](mna-format). |
+| **MNA** | MNE Node-graph for Analysis. A portable project file format (`.mna` JSON / `.mnx` CBOR) that bundles data references, processing parameters, and an executable computational graph into a single manifest. See [MNA Format](mna-format.mdx). |
 | **MNE** | Minimum-Norm Estimate. A distributed source localization method that finds the source distribution with minimum overall power that explains the measured data. |
 | **Morphing** | The process of mapping source estimates from one subject's cortical surface to another (e.g., `fsaverage`) for group analysis. |
 | **MxNE** | Mixed-Norm Estimate. A sparse inverse method using L1/L2 mixed norms (group lasso) to find focal sources via iteratively reweighted least squares (IRLS). |
@@ -36,7 +36,7 @@ A reference of key terms, abbreviations, and concepts used throughout the MNE-CP
 | **SNR** | Signal-to-Noise Ratio. In MNE, the assumed SNR controls the regularization parameter $\lambda^2 = 1 / \text{SNR}^2$. |
 | **SPHARA** | Spatial Harmonic Analysis. Spatial basis functions computed from the sensor geometry for noise reduction, similar to spatial frequency filtering. |
 | **Source space** | The set of candidate dipole locations (and orientations) on the cortical surface or in a volume where source currents are estimated. |
-| **SSP** | Signal-Space Projection. A method for removing environmental noise and artifacts by projecting data away from known noise subspaces. See [Signal-Space Projection](ssp). |
+| **SSP** | Signal-Space Projection. A method for removing environmental noise and artifacts by projecting data away from known noise subspaces. See [Signal-Space Projection](ssp.mdx). |
 | **SSS/tSSS** | Signal Space Separation / temporal SSS. Methods for removing external interference from MEG data by decomposing the measured field into internal and external multipole components. |
 | **xDAWN** | A supervised spatial filter designed to enhance event-related potentials by maximizing the signal-to-signal-plus-noise ratio. Used in BCI and ERP denoising. |
 
@@ -47,7 +47,7 @@ A reference of key terms, abbreviations, and concepts used throughout the MNE-CP
 | **CTF** | A MEG system manufacturer. CTF systems use axial gradiometers and software gradient compensation with reference channels. Uses a different head coordinate convention than Neuromag. |
 | **EEG** | Electroencephalography. Measures electrical potentials on the scalp using electrode caps. |
 | **Gradiometer** | A MEG sensor that measures the spatial gradient of the magnetic field. Planar gradiometers measure the gradient tangential to the helmet surface; axial gradiometers measure the radial gradient. |
-| **KIT** | A 160-channel MEG system (also known as Yokogawa). Data can be imported with [`mne_kit2fiff`](tools-kit2fiff). |
+| **KIT** | A 160-channel MEG system (also known as Yokogawa). Data can be imported with [`mne_kit2fiff`](tools-kit2fiff.mdx). |
 | **Magnetometer** | A MEG sensor that measures the absolute magnetic field strength at a single point. More sensitive to deep and distant sources than gradiometers, but also more sensitive to environmental noise. |
 | **MEG** | Magnetoencephalography. Measures the magnetic fields produced by neuronal currents using superconducting sensors (SQUIDs) in a magnetically shielded room. |
 | **Neuromag / Vectorview** | A 306-channel MEG system (Elekta / MEGIN) with 102 sensor triplets, each containing one magnetometer and two planar gradiometers. The MNE head coordinate convention originates from this system. |
@@ -71,19 +71,19 @@ A reference of key terms, abbreviations, and concepts used throughout the MNE-CP
 
 | Coordinate System | Description |
 |---|---|
-| **Head coordinates** | Defined by three fiducial landmarks: nasion (N), left auricular point (LAP), and right auricular point (RAP). Origin midway between LAP and RAP; x-axis toward nasion; y-axis toward LAP; z-axis upward. See [Forward Solution — Coordinate Systems](forward#megeeg-and-mri-coordinate-systems). |
+| **Head coordinates** | Defined by three fiducial landmarks: nasion (N), left auricular point (LAP), and right auricular point (RAP). Origin midway between LAP and RAP; x-axis toward nasion; y-axis toward LAP; z-axis upward. See [Forward Solution — Coordinate Systems](forward.mdx#megeeg-and-mri-coordinate-systems). |
 | **Device coordinates** | The MEG sensor coordinate system, defined by the MEG instrument. Relationship to head coordinates established via head position indicator (HPI) coils. |
 | **MRI (Surface RAS)** | FreeSurfer surface coordinates. Origin at the center of the MRI volume; axes aligned with anatomical directions (Right, Anterior, Superior). |
 | **MNI Talairach** | A standardized brain coordinate system based on the MNI152 template. Used for reporting source locations across subjects. |
 | **FreeSurfer Talairach** | FreeSurfer's own Talairach transformation, which differs slightly from the MNI Talairach. |
 
-For details on coordinate transformations ($T^-$, $T^+$, $T_1$–$T_4$), see [Forward Solution](forward).
+For details on coordinate transformations ($T^-$, $T^+$, $T_1$–$T_4$), see [Forward Solution](forward.mdx).
 
 ## File Formats and Extensions
 
 | Extension | Format | Description |
 |---|---|---|
-| `.fif` | FIFF | Functional Imaging File Format. The native binary format for all MNE data. See [FIFF Format](fiff-format). |
+| `.fif` | FIFF | Functional Imaging File Format. The native binary format for all MNE data. See [FIFF Format](fiff-format.mdx). |
 | `-raw.fif` | FIFF | Raw continuous MEG/EEG data |
 | `-ave.fif` | FIFF | Averaged evoked response data |
 | `-cov.fif` | FIFF | Noise-covariance matrix |
@@ -100,8 +100,8 @@ For details on coordinate transformations ($T^-$, $T^+$, $T_1$–$T_4$), see [Fo
 | `.annot` | Annotation | FreeSurfer cortical parcellation (atlas) file. |
 | `.surf` | Surface | FreeSurfer binary surface file (vertices + triangles). |
 | `.mgh` / `.mgz` | MRI volume | FreeSurfer MRI volume format (uncompressed / compressed). |
-| `.hpts` | Head points | Text file with digitization point coordinates. See [Data Conversion — hpts format](data-conversion#the-hpts-format). |
-| `.mna` | MNA (JSON) | MNE analysis project file — data references, parameters, and executable graph. See [MNA Format](mna-format). |
+| `.hpts` | Head points | Text file with digitization point coordinates. See [Data Conversion — hpts format](data-conversion.mdx#the-hpts-format). |
+| `.mna` | MNA (JSON) | MNE analysis project file — data references, parameters, and executable graph. See [MNA Format](mna-format.mdx). |
 | `.mnx` | MNA (CBOR) | Binary MNA project file in CBOR encoding. Same schema as `.mna` but more compact. Can also serve as a container file that encapsulates linked data files (raw, evoked, forward solutions, etc.) into a single self-contained archive. |
 | `.onnx` | ONNX | Open Neural Network Exchange model file. Used for CMNE LSTM inference. |
 
@@ -129,8 +129,8 @@ Default units for artifact rejection thresholds used in epoching:
 
 ## See Also
 
-- [Workflow](workflow) — The MEG/EEG processing workflow
-- [Forward Solution](forward) — Coordinate systems and the forward problem
-- [Inverse Estimation](inverse) — MNE, dSPM, sLORETA mathematics
-- [FIFF Format](fiff-format) — File format reference
-- [Data Conversion](data-conversion) — Importing data from other systems
+- [Workflow](workflow.mdx) — The MEG/EEG processing workflow
+- [Forward Solution](forward.mdx) — Coordinate systems and the forward problem
+- [Inverse Estimation](inverse.mdx) — MNE, dSPM, sLORETA mathematics
+- [FIFF Format](fiff-format.mdx) — File format reference
+- [Data Conversion](data-conversion.mdx) — Importing data from other systems

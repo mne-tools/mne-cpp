@@ -28,7 +28,7 @@ Including compensation channel data is recommended but not mandatory. If the dat
 
 ### CTF Data
 
-Use [`mne_ctf2fiff`](tools-ctf2fiff) to convert CTF ds directories to FIFF format. Key options:
+Use [`mne_ctf2fiff`](tools-ctf2fiff.mdx) to convert CTF ds directories to FIFF format. Key options:
 
 | Option | Description |
 |---|---|
@@ -56,11 +56,11 @@ $$
 
 where $\mathbf{M}^{(k)}$ is a composite compensation matrix containing the $n_1 \times n_2$ compensation data matrix $\mathbf{C}^{(k)}$ for grade $k$.
 
-Use [`mne_compensate_data`](tools-compensate-data) to change the compensation grade in evoked-response files. For raw data, use [`mne_process_raw`](tools-process-raw) with the desired compensation grade.
+Use [`mne_compensate_data`](tools-compensate-data.mdx) to change the compensation grade in evoked-response files. For raw data, use [`mne_process_raw`](tools-process-raw.mdx) with the desired compensation grade.
 
 ### KIT MEG System
 
-Use [`mne_kit2fiff`](tools-kit2fiff) to import 160-channel KIT MEG system data. Required input files:
+Use [`mne_kit2fiff`](tools-kit2fiff.mdx) to import 160-channel KIT MEG system data. Required input files:
 
 1. **Polhemus data file** (`.elp`) — fiducial and HPI coil locations
 2. **HPI coil device locations** — HPI coil positions in MEG device coordinates
@@ -72,7 +72,7 @@ The digital trigger channel (STI 014) can be synthesized from analog trigger cha
 
 ### EDF, EDF+, and BDF Formats
 
-Use [`mne_edf2fiff`](tools-edf2fiff) to convert European Data Format (EDF/EDF+, 16-bit) and BioSemi BDF (24-bit) files. Samples are
+Use [`mne_edf2fiff`](tools-edf2fiff.mdx) to convert European Data Format (EDF/EDF+, 16-bit) and BioSemi BDF (24-bit) files. Samples are
 scaled to SI units per channel and match `mne.io.read_raw_edf` / `mne.io.read_raw_bdf`.
 
 - Only channels at the highest sampling rate are converted
@@ -81,7 +81,7 @@ scaled to SI units per channel and match `mne.io.read_raw_edf` / `mne.io.read_ra
 
 ### BrainVision EEG Data
 
-Use [`mne_brain_vision2fiff`](tools-brain-vision2fiff) to import BrainVision data:
+Use [`mne_brain_vision2fiff`](tools-brain-vision2fiff.mdx) to import BrainVision data:
 
 | Option | Description |
 |---|---|
@@ -123,7 +123,7 @@ Coordinates are typically in the MEG head coordinate system in millimeters.
 
 ## Converting Volumetric Data
 
-The `mne_volume_data2mri` utility converts source estimate data (`.w` or `.stc` files) from a volumetric source space into FreeSurfer MRI overlay format (`.mgh` or `.mgz`). The volumetric source space must have been created with the `--mri` option in [`mne_volume_source_space`](tools-volume-source-space).
+The `mne_volume_data2mri` utility converts source estimate data (`.w` or `.stc` files) from a volumetric source space into FreeSurfer MRI overlay format (`.mgh` or `.mgz`). The volumetric source space must have been created with the `--mri` option in [`mne_volume_source_space`](tools-volume-source-space.mdx).
 
 ## Converting Surface Data
 
@@ -165,7 +165,7 @@ The `mne_collect_transforms` utility gathers coordinate transformations from var
 
 ## See Also
 
-- [FIFF Format](fiff-format) — Details on the FIFF file format
-- [Forward Solution](forward) — Coordinate systems and transformations
-- [Workflow](workflow) — The MEG/EEG processing workflow
-- [Tools Overview](tools-overview) — Complete list of command-line tools
+- [FIFF Format](fiff-format.mdx) — Details on the FIFF file format
+- [Forward Solution](forward.mdx) — Coordinate systems and transformations
+- [Workflow](workflow.mdx) — The MEG/EEG processing workflow
+- [Tools Overview](tools-overview.mdx) — Complete list of command-line tools

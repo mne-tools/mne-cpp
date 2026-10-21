@@ -64,6 +64,19 @@ class TestStrictConfig(unittest.TestCase):
                 self.assertRegex(self.config, rf"{option}:\s*'throw'")
         self.assertNotRegex(self.config, r"onBroken\w+:\s*'(warn|ignore|log)'")
 
+    def test_relative_doc_links_point_to_files(self) -> None:
+        """With trailingSlash, a link like ](workflow) resolves below the current page."""
+        link = re.compile(r"\]\(([^)\s#]+)(?:#[^)\s]*)?\)")
+        docs = _WEBSITE / "docs"
+        for page in sorted(docs.rglob("*.md*")):
+            if "api" in page.relative_to(docs).parts:
+                continue
+            for target in link.findall(page.read_text(encoding="utf-8")):
+                if re.match(r"([a-z]+:|/)", target) or Path(target.rstrip("/")).suffix:
+                    continue
+                with self.subTest(page=str(page.relative_to(docs)), target=target):
+                    self.fail("link to the .md/.mdx file instead of the URL slug")
+
     def test_missing_images_fail(self) -> None:
         """AC-T4.3-1, AC-T5.3-3: a missing image fails; only a local opt-in skips generated screenshots."""
         hook = self.config[self.config.index("onBrokenMarkdownImages"):]

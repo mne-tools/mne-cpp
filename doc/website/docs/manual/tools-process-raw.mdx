@@ -178,7 +178,7 @@ cov {
 }
 ```
 
-The noise-covariance matrix is a critical input for inverse modeling. For background on how it is used, see [The Minimum-Norm Estimates](inverse).
+The noise-covariance matrix is a critical input for inverse modeling. For background on how it is used, see [The Minimum-Norm Estimates](inverse.mdx).
 
 ### Signal-Space Projection (SSP)
 
@@ -192,7 +192,7 @@ The SSP algorithm:
 
 Separate components are computed for gradiometers (`--projngrad`), magnetometers (`--projnmag`), and EEG channels (`--projneeg`). Rejection thresholds (`--projgradrej`, `--projmagrej`, `--projeegrej`) exclude noisy epochs from the computation.
 
-For the mathematical background on SSP, see [Signal-Space Projection](ssp).
+For the mathematical background on SSP, see [Signal-Space Projection](ssp.mdx).
 
 ### Filtering and Decimation
 
@@ -281,9 +281,9 @@ mne_process_raw --raw patient_data.fif \
 
 ## See Also
 
-- [Signal-Space Projection (SSP)](ssp) — Mathematical background on the SSP method
-- [The Minimum-Norm Estimates](inverse) — How the noise-covariance matrix is used in source estimation
-- [mne_compute_raw_inverse](tools-compute-raw-inverse) — Compute inverse solutions from the averaged data
-- [mne_forward_solution](tools-forward-solution) — Compute the forward model needed for source estimation
-- [mne_dipole_fit](tools-dipole-fit) — Fit equivalent current dipoles to averaged data
-- [The Typical Workflow](workflow) — Where `mne_process_raw` fits in the overall MEG/EEG analysis pipeline
+- [Signal-Space Projection (SSP)](ssp.mdx) — Mathematical background on the SSP method
+- [The Minimum-Norm Estimates](inverse.mdx) — How the noise-covariance matrix is used in source estimation
+- [mne_compute_raw_inverse](tools-compute-raw-inverse.mdx) — Compute inverse solutions from the averaged data
+- [mne_forward_solution](tools-forward-solution.mdx) — Compute the forward model needed for source estimation
+- [mne_dipole_fit](tools-dipole-fit.mdx) — Fit equivalent current dipoles to averaged data
+- [The Typical Workflow](workflow.mdx) — Where `mne_process_raw` fits in the overall MEG/EEG analysis pipeline

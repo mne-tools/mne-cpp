@@ -6,7 +6,7 @@ sidebar_position: 7
 
 # The Sample Dataset
 
-This chapter gives a detailed description of the processing of the MNE sample dataset, which can be employed to familiarize with the [Workflow](workflow).
+This chapter gives a detailed description of the processing of the MNE sample dataset, which can be employed to familiarize with the [Workflow](workflow.mdx).
 
 :::important
 Going through this analysis exercise is not a substitute for reading other chapters of this manual and understanding the concepts underlying MNE software.
@@ -105,7 +105,7 @@ mne_setup_forward_model --surf --ico 4
 Before averaging, preview the raw data:
 
 1. Examine all channels and identify noisy or flat channels
-2. Mark bad channels using [`mne_mark_bad_channels`](tools-mark-bad-channels) or interactively
+2. Mark bad channels using [`mne_mark_bad_channels`](tools-mark-bad-channels.mdx) or interactively
 3. Verify that the bad channels are correctly excluded
 
 :::tip
@@ -126,7 +126,7 @@ This creates `sample_audvis-ave.fif` containing averages for left and right audi
 
 ### 5. Inspecting the Averages
 
-Load the averaged data in [MNE Analyze](analyze) or a compatible viewer and observe:
+Load the averaged data in [MNE Analyze](analyze.mdx) or a compatible viewer and observe:
 
 **Auditory responses:**
 - The main deflection occurs around 100 ms over the left and right temporal areas
@@ -148,7 +148,7 @@ This creates `sample_audvis-cov.fif`. The projections are set on, and the projec
 
 ### 7. MEG-MRI Coordinate Alignment
 
-Use [MNE Analyze](analyze) for the coordinate alignment. The process involves:
+Use [MNE Analyze](analyze.mdx) for the coordinate alignment. The process involves:
 
 1. Load the raw data file (provides digitizer data)
 2. Load an inflated surface for subject `sample`
@@ -221,7 +221,7 @@ If you computed the forward solution with a single-compartment BEM, you can only
 
 ### 10. Interactive Analysis
 
-Explore the data and current estimates in [MNE Analyze](analyze) or [MNE Inspect](inspect):
+Explore the data and current estimates in [MNE Analyze](analyze.mdx) or [MNE Inspect](inspect.mdx):
 
 1. **Load surfaces** — inflated surface for subject `sample`
 2. **Load data** — select `sample_audvis-ave.fif` and the inverse operator
@@ -232,7 +232,7 @@ Explore the data and current estimates in [MNE Analyze](analyze) or [MNE Inspect
 
 ## See Also
 
-- [Workflow](workflow) — The MEG/EEG processing workflow
-- [Forward Solution](forward) — Theory of coordinate systems and the forward problem
-- [Inverse Estimation](inverse) — Mathematical details of MNE, dSPM, and sLORETA
-- [Tools Overview](tools-overview) — Complete list of command-line tools
+- [Workflow](workflow.mdx) — The MEG/EEG processing workflow
+- [Forward Solution](forward.mdx) — Theory of coordinate systems and the forward problem
+- [Inverse Estimation](inverse.mdx) — Mathematical details of MNE, dSPM, and sLORETA
+- [Tools Overview](tools-overview.mdx) — Complete list of command-line tools

@@ -130,26 +130,26 @@ MNE-CPP provides several tools for converting data from other formats to FIFF:
 
 | Tool | Source Format |
 |---|---|
-| [`mne_edf2fiff`](tools-edf2fiff) | EDF / EDF+ / BDF |
-| [`mne_brain_vision2fiff`](tools-brain-vision2fiff) | BrainVision (`.vhdr`) |
-| [`mne_ctf2fiff`](tools-ctf2fiff) | CTF MEG (`.ds`) |
-| [`mne_kit2fiff`](tools-kit2fiff) | KIT / Yokogawa (`.sqd` / `.con`) |
+| [`mne_edf2fiff`](tools-edf2fiff.mdx) | EDF / EDF+ / BDF |
+| [`mne_brain_vision2fiff`](tools-brain-vision2fiff.mdx) | BrainVision (`.vhdr`) |
+| [`mne_ctf2fiff`](tools-ctf2fiff.mdx) | CTF MEG (`.ds`) |
+| [`mne_kit2fiff`](tools-kit2fiff.mdx) | KIT / Yokogawa (`.sqd` / `.con`) |
 
 For exporting FIFF data:
 
 | Tool | Target Format |
 |---|---|
-| [`mne_raw2mat`](tools-raw2mat) | MATLAB (`.mat`) |
+| [`mne_raw2mat`](tools-raw2mat.mdx) | MATLAB (`.mat`) |
 
 ## Inspecting FIFF Files
 
-Use [`mne_show_fiff`](tools-show-fiff) to list the contents of a FIFF file:
+Use [`mne_show_fiff`](tools-show-fiff.mdx) to list the contents of a FIFF file:
 
 ```bash
 mne_show_fiff --in sample_audvis_raw.fif
 ```
 
-Use [`mne_compare_fif_files`](tools-compare-fif-files) to compare two FIFF files tag by tag:
+Use [`mne_compare_fif_files`](tools-compare-fif-files.mdx) to compare two FIFF files tag by tag:
 
 ```bash
 mne_compare_fif_files --in1 file_a.fif --in2 file_b.fif
@@ -177,6 +177,6 @@ All MNE-CPP command-line tools employ the double-dash (`--`) option convention. 
 
 ## See Also
 
-- [Tools Overview](tools-overview) — Complete list of MNE-CPP command-line tools
-- [Workflow](workflow) — The MEG/EEG processing workflow
+- [Tools Overview](tools-overview.mdx) — Complete list of MNE-CPP command-line tools
+- [Workflow](workflow.mdx) — The MEG/EEG processing workflow
 - [Library API](/docs/api) — Programmatic access to FIFF files via `FIFFLIB`
