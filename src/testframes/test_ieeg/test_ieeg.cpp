@@ -133,6 +133,9 @@ void TestIeeg::handlesDegenerateInput()
     // A shape that does not fit the contacts is dropped, so the lead is paired as a single row
     QVERIFY(implantation.setLeadType(QStringLiteral("A"), IeegLeadType::Grid, 3, 2));
     QCOMPARE(implantation.leads()[0].cols, 0);
+    // 4 x 1073741825 wraps to 4 in 32-bit int arithmetic; it must not pass as a 4-contact grid
+    QVERIFY(implantation.setLeadType(QStringLiteral("A"), IeegLeadType::Grid, 4, 1073741825));
+    QCOMPARE(implantation.leads()[0].cols, 0);
     QCOMPARE(IeegReference::bipolarPairs(implantation).size(), 3);
     QCOMPARE(IeegReference::bipolarPairs(IeegImplantation()).size(), 0);
     QCOMPARE(IeegReference::bipolarMatrix({}, 4).rows(), Eigen::Index(0));

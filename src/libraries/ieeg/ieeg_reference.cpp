@@ -47,7 +47,7 @@ QVector<IeegBipolarPair> IeegReference::bipolarPairs(const IeegImplantation& imp
 
     for (const IeegLead& lead : implantation.leads()) {
         const QVector<int>& order = lead.contacts;
-        const bool grid = lead.type == IeegLeadType::Grid && lead.rows * lead.cols == order.size() && lead.cols > 0;
+        const bool grid = lead.type == IeegLeadType::Grid && qint64(lead.rows) * lead.cols == order.size() && lead.cols > 0;
         const int cols = grid ? lead.cols : int(order.size());
         // Along each row (the whole lead for depth leads and strips)
         for (int k = 0; k + 1 < order.size(); ++k) {

@@ -171,7 +171,7 @@ IeegImplantation IeegImplantation::readBids(const QString& electrodesTsv, QStrin
         const QRegularExpressionMatch m = dimension.match(shape);
         const int rows = m.hasMatch() ? m.captured(1).toInt() : 0;
         const int cols = m.hasMatch() ? m.captured(2).toInt() : 0;
-        IeegLeadType leadType = (rows > 1 && cols > 1 && rows * cols == lead.contacts.size()) ? IeegLeadType::Grid : lead.type;
+        IeegLeadType leadType = (rows > 1 && cols > 1 && qint64(rows) * cols == lead.contacts.size()) ? IeegLeadType::Grid : lead.type;
         if (type.contains(QLatin1String("depth")) || type.contains(QLatin1String("seeg")))
             leadType = IeegLeadType::Depth;
         else if (type.contains(QLatin1String("strip")))
@@ -191,7 +191,7 @@ bool IeegImplantation::setLeadType(const QString& lead, IeegLeadType type, int r
         if (l.name != lead)
             continue;
         l.type = type;
-        const bool shapeFits = rows > 0 && cols > 0 && rows * cols == l.contacts.size();
+        const bool shapeFits = rows > 0 && cols > 0 && qint64(rows) * cols == l.contacts.size();
         l.rows = shapeFits ? rows : 0;
         l.cols = shapeFits ? cols : 0;
         return true;

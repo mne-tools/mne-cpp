@@ -186,7 +186,7 @@ inline Eigen::MatrixXd InvSensorSet::r0() const
 
 inline Eigen::RowVectorXd InvSensorSet::w(int iSensor) const
 {
-    return m_w.segment(iSensor * m_np, m_np);
+    return m_w.segment(Eigen::Index(iSensor) * m_np, m_np);
 }
 
 inline Eigen::RowVectorXd InvSensorSet::w() const
@@ -196,7 +196,7 @@ inline Eigen::RowVectorXd InvSensorSet::w() const
 
 inline Eigen::MatrixXd InvSensorSet::rmag(int iSensor) const
 {
-    return m_rmag.block(iSensor * m_np, 0, m_np, 3);
+    return m_rmag.block(Eigen::Index(iSensor) * m_np, 0, m_np, 3);
 }
 
 inline Eigen::MatrixXd InvSensorSet::rmag() const
@@ -206,7 +206,7 @@ inline Eigen::MatrixXd InvSensorSet::rmag() const
 
 inline Eigen::MatrixXd InvSensorSet::cosmag(int iSensor) const
 {
-    return m_cosmag.block(iSensor * m_np, 0, m_np, 3);
+    return m_cosmag.block(Eigen::Index(iSensor) * m_np, 0, m_np, 3);
 }
 
 inline Eigen::MatrixXd InvSensorSet::cosmag() const
