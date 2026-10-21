@@ -427,8 +427,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
 - Manual screenshots are generated from the current build in CI and compared
   against reference images.
 - The website build uses a patched `braces` (nesting-depth bound for
-  GHSA-vfj7-8cjw-p6xm, which upstream has not fixed) and `follow-redirects`
-  1.16.1.
+  GHSA-vfj7-8cjw-p6xm, which upstream has not fixed), `follow-redirects`
+  1.16.1 and `launch-editor` 2.14.2.
 - The website fails to build on broken links or missing images, and has a
   generated quality page.
 - The build guide is complete for all three platforms; CI runs exactly the
