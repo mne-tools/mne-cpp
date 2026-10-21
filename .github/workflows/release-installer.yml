@@ -162,6 +162,15 @@ jobs:
           "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
         codesign --verify --verbose "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
 
+    # binarycreator appends its payload after linking, which breaks the linker's ad-hoc signature;
+    # Apple silicon kills an app with an invalid signature, so unsigned builds are re-signed ad hoc
+    - name: Ad-hoc sign installer app
+      if: env.CODESIGN_IDENTITY == ''
+      run: |
+        codesign --force --deep --sign - "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
+        codesign --verify --deep --strict "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
+        "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app/Contents/MacOS/MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin" --version
+
     - name: Free up disk space before DMG creation
       run: |
         echo "=== Disk usage before cleanup ==="

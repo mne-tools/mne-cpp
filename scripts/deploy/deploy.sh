@@ -355,6 +355,20 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         echo "Total output size:"
         du -sh ${BasePath}/out/${BuildName}/bin/ ${BasePath}/out/${BuildName}/lib/ 2>/dev/null
 
+        # macdeployqt and install_name_tool invalidate the linker's ad-hoc signatures, and Apple
+        # silicon kills a binary whose signature is invalid; release builds sign again below
+        echo ""
+        echo "=== Ad-hoc signing deployed binaries ==="
+        for app in ${BasePath}/out/${BuildName}/bin/*.app; do
+            [ -d "$app" ] || continue
+            ${MockText}codesign --force --deep --sign - "$app" || exit 1
+            ${MockText}codesign --verify --deep --strict "$app" || exit 1
+        done
+        for bin in ${BasePath}/out/${BuildName}/bin/* ${BasePath}/out/${BuildName}/lib/*.dylib; do
+            [ -f "$bin" ] && file "$bin" | grep -q Mach-O || continue
+            ${MockText}codesign --force --sign - "$bin" || exit 1
+        done
+
         # Install SDK components (headers + CMake config) into the output tree
         echo ""
         echo "=== Installing SDK components (headers + CMake config) ==="
