@@ -41,7 +41,8 @@ namespace
 {
 
 // Explanation classes of fiff_explanations.txt (MNE-C mne_show_fiff)
-enum ExplanationClass {
+enum ExplanationClass
+{
     TagClass = 1,
     BlockClass = 2,
     UnitClass = 3,
