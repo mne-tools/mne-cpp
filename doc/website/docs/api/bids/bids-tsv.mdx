@@ -18,13 +18,10 @@ class BIDSLIB::BidsTsv
 Generic BIDS TSV file reader/writer.
 
 BIDS TSV files are tab-separated value files with:
-A mandatory header row defining column names.
 
-
-"n/a" for missing values.
-
-
-UTF-8 encoding, LF line endings.
+- A mandatory header row defining column names.
+- "n/a" for missing values.
+- UTF-8 encoding, LF line endings.
 
 Domain-specific TSV I/O (channels, electrodes, events) is handled by [`BidsChannel`](/docs/api/bids/bids-channel), [`BidsElectrode`](/docs/api/bids/bids-electrode), and [`BidsEvent`](/docs/api/bids/bids-event) respectively.
 

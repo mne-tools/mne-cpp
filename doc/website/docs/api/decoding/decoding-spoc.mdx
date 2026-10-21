@@ -23,7 +23,7 @@ Source Power Comodulation decoder for continuous-target regression on band-power
 
 Estimates a bank of spatial filters whose log band-power envelope is maximally correlated with a continuous trial-level target. The fit builds the unweighted trial-mean covariance and a target-weighted covariance from centred labels, solves the resulting generalised eigenvalue problem, and keeps the top `n_components` eigenvectors as filters and the columns of their pseudoinverse as the corresponding activation patterns. As with CSP, the patterns — not the filters — are the quantity that should be plotted as topographies when interpreting which cortical sources drive the regression, in line with Haufe et al. 2014.
 
-After `fit` the decoder behaves as a deterministic feature extractor. `AveragePower` returns one (optionally log- or z-scored) band-power value per component and epoch, which plugs directly into a linear regressor; `CspSpace` returns the time- resolved filtered signal, useful when the downstream model consumes envelopes or instantaneous phase. Inputs must be epoched and already filtered in the relevant frequency band; the target vector $$z$$ is a real-valued vector of length `n_epochs`.
+After `fit` the decoder behaves as a deterministic feature extractor. `AveragePower` returns one (optionally log- or z-scored) band-power value per component and epoch, which plugs directly into a linear regressor; `CspSpace` returns the time- resolved filtered signal, useful when the downstream model consumes envelopes or instantaneous phase. Inputs must be epoched and already filtered in the relevant frequency band; the target vector $z$ is a real-valued vector of length `n_epochs`.
 
 ```cpp title="src/examples/ex_decoding/main.cpp"
 DecodingSpoc spoc(1);

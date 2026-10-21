@@ -186,7 +186,7 @@ def linkify_type(type_str: str, *, self_name: str = "") -> str:
     # fenced code blocks) and free text.  Only apply the regex to free text.
     _PROTECTED_RE = re.compile(
         r"```[\s\S]*?```"       # fenced code blocks
-        r"|`[^`]+`"             # inline code spans
+        r"|(`+)(?!`)[\s\S]*?(?<!`)\1(?!`)"  # inline code spans, any backtick run length
         r"|\[[^\]]*\]\([^)]*\)" # markdown links
     )
     parts: List[str] = []
@@ -317,85 +317,97 @@ def text_of(el) -> str:
     if el.text:
         parts.append(el.text)
     for child in el:
-        tag = child.tag
-        if tag == "computeroutput":
-            parts.append(f"`{text_of(child)}`")
-        elif tag == "bold":
-            parts.append(f"**{text_of(child)}**")
-        elif tag == "emphasis":
-            parts.append(f"*{text_of(child)}*")
-        elif tag == "ref":
-            ref_text = text_of(child)
-            refid = child.get("refid", "")
-            kindref = child.get("kindref", "")
-            # Try refid-based resolution first (most precise).
-            resolved = False
-            if kindref == "compound" and refid:
-                short = _REFID_MAP.get(refid, "")
-                if short and short in _XREF_MAP:
-                    parts.append(f"[`{short}`]({_XREF_MAP[short]})")
-                    resolved = True
-            if not resolved:
-                # Fallback: match the text against the xref map.
-                ref_short = ref_text.split("::")[-1] if "::" in ref_text else ref_text
-                if ref_short in _XREF_MAP:
-                    parts.append(f"[`{ref_short}`]({_XREF_MAP[ref_short]})")
-                elif ref_text in _XREF_MAP:
-                    parts.append(f"[`{ref_text}`]({_XREF_MAP[ref_text]})")
-                else:
-                    parts.append(f"`{ref_text}`")
-        elif tag == "ulink":
-            url = child.get("url", "")
-            parts.append(f"[{text_of(child)}]({url})")
-        elif tag == "formula":
-            formula = text_of(child).strip()
-            # Doxygen: @f[...]@f] => display math; @f$...@f$ => inline.
-            # The XML emission uses \[ \] / $ $ / \( \).
-            if formula.startswith("\\[") and formula.endswith("\\]"):
-                parts.append(f"\n\n$$\n{formula[2:-2].strip()}\n$$\n\n")
-            elif formula.startswith("\\(") and formula.endswith("\\)"):
-                parts.append(f"${formula[2:-2].strip()}$")
-            elif formula.startswith("$") and formula.endswith("$"):
-                parts.append(formula)
-            else:
-                parts.append(f"${formula}$")
-        elif tag == "simplesect":
-            kind = child.get("kind", "")
-            body = text_of(child).strip()
-            if kind == "return":
-                parts.append(f"\n\n**Returns:** {body}\n\n")
-            elif kind == "note":
-                parts.append(f"\n\n:::note\n{body}\n:::\n\n")
-            elif kind == "see":
-                parts.append(f"\n\n**See also:** {body}\n\n")
-            elif kind == "warning":
-                parts.append(f"\n\n:::warning\n{body}\n:::\n\n")
-            else:
-                parts.append(body)
-        elif tag == "parameterlist":
-            pass  # handled separately
-        elif tag == "para":
-            parts.append(text_of(child))
-            parts.append("\n\n")
-        elif tag in ("sect1", "sect2", "sect3"):
-            parts.append(text_of(child))
-        elif tag == "title":
-            depth = {"sect1": "##", "sect2": "###", "sect3": "####"}.get(el.tag, "##")
-            parts.append(f"\n\n{depth} {text_of(child)}\n\n")
-        elif tag == "itemizedlist":
-            for item in child.findall("listitem"):
-                parts.append(f"- {text_of(item).strip()}\n")
-            parts.append("\n")
-        elif tag == "table":
-            parts.append(render_table(child))
-        elif tag == "programlisting":
-            parts.append(render_code_block(child))
-        elif tag == "sp":
-            parts.append(" ")
-        else:
-            parts.append(text_of(child))
+        parts.append(_inline(child, el.tag))
         if child.tail:
             parts.append(child.tail)
+    return "".join(parts)
+
+
+def _inline(child, parent_tag: str) -> str:
+    """Markdown for one child element of a Doxygen description (its tail excluded)."""
+    tag = child.tag
+    parts: List[str] = []
+    if tag == "computeroutput":
+        code = text_of(child)
+        # Doxygen emits an empty element for "@c" before punctuation; a ref inside is already a code link
+        if code and not re.fullmatch(r"\[`[^`]*`\]\([^)]*\)", code):
+            code = f"`{code}`"
+        parts.append(code)
+    elif tag == "bold":
+        parts.append(f"**{text_of(child)}**")
+    elif tag == "emphasis":
+        parts.append(f"*{text_of(child)}*")
+    elif tag == "ref":
+        ref_text = text_of(child)
+        refid = child.get("refid", "")
+        kindref = child.get("kindref", "")
+        # Try refid-based resolution first (most precise).
+        resolved = False
+        if kindref == "compound" and refid:
+            short = _REFID_MAP.get(refid, "")
+            if short and short in _XREF_MAP:
+                parts.append(f"[`{short}`]({_XREF_MAP[short]})")
+                resolved = True
+        if not resolved:
+            # Fallback: match the text against the xref map.
+            ref_short = ref_text.split("::")[-1] if "::" in ref_text else ref_text
+            if ref_short in _XREF_MAP:
+                parts.append(f"[`{ref_short}`]({_XREF_MAP[ref_short]})")
+            elif ref_text in _XREF_MAP:
+                parts.append(f"[`{ref_text}`]({_XREF_MAP[ref_text]})")
+            else:
+                parts.append(f"`{ref_text}`")
+    elif tag == "ulink":
+        url = child.get("url", "")
+        parts.append(f"[{text_of(child)}]({url})")
+    elif tag == "formula":
+        formula = text_of(child).strip()
+        # Doxygen: @f[...]@f] => display math; @f$...@f$ => inline.
+        # The XML emission uses \[ \] / $ $ / \( \).
+        if formula.startswith("\\[") and formula.endswith("\\]"):
+            parts.append(f"\n\n$$\n{formula[2:-2].strip()}\n$$\n\n")
+        elif formula.startswith("\\(") and formula.endswith("\\)"):
+            parts.append(f"${formula[2:-2].strip()}$")
+        elif formula.startswith("$") and formula.endswith("$"):
+            parts.append(formula)
+        else:
+            parts.append(f"${formula}$")
+    elif tag == "simplesect":
+        kind = child.get("kind", "")
+        body = text_of(child).strip()
+        if kind == "return":
+            parts.append(f"\n\n**Returns:** {body}\n\n")
+        elif kind == "note":
+            parts.append(f"\n\n:::note\n{body}\n:::\n\n")
+        elif kind == "see":
+            parts.append(f"\n\n**See also:** {body}\n\n")
+        elif kind == "warning":
+            parts.append(f"\n\n:::warning\n{body}\n:::\n\n")
+        else:
+            parts.append(body)
+    elif tag == "parameterlist":
+        pass  # handled separately
+    elif tag == "para":
+        parts.append(text_of(child))
+        parts.append("\n\n")
+    elif tag in ("sect1", "sect2", "sect3"):
+        parts.append(text_of(child))
+    elif tag == "title":
+        depth = {"sect1": "##", "sect2": "###", "sect3": "####"}.get(parent_tag, "##")
+        parts.append(f"\n\n{depth} {text_of(child)}\n\n")
+    elif tag == "itemizedlist":
+        parts.append("\n\n")
+        for item in child.findall("listitem"):
+            parts.append(f"- {text_of(item).strip()}\n")
+        parts.append("\n")
+    elif tag == "table":
+        parts.append(render_table(child))
+    elif tag == "programlisting":
+        parts.append(render_code_block(child))
+    elif tag == "sp":
+        parts.append(" ")
+    else:
+        parts.append(text_of(child))
     return "".join(parts)
 
 
@@ -599,44 +611,7 @@ def extract_body_text(detail_el) -> str:
             if sub.tag in ("parameterlist", "simplesect"):
                 continue
             has_content = True
-            if sub.tag == "computeroutput":
-                text_parts.append(f"`{text_of(sub)}`")
-            elif sub.tag == "bold":
-                text_parts.append(f"**{text_of(sub)}**")
-            elif sub.tag == "emphasis":
-                text_parts.append(f"*{text_of(sub)}*")
-            elif sub.tag == "formula":
-                f = text_of(sub).strip()
-                if f.startswith("\\[") and f.endswith("\\]"):
-                    text_parts.append(f"\n\n$$\n{f[2:-2].strip()}\n$$\n\n")
-                elif f.startswith("\\(") and f.endswith("\\)"):
-                    text_parts.append(f"${f[2:-2].strip()}$")
-                else:
-                    text_parts.append(f"${f}$")
-            elif sub.tag == "ref":
-                ref_text = text_of(sub)
-                refid = sub.get("refid", "")
-                kindref = sub.get("kindref", "")
-                resolved = False
-                if kindref == "compound" and refid:
-                    short = _REFID_MAP.get(refid, "")
-                    if short and short in _XREF_MAP:
-                        text_parts.append(f"[`{short}`]({_XREF_MAP[short]})")
-                        resolved = True
-                if not resolved:
-                    ref_short = ref_text.split("::")[-1] if "::" in ref_text else ref_text
-                    if ref_short in _XREF_MAP:
-                        text_parts.append(f"[`{ref_short}`]({_XREF_MAP[ref_short]})")
-                    elif ref_text in _XREF_MAP:
-                        text_parts.append(f"[`{ref_text}`]({_XREF_MAP[ref_text]})")
-                    else:
-                        text_parts.append(f"`{ref_text}`")
-            elif sub.tag == "ulink":
-                text_parts.append(f"[{text_of(sub)}]({sub.get('url','')})")
-            elif sub.tag == "programlisting":
-                text_parts.append(render_code_block(sub))
-            else:
-                text_parts.append(text_of(sub))
+            text_parts.append(_inline(sub, child.tag))
             if sub.tail:
                 text_parts.append(sub.tail)
         if has_content:
@@ -666,6 +641,12 @@ def _mermaid_safe(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9_]", "_", short)
 
 
+def _mermaid_click(node_id: str, link: str) -> str:
+    """Mermaid ``click ... href`` line; the URL is relative to the API page, which Mermaid does not prefix with the baseUrl."""
+    relative = "../.." + link.removeprefix("/docs/api") + "/"
+    return f'    click {node_id} href "{relative}"'
+
+
 def _render_inheritance_diagram(compounddef, short_name: str,
                                  lines: List[str]) -> None:
     """Emit a Mermaid ``classDiagram`` block showing base and derived
@@ -691,9 +672,7 @@ def _render_inheritance_diagram(compounddef, short_name: str,
             seen_edges.add(edge)
             # Link the parent if it's a registered class
             if parent_short in _XREF_MAP:
-                diagram_lines.append(
-                    f'    click {parent_id} "{_XREF_MAP[parent_short]}"'
-                )
+                diagram_lines.append(_mermaid_click(parent_id, _XREF_MAP[parent_short]))
 
     for d in derived:
         child = d.text or ""
@@ -704,9 +683,7 @@ def _render_inheritance_diagram(compounddef, short_name: str,
             diagram_lines.append(f"    {me} <|-- {child_id}")
             seen_edges.add(edge)
             if child_short in _XREF_MAP:
-                diagram_lines.append(
-                    f'    click {child_id} "{_XREF_MAP[child_short]}"'
-                )
+                diagram_lines.append(_mermaid_click(child_id, _XREF_MAP[child_short]))
 
     lines.append("### Inheritance")
     lines.append("")

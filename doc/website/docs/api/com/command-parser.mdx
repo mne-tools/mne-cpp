@@ -17,7 +17,7 @@ class COMLIB::CommandParser
 
 Observer-pattern subject that decodes JSON or CLI command strings into [`RawCommand`](/docs/api/com/raw-command) and notifies attached managers.
 
-Single entry point ``parse()`` accepts either dialect, builds a [`[RawCommand](/docs/api/com/raw-command)`](/docs/api/com/raw-command), and broadcasts it to every attached [`[CommandManager](/docs/api/com/command-manager)`](/docs/api/com/command-manager); the `response` signal carries replies back from whichever manager handled the request so the caller (typically a [`[RtCmdClient](/docs/api/com/rt-cmd-client)`](/docs/api/com/rt-cmd-client)) can forward them to the originating socket.
+Single entry point ``parse()`` accepts either dialect, builds a [`RawCommand`](/docs/api/com/raw-command), and broadcasts it to every attached [`CommandManager`](/docs/api/com/command-manager); the `response` signal carries replies back from whichever manager handled the request so the caller (typically a [`RtCmdClient`](/docs/api/com/rt-cmd-client)) can forward them to the originating socket.
 
 ### Inheritance
 
@@ -25,7 +25,7 @@ Single entry point ``parse()`` accepts either dialect, builds a [`[RawCommand](/
 classDiagram
     QObject <|-- CommandParser
     Subject <|-- CommandParser
-    click Subject "/docs/api/utils/subject"
+    click Subject href "../../utils/subject/"
 ```
 
 ---

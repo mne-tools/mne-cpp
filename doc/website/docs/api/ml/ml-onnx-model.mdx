@@ -15,7 +15,7 @@ sidebar_position: 3
 class MLLIB::MlOnnxModel
 ```
 
-[`MlModel`](/docs/api/ml/ml-model) backend that runs ``.onnx graphs through ONNX Runtime with a cached CPU session.
+[`MlModel`](/docs/api/ml/ml-model) backend that runs .onnx graphs through ONNX Runtime with a cached CPU session.
 
 When mne-cpp is configured without `USE_ONNXRUNTIME` every method either throws `std::runtime_error` (`predict`) or returns false / logs a warning (`load`, `save`), so the same client code compiles and links on minimal builds and on WebAssembly without conditional call sites.
 
@@ -31,7 +31,7 @@ const QString classes = static_cast<MlOnnxModel&>(*model).metadata("classes");
 ```mermaid
 classDiagram
     MlModel <|-- MlOnnxModel
-    click MlModel "/docs/api/ml/ml-model"
+    click MlModel href "../../ml/ml-model/"
 ```
 
 ---

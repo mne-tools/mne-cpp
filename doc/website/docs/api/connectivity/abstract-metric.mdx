@@ -18,10 +18,9 @@ class CONNECTIVITYLIB::AbstractMetric
 Static base for every estimator in ``CONNECTIVITYLIB``.
 
 Holds the two pieces of global state that the dispatcher (`Connectivity::calculate`) must set before any metric runs:
-`CONNECTIVITYLIB::AbstractMetric::m_bStorageModeIsActive` "m_bStorageModeIsActive" enables caching of per-trial tapered spectra and CSDs in `ConnectivitySettings::IntermediateTrialData`, which lets a second metric reuse the FFT work done by the first.
 
-
-`CONNECTIVITYLIB::AbstractMetric::m_iNumberBinStart` "m_iNumberBinStart" and `CONNECTIVITYLIB::AbstractMetric::m_iNumberBinAmount` "m_iNumberBinAmount" define the frequency-bin window over which each metric averages its spectral output into the single scalar weight stored on each network edge.
+- `CONNECTIVITYLIB::AbstractMetric::m_bStorageModeIsActive` "m_bStorageModeIsActive" enables caching of per-trial tapered spectra and CSDs in `ConnectivitySettings::IntermediateTrialData`, which lets a second metric reuse the FFT work done by the first.
+- `CONNECTIVITYLIB::AbstractMetric::m_iNumberBinStart` "m_iNumberBinStart" and `CONNECTIVITYLIB::AbstractMetric::m_iNumberBinAmount` "m_iNumberBinAmount" define the frequency-bin window over which each metric averages its spectral output into the single scalar weight stored on each network edge.
 
 Static control knobs (storage mode, frequency band) shared by all `CONNECTIVITYLIB` metrics.
 
@@ -37,31 +36,31 @@ AbstractMetric::m_bStorageModeIsActive = false;
 ```mermaid
 classDiagram
     AbstractMetric <|-- Coherence
-    click Coherence "/docs/api/connectivity/coherence"
+    click Coherence href "../../connectivity/coherence/"
     AbstractMetric <|-- Coherency
-    click Coherency "/docs/api/connectivity/coherency"
+    click Coherency href "../../connectivity/coherency/"
     AbstractMetric <|-- Correlation
-    click Correlation "/docs/api/connectivity/correlation"
+    click Correlation href "../../connectivity/correlation/"
     AbstractMetric <|-- CrossCorrelation
-    click CrossCorrelation "/docs/api/connectivity/cross-correlation"
+    click CrossCorrelation href "../../connectivity/cross-correlation/"
     AbstractMetric <|-- DebiasedSquaredWeightedPhaseLagIndex
-    click DebiasedSquaredWeightedPhaseLagIndex "/docs/api/connectivity/debiased-squared-weighted-phase-lag-index"
+    click DebiasedSquaredWeightedPhaseLagIndex href "../../connectivity/debiased-squared-weighted-phase-lag-index/"
     AbstractMetric <|-- DirectedTransferFunction
-    click DirectedTransferFunction "/docs/api/connectivity/directed-transfer-function"
+    click DirectedTransferFunction href "../../connectivity/directed-transfer-function/"
     AbstractMetric <|-- GrangerCausality
-    click GrangerCausality "/docs/api/connectivity/granger-causality"
+    click GrangerCausality href "../../connectivity/granger-causality/"
     AbstractMetric <|-- ImagCoherence
-    click ImagCoherence "/docs/api/connectivity/imag-coherence"
+    click ImagCoherence href "../../connectivity/imag-coherence/"
     AbstractMetric <|-- PartialDirectedCoherence
-    click PartialDirectedCoherence "/docs/api/connectivity/partial-directed-coherence"
+    click PartialDirectedCoherence href "../../connectivity/partial-directed-coherence/"
     AbstractMetric <|-- PhaseLagIndex
-    click PhaseLagIndex "/docs/api/connectivity/phase-lag-index"
+    click PhaseLagIndex href "../../connectivity/phase-lag-index/"
     AbstractMetric <|-- PhaseLockingValue
-    click PhaseLockingValue "/docs/api/connectivity/phase-locking-value"
+    click PhaseLockingValue href "../../connectivity/phase-locking-value/"
     AbstractMetric <|-- UnbiasedSquaredPhaseLagIndex
-    click UnbiasedSquaredPhaseLagIndex "/docs/api/connectivity/unbiased-squared-phase-lag-index"
+    click UnbiasedSquaredPhaseLagIndex href "../../connectivity/unbiased-squared-phase-lag-index/"
     AbstractMetric <|-- WeightedPhaseLagIndex
-    click WeightedPhaseLagIndex "/docs/api/connectivity/weighted-phase-lag-index"
+    click WeightedPhaseLagIndex href "../../connectivity/weighted-phase-lag-index/"
 ```
 
 ---

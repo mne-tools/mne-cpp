@@ -55,7 +55,7 @@ Only modifies rows of good EEG channels (kind == FIFFV_EEG_CH, not in info.bads)
   Measurement info (identifies EEG channels; receives the projector).
 
 - **refChannels** : *const QStringList &*
-  Reference channel name(s).- Empty or "average" -&gt; average reference (mean of all good EEG channels). - Single channel name -&gt; re-reference to that channel. - Multiple channel names -&gt; re-reference to mean of those channels.
+  Reference channel name(s). - Empty or "average" -&gt; average reference (mean of all good EEG channels). - Single channel name -&gt; re-reference to that channel. - Multiple channel names -&gt; re-reference to mean of those channels.
 
 - **projection** : *bool*
   Average reference only: append an inactive average-reference projector over the good EEG channels to info.projs (mne make_eeg_average_ref_proj) and leave the data unchanged. Nothing is added if one is already present.

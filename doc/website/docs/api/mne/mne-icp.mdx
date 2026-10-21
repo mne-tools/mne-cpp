@@ -23,7 +23,7 @@ class; the functions live directly in the library namespace.
 
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
-Free functions for the point-to-surface ICP used by mne-cpp's coregistration tools to refine an initial `head` &lt;-&gt; `MRI` transformation: ``MNELIB::fitMatchedPoints`` aligns matched point pairs (e.g. fiducials), ``MNELIB::discard3DPointOutliers`` drops points far from the surface, and ``MNELIB::performIcp`` projects each point onto the nearest triangle of an [`[MNEBemSurface](/docs/api/mne/mne-bem-surface)`](/docs/api/mne/mne-bem-surface) (via [`[MNEProjectToSurface](/docs/api/mne/mne-project-to-surface)`](/docs/api/mne/mne-project-to-surface)), solves a rigid-body least squares with SVD and iterates until convergence.
+Free functions for the point-to-surface ICP used by mne-cpp's coregistration tools to refine an initial `head` &lt;-&gt; `MRI` transformation: ``MNELIB::fitMatchedPoints`` aligns matched point pairs (e.g. fiducials), ``MNELIB::discard3DPointOutliers`` drops points far from the surface, and ``MNELIB::performIcp`` projects each point onto the nearest triangle of an [`MNEBemSurface`](/docs/api/mne/mne-bem-surface) (via [`MNEProjectToSurface`](/docs/api/mne/mne-project-to-surface)), solves a rigid-body least squares with SVD and iterates until convergence.
 
 ```cpp title="src/examples/ex_mne_api/main.cpp"
 // 1. Rough start from three matched points (e.g. the fiducials)

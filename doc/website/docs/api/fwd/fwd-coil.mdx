@@ -17,7 +17,7 @@ class FWDLIB::FwdCoil
 
 Implements [`FwdCoil`](/docs/api/fwd/fwd-coil) (replaces `fwdCoil` / `fwdCoilRec` from MNE-C ``fwd_types.h``).
 
-Single MEG sensor coil or EEG electrode — stores the coil-local frame and the ``(r_mag, cos_mag, w) integration-point triples that approximate the Biot-Savart surface integral over the coil area.
+Single MEG sensor coil or EEG electrode — stores the coil-local frame and the (r_mag, cos_mag, w) integration-point triples that approximate the Biot-Savart surface integral over the coil area.
 
 ```cpp title="src/examples/ex_fwd_api/main.cpp"
 auto templates = FwdCoilSet::read_coil_defs(coilDefs); // integration points per coil type

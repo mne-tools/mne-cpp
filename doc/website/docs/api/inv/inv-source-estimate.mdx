@@ -21,7 +21,7 @@ class INVLIB::InvSourceEstimate
 
 Central source-space container produced by every `INVLIB` inverse solver.
 
-Carries the dense ``(n_sources × n_times) data matrix plus vertex indices, time origin and step, and optional focal dipoles, coupling groups and connectivity layers so one value can represent the output of any algorithm in `INVLIB`. Replaces `mneStcDataRec` of MNE-C and implements round-trip STC / W binary I/O with mne-python and mne-c.
+Carries the dense (n_sources × n_times) data matrix plus vertex indices, time origin and step, and optional focal dipoles, coupling groups and connectivity layers so one value can represent the output of any algorithm in `INVLIB`. Replaces `mneStcDataRec` of MNE-C and implements round-trip STC / W binary I/O with mne-python and mne-c.
 
 Source-space inverse-solution container with dense grid plus optional focal-dipole, coupling and connectivity layers.
 
@@ -55,9 +55,9 @@ const InvSourceEstimate fromStc(stcBack);
 ```mermaid
 classDiagram
     InvSourceEstimate <|-- InvVectorSourceEstimate
-    click InvVectorSourceEstimate "/docs/api/inv/inv-vector-source-estimate"
+    click InvVectorSourceEstimate href "../../inv/inv-vector-source-estimate/"
     InvSourceEstimate <|-- InvVolumeSourceEstimate
-    click InvVolumeSourceEstimate "/docs/api/inv/inv-volume-source-estimate"
+    click InvVolumeSourceEstimate href "../../inv/inv-volume-source-estimate/"
 ```
 
 ---

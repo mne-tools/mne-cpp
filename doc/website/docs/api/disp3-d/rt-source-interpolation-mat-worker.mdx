@@ -20,13 +20,10 @@ class DISP3DLIB::RtSourceInterpolationMatWorker
 This worker encapsulates the expensive `GeometryInfo::scdc()` (geodesic distance computation) and `Interpolation::createInterpolationMat()` calls that were previously performed either in [`StcLoadingWorker`](/docs/api/disp3-d/stc-loading-worker) (at load time only) or not recomputed at all when parameters changed at runtime.
 
 The worker for each hemisphere stores:
-[FsSurface](/docs/api/fs/fs-surface) vertex positions and neighbor topology
 
-
-Source vertex indices (from the STC file)
-
-
-Cancel distance and interpolation function
+- [FsSurface](/docs/api/fs/fs-surface) vertex positions and neighbor topology
+- Source vertex indices (from the STC file)
+- Cancel distance and interpolation function
 
 When any parameter changes, `computeInterpolationMatrix()` can be called (typically via a queued connection) to recompute the sparse interpolation matrix on the worker thread. When done, the result is emitted via newInterpolationMatrixAvailable().
 

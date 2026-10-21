@@ -18,22 +18,13 @@ class UTILSLIB::PythonRunner
 Standardized interface for launching Python scripts from C++.
 
 Features:
-Auto-discovers Python via PATH or explicit config.
 
-
-Runs scripts with `-u` (unbuffered) by default for real-time output.
-
-
-Streams stdout/stderr line-by-line through optional callbacks.
-
-
-Parses a simple progress protocol: lines matching `[progress] <float>%` or `[progress] <float>% <message>`.
-
-
-Integrates with MNE-CPP's logging (qDebug/qWarning).
-
-
-Supports timeout, environment injection, and working directory.
+- Auto-discovers Python via PATH or explicit config.
+- Runs scripts with `-u` (unbuffered) by default for real-time output.
+- Streams stdout/stderr line-by-line through optional callbacks.
+- Parses a simple progress protocol: lines matching `[progress] <float>%` or `[progress] <float>% <message>`.
+- Integrates with MNE-CPP's logging (qDebug/qWarning).
+- Supports timeout, environment injection, and working directory.
 
 No Python embedding or linkage is required.
 
@@ -209,7 +200,9 @@ If `config()`.venvDir is empty, returns immediately (no-op).
 Creates the venv if it doesn't exist yet (`python -m venv ...`).
 
 
-Installs dependencies:- If `config()`.packageDir is set (contains pyproject.toml): runs `pip install <packageDir>` inside the venv.
+Installs dependencies:
+
+- If `config()`.packageDir is set (contains pyproject.toml): runs `pip install <packageDir>` inside the venv.
 - Else if `config()`.requirementsFile is set: runs `pip install -r <file>` inside the venv.
 
 

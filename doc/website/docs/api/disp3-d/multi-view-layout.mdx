@@ -20,16 +20,11 @@ Pure-geometry class for multi-view viewport layout.
 This class has no widget dependencies — it works with sizes, rectangles, and fractional split positions. The hosting widget queries this class for rectangles and hit-test results, and updates separator widgets accordingly.
 
 Layout rules:
-1 pane → full area
 
-
-2 panes → side-by-side, split at m_splitX
-
-
-3 panes → full-width top row + 2 bottom panes split at m_splitX
-
-
-4 panes → 2×2 grid split at (m_splitX, m_splitY)
+- 1 pane → full area
+- 2 panes → side-by-side, split at m_splitX
+- 3 panes → full-width top row + 2 bottom panes split at m_splitX
+- 4 panes → 2×2 grid split at (m_splitX, m_splitY)
 
 Multi-view geometry computations.
 

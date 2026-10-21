@@ -37,7 +37,7 @@ const MatrixX3f talairach = chain.mniToTalairach(mni);
 
 ### addTalairach(xfmPath)
 
-Sets the RAS -&gt; MNI transform from a ``.xfm file and the two MNI -&gt; FreeSurfer Talairach transforms (MNE-C mne_mri_add_talairach_transforms).
+Sets the RAS -&gt; MNI transform from a .xfm file and the two MNI -&gt; FreeSurfer Talairach transforms (MNE-C mne_mri_add_talairach_transforms).
 
 **Parameters:**
 
@@ -46,7 +46,7 @@ Sets the RAS -&gt; MNI transform from a ``.xfm file and the two MNI -&gt; FreeSu
 
 **Returns:**
 
-- *bool* — True if the ``.xfm file could be read.
+- *bool* — True if the .xfm file could be read.
 
 ---
 
@@ -112,12 +112,12 @@ Maps MNI Talairach coordinates to FreeSurfer Talairach coordinates, using the tr
 
 ### readMniTransform(path)
 
-Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI ``.xfm file (MNE-C read_mni_coord_transform_file).
+Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI .xfm file (MNE-C read_mni_coord_transform_file).
 
 **Parameters:**
 
 - **path** : *const QString &*
-  Path to the ``.xfm file, usually `mri/transforms/talairach.xfm` in the subject directory.
+  Path to the .xfm file, usually `mri/transforms/talairach.xfm` in the subject directory.
 
 **Returns:**
 

@@ -72,6 +72,27 @@ def check(build: Path, channel: str, version: str) -> list[str]:
                    if not u.startswith(site)]
         if outside:
             problems.append(f"sitemap lists {len(outside)} URLs outside {site}")
+    return problems + content_problems(build)
+
+
+# Markdown that reached the page as text, and formulas KaTeX could not typeset
+_UNRENDERED = {
+    "markdown link shown as text": re.compile(r"\]\((?:/|\.\./|https?://)[^)\s]*\)"),
+    "KaTeX error": re.compile(r'class="katex-error"'),
+}
+
+
+def content_problems(build: Path) -> list[str]:
+    """Rendering defects in the article text of every page (code blocks excluded, inline code included)."""
+    problems = []
+    for page in sorted(build.rglob("*.html")):
+        html = page.read_text(encoding="utf-8", errors="replace")
+        article = html.split("<article", 1)[1].split("</article>", 1)[0] if "<article" in html else ""
+        text = re.sub(r"<pre\b.*?</pre>", "", article, flags=re.S)
+        for kind, pattern in _UNRENDERED.items():
+            hits = len(pattern.findall(text if kind != "KaTeX error" else article))
+            if hits:
+                problems.append(f"{page.relative_to(build)}: {hits} x {kind}")
     return problems
 
 

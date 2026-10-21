@@ -99,7 +99,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **addSubject** `[slot]` in [BidsViewModel](/docs/api/disp/bids-view-model) — Adds subject with given input name.
 - **addSurface** `[fn]` in [BrainTreeModel](/docs/api/disp3-d/brain-tree-model)
 - **addTable** `[fn]` in [Report](/docs/api/utils/report) — Add a table section.
-- **addTalairach** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Sets the RAS -&gt; MNI transform from a ``.xfm file and the two MNI -&gt; FreeSurfer Talairach transforms (MNE-C mne_mri_add_talairach_transforms).
+- **addTalairach** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Sets the RAS -&gt; MNI transform from a .xfm file and the two MNI -&gt; FreeSurfer Talairach transforms (MNE-C mne_mri_add_talairach_transforms).
 - **addText** `[fn]` in [Report](/docs/api/utils/report) — Add a text section.
 - **addToData** `[slot]` in [BidsViewModel](/docs/api/disp/bids-view-model) — Adds a sub-item to a data item (ex.
 - **addTriangleData** `[fn]` in [MNEBemSurface](/docs/api/mne/mne-bem-surface) — Definition of the mne_add_triangle_data function in mne_add_geometry_info.c.
@@ -170,7 +170,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **apply_inverse_trans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Applies the inverse coordinate transform to a single 3D point in place.
 - **apply_left_eyes** `[fn]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Apply the left-eye position and up-vector uniformly to all surfaces regardless of hemisphere.
 - **apply_left_right_eyes** `[fn]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Assign hemisphere-appropriate eye positions and up-vectors to each surface (left eye for left hemisphere, right eye for right).
-- **apply_trans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — TODO: dest - The id of the destination coordinate system (FIFFV_COORD_...).
+- **apply_trans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Applies the coordinate transform to given coordinates and returns the transformed coordinates.
 - **apply_trans** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Applies the coordinate transform to a single 3D point in place.
 - **apply_transpose** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Apply or revert CTF compensation across multiple time samples (channels x samples matrix), the transposed equivalent of `apply()`.
 - **applyBaselineCorrection** `[fn]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Applies baseline correction to the evoked data.
@@ -1236,7 +1236,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **DecodingSsd** `[fn]` in [DecodingSsd](/docs/api/decoding/decoding-ssd) — Constructs an SSD decoder.
 - **decompose_eigen** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Convenience wrapper for `decompose_eigen_small()` with default threshold and no rank override.
 - **decompose_eigen_small** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Perform eigenvalue decomposition of the covariance matrix, zero sub-threshold eigenvalues, classify eigenvectors by channel type, and compute inverse square-roots for whitening.
-- **decompress** `[fn]` in [MriNiftiIO](/docs/api/mri/mri-nifti-io) — Decompresses a ``.nii.gz file into `rawData`.
+- **decompress** `[fn]` in [MriNiftiIO](/docs/api/mri/mri-nifti-io) — Decompresses a .nii.gz file into `rawData`.
 - **dEegReject** `[var]` in [ArtifactDetectProjParams](/docs/api/utils/artifact-detect-proj-params) — Peak-to-peak rejection in V; 0 = off.
 - **defaultForIndex** `[fn]` in [SubView](/docs/api/disp3-d/sub-view) — Return default [`SubView`](/docs/api/disp3-d/sub-view) configuration for viewport `index`.
 - **defaultValue** `[var]` in [MnaOpSchemaAttr](/docs/api/mna/mna-op-schema-attr) — Default when not set.
@@ -4217,7 +4217,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **read** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Read all CTF compensation data sets (matrices and channel info) from a FIFF file, calibrate them, and return a populated set.
 - **read** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Reads every derivation stored in the `FIFFB_MNE_DERIVATIONS` blocks of a file (MNE-C `mne_read_deriv`).
 - **read** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution)
-- **read** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Reads an MNE-C ``.lout file.
+- **read** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Reads an MNE-C .lout file.
 - **read** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Reads one map from a morph-map file (MNE-C `load_one_morph_map`).
 - **read** `[fn]` in [MNENamedMatrix](/docs/api/mne/mne-named-matrix) — Factory: read a named matrix from a FIFF file.
 - **read** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Read a projection operator from a FIFF file by path.
@@ -4312,7 +4312,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **readMetadata** `[fn]` in [RtDataClient](/docs/api/com/rt-data-client) — Reads fiff metaata class from data connection.
 - **readMNESelFile** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Reads the specified MNE sel file.
 - **readMNESelFile** `[fn]` in [SelectionIO](/docs/api/utils/selection-io) — Reads the specified MNE sel file.
-- **readMniTransform** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI ``.xfm file (MNE-C read_mni_coord_transform_file).
+- **readMniTransform** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI .xfm file (MNE-C read_mni_coord_transform_file).
 - **readMriTransform** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads the MRI → head coordinate transform from a FIFF file.
 - **readNeuroscanDat** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Reads a Neuroscan .dat electrode file ("name number x y z" per line), as mne.channels.read_dig_dat does: point numbers 78, 76 and 82 are the nasion, LPA and RPA, 67 (the centroid) is skipped, and the coordinates are kept as they are.
 - **readPolhemusFastscan** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Reads the points of a Polhemus FastSCAN .txt file in metres, as mne.channels.read_polhemus_fastscan does.

@@ -59,10 +59,9 @@ Ensures pipelines for all supported modes are created.
 Create the dual render-target pair for multi-pass rendering.
 
 Both render targets share the same color texture and depth-stencil buffer but differ in their load/store flags:
-m_rtClear: clears color+depth on beginPass (first pass)
 
-
-m_rtPreserve: preserves previous output (passes 2+)
+- m_rtClear: clears color+depth on beginPass (first pass)
+- m_rtPreserve: preserves previous output (passes 2+)
 
 Qt bakes these flags into native resources at create() time, so calling setFlags() dynamically does NOT work (especially on WebGL). This is the validated pattern from test_wasm_multi_pass.
 

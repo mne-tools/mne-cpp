@@ -23,10 +23,8 @@ Central container for a BIDS raw dataset, bundling electrophysiological data wit
 
 [`BidsRawData`](/docs/api/bids/bids-raw-data) is the primary data object of the BIDS library, analogous to [FiffRawData](/docs/api/fiff/fiff-raw-data) for the FIFF library. It owns both the data and the I/O logic:
 
-**`read()`** — static factory that loads a BIDS dataset from disk.
-
-
-**`write()`** — member that writes the current dataset to a BIDS directory.
+- **`read()`** — static factory that loads a BIDS dataset from disk.
+- **`write()`** — member that writes the current dataset to a BIDS directory.
 
 Sidecar and coordinate-system fields that are derivable from [FiffInfo](/docs/api/fiff/fiff-info) (sampling frequency, channel counts) are computed on write and applied to [FiffInfo](/docs/api/fiff/fiff-info) on read. Only fields carrying independent information are stored as explicit members.
 

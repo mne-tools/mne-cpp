@@ -15,7 +15,7 @@ sidebar_position: 4
 class MRILIB::MriNiftiIO
 ```
 
-Stateless decoder for NIfTI-1 single-file volumes (``.nii and ``.nii.gz).
+Stateless decoder for NIfTI-1 single-file volumes (.nii and .nii.gz).
 
 Parses the 348-byte fixed-size header, expands any voxel-type / endianness combination NIfTI-1 supports into the canonical 16-bit unsigned slice buffer produced by [`MriMghIO`](/docs/api/mri/mri-mgh-io), and resolves voxel→RAS via the `sform/qform/pixdim` priority chain. The class is a pure namespace of `static` methods so callers can use it without owning any state; the populated [`MriVolData`](/docs/api/mri/mri-vol-data) carries the result.
 
@@ -32,12 +32,12 @@ MriNiftiIO::read(dataDir + "/gradient.nii.gz", direct);
 
 Reads a NIfTI-1 single-file volume.
 
-For ``.nii.gz inputs the file is decompressed in memory via zlib (re-using the same `MAX_WBITS+16` strategy as [`[MriMghIO](/docs/api/mri/mri-mgh-io)`](/docs/api/mri/mri-mgh-io)).
+For .nii.gz inputs the file is decompressed in memory via zlib (re-using the same `MAX_WBITS+16` strategy as [`MriMghIO`](/docs/api/mri/mri-mgh-io)).
 
 **Parameters:**
 
 - **niiFile** : *const QString &*
-  Path to the ``.nii or ``.nii.gz file.
+  Path to the .nii or .nii.gz file.
 
 - **volData** : *[MriVolData](/docs/api/mri/mri-vol-data) &*
   Volume to populate.
@@ -53,9 +53,9 @@ For ``.nii.gz inputs the file is decompressed in memory via zlib (re-using the s
 
 ### decompress(gzFile, rawData)
 
-Decompresses a ``.nii.gz file into `rawData`.
+Decompresses a .nii.gz file into `rawData`.
 
-Exposed for direct use by tests; `read` calls it transparently when the input path ends in ``.gz.
+Exposed for direct use by tests; `read` calls it transparently when the input path ends in .gz.
 
 **Parameters:**
 

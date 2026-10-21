@@ -17,7 +17,7 @@ class CONNECTIVITYLIB::MvarModel
 
 Multivariate autoregressive (MVAR) model fit and its frequency-domain decomposition into transfer function `H(f)` and spectral matrix `S(f)`.
 
-The model order `p` is either supplied by the caller or selected automatically by Bayesian Information Criterion over ``[1, 20]; the coefficient matrices are estimated by Levinson-Durbin recursion on the Yule-Walker equations. The resulting `H` and `S` are consumed by the three directed-connectivity metrics in this library (Granger Causality, DTF, PDC) and are exposed via `transferFunction` and `spectralMatrix` at arbitrary normalised frequencies.
+The model order `p` is either supplied by the caller or selected automatically by Bayesian Information Criterion over [1, 20]; the coefficient matrices are estimated by Levinson-Durbin recursion on the Yule-Walker equations. The resulting `H` and `S` are consumed by the three directed-connectivity metrics in this library (Granger Causality, DTF, PDC) and are exposed via `transferFunction` and `spectralMatrix` at arbitrary normalised frequencies.
 
 MVAR model fit; provides H(f) and S(f) for Granger Causality, DTF and PDC. 
 ```cpp title="src/examples/ex_connectivity_metrics/main.cpp"

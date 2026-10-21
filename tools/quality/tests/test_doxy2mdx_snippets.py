@@ -21,6 +21,7 @@ import sys
 import tempfile
 import textwrap
 import unittest
+import xml.etree.ElementTree as ET
 from contextlib import redirect_stderr
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -149,6 +150,20 @@ class TestSnippetRendering(SnippetRenderingTestCase):
         expected = textwrap.dedent("\n".join(REGION))
         self.assertIn(f'````cpp title="src/examples/ex_widget/main.cpp"\n{expected}\n````', example)
         self.assertIn("From [ex_widget](", example)
+
+
+class TestInheritanceDiagram(unittest.TestCase):
+    def test_click_uses_mermaid_href_syntax_and_a_relative_link(self) -> None:
+        """Mermaid needs ``click <id> href "<url>"``; a root link would leave the /dev/ site."""
+        compound = ET.fromstring('<compounddef><basecompoundref>DEMO::Base</basecompoundref>'
+                                 '<derivedcompoundref>OTHER::Child</derivedcompoundref></compounddef>')
+        saved = dict(doxy2mdx._XREF_MAP)
+        self.addCleanup(lambda: (doxy2mdx._XREF_MAP.clear(), doxy2mdx._XREF_MAP.update(saved)))
+        doxy2mdx._XREF_MAP.update({"Base": "/docs/api/demo/base", "Child": "/docs/api/other/child"})
+        lines: list[str] = []
+        doxy2mdx._render_inheritance_diagram(compound, "Widget", lines)
+        self.assertIn('    click Base href "../../demo/base/"', lines)
+        self.assertIn('    click Child href "../../other/child/"', lines)
 
 
 class TestStrictErrors(SnippetRenderingTestCase):

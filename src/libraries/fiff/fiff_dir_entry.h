@@ -54,7 +54,7 @@ namespace FIFFLIB
 /**
  * @brief Directory entry: tag kind + on-disk type + byte size + absolute file offset (16-byte record).
  *
- * Exact memory image of the legacy @c fiffDirEntryRec: kind (32-bit),
+ * Exact memory image of the legacy @c fiffDirEntryRec record: kind (32-bit),
  * type (32-bit), size (32-bit), pos (32-bit). The arrays of these records
  * materialize the @c FIFF_DIR tag at the tail of every well-formed FIFF
  * file and drive random-access tag lookup in @ref FiffStream.

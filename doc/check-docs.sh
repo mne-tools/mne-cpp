@@ -80,7 +80,8 @@ if [ "$CHANNEL" = dev ]; then
 else
   export MNECPP_SITE_ENV=stable
 fi
-( cd doc/website && npm ci && node --stack-size=400 vendor/braces/test/depth.js && npm run build )
+( cd doc/website && npm ci && node --stack-size=400 vendor/braces/test/depth.js \
+    && node scripts/check-diagrams.mjs && npm run build )
 
 step "Version routing"
 python3 tools/quality/check_website_build.py doc/website/build --channel "$CHANNEL"

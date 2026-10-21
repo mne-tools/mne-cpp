@@ -24,10 +24,9 @@ class; the functions live directly in the library namespace.
 SPDX-License-Identifier: BSD-3-Clause Copyright (c) 2026 MNE-CPP Authors.
 
 Provides functions equivalent to MNE-Python's mne.simulation module:
-simulateStc(): create synthetic source time courses
 
-
-simulateEvoked(): generate synthetic evoked data from forward model
+- simulateStc(): create synthetic source time courses
+- simulateEvoked(): generate synthetic evoked data from forward model
 
 ```cpp title="src/examples/ex_dsp_analysis/main.cpp"
 const VectorXi vertices = VectorXi::LinSpaced(5, 100, 104);

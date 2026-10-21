@@ -17,7 +17,7 @@ struct DECODINGLIB::IcaLabelResult
 
 Outcome of labelling a single [ICA](/docs/api/dsp/ica) component.
 
-Pairs a component index with its winning `IcaComponentLabel` and a confidence score in $$[0, 1]$$ derived from the underlying correlation or spectral statistic (for EOG/ECG: the maximum absolute Pearson correlation with the reference traces; for muscle: the fraction of power above 30 Hz). Downstream consumers typically threshold the score or render it next to the component topography so the user can override the automatic decision.
+Pairs a component index with its winning `IcaComponentLabel` and a confidence score in $[0, 1]$ derived from the underlying correlation or spectral statistic (for EOG/ECG: the maximum absolute Pearson correlation with the reference traces; for muscle: the fraction of power above 30 Hz). Downstream consumers typically threshold the score or render it next to the component topography so the user can override the automatic decision.
 
 ```cpp title="src/examples/ex_decoding/main.cpp"
 const QList<IcaLabelResult> labels = MlIcaLabel::classify(icaSources, eog, ecg, kSFreq);

@@ -20,13 +20,10 @@ A dense matrix with named rows and columns.
 [`MNENamedMatrix`](/docs/api/mne/mne-named-matrix) associates a dense float matrix (Eigen::MatrixXf) with optional row and column name lists (QStringList). It is the C++ equivalent of the MNE-C `mneNamedMatrixRec` struct, and is used throughout the library to represent projection vectors, CTF compensation matrices, and forward-solution gain matrices.
 
 The class provides factory methods to:
-`build()` a matrix from its constituent parts,
 
-
-`read()` a matrix from a FIFF stream, and
-
-
-`pick()` a sub-matrix by selecting named rows and/or columns.
+- `build()` a matrix from its constituent parts,
+- `read()` a matrix from a FIFF stream, and
+- `pick()` a sub-matrix by selecting named rows and/or columns.
 
 All factory methods return `std::unique_ptr<MNENamedMatrix>` for clear ownership.
 

@@ -17,7 +17,7 @@ class MLLIB::MLTrainer
 
 Launches Python training scripts via [`PythonRunner`](/docs/api/utils/python-runner) with automatic venv handling and prerequisite checks.
 
-Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely in the ``.py scripts under `scripts/ml/training/` and runs in a child process; no Python embedding or `libpython` linkage is required. If the configured [`[PythonRunnerConfig](/docs/api/utils/python-runner-config)`](/docs/api/utils/python-runner-config) carries a `venvDir`, the runner creates and updates the venv before each script invocation so dependencies are pinned per training job.
+Training logic (PyTorch, scikit-learn, MNE-Python, …) lives entirely in the .py scripts under `scripts/ml/training/` and runs in a child process; no Python embedding or `libpython` linkage is required. If the configured [`PythonRunnerConfig`](/docs/api/utils/python-runner-config) carries a `venvDir`, the runner creates and updates the venv before each script invocation so dependencies are pinned per training job.
 
 ```cpp title="src/examples/ex_ml/main.cpp"
 QTemporaryDir dir;

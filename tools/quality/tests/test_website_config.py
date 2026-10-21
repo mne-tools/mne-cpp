@@ -184,7 +184,7 @@ class TestVersionRouting(unittest.TestCase):
             f'<link rel="canonical" href="{url}"><link rel="stylesheet" href="{css}">'
             f'<link href="{base}assets/css/styles.css"><script src="{base}assets/js/main.js"></script>'
             f'<a class="navbar__link">{label}</a><a>v{self.VERSION} (Stable)</a>', encoding="utf-8")
-        (root / "sitemap.xml").write_text(f"<urlset><url><loc>{url}download</loc></url></urlset>", encoding="utf-8")
+        (root / "sitemap.xml").write_text(f"<urlset><url><loc>{url}download/</loc></url></urlset>", encoding="utf-8")
         return root
 
     def test_each_channel_needs_its_base_url_and_label(self) -> None:
@@ -202,6 +202,17 @@ class TestVersionRouting(unittest.TestCase):
         # A config stylesheet is not prefixed with the base URL by Docusaurus
         root_css = build_check.check(self.build("/dev/", "dev (latest)", css="/katex.min.css"), "dev", self.VERSION)
         self.assertIn("local links outside base URL '/dev/': /katex.min.css", root_css)
+
+    def test_unrendered_markdown_and_math_fail(self) -> None:
+        root = self.build("/dev/", "dev (latest)")
+        page = root / "docs" / "api" / "x" / "index.html"
+        page.parent.mkdir(parents=True)
+        page.write_text('<article><p>see <a href="/dev/docs/api/network"><code>[Network](/docs/api/network)</code></a></p>'
+                        '<pre><code>a[0](/b)</code></pre><span class="katex-error" title="x">\\frac</span></article>',
+                        encoding="utf-8")
+        problems = build_check.check(root, "dev", self.VERSION)
+        self.assertIn("docs/api/x/index.html: 1 x markdown link shown as text", problems)
+        self.assertIn("docs/api/x/index.html: 1 x KaTeX error", problems)
 
     def test_download_page_has_no_hard_coded_release(self) -> None:
         page = (_WEBSITE / "src" / "pages" / "download.tsx").read_text(encoding="utf-8")

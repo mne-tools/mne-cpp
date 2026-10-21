@@ -17,7 +17,7 @@ class COMLIB::CommandManager
 
 Observer-side registry of [`Command`](/docs/api/com/command) schemas a subsystem accepts from the shared [`CommandParser`](/docs/api/com/command-parser).
 
-Holds a `QMap<QString,Command>` indexed by command keyword; when [`CommandParser`](/docs/api/com/command-parser) notifies attached managers of a new [`RawCommand`](/docs/api/com/raw-command), each manager looks the keyword up in its own map and either dispatches the corresponding `[`[Command](/docs/api/com/command)`](/docs/api/com/command)` (re-emitting `triggered` / `response`) or silently passes. Schemas can be added one at a time or bulk-loaded from a `QJsonDocument` matching the server’s self-described command list.
+Holds a `QMap<QString,Command>` indexed by command keyword; when [`CommandParser`](/docs/api/com/command-parser) notifies attached managers of a new [`RawCommand`](/docs/api/com/raw-command), each manager looks the keyword up in its own map and either dispatches the corresponding [`Command`](/docs/api/com/command) (re-emitting `triggered` / `response`) or silently passes. Schemas can be added one at a time or bulk-loaded from a `QJsonDocument` matching the server’s self-described command list.
 
 ### Inheritance
 
@@ -25,7 +25,7 @@ Holds a `QMap<QString,Command>` indexed by command keyword; when [`CommandParser
 classDiagram
     QObject <|-- CommandManager
     IObserver <|-- CommandManager
-    click IObserver "/docs/api/utils/i-observer"
+    click IObserver href "../../utils/i-observer/"
 ```
 
 ---

@@ -17,11 +17,11 @@ class MRILIB::MriMghIO
 
 Stateless decoder for FreeSurfer MGH and MGZ volume containers.
 
-Parses the 284-byte big-endian header, decodes the column-major voxel buffer for every supported MRI type (uchar, int, float, short) and reads the optional tag footer (scan parameters, `talairach.xfm` path) into an [`MriVolData`](/docs/api/mri/mri-vol-data). ``.mgz inputs are inflated in-memory through zlib's `MAX_WBITS+16` gunzip mode before parsing, so callers never need to know whether they are looking at the compressed or uncompressed variant.
+Parses the 284-byte big-endian header, decodes the column-major voxel buffer for every supported MRI type (uchar, int, float, short) and reads the optional tag footer (scan parameters, `talairach.xfm` path) into an [`MriVolData`](/docs/api/mri/mri-vol-data). .mgz inputs are inflated in-memory through zlib's `MAX_WBITS+16` gunzip mode before parsing, so callers never need to know whether they are looking at the compressed or uncompressed variant.
 
 Format reference: [https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat](https://surfer.nmr.mgh.harvard.edu/fswiki/FsTutorial/MghFormat)
 
-Ported from `make_mgh_cor_set()` in MNE C `mne_make_cor_set` by Matti Hamalainen.
+Ported from `make_mgh_cor_set()` in [MNE](/docs/api/mne/mne-class) C `mne_make_cor_set` by Matti Hamalainen.
 
 ```cpp title="src/examples/ex_mri/main.cpp"
 MriVolData mgh;

@@ -22,19 +22,12 @@ class INVLIB::InvLabelTimeCourse
 Extract ROI-level time courses from vertex-level source estimates.
 
 Provides the five standard aggregation modes used in MNE-Python's `extract_label_time_course()`:
-**mean**: Simple average across vertices in the label.
 
-
-**mean_flip**: Mean with sign-flip so that dominant orientation is positive.
-
-
-**pca_flip**: First PCA component, flipped to align with dominant sign.
-
-
-**max**: Maximum absolute value at each time point.
-
-
-**auto**: mean_flip for scalar STCs.
+- **mean**: Simple average across vertices in the label.
+- **mean_flip**: Mean with sign-flip so that dominant orientation is positive.
+- **pca_flip**: First PCA component, flipped to align with dominant sign.
+- **max**: Maximum absolute value at each time point.
+- **auto**: mean_flip for scalar STCs.
 
 ```cpp title="src/examples/ex_inv_api/main.cpp"
 const MatrixXd labelMean = InvLabelTimeCourse::extract(stc, {v1}, "mean");      // 1 x 421

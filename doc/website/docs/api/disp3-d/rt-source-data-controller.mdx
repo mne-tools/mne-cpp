@@ -20,31 +20,19 @@ class DISP3DLIB::RtSourceDataController
 It manages a background data worker thread, an optional background interpolation matrix worker thread, and a timer that drives the data flow.
 
 The controller provides a simple public API for:
-Pushing new source estimate data
 
-
-Setting interpolation matrices (LH/RH) directly or triggering on-the-fly recomputation when parameters change
-
-
-Configuring streaming parameters (speed, looping, averaging)
-
-
-Configuring visualization parameters (colormap, thresholds)
-
-
-Starting/stopping the streaming
+- Pushing new source estimate data
+- Setting interpolation matrices (LH/RH) directly or triggering on-the-fly recomputation when parameters change
+- Configuring streaming parameters (speed, looping, averaging)
+- Configuring visualization parameters (colormap, thresholds)
+- Starting/stopping the streaming
 
 On-the-fly recomputation:
-Set surface/source geometry via setInterpolationInfoLeft/Right()
 
-
-Configure interpolation function and cancel distance via `setInterpolationFunction()` / `setCancelDistance()`
-
-
-Call `recomputeInterpolation()` to trigger background computation
-
-
-The new matrices are automatically forwarded to the data worker
+- Set surface/source geometry via setInterpolationInfoLeft/Right()
+- Configure interpolation function and cancel distance via `setInterpolationFunction()` / `setCancelDistance()`
+- Call `recomputeInterpolation()` to trigger background computation
+- The new matrices are automatically forwarded to the data worker
 
 Usage:
 Create controller

@@ -330,8 +330,6 @@ public:
 
     //=========================================================================================================
     /**
-     * TODO: dest       - The id of the destination coordinate system (FIFFV_COORD_...)
-     *
      * Applies the coordinate transform to given coordinates and returns the transformed coordinates
      *
      * @param[in] rr         The coordinates.

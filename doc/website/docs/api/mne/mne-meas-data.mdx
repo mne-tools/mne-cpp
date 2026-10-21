@@ -17,7 +17,7 @@ class MNELIB::MNEMeasData
 
 Measurement data container for [`MNE`](/docs/api/mne/mne-class) inverse and dipole-fit computations.
 
-Replaces `*mneMeasData` / `mneMeasDataRec` from MNE-C ``mne_types.h``. Holds channel information, coordinate transforms, projection operators, and one or more [`[MNEMeasDataSet](/docs/api/mne/mne-meas-data-set)`](/docs/api/mne/mne-meas-data-set) epochs loaded from a FIFF evoked-response file.
+Replaces `*mneMeasData` / `mneMeasDataRec` from MNE-C ``mne_types.h``. Holds channel information, coordinate transforms, projection operators, and one or more [`MNEMeasDataSet`](/docs/api/mne/mne-meas-data-set) epochs loaded from a FIFF evoked-response file.
 
 ```cpp title="src/examples/ex_mne_api/main.cpp"
 // MNE-C measurement container: data set 1 of the evoked file, MEG and EEG channels, time-major

@@ -18,13 +18,10 @@ class UTILSLIB::PolhemusCoregistration
 Head–device coregistration engine driven by a Polhemus Fastrak.
 
 The class wires itself to a [`PolhemusConnection`](/docs/api/utils/polhemus-connection) and maintains:
-A continuously updated device-to-world transform (from the tracker station + user-supplied calibration offset).
 
-
-An [`AcquiredPoints`](/docs/api/utils/acquired-points) store filled by explicit capture calls or automatically on pen-button press.
-
-
-The computed head–device transform after `computeRegistration`.
+- A continuously updated device-to-world transform (from the tracker station + user-supplied calibration offset).
+- An [`AcquiredPoints`](/docs/api/utils/acquired-points) store filled by explicit capture calls or automatically on pen-button press.
+- The computed head–device transform after `computeRegistration`.
 
 ```cpp title="src/examples/ex_utils/main.cpp"
 PolhemusConnection connection;

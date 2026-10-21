@@ -17,7 +17,7 @@ class DISPLIB::ColorMap
 
 Static lookup helpers mapping scalar values to `QRgb` / `QColor` across all `DISPLIB` palettes.
 
-Each palette exists as a 256-row `Eigen::MatrixX3i` RGB table; the `valueToXxx` accessors interpolate between rows so callers can map any value in $$[0,1]$$ to a colour without instantiating an object. Bundled palettes include Viridis, Jet, Hot, HotNeg1, HotNeg2, Bone, Cool, RedBlue and the MNE-Python `hot` variant.
+Each palette exists as a 256-row `Eigen::MatrixX3i` RGB table; the `valueToXxx` accessors interpolate between rows so callers can map any value in $[0,1]$ to a colour without instantiating an object. Bundled palettes include Viridis, Jet, Hot, HotNeg1, HotNeg2, Bone, Cool, RedBlue and the MNE-Python `hot` variant.
 
 ```cpp title="src/examples/ex_disp_plots/main.cpp"
 const QRgb low = ColorMap::valueToColor(0.0, "Viridis"); // v in [0, 1]
