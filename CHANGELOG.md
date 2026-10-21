@@ -320,6 +320,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
   - Could overwrite its own input.
   - Wrote empty annotation and event files.
   - Annotation durations grew on every save.
+- MNE Analyze and MNE Scan: the butterfly plot showed an empty (on some screens
+  magenta) area instead of the averages, and its screenshots were empty.
 - MNE Analyze:
   - Events: event files never opened, trigger detection found no onsets, and
     reselecting a recording discarded its events.

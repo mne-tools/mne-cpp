@@ -10,7 +10,7 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    Implementation of the ButterflyView QRhi butterfly evoked viewer (shader setup, vertex packing, draw loop).
+ * @brief    Implementation of the ButterflyView butterfly evoked viewer.
  */
 
 //=============================================================================================================
@@ -32,7 +32,6 @@
 #include <QPainterPath>
 #include <QDebug>
 #include <QSvgGenerator>
-#include <QSurfaceFormat>
 #include <QSettings>
 
 //=============================================================================================================
@@ -47,8 +46,8 @@ using namespace DISPLIB;
 
 ButterflyView::ButterflyView(const QString& sSettingsPath,
                              QWidget* parent,
-                             [[maybe_unused]] Qt::WindowFlags f)
-: QRhiWidget(parent)
+                             Qt::WindowFlags f)
+: QWidget(parent, f)
 , m_bShowMAG(true)
 , m_bShowGRAD(true)
 , m_bShowEEG(true)
@@ -62,18 +61,6 @@ ButterflyView::ButterflyView(const QString& sSettingsPath,
 , m_qMapAverageColor(QSharedPointer<QMap<QString, QColor>>::create())
 {
     m_sSettingsPath = sSettingsPath;
-
-#if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
-    setApi(QRhiWidget::Api::OpenGL);
-#elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
-    setApi(QRhiWidget::Api::Metal);
-#elif defined(Q_OS_WIN)
-    setApi(QRhiWidget::Api::Direct3D11);
-#else
-    setApi(QRhiWidget::Api::OpenGL);
-#endif
-    setSampleCount(1);
-    setAttribute(Qt::WA_NativeWindow);
 
     loadSettings();
 }
@@ -89,7 +76,7 @@ ButterflyView::~ButterflyView()
 
 void ButterflyView::updateViewport()
 {
-    // No-op: ButterflyView now derives from QRhiWidget directly.
+    update();
 }
 
 //=============================================================================================================
@@ -172,12 +159,7 @@ const QColor& ButterflyView::getBackgroundColor()
 
 void ButterflyView::takeScreenshot(const QString& fileName)
 {
-    //
-    // The curves are drawn by the render pass on the GPU, so QWidget::render()
-    // would produce an empty frame here: it only replays the CPU paint path.
-    // Ask the RHI for the rendered framebuffer instead.
-    //
-    const QImage frame = grabFramebuffer();
+    const QImage frame = grab().toImage();
 
     if (fileName.contains(".svg", Qt::CaseInsensitive)) {
         QSvgGenerator svgGen;
@@ -302,7 +284,7 @@ void ButterflyView::loadSettings()
 
 //=============================================================================================================
 
-void ButterflyView::paintEvent(QPaintEvent* event)
+void ButterflyView::paintEvent(QPaintEvent* /*event*/)
 {
     QPainter painter(this);
 
@@ -465,8 +447,6 @@ void ButterflyView::paintEvent(QPaintEvent* event)
             }
         }
     }
-
-    return QRhiWidget::paintEvent(event);
 }
 
 //=============================================================================================================

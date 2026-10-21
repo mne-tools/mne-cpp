@@ -1887,6 +1887,12 @@ void TestDispViewers2::butterflyView_drawsAveragesAcrossTheFullWidth()
     };
     QVERIFY(curveAt(52));
     QVERIFY2(curveAt(392), "decimated curve ends before the right edge");
+
+    // The screenshot holds the same QPainter-drawn frame
+    QTemporaryDir dir;
+    const QString shot = dir.filePath(QStringLiteral("butterfly.png"));
+    view.takeScreenshot(shot);
+    QCOMPARE(QImage(shot).convertToFormat(QImage::Format_RGB32), frame.convertToFormat(QImage::Format_RGB32));
 }
 
 //=============================================================================================================

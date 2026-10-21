@@ -11,12 +11,11 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    QRhi-accelerated butterfly plot overlaying every channel of one or more averaged conditions.
+ * @brief    Butterfly plot overlaying every channel of one or more averaged conditions.
  *
- * ButterflyView is a @c QRhiWidget that pushes all averaged traces of
- * the active @ref DISPLIB::EvokedSetModel through a single vertex/fragment
- * shader pair, giving a smooth zoomable rendering even with hundreds
- * of channels. Per-modality visibility (@c MAG / @c GRAD / @c EEG) is
+ * ButterflyView is a @c QWidget that paints all averaged traces of
+ * the active @ref DISPLIB::EvokedSetModel with @c QPainter, decimated to
+ * the widget width. Per-modality visibility (@c MAG / @c GRAD / @c EEG) is
  * toggled through @ref DISPLIB::ModalitySelectionView and the colour /
  * selection of conditions through @ref DISPLIB::AverageSelectionView. The
  * widget is the workhorse evoked viewer in MNE-Scan and is intended
@@ -37,7 +36,7 @@
 //=============================================================================================================
 
 #include <QMap>
-#include <QRhiWidget>
+#include <QWidget>
 #include <QtGlobal>
 
 
@@ -65,14 +64,13 @@ class ChannelInfoModel;
 
 //=============================================================================================================
 /**
- * @brief QRhi-accelerated butterfly viewer overlaying every channel of one or more averaged conditions.
+ * @brief Butterfly viewer overlaying every channel of one or more averaged conditions.
  *
- * Renders all visible traces in a single shader pass for smooth
- * zoom / pan; visibility per modality and per condition is driven by
+ * Paints all visible traces with QPainter; visibility per modality and per condition is driven by
  * @ref ModalitySelectionView and @ref AverageSelectionView. Used as
  * the main evoked viewer in MNE-Scan.
  */
-class DISPSHARED_EXPORT ButterflyView : public QRhiWidget
+class DISPSHARED_EXPORT ButterflyView : public QWidget
 {
     Q_OBJECT
 
