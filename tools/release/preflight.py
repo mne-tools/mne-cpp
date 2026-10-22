@@ -47,11 +47,16 @@ def file_problems(root: Path, version: str) -> list[str]:
         if found != version:
             problems.append(f"{name} carries {found}, expected {version}")
     citation = (root / "CITATION.cff").read_text(encoding="utf-8")
-    if not re.search(r'^date-released:\s*"\d{4}-\d{2}-\d{2}"\s*$', citation, re.M):
+    released = re.search(r'^date-released:\s*"(\d{4}-\d{2}-\d{2})"\s*$', citation, re.M)
+    if not released:
         problems.append("CITATION.cff has no date-released in YYYY-MM-DD form")
     changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
-    if not re.search(rf"^## \[{re.escape(version)}\] - \d{{4}}-\d{{2}}-\d{{2}}\s*$", changelog, re.M):
+    dated = re.search(rf"^## \[{re.escape(version)}\] - (\d{{4}}-\d{{2}}-\d{{2}})\s*$", changelog, re.M)
+    if not dated:
         problems.append(f"CHANGELOG.md has no dated '## [{version}] - YYYY-MM-DD' section")
+    elif released and released.group(1) != dated.group(1):
+        problems.append(f"CITATION.cff date-released {released.group(1)} differs from the CHANGELOG date "
+                        f"{dated.group(1)}")
     return problems
 
 

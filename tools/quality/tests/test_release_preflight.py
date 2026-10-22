@@ -50,6 +50,9 @@ class PreflightTest(unittest.TestCase):
 
     def test_every_invariant_is_enforced(self):
         self.assertEqual(preflight.file_problems(self.root, "2.4.0"), [])
+        (self.root / "CHANGELOG.md").write_text("## [2.4.0] - 2026-10-21\n")
+        self.assertEqual(preflight.file_problems(self.root, "2.4.0"),
+                         ["CITATION.cff date-released 2026-10-20 differs from the CHANGELOG date 2026-10-21"])
         (self.root / "doc/Doxyfile").write_text('PROJECT_NUMBER         = "2.4.0-dev"\n')
         (self.root / "CHANGELOG.md").write_text("## [2.4.0] - Unreleased\n## [2.3.0] - 2026-06-13\n")
         self.assertEqual(preflight.file_problems(self.root, "2.4.0"),
