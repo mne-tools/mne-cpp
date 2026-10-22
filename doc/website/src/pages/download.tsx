@@ -76,76 +76,35 @@ interface PlatformDef {
     match: (name: string) => boolean;
 }
 
+/** Release and dev_build assets share these suffixes (tools/release/verify_release.py REQUIRED). */
+const asset = (label: string, suffix: string): PlatformDef => ({ label, match: (n) => n.endsWith(suffix) });
+
 const INSTALLER_PLATFORMS: PlatformDef[] = [
-    { label: 'Windows (.exe)', match: (n) => n.endsWith('.exe') },
-    { label: 'macOS (.dmg)', match: (n) => n.endsWith('.dmg') },
-    { label: 'Linux (.run)', match: (n) => n.endsWith('.run') },
+    asset('Windows (x86_64, .exe)', 'windows-installer-x86_64.exe'),
+    asset('macOS (ARM64, .dmg)', 'macos-installer-arm64.dmg'),
+    asset('Linux (x86_64, .run)', 'linux-installer-x86_64.run'),
 ];
 
-const DEV_DYNAMIC: PlatformDef[] = [
-    { label: 'Windows (x86_64)', match: (n) => n.includes('windows-dynamic') },
-    { label: 'Linux (x86_64)', match: (n) => n.includes('linux-dynamic') },
-    { label: 'macOS (ARM64)', match: (n) => n.includes('macos-dynamic') },
+const DYNAMIC_PLATFORMS: PlatformDef[] = [
+    asset('Windows (x86_64)', 'windows-dynamic-x86_64.zip'),
+    asset('Linux (x86_64)', 'linux-dynamic-x86_64.tar.gz'),
+    asset('macOS (ARM64, .dmg)', 'macos-dynamic-arm64.dmg'),
+    asset('macOS (ARM64, .tar.gz)', 'macos-dynamic-arm64.tar.gz'),
 ];
 
-const DEV_STATIC: PlatformDef[] = [
-    { label: 'Windows (x86_64)', match: (n) => n.includes('windows-static') },
-    { label: 'Linux (x86_64)', match: (n) => n.includes('linux-static') },
-    { label: 'macOS (ARM64)', match: (n) => n.includes('macos-static') },
+const STATIC_PLATFORMS: PlatformDef[] = [
+    asset('Windows (x86_64)', 'windows-static-x86_64.zip'),
+    asset('Linux (x86_64)', 'linux-static-x86_64.tar.gz'),
+    asset('macOS (ARM64)', 'macos-static-arm64.tar.gz'),
 ];
 
-const DEV_WASM: PlatformDef[] = [
+const WASM_PLATFORMS: PlatformDef[] = [
     { label: 'WebAssembly', match: (n) => n.includes('wasm') },
-];
-
-const STABLE_DYNAMIC: PlatformDef[] = [
-    { label: 'Windows (x86_64)', match: (n) => n.includes('windows-dynamic') },
-    { label: 'Linux (x86_64)', match: (n) => n.includes('linux-dynamic') },
-    { label: 'macOS (x86_64)', match: (n) => n.includes('macos-dynamic') },
-];
-
-const STABLE_STATIC: PlatformDef[] = [
-    { label: 'Windows (x86_64)', match: (n) => n.includes('windows-static') },
-    { label: 'Linux (x86_64)', match: (n) => n.includes('linux-static') },
-    { label: 'macOS (x86_64)', match: (n) => n.includes('macos-static') },
 ];
 
 /* ────────────────────────────────────────────────────────────────
  *  Components
  * ──────────────────────────────────────────────────────────────── */
-
-function AssetTable({ assets, platforms }: { assets: GitHubAsset[]; platforms: PlatformDef[] }) {
-    const rows = platforms
-        .map((p) => ({ platform: p, asset: assets.find((a) => p.match(a.name)) }))
-        .filter((r) => r.asset);
-
-    if (rows.length === 0) return null;
-
-    return (
-        <table className="dl-table">
-            <thead>
-                <tr>
-                    <th>Platform</th>
-                    <th>File</th>
-                    <th className="dl-table__right">Size</th>
-                </tr>
-            </thead>
-            <tbody>
-                {rows.map((r, i) => (
-                    <tr key={i}>
-                        <td>{r.platform.label}</td>
-                        <td>
-                            <a href={r.asset!.browser_download_url} rel="noopener noreferrer">
-                                {r.asset!.name}
-                            </a>
-                        </td>
-                        <td className="dl-table__right dl-table__mono">{fmtSize(r.asset!.size)}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    );
-}
 
 /** Compact asset list for side-by-side layout */
 function AssetList({ assets, platforms, heading }: { assets: GitHubAsset[]; platforms: PlatformDef[]; heading?: string }) {
@@ -394,11 +353,11 @@ export default function Download(): React.JSX.Element {
                                             {stableRelease.assets.length > 0 && (
                                                 <>
                                                     <AssetList assets={stableRelease.assets} platforms={INSTALLER_PLATFORMS} heading="Installers" />
-                                                    <AssetList assets={stableRelease.assets} platforms={STABLE_DYNAMIC} heading="Dynamic Binaries" />
+                                                    <AssetList assets={stableRelease.assets} platforms={DYNAMIC_PLATFORMS} heading="Dynamic Binaries" />
                                                     <p className="dl-variant-note">Shared libraries. Smaller download. Full plugin support.</p>
-                                                    <AssetList assets={stableRelease.assets} platforms={STABLE_STATIC} heading="Static Binaries" />
+                                                    <AssetList assets={stableRelease.assets} platforms={STATIC_PLATFORMS} heading="Static Binaries" />
                                                     <p className="dl-variant-note">Self-contained. No external dependencies. No plugin support.</p>
-                                                    <AssetList assets={stableRelease.assets} platforms={DEV_WASM} heading="WebAssembly" />
+                                                    <AssetList assets={stableRelease.assets} platforms={WASM_PLATFORMS} heading="WebAssembly" />
                                                 </>
                                             )}
 
@@ -435,11 +394,11 @@ export default function Download(): React.JSX.Element {
                                             {devRelease.assets.length > 0 && (
                                                 <>
                                                     <AssetList assets={devRelease.assets} platforms={INSTALLER_PLATFORMS} heading="Installers" />
-                                                    <AssetList assets={devRelease.assets} platforms={DEV_DYNAMIC} heading="Dynamic Binaries" />
+                                                    <AssetList assets={devRelease.assets} platforms={DYNAMIC_PLATFORMS} heading="Dynamic Binaries" />
                                                     <p className="dl-variant-note">Shared libraries. Smaller download. Full plugin support.</p>
-                                                    <AssetList assets={devRelease.assets} platforms={DEV_STATIC} heading="Static Binaries" />
+                                                    <AssetList assets={devRelease.assets} platforms={STATIC_PLATFORMS} heading="Static Binaries" />
                                                     <p className="dl-variant-note">Self-contained. No external dependencies. No plugin support.</p>
-                                                    <AssetList assets={devRelease.assets} platforms={DEV_WASM} heading="WebAssembly" />
+                                                    <AssetList assets={devRelease.assets} platforms={WASM_PLATFORMS} heading="WebAssembly" />
                                                 </>
                                             )}
 

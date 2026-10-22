@@ -235,6 +235,19 @@ class TestVersionRouting(unittest.TestCase):
         page = (_WEBSITE / "src" / "pages" / "download.tsx").read_text(encoding="utf-8")
         self.assertNotRegex(page, r"releases/tag/v\d|tag_name: 'v\d")
 
+    def test_download_page_links_each_release_asset_by_its_exact_name(self) -> None:
+        sys.path.insert(0, str(_REPO_ROOT / "tools" / "release"))
+        import verify_release  # noqa: PLC0415
+
+        page = (_WEBSITE / "src" / "pages" / "download.tsx").read_text(encoding="utf-8")
+        rows = re.findall(r"asset\('([^']+)', '([^']+)'\)", page)
+        suffixes = [suffix for _, suffix in rows]
+        required = [s for platform in verify_release.REQUIRED.values() for s in platform]
+        # Each release asset is offered exactly once, so an installer row cannot pick up another .dmg
+        self.assertEqual(sorted(suffixes), sorted(required))
+        for label, suffix in rows:
+            self.assertIn("ARM64" if "arm64" in suffix else "x86_64", label, suffix)
+
     def test_site_version_matches_the_project(self) -> None:
         config = (_WEBSITE / "docusaurus.config.ts").read_text(encoding="utf-8")
         declared = re.search(r"^const stableVersion = '([^']+)'", config, re.MULTILINE).group(1)
