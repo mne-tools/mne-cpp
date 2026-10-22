@@ -248,6 +248,18 @@ class TestVersionRouting(unittest.TestCase):
         for label, suffix in rows:
             self.assertIn("ARM64" if "arm64" in suffix else "x86_64", label, suffix)
 
+    def test_stated_macos_minimum_is_the_build_target(self) -> None:
+        sys.path.insert(0, str(_REPO_ROOT / "tools" / "release"))
+        import verify_release  # noqa: PLC0415
+
+        cmake = (_REPO_ROOT / "src" / "CMakeLists.txt").read_text(encoding="utf-8")
+        target = re.search(r'set\(CMAKE_OSX_DEPLOYMENT_TARGET "([\d.]+)"', cmake)
+        self.assertIsNotNone(target, "src/CMakeLists.txt sets no macOS deployment target")
+        self.assertLess(cmake.index("CMAKE_OSX_DEPLOYMENT_TARGET"), cmake.index("project(mne_cpp"))
+        self.assertEqual(verify_release.MACOS_MINIMUM, target.group(1))
+        page = (_WEBSITE / "src" / "pages" / "download.tsx").read_text(encoding="utf-8")
+        self.assertIn(f"<td>macOS {target.group(1)} or later</td>", page)
+
     def test_site_version_matches_the_project(self) -> None:
         config = (_WEBSITE / "docusaurus.config.ts").read_text(encoding="utf-8")
         declared = re.search(r"^const stableVersion = '([^']+)'", config, re.MULTILINE).group(1)

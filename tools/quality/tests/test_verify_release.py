@@ -6,6 +6,7 @@
 import hashlib
 import io
 import json
+import struct
 import sys
 import tarfile
 import tempfile
@@ -108,6 +109,26 @@ class VerifyReleaseTest(unittest.TestCase):
         work.mkdir()
         self.assertEqual(verify_release.smoke(archive, work), [
             "linked.tar.gz: mne-cpp/resources links outside the archive (/home/runner/work/mne-cpp/mne-cpp/resources)"])
+
+    def test_macos_binaries_must_run_on_the_documented_minimum(self):
+        def macho(minos, fat=False):
+            # 64-bit Mach-O header + one LC_BUILD_VERSION (platform macOS, minos, sdk 26.5)
+            version = lambda v: (int(v.split(".")[0]) << 16) | (int(v.split(".")[1]) << 8)  # noqa: E731
+            thin = struct.pack("<7I4x", 0xFEEDFACF, 0x0100000C, 0, 2, 1, 24, 0) + struct.pack(
+                "<6I", 0x32, 24, 1, version(minos), version("26.5"), 0)
+            if not fat:
+                return thin
+            return struct.pack(">2I", 0xCAFEBABE, 1) + struct.pack(">5I", 0x0100000C, 0, 28, len(thin), 0) + thin
+
+        work = self.assets / "work"
+        (work / "lib").mkdir(parents=True)
+        (work / "lib" / "libmne_fiff.dylib").write_bytes(macho("26.0"))
+        (work / "lib" / "QtCore").write_bytes(macho("14.4", fat=True))
+        (work / "lib" / "readme.txt").write_text("not a binary")
+        self.assertEqual(verify_release.macos_minimum_problems(work, "14.4"),
+                         ["lib/libmne_fiff.dylib needs macOS 26.0, documented minimum is 14.4"])
+        (work / "lib" / "libmne_fiff.dylib").write_bytes(macho("14.0"))
+        self.assertEqual(verify_release.macos_minimum_problems(work, "14.4"), [])
 
 
 if __name__ == "__main__":

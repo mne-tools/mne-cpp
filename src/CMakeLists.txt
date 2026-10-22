@@ -5,6 +5,8 @@
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 cmake_minimum_required(VERSION 3.15)
+# Without it binaries require the build machine's macOS; 14.4 is the bundled Qt's minimum
+set(CMAKE_OSX_DEPLOYMENT_TARGET "14.4" CACHE STRING "Minimum macOS version")
 project(mne_cpp LANGUAGES CXX)
 
 set(MNE_CPP_VERSION_MAJOR 2)

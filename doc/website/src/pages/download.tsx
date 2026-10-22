@@ -683,12 +683,12 @@ Get-FileHash <downloaded-file> -Algorithm SHA256`}</code></pre>
                                     </tr>
                                     <tr>
                                         <td>macOS</td>
-                                        <td>macOS 12 (Monterey) or later</td>
-                                        <td>ARM64 / x86_64</td>
+                                        <td>macOS 14.4 or later</td>
+                                        <td>ARM64</td>
                                     </tr>
                                     <tr>
                                         <td>Linux</td>
-                                        <td>Ubuntu 20.04 or equivalent</td>
+                                        <td>Ubuntu 24.04 or equivalent (glibc 2.38, GCC 13 libstdc++)</td>
                                         <td>x86_64</td>
                                     </tr>
                                     <tr>

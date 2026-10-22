@@ -24,6 +24,7 @@ import hashlib
 import json
 import os
 import shutil
+import struct
 import subprocess
 import sys
 import tarfile
@@ -40,6 +41,9 @@ REQUIRED = {
 # Release signature status every signed asset must reach with --require-signed
 SIGNED = {".exe": "signed", ".zip": "signed", ".dmg": "signed-notarized"}
 SMOKE_TOOL = "mne_check_surface"
+# Oldest macOS the release runs on: CMAKE_OSX_DEPLOYMENT_TARGET in src/CMakeLists.txt and the download page
+MACOS_MINIMUM = "14.4"
+_LC_BUILD_VERSION = 0x32
 
 
 def _sha256(path: Path) -> str:
@@ -75,6 +79,50 @@ def check_assets(assets: Path, prefix: str, platforms: list[str], require_signed
             wanted = "unsigned" if unsigned_macos and name.endswith(".dmg") else SIGNED.get(Path(name).suffix)
             if wanted and require_signed and name in names and evidence.get(name) != wanted:
                 problems.append(f"{name} is {evidence.get(name, 'not recorded')}, expected {wanted}")
+    return problems
+
+
+def _slice_minos(stream, offset: int) -> list[tuple[int, int, int]]:
+    stream.seek(offset)
+    magic, _, _, _, ncmds, _, _ = struct.unpack("<7I", stream.read(28))
+    if magic != 0xFEEDFACF:
+        return []
+    stream.seek(offset + 32)
+    found = []
+    for _ in range(ncmds):
+        cmd, size = struct.unpack("<2I", stream.read(8))
+        body = stream.read(size - 8)
+        if cmd == _LC_BUILD_VERSION:
+            minos = struct.unpack_from("<I", body, 4)[0]
+            found.append((minos >> 16, (minos >> 8) & 0xFF, minos & 0xFF))
+    return found
+
+
+def _macho_minos(path: Path) -> list[tuple[int, int, int]]:
+    """Minimum macOS of every 64-bit slice of a thin or universal Mach-O file."""
+    with path.open("rb") as stream:
+        head = stream.read(8)
+        if len(head) < 8:
+            return []
+        if struct.unpack(">I", head[:4])[0] == 0xCAFEBABE:
+            # Java class files share this magic; their "count" is a class file version (>= 45)
+            count = struct.unpack(">I", head[4:])[0]
+            if count > 8:
+                return []
+            offsets = [struct.unpack(">5I", stream.read(20))[2] for _ in range(count)]
+            return [v for offset in offsets for v in _slice_minos(stream, offset)]
+        return _slice_minos(stream, 0) if struct.unpack("<I", head[:4])[0] == 0xFEEDFACF else []
+
+
+def macos_minimum_problems(root: Path, minimum: str) -> list[str]:
+    """Report every Mach-O file under @p root that needs a newer macOS than @p minimum."""
+    wanted = tuple(int(x) for x in minimum.split(".")) + (0,) * (3 - minimum.count(".") - 1)
+    problems = []
+    for path in sorted(p for p in root.rglob("*") if p.is_file() and not p.is_symlink()):
+        newest = max(_macho_minos(path), default=None)
+        if newest and newest > wanted:
+            shown = ".".join(map(str, newest[:3] if newest[2] else newest[:2]))
+            problems.append(f"{path.relative_to(root).as_posix()} needs macOS {shown}, documented minimum is {minimum}")
     return problems
 
 
@@ -119,6 +167,8 @@ def main(argv: list[str] | None = None) -> int:
         workdir = Path(tempfile.mkdtemp())
         try:
             problems += smoke(archive, workdir)
+            if args.platform == "macos":
+                problems += macos_minimum_problems(workdir, MACOS_MINIMUM)
         finally:
             shutil.rmtree(workdir, ignore_errors=True)
     for problem in problems:

@@ -315,6 +315,8 @@ desktop, and signed installers. 915 commits since v2.3.0.
   killed at launch because packaging invalidated their signatures.
 - macOS and Linux dynamic packages: `resources` (layouts, styles, server
   configuration) was a link to the build machine instead of the files.
+- macOS packages only started on the build machine's macOS (26); they now
+  run on macOS 14.4 and later, the minimum of the bundled Qt.
 - MNE Browse:
   - Saved EEG/EOG/STI channels 3276.8 times too large.
   - Could overwrite its own input.
