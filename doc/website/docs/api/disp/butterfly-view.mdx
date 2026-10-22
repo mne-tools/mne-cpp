@@ -15,15 +15,15 @@ sidebar_position: 12
 class DISPLIB::ButterflyView
 ```
 
-QRhi-accelerated butterfly viewer overlaying every channel of one or more averaged conditions.
+Butterfly viewer overlaying every channel of one or more averaged conditions.
 
-Renders all visible traces in a single shader pass for smooth zoom / pan; visibility per modality and per condition is driven by [`ModalitySelectionView`](/docs/api/disp/modality-selection-view) and [`AverageSelectionView`](/docs/api/disp/average-selection-view). Used as the main evoked viewer in MNE-Scan.
+Paints all visible traces with QPainter; visibility per modality and per condition is driven by [`ModalitySelectionView`](/docs/api/disp/modality-selection-view) and [`AverageSelectionView`](/docs/api/disp/average-selection-view). Used as the main evoked viewer in MNE-Scan.
 
 ### Inheritance
 
 ```mermaid
 classDiagram
-    QRhiWidget <|-- ButterflyView
+    QWidget <|-- ButterflyView
 ```
 
 ---
