@@ -9,6 +9,7 @@ workflow must agree with that declaration.
 
 import json
 import re
+import subprocess
 import sys
 import unittest
 from pathlib import Path
@@ -66,6 +67,18 @@ class WorkflowContracts(unittest.TestCase):
             self.assertIn(step, candidate)
         self.assertNotRegex(candidate, r"continue-on-error|inputs:\s*\n\s+skip")
         self.assertIn("release-candidate.yml --commit", (WORKFLOWS / "main.yml").read_text(encoding="utf-8"))
+
+    def test_release_notes_are_the_changelog_section(self) -> None:
+        text = (WORKFLOWS / "main.yml").read_text(encoding="utf-8")
+        self.assertNotIn("--generate-notes", text)
+        extract = re.search(r"awk (-v v=\"## \[\$\{TAG#v\}\]\" '[^']+') CHANGELOG\.md", text)
+        self.assertIsNotNone(extract)
+        self.assertIn("--notes-file", text)
+        changelog = "# Changelog\n\n## [2.4.0] - 2026-10-22\n\nNew.\n\n## [2.3.0] - 2026-04-28\n\nOld.\n"
+        script = extract.group(1).replace("${TAG#v}", "2.4.0")
+        notes = subprocess.run(["sh", "-c", f"awk {script}"], input=changelog, capture_output=True,
+                               text=True, check=True).stdout
+        self.assertEqual(notes.strip(), "New.")
 
     def test_unsigned_macos_is_one_explicit_switch(self) -> None:
         # G7: macOS ships unsigned only when the owner sets MACOS_SIGNING=unavailable, never on a missing secret

@@ -321,9 +321,14 @@ jobs:
             --title "MNE-CPP $TAG" \
             --target ${{ github.sha }}
         else
+          awk -v v="## [${TAG#v}]" 'index($0, v) == 1 {f = 1; next} f && /^## \[/ {exit} f' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "::error::CHANGELOG.md has no section for $TAG"
+            exit 1
+          fi
           gh release create "$TAG" \
             --title "MNE-CPP $TAG" \
-            --generate-notes \
+            --notes-file release-notes.md \
             --target ${{ github.sha }}
         fi
 
