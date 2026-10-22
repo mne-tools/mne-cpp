@@ -94,6 +94,9 @@ class ArtifactEvidenceTest(unittest.TestCase):
         self.assertTrue(first.startswith("Release text.\n"))
         self.assertIn("| `mne-cpp-macos-installer.dmg` | **unsigned** |", first)
         self.assertIn("| `mne-cpp-windows-installer.exe` | signed |", first)
+        self.assertIn("xattr -dr com.apple.quarantine", first)
+        self.assertNotIn("xattr", artifact_evidence.notes_section(
+            [{"name": "mne-cpp-macos-installer.dmg", "signature": "signed-notarized"}]))
         # A rerun replaces the section instead of appending a second one
         self.assertEqual(artifact_evidence.main(args), 0)
         self.assertEqual(notes.read_text(), first)

@@ -138,7 +138,13 @@ def notes_section(records: list[dict]) -> str:
              "macOS).", "", "| Asset | Verification |", "| --- | --- |"]
     lines += [f"| `{r['name']}` | {_DESCRIPTION[r['signature']]} |" for r in records
               if r["signature"] != "checksum-only"]
-    lines += ["| all other assets | SHA-256 checksum |", NOTES_END]
+    lines += ["| all other assets | SHA-256 checksum |"]
+    if any(r["name"].endswith(".dmg") and r["signature"] == "unsigned" for r in records):
+        lines += ["", "The macOS builds are not signed with an Apple Developer ID, so macOS blocks "
+                  "them on first launch. Allow them in System Settings > Privacy & Security > "
+                  "Open Anyway, or remove the quarantine flag from the downloaded image with "
+                  "`xattr -dr com.apple.quarantine <file>.dmg` before opening it."]
+    lines += [NOTES_END]
     return "\n".join(lines)
 
 

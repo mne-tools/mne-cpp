@@ -64,6 +64,28 @@ class VerifyReleaseTest(unittest.TestCase):
         self.assertNotIn(f"{PREFIX}-macos-installer-arm64.dmg is unsigned, expected signed-notarized",
                          self.check(signed=False))
 
+    def test_unsigned_macos_release_requires_dmgs_recorded_as_unsigned(self):
+        def check():
+            return verify_release.check_assets(self.assets, PREFIX, sorted(verify_release.REQUIRED), True,
+                                               unsigned_macos=True)
+
+        dmg = f"{PREFIX}-macos-installer-arm64.dmg"
+        self.assertIn(f"{dmg} is signed-notarized, expected unsigned", check())
+        evidence = json.loads((self.assets / "release-evidence.json").read_text())
+        for record in evidence:
+            if record["name"].endswith(".dmg"):
+                record["signature"] = "unsigned"
+        (self.assets / "release-evidence.json").write_text(json.dumps(evidence))
+        self.write_sums()
+        self.assertEqual(check(), [])
+        evidence[-1]["signature"] = "unsigned"
+        for record in evidence:
+            if record["name"].endswith(".exe"):
+                record["signature"] = "unsigned"
+        (self.assets / "release-evidence.json").write_text(json.dumps(evidence))
+        self.write_sums()
+        self.assertIn(f"{PREFIX}-windows-installer-x86_64.exe is unsigned, expected signed", check())
+
     def test_smoke_reports_an_archive_without_the_tool(self):
         archive = self.assets / "empty.tar.gz"
         with tarfile.open(archive, "w:gz") as t:

@@ -94,7 +94,7 @@ jobs:
       run: |
         brew list create-dmg >/dev/null 2>&1 || brew install create-dmg
     - name: Import Apple Developer ID certificate
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/') && vars.MACOS_SIGNING != 'unavailable'
       uses: ./.github/actions/macos-codesign-setup
       with:
         certificate-p12-base64: ${{ secrets.APPLE_DEVELOPER_ID_P12 }}

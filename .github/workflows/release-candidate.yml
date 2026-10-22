@@ -70,10 +70,16 @@ jobs:
         APPLE_ID: ${{ secrets.APPLE_ID }}
         APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        MACOS_UNSIGNED: ${{ vars.MACOS_SIGNING == 'unavailable' }}
       run: |
         missing=0
-        for name in SIGNPATH_API_TOKEN SIGNPATH_ORGANIZATION_ID APPLE_DEVELOPER_ID_P12 \
-                    APPLE_DEVELOPER_ID_PASSWORD APPLE_ID APPLE_APP_PASSWORD APPLE_TEAM_ID; do
+        required="SIGNPATH_API_TOKEN SIGNPATH_ORGANIZATION_ID"
+        if [ "$MACOS_UNSIGNED" = true ]; then
+          echo "macOS ships unsigned (MACOS_SIGNING=unavailable); the release notes record it." | tee -a "$GITHUB_STEP_SUMMARY"
+        else
+          required="$required APPLE_DEVELOPER_ID_P12 APPLE_DEVELOPER_ID_PASSWORD APPLE_ID APPLE_APP_PASSWORD APPLE_TEAM_ID"
+        fi
+        for name in $required; do
           if [ -z "${!name}" ]; then
             echo "::error::$name is not configured"
             missing=1

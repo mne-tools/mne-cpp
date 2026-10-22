@@ -67,6 +67,19 @@ class WorkflowContracts(unittest.TestCase):
         self.assertNotRegex(candidate, r"continue-on-error|inputs:\s*\n\s+skip")
         self.assertIn("release-candidate.yml --commit", (WORKFLOWS / "main.yml").read_text(encoding="utf-8"))
 
+    def test_unsigned_macos_is_one_explicit_switch(self) -> None:
+        # G7: macOS ships unsigned only when the owner sets MACOS_SIGNING=unavailable, never on a missing secret
+        switch = "vars.MACOS_SIGNING"
+        for name in ("release-macos.yml", "release-installer.yml"):
+            text = (WORKFLOWS / name).read_text(encoding="utf-8")
+            imports = re.findall(r"- name: Import Apple Developer ID certificate\n\s+if: ([^\n]+)", text)
+            self.assertTrue(imports, name)
+            for condition in imports:
+                self.assertIn(f"{switch} != 'unavailable'", condition, name)
+        self.assertIn(f"{switch} == 'unavailable'", (WORKFLOWS / "release-candidate.yml").read_text(encoding="utf-8"))
+        self.assertIn(f"unsigned_macos: ${{{{ {switch} == 'unavailable' }}}}",
+                      (WORKFLOWS / "main.yml").read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

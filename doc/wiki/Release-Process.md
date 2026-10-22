@@ -119,6 +119,13 @@ signs, notarizes and staples each `.dmg`, then checks it with
 `APPLE_ID`, `APPLE_APP_PASSWORD` (app-specific password) and `APPLE_TEAM_ID`.
 The `.tar.gz` archives are covered by `SHA256SUMS` only.
 
+To release without an Apple Developer ID, set the repository variable
+`MACOS_SIGNING` to `unavailable`. The macOS builds are then only ad-hoc signed,
+the release candidate no longer asks for the Apple secrets, the release notes
+mark both `.dmg` images as unsigned and explain how to open them, and the
+release verification requires exactly that. Delete the variable once the Apple
+secrets are configured.
+
 ## Post-release
 
 1. Verify all artifacts are attached to the release page.
