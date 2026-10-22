@@ -2,7 +2,7 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
-## [2.4.0] - Unreleased
+## [2.4.0] - 2026-10-22
 
 **Theme: correctness you can check.** v2.4.0 compares MNE-CPP against
 MNE-Python 1.11 wherever both compute the same thing. That comparison found and
