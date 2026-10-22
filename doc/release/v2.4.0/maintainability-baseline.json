@@ -3,7 +3,7 @@
   "generated_by": "tools/quality/audit_maintainability.py",
   "policy": "tools/quality/maintainability_policy.json",
   "scanned_files": 1503,
-  "scanned_lines": 393834,
+  "scanned_lines": 393812,
   "metrics": {
     "null_macro": {
       "total": 0,
