@@ -127,11 +127,10 @@ jobs:
         fi
         echo "Pipeline exercised end to end: MOCK — NOT SIGNED OR NOTARIZED" | tee -a "$GITHUB_STEP_SUMMARY"
 
+    # The runner resets GITHUB_REF for every step, so the tag is set on the command itself
     - name: Mock signing refuses release tags
-      env:
-        GITHUB_REF: refs/tags/v0.0.0
       run: |
-        if python3 tools/release/macos_signing.py check-credentials --mode mock; then
+        if GITHUB_REF=refs/tags/v0.0.0 python3 tools/release/macos_signing.py check-credentials --mode mock; then
           echo "::error::mock mode ran for a release tag"
           exit 1
         fi
