@@ -259,15 +259,27 @@ jobs:
           --release-tag "${{ steps.tag.outputs.tag }}" \
           --output-dir build_installer/staging
 
+    # The installer is installerbase.exe plus payload; its version resource must name MNE-CPP for SignPath.
+    - name: Stamp the installer template
+      shell: bash
+      run: |
+        python tools/release/pe_metadata.py stamp --description "MNE-CPP Installer" \
+          "$QtInstallerFramework_DIR/bin/installerbase.exe" build_installer/installerbase.exe
+
     - name: Build installer with binarycreator
       run: |
         binarycreator `
+          -t build_installer/installerbase.exe `
           -r build_installer/staging/config/hero.qrc `
           -c build_installer/staging/config/config.xml `
           -p build_installer/staging/packages `
           MNE-CPP-${{ env.MNE_CPP_VERSION }}-win64.exe
 
         Get-ChildItem MNE-CPP-*-win64.exe
+
+    - name: Check product metadata
+      shell: bash
+      run: python tools/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-installer.xml "MNE-CPP-${MNE_CPP_VERSION}-win64.exe"
 
     - name: Authenticode-sign the installer
       if: startsWith(github.ref, 'refs/tags/')

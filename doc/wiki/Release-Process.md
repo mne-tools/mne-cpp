@@ -87,26 +87,22 @@ every signed file with `signtool verify /pa /all /tw`. Repository settings:
 | Secret | `SIGNPATH_API_TOKEN` | API token of a submitter in the SignPath project |
 | Variable | `SIGNPATH_ORGANIZATION_ID` | SignPath organization ID |
 
-Artifact configurations in SignPath (files are uploaded unwrapped):
+The two artifact configurations (files are uploaded unwrapped) are kept in the
+repository and must be pasted unchanged into SignPath:
 
-```xml
-<!-- windows-archive -->
-<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
-  <zip-file>
-    <pe-file-set>
-      <include path="**/mne_*.exe" max-matches="unbounded" />
-      <include path="**/mne_*.dll" min-matches="0" max-matches="unbounded" />
-      <include path="**/mne_*_plugins/*.dll" min-matches="0" max-matches="unbounded" />
-      <for-each><authenticode-sign /></for-each>
-    </pe-file-set>
-  </zip-file>
-</artifact-configuration>
+| SignPath slug | Repository file | Signs |
+|---|---|---|
+| `windows-archive` | [`.signpath/artifact-configurations/windows-archive.xml`](https://github.com/mne-tools/mne-cpp/blob/main/.signpath/artifact-configurations/windows-archive.xml) | `mne_*.exe`, `mne_*.dll` and `mne_*_plugins/*.dll` inside the deployment `.zip` files; Qt and other third-party DLLs are not signed |
+| `windows-installer` | [`.signpath/artifact-configurations/windows-installer.xml`](https://github.com/mne-tools/mne-cpp/blob/main/.signpath/artifact-configurations/windows-installer.xml) | the Qt Installer Framework `.exe` itself |
 
-<!-- windows-installer -->
-<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
-  <pe-file><authenticode-sign /></pe-file>
-</artifact-configuration>
-```
+Both restrict every signed file to `product-name="MNE-CPP"` and
+`product-version="${version}"`, as the SignPath Foundation requires. The action
+passes `version` (from `src/CMakeLists.txt`) with each request and first runs
+`tools/release/pe_metadata.py check` against the same XML, so a binary without
+the version resource of
+[`cmake/mne_version_info.rc.in`](https://github.com/mne-tools/mne-cpp/blob/main/cmake/mne_version_info.rc.in)
+fails the build with its name. The installer template `installerbase.exe` gets
+that resource from `pe_metadata.py stamp` before `binarycreator` runs.
 
 **macOS (Developer ID, paid Apple Developer Program).**
 [`macos-codesign-setup`](https://github.com/mne-tools/mne-cpp/blob/main/.github/actions/macos-codesign-setup/action.yml)

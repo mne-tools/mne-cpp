@@ -101,6 +101,9 @@ jobs:
           echo "ERROR: Archive file not found!"
           exit 1
         }
+    - name: Check product metadata
+      shell: bash
+      run: python tools/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-archive.xml mne-cpp-windows-dynamic-x86_64.zip
     - name: Authenticode-sign the archive
       if: startsWith(github.ref, 'refs/tags/')
       uses: ./.github/actions/signpath-sign
@@ -224,6 +227,9 @@ jobs:
     - name: Deploy binaries (Windows)
       run: |
         ./scripts/deploy/deploy.bat static pack
+    - name: Check product metadata
+      shell: bash
+      run: python tools/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-archive.xml mne-cpp-windows-static-x86_64.zip
     - name: Authenticode-sign the archive
       if: startsWith(github.ref, 'refs/tags/')
       uses: ./.github/actions/signpath-sign

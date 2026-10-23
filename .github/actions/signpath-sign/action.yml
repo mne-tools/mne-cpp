@@ -4,9 +4,11 @@
 
 name: Authenticode-sign with SignPath
 description: >
-  Submit one file (installer .exe or deployment .zip) to SignPath, replace it
-  with the signed result and verify every signed executable with signtool
-  (v2.4.0 T10.7a). Windows runners only.
+  Check the product metadata that the artifact configuration in
+  .signpath/artifact-configurations restricts, submit one file (installer .exe
+  or deployment .zip) to SignPath with the release version as parameter,
+  replace it with the signed result and verify every signed executable with
+  signtool (v2.4.0 T10.7a). Windows runners only.
 
 inputs:
   file:
@@ -42,6 +44,17 @@ runs:
         exit 1
       fi
 
+  - name: Check product metadata
+    id: metadata
+    shell: bash
+    env:
+      FILE: ${{ inputs.file }}
+      CONFIGURATION: .signpath/artifact-configurations/${{ inputs.artifact-configuration-slug }}.xml
+    run: |
+      VERSION=$(python tools/release/pe_metadata.py version)
+      python tools/release/pe_metadata.py check --artifact-configuration "$CONFIGURATION" --version "$VERSION" "$FILE"
+      echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
   - name: Upload unsigned file
     id: unsigned
     uses: actions/upload-artifact@v7
@@ -59,6 +72,8 @@ runs:
       signing-policy-slug: ${{ inputs.signing-policy-slug }}
       artifact-configuration-slug: ${{ inputs.artifact-configuration-slug }}
       github-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+      parameters: |
+        version: "${{ steps.metadata.outputs.version }}"
       wait-for-completion: true
       wait-for-completion-timeout-in-seconds: 3600
       output-artifact-directory: ${{ runner.temp }}/signed

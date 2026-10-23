@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+<!-- Copyright (c) 2026 MNE-CPP Authors, Christoph Dinh <christoph.dinh@mne-cpp.org> -->
+<!--
+  SignPath artifact configuration "windows-archive" of project mne-cpp: the
+  deployment .zip files mne-cpp-windows-{dynamic,static}-x86_64.zip.
+  Only MNE-CPP's own executables, libraries and plugins are signed; Qt and the
+  other bundled third-party DLLs stay as their publishers shipped them.
+  Every signed file must identify itself as MNE-CPP of this release.
+  Keep identical to the configuration stored in SignPath; tools/release/pe_metadata.py
+  applies this file before every signing request.
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" required="true" />
+  </parameters>
+  <zip-file>
+    <pe-file-set product-name="MNE-CPP" product-version="${version}">
+      <include path="**/mne_*.exe" max-matches="unbounded" />
+      <include path="**/mne_*.dll" min-matches="0" max-matches="unbounded" />
+      <include path="**/mne_*_plugins/*.dll" min-matches="0" max-matches="unbounded" />
+      <for-each>
+        <authenticode-sign />
+      </for-each>
+    </pe-file-set>
+  </zip-file>
+</artifact-configuration>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+<!-- Copyright (c) 2026 MNE-CPP Authors, Christoph Dinh <christoph.dinh@mne-cpp.org> -->
+<!--
+  SignPath artifact configuration "windows-installer" of project mne-cpp: the
+  Qt Installer Framework installer MNE-CPP-<version>-win64.exe. The installer
+  executable itself is signed; its payload is the windows-archive content,
+  whose MNE-CPP binaries were signed before packaging.
+  Keep identical to the configuration stored in SignPath; tools/release/pe_metadata.py
+  applies this file before every signing request.
+-->
+<artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">
+  <parameters>
+    <parameter name="version" required="true" />
+  </parameters>
+  <pe-file product-name="MNE-CPP" product-version="${version}">
+    <authenticode-sign />
+  </pe-file>
+</artifact-configuration>
