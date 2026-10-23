@@ -7,7 +7,7 @@ sidebar_position: 21
 
 # FiffDirNode
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_dir_node.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_dir_node.h)
 
 `#include <fiff/fiff_dir_node.h>`
 
@@ -238,6 +238,7 @@ Copies directory subtrees from fidin to fidout.
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -246,7 +247,7 @@ Copies directory subtrees from fidin to fidout.
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 208"
 QFile structureFile(dir + "/sample_audvis-ave.fif");
@@ -262,7 +263,7 @@ ok &= expect(opened && measNodes.size() == 1 && hasNchan && nchanTag == 376 && !
              "FiffStream/FiffDirNode/FiffTag/FiffId: the FIFF_NCHAN tag of the measurement block reads 376");
 ````
 
-### [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx)
+### [ex_fiff_sniffer](../../examples/fiff/ex_fiff_sniffer.mdx)
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 

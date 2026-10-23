@@ -9,13 +9,13 @@ description: "MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slic
 
 MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR sets.
 
+<ExampleFacts name="ex_mri" />
+
 **Libraries:** [MRI](../../api/mri/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
 
-## Options
+## What it demonstrates
 
-| Option | Description |
-|---|---|
-| `--dataDir` | Directory with gradient.mgz and gradient.nii.gz &lt;dir&gt;. |
+data/gradient.mgz and data/gradient.nii.gz hold the same 6x5x4 volume (value = i + 10 j + 50 k) with a rotated, anisotropic voxel-to-RAS affine, written by nibabel. The example checks dimensions, the affine and voxel values against nibabel, slices the volume, and writes a COR set and COR.fif. Exits non-zero on any mismatch.
 
 ## Build and run
 
@@ -23,6 +23,27 @@ MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR se
 cmake --build build/developer-dynamic --target ex_mri
 ./out/Release/examples/ex_mri --help
 ```
+
+### Options
+
+| Option | Description |
+|---|---|
+| `--dataDir` | Directory with gradient.mgz and gradient.nii.gz &lt;dir&gt;. |
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`MriVolData`](../../api/mri/mri-vol-data.mdx) | MRI |
+| [`MriSlicer`](../../api/mri/mri-slicer.mdx) | MRI |
+| [`MriNiftiIO`](../../api/mri/mri-nifti-io.mdx) | MRI |
+| [`FiffCoordTrans`](../../api/fiff/fiff-coord-trans.mdx) | FIFF I/O |
+| [`MriCorFifIO`](../../api/mri/mri-cor-fif-io.mdx) | MRI |
+| [`MriCorIO`](../../api/mri/mri-cor-io.mdx) | MRI |
+| [`MriMghIO`](../../api/mri/mri-mgh-io.mdx) | MRI |
+| [`MriSlice`](../../api/mri/mri-slice.mdx) | MRI |
 
 ## Used in the API reference
 
@@ -37,7 +58,9 @@ cmake --build build/developer-dynamic --target ex_mri
 
 ## Source
 
-````cpp title="src/examples/ex_mri/main.cpp"
+[`src/examples/ex_mri`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mri) on GitHub.
+
+````cpp title="src/examples/ex_mri/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -192,4 +215,8 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_fs](../fs/ex_fs.mdx) — FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
 

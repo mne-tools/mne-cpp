@@ -9,20 +9,43 @@ description: "DSP Maxwell filtering: SSS, bad-channel detection, movement compen
 
 DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 
+<ExampleFacts name="ex_dsp_maxwell" />
+
 **Libraries:** [Signal Processing](../../api/dsp/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
 
-## Options
+## What it demonstrates
 
-| Option | Description |
-|---|---|
-| `--raw` | Raw &lt;file&gt;. |
+Uses the 306-channel sensor geometry of the MNE-CPP test data. The field of a dipole inside the head and a uniform field from outside are computed in closed form, so SSS must keep the first and remove the second. Exits non-zero on any mismatch.
 
 ## Build and run
+
+Needs the [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) repository cloned to `resources/data/mne-cpp-test-data`.
 
 ```bash
 cmake --build build/developer-dynamic --target ex_dsp_maxwell
 ./out/Release/examples/ex_dsp_maxwell --help
 ```
+
+### Options
+
+| Option | Description |
+|---|---|
+| `--raw` | Raw &lt;file&gt;. |
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`SSS`](../../api/dsp/sss.mdx) | Signal Processing |
+| [`MaxwellMovementComp`](../../api/dsp/maxwell-movement-comp.mdx) | Signal Processing |
+| [`FineCalibration`](../../api/dsp/fine-calibration.mdx) | Signal Processing |
+| [`FiffChInfo`](../../api/fiff/fiff-ch-info.mdx) | FIFF I/O |
+| [`FiffInfo`](../../api/fiff/fiff-info.mdx) | FIFF I/O |
+| [`HeadPosEntry`](../../api/dsp/head-pos-entry.mdx) | Signal Processing |
+| [`BadChannelsMaxwellParams`](../../api/dsp/bad-channels-maxwell-params.mdx) | Signal Processing |
+| [`BadChannelsMaxwellResult`](../../api/dsp/bad-channels-maxwell-result.mdx) | Signal Processing |
 
 ## Used in the API reference
 
@@ -42,7 +65,9 @@ cmake --build build/developer-dynamic --target ex_dsp_maxwell
 
 ## Source
 
-````cpp title="src/examples/ex_dsp_maxwell/main.cpp"
+[`src/examples/ex_dsp_maxwell`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_maxwell) on GitHub.
+
+````cpp title="src/examples/ex_dsp_maxwell/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -252,4 +277,9 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_dsp_artifacts](../dsp/ex_dsp_artifacts.mdx) — Artifact detection and repair with the dsp library on a recording with planted defects.
+- [ex_dsp_preprocessing](../dsp/ex_dsp_preprocessing.mdx) — Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 

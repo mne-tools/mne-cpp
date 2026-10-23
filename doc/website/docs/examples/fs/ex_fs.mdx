@@ -9,20 +9,43 @@ description: "FreeSurfer library: surfaces, curvature, parcellations, labels and
 
 FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
 
+<ExampleFacts name="ex_fs" />
+
 **Libraries:** [FreeSurfer](../../api/fs/index.mdx)
 
-## Options
+## What it demonstrates
 
-| Option | Description |
-|---|---|
-| `--subjectsDir` | FreeSurfer &lt;dir&gt;. |
+Reads the sample subject of the MNE-CPP test data and compares counts and values with nibabel and MNE-Python 1.11 (read_geometry, read_morph_data, read_annot, read_label, read_labels_from_annot). The atlas lookup runs on a small MGH volume written by the example. Exits non-zero on any mismatch.
 
 ## Build and run
+
+Needs the [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) repository cloned to `resources/data/mne-cpp-test-data`.
 
 ```bash
 cmake --build build/developer-dynamic --target ex_fs
 ./out/Release/examples/ex_fs --help
 ```
+
+### Options
+
+| Option | Description |
+|---|---|
+| `--subjectsDir` | FreeSurfer &lt;dir&gt;. |
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`FsLabel`](../../api/fs/fs-label.mdx) | FreeSurfer |
+| [`FsAnnotationSet`](../../api/fs/fs-annotation-set.mdx) | FreeSurfer |
+| [`FsLabelUtils`](../../api/fs/fs-label-utils.mdx) | FreeSurfer |
+| [`FsSurfaceSet`](../../api/fs/fs-surface-set.mdx) | FreeSurfer |
+| [`FsAnnotation`](../../api/fs/fs-annotation.mdx) | FreeSurfer |
+| [`FsAtlasLookup`](../../api/fs/fs-atlas-lookup.mdx) | FreeSurfer |
+| [`FsColortable`](../../api/fs/fs-colortable.mdx) | FreeSurfer |
+| [`FsSurface`](../../api/fs/fs-surface.mdx) | FreeSurfer |
 
 ## Used in the API reference
 
@@ -37,7 +60,9 @@ cmake --build build/developer-dynamic --target ex_fs
 
 ## Source
 
-````cpp title="src/examples/ex_fs/main.cpp"
+[`src/examples/ex_fs`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs) on GitHub.
+
+````cpp title="src/examples/ex_fs/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -226,4 +251,11 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_fs_surface](../fs/ex_fs_surface.mdx) — Load the pial, inflated, original and white FreeSurfer surfaces of a subject and show them in 3D.
+- [ex_mne_api](../fs/ex_mne_api.mdx) — MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
+- [ex_mri](../mri/ex_mri.mdx) — MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR sets.
+- [ex_read_fwd](../fs/ex_read_fwd.mdx) — Read a forward solution, print its gain matrix and source geometry, and cluster it by cortical parcellation.
 

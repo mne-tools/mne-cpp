@@ -7,7 +7,7 @@ sidebar_position: 21
 
 # VisualizationInfo
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/network/network.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/network/network.h)
 
 `#include <connectivity/network.h>`
 
@@ -32,6 +32,7 @@ network.setVisualizationInfo(look);
 
 ## Example
 
+- Start here: [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx) — Connectivity metrics on synthetic data with a known coupling.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
@@ -39,7 +40,7 @@ network.setVisualizationInfo(look);
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 200"
 VisualizationInfo visInfo = m_networkData[i].getVisualizationInfo();
@@ -51,7 +52,7 @@ m_networkData[i].setVisualizationInfo(visInfo);
 
 ### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
 
-Example to compare connectivity methods.
+Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
 ````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 359"
     lNetworks[j].setFrequencyRange(dFreqMin, dFreqMax);

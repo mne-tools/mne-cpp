@@ -9,7 +9,13 @@ description: "Utilities library: buffers, observers, logging, file formats, mont
 
 Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
 
+<ExampleFacts name="ex_utils" />
+
 **Libraries:** [Utilities](../../api/utils/index.mdx)
+
+## What it demonstrates
+
+Every step checks its result (round trips, known electrode positions, a hand-written digitiser record) and the example exits non-zero on a mismatch. All files are written to a temporary directory.
 
 ## Build and run
 
@@ -17,6 +23,21 @@ Utilities library: buffers, observers, logging, file formats, montages, layouts 
 cmake --build build/developer-dynamic --target ex_utils
 ./out/Release/examples/ex_utils
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`FastrakParser`](../../api/utils/fastrak-parser.mdx) | Utilities |
+| [`IOUtils`](../../api/utils/io-utils.mdx) | Utilities |
+| [`PythonRunner`](../../api/utils/python-runner.mdx) | Utilities |
+| [`SelectionIO`](../../api/utils/selection-io.mdx) | Utilities |
+| [`StandardMontage`](../../api/utils/standard-montage.mdx) | Utilities |
+| [`AcquiredPoints`](../../api/utils/acquired-points.mdx) | Utilities |
+| [`CircularBuffer`](../../api/utils/circular-buffer.mdx) | Utilities |
+| [`ElectrodePosition`](../../api/utils/electrode-position.mdx) | Utilities |
 
 ## Used in the API reference
 
@@ -47,7 +68,9 @@ cmake --build build/developer-dynamic --target ex_utils
 
 ## Source
 
-````cpp title="src/examples/ex_utils/main.cpp"
+[`src/examples/ex_utils`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils) on GitHub.
+
+````cpp title="src/examples/ex_utils/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause

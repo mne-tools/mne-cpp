@@ -7,7 +7,7 @@ sidebar_position: 46
 
 # Plot
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/plot.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/plot.h)
 
 `#include <disp/plot.h>`
 
@@ -89,6 +89,7 @@ Updates the plot using a given double vector without given X data.
 
 ## Example
 
+- Start here: [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 - Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
 - Build target: `ex_disp_plots` (runs under CTest)
 
@@ -96,7 +97,7 @@ Updates the plot using a given double vector without given X data.
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 109"
 DISPLIB::Plot* m_pSignalCoursePlot = nullptr;
@@ -109,7 +110,7 @@ DISPLIB::ImageSc* m_pImageConnWeights = nullptr;
 
 ### [ex_spectral](../../examples/disp/ex_spectral.mdx)
 
-Example of the computation of spectra, PSD and CSD.
+Multitaper spectra, power spectral density and cross-spectral density of random test signals.
 
 ````cpp title="src/examples/ex_spectral/main.cpp, line 84"
 //Plot hanning window

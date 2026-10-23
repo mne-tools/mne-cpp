@@ -7,7 +7,7 @@ sidebar_position: 2
 
 # Linalg
 
-**Namespace:** `MATHLIB` &nbsp;·&nbsp; **Library:** Math Library
+**Namespace:** `MATHLIB` &nbsp;·&nbsp; **Library:** Math Library &nbsp;·&nbsp; **Source:** [`math/linalg.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/linalg.h)
 
 :::info[Python equivalent]
 `numpy.linalg / scipy.linalg` in MNE-Python.
@@ -350,6 +350,7 @@ Compares triplet second entry (column).
 
 ## Example
 
+- Start here: [ex_math](../../examples/math/ex_math.mdx) — Math library on inputs with known answers.
 - Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
 - Build target: `ex_math` (runs under CTest)
 
@@ -357,7 +358,7 @@ Compares triplet second entry (column).
 
 ### [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx)
 
-Example of a Clustered Inverse Minimum Norm Estimation application.
+Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
 ````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 230"
 double t_dConditionNumber = Linalg::getConditionNumber(t_Fwd.sol->data, s);
@@ -366,7 +367,7 @@ double t_dConditionNumberClustered = Linalg::getConditionNumber(t_clusteredFwd.s
 
 ### [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx)
 
-Example of the computation of a clustered inverse mne raw.
+Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 559"
 double t_dConditionNumber = Linalg::getConditionNumber(t_Fwd.sol->data, s);

@@ -7,7 +7,7 @@ sidebar_position: 19
 
 # FiffDigitizerData
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_digitizer_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_digitizer_data.h)
 
 `#include <fiff/fiff_digitizer_data.h>`
 
@@ -109,6 +109,7 @@ This is a port of the original C function update_fids_from_dig_data from mne_ana
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -117,7 +118,7 @@ This is a port of the original C function update_fids_from_dig_data from mne_ana
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 240"
 FiffDigitizerData digData;
@@ -130,7 +131,7 @@ digData.pickCardinalFiducials(); // LPA, nasion and RPA moved into MRI coordinat
 ok &= expect(digData.nfids() == 3 && (Map<Vector3f>(digData.mri_fids[0].r) - Vector3f(-0.06925742f, 0.01058946f, -0.02500086f)).norm() < 1e-6f, "FiffDigitizerData moves the 3 cardinal fiducials into MRI coordinates");
 ````
 
-### [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx)
+### [ex_fiff_sniffer](../../examples/fiff/ex_fiff_sniffer.mdx)
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 

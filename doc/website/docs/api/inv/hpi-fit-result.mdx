@@ -7,7 +7,7 @@ sidebar_position: 40
 
 # HpiFitResult
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_hpi_fit.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_hpi_fit.h)
 
 `#include <inv/inv_hpi_fit.h>`
 
@@ -33,13 +33,14 @@ hpi.fit(updater.getProjectedData(), updater.getProjectors(), model, updater.getH
 
 ## Example
 
+- Start here: [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx) — Inverse library: continuous head position (HPI) fitting.
 - Full source: [`src/examples/ex_inv_hpi/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_hpi/main.cpp)
 - Build target: `ex_inv_hpi` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Used in examples
 
-### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
@@ -56,7 +57,7 @@ ok &= expect(workerFit.GoF.size() == 4 && workerFit.GoF.minCoeff() > 0.98 && wor
 
 ### [ex_hpiFit](../../examples/inv/ex_hpiFit.mdx)
 
-Example for cHPI fitting on raw data with SSP. The result is written to a .txt file for comparison with MaxFilter's .pos file.
+Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
 ````cpp title="src/examples/ex_hpiFit/main.cpp, line 207"
 HpiFitResult hpiFitResult;

@@ -115,7 +115,7 @@ export default function Home(): React.JSX.Element {
                     <HeroLogo />
                     <p className={styles.heroTagline}>{siteConfig.tagline}</p>
                     <div className={styles.heroCta}>
-                        <Link className="button button--primary button--lg" to="/docs/overview">
+                        <Link className="button button--primary button--lg" to="/docs/get-started">
                             Get Started
                         </Link>
                         <Link className="button button--outline button--lg" to="/download">
@@ -133,7 +133,7 @@ export default function Home(): React.JSX.Element {
                             {applications.map((app, idx) => (
                                 <div key={idx} className="col col--4">
                                     <Link to={app.link} className={styles.appCard}>
-                                        <img src={app.icon} alt={app.title} className={styles.appIcon} />
+                                        <img src={app.icon} alt="" className={styles.appIcon} width={72} height={72} />
                                         <Heading as="h3" className={styles.appTitle}>{app.title}</Heading>
                                         <p className={styles.appDesc}>{app.description}</p>
                                         <span className={styles.appLink}>Learn more →</span>

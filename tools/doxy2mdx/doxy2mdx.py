@@ -75,6 +75,7 @@ _RENDERED_SNIPPETS: List[str] = []   # '<file>#<region>' rendered for the curren
 _SNIPPET_ERRORS: List[str] = []
 _MARKER_RE = re.compile(r"^\s*//!\s*\[([^\]]+)\]\s*$")
 GITHUB_TREE = "https://github.com/mne-tools/mne-cpp/tree/staging"
+GITHUB_BLOB = "https://github.com/mne-tools/mne-cpp/blob/staging"
 
 # Namespaces we never document, even if they appear in the XML.
 _EXCLUDED_NAMESPACES = {
@@ -762,6 +763,9 @@ def _render_method(func, lines: List[str], *, self_name: str = "") -> None:
 # MDX generation per class
 # ---------------------------------------------------------------------------
 
+_OWN_JSX = "<Connections topics={"
+
+
 def _escape_mdx_bare_lt(content: str) -> str:
     """HTML-escape every ``<`` / ``>`` and backslash-escape every
     ``{`` / ``}`` that appears outside fenced code blocks and inline code
@@ -772,6 +776,13 @@ def _escape_mdx_bare_lt(content: str) -> str:
     out: List[str] = []
     i, n = 0, len(content)
     while i < n:
+        # The one JSX element this generator writes itself, always on its own line.
+        if content.startswith(_OWN_JSX, i) and (i == 0 or content[i - 1] == "\n"):
+            end = content.find("\n", i)
+            end = n if end == -1 else end
+            out.append(content[i:end])
+            i = end
+            continue
         if content.startswith("```", i):
             end = content.find("```", i + 3)
             end = n if end == -1 else end + 3
@@ -829,6 +840,11 @@ def _render_example_section(reg_entry: dict,
         lines.append("")
         return
     mode = reg_entry.get("example_mode", "compile")
+    group = generate_examples.primary_library(ex_dir, repo_root)
+    if group:
+        brief = generate_examples.example_info(ex_dir)[1]
+        lines.append(f"- Start here: [{example}](../../examples/{group}/{example}.mdx) — "
+                     f"{generate_examples.mdx_text(brief)}.")
     lines.append(f"- Full source: [`src/examples/{example}/main.cpp`]"
                  f"({GITHUB_TREE}/src/examples/{example}/main.cpp)")
     lines.append(f"- Build target: `{example}`"
@@ -872,12 +888,13 @@ def _render_exempt_example_section(reg_entry: dict, repo_root: Path, lines: List
     for ref in refs:
         path = ref.partition("#")[0]
         name = path.split("/")[0]
-        libraries = generate_examples.example_info(repo_root / "src" / "examples" / name)[0]
+        source = repo_root / "src" / "examples" / name
+        libraries = generate_examples.example_info(source)[0]
         lines.append(f"````cpp title=\"src/examples/{path}\"")
         lines.extend(_example_region(repo_root, ref))
         lines.append("````")
         lines.append("")
-        target = (f"../../examples/{libraries[0]}/{name}.mdx" if libraries
+        target = (f"../../examples/{generate_examples.primary_library(source, repo_root)}/{name}.mdx" if libraries
                   else f"{GITHUB_TREE}/src/examples/{path}")
         lines.append(f"From [{name}]({target}).")
         lines.append("")
@@ -990,9 +1007,10 @@ def generate_class_mdx(compounddef,
     # duplicate it here.
     ns = mod.get("namespace") or compound_name.split("::", 1)[0]
     mod_label = mod.get("sidebar_label", module_key)
-    lines.append(
-        f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label}"
-    )
+    banner = f"**Namespace:** `{ns}` &nbsp;·&nbsp; **Library:** {mod_label}"
+    if loc_file and not Path(loc_file).is_absolute():
+        banner += f" &nbsp;·&nbsp; **Source:** [`{loc_file}`]({GITHUB_BLOB}/src/libraries/{loc_file})"
+    lines.append(banner)
     lines.append("")
 
     if guide:
@@ -1014,6 +1032,11 @@ def generate_class_mdx(compounddef,
     lines.append(f"`#include <{include_dir}/{Path(loc_file).name}>`"
                  if loc_file else f"`#include <{include_dir}>`")
     lines.append("")
+
+    topics = [t["id"] for t in _REGISTRY.get("topics", {}).get("entries", []) if short_name in t["classes"]]
+    if topics:
+        lines.append(f"<Connections topics={{{json.dumps(topics)}}} context=\"api\" current=\"{short_name}\" />")
+        lines.append("")
 
     # Class signature (with template parameters)
     tparams: List[Tuple[str, str]] = []

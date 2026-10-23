@@ -7,9 +7,11 @@ sidebar_position: 10
 
 # ConnectivitySettings
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/connectivitysettings.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/connectivitysettings.h)
 
 `#include <connectivity/connectivitysettings.h>`
+
+<Connections topics={["connectivity"]} context="api" current="ConnectivitySettings" />
 
 ```cpp
 class CONNECTIVITYLIB::ConnectivitySettings
@@ -131,7 +133,7 @@ Constructs a [`ConnectivitySettings`](/docs/api/connectivity/connectivity-settin
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 97"
 ConnectivitySettings m_settings;
@@ -140,7 +142,7 @@ QList<Network> m_networkData;
 QMap<QString, Vector4i> mColor;
 ````
 
-### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
@@ -163,7 +165,7 @@ settings.setFFTSize(256);
 
 ### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
 
-Example to compare connectivity methods.
+Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
 ````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 195"
 ConnectivitySettings conSettings;

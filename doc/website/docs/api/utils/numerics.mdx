@@ -7,7 +7,7 @@ sidebar_position: 35
 
 # Numerics
 
-**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Source:** [`math/numerics.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/math/numerics.h)
 
 `#include <utils/numerics.h>`
 
@@ -207,6 +207,7 @@ Creates a class and frequency distribution from data matrix.
 
 ## Example
 
+- Start here: [ex_math](../../examples/math/ex_math.mdx) — Math library on inputs with known answers.
 - Full source: [`src/examples/ex_math/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math/main.cpp)
 - Build target: `ex_math` (runs under CTest)
 
@@ -214,7 +215,7 @@ Creates a class and frequency distribution from data matrix.
 
 ### [ex_histogram](../../examples/inv/ex_histogram.mdx)
 
-Example application of reading raw data and presenting the result in histogram form.
+Histogram of the source amplitudes of a clustered MNE, dSPM or sLORETA estimate of the sample evoked response.
 
 ````cpp title="src/examples/ex_histogram/main.cpp, line 204"
 dataSine = sineWaveGenerator(1.0e-6, (1.0 / 1.0e6), 0.0, 1.0); //creates synthetic data using sineWaveGenerator function

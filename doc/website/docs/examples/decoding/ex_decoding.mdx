@@ -9,7 +9,13 @@ description: "Spatial decoders and ICA labelling on synthetic mixtures with a kn
 
 Spatial decoders and ICA labelling on synthetic mixtures with a known ground truth.
 
+<ExampleFacts name="ex_decoding" />
+
 **Libraries:** [Decoding](../../api/decoding/index.mdx)
+
+## What it demonstrates
+
+Four sources are mixed into four channels by a fixed matrix. Each decoder must recover the source it was built for (CSP: a class-dependent variance, SPoC: a variance that tracks a continuous target, SSD: a 10 Hz rhythm), and the ICA labeller must tell ocular, cardiac, muscle and brain components apart. The example exits non-zero otherwise.
 
 ## Build and run
 
@@ -17,6 +23,18 @@ Spatial decoders and ICA labelling on synthetic mixtures with a known ground tru
 cmake --build build/developer-dynamic --target ex_decoding
 ./out/Release/examples/ex_decoding
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`IcaLabelResult`](../../api/decoding/ica-label-result.mdx) | Decoding |
+| [`MlIcaLabel`](../../api/decoding/ml-ica-label.mdx) | Decoding |
+| [`DecodingCsp`](../../api/decoding/decoding-csp.mdx) | Decoding |
+| [`DecodingSpoc`](../../api/decoding/decoding-spoc.mdx) | Decoding |
+| [`DecodingSsd`](../../api/decoding/decoding-ssd.mdx) | Decoding |
 
 ## Used in the API reference
 
@@ -28,7 +46,9 @@ cmake --build build/developer-dynamic --target ex_decoding
 
 ## Source
 
-````cpp title="src/examples/ex_decoding/main.cpp"
+[`src/examples/ex_decoding`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_decoding) on GitHub.
+
+````cpp title="src/examples/ex_decoding/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause

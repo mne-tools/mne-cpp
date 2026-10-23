@@ -9,7 +9,17 @@ description: "Spectral and filtering tools of the dsp library on signals with kn
 
 Spectral and filtering tools of the dsp library on signals with known content.
 
+<ExampleFacts name="ex_dsp_spectral" />
+
 **Libraries:** [Signal Processing](../../api/dsp/index.mdx)
+
+## What it demonstrates
+
+The test signal is a 20 Hz sine plus a weaker 55 Hz sine. Expected values come from SciPy (DPSS concentration ratios, Butterworth sections and gain, peak finding), MNE-Python 1.11 (multitaper PSD) or closed forms. The example exits non-zero if any value disagrees.
+
+## Background
+
+<Connections topics={["spectral-analysis"]} context="example" current="ex_dsp_spectral" />
 
 ## Build and run
 
@@ -17,6 +27,21 @@ Spectral and filtering tools of the dsp library on signals with known content.
 cmake --build build/developer-dynamic --target ex_dsp_spectral
 ./out/Release/examples/ex_dsp_spectral
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`IirBiquad`](../../api/dsp/iir-biquad.mdx) | Signal Processing |
+| [`IirFilter`](../../api/dsp/iir-filter.mdx) | Signal Processing |
+| [`MorletTfr`](../../api/dsp/morlet-tfr.mdx) | Signal Processing |
+| [`MorletTfrResult`](../../api/dsp/morlet-tfr-result.mdx) | Signal Processing |
+| [`MultitaperPsd`](../../api/dsp/multitaper-psd.mdx) | Signal Processing |
+| [`MultitaperPsdResult`](../../api/dsp/multitaper-psd-result.mdx) | Signal Processing |
+| [`MultitaperTfr`](../../api/dsp/multitaper-tfr.mdx) | Signal Processing |
+| [`MultitaperTfrResult`](../../api/dsp/multitaper-tfr-result.mdx) | Signal Processing |
 
 ## Used in the API reference
 
@@ -39,7 +64,9 @@ cmake --build build/developer-dynamic --target ex_dsp_spectral
 
 ## Source
 
-````cpp title="src/examples/ex_dsp_spectral/main.cpp"
+[`src/examples/ex_dsp_spectral`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral) on GitHub.
+
+````cpp title="src/examples/ex_dsp_spectral/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -261,4 +288,11 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_dsp_analysis](../dsp/ex_dsp_analysis.mdx) — DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation.
+- [ex_tf_plot](../disp/ex_tf_plot.mdx) — Spectrogram of one evoked channel shown as a time-frequency plot.
+- [ex_dsp_filter](../dsp/ex_dsp_filter.mdx) — FIR filter design, application and storage with the dsp library.
+- [ex_filtering](../dsp/ex_filtering.mdx) — Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filter and write the result.
 

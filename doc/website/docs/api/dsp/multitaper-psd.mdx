@@ -7,13 +7,15 @@ sidebar_position: 21
 
 # MultitaperPsd
 
-**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/multitaper_psd.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/multitaper_psd.h)
 
 :::info[Python equivalent]
 `mne.time_frequency.psd_array_multitaper` in MNE-Python.
 :::
 
 `#include <dsp/multitaper_psd.h>`
+
+<Connections topics={["spectral-analysis"]} context="api" current="MultitaperPsd" />
 
 ```cpp
 class UTILSLIB::MultitaperPsd
@@ -62,6 +64,7 @@ Compute multitaper PSD for every channel of a data matrix.
 
 ## Example
 
+- Start here: [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx) — Spectral and filtering tools of the dsp library on signals with known content.
 - Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
 - Build target: `ex_dsp_spectral` (runs under CTest)
 

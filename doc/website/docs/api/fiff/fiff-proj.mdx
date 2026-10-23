@@ -7,13 +7,15 @@ sidebar_position: 7
 
 # FiffProj
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_proj.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_proj.h)
 
 :::info[Python equivalent]
 `mne.Projection` in MNE-Python.
 :::
 
 `#include <fiff/fiff_proj.h>`
+
+<Connections topics={["ssp"]} context="api" current="FiffProj" />
 
 ```cpp
 class FIFFLIB::FiffProj
@@ -206,6 +208,7 @@ For each of gradiometers, magnetometers and EEG (bad channels excluded) the lead
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -214,7 +217,7 @@ For each of gradiometers, magnetometers and EEG (bad channels excluded) the lead
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 157"
 const FiffProj& pca = info.projs[0]; // "PCA-v1", 1 vector over 102 magnetometers, inactive
@@ -240,7 +243,7 @@ ok &= expect(eventsBack.rows() == 25 && eventsBack(0, 0) == 13988 && eventsBack(
              "MNE: event file round trip and SSP projector like mne.find_events / make_projector");
 ````
 
-### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 

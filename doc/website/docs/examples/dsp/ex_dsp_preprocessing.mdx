@@ -9,7 +9,13 @@ description: "Preprocessing tools of the dsp library on synthetic data with a kn
 
 Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 
+<ExampleFacts name="ex_dsp_preprocessing" />
+
 **Libraries:** [Signal Processing](../../api/dsp/index.mdx), [MNE Core](../../api/mne/index.mdx)
+
+## What it demonstrates
+
+Three ICA implementations must unmix a square wave, a sine and a sawtooth; epochs are cut around known events; bipolar and average references follow their definitions; xDAWN must find the channel pattern of a target response; and the surface Laplacian must match MNE-Python 1.11 (compute_current_source_density). The example exits non-zero otherwise.
 
 ## Build and run
 
@@ -17,6 +23,21 @@ Preprocessing tools of the dsp library on synthetic data with a known ground tru
 cmake --build build/developer-dynamic --target ex_dsp_preprocessing
 ./out/Release/examples/ex_dsp_preprocessing
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`MNEEpochData`](../../api/mne/mne-epoch-data.mdx) | MNE Core |
+| [`ICA`](../../api/dsp/ica.mdx) | Signal Processing |
+| [`IcaResult`](../../api/dsp/ica-result.mdx) | Signal Processing |
+| [`Xdawn`](../../api/dsp/xdawn.mdx) | Signal Processing |
+| [`ExtendedInfomax`](../../api/dsp/extended-infomax.mdx) | Signal Processing |
+| [`InfomaxResult`](../../api/dsp/infomax-result.mdx) | Signal Processing |
+| [`PicardIca`](../../api/dsp/picard-ica.mdx) | Signal Processing |
+| [`SurfaceLaplacian`](../../api/dsp/surface-laplacian.mdx) | Signal Processing |
 
 ## Used in the API reference
 
@@ -36,7 +57,9 @@ cmake --build build/developer-dynamic --target ex_dsp_preprocessing
 
 ## Source
 
-````cpp title="src/examples/ex_dsp_preprocessing/main.cpp"
+[`src/examples/ex_dsp_preprocessing`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_preprocessing) on GitHub.
+
+````cpp title="src/examples/ex_dsp_preprocessing/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -268,4 +291,9 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_dsp_artifacts](../dsp/ex_dsp_artifacts.mdx) — Artifact detection and repair with the dsp library on a recording with planted defects.
+- [ex_dsp_maxwell](../dsp/ex_dsp_maxwell.mdx) — DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
 

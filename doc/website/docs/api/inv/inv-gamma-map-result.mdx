@@ -7,7 +7,7 @@ sidebar_position: 46
 
 # InvGammaMapResult
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_gamma_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_gamma_map.h)
 
 `#include <inv/inv_gamma_map.h>`
 
@@ -26,6 +26,7 @@ const InvGammaMapResult gammaMap = InvGammaMap::compute(gain, measured, MatrixXd
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -34,7 +35,7 @@ const InvGammaMapResult gammaMap = InvGammaMap::compute(gain, measured, MatrixXd
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 250"
 // Gamma-MAP: sparse Bayesian learning with unit (whitened) noise, MacKay updates as in mne.inverse_sparse.gamma_map.

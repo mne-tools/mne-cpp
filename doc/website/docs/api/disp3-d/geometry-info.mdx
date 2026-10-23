@@ -7,7 +7,7 @@ sidebar_position: 2
 
 # GeometryInfo
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/helpers/geometryinfo.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/helpers/geometryinfo.h)
 
 `#include <disp3D/geometryinfo.h>`
 
@@ -137,12 +137,13 @@ filterBadChannels Filters bad channels from distance table.
 
 ## Example
 
+- Start here: [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Used in examples
 
-### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+### [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx)
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
@@ -157,9 +158,9 @@ ok &= expect(projected == Vector2i(0, 15) && distances->rows() == 16 && (*distan
              "GeometryInfo projects the sensors onto vertices 0 and 15; geodesic distances match scipy");
 ````
 
-### [ex_interpolation](../../examples/inv/ex_interpolation.mdx)
+### [ex_interpolation](../../examples/disp3D/ex_interpolation.mdx)
 
-Example of using the interpolation library and geometryInfo library.
+Map evoked MEG values onto a surface mesh with surface-constrained distances (GeometryInfo) and interpolation weights.
 
 ````cpp title="src/examples/ex_interpolation/main.cpp, line 130"
 //projecting with MEG

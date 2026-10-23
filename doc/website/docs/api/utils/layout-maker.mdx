@@ -7,7 +7,7 @@ sidebar_position: 28
 
 # LayoutMaker
 
-**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Source:** [`utils/layoutmaker.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/utils/layoutmaker.h)
 
 `#include <utils/layoutmaker.h>`
 
@@ -128,6 +128,7 @@ Reads the specified ANT elc-layout file.
 
 ## Example
 
+- Start here: [ex_utils](../../examples/utils/ex_utils.mdx) — Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
@@ -154,7 +155,7 @@ ok &= expect(layout2d.size() == names.size() && std::hypot(czX, czY) < 1.0f && l
 
 ### [ex_make_layout](../../examples/fiff/ex_make_layout.mdx)
 
-Builds example for making a 2D layout from 3D points.
+Project the 3D sensor positions of a FIFF file onto a 2D channel layout.
 
 ````cpp title="src/examples/ex_make_layout/main.cpp, line 142"
 if (!LayoutMaker::makeLayout(inputPoints,

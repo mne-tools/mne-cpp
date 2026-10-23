@@ -7,7 +7,7 @@ sidebar_position: 62
 
 # Spline
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/spline.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/spline.h)
 
 `#include <disp/spline.h>`
 
@@ -165,6 +165,7 @@ setColorMap sets the color mapping on the histogram background
 
 ## Example
 
+- Start here: [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 - Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
 - Build target: `ex_disp_plots` (runs under CTest)
 
@@ -183,7 +184,7 @@ ok &= expect(countColor(render(spline), steelBlue, 30) > 50, "Spline draws its c
 
 ### [ex_histogram](../../examples/inv/ex_histogram.mdx)
 
-Example application of reading raw data and presenting the result in histogram form.
+Histogram of the source amplitudes of a clustered MNE, dSPM or sLORETA estimate of the sample evoked response.
 
 ````cpp title="src/examples/ex_histogram/main.cpp, line 212"
 //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other

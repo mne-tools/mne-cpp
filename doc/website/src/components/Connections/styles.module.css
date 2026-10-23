@@ -1,0 +1,223 @@
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ */
+
+.connections {
+    margin: 1.25rem 0 1.75rem;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius);
+    background: var(--mc-surface);
+    overflow: hidden;
+}
+
+.header {
+    padding: 0.75rem 1rem 0.65rem;
+    border-bottom: 1px solid var(--mc-border);
+    border-left: 3px solid var(--ifm-color-primary);
+}
+
+.eyebrow {
+    font-family: var(--mc-font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mc-text-3);
+    margin-bottom: 0.3rem;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 650;
+    color: var(--mc-text);
+    letter-spacing: -0.01em;
+}
+
+.summary {
+    margin: 0.25rem 0 0 !important;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--mc-text-2);
+    max-width: 70ch;
+}
+
+.tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.tab {
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 560;
+    color: var(--mc-text-2);
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.tab:hover {
+    border-color: var(--mc-border-strong);
+    color: var(--mc-text);
+}
+
+.tabActive {
+    color: var(--mc-accent);
+    border-color: var(--mc-accent-line);
+    background: var(--mc-accent-soft);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.column {
+    padding: 0.7rem 1rem 0.8rem;
+    min-width: 0;
+}
+
+.column + .column {
+    border-left: 1px solid var(--mc-border);
+}
+
+.columnHere {
+    background: var(--mc-surface-2);
+}
+
+.columnTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.72rem !important;
+    font-weight: 650 !important;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mc-text-3) !important;
+    margin: 0 0 0.55rem !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    font-family: var(--mc-font-sans) !important;
+}
+
+.icon {
+    width: 15px;
+    height: 15px;
+    flex: none;
+    fill: none;
+    stroke: var(--mc-accent);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.subTitle {
+    font-size: 0.7rem;
+    color: var(--mc-text-3);
+    margin: 0.7rem 0 0.3rem;
+}
+
+.list {
+    list-style: none;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.list li {
+    margin: 0 0 0.35rem;
+    font-size: 0.84rem;
+    line-height: 1.4;
+}
+
+.inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem 0.6rem;
+}
+
+.inline li {
+    margin: 0;
+}
+
+.link {
+    color: var(--mc-text) !important;
+    text-decoration: none !important;
+}
+
+.link:hover {
+    color: var(--mc-accent) !important;
+}
+
+.code {
+    font-family: var(--mc-font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--mc-accent) !important;
+    text-decoration: none !important;
+    overflow-wrap: anywhere;
+}
+
+.code:hover {
+    text-decoration: underline !important;
+}
+
+.linkHere {
+    color: var(--mc-text-3) !important;
+    pointer-events: none;
+}
+
+.linkHere::after {
+    content: ' · this page';
+    font-family: var(--mc-font-sans);
+    font-size: 0.7rem;
+}
+
+.methods {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 0.5rem;
+    margin-top: 0.1rem;
+}
+
+.method {
+    font-family: var(--mc-font-mono);
+    font-size: 0.74rem;
+    color: var(--mc-text-3) !important;
+    text-decoration: none !important;
+}
+
+.method:hover {
+    color: var(--mc-accent) !important;
+}
+
+.start {
+    margin-left: 0.45rem;
+    font-size: 0.66rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--mc-teal);
+    border: 1px solid rgba(13, 148, 136, 0.3);
+    background: var(--mc-teal-soft);
+    border-radius: 999px;
+    padding: 0.08rem 0.4rem;
+    white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+    .grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .column + .column {
+        border-left: 0;
+        border-top: 1px solid var(--mc-border);
+    }
+}

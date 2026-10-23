@@ -7,7 +7,7 @@ sidebar_position: 29
 
 # FiffTag
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_tag.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_tag.h)
 
 `#include <fiff/fiff_tag.h>`
 
@@ -471,6 +471,7 @@ This corresponds to the old sizeof(fiffTagRec) - sizeof(fiff_data_t *).
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -479,7 +480,7 @@ This corresponds to the old sizeof(fiffTagRec) - sizeof(fiff_data_t *).
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 209"
 FiffStream::SPtr stream(new FiffStream(&structureFile));

@@ -7,13 +7,15 @@ sidebar_position: 3
 
 # FiffInfo
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_info.h)
 
 :::info[Python equivalent]
 `mne.Info` in MNE-Python.
 :::
 
 `#include <fiff/fiff_info.h>`
+
+<Connections topics={["fiff-io", "ssp"]} context="api" current="FiffInfo" />
 
 ```cpp
 class FIFFLIB::FiffInfo
@@ -270,13 +272,14 @@ Opens the file, reads measurement info, and splits channels into MEG and EEG lis
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Used in examples
 
-### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
@@ -320,7 +323,7 @@ FiffInfo makeInfo()
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 109"
 QFile rawFile(dir + "/sample_audvis_trunc_raw.fif");
@@ -336,7 +339,7 @@ ok &= expect(first.ch_name == "MEG0113" && first.kind == FIFFV_MEG_CH && first.c
              "FiffChInfo/FiffChPos: MEG0113 is a 3012 planar gradiometer at (-0.1066, 0.0464, -0.0604) m");
 ````
 
-Also used in [ex_dsp_maxwell](../../examples/dsp/ex_dsp_maxwell.mdx), [ex_hpiFit](../../examples/inv/ex_hpiFit.mdx), [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx), [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_compute_forward](../../examples/fwd/ex_compute_forward.mdx), [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx), [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx), [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inv_api](../../examples/inv/ex_inv_api.mdx), [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx), [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_make_inverse_operator](../../examples/inv/ex_make_inverse_operator.mdx), [ex_make_layout](../../examples/fiff/ex_make_layout.mdx).
+Also used in [ex_dsp_maxwell](../../examples/dsp/ex_dsp_maxwell.mdx), [ex_hpiFit](../../examples/inv/ex_hpiFit.mdx), [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx), [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_compute_forward](../../examples/fwd/ex_compute_forward.mdx), [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx), [ex_fiff_sniffer](../../examples/fiff/ex_fiff_sniffer.mdx), [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inv_api](../../examples/inv/ex_inv_api.mdx), [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx), [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_make_inverse_operator](../../examples/inv/ex_make_inverse_operator.mdx), [ex_make_layout](../../examples/fiff/ex_make_layout.mdx).
 
 ## Authors of this file
 

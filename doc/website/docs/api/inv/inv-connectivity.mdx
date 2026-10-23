@@ -7,7 +7,7 @@ sidebar_position: 43
 
 # InvConnectivity
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/inv_connectivity.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/inv_connectivity.h)
 
 `#include <inv/inv_connectivity.h>`
 
@@ -58,6 +58,7 @@ const InvSourceEstimate fromTokenStream = fromTokens(tokens);
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 
@@ -65,7 +66,7 @@ const InvSourceEstimate fromTokenStream = fromTokens(tokens);
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 295"
 pair.moments = {Vector3d::UnitZ(), Vector3d::UnitZ()};

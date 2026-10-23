@@ -14739,5 +14739,1099 @@
       "sklearn_module": "sklearn.neighbors",
       "rationale": "LOF for bad channel detection; BallTree for fast spatial indexing on meshes"
     }
-  ]
+  ],
+  "topics": {
+    "$comment": "Scientific topics linking manual sections (paths relative to doc/website/docs, optional #anchor), command-line tool pages, registered classes, Class::method references and src/examples programs. tools/doxy2mdx/generate_examples.py resolves every reference and fails on unknown ones; doc/website/src/components/Connections renders them on manual, API and example pages.",
+    "entries": [
+      {
+        "id": "fiff-io",
+        "title": "Reading and writing FIFF data",
+        "summary": "The FIFF file format of MEG/EEG measurements, its tag and block structure, and raw, evoked and measurement-info data access.",
+        "manual": [
+          "manual/fiff-format.mdx",
+          "manual/fiff-format.mdx#key-data-blocks"
+        ],
+        "tools": [
+          "manual/tools-show-fiff.mdx",
+          "manual/tools-compare-fif-files.mdx"
+        ],
+        "classes": [
+          "FiffRawData",
+          "FiffStream",
+          "FiffInfo",
+          "FiffEvoked"
+        ],
+        "methods": [
+          "FiffRawData::read_raw_segment",
+          "FiffStream::start_writing_raw"
+        ],
+        "examples": [
+          "ex_read_raw",
+          "ex_fiff_api",
+          "ex_read_write_raw",
+          "ex_fiff_structure",
+          "ex_read_evoked"
+        ],
+        "start": "ex_read_raw"
+      },
+      {
+        "id": "epochs-averaging",
+        "title": "Epochs and averaging",
+        "summary": "Event-locked epochs, artifact rejection and averaging of raw recordings into evoked responses.",
+        "manual": [
+          "manual/workflow.mdx#epoching-and-evoked-data",
+          "manual/workflow.mdx#off-line-averaging"
+        ],
+        "tools": [
+          "manual/tools-process-raw.mdx"
+        ],
+        "classes": [
+          "MNEEpochDataList",
+          "FiffEvoked",
+          "FiffEvokedSet"
+        ],
+        "methods": [
+          "MNEEpochDataList::readEpochs",
+          "MNEEpochDataList::computeAverage"
+        ],
+        "examples": [
+          "ex_averaging",
+          "ex_read_epochs",
+          "ex_find_evoked"
+        ],
+        "start": "ex_averaging"
+      },
+      {
+        "id": "ssp",
+        "title": "Signal-space projection (SSP)",
+        "summary": "Suppression of environmental and physiological artifacts by projecting the data onto the complement of a noise subspace.",
+        "manual": [
+          "manual/ssp.mdx",
+          "manual/ssp.mdx#estimation-of-the-noise-subspace"
+        ],
+        "tools": [
+          "manual/tools-cov2proj.mdx"
+        ],
+        "classes": [
+          "FiffProj",
+          "FiffInfo"
+        ],
+        "methods": [
+          "FiffInfo::make_projector"
+        ],
+        "examples": [
+          "ex_read_raw",
+          "ex_fiff_api",
+          "ex_hpiFit"
+        ],
+        "start": "ex_read_raw"
+      },
+      {
+        "id": "noise-covariance",
+        "title": "Noise covariance",
+        "summary": "Estimation and regularization of the sensor noise covariance used to whiten data for source estimation.",
+        "manual": [
+          "manual/workflow.mdx#computing-the-noise-covariance-matrix",
+          "manual/inverse.mdx#regularization-of-the-noise-covariance-matrix"
+        ],
+        "tools": [],
+        "classes": [
+          "FiffCov"
+        ],
+        "methods": [
+          "FiffCov::regularize"
+        ],
+        "examples": [
+          "ex_make_inverse_operator",
+          "ex_fiff_api"
+        ],
+        "start": "ex_make_inverse_operator"
+      },
+      {
+        "id": "filtering",
+        "title": "Digital filtering",
+        "summary": "FIR filter design and zero-phase application to continuous MEG/EEG data.",
+        "manual": [
+          "manual/analyze-filter.mdx"
+        ],
+        "tools": [
+          "manual/tools-process-raw.mdx"
+        ],
+        "classes": [
+          "FilterKernel",
+          "FirFilter"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_dsp_filter",
+          "ex_filtering",
+          "ex_dsp_analysis"
+        ],
+        "start": "ex_dsp_filter"
+      },
+      {
+        "id": "spectral-analysis",
+        "title": "Spectral and time-frequency analysis",
+        "summary": "Power spectral density with Welch and multitaper estimators and Morlet time-frequency representations.",
+        "manual": [
+          "api/dsp/index.mdx"
+        ],
+        "tools": [],
+        "classes": [
+          "WelchPsd",
+          "MultitaperPsd",
+          "MorletTfr"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_dsp_spectral",
+          "ex_dsp_analysis",
+          "ex_tf_plot"
+        ],
+        "start": "ex_dsp_spectral"
+      },
+      {
+        "id": "forward-modeling",
+        "title": "Forward modeling",
+        "summary": "Coordinate frames, source spaces, boundary-element and sphere head models, coil geometry and the MEG/EEG gain matrix.",
+        "manual": [
+          "manual/forward.mdx",
+          "manual/forward.mdx#computing-the-forward-solution",
+          "manual/forward.mdx#creating-the-bem-meshes"
+        ],
+        "tools": [
+          "manual/tools-forward-solution.mdx",
+          "manual/tools-setup-forward-model.mdx"
+        ],
+        "classes": [
+          "ComputeFwd",
+          "MNEForwardSolution",
+          "FwdBemModel",
+          "FwdCoilSet"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_compute_forward",
+          "ex_fwd_api",
+          "ex_read_fwd",
+          "ex_read_bem"
+        ],
+        "start": "ex_compute_forward"
+      },
+      {
+        "id": "minimum-norm",
+        "title": "Minimum-norm estimation",
+        "summary": "Distributed L2 minimum-norm estimates and their noise-normalized variants dSPM, sLORETA and eLORETA.",
+        "manual": [
+          "manual/inverse.mdx#minimum-norm-estimates",
+          "manual/inverse.mdx#noise-normalization",
+          "manual/workflow.mdx#calculating-the-inverse-operator"
+        ],
+        "tools": [
+          "manual/tools-inverse-operator.mdx",
+          "manual/tools-compute-mne.mdx",
+          "manual/tools-compute-raw-inverse.mdx"
+        ],
+        "classes": [
+          "MNEInverseOperator",
+          "InvMinimumNorm",
+          "InvSourceEstimate"
+        ],
+        "methods": [
+          "MNEInverseOperator::make_inverse_operator",
+          "InvMinimumNorm::calculateInverse"
+        ],
+        "examples": [
+          "ex_inverse_mne",
+          "ex_make_inverse_operator",
+          "ex_inv_api",
+          "ex_inverse_mne_raw",
+          "ex_clustered_inverse_mne"
+        ],
+        "start": "ex_inverse_mne"
+      },
+      {
+        "id": "cmne",
+        "title": "Contextual minimum-norm estimation (CMNE)",
+        "summary": "Minimum-norm estimates refined by a recurrent network that predicts source activity from its temporal context.",
+        "manual": [
+          "manual/inverse.mdx#contextual-minimum-norm-estimates-cmne"
+        ],
+        "tools": [
+          "manual/tools-compute-cmne.mdx"
+        ],
+        "classes": [
+          "InvCMNE"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_inv_api"
+        ],
+        "start": "ex_inv_api"
+      },
+      {
+        "id": "sparse-inverse",
+        "title": "Sparse source estimation",
+        "summary": "Mixed-norm (MxNE, TF-MxNE) and Gamma-MAP estimates that explain the data with few active sources.",
+        "manual": [
+          "manual/inverse.mdx#sparse-methods"
+        ],
+        "tools": [],
+        "classes": [
+          "InvMxne",
+          "InvTfMxne",
+          "InvGammaMap"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_inv_api"
+        ],
+        "start": "ex_inv_api"
+      },
+      {
+        "id": "beamformers",
+        "title": "Beamformers",
+        "summary": "Spatial filters that pass activity from one location and suppress the rest: LCMV in the time domain, DICS in the frequency domain.",
+        "manual": [
+          "manual/inverse.mdx#beamformer-methods"
+        ],
+        "tools": [],
+        "classes": [
+          "InvLCMV",
+          "InvDICS"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_inv_beamformer"
+        ],
+        "start": "ex_inv_beamformer"
+      },
+      {
+        "id": "rap-music",
+        "title": "RAP-MUSIC dipole scanning",
+        "summary": "Recursively applied and projected MUSIC and its truncated and Powell-accelerated variants for localizing correlated dipoles.",
+        "manual": [
+          "manual/inverse.mdx#rap-music"
+        ],
+        "tools": [],
+        "classes": [
+          "InvRapMusic",
+          "InvPwlRapMusic",
+          "InvTrapMusic"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_inverse_rap_music",
+          "ex_inverse_pwl_rap_music",
+          "ex_inv_beamformer",
+          "ex_clustered_inverse_rap_music_raw"
+        ],
+        "start": "ex_inverse_rap_music"
+      },
+      {
+        "id": "dipole-fitting",
+        "title": "Equivalent current dipole fitting",
+        "summary": "Nonlinear least-squares fit of a few current dipoles in a sphere or BEM head model, with goodness of fit.",
+        "manual": [
+          "manual/inverse.mdx#dipole-fitting",
+          "manual/dipole-fit.mdx"
+        ],
+        "tools": [
+          "manual/tools-dipole-fit.mdx"
+        ],
+        "classes": [
+          "InvDipoleFit",
+          "InvEcdSet"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_inv_dipole_fit"
+        ],
+        "start": "ex_inv_dipole_fit"
+      },
+      {
+        "id": "head-position",
+        "title": "Continuous head position (cHPI)",
+        "summary": "Fitting of head-position indicator coils during the recording to track and compensate head movement.",
+        "manual": [
+          "manual/scan-headmonitoring.mdx"
+        ],
+        "tools": [],
+        "classes": [
+          "InvHpiFit"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_inv_hpi",
+          "ex_hpiFit",
+          "ex_dsp_rt"
+        ],
+        "start": "ex_inv_hpi"
+      },
+      {
+        "id": "connectivity",
+        "title": "Functional connectivity",
+        "summary": "Coupling between sensor or source time courses: correlation, coherence, phase-lag and phase-locking metrics, and Granger-type measures.",
+        "manual": [
+          "api/connectivity/index.mdx",
+          "api/connectivity/index.mdx#supported-metrics"
+        ],
+        "tools": [],
+        "classes": [
+          "Connectivity",
+          "ConnectivitySettings",
+          "Coherence",
+          "PhaseLagIndex"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_connectivity_metrics",
+          "ex_connectivity",
+          "ex_connectivity_comparison",
+          "ex_connectivity_performance"
+        ],
+        "start": "ex_connectivity_metrics"
+      },
+      {
+        "id": "real-time",
+        "title": "Real-time processing",
+        "summary": "Worker-based online averaging, covariance, noise spectrum, connectivity, head-position fitting and inverse operators for streaming data.",
+        "manual": [
+          "manual/scan.mdx",
+          "manual/scan-sourceloc.mdx"
+        ],
+        "tools": [
+          "manual/tools-rt-server.mdx"
+        ],
+        "classes": [
+          "RtAveraging",
+          "RtInvOp",
+          "RtConnectivity"
+        ],
+        "methods": [],
+        "examples": [
+          "ex_dsp_rt",
+          "ex_lsl"
+        ],
+        "start": "ex_dsp_rt"
+      }
+    ]
+  },
+  "examples": {
+    "$comment": "Explorer metadata of every src/examples program: what it is for (tasks), which recordings it handles (modalities) and how much background it assumes (level). 'library' overrides the primary library, which otherwise is the most specific library the example includes. Libraries and source dependencies are derived from the #include lines, not stored here.",
+    "facets": {
+      "tasks": {
+        "io": "Read & write data",
+        "preprocessing": "Preprocess recordings",
+        "signal-analysis": "Filter & analyze signals",
+        "source-estimation": "Estimate brain activity",
+        "source-localization": "Localize sources",
+        "forward-modeling": "Model the forward problem",
+        "connectivity": "Analyze connectivity",
+        "visualization": "Visualize data",
+        "anatomy": "Anatomy & MRI",
+        "real-time": "Real-time pipelines",
+        "statistics-ml": "Statistics & machine learning",
+        "infrastructure": "Infrastructure"
+      },
+      "modalities": {
+        "meg": "MEG",
+        "eeg": "EEG",
+        "ieeg": "iEEG / sEEG / ECoG",
+        "mri": "MRI",
+        "generic": "Modality-independent"
+      },
+      "levels": {
+        "start": "Getting started",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+      }
+    },
+    "entries": {
+      "ex_averaging": {
+        "tasks": [
+          "preprocessing",
+          "io"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_bids": {
+        "tasks": [
+          "io"
+        ],
+        "modalities": [
+          "eeg",
+          "ieeg"
+        ],
+        "level": "start"
+      },
+      "ex_cancel_noise": {
+        "tasks": [
+          "preprocessing"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_clustered_inverse_mne": {
+        "tasks": [
+          "source-estimation"
+        ],
+        "modalities": [
+          "meg",
+          "eeg",
+          "mri"
+        ],
+        "level": "advanced"
+      },
+      "ex_clustered_inverse_mne_raw": {
+        "tasks": [
+          "source-estimation"
+        ],
+        "modalities": [
+          "meg",
+          "eeg",
+          "mri"
+        ],
+        "level": "advanced"
+      },
+      "ex_clustered_inverse_pwl_rap_music_raw": {
+        "tasks": [
+          "source-localization"
+        ],
+        "modalities": [
+          "meg",
+          "mri"
+        ],
+        "level": "advanced"
+      },
+      "ex_clustered_inverse_rap_music_raw": {
+        "tasks": [
+          "source-localization"
+        ],
+        "modalities": [
+          "meg",
+          "mri"
+        ],
+        "level": "advanced"
+      },
+      "ex_compute_forward": {
+        "tasks": [
+          "forward-modeling"
+        ],
+        "modalities": [
+          "meg",
+          "eeg",
+          "mri"
+        ],
+        "level": "intermediate"
+      },
+      "ex_connectivity": {
+        "tasks": [
+          "connectivity",
+          "visualization"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "advanced"
+      },
+      "ex_connectivity_comparison": {
+        "tasks": [
+          "connectivity"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "advanced"
+      },
+      "ex_connectivity_metrics": {
+        "tasks": [
+          "connectivity"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      },
+      "ex_connectivity_performance": {
+        "tasks": [
+          "connectivity"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "intermediate"
+      },
+      "ex_coreg": {
+        "tasks": [
+          "anatomy",
+          "visualization"
+        ],
+        "modalities": [
+          "meg",
+          "mri"
+        ],
+        "level": "intermediate"
+      },
+      "ex_decoding": {
+        "tasks": [
+          "statistics-ml"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "intermediate"
+      },
+      "ex_disp": {
+        "tasks": [
+          "visualization"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "start"
+      },
+      "ex_disp3d_scene": {
+        "tasks": [
+          "visualization"
+        ],
+        "modalities": [
+          "meg",
+          "eeg",
+          "ieeg",
+          "mri"
+        ],
+        "level": "intermediate",
+        "library": "disp3D"
+      },
+      "ex_disp_3D": {
+        "tasks": [
+          "source-estimation",
+          "visualization"
+        ],
+        "modalities": [
+          "meg",
+          "mri"
+        ],
+        "level": "advanced",
+        "library": "disp3D"
+      },
+      "ex_disp_plots": {
+        "tasks": [
+          "visualization"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      },
+      "ex_dsp_analysis": {
+        "tasks": [
+          "signal-analysis"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start",
+        "library": "dsp"
+      },
+      "ex_dsp_artifacts": {
+        "tasks": [
+          "preprocessing"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_dsp_filter": {
+        "tasks": [
+          "signal-analysis"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      },
+      "ex_dsp_maxwell": {
+        "tasks": [
+          "preprocessing"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "advanced"
+      },
+      "ex_dsp_preprocessing": {
+        "tasks": [
+          "preprocessing"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_dsp_rt": {
+        "tasks": [
+          "real-time"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "advanced",
+        "library": "dsp"
+      },
+      "ex_dsp_spectral": {
+        "tasks": [
+          "signal-analysis"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      },
+      "ex_evoked_grad_amp": {
+        "tasks": [
+          "signal-analysis"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_fiff_api": {
+        "tasks": [
+          "io"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_fiff_io": {
+        "tasks": [
+          "io"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_fiff_sniffer": {
+        "tasks": [
+          "io"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate",
+        "library": "fiff"
+      },
+      "ex_fiff_structure": {
+        "tasks": [
+          "io"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_filtering": {
+        "tasks": [
+          "signal-analysis",
+          "io"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "start"
+      },
+      "ex_find_evoked": {
+        "tasks": [
+          "io"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_fs": {
+        "tasks": [
+          "anatomy",
+          "io"
+        ],
+        "modalities": [
+          "mri"
+        ],
+        "level": "start"
+      },
+      "ex_fs_surface": {
+        "tasks": [
+          "anatomy",
+          "visualization"
+        ],
+        "modalities": [
+          "mri"
+        ],
+        "level": "start",
+        "library": "fs"
+      },
+      "ex_fwd_api": {
+        "tasks": [
+          "forward-modeling"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_histogram": {
+        "tasks": [
+          "source-estimation"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_hpiFit": {
+        "tasks": [
+          "preprocessing"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "advanced"
+      },
+      "ex_ieeg": {
+        "tasks": [
+          "visualization"
+        ],
+        "modalities": [
+          "ieeg"
+        ],
+        "level": "start"
+      },
+      "ex_interpolation": {
+        "tasks": [
+          "visualization"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "intermediate",
+        "library": "disp3D"
+      },
+      "ex_inv_api": {
+        "tasks": [
+          "source-estimation"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_inv_beamformer": {
+        "tasks": [
+          "source-localization"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_inv_dipole_fit": {
+        "tasks": [
+          "source-localization"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_inv_hpi": {
+        "tasks": [
+          "preprocessing"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_inverse_mne": {
+        "tasks": [
+          "source-estimation"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_inverse_mne_raw": {
+        "tasks": [
+          "source-estimation"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_inverse_pwl_rap_music": {
+        "tasks": [
+          "source-localization"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "advanced"
+      },
+      "ex_inverse_rap_music": {
+        "tasks": [
+          "source-localization"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "advanced"
+      },
+      "ex_lsl": {
+        "tasks": [
+          "real-time",
+          "io"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      },
+      "ex_make_inverse_operator": {
+        "tasks": [
+          "source-estimation"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_make_layout": {
+        "tasks": [
+          "visualization"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "start"
+      },
+      "ex_math": {
+        "tasks": [
+          "infrastructure"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      },
+      "ex_ml": {
+        "tasks": [
+          "statistics-ml"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "intermediate"
+      },
+      "ex_mna": {
+        "tasks": [
+          "infrastructure"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "intermediate"
+      },
+      "ex_mne_api": {
+        "tasks": [
+          "anatomy",
+          "forward-modeling"
+        ],
+        "modalities": [
+          "meg",
+          "mri"
+        ],
+        "level": "intermediate"
+      },
+      "ex_mri": {
+        "tasks": [
+          "anatomy",
+          "io"
+        ],
+        "modalities": [
+          "mri"
+        ],
+        "level": "start"
+      },
+      "ex_read_bem": {
+        "tasks": [
+          "io",
+          "forward-modeling"
+        ],
+        "modalities": [
+          "mri"
+        ],
+        "level": "start"
+      },
+      "ex_read_epochs": {
+        "tasks": [
+          "io",
+          "preprocessing"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_read_evoked": {
+        "tasks": [
+          "io"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_read_fwd": {
+        "tasks": [
+          "io",
+          "forward-modeling"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_read_fwd_disp_3D": {
+        "tasks": [
+          "forward-modeling",
+          "visualization"
+        ],
+        "modalities": [
+          "meg",
+          "mri"
+        ],
+        "level": "start"
+      },
+      "ex_read_raw": {
+        "tasks": [
+          "io"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_read_write_raw": {
+        "tasks": [
+          "io"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
+        ],
+        "level": "start"
+      },
+      "ex_roi_clustered_inverse_pwl_rap_music": {
+        "tasks": [
+          "source-localization"
+        ],
+        "modalities": [
+          "meg",
+          "mri"
+        ],
+        "level": "advanced"
+      },
+      "ex_spectral": {
+        "tasks": [
+          "signal-analysis"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      },
+      "ex_st_clustered_inverse_pwl_rap_music": {
+        "tasks": [
+          "source-localization"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "advanced"
+      },
+      "ex_sts_statistics": {
+        "tasks": [
+          "statistics-ml"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      },
+      "ex_tf_plot": {
+        "tasks": [
+          "signal-analysis",
+          "visualization"
+        ],
+        "modalities": [
+          "meg"
+        ],
+        "level": "start"
+      },
+      "ex_utils": {
+        "tasks": [
+          "infrastructure"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      },
+      "ex_warp": {
+        "tasks": [
+          "infrastructure"
+        ],
+        "modalities": [
+          "generic"
+        ],
+        "level": "start"
+      }
+    }
+  }
 }

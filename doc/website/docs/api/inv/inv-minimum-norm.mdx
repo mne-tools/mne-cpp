@@ -7,13 +7,15 @@ sidebar_position: 1
 
 # InvMinimumNorm
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/minimum_norm/inv_minimum_norm.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/minimum_norm/inv_minimum_norm.h)
 
 :::info[Python equivalent]
 `mne.minimum_norm.apply_inverse` in MNE-Python.
 :::
 
 `#include <inv/inv_minimum_norm.h>`
+
+<Connections topics={["minimum-norm"]} context="api" current="InvMinimumNorm" />
 
 ```cpp
 class INVLIB::InvMinimumNorm
@@ -244,6 +246,7 @@ Get the assembled kernel.
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -252,7 +255,7 @@ Get the assembled kernel.
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 121"
 const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
@@ -266,7 +269,7 @@ ok &= expect(stc.data.rows() == 70 && stc.data.cols() == 421 && near(stc.data.cw
 
 ### [ex_make_inverse_operator](../../examples/inv/ex_make_inverse_operator.mdx)
 
-Example of making an inverse operator.
+Assemble MEG+EEG, MEG-only and EEG-only inverse operators from a forward solution and a regularized noise covariance, then apply them.
 
 ````cpp title="src/examples/ex_make_inverse_operator/main.cpp, line 117"
 // Compute inverse solution
@@ -276,7 +279,7 @@ InvSourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evoked
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/main.cpp, line 316"
 // Compute inverse solution
@@ -284,7 +287,7 @@ InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
 minimumNorm.doInverseSetup(1, true);
 ````
 
-Also used in [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx), [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx).
+Also used in [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx), [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx).
 
 ## Authors of this file
 

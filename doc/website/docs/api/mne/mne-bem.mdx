@@ -7,7 +7,7 @@ sidebar_position: 4
 
 # MNEBem
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_bem.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_bem.h)
 
 :::info[Python equivalent]
 `mne.make_bem_model` in MNE-Python.
@@ -257,6 +257,7 @@ Transform the Bem using the inverse.
 
 ## Example
 
+- Start here: [ex_mne_api](../../examples/fs/ex_mne_api.mdx) — MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 - Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -278,7 +279,7 @@ ok &= expect(bem.size() == 1 && innerSkull.id == FIFFV_BEM_SURF_ID_BRAIN && inne
 
 ### [ex_read_bem](../../examples/mne/ex_read_bem.mdx)
 
-Example of reading BEM data.
+Read a BEM model from FIFF, write it back and verify the round trip.
 
 ````cpp title="src/examples/ex_read_bem/main.cpp, line 76"
 // Read the BEM
@@ -286,9 +287,9 @@ QFile t_fileBem(parser.value(bemFileInOption));
 MNEBem t_Bem(t_fileBem);
 ````
 
-### [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx)
+### [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx)
 
-Example of using the MNE-CPP Disp3D library.
+Compute a clustered MNE, dSPM or sLORETA estimate of the sample evoked response and show it on the cortex with Disp3D.
 
 ````cpp title="src/examples/ex_disp_3D/main.cpp, line 254"
 //Read and show BEM
@@ -299,7 +300,7 @@ for (int i = 0; i < t_Bem.size(); ++i) {
 }
 ````
 
-Also used in [ex_interpolation](../../examples/inv/ex_interpolation.mdx).
+Also used in [ex_interpolation](../../examples/disp3D/ex_interpolation.mdx).
 
 ## Authors of this file
 

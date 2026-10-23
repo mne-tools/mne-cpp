@@ -9,7 +9,17 @@ description: "DSP library: Welch PSD, FIR filtering, peak finding, envelope corr
 
 DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation.
 
+<ExampleFacts name="ex_dsp_analysis" />
+
 **Libraries:** [Inverse](../../api/inv/index.mdx), [Signal Processing](../../api/dsp/index.mdx)
+
+## What it demonstrates
+
+Every check runs on a synthetic signal and compares with SciPy 1.15 (signal.welch, signal.find_peaks, signal.peak_prominences, signal.hilbert) or a closed form. Exits non-zero on any mismatch.
+
+## Background
+
+<Connections topics={["filtering", "spectral-analysis"]} context="example" current="ex_dsp_analysis" />
 
 ## Build and run
 
@@ -17,6 +27,21 @@ DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHAR
 cmake --build build/developer-dynamic --target ex_dsp_analysis
 ./out/Release/examples/ex_dsp_analysis
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`FirFilter`](../../api/dsp/fir-filter.mdx) | Signal Processing |
+| [`ConnectivityAec`](../../api/dsp/connectivity-aec.mdx) | Signal Processing |
+| [`PeakFinderParams`](../../api/dsp/peak-finder-params.mdx) | Signal Processing |
+| [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
+| [`WelchPsd`](../../api/dsp/welch-psd.mdx) | Signal Processing |
+| [`FilterKernel`](../../api/dsp/filter-kernel.mdx) | Signal Processing |
+| [`SimulateStcParams`](../../api/dsp/simulate-stc-params.mdx) | Signal Processing |
+| [`WelchPsdResult`](../../api/dsp/welch-psd-result.mdx) | Signal Processing |
 
 ## Used in the API reference
 
@@ -33,7 +58,9 @@ cmake --build build/developer-dynamic --target ex_dsp_analysis
 
 ## Source
 
-````cpp title="src/examples/ex_dsp_analysis/main.cpp"
+[`src/examples/ex_dsp_analysis`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_analysis) on GitHub.
+
+````cpp title="src/examples/ex_dsp_analysis/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -235,4 +262,11 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_dsp_filter](../dsp/ex_dsp_filter.mdx) — FIR filter design, application and storage with the dsp library.
+- [ex_dsp_spectral](../dsp/ex_dsp_spectral.mdx) — Spectral and filtering tools of the dsp library on signals with known content.
+- [ex_filtering](../dsp/ex_filtering.mdx) — Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filter and write the result.
+- [ex_tf_plot](../disp/ex_tf_plot.mdx) — Spectrogram of one evoked channel shown as a time-frequency plot.
 

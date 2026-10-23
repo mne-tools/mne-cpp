@@ -7,13 +7,15 @@ sidebar_position: 2
 
 # FiffRawData
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_raw_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_raw_data.h)
 
 :::info[Python equivalent]
 `mne.io.Raw` in MNE-Python.
 :::
 
 `#include <fiff/fiff_raw_data.h>`
+
+<Connections topics={["fiff-io"]} context="api" current="FiffRawData" />
 
 ```cpp
 class FIFFLIB::FiffRawData
@@ -270,6 +272,7 @@ Ported from save.c (MNE-C).
 
 ## Example
 
+- Start here: [ex_read_raw](../../examples/mne/ex_read_raw.mdx) — Read a segment of a raw FIFF recording with channel picking, SSP projectors and CTF compensation.
 - Full source: [`src/examples/ex_read_raw/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_read_raw/main.cpp)
 - Build target: `ex_read_raw` (compiled in CI)
 - Data: [MNE sample data](https://mne.tools/stable/documentation/datasets.html#sample)
@@ -278,7 +281,7 @@ Ported from save.c (MNE-C).
 
 ### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
 
-FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application.
 
 ````cpp title="src/examples/ex_fiff_structure/main.cpp, line 95"
 QFile rawFile(rawPath);
@@ -294,7 +297,7 @@ ok &= expect(epochs.size() == 13 && epochs[0].data.cols() == 601 && std::lround(
              "FiffEpochs/FiffEpochData: 13 fixed-length epochs like mne.make_fixed_length_epochs, averaged over 13");
 ````
 
-### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
@@ -317,7 +320,7 @@ projInfo.make_projector(projectors);
 
 ### [ex_averaging](../../examples/mne/ex_averaging.mdx)
 
-Average data from a raw data file.
+Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
 ````cpp title="src/examples/ex_averaging/main.cpp, line 115"
 // Setup for reading the raw data

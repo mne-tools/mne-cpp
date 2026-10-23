@@ -8,6 +8,8 @@ sidebar_position: 6
 
 The Functional Imaging File Format (FIFF) is the standard data format used throughout the MNE software ecosystem. Originally developed at the Neuromag/Elekta/MEGIN MEG systems group, FIFF stores MEG, EEG, and MRI data along with all associated metadata in a single, structured binary format.
 
+<Connections topic="fiff-io" context="manual" />
+
 ## Overview
 
 FIFF files use a **tag-based** hierarchical structure. Each piece of information — a data array, a string, a coordinate transformation matrix — is stored as a **tag** identified by a numeric kind and type. Tags are organized into **blocks** (also called trees) that group related information together.

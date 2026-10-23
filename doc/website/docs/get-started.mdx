@@ -1,0 +1,150 @@
+---
+title: Get Started
+sidebar_label: Get Started
+sidebar_position: 2
+description: Build MNE-CPP, install it, and write a first C++ program that reads a MEG/EEG recording.
+---
+
+# Get Started
+
+MNE-CPP can be used in three ways. Pick the one that matches what you want to do:
+
+| You want to… | Start here |
+|---|---|
+| **Run the applications** — record, browse, analyze and visualize data | [Download](pathname:///download) an installer, or open MNE Browse or MNE Inspect [in the browser](manual/online.mdx) |
+| **Write C++ against the libraries** | This page: build, install and link MNE-CPP |
+| **Understand the methods** | The [processing workflow](manual/workflow.mdx), [forward modeling](manual/forward.mdx) and [inverse methods](manual/inverse.mdx) |
+
+The rest of this page builds MNE-CPP itself, installs it, and then builds a separate program that
+uses it as a library — the two things are distinct: you only build MNE-CPP once, and your own
+projects find it with CMake's `find_package`.
+
+## 1. Build MNE-CPP
+
+You need Git, CMake and a C++20 compiler (GCC 13+, Apple Clang or MSVC); the
+[build guide](development/buildguide-cmake.mdx) lists the tested versions and alternatives. The
+`init` script downloads the Qt and Eigen builds that CI uses into `src/external/` and configures
+`build/developer-dynamic`:
+
+```bash title="Linux and macOS"
+git clone --recursive https://github.com/mne-tools/mne-cpp.git
+cd mne-cpp
+./init.sh
+cmake --build build/developer-dynamic --parallel 4
+```
+
+On Windows run `.\init.bat` and `cmake --build build\developer-dynamic --config Release --parallel 4`
+instead. Check the build by running an example:
+
+```bash
+./out/Release/examples/ex_math
+```
+
+`--recursive` also fetches [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) into
+`resources/data/mne-cpp-test-data`, the small recordings that the tests and many examples read. In an
+existing clone, get it with `git submodule update --init resources/data/mne-cpp-test-data`.
+
+## 2. Install the libraries
+
+Install headers, libraries and the CMake package files into a prefix of your choice:
+
+```bash
+cmake --install build/developer-dynamic --prefix "$HOME/mne-cpp-sdk"
+```
+
+The prefix now contains `include/<library>/…`, the shared libraries, and
+`lib/cmake/MNE-CPP/MNE-CPPConfig.cmake`, which defines one imported target per library —
+`MNE-CPP::mne_fiff`, `MNE-CPP::mne_dsp`, `MNE-CPP::mne_inv` and so on.
+
+## 3. Write a program that uses MNE-CPP
+
+Create a new directory outside the MNE-CPP checkout with two files. The program opens a FIFF
+recording with [`FiffRawData`](api/fiff/fiff-raw-data.mdx), prints its size and reads the first second
+of every channel with
+[`read_raw_segment`](api/fiff/fiff-raw-data.mdx#read_raw_segmentdata-times-from-to-sel-do_debug).
+
+```cmake title="raw_summary/CMakeLists.txt"
+cmake_minimum_required(VERSION 3.21)
+project(raw_summary LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(MNE-CPP 2.4 REQUIRED)
+
+add_executable(raw_summary main.cpp)
+target_link_libraries(raw_summary PRIVATE MNE-CPP::mne_fiff)
+```
+
+```cpp title="raw_summary/main.cpp"
+#include <fiff/fiff_raw_data.h>
+
+#include <QFile>
+
+#include <cstdio>
+
+int main(int argc, char* argv[])
+{
+    if (argc < 2) {
+        std::fprintf(stderr, "usage: %s <raw.fif>\n", argv[0]);
+        return 1;
+    }
+
+    QFile file(argv[1]);
+    FIFFLIB::FiffRawData raw(file);
+    if (raw.isEmpty()) {
+        std::fprintf(stderr, "could not read %s\n", argv[1]);
+        return 1;
+    }
+
+    const double sfreq = raw.info.sfreq;
+    std::printf("%d channels at %.1f Hz, %.1f s\n", raw.info.nchan, sfreq,
+                (raw.last_samp - raw.first_samp + 1) / sfreq);
+
+    // The first second of every channel: rows are channels, columns samples.
+    Eigen::MatrixXd data, times;
+    if (!raw.read_raw_segment(data, times, raw.first_samp, raw.first_samp + static_cast<int>(sfreq) - 1)) {
+        return 1;
+    }
+    std::printf("read %lld x %lld samples, first channel %s\n", static_cast<long long>(data.rows()),
+                static_cast<long long>(data.cols()), qPrintable(raw.info.ch_names.first()));
+    return 0;
+}
+```
+
+Configure it with the install prefix, Qt and Eigen on `CMAKE_PREFIX_PATH`. With the dependencies
+that `init` downloaded, that is (replace `~/mne-cpp` with your checkout):
+
+```bash
+cmake -S raw_summary -B raw_summary/build -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_PREFIX_PATH="$HOME/mne-cpp-sdk;$HOME/mne-cpp/src/external/qt/dynamic;$HOME/mne-cpp/src/external/eigen"
+cmake --build raw_summary/build
+./raw_summary/build/raw_summary ~/mne-cpp/resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
+```
+
+The last two lines of the output are:
+
+```text
+376 channels at 300.3 Hz, 20.0 s
+read 376 x 300 samples, first channel MEG0113
+```
+
+The lines before them are the reader's own log: the projectors stored in the file and the sample
+range. If you use a Qt from the Qt Online Installer or a system Eigen, put those prefixes on
+`CMAKE_PREFIX_PATH` instead.
+
+:::note[Where this was verified]
+These steps were run end to end on macOS with the Qt and Eigen bundles that `init.sh` downloads.
+On Windows the same CMake project works with MSVC; the Qt `bin` directory must be on `PATH`
+when you run the program, as described in the [build guide](development/buildguide-cmake.mdx).
+:::
+
+## Next steps
+
+<Connections topic="fiff-io" context="manual" />
+
+- Find an example by task, recording type or library in the [examples explorer](examples/index.mdx).
+- Look up a class in the [API reference](api/index.mdx), or press <kbd>Ctrl</kbd> <kbd>K</kbd> to search
+  for it by name.
+- Follow a complete analysis in the [processing workflow](manual/workflow.mdx), from raw data to source
+  estimates.

@@ -7,13 +7,15 @@ sidebar_position: 4
 
 # PhaseLagIndex
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/metrics/phaselagindex.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/metrics/phaselagindex.h)
 
 :::info[Python equivalent]
 `mne_connectivity.spectral_connectivity_epochs (method='pli')` in MNE-Python.
 :::
 
 `#include <connectivity/phaselagindex.h>`
+
+<Connections topics={["connectivity"]} context="api" current="PhaseLagIndex" />
 
 ```cpp
 class CONNECTIVITYLIB::PhaseLagIndex
@@ -67,6 +69,7 @@ Calculates the PLI between the rows of the data matrix.
 
 ## Example
 
+- Start here: [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx) — Connectivity metrics on synthetic data with a known coupling.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 

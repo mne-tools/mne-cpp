@@ -7,7 +7,7 @@ sidebar_position: 18
 
 # NetworkNode
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/network/networknode.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/network/networknode.h)
 
 `#include <connectivity/networknode.h>`
 
@@ -291,6 +291,7 @@ Automatically decides whether to add to the in or out edges.
 
 ## Example
 
+- Start here: [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx) — Connectivity metrics on synthetic data with a known coupling.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
@@ -308,7 +309,7 @@ coherency.setFrequencyRange(8.0f, 12.0f);
 ok &= expect(std::fabs(edgeWeight(coherency, 0, 1) - coh01) < 1e-9, "Coherency::calculateAbs equals Coherence");
 ````
 
-### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+### [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx)
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 

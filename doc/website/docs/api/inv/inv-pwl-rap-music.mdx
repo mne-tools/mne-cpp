@@ -7,9 +7,11 @@ sidebar_position: 32
 
 # InvPwlRapMusic
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/rap_music/inv_pwl_rap_music.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/rap_music/inv_pwl_rap_music.h)
 
 `#include <inv/inv_pwl_rap_music.h>`
+
+<Connections topics={["rap-music"]} context="api" current="InvPwlRapMusic" />
 
 ```cpp
 class INVLIB::InvPwlRapMusic
@@ -133,6 +135,7 @@ Even so the base class RAP MUSIC implementation is called.
 
 ## Example
 
+- Start here: [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx) — Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
 - Full source: [`src/examples/ex_inv_beamformer/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_beamformer/main.cpp)
 - Build target: `ex_inv_beamformer` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -156,7 +159,7 @@ ok &= expect(pairs.size() == 1 && isPair(pairs[0], 10, 50) && pairs[0].m_vCorrel
 
 ### [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx)
 
-Example of the computation of a raw clustered inverse Powell RAP-MUSIC.
+Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 433"
 //
@@ -167,7 +170,7 @@ InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
 ### [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx)
 
-Example of MNEForwardSolution and Powell Rap Music application.
+Localize dipole pairs in the sample evoked response with Powell-accelerated RAP-MUSIC on a clustered forward solution.
 
 ````cpp title="src/examples/ex_inverse_pwl_rap_music/main.cpp, line 152"
 InvPwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);

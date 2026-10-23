@@ -7,7 +7,7 @@ sidebar_position: 47
 
 # InvMxneResult
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_mxne.h)
 
 `#include <inv/inv_mxne.h>`
 
@@ -32,6 +32,7 @@ const InvMxneResult mxne = InvMxne::compute(gain, measured, 0.5 * alphaMax, 1000
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -40,7 +41,7 @@ const InvMxneResult mxne = InvMxne::compute(gain, measured, 0.5 * alphaMax, 1000
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 240"
 const MatrixXd gain = whitener * fixedFwd.sol->data * 1e-9;

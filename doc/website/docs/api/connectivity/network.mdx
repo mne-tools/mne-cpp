@@ -7,7 +7,7 @@ sidebar_position: 16
 
 # Network
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/network/network.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/network/network.h)
 
 `#include <connectivity/network.h>`
 
@@ -446,6 +446,7 @@ Returns the current FFT size.
 
 ## Example
 
+- Start here: [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx) — Connectivity metrics on synthetic data with a known coupling.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
@@ -472,7 +473,7 @@ double edgeWeight(const Network& network, int start, int end)
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 97"
 ConnectivitySettings m_settings;
@@ -483,13 +484,13 @@ QMap<QString, Vector4i> mColor;
 
 ### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
 
-Example to compare connectivity methods.
+Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
 ````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 345"
 QList<Network> lNetworks = Connectivity::calculate(conSettings);
 ````
 
-Also used in [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx), [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx).
+Also used in [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx), [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx).
 
 ## Authors of this file
 

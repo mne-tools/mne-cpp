@@ -9,7 +9,17 @@ description: "LSL library: publish a stream, discover it and receive its samples
 
 LSL library: publish a stream, discover it and receive its samples over loopback.
 
+<ExampleFacts name="ex_lsl" />
+
 **Libraries:** [Lab Streaming Layer](../../api/lsl/index.mdx)
+
+## What it demonstrates
+
+An outlet publishes a 3-channel stream; an inlet connected to it on 127.0.0.1 must receive every pushed sample in order. Discovery by name is checked when multicast is available. Exits non-zero on any mismatch.
+
+## Background
+
+<Connections topics={["real-time"]} context="example" current="ex_lsl" />
 
 ## Build and run
 
@@ -17,6 +27,16 @@ LSL library: publish a stream, discover it and receive its samples over loopback
 cmake --build build/developer-dynamic --target ex_lsl
 ./out/Release/examples/ex_lsl
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`stream_info`](../../api/lsl/stream_info.mdx) | Lab Streaming Layer |
+| [`stream_inlet`](../../api/lsl/stream_inlet.mdx) | Lab Streaming Layer |
+| [`stream_outlet`](../../api/lsl/stream_outlet.mdx) | Lab Streaming Layer |
 
 ## Used in the API reference
 
@@ -26,7 +46,9 @@ cmake --build build/developer-dynamic --target ex_lsl
 
 ## Source
 
-````cpp title="src/examples/ex_lsl/main.cpp"
+[`src/examples/ex_lsl`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_lsl) on GitHub.
+
+````cpp title="src/examples/ex_lsl/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -145,4 +167,8 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_dsp_rt](../dsp/ex_dsp_rt.mdx) — DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 

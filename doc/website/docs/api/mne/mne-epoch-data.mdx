@@ -7,7 +7,7 @@ sidebar_position: 18
 
 # MNEEpochData
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_epoch_data.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_epoch_data.h)
 
 `#include <mne/mne_epoch_data.h>`
 
@@ -113,6 +113,7 @@ Returns whether this epoch should be excluded from averaging.
 
 ## Example
 
+- Start here: [ex_mne_api](../../examples/fs/ex_mne_api.mdx) — MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 - Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -121,7 +122,7 @@ Returns whether this epoch should be excluded from averaging.
 
 ### [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx)
 
-Example of the computation of a clustered inverse mne raw.
+Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 341"
 MNEEpochData* epoch = NULL;
@@ -129,7 +130,7 @@ MNEEpochData* epoch = NULL;
 
 ### [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx)
 
-Example of the computation of a raw clustered inverse Powell RAP-MUSIC.
+Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 350"
 MNEEpochData* epoch = NULL;
@@ -137,7 +138,7 @@ MNEEpochData* epoch = NULL;
 
 ### [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx)
 
-Example of the computation of a raw clustered inverse rap music.
+Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 347"
 MNEEpochData* epoch = NULL;

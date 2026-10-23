@@ -7,13 +7,15 @@ sidebar_position: 11
 
 # InvHpiFit
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/hpi/inv_hpi_fit.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/hpi/inv_hpi_fit.h)
 
 :::info[Python equivalent]
 `mne.chpi` in MNE-Python.
 :::
 
 `#include <inv/inv_hpi_fit.h>`
+
+<Connections topics={["head-position"]} context="api" current="InvHpiFit" />
 
 ```cpp
 class INVLIB::InvHpiFit
@@ -147,6 +149,7 @@ Compares two 4x4 transformation matrices by evaluating their rotation and transl
 
 ## Example
 
+- Start here: [ex_inv_hpi](../../examples/inv/ex_inv_hpi.mdx) — Inverse library: continuous head position (HPI) fitting.
 - Full source: [`src/examples/ex_inv_hpi/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_hpi/main.cpp)
 - Build target: `ex_inv_hpi` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -155,14 +158,14 @@ Compares two 4x4 transformation matrices by evaluating their rotation and transl
 
 ### [ex_hpiFit](../../examples/inv/ex_hpiFit.mdx)
 
-Example for cHPI fitting on raw data with SSP. The result is written to a .txt file for comparison with MaxFilter's .pos file.
+Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
 ````cpp title="src/examples/ex_hpiFit/main.cpp, line 182"
 InvHpiDataUpdater hpiDataUpdater = InvHpiDataUpdater(pFiffInfo);
 InvHpiFit HPI = InvHpiFit(hpiDataUpdater.getSensors());
 ````
 
-### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 

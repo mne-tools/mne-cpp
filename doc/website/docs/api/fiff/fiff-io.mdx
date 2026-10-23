@@ -7,7 +7,7 @@ sidebar_position: 32
 
 # FiffIO
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_io.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_io.h)
 
 `#include <fiff/fiff_io.h>`
 
@@ -195,6 +195,7 @@ Setup a [`FiffStream`](/docs/api/fiff/fiff-stream).
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -203,7 +204,7 @@ Setup a [`FiffStream`](/docs/api/fiff/fiff-stream).
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 271"
 QFile ioFile(dir + "/sample_audvis-ave.fif");
@@ -213,13 +214,13 @@ ok &= expect(io.m_qlistEvoked.size() == 4 && io.m_qlistRaw.isEmpty(), "FiffIO fi
 
 ### [ex_fiff_io](../../examples/mne/ex_fiff_io.mdx)
 
-Example of the FiffIO interface class.
+Read the data sets of a FIFF file through the generic FiffIO interface and write its raw data back to disk.
 
 ````cpp title="src/examples/ex_fiff_io/main.cpp, line 72"
 FiffIO p_fiffIO(t_listSampleFilesIn);
 ````
 
-### [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx)
+### [ex_fiff_sniffer](../../examples/fiff/ex_fiff_sniffer.mdx)
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 

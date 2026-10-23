@@ -9,20 +9,43 @@ description: "BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a r
 
 BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
 
+<ExampleFacts name="ex_bids" />
+
 **Libraries:** [BIDS](../../api/bids/index.mdx)
 
-## Options
+## What it demonstrates
 
-| Option | Description |
-|---|---|
-| `--bidsRoot` | BIDS dataset &lt;dir&gt;. |
+Reads the BIDS dataset of the MNE-CPP test data and compares counts and samples with MNE-Python 1.11 (read_raw_brainvision, read_raw_edf). Exits non-zero on any mismatch.
 
 ## Build and run
+
+Needs the [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) repository cloned to `resources/data/mne-cpp-test-data`.
 
 ```bash
 cmake --build build/developer-dynamic --target ex_bids
 ./out/Release/examples/ex_bids --help
 ```
+
+### Options
+
+| Option | Description |
+|---|---|
+| `--bidsRoot` | BIDS dataset &lt;dir&gt;. |
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`BidsRawData`](../../api/bids/bids-raw-data.mdx) | BIDS |
+| [`BIDSPath`](../../api/bids/bids-path.mdx) | BIDS |
+| [`BidsElectrode`](../../api/bids/bids-electrode.mdx) | BIDS |
+| [`EDFReader`](../../api/bids/edf-reader.mdx) | BIDS |
+| [`BidsTsv`](../../api/bids/bids-tsv.mdx) | BIDS |
+| [`AbstractFormatReader`](../../api/bids/abstract-format-reader.mdx) | BIDS |
+| [`BidsChannel`](../../api/bids/bids-channel.mdx) | BIDS |
+| [`BidsCoordinateSystem`](../../api/bids/bids-coordinate-system.mdx) | BIDS |
 
 ## Used in the API reference
 
@@ -43,7 +66,9 @@ cmake --build build/developer-dynamic --target ex_bids
 
 ## Source
 
-````cpp title="src/examples/ex_bids/main.cpp"
+[`src/examples/ex_bids`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_bids) on GitHub.
+
+````cpp title="src/examples/ex_bids/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause

@@ -7,7 +7,7 @@ sidebar_position: 15
 
 # FiffCtfComp
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_ctf_comp.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_ctf_comp.h)
 
 `#include <fiff/fiff_ctf_comp.h>`
 
@@ -96,6 +96,7 @@ The factors are kept in rowcals and colcals so that write_ctf_comp can undo them
 
 ## Example
 
+- Start here: [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx) — FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application.
 - Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
 - Build target: `ex_fiff_structure` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -104,7 +105,7 @@ The factors are kept in rowcals and colcals so that write_ctf_comp can undo them
 
 ### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
 
-FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application.
 
 ````cpp title="src/examples/ex_fiff_structure/main.cpp, line 140"
 // CTF third-order gradient compensation: info.comps holds one FiffCtfComp per grade.
@@ -120,7 +121,7 @@ ok &= expect(ctf.info.comps.size() == 5 && compensator.rows() == 36 && std::abs(
 
 ### [ex_cancel_noise](../../examples/mne/ex_cancel_noise.mdx)
 
-Example of noise cancellation procedures.
+Build the CTF software gradient compensator that converts an evoked data set between compensation grades.
 
 ````cpp title="src/examples/ex_cancel_noise/main.cpp, line 86"
 //example for compensator generation

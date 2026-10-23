@@ -7,7 +7,7 @@ sidebar_position: 27
 
 # LayoutLoader
 
-**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Source:** [`utils/layoutloader.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/utils/layoutloader.h)
 
 `#include <utils/layoutloader.h>`
 
@@ -88,6 +88,7 @@ Reads the specified ANT elc-layout file.
 
 ## Example
 
+- Start here: [ex_utils](../../examples/utils/ex_utils.mdx) — Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
@@ -108,7 +109,7 @@ ok &= expect(capNames == QStringList({"Fp1", "Cz"}) && capUnit == "mm" && cap3D.
 
 ### [ex_make_layout](../../examples/fiff/ex_make_layout.mdx)
 
-Builds example for making a 2D layout from 3D points.
+Project the 3D sensor positions of a FIFF file onto a 2D channel layout.
 
 ````cpp title="src/examples/ex_make_layout/main.cpp, line 125"
     LayoutLoader::readAsaElcFile(parser.value(inputOption), names, inputPoints, channel2DData, unit);

@@ -7,7 +7,7 @@ sidebar_position: 13
 
 # MNECorticalMap
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_cortical_map.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_cortical_map.h)
 
 `#include <mne/mne_cortical_map.h>`
 
@@ -65,6 +65,7 @@ K is the inverse operator kernel; G holds the rows of the forward gain for the k
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -73,7 +74,7 @@ K is the inverse operator kernel; G holds the rows of the forward gain for the k
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 157"
 QList<VectorXi> kernelVertices;

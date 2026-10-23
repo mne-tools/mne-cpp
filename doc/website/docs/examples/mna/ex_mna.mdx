@@ -9,7 +9,13 @@ description: "MNA library: register operations, build and run a graph, bind para
 
 MNA library: register operations, build and run a graph, bind parameters and save a project.
 
+<ExampleFacts name="ex_mna" />
+
 **Libraries:** [MNA Pipelines](../../api/mna/index.mdx)
+
+## What it demonstrates
+
+Two operations are declared in a registry file and given C++ implementations; a three-node graph is validated, executed (also incrementally) with a parameter-tree binding, and stored as .mna (JSON) and .mnx (CBOR) projects. Every result is a closed form. Exits non-zero on any mismatch.
 
 ## Build and run
 
@@ -17,6 +23,21 @@ MNA library: register operations, build and run a graph, bind parameters and sav
 cmake --build build/developer-dynamic --target ex_mna
 ./out/Release/examples/ex_mna
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`MnaGraphExecutor`](../../api/mna/mna-graph-executor.mdx) | MNA Pipelines |
+| [`MnaIO`](../../api/mna/mna-io.mdx) | MNA Pipelines |
+| [`MnaNode`](../../api/mna/mna-node.mdx) | MNA Pipelines |
+| [`MnaPort`](../../api/mna/mna-port.mdx) | MNA Pipelines |
+| [`MnaProject`](../../api/mna/mna-project.mdx) | MNA Pipelines |
+| [`MnaRegistryLoader`](../../api/mna/mna-registry-loader.mdx) | MNA Pipelines |
+| [`MnaScript`](../../api/mna/mna-script.mdx) | MNA Pipelines |
+| [`MnaVerification`](../../api/mna/mna-verification.mdx) | MNA Pipelines |
 
 ## Used in the API reference
 
@@ -45,7 +66,9 @@ cmake --build build/developer-dynamic --target ex_mna
 
 ## Source
 
-````cpp title="src/examples/ex_mna/main.cpp"
+[`src/examples/ex_mna`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mna) on GitHub.
+
+````cpp title="src/examples/ex_mna/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause

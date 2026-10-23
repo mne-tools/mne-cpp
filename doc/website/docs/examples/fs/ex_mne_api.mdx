@@ -9,9 +9,24 @@ description: "MNE library: BEM surfaces, surface projection, ICP, source spaces 
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
+<ExampleFacts name="ex_mne_api" />
+
 **Libraries:** [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
 
-## Options
+## What it demonstrates
+
+Reads the sample BEM, source space and raw recording and compares what it finds with MNE-Python 1.11 (read_bem_surfaces, _project_onto_surface, read_source_spaces, find_events, Epochs). The ICP part recovers a known rigid transform. Exits non-zero on any mismatch.
+
+## Build and run
+
+Needs the [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) repository cloned to `resources/data/mne-cpp-test-data`.
+
+```bash
+cmake --build build/developer-dynamic --target ex_mne_api
+./out/Release/examples/ex_mne_api --help
+```
+
+### Options
 
 | Option | Description |
 |---|---|
@@ -19,12 +34,20 @@ MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 | `--ctf` | CTF raw file stored at compensation grade 3. |
 | `--sss` | Raw file with an SSS processing record. |
 
-## Build and run
+## Key API
 
-```bash
-cmake --build build/developer-dynamic --target ex_mne_api
-./out/Release/examples/ex_mne_api --help
-```
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`MNE`](../../api/mne/mne-class.mdx) | MNE Core |
+| [`MNEEpochDataList`](../../api/mne/mne-epoch-data-list.mdx) | MNE Core |
+| [`MNESourceSpace`](../../api/mne/mne-source-space.mdx) | MNE Core |
+| [`MNECTFCompDataSet`](../../api/mne/mnectf-comp-data-set.mdx) | MNE Core |
+| [`MNEProjOp`](../../api/mne/mne-proj-op.mdx) | MNE Core |
+| [`FsSurface`](../../api/fs/fs-surface.mdx) | FreeSurfer |
+| [`MNEBemSurface`](../../api/mne/mne-bem-surface.mdx) | MNE Core |
+| [`MNEDescriptionParser`](../../api/mne/mne-description-parser.mdx) | MNE Core |
 
 ## Used in the API reference
 
@@ -93,7 +116,9 @@ cmake --build build/developer-dynamic --target ex_mne_api
 
 ## Source
 
-````cpp title="src/examples/ex_mne_api/main.cpp"
+[`src/examples/ex_mne_api`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api) on GitHub.
+
+````cpp title="src/examples/ex_mne_api/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -650,4 +675,10 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_fs](../fs/ex_fs.mdx) — FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
+- [ex_fs_surface](../fs/ex_fs_surface.mdx) — Load the pial, inflated, original and white FreeSurfer surfaces of a subject and show them in 3D.
+- [ex_read_fwd](../fs/ex_read_fwd.mdx) — Read a forward solution, print its gain matrix and source geometry, and cluster it by cortical parcellation.
 

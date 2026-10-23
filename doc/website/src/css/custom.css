@@ -589,3 +589,262 @@ html {
         margin-bottom: 1rem;
     }
 }
+/* ═══════════════════════════════════════
+ *  Documentation layer
+ *  Tokens derive from the brand palette above so the cross-reference panel,
+ *  the examples explorer and the generated API pages match the homepage.
+ * ═══════════════════════════════════════ */
+
+:root {
+    --mc-accent: var(--ifm-color-primary);
+    --mc-accent-soft: rgba(108, 92, 231, 0.07);
+    --mc-accent-line: rgba(108, 92, 231, 0.3);
+    --mc-surface: var(--ifm-background-surface-color);
+    --mc-surface-2: var(--ifm-color-emphasis-100);
+    --mc-border: var(--ifm-color-emphasis-200);
+    --mc-border-strong: var(--ifm-color-emphasis-300);
+    --mc-text: var(--ifm-font-color-base);
+    --mc-text-2: var(--ifm-color-emphasis-800);
+    --mc-text-3: var(--ifm-color-emphasis-600);
+    --mc-teal: #0f766e;
+    --mc-teal-soft: rgba(15, 118, 110, 0.08);
+    --mc-amber: #a15c07;
+    --mc-amber-soft: rgba(255, 193, 7, 0.1);
+    --mc-radius-sm: 6px;
+    --mc-radius: 8px;
+    --mc-radius-lg: 10px;
+    --mc-focus: 0 0 0 3px rgba(108, 92, 231, 0.3);
+    --mc-font-mono: var(--ifm-font-family-monospace);
+    --mc-font-sans: var(--ifm-font-family-base);
+}
+
+[data-theme='dark'] {
+    --mc-accent-soft: rgba(162, 155, 254, 0.1);
+    --mc-accent-line: rgba(162, 155, 254, 0.32);
+    --mc-teal: #5eead4;
+    --mc-teal-soft: rgba(94, 234, 212, 0.08);
+    --mc-amber: #ffd54f;
+    --mc-amber-soft: rgba(255, 193, 7, 0.08);
+    --mc-focus: 0 0 0 3px rgba(162, 155, 254, 0.4);
+}
+
+:focus-visible {
+    outline: 2px solid var(--ifm-color-primary);
+    outline-offset: 2px;
+}
+
+/* Comfortable measure for long scientific prose; tables, code and equations keep the full column. */
+.theme-doc-markdown > p,
+.theme-doc-markdown > ul,
+.theme-doc-markdown > ol {
+    max-width: 78ch;
+}
+
+.katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.25rem 0;
+}
+
+/* Tables */
+.markdown table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-sm);
+    font-size: 0.875rem;
+}
+
+.markdown table th {
+    background: var(--mc-surface-2);
+    font-weight: 600;
+    border: 0;
+    border-bottom: 1px solid var(--mc-border);
+}
+
+.markdown table td {
+    border: 0;
+    border-top: 1px solid var(--mc-border);
+    vertical-align: top;
+}
+
+.markdown table tbody tr:first-child td {
+    border-top: 0;
+}
+
+.markdown table tr:nth-child(2n) {
+    background: transparent;
+}
+
+/* Code blocks: a quiet file-name bar */
+[class*='codeBlockTitle'] {
+    font-family: var(--mc-font-mono);
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: var(--mc-text-3) !important;
+    border-bottom: 1px solid var(--mc-border) !important;
+}
+
+/* TOC and breadcrumbs */
+.table-of-contents {
+    font-size: 0.8rem;
+}
+
+.table-of-contents__link--active {
+    font-weight: 600;
+}
+
+.breadcrumbs__link {
+    font-size: 0.8rem;
+}
+
+/* Search results: the page path reads as a category */
+[class*='hitPath'] {
+    font-family: var(--mc-font-mono);
+    font-size: 0.72rem !important;
+}
+
+/* Generated API pages: each method heading is a signature block with its own anchor */
+[class*='docs-doc-id-api/'] .markdown h3 {
+    font-family: var(--mc-font-mono);
+    font-size: 0.92rem;
+    font-weight: 600;
+    background: var(--mc-surface-2);
+    border-left: 3px solid var(--mc-accent-line);
+    border-radius: 0 var(--mc-radius-sm) var(--mc-radius-sm) 0;
+    padding: 0.5rem 0.8rem;
+    overflow-wrap: anywhere;
+    margin-top: 1.75rem;
+}
+
+[class*='docs-doc-id-api/'] .markdown h1 + p {
+    font-size: 0.875rem;
+    color: var(--mc-text-3);
+}
+
+/* Small shared utilities */
+.mc-eyebrow {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mc-text-3);
+}
+
+.mc-tag {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 550;
+    line-height: 1;
+    padding: 0.28rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--mc-border);
+    background: var(--mc-surface);
+    color: var(--mc-text-2);
+    white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+a.mc-tag:hover {
+    border-color: var(--mc-accent-line);
+    color: var(--mc-accent);
+    text-decoration: none;
+}
+
+.mc-tag--accent {
+    border-color: var(--mc-accent-line);
+    background: var(--mc-accent-soft);
+    color: var(--mc-accent);
+}
+
+.mc-tag--teal {
+    border-color: rgba(15, 118, 110, 0.3);
+    background: var(--mc-teal-soft);
+    color: var(--mc-teal);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Download page additions */
+.dl-launch {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.dl-note {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--ifm-color-emphasis-700);
+    background: #fff8e1;
+    border-left: 3px solid #ffc107;
+    border-radius: 4px;
+    margin: 0 0 1rem;
+}
+
+[data-theme='dark'] .dl-note {
+    background: rgba(255, 193, 7, 0.08);
+}
+
+.dl-sub-title {
+    font-size: 1rem !important;
+    margin: 1.25rem 0 0.35rem !important;
+}
+
+.dl-asset-list__meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dl-digest {
+    white-space: nowrap;
+    font-family: var(--ifm-font-family-monospace);
+    font-size: 0.7rem;
+    color: var(--ifm-color-emphasis-500);
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 0.05rem 0.3rem;
+    cursor: copy;
+}
+
+.dl-digest:hover {
+    color: var(--ifm-color-primary);
+    border-color: var(--ifm-color-emphasis-200);
+}
+
+/* Standalone MDX pages (code signing policy) */
+.mc-callout {
+    border-left: 3px solid var(--ifm-color-primary);
+    background: var(--mc-surface-2);
+    border-radius: 0 var(--mc-radius) var(--mc-radius) 0;
+    padding: 0.85rem 1.1rem;
+    margin: 1.25rem 0;
+}
+
+.mc-callout--amber {
+    border-left-color: #ffc107;
+    background: #fff8e1;
+}
+
+[data-theme='dark'] .mc-callout--amber {
+    background: rgba(255, 193, 7, 0.08);
+}
+
+.mc-callout p:last-child {
+    margin-bottom: 0;
+}

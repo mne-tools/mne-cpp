@@ -9,7 +9,13 @@ description: "IEEG library: group sEEG contacts into a lead, derive a bipolar mo
 
 IEEG library: group sEEG contacts into a lead, derive a bipolar montage and paint contact values onto a surface.
 
+<ExampleFacts name="ex_ieeg" />
+
 **Libraries:** [iEEG](../../api/ieeg/index.mdx)
+
+## What it demonstrates
+
+Builds a small implantation in code, so it needs no data. Exits non-zero on any mismatch.
 
 ## Build and run
 
@@ -17,6 +23,19 @@ IEEG library: group sEEG contacts into a lead, derive a bipolar montage and pain
 cmake --build build/developer-dynamic --target ex_ieeg
 ./out/Release/examples/ex_ieeg
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`IeegReference`](../../api/ieeg/ieeg-reference.mdx) | iEEG |
+| [`IeegContact`](../../api/ieeg/ieeg-contact.mdx) | iEEG |
+| [`IeegImplantation`](../../api/ieeg/ieeg-implantation.mdx) | iEEG |
+| [`IeegSurfaceMap`](../../api/ieeg/ieeg-surface-map.mdx) | iEEG |
+| [`IeegBipolarPair`](../../api/ieeg/ieeg-bipolar-pair.mdx) | iEEG |
+| [`IeegLead`](../../api/ieeg/ieeg-lead.mdx) | iEEG |
 
 ## Used in the API reference
 
@@ -29,7 +48,9 @@ cmake --build build/developer-dynamic --target ex_ieeg
 
 ## Source
 
-````cpp title="src/examples/ex_ieeg/main.cpp"
+[`src/examples/ex_ieeg`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg) on GitHub.
+
+````cpp title="src/examples/ex_ieeg/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause

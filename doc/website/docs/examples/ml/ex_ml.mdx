@@ -9,7 +9,13 @@ description: "ML library: tensors, ONNX inference through the MlModel interface,
 
 ML library: tensors, ONNX inference through the MlModel interface, and the Python trainer.
 
+<ExampleFacts name="ex_ml" />
+
 **Libraries:** [Machine Learning](../../api/ml/index.mdx)
+
+## What it demonstrates
+
+Runs a bundled two-class softmax(x W + b) ONNX model (written by data/make_fixture.py) on two rows and compares the probabilities with the NumPy closed form, then runs a short Python script through MLTrainer. Exits non-zero on any mismatch.
 
 ## Build and run
 
@@ -17,6 +23,17 @@ ML library: tensors, ONNX inference through the MlModel interface, and the Pytho
 cmake --build build/developer-dynamic --target ex_ml
 ./out/Release/examples/ex_ml
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`MlTensor`](../../api/ml/ml-tensor.mdx) | Machine Learning |
+| [`MlOnnxModel`](../../api/ml/ml-onnx-model.mdx) | Machine Learning |
+| [`MLTrainer`](../../api/ml/ml-trainer.mdx) | Machine Learning |
+| [`MlModel`](../../api/ml/ml-model.mdx) | Machine Learning |
 
 ## Used in the API reference
 
@@ -27,7 +44,9 @@ cmake --build build/developer-dynamic --target ex_ml
 
 ## Source
 
-````cpp title="src/examples/ex_ml/main.cpp"
+[`src/examples/ex_ml`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ml) on GitHub.
+
+````cpp title="src/examples/ex_ml/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause

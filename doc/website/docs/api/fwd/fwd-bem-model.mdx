@@ -7,13 +7,15 @@ sidebar_position: 2
 
 # FwdBemModel
 
-**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library
+**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/fwd_bem_model.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/fwd_bem_model.h)
 
 :::info[Python equivalent]
 `mne.make_bem_model` in MNE-Python.
 :::
 
 `#include <fwd/fwd_bem_model.h>`
+
+<Connections topics={["forward-modeling"]} context="api" current="FwdBemModel" />
 
 ```cpp
 class FWDLIB::FwdBemModel
@@ -1433,6 +1435,7 @@ Returns one row per cardinal dipole direction (x, y, z).
 
 ## Example
 
+- Start here: [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx) — Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 - Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
 - Build target: `ex_fwd_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)

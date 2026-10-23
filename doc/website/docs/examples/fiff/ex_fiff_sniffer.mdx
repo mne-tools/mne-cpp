@@ -9,9 +9,20 @@ description: "Read a FIFF file from a memory buffer with a chosen byte order and
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 
+<ExampleFacts name="ex_fiff_sniffer" />
+
 **Libraries:** [Connectivity](../../api/connectivity/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
 
-## Options
+## Build and run
+
+Needs the [MNE sample dataset](../../manual/sample-dataset.mdx) in `resources/data/MNE-sample-data`.
+
+```bash
+cmake --build build/developer-dynamic --target ex_fiff_sniffer
+./out/Release/examples/ex_fiff_sniffer --help
+```
+
+### Options
 
 | Option | Description |
 |---|---|
@@ -19,14 +30,19 @@ Read a FIFF file from a memory buffer with a chosen byte order and summarise its
 | `--endian` | The file's endianness. 'little' or 'big' |
 | `--pad` | Adds -1 to end of stream to account for unfinished file (use for neuromag2ft) |
 
-## Build and run
+## Key API
 
-```bash
-cmake --build build/developer-dynamic --target ex_fiff_sniffer
-./out/Release/examples/ex_fiff_sniffer --help
-```
+The documented classes this example uses most:
 
-The default inputs come from the [MNE sample dataset](../../manual/sample-dataset.mdx).
+| Class | Library |
+|---|---|
+| [`Fiff`](../../api/fiff/fiff-class.mdx) | FIFF I/O |
+| [`FiffDigitizerData`](../../api/fiff/fiff-digitizer-data.mdx) | FIFF I/O |
+| [`FiffDirNode`](../../api/fiff/fiff-dir-node.mdx) | FIFF I/O |
+| [`FiffIO`](../../api/fiff/fiff-io.mdx) | FIFF I/O |
+| [`FiffInfo`](../../api/fiff/fiff-info.mdx) | FIFF I/O |
+| [`FiffStream`](../../api/fiff/fiff-stream.mdx) | FIFF I/O |
+| [`MNE`](../../api/mne/mne-class.mdx) | MNE Core |
 
 ## Used in the API reference
 
@@ -38,7 +54,9 @@ The default inputs come from the [MNE sample dataset](../../manual/sample-datase
 
 ## Source
 
-````cpp title="src/examples/ex_fiff_sniffer/main.cpp"
+[`src/examples/ex_fiff_sniffer`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_sniffer) on GitHub.
+
+````cpp title="src/examples/ex_fiff_sniffer/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -223,4 +241,10 @@ int main(int argc, char* argv[])
     return 0;
 }
 ````
+
+## Related examples
+
+- [ex_fiff_api](../fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
+- [ex_fiff_structure](../fiff/ex_fiff_structure.mdx) — FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application.
+- [ex_read_write_raw](../fiff/ex_read_write_raw.mdx) — Copy a raw FIFF recording buffer by buffer into a new file with FiffStream.
 

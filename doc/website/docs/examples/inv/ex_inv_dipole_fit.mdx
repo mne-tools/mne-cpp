@@ -9,20 +9,47 @@ description: "Inverse library: equivalent current dipole fitting in a sphere mod
 
 Inverse library: equivalent current dipole fitting in a sphere model.
 
+<ExampleFacts name="ex_inv_dipole_fit" />
+
 **Libraries:** [Inverse](../../api/inv/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
 
-## Options
+## What it demonstrates
 
-| Option | Description |
-|---|---|
-| `--data` | MNE-CPP test data &lt;dir&gt;. |
+The field of a 30 nAm dipole at (30, 20, 70) mm is computed for the 305 good MEG channels of the sample recording, written as an evoked file and fitted back, once sample by sample (InvDipoleFitData, InvGuessData) and once through the full pipeline (InvDipoleFitSettings, InvDipoleFit). The result must match mne.fit_dipole on the same data (sphere at (0, 0, 40) mm, ad-hoc noise). Exits non-zero on any mismatch.
+
+## Background
+
+<Connections topics={["dipole-fitting"]} context="example" current="ex_inv_dipole_fit" />
 
 ## Build and run
+
+Needs the [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) repository cloned to `resources/data/mne-cpp-test-data`.
 
 ```bash
 cmake --build build/developer-dynamic --target ex_inv_dipole_fit
 ./out/Release/examples/ex_inv_dipole_fit --help
 ```
+
+### Options
+
+| Option | Description |
+|---|---|
+| `--data` | MNE-CPP test data &lt;dir&gt;. |
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`InvDipoleFitData`](../../api/inv/inv-dipole-fit-data.mdx) | Inverse |
+| [`FiffEvokedSet`](../../api/fiff/fiff-evoked-set.mdx) | FIFF I/O |
+| [`InvEcdSet`](../../api/inv/inv-ecd-set.mdx) | Inverse |
+| [`InvDipoleFit`](../../api/inv/inv-dipole-fit.mdx) | Inverse |
+| [`InvDipoleFitSettings`](../../api/inv/inv-dipole-fit-settings.mdx) | Inverse |
+| [`InvDipoleForward`](../../api/inv/inv-dipole-forward.mdx) | Inverse |
+| [`InvEcd`](../../api/inv/inv-ecd.mdx) | Inverse |
+| [`InvGuessData`](../../api/inv/inv-guess-data.mdx) | Inverse |
 
 ## Used in the API reference
 
@@ -39,7 +66,9 @@ cmake --build build/developer-dynamic --target ex_inv_dipole_fit
 
 ## Source
 
-````cpp title="src/examples/ex_inv_dipole_fit/main.cpp"
+[`src/examples/ex_inv_dipole_fit`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_dipole_fit) on GitHub.
+
+````cpp title="src/examples/ex_inv_dipole_fit/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -191,4 +220,12 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_clustered_inverse_pwl_rap_music_raw](../inv/ex_clustered_inverse_pwl_rap_music_raw.mdx) — Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
+- [ex_clustered_inverse_rap_music_raw](../inv/ex_clustered_inverse_rap_music_raw.mdx) — Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellation-clustered forward solution.
+- [ex_inv_beamformer](../inv/ex_inv_beamformer.mdx) — Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners.
+- [ex_inverse_pwl_rap_music](../inv/ex_inverse_pwl_rap_music.mdx) — Localize dipole pairs in the sample evoked response with Powell-accelerated RAP-MUSIC on a clustered forward solution.
+- [ex_inverse_rap_music](../inv/ex_inverse_rap_music.mdx) — Localize dipole pairs in the sample evoked response with RAP-MUSIC on a clustered forward solution.
 

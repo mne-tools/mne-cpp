@@ -7,7 +7,7 @@ sidebar_position: 1
 
 # IeegImplantation
 
-**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Library:** iEEG Library
+**Namespace:** `IEEGLIB` &nbsp;·&nbsp; **Library:** iEEG Library &nbsp;·&nbsp; **Source:** [`ieeg/ieeg_implantation.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/ieeg/ieeg_implantation.h)
 
 :::info[Python equivalent]
 `mne.channels.DigMontage (iEEG)` in MNE-Python.
@@ -184,6 +184,7 @@ Units and the coordinate system come from the `*_coordsystem.json` in the same f
 
 ## Example
 
+- Start here: [ex_ieeg](../../examples/ieeg/ex_ieeg.mdx) — IEEG library: group sEEG contacts into a lead, derive a bipolar montage and paint contact values onto a surface.
 - Full source: [`src/examples/ex_ieeg/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_ieeg/main.cpp)
 - Build target: `ex_ieeg` (runs under CTest)
 
@@ -201,7 +202,7 @@ ok &= expect(implantation.leads().size() == 1 && lead.name == "LA" && lead.type 
              "IeegImplantation: one depth lead LA, ordered by contact number");
 ````
 
-### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+### [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx)
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 

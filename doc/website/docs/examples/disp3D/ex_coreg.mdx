@@ -9,9 +9,20 @@ description: "Coregistration workflow: fit digitizer points to the head surface 
 
 Coregistration workflow: fit digitizer points to the head surface with ICP.
 
+<ExampleFacts name="ex_coreg" />
+
 **Libraries:** [3D Visualization](../../api/disp3-d/index.mdx), [Utilities](../../api/utils/index.mdx)
 
-## Options
+## Build and run
+
+Needs the [MNE sample dataset](../../manual/sample-dataset.mdx) in `resources/data/MNE-sample-data`.
+
+```bash
+cmake --build build/developer-dynamic --target ex_coreg
+./out/Release/examples/ex_coreg --help
+```
+
+### Options
 
 | Option | Description |
 |---|---|
@@ -23,18 +34,20 @@ Coregistration workflow: fit digitizer points to the head surface with ICP.
 | `--dist` | The maximum distance between digitizer and head shape in mm. |
 | `--iter` | The maximum number of icp iterations. |
 
-## Build and run
+## Key API
 
-```bash
-cmake --build build/developer-dynamic --target ex_coreg
-./out/Release/examples/ex_coreg --help
-```
+The documented classes this example uses most:
 
-The default inputs come from the [MNE sample dataset](../../manual/sample-dataset.mdx).
+| Class | Library |
+|---|---|
+| [`BrainTreeModel`](../../api/disp3-d/brain-tree-model.mdx) | 3D Visualization |
+| [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
 
 ## Source
 
-````cpp title="src/examples/ex_coreg/main.cpp"
+[`src/examples/ex_coreg`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_coreg) on GitHub.
+
+````cpp title="src/examples/ex_coreg/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -263,4 +276,12 @@ int main(int argc, char* argv[])
     return a.exec();
 }
 ````
+
+## Related examples
+
+- [ex_disp3d_scene](../disp3D/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
+- [ex_disp_3D](../disp3D/ex_disp_3D.mdx) — Compute a clustered MNE, dSPM or sLORETA estimate of the sample evoked response and show it on the cortex with Disp3D.
+- [ex_fs_surface](../fs/ex_fs_surface.mdx) — Load the pial, inflated, original and white FreeSurfer surfaces of a subject and show them in 3D.
+- [ex_interpolation](../disp3D/ex_interpolation.mdx) — Map evoked MEG values onto a surface mesh with surface-constrained distances (GeometryInfo) and interpolation weights.
+- [ex_read_fwd_disp_3D](../disp3D/ex_read_fwd_disp_3D.mdx) — Read a forward solution and show its source space with the FreeSurfer parcellation in 3D.
 

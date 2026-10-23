@@ -7,9 +7,11 @@ sidebar_position: 2
 
 # InvCMNE
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/minimum_norm/inv_cmne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/minimum_norm/inv_cmne.h)
 
 `#include <inv/inv_cmne.h>`
+
+<Connections topics={["cmne"]} context="api" current="InvCMNE" />
 
 ```cpp
 class INVLIB::InvCMNE
@@ -185,6 +187,7 @@ This is a convenience wrapper that calls `scripts/ml/training/train_cmne_lstm.py
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -193,7 +196,7 @@ This is a convenience wrapper that calls `scripts/ml/training/train_cmne_lstm.py
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 275"
 cmneSettings.lookBack = 20;

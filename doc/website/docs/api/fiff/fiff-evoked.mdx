@@ -7,13 +7,15 @@ sidebar_position: 4
 
 # FiffEvoked
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_evoked.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_evoked.h)
 
 :::info[Python equivalent]
 `mne.Evoked` in MNE-Python.
 :::
 
 `#include <fiff/fiff_evoked.h>`
+
+<Connections topics={["fiff-io", "epochs-averaging"]} context="api" current="FiffEvoked" />
 
 ```cpp
 class FIFFLIB::FiffEvoked
@@ -270,6 +272,7 @@ Merges evoked data with a predefined weighting strategy (weights="nave" or "equa
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -278,7 +281,7 @@ Merges evoked data with a predefined weighting strategy (weights="nave" or "equa
 
 ### [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx)
 
-Example of the computation of a raw clustered inverse Powell RAP-MUSIC.
+Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_pwl_rap_music_raw/main.cpp, line 420"
 FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * raw.info.sfreq + 0.5), vecSel);
@@ -286,7 +289,7 @@ FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * r
 
 ### [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx)
 
-Example of the computation of a raw clustered inverse rap music.
+Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_rap_music_raw/main.cpp, line 415"
 FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * raw.info.sfreq + 0.5), vecSel);
@@ -294,7 +297,7 @@ FiffEvoked evoked = data.average(raw.info, tmin * raw.info.sfreq, floor(tmax * r
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 199"
 QFile aveFile(dir + "/sample_audvis-ave.fif");
@@ -305,7 +308,7 @@ ok &= expect(evokedSet.evoked.size() == 4 && leftAuditory.comment == "Left Audit
              "FiffEvokedSet/FiffEvoked: 4 conditions; Left Auditory averages 55 epochs over 421 samples");
 ````
 
-Also used in [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_mne_api](../../examples/fs/ex_mne_api.mdx), [ex_averaging](../../examples/mne/ex_averaging.mdx), [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx), [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx), [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx), [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_interpolation](../../examples/inv/ex_interpolation.mdx), [ex_inv_api](../../examples/inv/ex_inv_api.mdx), [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_make_inverse_operator](../../examples/inv/ex_make_inverse_operator.mdx), [ex_read_evoked](../../examples/mne/ex_read_evoked.mdx), [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx).
+Also used in [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_mne_api](../../examples/fs/ex_mne_api.mdx), [ex_averaging](../../examples/mne/ex_averaging.mdx), [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx), [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx), [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx), [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_interpolation](../../examples/disp3D/ex_interpolation.mdx), [ex_inv_api](../../examples/inv/ex_inv_api.mdx), [ex_inv_dipole_fit](../../examples/inv/ex_inv_dipole_fit.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_make_inverse_operator](../../examples/inv/ex_make_inverse_operator.mdx), [ex_read_evoked](../../examples/mne/ex_read_evoked.mdx), [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx).
 
 ## Authors of this file
 

@@ -9,7 +9,13 @@ description: "Disp plots: colour maps, bar and spline histograms, line plots, im
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
+<ExampleFacts name="ex_disp_plots" />
+
 **Libraries:** [Visualization](../../api/disp/index.mdx)
+
+## What it demonstrates
+
+Colour maps are compared with matplotlib 3.10; every widget is rendered offscreen with QWidget::grab() and its pixels are checked against the data it was given. Exits non-zero on any mismatch.
 
 ## Build and run
 
@@ -17,6 +23,21 @@ Disp plots: colour maps, bar and spline histograms, line plots, image and time-f
 cmake --build build/developer-dynamic --target ex_disp_plots
 ./out/Release/examples/ex_disp_plots
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`ColorMap`](../../api/disp/color-map.mdx) | Visualization |
+| [`Bar`](../../api/disp/bar.mdx) | Visualization |
+| [`ImageSc`](../../api/disp/image-sc.mdx) | Visualization |
+| [`LinePlot`](../../api/disp/line-plot.mdx) | Visualization |
+| [`Plot`](../../api/disp/plot.mdx) | Visualization |
+| [`Spline`](../../api/disp/spline.mdx) | Visualization |
+| [`TFplot`](../../api/disp/t-fplot.mdx) | Visualization |
+| [`Graph`](../../api/disp/graph.mdx) | Visualization |
 
 ## Used in the API reference
 
@@ -31,7 +52,9 @@ cmake --build build/developer-dynamic --target ex_disp_plots
 
 ## Source
 
-````cpp title="src/examples/ex_disp_plots/main.cpp"
+[`src/examples/ex_disp_plots`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots) on GitHub.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -237,4 +260,9 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_disp](../disp/ex_disp.mdx) — Disp library widgets: image map, line plot and time-frequency plot of raw data.
+- [ex_tf_plot](../disp/ex_tf_plot.mdx) — Spectrogram of one evoked channel shown as a time-frequency plot.
 

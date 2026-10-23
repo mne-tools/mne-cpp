@@ -7,7 +7,7 @@ sidebar_position: 12
 
 # MNEClusterInfo
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_cluster_info.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_cluster_info.h)
 
 `#include <mne/mne_cluster_info.h>`
 
@@ -82,6 +82,7 @@ Writes the cluster info as text, and the centroid vertex numbers to `centroids_<
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -90,7 +91,7 @@ Writes the cluster info as text, and the centroid vertex numbers to `centroids_<
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 169"
 const FsAnnotationSet aparc(data + "/subjects/sample/label/lh.aparc.annot", data + "/subjects/sample/label/rh.aparc.annot");

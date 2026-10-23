@@ -7,7 +7,7 @@ sidebar_position: 16
 
 # FiffDataRef
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_data_ref.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_data_ref.h)
 
 `#include <fiff/fiff_data_ref.h>`
 
@@ -58,6 +58,7 @@ Size of the old struct (`fiffDataRefRec`) 2*int + 2*long = 2*4 + 2*8 = 24.
 
 ## Example
 
+- Start here: [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx) — FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application.
 - Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
 - Build target: `ex_fiff_structure` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -66,7 +67,7 @@ Size of the old struct (`fiffDataRefRec`) 2*int + 2*long = 2*4 + 2*8 = 24.
 
 ### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
 
-FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application.
 
 ````cpp title="src/examples/ex_fiff_structure/main.cpp, line 132"
 // A reference to data in an external file: 2 x 32-bit type and byte order, 2 x 64-bit size and offset.

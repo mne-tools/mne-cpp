@@ -7,7 +7,7 @@ sidebar_position: 23
 
 # IOUtils
 
-**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library
+**Namespace:** `UTILSLIB` &nbsp;·&nbsp; **Library:** Utilities Library &nbsp;·&nbsp; **Source:** [`utils/ioutils.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/utils/ioutils.h)
 
 `#include <utils/ioutils.h>`
 
@@ -150,6 +150,7 @@ Read Eigen Matrix from file (std::string path).
 
 ## Example
 
+- Start here: [ex_utils](../../examples/utils/ex_utils.mdx) — Utilities library: buffers, observers, logging, file formats, montages, layouts and reports.
 - Full source: [`src/examples/ex_utils/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_utils/main.cpp)
 - Build target: `ex_utils` (runs under CTest)
 
@@ -172,7 +173,7 @@ ok &= expect(readBack.rows() == 2 && readBack.cols() == 3 && (readBack - matrix)
 
 ### [ex_hpiFit](../../examples/inv/ex_hpiFit.mdx)
 
-Example for cHPI fitting on raw data with SSP. The result is written to a .txt file for comparison with MaxFilter's .pos file.
+Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
 ````cpp title="src/examples/ex_hpiFit/main.cpp, line 261"
         IOUtils::write_eigen_matrix(matPosition, QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + sNameOut));

@@ -14,6 +14,8 @@ In the Bayesian sense, the ensuing current distribution is the maximum a posteri
 - The amplitudes of the currents have a Gaussian prior distribution with a known source covariance matrix.
 - The measured data contain additive noise with a Gaussian distribution with a known covariance matrix. The noise is not correlated over time.
 
+<Connections topic="minimum-norm" context="manual" />
+
 ### The Linear Inverse Operator
 
 The measured data in the source estimation procedure consists of MEG and EEG data, recorded on a total of $N$ channels. The task is to estimate a total of $Q$ strengths of sources located on the cortical mantle. If the number of source locations is $P$, $Q = P$ for fixed-orientation sources and $Q = 3P$ if the source orientations are unconstrained.
@@ -292,6 +294,8 @@ $$
 
 Standard minimum-norm methods such as MNE, dSPM, sLORETA, and eLORETA compute source estimates **independently at each time point**: the estimate $\hat{j}(t)$ depends only on the measurement $x(t)$ and not on the temporal context in which $x(t)$ occurs. While this makes the methods robust and computationally straightforward, it ignores the rich temporal structure of neural signals. Brain activity unfolds over time with characteristic dynamics — somatosensory responses follow reproducible sequences across cortical areas, auditory processing propagates from primary to associative cortices, and so forth.
 
+<Connections topic="cmne" context="manual" />
+
 **Contextual Minimum-Norm Estimates (CMNE)** address this limitation by augmenting dSPM with a **spatiotemporal LSTM network** that learns to exploit temporal context (Dinh et al., 2021). Rather than replacing the physics-based inverse model, CMNE uses data-driven temporal learning as a post-processing correction that improves spatial fidelity while preserving the well-understood regularization properties of dSPM.
 
 > Dinh, C.; Samuelsson, J.G.; Hunold, A.; Hämäläinen, M.S.; Khan, S.:
@@ -500,6 +504,8 @@ Convenience scripts `run_compute.sh` and `run_train.sh` are provided for quick e
 
 Sparse inverse methods estimate source activity under the assumption that only a small number of cortical locations are active at any given time. Unlike distributed methods (MNE, dSPM, sLORETA) that produce estimates at all cortical locations, sparse methods enforce sparsity through appropriate penalty terms, yielding solutions with most source amplitudes exactly zero. This makes them particularly suitable for localizing focal brain activity.
 
+<Connections topic="sparse-inverse" context="manual" />
+
 ### Mixed-Norm Estimates (MxNE)
 
 The **Mixed-Norm Estimate** (MxNE; Gramfort et al., 2012) promotes spatial sparsity while allowing temporal smoothness within each active source. It minimizes a cost function with an $\ell_{2,1}$-norm (group lasso) penalty:
@@ -611,6 +617,8 @@ $$
 ## Beamformer Methods
 
 Beamformers are a family of adaptive spatial filters that estimate the source activity at a given brain location while suppressing contributions from other locations and noise. Unlike minimum-norm methods, beamformers do not require an explicit regularized inverse operator — instead, they construct a spatial filter from the data covariance and the forward model at each source point.
+
+<Connections topic="beamformers" context="manual" />
 
 ### LCMV Beamformer
 
@@ -745,6 +753,8 @@ All regularization and weight-normalization options from LCMV apply identically.
 
 **Recursively Applied and Projected MUltiple SIgnal Classification** (RAP-MUSIC; Mosher & Leahy, 1999) is a scanning method that localizes multiple correlated or uncorrelated dipolar sources by iteratively identifying them and projecting them out of the data.
 
+<Connections topic="rap-music" context="manual" />
+
 ### Signal Subspace Estimation
 
 Given the measured data matrix $F$ ($N$ channels × $T$ time samples), the signal subspace is estimated from the eigendecomposition of the data covariance:
@@ -817,6 +827,8 @@ This Powell search was further combined with **lead-field clustering** (RTC-MUSI
 ## Dipole Fitting
 
 **Sequential equivalent current dipole (ECD) fitting** localizes focal brain activity by fitting one or more current dipoles to the measured field pattern at each time point. Unlike distributed methods (MNE, beamformers) that estimate activity at many locations simultaneously, dipole fitting finds the single position, orientation, and amplitude that best explain the data.
+
+<Connections topic="dipole-fitting" context="manual" />
 
 ### Forward Model
 

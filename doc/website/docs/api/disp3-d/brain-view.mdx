@@ -7,7 +7,7 @@ sidebar_position: 20
 
 # BrainView
 
-**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library
+**Namespace:** `DISP3DLIB` &nbsp;·&nbsp; **Library:** 3D Display Library &nbsp;·&nbsp; **Source:** [`disp3D/view/brainview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp3D/view/brainview.h)
 
 `#include <disp3D/brainview.h>`
 
@@ -89,12 +89,13 @@ Each view can start from a different orientation (e.g., top, front, left).
 
 ## Example
 
+- Start here: [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx) — Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 - Full source: [`src/examples/ex_disp3d_scene/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene/main.cpp)
 - Build target: `ex_disp3d_scene` (runs under CTest)
 
 ## Used in examples
 
-### [ex_disp3d_scene](../../examples/connectivity/ex_disp3d_scene.mdx)
+### [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx)
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
@@ -105,7 +106,7 @@ bool ok = true;
 
 ### [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx)
 
-Example of a Clustered Inverse Minimum Norm Estimation application.
+Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
 ````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 292"
 BrainView* pBrainView = new BrainView();
@@ -115,7 +116,7 @@ pBrainView->setModel(pModel);
 
 ### [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx)
 
-Example of the computation of a clustered inverse mne raw.
+Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 621"
 BrainView* pBrainView = new BrainView();
@@ -123,7 +124,7 @@ BrainTreeModel* pModel = new BrainTreeModel();
 pBrainView->setModel(pModel);
 ````
 
-Also used in [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx), [ex_coreg](../../examples/disp3D/ex_coreg.mdx), [ex_fs_surface](../../examples/disp3D/ex_fs_surface.mdx), [ex_read_fwd_disp_3D](../../examples/disp3D/ex_read_fwd_disp_3D.mdx).
+Also used in [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx), [ex_coreg](../../examples/disp3D/ex_coreg.mdx), [ex_fs_surface](../../examples/fs/ex_fs_surface.mdx), [ex_read_fwd_disp_3D](../../examples/disp3D/ex_read_fwd_disp_3D.mdx).
 
 ## Authors of this file
 

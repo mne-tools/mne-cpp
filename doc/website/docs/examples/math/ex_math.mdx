@@ -9,7 +9,13 @@ description: "Math library on inputs with known answers"
 
 Math library on inputs with known answers.
 
+<ExampleFacts name="ex_math" />
+
 **Libraries:** [Math](../../api/math/index.mdx)
+
+## What it demonstrates
+
+Expected values come from NumPy (pseudo-inverse, condition number, FFT frequencies), MNE-Python 1.11 (baseline rescaling) or closed forms (sphere, minimum, clusters, warp of a pure translation). The example exits non-zero if any value disagrees.
 
 ## Build and run
 
@@ -17,6 +23,18 @@ Math library on inputs with known answers.
 cmake --build build/developer-dynamic --target ex_math
 ./out/Release/examples/ex_math
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`KMeans`](../../api/math/k-means.mdx) | Math |
+| [`Linalg`](../../api/math/linalg.mdx) | Math |
+| [`SimplexAlgorithm`](../../api/math/simplex-algorithm.mdx) | Math |
+| [`Sphere`](../../api/math/sphere.mdx) | Math |
+| [`Warp`](../../api/math/warp.mdx) | Math |
 
 ## Used in the API reference
 
@@ -32,7 +50,9 @@ cmake --build build/developer-dynamic --target ex_math
 
 ## Source
 
-````cpp title="src/examples/ex_math/main.cpp"
+[`src/examples/ex_math`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_math) on GitHub.
+
+````cpp title="src/examples/ex_math/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -224,4 +244,8 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_warp](../math/ex_warp.mdx) — Example demonstrating thin-plate-spline (TPS) warping with UTILSLIB::Warp.
 

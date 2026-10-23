@@ -7,13 +7,15 @@ sidebar_position: 1
 
 # FilterKernel
 
-**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library
+**Namespace:** `RTPROCESSINGLIB` &nbsp;·&nbsp; **Library:** DSP Library &nbsp;·&nbsp; **Source:** [`dsp/filterkernel.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/dsp/filterkernel.h)
 
 :::info[Python equivalent]
 `mne.filter.create_filter` in MNE-Python.
 :::
 
 `#include <dsp/filterkernel.h>`
+
+<Connections topics={["filtering"]} context="api" current="FilterKernel" />
 
 ```cpp
 class UTILSLIB::FilterKernel
@@ -221,6 +223,7 @@ Applies the current filter to the input data using multiplication in frequency d
 
 ## Example
 
+- Start here: [ex_dsp_filter](../../examples/dsp/ex_dsp_filter.mdx) — FIR filter design, application and storage with the dsp library.
 - Full source: [`src/examples/ex_dsp_filter/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_filter/main.cpp)
 - Build target: `ex_dsp_filter` (runs under CTest)
 
@@ -248,7 +251,7 @@ for (const FilterKernel* kernel : {&lowPass, &lowPassPm}) {
 
 ### [ex_filtering](../../examples/dsp/ex_filtering.mdx)
 
-Example for filtering data with a user defined FIR filter and writing the result to a file.
+Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filter and write the result.
 
 ````cpp title="src/examples/ex_filtering/main.cpp, line 89"
 printf("Filtering...");
@@ -267,7 +270,7 @@ if (RTPROCESSINGLIB::filterFile(fileOut,
     printf("[failed]\n");
 ````
 
-### [ex_dsp_analysis](../../examples/inv/ex_dsp_analysis.mdx)
+### [ex_dsp_analysis](../../examples/dsp/ex_dsp_analysis.mdx)
 
 DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation.
 

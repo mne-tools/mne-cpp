@@ -7,7 +7,7 @@ sidebar_position: 63
 
 # TFplot
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/tfplot.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/tfplot.h)
 
 `#include <disp/tfplot.h>`
 
@@ -78,6 +78,7 @@ Constructs [`TFplot`](/docs/api/disp/t-fplot) class.
 
 ## Example
 
+- Start here: [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 - Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
 - Build target: `ex_disp_plots` (runs under CTest)
 
@@ -98,7 +99,7 @@ ok &= expect(countColor(tfImage, ColorMap::valueToJet(1.0), 10) > 100 && countCo
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 116"
 TFplot::SPtr m_pTfPlot;

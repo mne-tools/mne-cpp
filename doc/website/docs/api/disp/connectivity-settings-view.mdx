@@ -7,7 +7,7 @@ sidebar_position: 21
 
 # ConnectivitySettingsView
 
-**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/viewers/connectivitysettingsview.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/viewers/connectivitysettingsview.h)
 
 `#include <disp/connectivitysettingsview.h>`
 
@@ -172,7 +172,7 @@ Clears the view.
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/main.cpp, line 401"
 // Create ConnectivitySettingsView as standalone widget
@@ -181,7 +181,7 @@ QSharedPointer<ConnectivitySettingsView> pConnSettingsView = QSharedPointer<Conn
 
 ### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
 
-Example to compare connectivity methods.
+Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
 ````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 379"
 // Create ConnectivitySettingsView as standalone widget

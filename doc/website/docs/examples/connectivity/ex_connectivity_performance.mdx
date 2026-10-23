@@ -9,16 +9,34 @@ description: "Benchmark the run time of connectivity methods over channel and sa
 
 Benchmark the run time of connectivity methods over channel and sample counts.
 
+<ExampleFacts name="ex_connectivity_performance" />
+
 **Libraries:** [Connectivity](../../api/connectivity/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Utilities](../../api/utils/index.mdx)
 
+## Background
+
+<Connections topics={["connectivity"]} context="example" current="ex_connectivity_performance" />
+
 ## Build and run
+
+Needs the [MNE sample dataset](../../manual/sample-dataset.mdx) in `resources/data/MNE-sample-data`.
 
 ```bash
 cmake --build build/developer-dynamic --target ex_connectivity_performance
 ./out/Release/examples/ex_connectivity_performance
 ```
 
-The default inputs come from the [MNE sample dataset](../../manual/sample-dataset.mdx).
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`AbstractMetric`](../../api/connectivity/abstract-metric.mdx) | Connectivity |
+| [`Connectivity`](../../api/connectivity/connectivity-class.mdx) | Connectivity |
+| [`ConnectivitySettings`](../../api/connectivity/connectivity-settings.mdx) | Connectivity |
+| [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
+| [`MNE`](../../api/mne/mne-class.mdx) | MNE Core |
 
 ## Used in the API reference
 
@@ -26,7 +44,9 @@ The default inputs come from the [MNE sample dataset](../../manual/sample-datase
 
 ## Source
 
-````cpp title="src/examples/ex_connectivity_performance/main.cpp"
+[`src/examples/ex_connectivity_performance`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_performance) on GitHub.
+
+````cpp title="src/examples/ex_connectivity_performance/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -294,4 +314,10 @@ int main(int argc, char* argv[])
     return 0;
 }
 ````
+
+## Related examples
+
+- [ex_connectivity](../connectivity/ex_connectivity.mdx) — Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
+- [ex_connectivity_comparison](../connectivity/ex_connectivity_comparison.mdx) — Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
+- [ex_connectivity_metrics](../connectivity/ex_connectivity_metrics.mdx) — Connectivity metrics on synthetic data with a known coupling.
 

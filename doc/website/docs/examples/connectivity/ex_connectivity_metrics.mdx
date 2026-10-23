@@ -9,7 +9,17 @@ description: "Connectivity metrics on synthetic data with a known coupling"
 
 Connectivity metrics on synthetic data with a known coupling.
 
+<ExampleFacts name="ex_connectivity_metrics" />
+
 **Libraries:** [Connectivity](../../api/connectivity/index.mdx)
+
+## What it demonstrates
+
+Channel 1 is channel 0 delayed by 12 ms plus independent noise; channel 2 is independent noise. Every metric of the connectivity library is computed and the example exits non-zero unless it recovers that structure, so it doubles as a deterministic check.
+
+## Background
+
+<Connections topics={["connectivity"]} context="example" current="ex_connectivity_metrics" />
 
 ## Build and run
 
@@ -17,6 +27,21 @@ Connectivity metrics on synthetic data with a known coupling.
 cmake --build build/developer-dynamic --target ex_connectivity_metrics
 ./out/Release/examples/ex_connectivity_metrics
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`Network`](../../api/connectivity/network.mdx) | Connectivity |
+| [`AbstractMetric`](../../api/connectivity/abstract-metric.mdx) | Connectivity |
+| [`Connectivity`](../../api/connectivity/connectivity-class.mdx) | Connectivity |
+| [`NetworkNode`](../../api/connectivity/network-node.mdx) | Connectivity |
+| [`Coherence`](../../api/connectivity/coherence.mdx) | Connectivity |
+| [`Coherency`](../../api/connectivity/coherency.mdx) | Connectivity |
+| [`MvarModel`](../../api/connectivity/mvar-model.mdx) | Connectivity |
+| [`NetworkEdge`](../../api/connectivity/network-edge.mdx) | Connectivity |
 
 ## Used in the API reference
 
@@ -43,7 +68,9 @@ cmake --build build/developer-dynamic --target ex_connectivity_metrics
 
 ## Source
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp"
+[`src/examples/ex_connectivity_metrics`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics) on GitHub.
+
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -356,4 +383,10 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_connectivity](../connectivity/ex_connectivity.mdx) — Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
+- [ex_connectivity_comparison](../connectivity/ex_connectivity_comparison.mdx) — Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
+- [ex_connectivity_performance](../connectivity/ex_connectivity_performance.mdx) — Benchmark the run time of connectivity methods over channel and sample counts.
 

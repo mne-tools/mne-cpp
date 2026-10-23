@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # FsAnnotationSet
 
-**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library
+**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Source:** [`fs/fs_annotationset.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fs/fs_annotationset.h)
 
 `#include <fs/fs_annotationset.h>`
 
@@ -262,6 +262,7 @@ Reads different annotation files and assembles them to a [`FsAnnotationSet`](/do
 
 ## Example
 
+- Start here: [ex_fs](../../examples/fs/ex_fs.mdx) — FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
 - Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
 - Build target: `ex_fs` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -279,7 +280,7 @@ ok &= expect(parcellation.size() == 2, "FsAnnotationSet holds both hemispheres")
 
 ### [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx)
 
-Example of a Clustered Inverse Minimum Norm Estimation application.
+Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
 
 ````cpp title="src/examples/ex_clustered_inverse_mne/main.cpp, line 126"
 FsSurfaceSet t_surfSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
@@ -288,14 +289,14 @@ FsAnnotationSet t_annotationSet(parser.value(subjectOption), parser.value(hemiOp
 
 ### [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx)
 
-Example of the computation of a clustered inverse mne raw.
+Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 139"
 FsSurfaceSet t_surfSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
 FsAnnotationSet t_annotationSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 ````
 
-Also used in [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inv_api](../../examples/inv/ex_inv_api.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_read_fwd](../../examples/fs/ex_read_fwd.mdx), [ex_read_fwd_disp_3D](../../examples/disp3D/ex_read_fwd_disp_3D.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx).
+Also used in [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inv_api](../../examples/inv/ex_inv_api.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_read_fwd](../../examples/fs/ex_read_fwd.mdx), [ex_read_fwd_disp_3D](../../examples/disp3D/ex_read_fwd_disp_3D.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx).
 
 ## Authors of this file
 

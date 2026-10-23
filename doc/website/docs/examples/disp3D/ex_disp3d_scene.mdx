@@ -9,7 +9,13 @@ description: "Disp3D scene data: sensor-to-surface interpolation, electrodes, MR
 
 Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers.
 
+<ExampleFacts name="ex_disp3d_scene" />
+
 **Libraries:** [Connectivity](../../api/connectivity/index.mdx), [Inverse](../../api/inv/index.mdx), [3D Visualization](../../api/disp3-d/index.mdx), [iEEG](../../api/ieeg/index.mdx)
+
+## What it demonstrates
+
+Runs without a GPU: it exercises the CPU side that feeds the renderer. Geodesic distances on a 4 x 4 grid equal scipy.sparse.csgraph.dijkstra (Manhattan distances); everything else is a closed form. Exits non-zero on any mismatch.
 
 ## Build and run
 
@@ -17,6 +23,21 @@ Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, vide
 cmake --build build/developer-dynamic --target ex_disp3d_scene
 ./out/Release/examples/ex_disp3d_scene
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`BrainSurface`](../../api/disp3-d/brain-surface.mdx) | 3D Visualization |
+| [`BrainView`](../../api/disp3-d/brain-view.mdx) | 3D Visualization |
+| [`ElectrodeObject`](../../api/disp3-d/electrode-object.mdx) | 3D Visualization |
+| [`GeometryInfo`](../../api/disp3-d/geometry-info.mdx) | 3D Visualization |
+| [`Interpolation`](../../api/disp3-d/interpolation.mdx) | 3D Visualization |
+| [`MultimodalScene`](../../api/disp3-d/multimodal-scene.mdx) | 3D Visualization |
+| [`SensorFieldMapper`](../../api/disp3-d/sensor-field-mapper.mdx) | 3D Visualization |
+| [`DipoleObject`](../../api/disp3-d/dipole-object.mdx) | 3D Visualization |
 
 ## Used in the API reference
 
@@ -50,7 +71,9 @@ cmake --build build/developer-dynamic --target ex_disp3d_scene
 
 ## Source
 
-````cpp title="src/examples/ex_disp3d_scene/main.cpp"
+[`src/examples/ex_disp3d_scene`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp3d_scene) on GitHub.
+
+````cpp title="src/examples/ex_disp3d_scene/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -390,4 +413,11 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_coreg](../disp3D/ex_coreg.mdx) — Coregistration workflow: fit digitizer points to the head surface with ICP.
+- [ex_disp_3D](../disp3D/ex_disp_3D.mdx) — Compute a clustered MNE, dSPM or sLORETA estimate of the sample evoked response and show it on the cortex with Disp3D.
+- [ex_interpolation](../disp3D/ex_interpolation.mdx) — Map evoked MEG values onto a surface mesh with surface-constrained distances (GeometryInfo) and interpolation weights.
+- [ex_read_fwd_disp_3D](../disp3D/ex_read_fwd_disp_3D.mdx) — Read a forward solution and show its source space with the FreeSurfer parcellation in 3D.
 

@@ -7,7 +7,7 @@ sidebar_position: 8
 
 # AbstractMetric
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/metrics/abstractmetric.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/metrics/abstractmetric.h)
 
 `#include <connectivity/abstractmetric.h>`
 
@@ -75,6 +75,7 @@ Constructs a [`AbstractMetric`](/docs/api/connectivity/abstract-metric) object.
 
 ## Example
 
+- Start here: [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx) — Connectivity metrics on synthetic data with a known coupling.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
@@ -92,7 +93,7 @@ AbstractMetric::m_iNumberBinAmount = 4;
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/main.cpp, line 103"
 AbstractMetric::m_bStorageModeIsActive = false;

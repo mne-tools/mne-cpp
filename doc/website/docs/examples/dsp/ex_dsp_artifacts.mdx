@@ -9,7 +9,13 @@ description: "Artifact detection and repair with the dsp library on a recording 
 
 Artifact detection and repair with the dsp library on a recording with planted defects.
 
+<ExampleFacts name="ex_dsp_artifacts" />
+
 **Libraries:** [Signal Processing](../../api/dsp/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
+
+## What it demonstrates
+
+Eight EEG channels, one EOG and one ECG channel are simulated. EEG 2 is flat, EEG 5 is noisy, EEG 6 and EEG 7 are bridged, blinks leak into the frontal channels, the heart beats every 0.8 s and two stimuli cause 5 ms spikes. Every detector and repair step must find exactly what was planted; the example exits non-zero otherwise.
 
 ## Build and run
 
@@ -17,6 +23,21 @@ Artifact detection and repair with the dsp library on a recording with planted d
 cmake --build build/developer-dynamic --target ex_dsp_artifacts
 ./out/Release/examples/ex_dsp_artifacts
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`FiffInfo`](../../api/fiff/fiff-info.mdx) | FIFF I/O |
+| [`FiffAnnotations`](../../api/fiff/fiff-annotations.mdx) | FIFF I/O |
+| [`AnnotateAmplitudeParams`](../../api/dsp/annotate-amplitude-params.mdx) | Signal Processing |
+| [`AnnotateMusclParams`](../../api/dsp/annotate-muscl-params.mdx) | Signal Processing |
+| [`BridgedElectrodeParams`](../../api/dsp/bridged-electrode-params.mdx) | Signal Processing |
+| [`EogRegression`](../../api/dsp/eog-regression.mdx) | Signal Processing |
+| [`FiffChInfo`](../../api/fiff/fiff-ch-info.mdx) | FIFF I/O |
+| [`LofBadChannelParams`](../../api/dsp/lof-bad-channel-params.mdx) | Signal Processing |
 
 ## Used in the API reference
 
@@ -41,7 +62,9 @@ cmake --build build/developer-dynamic --target ex_dsp_artifacts
 
 ## Source
 
-````cpp title="src/examples/ex_dsp_artifacts/main.cpp"
+[`src/examples/ex_dsp_artifacts`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_artifacts) on GitHub.
+
+````cpp title="src/examples/ex_dsp_artifacts/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -299,4 +322,9 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_dsp_maxwell](../dsp/ex_dsp_maxwell.mdx) — DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal.
+- [ex_dsp_preprocessing](../dsp/ex_dsp_preprocessing.mdx) — Preprocessing tools of the dsp library on synthetic data with a known ground truth.
 

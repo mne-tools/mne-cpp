@@ -7,13 +7,15 @@ sidebar_position: 1
 
 # FiffStream
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_stream.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_stream.h)
 
 :::info[Python equivalent]
 `mne.io.fiff.FiffStream` in MNE-Python.
 :::
 
 `#include <fiff/fiff_stream.h>`
+
+<Connections topics={["fiff-io"]} context="api" current="FiffStream" />
 
 ```cpp
 class FIFFLIB::FiffStream
@@ -1136,6 +1138,7 @@ Opens the source file, locates the FIFFB_PROCESSING_HISTORY block, reads all tag
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -1144,7 +1147,7 @@ Opens the source file, locates the FIFFB_PROCESSING_HISTORY block, reads all tag
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 208"
 QFile structureFile(dir + "/sample_audvis-ave.fif");
@@ -1160,7 +1163,7 @@ ok &= expect(opened && measNodes.size() == 1 && hasNchan && nchanTag == 376 && !
              "FiffStream/FiffDirNode/FiffTag/FiffId: the FIFF_NCHAN tag of the measurement block reads 376");
 ````
 
-### [ex_fiff_sniffer](../../examples/connectivity/ex_fiff_sniffer.mdx)
+### [ex_fiff_sniffer](../../examples/fiff/ex_fiff_sniffer.mdx)
 
 Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents.
 
@@ -1175,7 +1178,7 @@ if (littleEndian) {
 
 ### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
 
-FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application.
 
 ````cpp title="src/examples/ex_fiff_structure/main.cpp, line 120"
 QFile structureFile(rawPath);

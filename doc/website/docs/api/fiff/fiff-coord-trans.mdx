@@ -7,7 +7,7 @@ sidebar_position: 8
 
 # FiffCoordTrans
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_coord_trans.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_coord_trans.h)
 
 :::info[Python equivalent]
 `mne.transforms.Transform` in MNE-Python.
@@ -583,6 +583,7 @@ Performs a Procrustes alignment between two sets of corresponding 3D points.
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -591,7 +592,7 @@ Performs a Procrustes alignment between two sets of corresponding 3D points.
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 131"
 const FiffCoordTrans headToMri = FiffCoordTrans::readTransform(dir + "/all-trans.fif", FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
@@ -606,7 +607,7 @@ ok &= expect(devHead.from == FIFFV_COORD_DEVICE && devHead.to == FIFFV_COORD_HEA
 
 ### [ex_read_evoked](../../examples/mne/ex_read_evoked.mdx)
 
-Example for read an evoked from fiff file.
+Read an evoked data set from FIFF and print its measurement info and coordinate transforms.
 
 ````cpp title="src/examples/ex_read_evoked/main.cpp, line 79"
 //Select the head coordinate system

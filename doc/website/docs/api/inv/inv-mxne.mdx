@@ -7,13 +7,15 @@ sidebar_position: 8
 
 # InvMxne
 
-**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library
+**Namespace:** `INVLIB` &nbsp;·&nbsp; **Library:** Inverse Library &nbsp;·&nbsp; **Source:** [`inv/sparse/inv_mxne.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/inv/sparse/inv_mxne.h)
 
 :::info[Python equivalent]
 `mne.inverse_sparse.mixed_norm` in MNE-Python.
 :::
 
 `#include <inv/inv_mxne.h>`
+
+<Connections topics={["sparse-inverse"]} context="api" current="InvMxne" />
 
 ```cpp
 class INVLIB::InvMxne
@@ -69,6 +71,7 @@ Compute the MxNE inverse solution.
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -77,7 +80,7 @@ Compute the MxNE inverse solution.
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 240"
 const MatrixXd gain = whitener * fixedFwd.sol->data * 1e-9;

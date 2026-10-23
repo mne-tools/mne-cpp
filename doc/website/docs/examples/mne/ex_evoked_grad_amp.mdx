@@ -9,27 +9,40 @@ description: "Compute tangential gradient amplitudes from planar gradiometer dat
 
 Compute tangential gradient amplitudes from planar gradiometer data.
 
+<ExampleFacts name="ex_evoked_grad_amp" />
+
 **Libraries:** [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Utilities](../../api/utils/index.mdx)
 
-## Options
-
-| Option | Description |
-|---|---|
-| `--ave` | Path to the evoked/average &lt;file&gt;. |
-| `--doBaseline` | Do baseline correction. |
-
 ## Build and run
+
+Needs the [MNE sample dataset](../../manual/sample-dataset.mdx) in `resources/data/MNE-sample-data`.
 
 ```bash
 cmake --build build/developer-dynamic --target ex_evoked_grad_amp
 ./out/Release/examples/ex_evoked_grad_amp --help
 ```
 
-The default inputs come from the [MNE sample dataset](../../manual/sample-dataset.mdx).
+### Options
+
+| Option | Description |
+|---|---|
+| `--ave` | Path to the evoked/average &lt;file&gt;. |
+| `--doBaseline` | Do baseline correction. |
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`FiffEvokedSet`](../../api/fiff/fiff-evoked-set.mdx) | FIFF I/O |
+| [`MNE`](../../api/mne/mne-class.mdx) | MNE Core |
 
 ## Source
 
-````cpp title="src/examples/ex_evoked_grad_amp/main.cpp"
+[`src/examples/ex_evoked_grad_amp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_evoked_grad_amp) on GitHub.
+
+````cpp title="src/examples/ex_evoked_grad_amp/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause

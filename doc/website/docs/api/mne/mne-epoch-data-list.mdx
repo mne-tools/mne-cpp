@@ -7,9 +7,11 @@ sidebar_position: 19
 
 # MNEEpochDataList
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_epoch_data_list.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_epoch_data_list.h)
 
 `#include <mne/mne_epoch_data_list.h>`
+
+<Connections topics={["epochs-averaging"]} context="api" current="MNEEpochDataList" />
 
 ```cpp
 class MNELIB::MNEEpochDataList
@@ -273,6 +275,7 @@ Convenience function: reads epochs, optionally applies baseline correction and a
 
 ## Example
 
+- Start here: [ex_mne_api](../../examples/fs/ex_mne_api.mdx) — MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 - Full source: [`src/examples/ex_mne_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_mne_api/main.cpp)
 - Build target: `ex_mne_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -300,7 +303,7 @@ ok &= expect(evoked.nave == 6 && near(evoked.data.topRows(306).norm(), 6.0801191
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/connectivitysettingsmanager.h, line 116"
 TFplot::SPtr m_pTfPlot;
@@ -311,7 +314,7 @@ MNELIB::MNEEpochDataList epochs;
 
 ### [ex_averaging](../../examples/mne/ex_averaging.mdx)
 
-Average data from a raw data file.
+Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
 ````cpp title="src/examples/ex_averaging/main.cpp, line 151"
 FiffEvoked evoked = MNEEpochDataList::computeAverage(raw,

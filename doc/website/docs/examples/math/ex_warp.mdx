@@ -9,7 +9,13 @@ description: "Example demonstrating thin-plate-spline (TPS) warping with UTILSLI
 
 Example demonstrating thin-plate-spline (TPS) warping with UTILSLIB::Warp.
 
+<ExampleFacts name="ex_warp" />
+
 **Libraries:** [Math](../../api/math/index.mdx)
+
+## What it demonstrates
+
+This example shows how to non-rigidly register one 3-D geometry onto another using a set of landmark correspondences. It defines a small set of source landmarks (the corners of a unit cube), a matching set of destination landmarks (an affine stretch plus a non-linear bump), warps a regular grid of source vertices onto the destination geometry, and verifies that the warp maps the source landmarks exactly onto the destination landmarks - the defining property of Bookstein's thin-plate spline.
 
 ## Build and run
 
@@ -18,13 +24,23 @@ cmake --build build/developer-dynamic --target ex_warp
 ./out/Release/examples/ex_warp
 ```
 
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`Warp`](../../api/math/warp.mdx) | Math |
+
 ## Used in the API reference
 
 - [Warp](../../api/math/warp.mdx)
 
 ## Source
 
-````cpp title="src/examples/ex_warp/main.cpp"
+[`src/examples/ex_warp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_warp) on GitHub.
+
+````cpp title="src/examples/ex_warp/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -168,4 +184,8 @@ int main(int argc, char* argv[])
     return 0;
 }
 ````
+
+## Related examples
+
+- [ex_math](../math/ex_math.mdx) — Math library on inputs with known answers.
 

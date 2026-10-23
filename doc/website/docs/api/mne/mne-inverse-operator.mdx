@@ -7,13 +7,15 @@ sidebar_position: 2
 
 # MNEInverseOperator
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_inverse_operator.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_inverse_operator.h)
 
 :::info[Python equivalent]
 `mne.InverseOperator` in MNE-Python.
 :::
 
 `#include <mne/mne_inverse_operator.h>`
+
+<Connections topics={["minimum-norm"]} context="api" current="MNEInverseOperator" />
 
 ```cpp
 class MNELIB::MNEInverseOperator
@@ -343,6 +345,7 @@ Read an inverse operator from a FIFF file.
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -351,7 +354,7 @@ Read an inverse operator from a FIFF file.
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 121"
 const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
@@ -363,7 +366,7 @@ ok &= expect(stc.data.rows() == 70 && stc.data.cols() == 421 && near(stc.data.cw
              "InvMinimumNorm/InvSourceEstimate: dSPM on 70 V1 sources matches mne.minimum_norm.apply_inverse");
 ````
 
-### [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx)
+### [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx)
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
@@ -385,13 +388,13 @@ rtInvOp.stop();
 
 ### [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx)
 
-Example of the computation of a clustered inverse mne raw.
+Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
 
 ````cpp title="src/examples/ex_clustered_inverse_mne_raw/main.cpp, line 453"
 MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 ````
 
-Also used in [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx).
+Also used in [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx).
 
 ## Authors of this file
 

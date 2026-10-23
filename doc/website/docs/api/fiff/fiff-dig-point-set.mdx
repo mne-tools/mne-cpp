@@ -7,7 +7,7 @@ sidebar_position: 18
 
 # FiffDigPointSet
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_dig_point_set.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_dig_point_set.h)
 
 `#include <fiff/fiff_dig_point_set.h>`
 
@@ -440,6 +440,7 @@ Reads a Neuroscan .dat electrode file ("name number x y z" per line), as mne.cha
 
 ## Example
 
+- Start here: [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx) — FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 - Full source: [`src/examples/ex_fiff_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_api/main.cpp)
 - Build target: `ex_fiff_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -448,7 +449,7 @@ Reads a Neuroscan .dat electrode file ("name number x y z" per line), as mne.cha
 
 ### [ex_fiff_api](../../examples/fiff/ex_fiff_api.mdx)
 
-FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events,.
+FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure.
 
 ````cpp title="src/examples/ex_fiff_api/main.cpp, line 123"
 FiffDigPointSet digitizer(info.dig);                                    // 146 points in head coordinates
@@ -458,9 +459,9 @@ ok &= expect(digitizer.size() == 146 && cardinal.size() == 3 && cardinal[0].iden
              "FiffDigPointSet/FiffDigPoint: 146 points, LPA at x = -71.38 mm");
 ````
 
-### [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx)
+### [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx)
 
-Example of using the MNE-CPP Disp3D library.
+Compute a clustered MNE, dSPM or sLORETA estimate of the sample evoked response and show it on the cortex with Disp3D.
 
 ````cpp title="src/examples/ex_disp_3D/main.cpp, line 264"
 // Read and show digitizer points
@@ -470,7 +471,7 @@ FiffDigPointSet t_Dig(t_fileDig);
 
 ### [ex_hpiFit](../../examples/inv/ex_hpiFit.mdx)
 
-Example for cHPI fitting on raw data with SSP. The result is written to a .txt file for comparison with MaxFilter's .pos file.
+Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
 
 ````cpp title="src/examples/ex_hpiFit/main.cpp, line 155"
 QVector<double> vecError(lFreqs.size());

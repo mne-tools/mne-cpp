@@ -9,20 +9,47 @@ description: "DSP real-time workers: averaging, covariance, noise spectrum, conn
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
+<ExampleFacts name="ex_dsp_rt" />
+
 **Libraries:** [Connectivity](../../api/connectivity/index.mdx), [Inverse](../../api/inv/index.mdx), [Signal Processing](../../api/dsp/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
 
-## Options
+## What it demonstrates
 
-| Option | Description |
-|---|---|
-| `--data` | MNE-CPP test data &lt;dir&gt;. |
+Each worker is fed blocks the way MNE Scan feeds it and its result is compared with a closed form, NumPy/SciPy 1.15 (scipy.signal.welch) or the corresponding offline call. The threaded front ends are driven through their signals with a bounded event loop. Exits non-zero on any mismatch.
+
+## Background
+
+<Connections topics={["head-position", "real-time"]} context="example" current="ex_dsp_rt" />
 
 ## Build and run
+
+Needs the [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) repository cloned to `resources/data/mne-cpp-test-data`.
 
 ```bash
 cmake --build build/developer-dynamic --target ex_dsp_rt
 ./out/Release/examples/ex_dsp_rt --help
 ```
+
+### Options
+
+| Option | Description |
+|---|---|
+| `--data` | MNE-CPP test data &lt;dir&gt;. |
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`FiffInfo`](../../api/fiff/fiff-info.mdx) | FIFF I/O |
+| [`RtAveraging`](../../api/dsp/rt-averaging.mdx) | Signal Processing |
+| [`RtCov`](../../api/dsp/rt-cov.mdx) | Signal Processing |
+| [`FiffEvokedSet`](../../api/fiff/fiff-evoked-set.mdx) | FIFF I/O |
+| [`HpiFitResult`](../../api/inv/hpi-fit-result.mdx) | Inverse |
+| [`RtAveragingWorker`](../../api/dsp/rt-averaging-worker.mdx) | Signal Processing |
+| [`RtConnectivity`](../../api/dsp/rt-connectivity.mdx) | Signal Processing |
+| [`RtHpiWorker`](../../api/dsp/rt-hpi-worker.mdx) | Signal Processing |
 
 ## Used in the API reference
 
@@ -53,7 +80,9 @@ cmake --build build/developer-dynamic --target ex_dsp_rt
 
 ## Source
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp"
+[`src/examples/ex_dsp_rt`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_rt) on GitHub.
+
+````cpp title="src/examples/ex_dsp_rt/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -390,4 +419,10 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_lsl](../lsl/ex_lsl.mdx) — LSL library: publish a stream, discover it and receive its samples over loopback.
+- [ex_hpiFit](../inv/ex_hpiFit.mdx) — Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
+- [ex_inv_hpi](../inv/ex_inv_hpi.mdx) — Inverse library: continuous head position (HPI) fitting.
 

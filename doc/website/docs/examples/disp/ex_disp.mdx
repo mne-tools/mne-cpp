@@ -9,9 +9,20 @@ description: "Disp library widgets: image map, line plot and time-frequency plot
 
 Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
+<ExampleFacts name="ex_disp" />
+
 **Libraries:** [Visualization](../../api/disp/index.mdx), [Signal Processing](../../api/dsp/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Utilities](../../api/utils/index.mdx)
 
-## Options
+## Build and run
+
+Needs the [MNE sample dataset](../../manual/sample-dataset.mdx) in `resources/data/MNE-sample-data`.
+
+```bash
+cmake --build build/developer-dynamic --target ex_disp
+./out/Release/examples/ex_disp --help
+```
+
+### Options
 
 | Option | Description |
 |---|---|
@@ -21,14 +32,18 @@ Disp library widgets: image map, line plot and time-frequency plot of raw data.
 | `--inSamples` | Timing is set in samples. |
 | `--keepComp` | Keep compensators. |
 
-## Build and run
+## Key API
 
-```bash
-cmake --build build/developer-dynamic --target ex_disp
-./out/Release/examples/ex_disp --help
-```
+The documented classes this example uses most:
 
-The default inputs come from the [MNE sample dataset](../../manual/sample-dataset.mdx).
+| Class | Library |
+|---|---|
+| [`ImageSc`](../../api/disp/image-sc.mdx) | Visualization |
+| [`MNE`](../../api/mne/mne-class.mdx) | MNE Core |
+| [`Plot`](../../api/disp/plot.mdx) | Visualization |
+| [`FiffRawData`](../../api/fiff/fiff-raw-data.mdx) | FIFF I/O |
+| [`Spectrogram`](../../api/utils/spectrogram.mdx) | Utilities |
+| [`TFplot`](../../api/disp/t-fplot.mdx) | Visualization |
 
 ## Used in the API reference
 
@@ -39,7 +54,9 @@ The default inputs come from the [MNE sample dataset](../../manual/sample-datase
 
 ## Source
 
-````cpp title="src/examples/ex_disp/main.cpp"
+[`src/examples/ex_disp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp) on GitHub.
+
+````cpp title="src/examples/ex_disp/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -266,4 +283,9 @@ int main(int argc, char* argv[])
     return a.exec();
 }
 ````
+
+## Related examples
+
+- [ex_disp_plots](../disp/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+- [ex_tf_plot](../disp/ex_tf_plot.mdx) — Spectrogram of one evoked channel shown as a time-frequency plot.
 

@@ -9,7 +9,13 @@ description: "Statistics library on small literal data sets with known answers"
 
 Statistics library on small literal data sets with known answers.
 
+<ExampleFacts name="ex_sts_statistics" />
+
 **Libraries:** [Statistics](../../api/sts/index.mdx)
+
+## What it demonstrates
+
+The expected numbers come from scipy 1.16 (t- and F-tests), scikit-learn (Ledoit-Wolf, OAS) and MNE-Python 1.11 (FDR, Bonferroni) on the same arrays, or from closed forms. The example exits non-zero if any value disagrees.
 
 ## Build and run
 
@@ -17,6 +23,21 @@ Statistics library on small literal data sets with known answers.
 cmake --build build/developer-dynamic --target ex_sts_statistics
 ./out/Release/examples/ex_sts_statistics
 ```
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`StatsTtest`](../../api/sts/stats-ttest.mdx) | Statistics |
+| [`StatsTtestResult`](../../api/sts/stats-ttest-result.mdx) | Statistics |
+| [`StatsMcCorrection`](../../api/sts/stats-mc-correction.mdx) | Statistics |
+| [`StatsSourceMetrics`](../../api/sts/stats-source-metrics.mdx) | Statistics |
+| [`StsCovEstimators`](../../api/sts/sts-cov-estimators.mdx) | Statistics |
+| [`StatsAdjacency`](../../api/sts/stats-adjacency.mdx) | Statistics |
+| [`StatsCluster`](../../api/sts/stats-cluster.mdx) | Statistics |
+| [`StatsClusterResult`](../../api/sts/stats-cluster-result.mdx) | Statistics |
 
 ## Used in the API reference
 
@@ -33,7 +54,9 @@ cmake --build build/developer-dynamic --target ex_sts_statistics
 
 ## Source
 
-````cpp title="src/examples/ex_sts_statistics/main.cpp"
+[`src/examples/ex_sts_statistics`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_sts_statistics) on GitHub.
+
+````cpp title="src/examples/ex_sts_statistics/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause

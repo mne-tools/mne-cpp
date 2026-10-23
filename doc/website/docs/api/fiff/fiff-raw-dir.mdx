@@ -7,7 +7,7 @@ sidebar_position: 27
 
 # FiffRawDir
 
-**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library
+**Namespace:** `FIFFLIB` &nbsp;·&nbsp; **Library:** FIFF Library &nbsp;·&nbsp; **Source:** [`fiff/fiff_raw_dir.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fiff/fiff_raw_dir.h)
 
 `#include <fiff/fiff_raw_dir.h>`
 
@@ -73,6 +73,7 @@ Destroys the raw Directory entry.
 
 ## Example
 
+- Start here: [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx) — FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application.
 - Full source: [`src/examples/ex_fiff_structure/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fiff_structure/main.cpp)
 - Build target: `ex_fiff_structure` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -81,7 +82,7 @@ Destroys the raw Directory entry.
 
 ### [ex_fiff_structure](../../examples/fiff/ex_fiff_structure.mdx)
 
-FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing.
+FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application.
 
 ````cpp title="src/examples/ex_fiff_structure/main.cpp, line 109"
 // The raw data directory: one FiffRawDir per data buffer, each pointing at its FiffDirEntry in the file.

@@ -239,10 +239,18 @@
     color: inherit !important;
 }
 
-.appCard:hover {
+.appCard:hover,
+.appCard:focus-visible {
     transform: translateY(-6px);
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
     text-decoration: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .appCard:hover,
+    .appCard:focus-visible {
+        transform: none;
+    }
 }
 
 .appIcon {

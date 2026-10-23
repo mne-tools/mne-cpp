@@ -9,20 +9,47 @@ description: "Inverse library: continuous head position (HPI) fitting"
 
 Inverse library: continuous head position (HPI) fitting.
 
+<ExampleFacts name="ex_inv_hpi" />
+
 **Libraries:** [Inverse](../../api/inv/index.mdx), [FIFF I/O](../../api/fiff/index.mdx), [Utilities](../../api/utils/index.mdx)
 
-## Options
+## What it demonstrates
 
-| Option | Description |
-|---|---|
-| `--data` | MNE-CPP test data &lt;dir&gt;. |
+Fits the four HPI coils in the first 200 ms of the test recording and compares the device-to-head transform with the head position MaxFilter computed for the same recording (Result/ref_hpiFit_pos.txt, quaternion format). Exits non-zero on any mismatch.
+
+## Background
+
+<Connections topics={["head-position"]} context="example" current="ex_inv_hpi" />
 
 ## Build and run
+
+Needs the [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data) repository cloned to `resources/data/mne-cpp-test-data`.
 
 ```bash
 cmake --build build/developer-dynamic --target ex_inv_hpi
 ./out/Release/examples/ex_inv_hpi --help
 ```
+
+### Options
+
+| Option | Description |
+|---|---|
+| `--data` | MNE-CPP test data &lt;dir&gt;. |
+
+## Key API
+
+The documented classes this example uses most:
+
+| Class | Library |
+|---|---|
+| [`InvHpiModelParameters`](../../api/inv/inv-hpi-model-parameters.mdx) | Inverse |
+| [`FiffChInfo`](../../api/fiff/fiff-ch-info.mdx) | FIFF I/O |
+| [`InvHpiDataUpdater`](../../api/inv/inv-hpi-data-updater.mdx) | Inverse |
+| [`InvHpiFit`](../../api/inv/inv-hpi-fit.mdx) | Inverse |
+| [`InvHpiFitData`](../../api/inv/inv-hpi-fit-data.mdx) | Inverse |
+| [`InvSensorSet`](../../api/inv/inv-sensor-set.mdx) | Inverse |
+| [`InvSensorSetCreator`](../../api/inv/inv-sensor-set-creator.mdx) | Inverse |
+| [`InvSignalModel`](../../api/inv/inv-signal-model.mdx) | Inverse |
 
 ## Used in the API reference
 
@@ -41,7 +68,9 @@ cmake --build build/developer-dynamic --target ex_inv_hpi
 
 ## Source
 
-````cpp title="src/examples/ex_inv_hpi/main.cpp"
+[`src/examples/ex_inv_hpi`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_hpi) on GitHub.
+
+````cpp title="src/examples/ex_inv_hpi/main.cpp" showLineNumbers
 //=============================================================================================================
 /**
  * SPDX-License-Identifier: BSD-3-Clause
@@ -194,4 +223,9 @@ int main(int argc, char* argv[])
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 ````
+
+## Related examples
+
+- [ex_hpiFit](../inv/ex_hpiFit.mdx) — Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
+- [ex_dsp_rt](../dsp/ex_dsp_rt.mdx) — DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 

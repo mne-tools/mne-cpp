@@ -7,7 +7,7 @@ sidebar_position: 3
 
 # FsLabel
 
-**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library
+**Namespace:** `FSLIB` &nbsp;·&nbsp; **Library:** FreeSurfer Library &nbsp;·&nbsp; **Source:** [`fs/fs_label.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fs/fs_label.h)
 
 :::info[Python equivalent]
 `mne.read_label` in MNE-Python.
@@ -140,6 +140,7 @@ Reads a [`FsLabel`](/docs/api/fs/fs-label) from a FreeSurfer label file. This is
 
 ## Example
 
+- Start here: [ex_fs](../../examples/fs/ex_fs.mdx) — FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume.
 - Full source: [`src/examples/ex_fs/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fs/main.cpp)
 - Build target: `ex_fs` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -168,7 +169,7 @@ ok &= expect(colors.getNames().size() == 36 && regions.size() == 34 && precentra
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 112"
 FsLabel v1;

@@ -7,13 +7,15 @@ sidebar_position: 1
 
 # ComputeFwd
 
-**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library
+**Namespace:** `FWDLIB` &nbsp;·&nbsp; **Library:** Forward Library &nbsp;·&nbsp; **Source:** [`fwd/compute_fwd/compute_fwd.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/fwd/compute_fwd/compute_fwd.h)
 
 :::info[Python equivalent]
 `mne.make_forward_solution` in MNE-Python.
 :::
 
 `#include <fwd/compute_fwd.h>`
+
+<Connections topics={["forward-modeling"]} context="api" current="ComputeFwd" />
 
 ```cpp
 class FWDLIB::ComputeFwd
@@ -101,6 +103,7 @@ Update the head position with a new device-to-head transform and recompute the M
 
 ## Example
 
+- Start here: [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx) — Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 - Full source: [`src/examples/ex_fwd_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_fwd_api/main.cpp)
 - Build target: `ex_fwd_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -125,7 +128,7 @@ ok &= expect(fwd && fwd->nsource == 78 && fwd->sol->data.rows() == 366 && near(f
 
 ### [ex_compute_forward](../../examples/fwd/ex_compute_forward.mdx)
 
-This example shows how to compute the forward solution.
+Compute the MEG/EEG forward solution of the sample subject from its BEM, source space and head-MRI transform.
 
 ````cpp title="src/examples/ex_compute_forward/main.cpp, line 115"
 timer0.start();

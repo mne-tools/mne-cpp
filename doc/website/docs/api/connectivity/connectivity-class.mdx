@@ -7,13 +7,15 @@ sidebar_position: 1
 
 # Connectivity
 
-**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library
+**Namespace:** `CONNECTIVITYLIB` &nbsp;·&nbsp; **Library:** Connectivity Library &nbsp;·&nbsp; **Source:** [`connectivity/connectivity.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/connectivity/connectivity.h)
 
 :::info[Python equivalent]
 `mne_connectivity.spectral_connectivity_epochs` in MNE-Python.
 :::
 
 `#include <connectivity/connectivity.h>`
+
+<Connections topics={["connectivity"]} context="api" current="Connectivity" />
 
 ```cpp
 class CONNECTIVITYLIB::Connectivity
@@ -77,6 +79,7 @@ Computes the network based on the current settings.
 
 ## Example
 
+- Start here: [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx) — Connectivity metrics on synthetic data with a known coupling.
 - Full source: [`src/examples/ex_connectivity_metrics/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_connectivity_metrics/main.cpp)
 - Build target: `ex_connectivity_metrics` (runs under CTest)
 
@@ -98,7 +101,7 @@ ok &= expect(networks.size() == 3, "Connectivity::calculate returns one network 
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/main.cpp, line 107"
 QCommandLineParser parser;
@@ -108,7 +111,7 @@ parser.addHelpOption();
 
 ### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
 
-Example to compare connectivity methods.
+Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
 ````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 100"
 QCommandLineParser parser;
@@ -116,7 +119,7 @@ parser.setApplicationDescription("Connectivity Comparison Example");
 parser.addHelpOption();
 ````
 
-Also used in [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx), [ex_connectivity_performance](../../examples/connectivity/ex_connectivity_performance.mdx).
+Also used in [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx), [ex_connectivity_performance](../../examples/connectivity/ex_connectivity_performance.mdx).
 
 ## Authors of this file
 

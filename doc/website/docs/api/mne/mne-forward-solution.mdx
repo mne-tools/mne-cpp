@@ -7,13 +7,15 @@ sidebar_position: 1
 
 # MNEForwardSolution
 
-**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library
+**Namespace:** `MNELIB` &nbsp;·&nbsp; **Library:** MNE Library &nbsp;·&nbsp; **Source:** [`mne/mne_forward_solution.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/mne/mne_forward_solution.h)
 
 :::info[Python equivalent]
 `mne.Forward` in MNE-Python.
 :::
 
 `#include <mne/mne_forward_solution.h>`
+
+<Connections topics={["forward-modeling"]} context="api" current="MNEForwardSolution" />
 
 ```cpp
 class MNELIB::MNEForwardSolution
@@ -468,6 +470,7 @@ Restrict gain matrix entries for optimal depth weighting.
 
 ## Example
 
+- Start here: [ex_inv_api](../../examples/inv/ex_inv_api.mdx) — Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 - Full source: [`src/examples/ex_inv_api/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inv_api/main.cpp)
 - Build target: `ex_inv_api` (runs under CTest)
 - Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
@@ -476,7 +479,7 @@ Restrict gain matrix entries for optimal depth weighting.
 
 ### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers.
+Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
 ````cpp title="src/examples/ex_inv_api/main.cpp, line 112"
 FsLabel v1;
@@ -491,7 +494,7 @@ const FiffEvoked evoked(aveFile, 0); // "Left Auditory"
 
 ### [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx)
 
-Example of using the MNE-CPP Connectivity library.
+Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
 
 ````cpp title="src/examples/ex_connectivity/main.cpp, line 186"
 MNEForwardSolution t_clusteredFwd;
@@ -500,14 +503,14 @@ MNEForwardSolution t_Fwd;
 
 ### [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx)
 
-Example to compare connectivity methods.
+Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
 
 ````cpp title="src/examples/ex_connectivity_comparison/main.cpp, line 183"
 MNEForwardSolution t_clusteredFwd;
 MNEForwardSolution t_Fwd;
 ````
 
-Also used in [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_disp_3D](../../examples/inv/ex_disp_3D.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_read_fwd](../../examples/fs/ex_read_fwd.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx), [ex_compute_forward](../../examples/fwd/ex_compute_forward.mdx), [ex_dsp_rt](../../examples/connectivity/ex_dsp_rt.mdx), [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_read_fwd_disp_3D](../../examples/disp3D/ex_read_fwd_disp_3D.mdx).
+Also used in [ex_fwd_api](../../examples/fwd/ex_fwd_api.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_clustered_inverse_mne_raw](../../examples/inv/ex_clustered_inverse_mne_raw.mdx), [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_read_fwd](../../examples/fs/ex_read_fwd.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx), [ex_compute_forward](../../examples/fwd/ex_compute_forward.mdx), [ex_dsp_rt](../../examples/dsp/ex_dsp_rt.mdx), [ex_inv_beamformer](../../examples/inv/ex_inv_beamformer.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_read_fwd_disp_3D](../../examples/disp3D/ex_read_fwd_disp_3D.mdx).
 
 ## Authors of this file
 
