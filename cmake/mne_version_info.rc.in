@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2026 MNE-CPP Authors
+//   Christoph Dinh <christoph.dinh@mne-cpp.org>
+//
+// Windows version resource of every first-party MNE-CPP binary. SignPath
+// rejects a signed file whose ProductName or ProductVersion differs from
+// .signpath/artifact-configurations/*.xml; tools/release/check_pe_metadata.py
+// checks the same before submission. Numeric constants (winver.h values) keep
+// the file compilable by a bare rc.exe without the SDK include path.
+
+1 VERSIONINFO
+ FILEVERSION     @MNE_RC_VERSION_COMMA@
+ PRODUCTVERSION  @MNE_RC_VERSION_COMMA@
+ FILEFLAGSMASK   0x3FL
+ FILEFLAGS       0x0L
+ FILEOS          0x40004L
+ FILETYPE        @MNE_RC_FILETYPE@
+ FILESUBTYPE     0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName",      "MNE-CPP"
+            VALUE "FileDescription",  "@MNE_RC_DESCRIPTION@"
+            VALUE "FileVersion",      "@MNE_RC_VERSION@"
+            VALUE "InternalName",     "@MNE_RC_INTERNAL_NAME@"
+            VALUE "LegalCopyright",   "Copyright (c) MNE-CPP Authors. BSD-3-Clause."
+            VALUE "ProductName",      "MNE-CPP"
+            VALUE "ProductVersion",   "@MNE_RC_VERSION@"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END

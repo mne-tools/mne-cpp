@@ -438,6 +438,12 @@ if(BUILD_TESTS)
   add_subdirectory(testframes)
 endif()
 
+if(WIN32)
+  enable_language(RC)
+  include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/MneVersionInfo.cmake)
+  mne_add_windows_version_info(${CMAKE_CURRENT_SOURCE_DIR} ${MNE_CPP_VERSION})
+endif()
+
 ##==============================================================================
 ## CMake package config for find_package(MNE-CPP) — SDK discovery
 ## (Not applicable for WASM builds which use a bundled Eigen target and
