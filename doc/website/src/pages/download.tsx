@@ -381,7 +381,7 @@ export default function Download(): React.JSX.Element {
                                                     This release has no Windows downloads: Windows binaries are published
                                                     once they are signed under the{' '}
                                                     <Link to="/code-signing-policy">code signing policy</Link>.
-                                                    Unsigned Windows development builds are listed on the right.
+                                                    Unsigned Windows development builds are listed under Development Builds.
                                                 </div>
                                             )}
 
@@ -684,7 +684,7 @@ cmake --build build/developer-dynamic --parallel`}</code></pre>
                             <Heading as="h2" id="verifying">Verifying Downloads</Heading>
                             <p className="dl-card__desc">
                                 GitHub computes the SHA-256 digest of every release asset. It is shown next to each
-                                download above (click to copy) and on the{' '}
+                                download above on wider screens (click to copy) and on the{' '}
                                 <a href="https://github.com/mne-tools/mne-cpp/releases" target="_blank" rel="noopener noreferrer">
                                     GitHub release page
                                 </a>. Compare it with the output of:

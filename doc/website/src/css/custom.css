@@ -827,6 +827,13 @@ a.mc-tag:hover {
     border-color: var(--ifm-color-emphasis-200);
 }
 
+/* Phones keep name and size readable; the digest stays on the release page and in the verify section. */
+@media (max-width: 480px) {
+    .dl-digest {
+        display: none;
+    }
+}
+
 /* Standalone MDX pages (code signing policy) */
 .mc-callout {
     border-left: 3px solid var(--ifm-color-primary);
