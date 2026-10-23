@@ -2,6 +2,26 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
+## [2.4.0-rc] - 2026-10-23
+
+Release candidate that replaces the v2.4.0 tag of 2026-10-22, whose Windows
+downloads could not be signed. It contains everything listed under 2.4.0 below,
+plus:
+
+- **Code signing** — every Windows executable and DLL carries a version
+  resource with product name MNE-CPP and the release version, checked before
+  each SignPath request against the artifact configurations in `.signpath/`.
+  The macOS release is prepared for Developer ID signing and notarization of
+  the apps, the `.dmg` images and the installer. The
+  [code signing policy](https://mne-cpp.github.io/code-signing-policy/) states
+  what is signed, by whom, and what the applications send over the network.
+- **Documentation** — the manual, API reference and examples link to each
+  other by scientific topic; the examples page can be filtered by task,
+  recording type, level and library; a new Get Started guide builds a first
+  program against an installed MNE-CPP.
+- **Examples** — every example states what it computes instead of a generic
+  description.
+
 ## [2.4.0] - 2026-10-22
 
 **Theme: correctness you can check.** v2.4.0 compares MNE-CPP against
