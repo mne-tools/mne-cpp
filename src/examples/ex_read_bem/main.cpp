@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     Mai, 2015
- * @brief    Example of reading BEM data
+ * @brief    Read a BEM model from FIFF, write it back and verify the round trip.
  */
 
 //=============================================================================================================

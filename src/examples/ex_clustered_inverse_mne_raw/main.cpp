@@ -10,7 +10,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2013
- * @brief    Example of the computation of a clustered inverse mne raw
+ * @brief    Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution.
  */
 
 //=============================================================================================================

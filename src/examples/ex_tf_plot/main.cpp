@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     September, 2018
- * @brief    Read data and perform tf analysis
+ * @brief    Spectrogram of one evoked channel shown as a time-frequency plot.
  */
 
 //=============================================================================================================

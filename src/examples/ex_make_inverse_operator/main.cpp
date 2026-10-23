@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Example of making an inverse operator
+ * @brief    Assemble MEG+EEG, MEG-only and EEG-only inverse operators from a forward solution and a regularized noise covariance, then apply them.
  */
 
 //=============================================================================================================

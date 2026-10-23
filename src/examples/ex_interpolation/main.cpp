@@ -13,7 +13,7 @@
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
  * @since    0.1.0
  * @date     May, 2017
- * @brief    Example of using the interpolation library and geometryInfo library
+ * @brief    Map evoked MEG values onto a surface mesh with surface-constrained distances (GeometryInfo) and interpolation weights.
  */
 
 //=============================================================================================================

@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Example of a L2 minimum-norm estimate or a dSPM solution
+ * @brief    L2 minimum-norm or dSPM estimate of the sample evoked response from a precomputed inverse operator.
  */
 
 //=============================================================================================================

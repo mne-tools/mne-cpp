@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief     Example of reading ForwardSolution data from a fiff file
+ * @brief     Read a forward solution, print its gain matrix and source geometry, and cluster it by cortical parcellation.
  */
 
 //=============================================================================================================

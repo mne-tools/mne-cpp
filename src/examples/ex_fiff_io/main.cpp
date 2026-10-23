@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief     Example of the FiffIO interface class
+ * @brief     Read the data sets of a FIFF file through the generic FiffIO interface and write its raw data back to disk.
  */
 
 //=============================================================================================================

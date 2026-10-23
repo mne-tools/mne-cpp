@@ -10,7 +10,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     March, 2014
- * @brief    Example of the computation of a single trial clustered inverse rap music
+ * @brief    Localize dipole pairs in single trials of a raw recording with Powell RAP-MUSIC on a clustered forward solution.
  */
 
 //=============================================================================================================

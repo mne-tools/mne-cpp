@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Example of an FreeSurfer FsSurface application
+ * @brief    Load the pial, inflated, original and white FreeSurfer surfaces of a subject and show them in 3D.
  */
 
 //=============================================================================================================

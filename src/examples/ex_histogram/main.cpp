@@ -10,7 +10,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     March, 2016
- * @brief    Example application of reading raw data and presenting the result in histogram form
+ * @brief    Histogram of the source amplitudes of a clustered MNE, dSPM or sLORETA estimate of the sample evoked response.
  */
 
 //=============================================================================================================

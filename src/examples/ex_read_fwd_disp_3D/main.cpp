@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Example of reading ForwardSolution data from a fiff file and display it in 3D
+ * @brief    Read a forward solution and show its source space with the FreeSurfer parcellation in 3D.
  */
 
 //=============================================================================================================

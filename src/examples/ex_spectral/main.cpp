@@ -10,7 +10,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     March, 2018
- * @brief    Example of the computation of spectra, PSD and CSD
+ * @brief    Multitaper spectra, power spectral density and cross-spectral density of random test signals.
  */
 
 //=============================================================================================================

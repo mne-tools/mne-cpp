@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Read epoch data from a raw data file
+ * @brief    Read stimulus-locked epochs from a raw FIFF recording with event selection and artifact rejection.
  */
 
 //=============================================================================================================

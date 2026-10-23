@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2016
- * @brief    Example of noise cancellation procedures
+ * @brief    Build the CTF software gradient compensator that converts an evoked data set between compensation grades.
  */
 
 //=============================================================================================================

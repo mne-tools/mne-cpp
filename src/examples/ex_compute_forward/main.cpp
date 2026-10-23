@@ -9,7 +9,7 @@
  *           Ruben Dörfel <ruben.deorfel@tu-ilmenau.de>
  * @date     April, 2020
  * @version  dev
- * @brief     This example shows how to compute the forward solution.
+ * @brief     Compute the MEG/EEG forward solution of the sample subject from its BEM, source space and head-MRI transform.
  */
 
 //=============================================================================================================

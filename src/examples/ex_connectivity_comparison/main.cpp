@@ -11,7 +11,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2016
- * @brief     Example to compare connectivity methods
+ * @brief     Compare connectivity metrics side by side on the same averaged sensor- or source-level data.
  */
 
 //=============================================================================================================

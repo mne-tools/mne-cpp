@@ -10,7 +10,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Example of a Clustered Inverse Minimum Norm Estimation application
+ * @brief    Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response.
  */
 
 //=============================================================================================================

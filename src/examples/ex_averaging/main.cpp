@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.3
  * @date     July, 2020
- * @brief    Average data from a raw data file
+ * @brief    Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
  */
 
 //=============================================================================================================

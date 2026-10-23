@@ -9,7 +9,7 @@
  *           Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.0
  * @date     January, 2020
- * @brief     Example for cHPI fitting on raw data with SSP. The result is written to a .txt file for comparison with MaxFilter's .pos file.
+ * @brief     Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter.
  */
 
 //=============================================================================================================

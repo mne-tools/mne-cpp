@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     January, 2015
- * @brief    Builds example for making a 2D layout from 3D points
+ * @brief    Project the 3D sensor positions of a FIFF file onto a 2D channel layout.
  */
 
 //=============================================================================================================

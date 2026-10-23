@@ -10,7 +10,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     11, 2019
- * @brief     Example for filtering data with a user defined FIR filter and writing the result to a file.
+ * @brief     Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filter and write the result.
  */
 
 //=============================================================================================================

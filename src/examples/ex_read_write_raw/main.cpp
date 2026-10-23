@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Example of processing raw data (read and write)
+ * @brief    Copy a raw FIFF recording buffer by buffer into a new file with FiffStream.
  */
 
 //=============================================================================================================

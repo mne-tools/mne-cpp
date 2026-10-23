@@ -12,7 +12,7 @@
  *           Faris Yahya <mfarisyahya@gmail.com>
  * @since    0.1.0
  * @date     July, 2016
- * @brief    Example of using the MNE-CPP Connectivity library
+ * @brief    Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network.
  */
 
 //=============================================================================================================

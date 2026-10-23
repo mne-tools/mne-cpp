@@ -10,7 +10,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Example of a computation of a raw inverse
+ * @brief    Average epochs of a raw recording and compute an MNE, dSPM or sLORETA source estimate of the response.
  */
 
 //=============================================================================================================

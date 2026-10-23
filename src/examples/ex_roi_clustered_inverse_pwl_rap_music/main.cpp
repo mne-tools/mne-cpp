@@ -10,7 +10,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     March, 2014
- * @brief    Example of the computation of a roi clustered inverse powell rap music
+ * @brief    Restrict the forward solution to selected parcellation labels and localize dipole pairs with Powell RAP-MUSIC.
  */
 
 //=============================================================================================================

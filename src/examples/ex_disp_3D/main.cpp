@@ -15,7 +15,7 @@
  * @date     July, 2016
  * Copyright (C) 2016, Lars Debor, Christoph Dinh, Felix Griesau, Juan Garcia-Prieto, Lorenz Esch,
  *                     Simon Heinke. All rights reserved.
- * @brief    Example of using the MNE-CPP Disp3D library
+ * @brief    Compute a clustered MNE, dSPM or sLORETA estimate of the sample evoked response and show it on the cortex with Disp3D.
  */
 
 //=============================================================================================================

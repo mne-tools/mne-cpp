@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Example of reading raw data
+ * @brief    Read a segment of a raw FIFF recording with channel picking, SSP projectors and CTF compensation.
  */
 
 //=============================================================================================================

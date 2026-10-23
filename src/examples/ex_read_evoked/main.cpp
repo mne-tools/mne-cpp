@@ -9,7 +9,7 @@
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     July, 2012
- * @brief    Example for read an evoked from fiff file.
+ * @brief    Read an evoked data set from FIFF and print its measurement info and coordinate transforms.
  */
 
 //=============================================================================================================
