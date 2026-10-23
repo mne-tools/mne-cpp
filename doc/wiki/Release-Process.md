@@ -104,16 +104,13 @@ the version resource of
 fails the build with its name. The installer template `installerbase.exe` gets
 that resource from `pe_metadata.py stamp` before `binarycreator` runs.
 
-**macOS (Developer ID, paid Apple Developer Program).**
-[`macos-codesign-setup`](https://github.com/mne-tools/mne-cpp/blob/main/.github/actions/macos-codesign-setup/action.yml)
-imports the certificate into a temporary keychain; the `.app` bundles are
-signed with the hardened runtime, and
-[`macos_notarize.sh`](https://github.com/mne-tools/mne-cpp/blob/main/scripts/deploy/macos_notarize.sh)
-signs, notarizes and staples each `.dmg`, then checks it with
-`codesign --verify`, `stapler validate` and `spctl --assess`. Secrets:
-`APPLE_DEVELOPER_ID_P12` (base64 `.p12`), `APPLE_DEVELOPER_ID_PASSWORD`,
-`APPLE_ID`, `APPLE_APP_PASSWORD` (app-specific password) and `APPLE_TEAM_ID`.
-The `.tar.gz` archives are covered by `SHA256SUMS` only.
+**macOS (Developer ID, paid Apple Developer Program).** The apps, tools and
+libraries of the dynamic build, the `.dmg` images and the QtIFW installer are
+signed with the hardened runtime, notarized with `notarytool`, stapled and
+verified before upload; see [MacOS-Code-Signing.md](MacOS-Code-Signing.md) for the
+pipeline, the three operating modes and the secrets (`APPLE_APPLICATION_CERT_BASE64`,
+`APPLE_APPLICATION_CERT_PASSWORD`, `APPLE_ID`, `APPLE_ID_PASSWORD`, `APPLE_TEAM_ID`).
+The `.tar.gz` archives contain the notarized code and are covered by `SHA256SUMS`.
 
 To release without an Apple Developer ID, set the repository variable
 `MACOS_SIGNING` to `unavailable`. The macOS builds are then only ad-hoc signed,

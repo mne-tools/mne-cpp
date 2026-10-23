@@ -1,0 +1,141 @@
+# SPDX-License-Identifier: BSD-3-Clause
+# Copyright (c) 2026 MNE-CPP Authors
+#   Christoph Dinh <christoph.dinh@mne-cpp.org>
+
+name: macOS Signing Pipeline Test
+
+# Mode B of doc/wiki/MacOS-Code-Signing.md: runs the release signing chain of
+# release-macos.yml and release-installer.yml on the current dev_build with the
+# dummy values of tools/release/fixtures/macos-signing-dummy.env and an
+# ephemeral self-signed identity. Apple is never contacted, no repository
+# secret is read, nothing is published: every result is MOCK — NOT SIGNED OR
+# NOTARIZED. The negative job proves that production mode rejects the dummies.
+on:
+  workflow_dispatch:
+  push:
+    branches: [staging]
+    paths:
+    - .github/workflows/macos-signing-test.yml
+    - .github/actions/macos-codesign-setup/**
+    - scripts/deploy/macos_release_signing.sh
+    - tools/release/macos_signing.py
+    - tools/release/fixtures/macos-signing-dummy.env
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-signing-test
+  cancel-in-progress: true
+
+jobs:
+  MockSigning:
+    runs-on: macos-26
+    env:
+      MACOS_NOTARY_EVIDENCE: ${{ github.workspace }}/mock-notarization.json
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+      with:
+        persist-credentials: false
+
+    - name: Load the dummy credentials
+      run: |
+        grep -v '^#' tools/release/fixtures/macos-signing-dummy.env | grep . >> "$GITHUB_ENV"
+        echo "## MOCK — NOT SIGNED OR NOTARIZED" >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Dummy credentials pass mock and fail production
+      run: |
+        python3 tools/release/macos_signing.py check-credentials --mode mock
+        if python3 tools/release/macos_signing.py check-credentials --mode production; then
+          echo "::error::production mode accepted the dummy credentials"
+          exit 1
+        fi
+
+    - name: Create an ephemeral test identity
+      run: |
+        P12=$(python3 tools/release/macos_signing.py make-test-identity "$RUNNER_TEMP/test-identity")
+        echo "TEST_P12_BASE64=$(base64 -i "$P12" | tr -d '\n')" >> "$GITHUB_ENV"
+
+    - name: Import the test identity (mock)
+      uses: ./.github/actions/macos-codesign-setup
+      with:
+        certificate-base64: ${{ env.TEST_P12_BASE64 }}
+        certificate-password: TEST_ONLY_PASSWORD
+        team-id: TESTONLY00
+        mode: mock
+
+    - name: Production identity selection rejects the test identity
+      run: |
+        if python3 tools/release/macos_signing.py select-identity --mode production --keychain "$KEYCHAIN_PATH"; then
+          echo "::error::production mode accepted a self-signed identity"
+          exit 1
+        fi
+
+    - name: Download the macOS dev build
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release download dev_build --repo "$GITHUB_REPOSITORY" -p 'mne-cpp-dev-macos-dynamic-arm64.tar.gz'
+        mkdir -p out
+        tar xzf mne-cpp-dev-macos-dynamic-arm64.tar.gz -C out
+        # Builds made before resources moved to Contents/Resources: relocate as deploy.sh now does
+        for app in out/bin/*.app; do
+          if [ -d "$app/Contents/MacOS/resources" ]; then
+            mkdir -p "$app/Contents/Resources"
+            cp -a "$app/Contents/MacOS/resources/." "$app/Contents/Resources/"
+            rm -rf "$app/Contents/MacOS/resources"
+          fi
+        done
+
+    - name: Sign, verify and mock-notarize the release tree
+      run: scripts/deploy/macos_release_signing.sh tree out
+
+    - name: Signatures survive the archive that feeds the installer
+      run: |
+        tar czf signed.tar.gz -C out bin lib include resources
+        mkdir roundtrip && tar xzf signed.tar.gz -C roundtrip
+        python3 tools/release/macos_signing.py verify --mode mock roundtrip/bin roundtrip/lib
+
+    - name: Build, sign and mock-notarize the application DMG
+      run: |
+        brew list create-dmg >/dev/null 2>&1 || brew install create-dmg
+        mkdir dmg_stage && for app in out/bin/*.app; do ditto "$app" "dmg_stage/$(basename "$app")"; done
+        create-dmg --volname "MNE-CPP mock" --no-internet-enable mock-dynamic.dmg dmg_stage
+        scripts/deploy/macos_release_signing.sh dmg mock-dynamic.dmg
+
+    - name: Simulated notarization rejection fails
+      env:
+        MACOS_MOCK_NOTARY_RESULT: Invalid
+      run: |
+        if scripts/deploy/macos_release_signing.sh dmg mock-dynamic.dmg; then
+          echo "::error::a rejected notarization did not stop the pipeline"
+          exit 1
+        fi
+
+    - name: Publish gate refuses mock evidence
+      run: |
+        cat "$MACOS_NOTARY_EVIDENCE"
+        if python3 tools/release/macos_signing.py require-production-evidence "$MACOS_NOTARY_EVIDENCE"; then
+          echo "::error::the publish gate accepted mock evidence"
+          exit 1
+        fi
+        if python3 tools/release/macos_signing.py verify --mode production out/bin; then
+          echo "::error::production verification accepted mock signatures"
+          exit 1
+        fi
+        echo "Pipeline exercised end to end: MOCK — NOT SIGNED OR NOTARIZED" | tee -a "$GITHUB_STEP_SUMMARY"
+
+    - name: Mock signing refuses release tags
+      env:
+        GITHUB_REF: refs/tags/v0.0.0
+      run: |
+        if python3 tools/release/macos_signing.py check-credentials --mode mock; then
+          echo "::error::mock mode ran for a release tag"
+          exit 1
+        fi
+
+    - name: Cleanup keychain
+      if: always() && env.KEYCHAIN_PATH != ''
+      run: security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true

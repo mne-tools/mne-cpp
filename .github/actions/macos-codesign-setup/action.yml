@@ -2,20 +2,32 @@
 # Copyright (c) 2026 MNE-CPP Authors
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
-name: Import the Developer ID certificate
+name: Import the Developer ID Application certificate
 description: >
-  Import the Apple Developer ID Application certificate into a temporary
-  keychain and export CODESIGN_IDENTITY and KEYCHAIN_PATH (v2.4.0 T10.7b).
-  Fails when the certificate is missing, so tagged releases are never shipped
-  unsigned. Remove the keychain with `security delete-keychain "$KEYCHAIN_PATH"`.
+  Import the Developer ID Application certificate into a temporary keychain,
+  select the one identity of the given Apple Team ID and export
+  CODESIGN_IDENTITY (SHA-1), KEYCHAIN_PATH and MACOS_SIGNING_MODE for
+  scripts/deploy/deploy.sh and tools/release/macos_signing.py. Production mode
+  accepts only an identity that macOS trusts; mock mode (pipeline test) accepts
+  the ephemeral self-signed test identity. Remove the keychain afterwards with
+  `security delete-keychain "$KEYCHAIN_PATH"`. See doc/wiki/MacOS-Code-Signing.md.
 
 inputs:
-  certificate-p12-base64:
-    description: Base64-encoded .p12 (secrets.APPLE_DEVELOPER_ID_P12).
+  certificate-base64:
+    description: Base64-encoded .p12 with certificate and private key (secrets.APPLE_APPLICATION_CERT_BASE64).
     required: true
   certificate-password:
-    description: Password of the .p12 (secrets.APPLE_DEVELOPER_ID_PASSWORD).
+    description: Password of the .p12 (secrets.APPLE_APPLICATION_CERT_PASSWORD).
     required: true
+  team-id:
+    description: Apple Team ID the identity must belong to (secrets.APPLE_TEAM_ID).
+    required: true
+  keychain-password:
+    description: Optional fixed password of the temporary keychain (secrets.APPLE_KEYCHAIN_PASSWORD); random when empty.
+    default: ''
+  mode:
+    description: production or mock.
+    default: production
 
 runs:
   using: composite
@@ -23,33 +35,45 @@ runs:
   - name: Import certificate
     shell: bash
     env:
-      P12: ${{ inputs.certificate-p12-base64 }}
+      P12: ${{ inputs.certificate-base64 }}
       P12_PASSWORD: ${{ inputs.certificate-password }}
+      APPLE_TEAM_ID: ${{ inputs.team-id }}
+      FIXED_KEYCHAIN_PASSWORD: ${{ inputs.keychain-password }}
+      MODE: ${{ inputs.mode }}
+      ACTION_PATH: ${{ github.action_path }}
     run: |
-      if [ -z "$P12" ]; then
-        echo "::error::macOS signing needs the APPLE_DEVELOPER_ID_P12 and APPLE_DEVELOPER_ID_PASSWORD secrets"
+      case "$MODE" in production|mock) ;; *) echo "::error::mode must be production or mock"; exit 1 ;; esac
+      if [ -z "$P12" ] || [ -z "$P12_PASSWORD" ] || [ -z "$APPLE_TEAM_ID" ]; then
+        echo "::error::macOS signing needs APPLE_APPLICATION_CERT_BASE64, APPLE_APPLICATION_CERT_PASSWORD and APPLE_TEAM_ID"
         exit 1
       fi
       KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
-      KEYCHAIN_PASSWORD="$(openssl rand -hex 16)"
+      KEYCHAIN_PASSWORD="${FIXED_KEYCHAIN_PASSWORD:-$(openssl rand -hex 24)}"
+      echo "::add-mask::$KEYCHAIN_PASSWORD"
+      security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
       security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
       security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
       security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
-      echo "$P12" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
-      security import "$RUNNER_TEMP/certificate.p12" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" \
-        -T /usr/bin/codesign -T /usr/bin/productsign
-      rm -f "$RUNNER_TEMP/certificate.p12"
-      security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+      # The keychain is recorded before the import so that a cleanup step removes it even on failure.
+      echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
+      CERT="$RUNNER_TEMP/certificate.p12"
+      trap 'rm -f "$CERT"' EXIT
+      if ! printf '%s' "$P12" | tr -d '[:space:]' | base64 --decode > "$CERT" 2>/dev/null || [ ! -s "$CERT" ]; then
+        echo "::error::APPLE_APPLICATION_CERT_BASE64 is not a Base64-encoded .p12"
+        exit 1
+      fi
+      if ! security import "$CERT" -k "$KEYCHAIN_PATH" -P "$P12_PASSWORD" -T /usr/bin/codesign >/dev/null; then
+        echo "::error::the .p12 could not be imported; check APPLE_APPLICATION_CERT_PASSWORD"
+        exit 1
+      fi
+      security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH" >/dev/null
       # One argument per existing keychain.
       # shellcheck disable=SC2046
       security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
-      IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | head -1 | awk -F'"' '{print $2}')
-      if [ -z "$IDENTITY" ]; then
-        echo "::error::The certificate holds no code-signing identity"
-        exit 1
-      fi
+      SELECTED=$(python3 "$ACTION_PATH/../../../tools/release/macos_signing.py" select-identity --mode "$MODE" \
+        --keychain "$KEYCHAIN_PATH") || exit 1
       {
-        echo "CODESIGN_IDENTITY=$IDENTITY"
-        echo "KEYCHAIN_PATH=$KEYCHAIN_PATH"
+        echo "CODESIGN_IDENTITY=${SELECTED%%$'\t'*}"
+        echo "MACOS_SIGNING_MODE=$MODE"
       } >> "$GITHUB_ENV"
-      echo "Signing identity: $IDENTITY"
+      echo "Signing identity (${MODE}): ${SELECTED#*$'\t'}"

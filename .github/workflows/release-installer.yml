@@ -137,14 +137,45 @@ jobs:
           --output-dir build_installer/staging
 
     # -----------------------------------------------------------------
-    # Code Signing & Notarization
+    # Code Signing & Notarization (doc/wiki/MacOS-Code-Signing.md)
+    # The payload comes from the release's dynamic archive, whose apps and tools
+    # release-macos.yml already signed, notarized and stapled; this job checks that
+    # and then signs, notarizes and staples the installer itself.
     # -----------------------------------------------------------------
+    - name: Check Apple signing credentials
+      if: startsWith(github.ref, 'refs/tags/') && vars.MACOS_SIGNING != 'unavailable'
+      env:
+        APPLE_APPLICATION_CERT_BASE64: ${{ secrets.APPLE_APPLICATION_CERT_BASE64 }}
+        APPLE_APPLICATION_CERT_PASSWORD: ${{ secrets.APPLE_APPLICATION_CERT_PASSWORD }}
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        APPLE_INSTALLER_CERT_BASE64: ${{ secrets.APPLE_INSTALLER_CERT_BASE64 }}
+        APPLE_INSTALLER_CERT_PASSWORD: ${{ secrets.APPLE_INSTALLER_CERT_PASSWORD }}
+      run: python3 tools/release/macos_signing.py check-credentials --mode production
+
     - name: Import Apple Developer ID certificate
       if: startsWith(github.ref, 'refs/tags/') && vars.MACOS_SIGNING != 'unavailable'
       uses: ./.github/actions/macos-codesign-setup
       with:
-        certificate-p12-base64: ${{ secrets.APPLE_DEVELOPER_ID_P12 }}
-        certificate-password: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
+        certificate-base64: ${{ secrets.APPLE_APPLICATION_CERT_BASE64 }}
+        certificate-password: ${{ secrets.APPLE_APPLICATION_CERT_PASSWORD }}
+        team-id: ${{ secrets.APPLE_TEAM_ID }}
+        keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
+        mode: production
+
+    - name: Installer payload is signed by the same team
+      if: env.MACOS_SIGNING_MODE != ''
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        python3 tools/release/macos_signing.py verify --mode "$MACOS_SIGNING_MODE" \
+          build_installer/staging/packages/org.mnecpp.apps/data/bin \
+          build_installer/staging/packages/org.mnecpp.tools/data/bin \
+          build_installer/staging/packages/org.mnecpp.runtime/data/lib
+        for app in build_installer/staging/packages/org.mnecpp.apps/data/bin/*.app; do
+          xcrun stapler validate "$app"
+        done
 
     - name: Build installer with binarycreator
       run: |
@@ -155,17 +186,34 @@ jobs:
           MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin
 
     - name: Codesign installer app
-      if: env.CODESIGN_IDENTITY != ''
+      if: env.MACOS_SIGNING_MODE != ''
+      env:
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
-        codesign --force --deep --options runtime --timestamp \
-          --sign "$CODESIGN_IDENTITY" \
+        python3 tools/release/macos_signing.py sign --mode "$MACOS_SIGNING_MODE" \
+          --identity "$CODESIGN_IDENTITY" --keychain "$KEYCHAIN_PATH" "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
+        python3 tools/release/macos_signing.py verify --mode "$MACOS_SIGNING_MODE" \
           "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
-        codesign --verify --verbose "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
+
+    # The app gets its own ticket first, so it stays valid offline once copied out of the image
+    - name: Notarize and staple installer app
+      if: env.MACOS_SIGNING_MODE != ''
+      env:
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        APP="MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
+        ditto -c -k --keepParent "$APP" installer-app.zip
+        python3 tools/release/macos_signing.py notarize --mode "$MACOS_SIGNING_MODE" \
+          --evidence macos-notarization-installer.json installer-app.zip
+        rm installer-app.zip
+        python3 tools/release/macos_signing.py staple --mode "$MACOS_SIGNING_MODE" "$APP"
 
     # binarycreator appends its payload after linking, which breaks the linker's ad-hoc signature;
     # Apple silicon kills an app with an invalid signature, so unsigned builds are re-signed ad hoc
     - name: Ad-hoc sign installer app
-      if: env.CODESIGN_IDENTITY == ''
+      if: env.MACOS_SIGNING_MODE == ''
       run: |
         codesign --force --deep --sign - "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
         codesign --verify --deep --strict "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
@@ -191,12 +239,19 @@ jobs:
         ls -lh MNE-CPP-*-Darwin.dmg
 
     - name: Sign, notarize and staple DMG
-      if: env.CODESIGN_IDENTITY != ''
+      if: env.MACOS_SIGNING_MODE != ''
       env:
         APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-      run: ./scripts/deploy/macos_notarize.sh "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
+      run: |
+        DMG="MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
+        python3 tools/release/macos_signing.py sign --mode "$MACOS_SIGNING_MODE" \
+          --identity "$CODESIGN_IDENTITY" --keychain "$KEYCHAIN_PATH" "$DMG"
+        python3 tools/release/macos_signing.py notarize --mode "$MACOS_SIGNING_MODE" \
+          --evidence macos-notarization-installer.json "$DMG"
+        python3 tools/release/macos_signing.py staple --mode "$MACOS_SIGNING_MODE" "$DMG"
+        python3 tools/release/macos_signing.py require-production-evidence macos-notarization-installer.json
 
     - name: Cleanup keychain
       if: always() && env.KEYCHAIN_PATH != ''
@@ -215,7 +270,10 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: signing-evidence-macos-installer
-        path: evidence-macos-installer.json
+        path: |
+          evidence-macos-installer.json
+          macos-notarization-installer.json
+        if-no-files-found: ignore
 
   WindowsInstaller:
     runs-on: windows-2025-vs2026

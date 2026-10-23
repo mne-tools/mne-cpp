@@ -93,17 +93,32 @@ jobs:
     - name: Install create-dmg
       run: |
         brew list create-dmg >/dev/null 2>&1 || brew install create-dmg
+    # Release tags are signed and notarized (doc/wiki/MacOS-Code-Signing.md) unless the owner sets MACOS_SIGNING=unavailable
+    - name: Check Apple signing credentials
+      if: startsWith(github.ref, 'refs/tags/') && vars.MACOS_SIGNING != 'unavailable'
+      env:
+        APPLE_APPLICATION_CERT_BASE64: ${{ secrets.APPLE_APPLICATION_CERT_BASE64 }}
+        APPLE_APPLICATION_CERT_PASSWORD: ${{ secrets.APPLE_APPLICATION_CERT_PASSWORD }}
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        APPLE_INSTALLER_CERT_BASE64: ${{ secrets.APPLE_INSTALLER_CERT_BASE64 }}
+        APPLE_INSTALLER_CERT_PASSWORD: ${{ secrets.APPLE_INSTALLER_CERT_PASSWORD }}
+      run: python3 tools/release/macos_signing.py check-credentials --mode production
     - name: Import Apple Developer ID certificate
       if: startsWith(github.ref, 'refs/tags/') && vars.MACOS_SIGNING != 'unavailable'
       uses: ./.github/actions/macos-codesign-setup
       with:
-        certificate-p12-base64: ${{ secrets.APPLE_DEVELOPER_ID_P12 }}
-        certificate-password: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
+        certificate-base64: ${{ secrets.APPLE_APPLICATION_CERT_BASE64 }}
+        certificate-password: ${{ secrets.APPLE_APPLICATION_CERT_PASSWORD }}
+        team-id: ${{ secrets.APPLE_TEAM_ID }}
+        keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
+        mode: production
     - name: Deploy binaries (MacOS)
       env:
-        # With CODESIGN_IDENTITY set (tagged releases), deploy.sh signs the apps and notarizes the .dmg.
+        # With MACOS_SIGNING_MODE set by the import step, deploy.sh signs, notarizes and staples.
         APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
       run: |
         echo "Qt environment:"
@@ -127,6 +142,9 @@ jobs:
         if [ "${QT_FW_COUNT}" -lt 10 ]; then
           echo "WARNING: Very few Qt framework entries found. Deployment may be incomplete."
         fi
+    - name: Notarization accepted by Apple
+      if: env.MACOS_SIGNING_MODE != ''
+      run: python3 tools/release/macos_signing.py require-production-evidence macos-notarization-dynamic.json
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:
@@ -153,7 +171,9 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: signing-evidence-macos-dynamic
-        path: evidence-macos-dynamic.json
+        path: |
+          evidence-macos-dynamic.json
+          macos-notarization-dynamic.json
         if-no-files-found: ignore
 
 

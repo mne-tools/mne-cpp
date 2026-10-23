@@ -219,23 +219,29 @@ if [[ ${LinkOption} == "dynamic" ]]; then
     done
 
     # Copy plugins and resources into the relevant .app bundles.
+    # Data goes to Contents/Resources, which the apps reach as Contents/MacOS/../resources on the
+    # default case-insensitive volume; data in Contents/MacOS would carry its code signature in
+    # extended attributes that the installer archive does not keep.
 
     # mne_scan.app — plugins + resources
     if [ -d "${BasePath}/out/${BuildName}/bin/mne_scan.app" ]; then
         ${MockText}cp -a ${BasePath}/out/${BuildName}/bin/mne_scan_plugins ${BasePath}/out/${BuildName}/bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
-        ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/bin/mne_scan.app/Contents/MacOS/resources
+        ${MockText}mkdir -p ${BasePath}/out/${BuildName}/bin/mne_scan.app/Contents/Resources
+        ${MockText}cp -a ${BasePath}/out/${BuildName}/resources/. ${BasePath}/out/${BuildName}/bin/mne_scan.app/Contents/Resources/
     fi
 
     # mne_analyze.app — plugins + resources
     if [ -d "${BasePath}/out/${BuildName}/bin/mne_analyze.app" ]; then
         ${MockText}cp -a ${BasePath}/out/${BuildName}/bin/mne_analyze_plugins ${BasePath}/out/${BuildName}/bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
-        ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/bin/mne_analyze.app/Contents/MacOS/resources
+        ${MockText}mkdir -p ${BasePath}/out/${BuildName}/bin/mne_analyze.app/Contents/Resources
+        ${MockText}cp -a ${BasePath}/out/${BuildName}/resources/. ${BasePath}/out/${BuildName}/bin/mne_analyze.app/Contents/Resources/
     fi
 
     # mne_rt_server.app — plugins + resources (if it exists as a .app bundle)
     if [ -d "${BasePath}/out/${BuildName}/bin/mne_rt_server.app" ]; then
         ${MockText}cp -a ${BasePath}/out/${BuildName}/bin/mne_rt_server_plugins ${BasePath}/out/${BuildName}/bin/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
-        ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/bin/mne_rt_server.app/Contents/MacOS/resources
+        ${MockText}mkdir -p ${BasePath}/out/${BuildName}/bin/mne_rt_server.app/Contents/Resources
+        ${MockText}cp -a ${BasePath}/out/${BuildName}/resources/. ${BasePath}/out/${BuildName}/bin/mne_rt_server.app/Contents/Resources/
     fi
 
     # ---------------------------------------------------------------
@@ -394,6 +400,17 @@ if [[ ${LinkOption} == "dynamic" ]]; then
             MACOS_ARCH="x86_64"
         fi
 
+        # Developer ID signing for MACOS_SIGNING_MODE=production (release tags) or mock (pipeline
+        # test); without it the ad-hoc signatures above stay. bin/ and lib/ are signed inside-out
+        # with the hardened runtime, notarized as one submission, and the apps get their ticket
+        # stapled, so the tarball, the .dmg and the installer payload carry the same signed code.
+        if [ -n "${MACOS_SIGNING_MODE:-}" ]; then
+            echo ""
+            echo "=== Developer ID signing (${MACOS_SIGNING_MODE}) ==="
+            export MACOS_NOTARY_EVIDENCE="${MACOS_NOTARY_EVIDENCE:-${BasePath}/macos-notarization-dynamic.json}"
+            ${MockText}"${BasePath}/scripts/deploy/macos_release_signing.sh" tree "${BasePath}/out/${BuildName}" || exit 1
+        fi
+
         # Creating archive of all macos deployed applications.
         # Include bin/ (with Qt frameworks inside .app bundles), lib/
         # (MNE-CPP shared libraries + Qt frameworks for CLI tools),
@@ -402,9 +419,12 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         ${MockText}tar cfvz mne-cpp-macos-dynamic-${MACOS_ARCH}.tar.gz -C ${BasePath}/out/${BuildName} bin lib include share resources
 
         # Build a drag-install .dmg alongside the tarball when create-dmg is
-        # available. Optional: skipped silently in environments without the
-        # helper (e.g. minimal CI runners). Local devs can install via
-        # `brew install create-dmg`.
+        # available. Development builds skip it without the helper; a signing run
+        # requires it, because the .dmg is a release artifact (`brew install create-dmg`).
+        if ! command -v create-dmg >/dev/null 2>&1 && [ -n "${MACOS_SIGNING_MODE:-}" ]; then
+            echo "ERROR: create-dmg is required to build the signed .dmg"
+            exit 1
+        fi
         if command -v create-dmg >/dev/null 2>&1; then
             DMG_NAME="mne-cpp-macos-dynamic-${MACOS_ARCH}.dmg"
             DMG_STAGE="${BasePath}/out/${BuildName}/dmg_stage"
@@ -414,28 +434,31 @@ if [[ ${LinkOption} == "dynamic" ]]; then
             # for drag-install into /Applications.
             for app in ${BasePath}/out/${BuildName}/bin/*.app; do
                 [ -d "${app}" ] || continue
-                ${MockText}cp -a "${app}" "${DMG_STAGE}/"
+                ${MockText}ditto "${app}" "${DMG_STAGE}/$(basename "${app}")"
             done
-            # Release builds sign every bundle with the hardened runtime, which notarization requires.
-            if [ -n "${CODESIGN_IDENTITY:-}" ]; then
-                for app in "${DMG_STAGE}"/*.app; do
-                    ${MockText}codesign --force --deep --options runtime --timestamp --sign "${CODESIGN_IDENTITY}" "${app}" || exit 1
-                    ${MockText}codesign --verify --strict --deep "${app}" || exit 1
-                done
+            if [ -n "${MACOS_SIGNING_MODE:-}" ]; then
+                ${MockText}create-dmg \
+                    --volname "MNE-CPP ${MACOS_ARCH}" \
+                    --window-pos 200 120 \
+                    --window-size 720 420 \
+                    --icon-size 96 \
+                    --app-drop-link 540 200 \
+                    --no-internet-enable \
+                    "${DMG_NAME}" \
+                    "${DMG_STAGE}" || exit 1
+                ${MockText}"${BasePath}/scripts/deploy/macos_release_signing.sh" dmg "${DMG_NAME}" || exit 1
+            else
+                ${MockText}create-dmg \
+                    --volname "MNE-CPP ${MACOS_ARCH}" \
+                    --window-pos 200 120 \
+                    --window-size 720 420 \
+                    --icon-size 96 \
+                    --app-drop-link 540 200 \
+                    --no-internet-enable \
+                    "${DMG_NAME}" \
+                    "${DMG_STAGE}" || echo "[deploy] create-dmg failed; tarball remains the primary artefact."
             fi
-            ${MockText}create-dmg \
-                --volname "MNE-CPP ${MACOS_ARCH}" \
-                --window-pos 200 120 \
-                --window-size 720 420 \
-                --icon-size 96 \
-                --app-drop-link 540 200 \
-                --no-internet-enable \
-                "${DMG_NAME}" \
-                "${DMG_STAGE}" || echo "[deploy] create-dmg failed; tarball remains the primary artefact."
             ${MockText}rm -rf "${DMG_STAGE}"
-            if [ -n "${CODESIGN_IDENTITY:-}" ]; then
-                ${MockText}"${BasePath}/scripts/deploy/macos_notarize.sh" "${DMG_NAME}" || exit 1
-            fi
         else
             echo "[deploy] create-dmg not found on PATH; skipping .dmg generation (tarball is the only artefact)."
         fi

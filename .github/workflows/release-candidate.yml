@@ -65,26 +65,28 @@ jobs:
       env:
         SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
         SIGNPATH_ORGANIZATION_ID: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
-        APPLE_DEVELOPER_ID_P12: ${{ secrets.APPLE_DEVELOPER_ID_P12 }}
-        APPLE_DEVELOPER_ID_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
+        APPLE_APPLICATION_CERT_BASE64: ${{ secrets.APPLE_APPLICATION_CERT_BASE64 }}
+        APPLE_APPLICATION_CERT_PASSWORD: ${{ secrets.APPLE_APPLICATION_CERT_PASSWORD }}
         APPLE_ID: ${{ secrets.APPLE_ID }}
-        APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        APPLE_INSTALLER_CERT_BASE64: ${{ secrets.APPLE_INSTALLER_CERT_BASE64 }}
+        APPLE_INSTALLER_CERT_PASSWORD: ${{ secrets.APPLE_INSTALLER_CERT_PASSWORD }}
         MACOS_UNSIGNED: ${{ vars.MACOS_SIGNING == 'unavailable' }}
       run: |
         missing=0
-        required="SIGNPATH_API_TOKEN SIGNPATH_ORGANIZATION_ID"
-        if [ "$MACOS_UNSIGNED" = true ]; then
-          echo "macOS ships unsigned (MACOS_SIGNING=unavailable); the release notes record it." | tee -a "$GITHUB_STEP_SUMMARY"
-        else
-          required="$required APPLE_DEVELOPER_ID_P12 APPLE_DEVELOPER_ID_PASSWORD APPLE_ID APPLE_APP_PASSWORD APPLE_TEAM_ID"
-        fi
-        for name in $required; do
+        for name in SIGNPATH_API_TOKEN SIGNPATH_ORGANIZATION_ID; do
           if [ -z "${!name}" ]; then
             echo "::error::$name is not configured"
             missing=1
           fi
         done
+        if [ "$MACOS_UNSIGNED" = true ]; then
+          echo "::warning::macOS ships unsigned (MACOS_SIGNING=unavailable); the release notes record it."
+          echo "macOS ships unsigned (MACOS_SIGNING=unavailable); the release notes record it." >> "$GITHUB_STEP_SUMMARY"
+        else
+          python3 tools/release/macos_signing.py check-credentials --mode production || missing=1
+        fi
         exit $missing
 
     - name: Build and verify the evidence bundle
