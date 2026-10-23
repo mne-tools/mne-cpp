@@ -71,12 +71,14 @@ purpose; MNE-CPP is provided under the [BSD 3-Clause License](https://github.com
 
 | Role | Members | How it is enforced |
 |---|---|---|
-| **Committers (authors)** — may change the source code | Maintainers with write access to [mne-tools/mne-cpp](https://github.com/mne-tools/mne-cpp): [Christoph Dinh](https://github.com/chdinh), [Lorenz Esch](https://github.com/LorenzE) and [Juan Garcia-Prieto](https://github.com/juangpc) | GitHub repository permissions. Only Christoph Dinh and Lorenz Esch may push to the release branch `main`. |
-| **Reviewers** — review every change proposed by others, in particular external pull requests | The committers above | Branch protection on `staging` and `main` requires an approving review before a pull request is merged. |
+| **Committers (authors)** — may change the source code | [Dr.-Ing. Christoph Dinh](https://github.com/chdinh), maintainer of [mne-tools/mne-cpp](https://github.com/mne-tools/mne-cpp) | GitHub repository permissions and the push restriction on the release branch `main`. |
+| **Reviewers** — review every change proposed by others, in particular external pull requests | [Dr.-Ing. Christoph Dinh](https://github.com/chdinh) | Branch protection on `staging` and `main` requires an approving review before a pull request is merged. |
 | **Signing approver** — decides whether a release may be signed | [Dr.-Ing. Christoph Dinh](https://github.com/chdinh) | Every signing request under the release signing policy waits for manual approval in SignPath. |
 
-Administrators of the [mne-tools GitHub organization](https://github.com/orgs/mne-tools/people)
-also hold administrative access to the repository through the organization.
+[Owners of the mne-tools GitHub organization](https://github.com/orgs/mne-tools/people?query=role%3Aowner),
+among them [Eric Larson](https://github.com/larsoner), hold administrative access to the
+repository through the organization; they do not take part in MNE-CPP's development or
+release signing.
 
 All team members must use multi-factor authentication for GitHub and for SignPath. Pull
 requests that change build scripts or CI workflows get particular attention in review, because
