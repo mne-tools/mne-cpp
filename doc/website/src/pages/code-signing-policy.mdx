@@ -1,0 +1,152 @@
+---
+title: Code signing policy
+description: How MNE-CPP signs its Windows releases with SignPath, who approves signing requests, and what the signed applications send over the network.
+---
+
+<div className="mc-eyebrow">Releases · Security · Privacy</div>
+
+# Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+This policy covers the Windows binaries that MNE-CPP publishes on its
+[download page](/download) and on [GitHub Releases](https://github.com/mne-tools/mne-cpp/releases).
+It is maintained in the repository next to the pipeline it describes; changes to it are
+reviewed like code.
+
+<div className="mc-callout mc-callout--amber">
+
+**Current status.** The release pipeline is ready to sign, but no MNE-CPP release carries a
+SignPath Foundation signature yet. For v2.4.0, SignPath rejected the signing requests because
+the project's release signing policy was not yet active, so v2.4.0 was published without Windows
+downloads. This page will name the first signed release once it exists. Until then, check
+every download against its [SHA-256 checksum](/download#verifying).
+
+</div>
+
+## What is signed
+
+Only binaries that the MNE-CPP team builds from its own source code are signed with the
+SignPath Foundation certificate:
+
+| Release asset | Signed files | SignPath artifact configuration |
+|---|---|---|
+| `mne-cpp-<version>-windows-dynamic-x86_64.zip` | MNE-CPP's applications, tools and libraries (`mne_*.exe`, `mne_*.dll`) and plugins (`mne_*_plugins/*.dll`) inside the archive | [`windows-archive`](https://github.com/mne-tools/mne-cpp/blob/staging/.signpath/artifact-configurations/windows-archive.xml) |
+| `mne-cpp-<version>-windows-static-x86_64.zip` | The same, statically linked | [`windows-archive`](https://github.com/mne-tools/mne-cpp/blob/staging/.signpath/artifact-configurations/windows-archive.xml) |
+| `mne-cpp-<version>-windows-installer-x86_64.exe` | The installer executable; its payload is the signed archive content | [`windows-installer`](https://github.com/mne-tools/mne-cpp/blob/staging/.signpath/artifact-configurations/windows-installer.xml) |
+
+Not signed with the MNE-CPP certificate:
+
+- **Third-party components** shipped alongside MNE-CPP — Qt, ONNX Runtime and the compiler
+  runtime — keep their publishers' signatures, or none. MNE-CPP never signs them.
+- **Examples and test programs** (`ex_*`, `test_*`) that some archives contain.
+- **macOS and Linux** packages. Their signing (Apple Developer ID on macOS) is separate from
+  SignPath and recorded in each release's notes.
+
+### Provenance
+
+Every signed file is built by the GitHub Actions workflows
+[`release-windows.yml`](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/release-windows.yml)
+and [`release-installer.yml`](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/release-installer.yml)
+from a release tag of [mne-tools/mne-cpp](https://github.com/mne-tools/mne-cpp). The workflow
+uploads the unsigned file as a build artifact, and SignPath fetches it from that workflow run,
+so the signature ties the binary to the public source and build scripts of the tagged commit.
+
+Before a request is submitted, the pipeline checks that every file the artifact configuration
+selects carries a Windows version resource with `ProductName` **MNE-CPP** and the release version
+as `ProductVersion` ([`tools/release/pe_metadata.py`](https://github.com/mne-tools/mne-cpp/blob/staging/tools/release/pe_metadata.py));
+SignPath enforces the same restrictions on its side and refuses to sign any file that does
+not match. The resource is generated for every MNE-CPP executable and library from
+[`cmake/mne_version_info.rc.in`](https://github.com/mne-tools/mne-cpp/blob/staging/cmake/mne_version_info.rc.in)
+and the version in `src/CMakeLists.txt`.
+
+### What a signature tells you
+
+A valid signature by *SignPath Foundation* means that the file was produced by MNE-CPP's
+release pipeline from the public source code and has not been modified since. It does not
+mean that the software was audited, and it makes no statement about fitness for a particular
+purpose; MNE-CPP is provided under the [BSD 3-Clause License](https://github.com/mne-tools/mne-cpp/blob/main/LICENSE).
+
+## Team roles
+
+| Role | Members | How it is enforced |
+|---|---|---|
+| **Committers (authors)** — may change the source code | Maintainers with write access to [mne-tools/mne-cpp](https://github.com/mne-tools/mne-cpp): [Christoph Dinh](https://github.com/chdinh), [Lorenz Esch](https://github.com/LorenzE) and [Juan Garcia-Prieto](https://github.com/juangpc) | GitHub repository permissions. Only Christoph Dinh and Lorenz Esch may push to the release branch `main`. |
+| **Reviewers** — review every change proposed by others, in particular external pull requests | The committers above | Branch protection on `staging` and `main` requires an approving review before a pull request is merged. |
+| **Signing approver** — decides whether a release may be signed | [Dr.-Ing. Christoph Dinh](https://github.com/chdinh) | Every signing request under the release signing policy waits for manual approval in SignPath. |
+
+Administrators of the [mne-tools GitHub organization](https://github.com/orgs/mne-tools/people)
+also hold administrative access to the repository through the organization.
+
+All team members must use multi-factor authentication for GitHub and for SignPath. Pull
+requests that change build scripts or CI workflows get particular attention in review, because
+those files determine what ends up in a signed binary.
+
+### How a release is signed
+
+1. A maintainer tags a release on `main`; GitHub Actions builds the Windows archives and the
+   installer from that tag.
+2. The pipeline checks the product metadata of every file to be signed and fails on any mismatch.
+3. It submits the signing request to SignPath with the release version as parameter.
+4. The signing approver reviews the request — the tagged commit and the workflow run it came
+   from — and approves or rejects it. **No release is signed without this manual approval.**
+5. The signed files are verified with `signtool verify` and published with SHA-256 checksums.
+
+## Privacy statement
+
+### MNE-CPP applications
+
+This program will not transfer any information to other networked systems unless specifically
+requested by the user or the person installing or operating it.
+
+MNE-CPP contains no telemetry, usage analytics, crash reporting or automatic update checks.
+The network functions below run only when you, or whoever installs or operates the software,
+configure and start them:
+
+- **Real-time acquisition in MNE Scan** connects to the devices and data sources you
+  configure: networked amplifiers and MEG systems (BabyMEG, Natus), an MNE real-time server
+  (`mne_rt_server`) or FIFF simulator, a FieldTrip buffer, or Lab Streaming Layer streams,
+  whose discovery uses your local network. `mne_rt_server` listens on TCP ports while it runs.
+- **MNE Analyze Studio's assistant** is off until you enter an API key or endpoint. It then
+  sends your prompts and the analysis context it needs to the provider you selected — for
+  example [OpenAI](https://openai.com/policies/privacy-policy/),
+  [Google](https://policies.google.com/privacy), [GitHub Models](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement)
+  or [Anthropic](https://www.anthropic.com/legal/privacy) — under that provider's privacy policy.
+- **Python-based features** that need Python packages create a Python environment and install
+  the packages from the [Python Package Index](https://pypi.org/) when you start them.
+- **The installer** downloads data only for optional components that are off by default: the
+  MNE sample dataset from [OSF](https://osf.io/) and MNE-Python from the Python Package Index.
+- **Links** in the applications, such as to this website, open your web browser.
+
+The browser versions of MNE Analyze, MNE Anonymize, MNE Browse and MNE Inspect process the
+files you open locally in the browser; they do not upload them.
+
+### This website
+
+This website is hosted on GitHub Pages; GitHub processes the requests to it as described in the
+[GitHub Privacy Statement](https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement).
+The site sets no cookies and uses no analytics. Search runs in your browser. The download page
+asks the GitHub API for the current release assets, and the home page loads contributor
+avatars from GitHub. Your light or dark theme choice is kept in your browser's local storage.
+
+## Verifying a signed download
+
+Once a release is signed, Windows shows *SignPath Foundation* as the publisher. To check a file
+yourself, open its **Properties → Digital Signatures** tab, or run in PowerShell:
+
+```powershell
+Get-AuthenticodeSignature .\mne_scan.exe | Format-List Status, SignerCertificate
+```
+
+`Status` must be `Valid` and the signer certificate must be issued to *SignPath Foundation*.
+With the Windows SDK, `signtool verify /pa /v .\mne_scan.exe` prints the full certificate chain
+and timestamp. In the archives, each MNE-CPP `.exe` and `.dll` carries its own signature;
+check the ones you run. Independently of signatures, compare every download with its SHA-256
+checksum as described on the [download page](/download#verifying).
+
+## Reporting a problem
+
+If you believe a file signed for MNE-CPP violates this policy, please report it through
+[GitHub Security Advisories](https://github.com/mne-tools/mne-cpp/security/advisories/new) as
+described in our [security policy](https://github.com/mne-tools/mne-cpp/blob/main/SECURITY.md),
+and to SignPath at [support@signpath.io](mailto:support@signpath.io).

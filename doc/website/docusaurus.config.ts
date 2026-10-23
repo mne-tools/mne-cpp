@@ -66,6 +66,10 @@ const config: Config = {
                 docsRouteBasePath: '/docs',
                 searchBarShortcutHint: true,
                 searchBarPosition: 'right',
+                // Show where a hit lives (Manual, API, Examples) so results read as categories.
+                explicitSearchResultPath: true,
+                highlightSearchTermsOnTargetPage: true,
+                searchResultLimits: 12,
             },
         ],
     ],
@@ -166,7 +170,7 @@ const config: Config = {
                 {
                     title: 'Documentation',
                     items: [
-                        { label: 'Getting Started', to: '/docs/overview' },
+                        { label: 'Get Started', to: '/docs/get-started' },
                         { label: 'Manual', to: '/docs/manual/intro' },
                         { label: 'Publications', to: '/docs/publications' },
                     ],
@@ -185,6 +189,7 @@ const config: Config = {
                     items: [
                         { label: 'GitHub', href: 'https://github.com/mne-tools/mne-cpp' },
                         { label: 'How to Cite', to: '/docs/cite' },
+                        { label: 'Code signing policy', to: '/code-signing-policy' },
                         { label: 'Legal Notice', to: '/docs/overview#legal-notice' },
                     ],
                 },

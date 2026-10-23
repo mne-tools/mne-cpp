@@ -54,7 +54,7 @@ Libraries
 | **Ieeg** | Intracranial EEG — sEEG/ECoG implantations from BIDS, bipolar re-referencing, contact values painted onto the cortex |
 | **Disp3D** | 3D brain visualization (Metal / Vulkan / D3D / OpenGL via Qt RHI) |
 
-All libraries depend on [Qt](https://www.qt.io/), [Eigen](http://eigen.tuxfamily.org/), and [skigen](https://github.com/skigen-project/skigen) (header-only scikit-learn-equivalent algorithms backing ML/decoding). See the [API documentation](https://mne-cpp.github.io/docs/development/api).
+All libraries depend on [Qt](https://www.qt.io/), [Eigen](http://eigen.tuxfamily.org/), and [skigen](https://github.com/skigen-project/skigen) (header-only scikit-learn-equivalent algorithms backing ML/decoding). See the [API documentation](https://mne-cpp.github.io/docs/api/) and the [examples](https://mne-cpp.github.io/docs/examples/).
 
 Development
 -----------
@@ -78,7 +78,7 @@ cmake --build build\developer-dynamic --parallel
 
 ### Requirements
 
-[CMake](https://cmake.org/download/) ≥ 3.21 and a C++17 compiler:
+[CMake](https://cmake.org/download/) ≥ 3.21 and a C++20 compiler:
 
 | Platform | Compiler |
 |----------|----------|
@@ -96,6 +96,12 @@ Releases
 --------
 
 Pre-built binaries for Windows, macOS, and Linux are available on the [download page](https://mne-cpp.github.io/download).
+
+### Code signing policy
+
+Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+
+Windows release binaries are built by GitHub Actions from this repository and submitted to SignPath for Authenticode signing; no request is signed without the manual approval of the signing approver. Team roles, the privacy statement and the current signing status are in the [Code signing policy](https://mne-cpp.github.io/code-signing-policy/).
 
 Contact
 -------

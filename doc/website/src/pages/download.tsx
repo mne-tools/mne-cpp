@@ -19,6 +19,8 @@ interface GitHubAsset {
     browser_download_url: string;
     size: number;
     updated_at: string;
+    /** "sha256:<hex>", computed by GitHub for every release asset. */
+    digest?: string | null;
 }
 
 interface GitHubRelease {
@@ -123,11 +125,34 @@ function AssetList({ assets, platforms, heading }: { assets: GitHubAsset[]; plat
                         <a href={r.asset!.browser_download_url} rel="noopener noreferrer">
                             {r.platform.label}
                         </a>
-                        <span className="dl-asset-list__size">{fmtSize(r.asset!.size)}</span>
+                        <span className="dl-asset-list__meta">
+                            {r.asset!.digest?.startsWith('sha256:') && <Digest value={r.asset!.digest.slice(7)} />}
+                            <span className="dl-asset-list__size">{fmtSize(r.asset!.size)}</span>
+                        </span>
                     </li>
                 ))}
             </ul>
         </div>
+    );
+}
+
+/** Abbreviated SHA-256 that copies the full value. */
+function Digest({ value }: { value: string }) {
+    const [copied, setCopied] = useState(false);
+    return (
+        <button
+            type="button"
+            className="dl-digest"
+            title={`SHA-256 ${value} (click to copy)`}
+            aria-label={`Copy SHA-256 checksum ${value}`}
+            onClick={() => {
+                navigator.clipboard?.writeText(value).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1500);
+                });
+            }}>
+            {copied ? 'copied' : `sha256 ${value.slice(0, 8)}…`}
+        </button>
     );
 }
 
@@ -187,6 +212,7 @@ const TOC_ITEMS: { id: string; label: string }[] = [
     { id: 'sample-data', label: 'Sample Data' },
     { id: 'quick-start', label: 'Quick Start' },
     { id: 'verifying', label: 'Verifying Downloads' },
+    { id: 'code-signing', label: 'Code signing policy' },
     { id: 'requirements', label: 'System Requirements' },
 ];
 
@@ -350,6 +376,15 @@ export default function Download(): React.JSX.Element {
                                         <>
                                             <ReleaseMeta release={stableRelease} commitSha={stableRelease.target_commitish} />
 
+                                            {stableRelease.assets.length > 0 && !stableRelease.assets.some((a) => a.name.includes('windows')) && (
+                                                <div className="dl-note dl-note--amber">
+                                                    This release has no Windows downloads: Windows binaries are published
+                                                    once they are signed under the{' '}
+                                                    <Link to="/code-signing-policy">code signing policy</Link>.
+                                                    Unsigned Windows development builds are listed on the right.
+                                                </div>
+                                            )}
+
                                             {stableRelease.assets.length > 0 && (
                                                 <>
                                                     <AssetList assets={stableRelease.assets} platforms={INSTALLER_PLATFORMS} heading="Installers" />
@@ -416,8 +451,8 @@ export default function Download(): React.JSX.Element {
                         {/* ──────────────────────────────────────────
                  *  3 · Browser-Based Applications (WebAssembly)
                  * ────────────────────────────────────────── */}
-                        <section id="browser-apps" className="dl-card">
-                            <Heading as="h2">
+                        <section className="dl-card">
+                            <Heading as="h2" id="browser-apps">
                                 Browser-Based Applications{' '}
                                 <span className="dl-badge dl-badge--experimental">Experimental</span>
                             </Heading>
@@ -454,7 +489,7 @@ export default function Download(): React.JSX.Element {
                                         <td>MNE Analyze</td>
                                         <td>Visualization, filtering, averaging, source localization</td>
                                         <td className="dl-table__right">
-                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                            <div className="dl-launch">
                                                 <a
                                                     href={wasmAppUrl(STABLE_WASM_BASE_URL, 'mne_analyze.html')}
                                                     target="_blank"
@@ -478,7 +513,7 @@ export default function Download(): React.JSX.Element {
                                         <td>MNE Anonymize</td>
                                         <td>Remove or replace personally identifiable information from FIFF files</td>
                                         <td className="dl-table__right">
-                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                            <div className="dl-launch">
                                                 <a
                                                     href={wasmAppUrl(STABLE_WASM_BASE_URL, 'mne_anonymize.html')}
                                                     target="_blank"
@@ -502,7 +537,7 @@ export default function Download(): React.JSX.Element {
                                         <td>MNE Browse</td>
                                         <td>Browse and inspect raw MEG/EEG data files</td>
                                         <td className="dl-table__right">
-                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                            <div className="dl-launch">
                                                 <a
                                                     href={wasmAppUrl(STABLE_WASM_BASE_URL, 'mne_browse.html')}
                                                     target="_blank"
@@ -526,7 +561,7 @@ export default function Download(): React.JSX.Element {
                                         <td>MNE Inspect</td>
                                         <td>Inspect and review MEG/EEG channel data quality</td>
                                         <td className="dl-table__right">
-                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                                            <div className="dl-launch">
                                                 <a
                                                     href={wasmAppUrl(STABLE_WASM_BASE_URL, 'mne_inspect.html')}
                                                     target="_blank"
@@ -561,8 +596,8 @@ export default function Download(): React.JSX.Element {
                         {/* ──────────────────────────────────────────
                  *  4 · Sample Data
                  * ────────────────────────────────────────── */}
-                        <section id="sample-data" className="dl-card">
-                            <Heading as="h2">Sample Data</Heading>
+                        <section className="dl-card">
+                            <Heading as="h2" id="sample-data">Sample Data</Heading>
                             <p className="dl-card__desc">
                                 The MNE sample dataset contains auditory and visual MEG/EEG recordings
                                 together with structural MRI data. It is used across all MNE tutorials
@@ -605,8 +640,8 @@ export default function Download(): React.JSX.Element {
                         {/* ──────────────────────────────────────────
                  *  5 · Getting Started
                  * ────────────────────────────────────────── */}
-                        <section id="quick-start" className="dl-card">
-                            <Heading as="h2">Quick Start</Heading>
+                        <section className="dl-card">
+                            <Heading as="h2" id="quick-start">Quick Start</Heading>
 
                             <div className="row">
                                 <div className="col col--6">
@@ -645,27 +680,53 @@ cmake --build build/developer-dynamic --parallel`}</code></pre>
                         {/* ──────────────────────────────────────────
                  *  6 · Verifying Downloads
                  * ────────────────────────────────────────── */}
-                        <section id="verifying" className="dl-card">
-                            <Heading as="h2">Verifying Downloads</Heading>
+                        <section className="dl-card">
+                            <Heading as="h2" id="verifying">Verifying Downloads</Heading>
                             <p className="dl-card__desc">
-                                Verify download integrity with SHA-256. Compare the output against
-                                the checksum listed on the corresponding{' '}
+                                GitHub computes the SHA-256 digest of every release asset. It is shown next to each
+                                download above (click to copy) and on the{' '}
                                 <a href="https://github.com/mne-tools/mne-cpp/releases" target="_blank" rel="noopener noreferrer">
                                     GitHub release page
-                                </a>.
+                                </a>. Compare it with the output of:
                             </p>
                             <pre className="dl-code"><code>{`# macOS / Linux
 shasum -a 256 <downloaded-file>
 
 # Windows (PowerShell)
 Get-FileHash <downloaded-file> -Algorithm SHA256`}</code></pre>
+                            <Heading as="h3" className="dl-sub-title">Windows signatures</Heading>
+                            <p className="dl-card__desc">
+                                Signed Windows releases name <em>SignPath Foundation</em> as publisher. Check a signature in
+                                the file's <strong>Properties → Digital Signatures</strong> tab or with PowerShell;{' '}
+                                <code>Status</code> must be <code>Valid</code>. No release is signed yet; the{' '}
+                                <Link to="/code-signing-policy">code signing policy</Link> records the current status.
+                            </p>
+                            <pre className="dl-code"><code>{`Get-AuthenticodeSignature .\\mne_scan.exe | Format-List Status, SignerCertificate`}</code></pre>
+                        </section>
+
+                        <section className="dl-card">
+                            <Heading as="h2" id="code-signing">Code signing policy</Heading>
+                            <p className="dl-card__desc">
+                                Free code signing provided by{' '}
+                                <a href="https://about.signpath.io/" target="_blank" rel="noopener noreferrer">SignPath.io</a>,
+                                certificate by{' '}
+                                <a href="https://signpath.org/" target="_blank" rel="noopener noreferrer">SignPath Foundation</a>.
+                            </p>
+                            <p className="dl-card__desc">
+                                Only MNE-CPP's own Windows binaries, built by GitHub Actions from a release tag, are signed,
+                                and each signing request needs the manual approval of the signing approver. The policy
+                                lists what is signed, the team roles and what the applications send over the network.
+                            </p>
+                            <Link to="/code-signing-policy" className="button button--outline button--primary button--sm">
+                                Read the code signing policy
+                            </Link>
                         </section>
 
                         {/* ──────────────────────────────────────────
                  *  7 · System Requirements
                  * ────────────────────────────────────────── */}
-                        <section id="requirements" className="dl-card">
-                            <Heading as="h2">System Requirements</Heading>
+                        <section className="dl-card">
+                            <Heading as="h2" id="requirements">System Requirements</Heading>
 
                             <table className="dl-table">
                                 <thead>
