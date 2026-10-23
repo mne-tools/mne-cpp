@@ -68,6 +68,12 @@ class WorkflowContracts(unittest.TestCase):
         self.assertNotRegex(candidate, r"continue-on-error|inputs:\s*\n\s+skip")
         self.assertIn("release-candidate.yml --commit", (WORKFLOWS / "main.yml").read_text(encoding="utf-8"))
 
+    def test_no_branch_shares_the_release_tag_name(self) -> None:
+        # SignPath (and plain git) cannot resolve a ref that is both branch and tag; v2.4.0 failed on it
+        text = (WORKFLOWS / "main.yml").read_text(encoding="utf-8")
+        self.assertNotRegex(text, r'refs/heads/"?\$\{?TAG\}?"?')
+        self.assertNotRegex(text, r'git checkout -b "?\$\{?TAG\}?"?')
+
     def test_release_notes_are_the_changelog_section(self) -> None:
         text = (WORKFLOWS / "main.yml").read_text(encoding="utf-8")
         self.assertNotIn("--generate-notes", text)

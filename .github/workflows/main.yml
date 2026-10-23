@@ -295,19 +295,18 @@ jobs:
         fi
         echo "Release candidate: $run" >> "$GITHUB_STEP_SUMMARY"
 
-    - name: Create version branch for new minor releases
+    - name: Create maintenance branch for new minor releases
       run: |
         TAG="${GITHUB_REF#refs/tags/}"
         currentVersionPatch=$(echo "$TAG" | cut -d. -f3)
         if [[ "$currentVersionPatch" == 0 ]]; then
-          echo "New minor version — ensuring branch $TAG exists"
-          git config --global user.email christoph.dinh@mne-cpp.org
-          git config --global user.name chdinh
-          if git ls-remote --exit-code --heads origin "$TAG" >/dev/null 2>&1; then
-            echo "Branch $TAG already exists — leaving it unchanged"
+          # vX.Y.x, never the tag name: a ref that is both branch and tag breaks SignPath and git
+          BRANCH="${TAG%.0}.x"
+          echo "New minor version — ensuring branch $BRANCH exists"
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            echo "Branch $BRANCH already exists — leaving it unchanged"
           else
-            git checkout -b "$TAG"
-            git push origin "refs/heads/$TAG"
+            git push origin "$GITHUB_SHA:refs/heads/$BRANCH"
           fi
         fi
 
