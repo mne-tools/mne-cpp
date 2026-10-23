@@ -48,6 +48,13 @@ class PreflightTest(unittest.TestCase):
         head = self.git("rev-parse", "HEAD").strip()
         self.assertEqual(self.run_preflight("--commit", head[:9]), 0)
 
+    def test_release_candidate_section_counts_for_its_version(self):
+        (self.root / "CHANGELOG.md").write_text("## [2.4.0-rc] - 2026-10-20\n## [2.3.0] - 2026-06-13\n")
+        self.assertEqual(preflight.file_problems(self.root, "2.4.0"), [])
+        (self.root / "CHANGELOG.md").write_text("## [2.4.0-beta] - 2026-10-20\n")
+        self.assertEqual(preflight.file_problems(self.root, "2.4.0"),
+                         ["CHANGELOG.md has no dated '## [2.4.0] - YYYY-MM-DD' section"])
+
     def test_every_invariant_is_enforced(self):
         self.assertEqual(preflight.file_problems(self.root, "2.4.0"), [])
         (self.root / "CHANGELOG.md").write_text("## [2.4.0] - 2026-10-21\n")

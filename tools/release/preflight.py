@@ -51,7 +51,8 @@ def file_problems(root: Path, version: str) -> list[str]:
     if not released:
         problems.append("CITATION.cff has no date-released in YYYY-MM-DD form")
     changelog = (root / "CHANGELOG.md").read_text(encoding="utf-8")
-    dated = re.search(rf"^## \[{re.escape(version)}\] - (\d{{4}}-\d{{2}}-\d{{2}})\s*$", changelog, re.M)
+    # A release candidate (tag vX.Y.Z-rc) carries the notes of its version under its own heading.
+    dated = re.search(rf"^## \[{re.escape(version)}(?:-rc\d*)?\] - (\d{{4}}-\d{{2}}-\d{{2}})\s*$", changelog, re.M)
     if not dated:
         problems.append(f"CHANGELOG.md has no dated '## [{version}] - YYYY-MM-DD' section")
     elif released and released.group(1) != dated.group(1):

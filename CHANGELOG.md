@@ -4,9 +4,18 @@ All notable changes to MNE-CPP will be documented in this file.
 
 ## [2.4.0-rc] - 2026-10-23
 
-Release candidate that replaces the v2.4.0 tag of 2026-10-22, whose Windows
-downloads could not be signed. It contains everything listed under 2.4.0 below,
-plus:
+**Theme: correctness you can check.** v2.4.0 compares MNE-CPP against
+MNE-Python 1.11 wherever both compute the same thing. That comparison found and
+fixed more than 20 numerical defects in inverse, forward, beamformer, filtering
+and spectral code and more than 200 other bugs. The release adds sEEG/ECoG
+support, about 60 new MNE-Python ports, a WebAssembly renderer that matches the
+desktop, and a signing pipeline for the Windows and macOS installers. 970
+commits since v2.3.0.
+
+This release candidate replaces the v2.4.0 tag of 2026-10-22, whose Windows
+downloads could not be signed.
+
+### Highlights
 
 - **Code signing** — every Windows executable and DLL carries a version
   resource with product name MNE-CPP and the release version, checked before
@@ -15,24 +24,11 @@ plus:
   the apps, the `.dmg` images and the installer. The
   [code signing policy](https://mne-cpp.github.io/code-signing-policy/) states
   what is signed, by whom, and what the applications send over the network.
-- **Documentation** — the manual, API reference and examples link to each
-  other by scientific topic; the examples page can be filtered by task,
+- **Connected documentation** — the manual, API reference and examples link to
+  each other by scientific topic; the examples page can be filtered by task,
   recording type, level and library; a new Get Started guide builds a first
-  program against an installed MNE-CPP.
-- **Examples** — every example states what it computes instead of a generic
-  description.
-
-## [2.4.0] - 2026-10-22
-
-**Theme: correctness you can check.** v2.4.0 compares MNE-CPP against
-MNE-Python 1.11 wherever both compute the same thing. That comparison found and
-fixed more than 20 numerical defects in inverse, forward, beamformer, filtering
-and spectral code and more than 200 other bugs. The release adds sEEG/ECoG
-support, about 60 new MNE-Python ports, a WebAssembly renderer that matches the
-desktop, and signed installers. 915 commits since v2.3.0.
-
-### Highlights
-
+  program against an installed MNE-CPP, and every example states what it
+  computes.
 - **sEEG and ECoG** — new `mne_ieeg` library (implantations, leads, bipolar
   montages, projection of contact values onto the cortex). MNE Inspect draws
   and picks depth and grid electrodes from BIDS `*_electrodes.tsv` and paints
