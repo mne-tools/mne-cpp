@@ -216,7 +216,7 @@ for (int py = 0; py < lineImage.height(); ++py) {
 
 Multitaper spectra, power spectral density and cross-spectral density of random test signals.
 
-````cpp title="src/examples/ex_spectral/main.cpp, line 93"
+````cpp title="src/examples/ex_spectral/main.cpp, line 95"
 //Plot hanning window
 VectorXd hann = matTaps.row(0).transpose();
 LinePlot plotWindow(toVector(hann), "Hanning window");
@@ -228,7 +228,7 @@ plotWindow.setYLabel("Weight");
 
 Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
-````cpp title="src/examples/ex_averaging/main.cpp, line 175"
+````cpp title="src/examples/ex_averaging/main.cpp, line 178"
 LinePlot butterfly;
 butterfly.setTitle(QString("Evoked response to event %1 (%2 epochs)").arg(event).arg(evoked.nave));
 butterfly.setXLabel("Time [ms]");
@@ -242,7 +242,7 @@ for (int c = 0; c < evoked.data.rows(); ++c) {
         butterfly.addSeries(times, values, QString(), QColor(30, 60, 110, 70));
     }
 }
-FigureExporter::save(butterfly, "evoked", QString("Butterfly plot of the %1 good gradiometers averaged over %2 epochs of event %3, baseline-corrected over the prestimulus interval.")
+FigureExporter::save(butterfly, "evoked", QString("Butterfly plot of the %1 good gradiometers averaged over %2 epochs of event %3, baseline-corrected over the prestimulus interval.").arg(butterfly.seriesCount()).arg(evoked.nave).arg(event));
 ````
 
 Also used in [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_read_evoked](../../examples/mne/ex_read_evoked.mdx), [ex_read_raw](../../examples/mne/ex_read_raw.mdx).

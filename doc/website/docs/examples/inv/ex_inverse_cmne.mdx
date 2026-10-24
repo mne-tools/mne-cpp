@@ -260,10 +260,10 @@ int main(int argc, char* argv[])
 
     //! [inv_cmne_settings_usage]
     InvCMNESettings settings;
-    settings.lambda2 = 1.0 / 9.0;                           // SNR 3
+    settings.lambda2 = 1.0 / 9.0;                             // SNR 3
     settings.lookBack = parser.value(lookBackOption).toInt(); // k = 20 samples = 133 ms at 150 Hz
     settings.numSources = fwd.nsource;
-    settings.onnxModelPath = parser.value(onnxOption);      // empty: the paper's control estimate
+    settings.onnxModelPath = parser.value(onnxOption); // empty: the paper's control estimate
     //! [inv_cmne_settings_usage]
 
     //! [inv_cmne_usage]
