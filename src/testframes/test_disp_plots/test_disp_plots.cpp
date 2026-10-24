@@ -341,14 +341,22 @@ void TestDispPlots::testLinePlotUpdateData()
     QVector<double> x2 = {0.0, 1.0, 2.0, 3.0};
     QVector<double> y2 = {0.0, 1.0, 4.0, 9.0};
     plot.updateData(x2, y2);
+    QCOMPARE(plot.seriesCount(), 1);
+
+    // Trace the same data in pure red on top: no other plot element is red on any platform style
+    plot.addSeries(x2, y2, QString(), QColor(255, 0, 0));
+
+    // Subpixel-antialiased labels (Linux) have coloured fringes that would be taken for the curve
+    QFont font = plot.font();
+    font.setStyleStrategy(QFont::NoAntialias);
+    plot.setFont(font);
 
     // The curve rises from (0, 0) at the bottom-left of its extent to (3, 9) at the top-right
     plot.resize(400, 300);
     const QImage image = plot.grab().toImage();
-    // Only the line itself is steel blue (the default first series colour); text and grid are grey
     const auto isCurve = [&image](int x, int y) {
         const QColor c = image.pixelColor(x, y);
-        return qAbs(c.red() - 70) < 30 && qAbs(c.green() - 130) < 30 && qAbs(c.blue() - 180) < 30;
+        return c.red() > 200 && c.green() < 90 && c.blue() < 90;
     };
     QRect extent;
     for (int y = 0; y < image.height(); ++y) {
