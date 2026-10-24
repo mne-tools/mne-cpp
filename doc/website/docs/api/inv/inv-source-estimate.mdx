@@ -340,7 +340,7 @@ The .w format stores vertex indices (3-byte big-endian) and float values (4-byte
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 121"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 120"
 const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
 const float lambda2 = 1.0f / 9.0f; // SNR 3
 InvMinimumNorm dspm(inverse, lambda2, "dSPM");
@@ -383,7 +383,7 @@ Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a par
     }
 ````
 
-Also used in [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_make_inverse_operator](../../examples/inv/ex_make_inverse_operator.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx), [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx), [ex_dsp_analysis](../../examples/dsp/ex_dsp_analysis.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx).
+Also used in [ex_connectivity](../../examples/connectivity/ex_connectivity.mdx), [ex_connectivity_comparison](../../examples/connectivity/ex_connectivity_comparison.mdx), [ex_make_inverse_operator](../../examples/inv/ex_make_inverse_operator.mdx), [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_st_clustered_inverse_pwl_rap_music](../../examples/inv/ex_st_clustered_inverse_pwl_rap_music.mdx), [ex_clustered_inverse_mne](../../examples/inv/ex_clustered_inverse_mne.mdx), [ex_clustered_inverse_rap_music_raw](../../examples/inv/ex_clustered_inverse_rap_music_raw.mdx), [ex_disp_3D](../../examples/disp3D/ex_disp_3D.mdx), [ex_dsp_analysis](../../examples/dsp/ex_dsp_analysis.mdx), [ex_inverse_cmne](../../examples/inv/ex_inverse_cmne.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_inverse_mne_raw](../../examples/inv/ex_inverse_mne_raw.mdx), [ex_inverse_pwl_rap_music](../../examples/inv/ex_inverse_pwl_rap_music.mdx), [ex_inverse_rap_music](../../examples/inv/ex_inverse_rap_music.mdx), [ex_disp3d_scene](../../examples/disp3D/ex_disp3d_scene.mdx), [ex_histogram](../../examples/inv/ex_histogram.mdx).
 
 ## Authors of this file
 

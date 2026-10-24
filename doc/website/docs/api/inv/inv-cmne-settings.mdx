@@ -21,28 +21,35 @@ Settings for the Contextual [MNE](/docs/api/mne/mne-class) (CMNE) inverse solver
 
 CMNE settings
 
+```cpp title="src/examples/ex_inverse_cmne/main.cpp"
+InvCMNESettings settings;
+settings.lambda2 = 1.0 / 9.0;                           // SNR 3
+settings.lookBack = parser.value(lookBackOption).toInt(); // k = 20 samples = 133 ms at 150 Hz
+settings.numSources = fwd.nsource;
+settings.onnxModelPath = parser.value(onnxOption);      // empty: the paper's control estimate
+```
+
 ---
+
+## Example
+
+- Start here: [ex_inverse_cmne](../../examples/inv/ex_inverse_cmne.mdx) — Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices.
+- Full source: [`src/examples/ex_inverse_cmne/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_inverse_cmne/main.cpp)
+- Build target: `ex_inverse_cmne` (runs under CTest)
+- Data: [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data)
 
 ## Used in examples
 
-### [ex_inv_api](../../examples/inv/ex_inv_api.mdx)
+### [ex_inverse_cmne](../../examples/inv/ex_inverse_cmne.mdx)
 
-Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
+Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 271"
-// Contextual MNE: dSPM with a fixed-orientation kernel, then rectified and z-scored per source. Without an
-// ONNX LSTM model the result is the paper's control estimate.
-InvCMNESettings cmneSettings;
-cmneSettings.lambda2 = lambda2;
-cmneSettings.lookBack = 20;
-const MatrixXd fixedGain = fixedFwd.sol->data;
-const MatrixXd sourceCov = MatrixXd::Identity(fixedGain.cols(), fixedGain.cols());
-const InvCMNEResult cmne = InvCMNE::compute(goodData, fixedGain, inverse.noise_cov->data, sourceCov, cmneSettings);
-// Every row of the dSPM kernel maps sensor noise with the noise covariance to unit variance.
-const MatrixXd& kDspm = cmne.matKernelDspm;
-const VectorXd unitNoise = (kDspm * inverse.noise_cov->data * kDspm.transpose()).diagonal();
-ok &= expect(kDspm.rows() == 70 && (unitNoise.array() - 1.0).abs().maxCoeff() < 1e-6 && cmne.stcCmne.data.rows() == 70 && cmne.stcCmne.data.cols() == 421,
-             "InvCMNE: dSPM kernel has unit noise variance per source, CMNE estimate for all 421 samples");
+````cpp title="src/examples/ex_inverse_cmne/main.cpp, line 128"
+InvCMNESettings settings;
+settings.lambda2 = 1.0 / 9.0;                           // SNR 3
+settings.lookBack = parser.value(lookBackOption).toInt(); // k = 20 samples = 133 ms at 150 Hz
+settings.numSources = fwd.nsource;
+settings.onnxModelPath = parser.value(onnxOption);      // empty: the paper's control estimate
 ````
 
 ## Authors of this file

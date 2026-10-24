@@ -76,7 +76,7 @@ K is the inverse operator kernel; G holds the rows of the forward gain for the k
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 157"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 156"
 QList<VectorXi> kernelVertices;
 prepared.assemble_kernel(FsLabel(), "MNE", false, surfaceKernel, noNormals, kernelVertices);
 prepared.getKernel() = surfaceKernel;

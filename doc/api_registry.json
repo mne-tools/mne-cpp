@@ -688,9 +688,9 @@
       "mne_python": null,
       "sklearn": null,
       "test": "test_inv_cmne",
-      "example": "ex_inv_api",
+      "example": "ex_inverse_cmne",
       "example_snippet": [
-        "ex_inv_api/main.cpp#inv_cmne_usage"
+        "ex_inverse_cmne/main.cpp#inv_cmne_usage"
       ],
       "example_mode": "run",
       "required_data": [
@@ -9003,9 +9003,9 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": "ex_inv_api",
+      "example": "ex_inverse_cmne",
       "example_snippet": [
-        "ex_inv_api/main.cpp#inv_cmne_usage"
+        "ex_inverse_cmne/main.cpp#inv_cmne_usage"
       ],
       "example_mode": "run",
       "required_data": [
@@ -9028,7 +9028,14 @@
       "mne_python": null,
       "sklearn": null,
       "test": null,
-      "example": null,
+      "example": "ex_inverse_cmne",
+      "example_snippet": [
+        "ex_inverse_cmne/main.cpp#inv_cmne_settings_usage"
+      ],
+      "example_mode": "run",
+      "required_data": [
+        "mne-cpp-test-data"
+      ],
       "status": "documented",
       "skigen_candidate": false,
       "documented": true,
@@ -14963,11 +14970,13 @@
         "classes": [
           "InvCMNE"
         ],
-        "methods": [],
-        "examples": [
-          "ex_inv_api"
+        "methods": [
+          "InvCMNE::compute"
         ],
-        "start": "ex_inv_api"
+        "examples": [
+          "ex_inverse_cmne"
+        ],
+        "start": "ex_inverse_cmne"
       },
       {
         "id": "sparse-inverse",
@@ -15576,6 +15585,16 @@
         ],
         "modalities": [
           "meg"
+        ],
+        "level": "intermediate"
+      },
+      "ex_inverse_cmne": {
+        "tasks": [
+          "source-estimation"
+        ],
+        "modalities": [
+          "meg",
+          "eeg"
         ],
         "level": "intermediate"
       },

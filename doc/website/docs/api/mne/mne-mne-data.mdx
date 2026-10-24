@@ -125,7 +125,7 @@ Fills all fields for one data set: projects it on the eigenfields, estimates the
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 131"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 130"
 const MNEMneData perTime = dspm.mneData(evoked);       // lambda2 estimated per time point (MNE-C mne_analyze)
 const MNEMneData atSnr3 = dspm.mneData(evoked, 9.0);   // power SNR 9: lambda2 = mean(sing^2) / 9
 const VectorXd amplitudeSnr = perTime.SNR.cwiseSqrt(); // == mne.minimum_norm.estimate_snr's snr

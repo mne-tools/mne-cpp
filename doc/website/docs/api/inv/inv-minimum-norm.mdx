@@ -257,7 +257,7 @@ Get the assembled kernel.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 121"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 120"
 const MNEInverseOperator inverse = MNEInverseOperator::make_inverse_operator(evoked.info, fwd, noiseCov, 0.2f, 0.8f);
 const float lambda2 = 1.0f / 9.0f; // SNR 3
 InvMinimumNorm dspm(inverse, lambda2, "dSPM");

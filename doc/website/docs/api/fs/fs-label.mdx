@@ -171,7 +171,7 @@ ok &= expect(colors.getNames().size() == 36 && regions.size() == 34 && precentra
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 112"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 111"
 FsLabel v1;
 FsLabel::read(data + "/subjects/sample/label/lh.V1.label", v1);
 QFile fwdFile(data + "/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
@@ -197,7 +197,7 @@ QFile covFile(data + "/MEG/sample/sample_audvis-cov.fif");
 const FiffCov noiseCov = FiffCov(covFile).pick_channels(good).prepare_noise_cov(info, good);
 ````
 
-Also used in [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx).
+Also used in [ex_roi_clustered_inverse_pwl_rap_music](../../examples/inv/ex_roi_clustered_inverse_pwl_rap_music.mdx), [ex_clustered_inverse_pwl_rap_music_raw](../../examples/inv/ex_clustered_inverse_pwl_rap_music_raw.mdx), [ex_inverse_cmne](../../examples/inv/ex_inverse_cmne.mdx).
 
 ## Authors of this file
 

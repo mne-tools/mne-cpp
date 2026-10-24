@@ -93,7 +93,7 @@ For surface source spaces, the sign of each vertex's contribution should be flip
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 227"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 226"
 const MatrixXd labelMean = InvLabelTimeCourse::extract(stc, {v1}, "mean");      // 1 x 421
 const MatrixXd labelMax = InvLabelTimeCourse::extract(stc, {v1}, "max");        // the largest |value| per sample
 const MatrixXd labelFlip = InvLabelTimeCourse::extract(stc, {v1}, "mean_flip"); // signs flipped by the patch normals

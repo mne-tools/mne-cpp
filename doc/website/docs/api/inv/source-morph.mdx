@@ -110,7 +110,7 @@ Get the number of target vertices.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 219"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 218"
 SourceMorph morph;
 morph.compute(stc.vertices, VectorXi::LinSpaced(35, 0, 34), pairAverage);
 const InvSourceEstimate morphed = morph.apply(stc);

@@ -93,7 +93,7 @@ Writes the cluster info as text, and the centroid vertex numbers to `centroids_<
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 169"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 168"
 const FsAnnotationSet aparc(data + "/subjects/sample/label/lh.aparc.annot", data + "/subjects/sample/label/rh.aparc.annot");
 MatrixXd clusterMean; // 3 x 70 sources -> 3 x nClusters, averaging per orientation
 const MNEForwardSolution clustered = fwd.cluster_forward_solution(aparc, 20, clusterMean, FiffCov(), FiffInfo(), "sqeuclidean");

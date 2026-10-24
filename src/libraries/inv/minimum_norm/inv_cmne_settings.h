@@ -45,6 +45,8 @@ namespace INVLIB
  * Settings for the Contextual MNE (CMNE) inverse solver (Dinh et al. 2021).
  *
  * @brief CMNE settings
+ *
+ * @snippet ex_inverse_cmne/main.cpp inv_cmne_settings_usage
  */
 struct INVSHARED_EXPORT InvCMNESettings
 {

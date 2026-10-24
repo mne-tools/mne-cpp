@@ -902,7 +902,6 @@
       "level": "intermediate",
       "topics": [
         "minimum-norm",
-        "cmne",
         "sparse-inverse"
       ]
     },
@@ -970,6 +969,29 @@
       "level": "intermediate",
       "topics": [
         "head-position"
+      ]
+    },
+    {
+      "name": "ex_inverse_cmne",
+      "brief": "Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices",
+      "url": "/docs/examples/inv/ex_inverse_cmne/",
+      "library": "inv",
+      "libraries": [
+        "inv",
+        "fs",
+        "mne",
+        "fiff"
+      ],
+      "tasks": [
+        "source-estimation"
+      ],
+      "modalities": [
+        "meg",
+        "eeg"
+      ],
+      "level": "intermediate",
+      "topics": [
+        "cmne"
       ]
     },
     {
@@ -2060,15 +2082,20 @@
         {
           "name": "InvCMNE",
           "url": "/docs/api/inv/inv-cmne/",
-          "methods": []
+          "methods": [
+            {
+              "name": "compute",
+              "url": "/docs/api/inv/inv-cmne/#computematevoked-matgain-matnoisecov-matsrccov-settings"
+            }
+          ]
         }
       ],
       "examples": [
         {
-          "name": "ex_inv_api",
+          "name": "ex_inverse_cmne",
           "start": true,
-          "brief": "Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O",
-          "url": "/docs/examples/inv/ex_inv_api/"
+          "brief": "Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices",
+          "url": "/docs/examples/inv/ex_inverse_cmne/"
         }
       ]
     },

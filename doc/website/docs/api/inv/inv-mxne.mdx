@@ -82,7 +82,7 @@ Compute the MxNE inverse solution.
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 240"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 239"
 const MatrixXd gain = whitener * fixedFwd.sol->data * 1e-9;
 const MatrixXd measured = whitener * evoked.pick_channels(inverse.noise_cov->names).data.middleCols(170, 40); // 83-148 ms
 const double alphaMax = (gain.transpose() * measured).rowwise().norm().maxCoeff();

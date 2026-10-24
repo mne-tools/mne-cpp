@@ -182,7 +182,7 @@ Distance between true source location and the location of the maximum of the PSF
 
 Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O.
 
-````cpp title="src/examples/ex_inv_api/main.cpp, line 143"
+````cpp title="src/examples/ex_inv_api/main.cpp, line 142"
 mne.doInverseSetup(evoked.nave);
 const MatrixXd& kernel = mne.getKernel(); // 210 source components x 364 good channels
 const MNEForwardSolution goodFwd = fwd.pick_channels(inverse.noise_cov->names);

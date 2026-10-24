@@ -19,7 +19,7 @@ Builds a loose-orientation inverse operator for the 70 lh.V1 sources of the samp
 
 ## Background
 
-<Connections topics={["minimum-norm", "cmne", "sparse-inverse"]} context="example" current="ex_inv_api" />
+<Connections topics={["minimum-norm", "sparse-inverse"]} context="example" current="ex_inv_api" />
 
 ## Build and run
 
@@ -55,9 +55,6 @@ The documented classes this example uses most:
 
 - [FiffCov](../../api/fiff/fiff-cov.mdx)
 - [FsLabel](../../api/fs/fs-label.mdx)
-- [InvCMNEResult](../../api/inv/inv-cmne-result.mdx)
-- [InvCMNESettings](../../api/inv/inv-cmne-settings.mdx)
-- [InvCMNE](../../api/inv/inv-cmne.mdx)
 - [InvConnectivity](../../api/inv/inv-connectivity.mdx)
 - [InvConvenience](../../api/inv/inv-convenience.mdx)
 - [InvFocalDipole](../../api/inv/inv-focal-dipole.mdx)
@@ -125,7 +122,6 @@ The documented classes this example uses most:
 #include <inv/inv_source_estimate_token.h>
 #include <inv/inv_vector_source_estimate.h>
 #include <inv/inv_volume_source_estimate.h>
-#include <inv/minimum_norm/inv_cmne.h>
 #include <inv/minimum_norm/inv_minimum_norm.h>
 #include <inv/morph/source_morph.h>
 #include <inv/sparse/inv_gamma_map.h>
@@ -362,22 +358,6 @@ int main(int argc, char* argv[])
     //! [inv_tf_mxne_usage]
     ok &= expect(!tfMxne.activeVertices.isEmpty() && tfMxne.activeVertices.size() <= 5 && tfMxne.activeVertices.contains(8),
                  QString("InvTfMxne: %1 V1 sources, including the strongest MxNE source 8").arg(tfMxne.activeVertices.size()));
-
-    //! [inv_cmne_usage]
-    // Contextual MNE: dSPM with a fixed-orientation kernel, then rectified and z-scored per source. Without an
-    // ONNX LSTM model the result is the paper's control estimate.
-    InvCMNESettings cmneSettings;
-    cmneSettings.lambda2 = lambda2;
-    cmneSettings.lookBack = 20;
-    const MatrixXd fixedGain = fixedFwd.sol->data;
-    const MatrixXd sourceCov = MatrixXd::Identity(fixedGain.cols(), fixedGain.cols());
-    const InvCMNEResult cmne = InvCMNE::compute(goodData, fixedGain, inverse.noise_cov->data, sourceCov, cmneSettings);
-    //! [inv_cmne_usage]
-    // Every row of the dSPM kernel maps sensor noise with the noise covariance to unit variance.
-    const MatrixXd& kDspm = cmne.matKernelDspm;
-    const VectorXd unitNoise = (kDspm * inverse.noise_cov->data * kDspm.transpose()).diagonal();
-    ok &= expect(kDspm.rows() == 70 && (unitNoise.array() - 1.0).abs().maxCoeff() < 1e-6 && cmne.stcCmne.data.rows() == 70 && cmne.stcCmne.data.cols() == 421,
-                 "InvCMNE: dSPM kernel has unit noise variance per source, CMNE estimate for all 421 samples");
 
     //! [inv_source_estimate_token_usage]
     InvSourceEstimate layered = stc;

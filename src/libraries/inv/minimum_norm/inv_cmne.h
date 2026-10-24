@@ -66,7 +66,7 @@ namespace INVLIB
  *
  * @brief CMNE result
  *
- * @snippet ex_inv_api/main.cpp inv_cmne_usage
+ * @snippet ex_inverse_cmne/main.cpp inv_cmne_usage
  */
 struct INVSHARED_EXPORT InvCMNEResult
 {
@@ -87,7 +87,7 @@ struct INVSHARED_EXPORT InvCMNEResult
  *
  * @brief CMNE inverse solver
  *
- * @snippet ex_inv_api/main.cpp inv_cmne_usage
+ * @snippet ex_inverse_cmne/main.cpp inv_cmne_usage
  */
 class INVSHARED_EXPORT InvCMNE
 {
