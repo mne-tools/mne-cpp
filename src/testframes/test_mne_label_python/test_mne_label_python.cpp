@@ -317,6 +317,21 @@ void TestMneLabelPython::clusterForward_invariants()
     // The clustered gain is the cluster average of the original gain columns.
     QVERIFY((c.sol->data - small.sol->data * D).cwiseAbs().maxCoeff() < 1e-9 * small.sol->data.cwiseAbs().maxCoeff());
 
+    // Surface orientation, as make_inverse_operator applies it, rotates every cluster into the
+    // frame of its centroid's normal (it read past vertno before nuse followed the clustering).
+    QCOMPARE(c.src[0].nuse + c.src[1].nuse, nClusters);
+    MNEForwardSolution surf = c;
+    surf.convert_to_surf_ori();
+    QCOMPARE(static_cast<int>(surf.source_rr.rows()), nClusters);
+    for (int h = 0, row = 0; h < 2; ++h) {
+        const MNEClusterInfo& info = c.src.hemisphereAt(h)->cluster_info;
+        for (int k = 0; k < info.centroidVertno.size(); ++k, ++row) {
+            const int v = info.centroidVertno[k];
+            QVERIFY((surf.source_rr.row(row) - small.src[h].rr.row(v)).norm() < 1e-6f);
+            QVERIFY(std::abs(surf.source_nn.row(3 * row + 2).dot(small.src[h].nn.row(v)) - 1.0f) < 1e-4f);
+        }
+    }
+
     // With a noise covariance the clusters are found on the whitened gain (MEG and EEG in
     // comparable units) but the centroids remain averages of the original gain.
     QFile covFile(dataPath("MEG/sample/sample_audvis-cov.fif"));

@@ -681,6 +681,9 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
         // Assemble new hemisphere information
         //
         p_fwdOut.src[h].vertno.conservativeResize(count);
+        p_fwdOut.src[h].nuse = count;
+        // Patches belong to the original sources; a cluster's normal is that of its centroid
+        p_fwdOut.src.hemisphereAt(h)->patch_inds = VectorXi();
 
         qInfo("[done]");
     }
@@ -1550,9 +1553,15 @@ void MNEForwardSolution::convert_to_surf_ori()
     this->source_rr = MatrixXf::Zero(this->nsource, 3);
     this->source_nn = MatrixXf::Zero(this->nsource * 3, 3);
 
+    // A clustered source sits at its centroid; its vertno holds the label id
+    const auto vertexOf = [this](qint32 k, qint32 q) {
+        auto* hemi = src.hemisphereAt(k);
+        return hemi && hemi->isClustered() ? hemi->cluster_info.centroidVertno[q] : src[k].vertno(q);
+    };
+
     for (qint32 k = 0; k < src.size(); ++k) {
         for (qint32 q = 0; q < src[k].nuse; ++q)
-            this->source_rr.block(q + nuse, 0, 1, 3) = src[k].rr.block(src[k].vertno(q), 0, 1, 3);
+            this->source_rr.block(q + nuse, 0, 1, 3) = src[k].rr.block(vertexOf(k, q), 0, 1, 3);
 
         for (qint32 p = 0; p < src[k].nuse; ++p) {
             //
@@ -1568,7 +1577,7 @@ void MNEForwardSolution::convert_to_surf_ori()
                 nn = t_nn.rowwise().sum();
                 nn.array() /= nn.norm();
             } else
-                nn = src[k].nn.block(src[k].vertno(p), 0, 1, 3).transpose();
+                nn = src[k].nn.block(vertexOf(k, p), 0, 1, 3).transpose();
 
             Matrix3f tmp = Matrix3f::Identity(nn.rows(), nn.rows()) - nn * nn.transpose();
 
