@@ -88,7 +88,9 @@ int main(int argc, char* argv[])
     for (int k = 0; k < freqs.size(); ++k) {
         freqs[k] = k * dSampFreq / iNfft;
     }
-    const auto toVector = [](const VectorXd& v) { return QVector<double>(v.data(), v.data() + v.size()); };
+    const auto toVector = [](const VectorXd& v) {
+        return QVector<double>(v.data(), v.data() + v.size());
+    };
 
     //Plot hanning window
     VectorXd hann = matTaps.row(0).transpose();

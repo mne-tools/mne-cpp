@@ -62,7 +62,10 @@ QVector<double> niceTicks(double lo, double hi, int target)
     const double raw = (hi - lo) / target;
     const double magnitude = std::pow(10.0, std::floor(std::log10(raw)));
     const double norm = raw / magnitude;
-    const double step = (norm < 1.5 ? 1.0 : norm < 3.0 ? 2.0 : norm < 7.0 ? 5.0 : 10.0) * magnitude;
+    const double step = (norm < 1.5 ? 1.0 : norm < 3.0 ? 2.0
+                             : norm < 7.0              ? 5.0
+                                                       : 10.0) *
+        magnitude;
     QVector<double> ticks;
     for (double v = std::ceil(lo / step) * step; v <= hi + step * 1e-9; v += step) {
         ticks.append(std::abs(v) < step * 1e-9 ? 0.0 : v);
@@ -246,8 +249,12 @@ void LinePlot::paintEvent(QPaintEvent* /*event*/)
         return;
     }
 
-    auto toPixelX = [&](double dx) { return area.left() + (dx - minX) / (maxX - minX) * area.width(); };
-    auto toPixelY = [&](double dy) { return area.bottom() - (dy - minY) / (maxY - minY) * area.height(); };
+    auto toPixelX = [&](double dx) {
+        return area.left() + (dx - minX) / (maxX - minX) * area.width();
+    };
+    auto toPixelY = [&](double dy) {
+        return area.bottom() - (dy - minY) / (maxY - minY) * area.height();
+    };
 
     // Legend: in the corner of the axes that hides the least of the lines, else to the right of them
     int labelWidth = 0;

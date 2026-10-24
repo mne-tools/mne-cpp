@@ -218,14 +218,14 @@ private:
         QColor color;      /**< Line colour. */
     };
 
-    QString m_sTitle;        /**< Title. */
-    QString m_sXLabel;       /**< X axis label. */
-    QString m_sYLabel;       /**< Y axis label. */
+    QString m_sTitle;         /**< Title. */
+    QString m_sXLabel;        /**< X axis label. */
+    QString m_sYLabel;        /**< Y axis label. */
     QVector<Series> m_series; /**< The plotted series. */
-    double m_dMinX;          /**< Minimum X value. */
-    double m_dMaxX;          /**< Maximum X value. */
-    double m_dMinY;          /**< Minimum Y value. */
-    double m_dMaxY;          /**< Maximum Y value. */
+    double m_dMinX;           /**< Minimum X value. */
+    double m_dMaxX;           /**< Maximum X value. */
+    double m_dMinY;           /**< Minimum Y value. */
+    double m_dMaxY;           /**< Maximum Y value. */
 };
 
 //=============================================================================================================

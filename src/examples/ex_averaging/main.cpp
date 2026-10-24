@@ -165,7 +165,10 @@ int main(int argc, char* argv[])
                                                          picks);
 
     qInfo().noquote() << QString("Averaged %1 epochs of event %2 over %3 channels and %4 samples.")
-                             .arg(evoked.nave).arg(event).arg(evoked.data.rows()).arg(evoked.data.cols());
+                             .arg(evoked.nave)
+                             .arg(event)
+                             .arg(evoked.data.rows())
+                             .arg(evoked.data.cols());
 
     // Butterfly plot of the gradiometers in fT/cm against time in ms
     QVector<double> times(evoked.times.size());
@@ -185,8 +188,7 @@ int main(int argc, char* argv[])
             butterfly.addSeries(times, values, QString(), QColor(30, 60, 110, 70));
         }
     }
-    FigureExporter::save(butterfly, "evoked", QString("Butterfly plot of the %1 good gradiometers averaged over %2 epochs of event %3, baseline-corrected over the prestimulus interval.")
-                                                   .arg(butterfly.seriesCount()).arg(evoked.nave).arg(event));
+    FigureExporter::save(butterfly, "evoked", QString("Butterfly plot of the %1 good gradiometers averaged over %2 epochs of event %3, baseline-corrected over the prestimulus interval.").arg(butterfly.seriesCount()).arg(evoked.nave).arg(event));
 
     return 0;
 }
