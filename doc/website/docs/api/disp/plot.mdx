@@ -108,37 +108,35 @@ DISPLIB::Plot* m_pEvokedSourceSignalCoursePlot = nullptr;
 DISPLIB::ImageSc* m_pImageConnWeights = nullptr;
 ````
 
-### [ex_spectral](../../examples/disp/ex_spectral.mdx)
-
-Multitaper spectra, power spectral density and cross-spectral density of random test signals.
-
-````cpp title="src/examples/ex_spectral/main.cpp, line 84"
-//Plot hanning window
-VectorXd hann = matTaps.row(0).transpose();
-Plot plotWindow(hann);
-plotWindow.setTitle("Hanning window");
-plotWindow.setXLabel("X Axes");
-plotWindow.setYLabel("Y Axes");
-plotWindow.setWindowTitle("Corresponding function to MATLABs plot");
-plotWindow.show();
-````
-
 ### [ex_disp](../../examples/disp/ex_disp.mdx)
 
 Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
 ````cpp title="src/examples/ex_disp/main.cpp, line 207"
-//Plot example
-VectorXd dataCol = data.col(0);
+//Plot example: the first channel over time
+VectorXd dataCol = data.row(0).transpose();
 Plot plot(dataCol);
-plot.setTitle("Data Row 0 Plot");
-plot.setXLabel("X Axes");
-plot.setYLabel("Y Axes");
+plot.setTitle(raw.info.ch_names[picks(0)]);
+plot.setXLabel("Sample");
+plot.setYLabel("Amplitude");
 plot.setWindowTitle("Corresponding function to MATLABs plot");
-plot.show();
 ````
 
-Also used in [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx), [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx).
+### [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx)
+
+Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 185"
+VectorXd samples = VectorXd::LinSpaced(50, -1.0, 1.0);
+Plot plot(samples); // Plot is a Graph with title and axis labels
+plot.setTitle("ramp");
+plot.setXLabel("sample");
+plot.setYLabel("value");
+const QImage plotImage = render(plot);
+ok &= expect(countColor(plotImage, qRgb(255, 255, 255), 0) < plotImage.width() * plotImage.height(), "Plot renders axes and data");
+````
+
+Also used in [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx).
 
 ## Authors of this file
 

@@ -1,0 +1,141 @@
+---
+id: figure-exporter
+title: "DISPLIB::FigureExporter"
+sidebar_label: FigureExporter
+sidebar_position: 70
+---
+
+# FigureExporter
+
+**Namespace:** `DISPLIB` &nbsp;·&nbsp; **Library:** Display Library &nbsp;·&nbsp; **Source:** [`disp/plots/helpers/figureexporter.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/disp/plots/helpers/figureexporter.h)
+
+`#include <disp/figureexporter.h>`
+
+```cpp
+class DISPLIB::FigureExporter
+```
+
+Writes captioned figures to `MNE_CPP_FIGURE_DIR`.
+
+```cpp title="src/examples/ex_disp_plots/main.cpp"
+// Written only when MNE_CPP_FIGURE_DIR names a directory
+FigureExporter::save(line, "line_plot", "LinePlot: one period of a sine wave.");
+```
+
+---
+
+## Static Methods
+
+### directory()
+
+Returns the directory figures are written to.
+
+**Returns:**
+
+- *QString* — The value of `MNE_CPP_FIGURE_DIR`, or an empty string when figures are not written.
+
+---
+
+### save(widget, name, caption, size)
+
+Renders `widget` offscreen at `size` and writes it as the next figure.
+
+**Parameters:**
+
+- **widget** : *QWidget &*
+  The widget to render; it is resized and never shown on screen.
+
+- **name** : *const QString &*
+  File name stem; characters other than letters, digits, '-' and '*' become '*'.
+
+- **caption** : *const QString &*
+  Caption shown below the figure.
+
+- **size** : *const QSize &*
+  Logical size of the figure in pixels.
+
+**Returns:**
+
+- *QString* — The path of the written PNG, or an empty string when figures are not written or writing failed.
+
+---
+
+### save(image, name, caption)
+
+Writes `image` as the next figure.
+
+**Parameters:**
+
+- **image** : *const QImage &*
+  The figure.
+
+- **name** : *const QString &*
+  File name stem; characters other than letters, digits, '-' and '*' become '*'.
+
+- **caption** : *const QString &*
+  Caption shown below the figure.
+
+**Returns:**
+
+- *QString* — The path of the written PNG, or an empty string when figures are not written or writing failed.
+
+---
+
+## Example
+
+- Start here: [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+- Full source: [`src/examples/ex_disp_plots/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_disp_plots/main.cpp)
+- Build target: `ex_disp_plots` (runs under CTest)
+
+## Used in examples
+
+### [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx)
+
+Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
+
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 204"
+// Written only when MNE_CPP_FIGURE_DIR names a directory
+FigureExporter::save(line, "line_plot", "LinePlot: one period of a sine wave.");
+FigureExporter::save(bar, "bar", "Bar: counts of four amplitude classes.");
+FigureExporter::save(spline, "spline", "Spline: the same histogram as a smooth curve with three threshold markers.");
+FigureExporter::save(image, "image_sc", "ImageSc: a left-to-right ramp in the viridis colour map.");
+FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-30 Hz band.");
+````
+
+### [ex_disp](../../examples/disp/ex_disp.mdx)
+
+Disp library widgets: image map, line plot and time-frequency plot of raw data.
+
+````cpp title="src/examples/ex_disp/main.cpp, line 219"
+FigureExporter::save(imagesc, "image_sc", QString("ImageSc of %1 MEG channels from %2 s to %3 s.").arg(data.rows()).arg(from).arg(to));
+FigureExporter::save(plot, "plot", QString("Plot of %1 over the same segment.").arg(raw.info.ch_names[picks(0)]));
+FigureExporter::save(tfplot, "tf_plot", QString("TFplot: spectrogram (0-100 Hz) of %1.").arg(raw.info.ch_names[picks(0)]));
+if (!FigureExporter::directory().isEmpty()) {
+    return 0;
+}
+imagesc.show();
+plot.show();
+tfplot.show();
+````
+
+### [ex_spectral](../../examples/disp/ex_spectral.mdx)
+
+Multitaper spectra, power spectral density and cross-spectral density of random test signals.
+
+````cpp title="src/examples/ex_spectral/main.cpp, line 149"
+FigureExporter::save(plotWindow, "hanning", "The single Hanning taper applied before the FFT.");
+FigureExporter::save(plotPsd, "psd", "PSD of row 0 from the tapered spectrum, by hand and as the CSD of the signal with itself.");
+FigureExporter::save(plotCsd, "csd", "Real part of the cross-spectral density of rows 0 and 1: only their shared component remains.");
+if (!FigureExporter::directory().isEmpty()) {
+    return 0;
+}
+plotWindow.show();
+plotPsd.show();
+plotCsd.show();
+````
+
+Also used in [ex_histogram](../../examples/inv/ex_histogram.mdx), [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx), [ex_averaging](../../examples/mne/ex_averaging.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_read_evoked](../../examples/mne/ex_read_evoked.mdx), [ex_read_raw](../../examples/mne/ex_read_raw.mdx).
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

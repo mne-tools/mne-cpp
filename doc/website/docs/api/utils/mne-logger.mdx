@@ -98,9 +98,9 @@ ok &= expect(log.open(QIODevice::ReadOnly) && log.readAll().contains("logging to
 
 Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
-````cpp title="src/examples/ex_averaging/main.cpp, line 66"
+````cpp title="src/examples/ex_averaging/main.cpp, line 70"
 qInstallMessageHandler(MNELogger::customLogWriter);
-QCoreApplication a(argc, argv);
+QApplication a(argc, argv);
 ````
 
 ### [ex_cancel_noise](../../examples/mne/ex_cancel_noise.mdx)

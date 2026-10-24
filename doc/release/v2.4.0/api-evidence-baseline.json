@@ -3,27 +3,27 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 468,
+    "exported_classes": 469,
     "exported_free_functions": 119,
-    "registered_classes": 518,
+    "registered_classes": 519,
     "exported_not_registered": 0,
     "registered_function_modules": 13,
     "registered_header_only": 37,
     "registered_stale": 0,
-    "registered_with_test": 162,
+    "registered_with_test": 163,
     "registered_test_unresolved": 0,
-    "registered_with_example": 374,
+    "registered_with_example": 376,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 93,
     "registered_without_api_page": 0,
-    "with_snippet": 395,
-    "public_api_units": 518,
-    "example_eligible": 374,
+    "with_snippet": 397,
+    "public_api_units": 519,
+    "example_eligible": 375,
     "example_exempt": 144,
-    "eligible_backed_by_registry_example": 374,
-    "eligible_used_by_some_example": 352,
-    "examples_on_disk": 69,
-    "examples_built": 69
+    "eligible_backed_by_registry_example": 375,
+    "eligible_used_by_some_example": 353,
+    "examples_on_disk": 70,
+    "examples_built": 70
   },
   "by_library": {
     "bids": {
@@ -63,13 +63,13 @@
       "with_snippet": 5
     },
     "disp": {
-      "public": 69,
-      "registered": 69,
-      "with_test": 5,
-      "eligible": 8,
-      "eligible_with_registry_example": 8,
-      "eligible_used_by_example": 8,
-      "with_snippet": 8
+      "public": 70,
+      "registered": 70,
+      "with_test": 6,
+      "eligible": 9,
+      "eligible_with_registry_example": 9,
+      "eligible_used_by_example": 9,
+      "with_snippet": 9
     },
     "disp3D": {
       "public": 49,
@@ -132,7 +132,7 @@
       "eligible": 46,
       "eligible_with_registry_example": 46,
       "eligible_used_by_example": 41,
-      "with_snippet": 52
+      "with_snippet": 53
     },
     "lsl": {
       "public": 3,
@@ -1989,6 +1989,37 @@
       "exempt_reason": null
     },
     {
+      "name": "FigureExporter",
+      "header": "disp/plots/helpers/figureexporter.h",
+      "library": "disp",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_disp_plots",
+      "test_resolves": true,
+      "example": "ex_disp_plots",
+      "example_state": "built",
+      "including_examples": [
+        "ex_averaging",
+        "ex_disp",
+        "ex_disp_plots",
+        "ex_histogram",
+        "ex_inverse_mne",
+        "ex_read_evoked",
+        "ex_read_raw",
+        "ex_spectral",
+        "ex_tf_plot"
+      ],
+      "snippets": [
+        "ex_disp_plots/main.cpp#figure_export"
+      ],
+      "api_page": "doc/website/docs/api/disp/figure-exporter.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
       "name": "ImageSc",
       "header": "disp/plots/imagesc.h",
       "library": "disp",
@@ -2026,7 +2057,12 @@
       "example": "ex_disp_plots",
       "example_state": "built",
       "including_examples": [
-        "ex_disp_plots"
+        "ex_averaging",
+        "ex_disp_plots",
+        "ex_inverse_mne",
+        "ex_read_evoked",
+        "ex_read_raw",
+        "ex_spectral"
       ],
       "snippets": [
         "ex_disp_plots/main.cpp#line_plot_usage"
@@ -2051,8 +2087,7 @@
       "including_examples": [
         "ex_connectivity",
         "ex_disp",
-        "ex_disp_plots",
-        "ex_spectral"
+        "ex_disp_plots"
       ],
       "snippets": [
         "ex_disp_plots/main.cpp#plot_usage"
@@ -6638,6 +6673,7 @@
         "ex_fiff_api",
         "ex_inv_api",
         "ex_inv_beamformer",
+        "ex_inverse_cmne",
         "ex_make_inverse_operator",
         "ex_mne_api"
       ],
@@ -6908,6 +6944,7 @@
         "ex_histogram",
         "ex_inv_api",
         "ex_inv_beamformer",
+        "ex_inverse_cmne",
         "ex_inverse_mne",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -7432,6 +7469,7 @@
         "ex_fs",
         "ex_histogram",
         "ex_inv_api",
+        "ex_inverse_cmne",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
         "ex_inverse_rap_music",
@@ -7517,6 +7555,7 @@
         "ex_histogram",
         "ex_inv_api",
         "ex_inv_beamformer",
+        "ex_inverse_cmne",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
         "ex_inverse_rap_music",
@@ -7609,6 +7648,7 @@
         "ex_disp_3D",
         "ex_fs",
         "ex_fs_surface",
+        "ex_inverse_cmne",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
         "ex_inverse_rap_music",
@@ -8803,6 +8843,7 @@
         "ex_interpolation",
         "ex_inv_api",
         "ex_inv_beamformer",
+        "ex_inverse_cmne",
         "ex_inverse_mne",
         "ex_inverse_mne_raw",
         "ex_inverse_pwl_rap_music",
@@ -8943,14 +8984,14 @@
       "registry_status": "done",
       "test": "test_inv_cmne",
       "test_resolves": true,
-      "example": "ex_inv_api",
+      "example": "ex_inverse_cmne",
       "example_state": "built",
       "including_examples": [
-        "ex_inv_api"
+        "ex_inverse_cmne"
       ],
       "snippets": [
-        "ex_inv_api/main.cpp#inv_cmne_usage",
-        "ex_inv_api/main.cpp#inv_cmne_usage"
+        "ex_inverse_cmne/main.cpp#inv_cmne_usage",
+        "ex_inverse_cmne/main.cpp#inv_cmne_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-cmne.mdx",
       "python_equiv": null,
@@ -8967,14 +9008,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": "ex_inv_api",
+      "example": "ex_inverse_cmne",
       "example_state": "built",
       "including_examples": [
-        "ex_inv_api"
+        "ex_inverse_cmne"
       ],
       "snippets": [
-        "ex_inv_api/main.cpp#inv_cmne_usage",
-        "ex_inv_api/main.cpp#inv_cmne_usage"
+        "ex_inverse_cmne/main.cpp#inv_cmne_usage",
+        "ex_inverse_cmne/main.cpp#inv_cmne_usage"
       ],
       "api_page": "doc/website/docs/api/inv/inv-cmne-result.mdx",
       "python_equiv": null,
@@ -8991,10 +9032,14 @@
       "registry_status": "documented",
       "test": null,
       "test_resolves": false,
-      "example": null,
-      "example_state": "none",
-      "including_examples": [],
-      "snippets": [],
+      "example": "ex_inverse_cmne",
+      "example_state": "built",
+      "including_examples": [
+        "ex_inverse_cmne"
+      ],
+      "snippets": [
+        "ex_inverse_cmne/main.cpp#inv_cmne_settings_usage"
+      ],
       "api_page": "doc/website/docs/api/inv/inv-cmne-settings.mdx",
       "python_equiv": null,
       "example_eligible": false,
@@ -10786,6 +10831,7 @@
         "ex_fwd_api",
         "ex_inv_api",
         "ex_inv_beamformer",
+        "ex_inverse_cmne",
         "ex_read_fwd",
         "ex_read_fwd_disp_3D"
       ],
@@ -10815,6 +10861,7 @@
         "ex_fwd_api",
         "ex_inv_api",
         "ex_inv_beamformer",
+        "ex_inverse_cmne",
         "ex_read_fwd",
         "ex_read_fwd_disp_3D"
       ],
@@ -10844,6 +10891,7 @@
         "ex_fwd_api",
         "ex_inv_api",
         "ex_inv_beamformer",
+        "ex_inverse_cmne",
         "ex_read_fwd",
         "ex_read_fwd_disp_3D"
       ],

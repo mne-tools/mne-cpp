@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6334 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6343 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -93,6 +93,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **addSampleAsEvent** `[signal]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view)
 - **addSelectionBem** `[fn]` in [CoregSettingsView](/docs/api/disp/coreg-settings-view) — Add a new Bem to the drop down menu.
 - **addSensors** `[fn]` in [BrainTreeModel](/docs/api/disp3-d/brain-tree-model)
+- **addSeries** `[fn]` in [LinePlot](/docs/api/disp/line-plot) — Adds a series to the plot; the axes grow to include it and a legend lists the labelled series.
 - **addSessionToSubject** `[slot]` in [BidsViewModel](/docs/api/disp/bids-view-model) — Adds session named after sSessionName to subjects names sSubjectName.
 - **addSessionToSubject** `[slot]` in [BidsViewModel](/docs/api/disp/bids-view-model) — Adds session named after sSessionName to subject at subjectIndex.
 - **addSourceSpace** `[fn]` in [BrainTreeModel](/docs/api/disp3-d/brain-tree-model)
@@ -686,6 +687,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **color** `[var]` in `InstanceData`
 - **color** `[var]` in `InstanceData`
 - **color** `[var]` in [LiveMarker](/docs/api/disp3-d/live-marker)
+- **color** `[var]` in `Series` — Line colour.
 - **color** `[var]` in [TimeRulerEventMark](/docs/api/disp/time-ruler-event-mark) — Display colour.
 - **color** `[var]` in [TimeRulerReferenceMark](/docs/api/disp/time-ruler-reference-mark) — Display colour.
 - **color_scale** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Color scale used to compute vertex colors.
@@ -1365,6 +1367,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **DirectedTransferFunction** `[fn]` in [DirectedTransferFunction](/docs/api/connectivity/directed-transfer-function) — Constructs a [`DirectedTransferFunction`](/docs/api/connectivity/directed-transfer-function) object.
 - **direction** `[var]` in [MnaPort](/docs/api/mna/mna-port) — Input or Output.
 - **directory** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Constructs the directory path for this entity combination.
+- **directory** `[fn]` in [FigureExporter](/docs/api/disp/figure-exporter) — Returns the directory figures are written to.
 - **dirtree** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Returns the directory compiled into a tree tree is set when `open()` was called.
 - **dirty** `[var]` in [MnaNode](/docs/api/mna/mna-node) — Whether node needs re-execution.
 - **dirtyNodes** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph)
@@ -2869,6 +2872,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **label** `[var]` in [IcaLabelResult](/docs/api/decoding/ica-label-result) — Assigned label.
 - **label** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Channel names as written in the file (e.g.
 - **label** `[var]` in [PickResult](/docs/api/disp3-d/pick-result) — Human-readable label (contact name, vertex coordinate string, …).
+- **label** `[var]` in `Series` — Legend entry.
 - **label** `[var]` in [TimeRulerEventMark](/docs/api/disp/time-ruler-event-mark) — Short text (event type number).
 - **label** `[var]` in [TimeRulerReferenceMark](/docs/api/disp/time-ruler-reference-mark) — Short text identifier, e.g. M1.
 - **label_id** `[var]` in [FsLabel](/docs/api/fs/fs-label) — [`FsLabel`](/docs/api/fs/fs-label) id (optional).
@@ -4558,6 +4562,8 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **save** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Save this evoked data set to a FIFF file.
 - **save** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Save this evoked data set as FIFF to an I/O device, e.g.
 - **save** `[fn]` in [FiffRawData](/docs/api/fiff/fiff-raw-data) — Save raw data to a FIFF file, optionally with decimation and channel picking.
+- **save** `[fn]` in [FigureExporter](/docs/api/disp/figure-exporter) — Renders `widget` offscreen at `size` and writes it as the next figure.
+- **save** `[fn]` in [FigureExporter](/docs/api/disp/figure-exporter) — Writes `image` as the next figure.
 - **save** `[fn]` in [MlModel](/docs/api/ml/ml-model) — Serialise the model to disk.
 - **save** `[fn]` in [MlOnnxModel](/docs/api/ml/ml-onnx-model) — Serialise the model to disk.
 - **save** `[fn]` in [Report](/docs/api/utils/report) — Save the report to an HTML file.
@@ -4709,6 +4715,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **SensorTreeItem** `[fn]` in [SensorTreeItem](/docs/api/disp3-d/sensor-tree-item)
 - **separatorGeometries** `[fn]` in [MultiViewLayout](/docs/api/disp3-d/multi-view-layout) — Compute the separator widget geometries.
 - **separatorLinePx** `[fn]` in [MultiViewLayout](/docs/api/disp3-d/multi-view-layout)
+- **seriesCount** `[fn]` in [LinePlot](/docs/api/disp/line-plot) — Returns the number of series in the plot.
 - **session** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Session label (without "ses-").
 - **sessions** `[var]` in [MnaSubject](/docs/api/mna/mna-subject) — Sessions for this subject.
 - **set** `[var]` in [FwdCompData](/docs/api/fwd/fwd-comp-data) — The compensation data set.
@@ -6369,6 +6376,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **x** `[var]` in [BidsElectrode](/docs/api/bids/bids-electrode) — X coordinate or "n/a" (REQUIRED).
 - **x** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
 - **x** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **x** `[var]` in `Series` — X data points.
 - **x** `[var]` in `VelocitySample`
 - **x** `[var]` in [VertexData](/docs/api/disp3-d/vertex-data)
 - **x** `[var]` in [VertexData](/docs/api/disp3-d/vertex-data)
@@ -6390,6 +6398,7 @@ Index of 6334 public class members (functions, variables, typedefs, enums) acros
 - **y** `[var]` in [fitUserRec](/docs/api/fwd/fit-user-rec)
 - **y** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
 - **y** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
+- **y** `[var]` in `Series` — Y data points.
 - **y** `[var]` in [VertexData](/docs/api/disp3-d/vertex-data)
 - **y** `[var]` in [VertexData](/docs/api/disp3-d/vertex-data)
 - **y** `[var]` in [VertexData](/docs/api/disp3-d/vertex-data)

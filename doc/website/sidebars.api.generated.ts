@@ -641,7 +641,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/disp/trigger-detection-view',
         'api/disp/channel-display-info',
         'api/disp/time-ruler-event-mark',
-        'api/disp/time-ruler-reference-mark'
+        'api/disp/time-ruler-reference-mark',
+        'api/disp/figure-exporter'
       ],
     },
     {

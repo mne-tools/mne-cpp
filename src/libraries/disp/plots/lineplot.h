@@ -180,6 +180,8 @@ public:
     //=========================================================================================================
     /**
      * Returns the number of series in the plot.
+     *
+     * @return The number of series.
      */
     int seriesCount() const;
 
@@ -195,7 +197,13 @@ protected:
 private:
     //=========================================================================================================
     /**
-     * Returns the length in pixels of the lines inside @p rect, for the given data-to-pixel mapping.
+     * Returns the length of the lines inside a rectangle.
+     *
+     * @param[in] rect       The rectangle in pixels.
+     * @param[in] toPixelX   Maps an x value to pixels.
+     * @param[in] toPixelY   Maps a y value to pixels.
+     *
+     * @return The length in pixels of the lines inside @p rect.
      */
     double hiddenLength(const QRectF& rect,
                         const std::function<double(double)>& toPixelX,

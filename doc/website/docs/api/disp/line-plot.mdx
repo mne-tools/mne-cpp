@@ -154,6 +154,36 @@ Updates the plot using the given vectors.
 
 ---
 
+### addSeries(x, y, label, color)
+
+Adds a series to the plot; the axes grow to include it and a legend lists the labelled series.
+
+**Parameters:**
+
+- **x** : *const QVector&lt; double &gt; &*
+  X-Axis data to plot.
+
+- **y** : *const QVector&lt; double &gt; &*
+  Y-Axis data to plot.
+
+- **label** : *const QString &*
+  Legend entry; series without a label are not listed.
+
+- **color** : *const QColor &*
+  Line colour; an invalid colour takes the next colour of the default palette.
+
+---
+
+### seriesCount()
+
+Returns the number of series in the plot.
+
+**Returns:**
+
+- *int* — The number of series.
+
+---
+
 ## Example
 
 - Start here: [ex_disp_plots](../../examples/disp/ex_disp_plots.mdx) — Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
@@ -166,7 +196,7 @@ Updates the plot using the given vectors.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 150"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 151"
 LinePlot line(x, y, "sin(2 pi t)");
 line.setXLabel("t [s]");
 line.setYLabel("amplitude");
@@ -181,6 +211,41 @@ for (int py = 0; py < lineImage.height(); ++py) {
         }
     }
 ````
+
+### [ex_spectral](../../examples/disp/ex_spectral.mdx)
+
+Multitaper spectra, power spectral density and cross-spectral density of random test signals.
+
+````cpp title="src/examples/ex_spectral/main.cpp, line 93"
+//Plot hanning window
+VectorXd hann = matTaps.row(0).transpose();
+LinePlot plotWindow(toVector(hann), "Hanning window");
+plotWindow.setXLabel("Sample");
+plotWindow.setYLabel("Weight");
+````
+
+### [ex_averaging](../../examples/mne/ex_averaging.mdx)
+
+Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
+
+````cpp title="src/examples/ex_averaging/main.cpp, line 175"
+LinePlot butterfly;
+butterfly.setTitle(QString("Evoked response to event %1 (%2 epochs)").arg(event).arg(evoked.nave));
+butterfly.setXLabel("Time [ms]");
+butterfly.setYLabel("Gradiometers [fT/cm]");
+for (int c = 0; c < evoked.data.rows(); ++c) {
+    if (evoked.info.chs[c].unit == FIFF_UNIT_T_M && !evoked.info.bads.contains(evoked.info.ch_names[c])) {
+        QVector<double> values(times.size());
+        for (int s = 0; s < times.size(); ++s) {
+            values[s] = 1e13 * evoked.data(c, s);
+        }
+        butterfly.addSeries(times, values, QString(), QColor(30, 60, 110, 70));
+    }
+}
+FigureExporter::save(butterfly, "evoked", QString("Butterfly plot of the %1 good gradiometers averaged over %2 epochs of event %3, baseline-corrected over the prestimulus interval.")
+````
+
+Also used in [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_read_evoked](../../examples/mne/ex_read_evoked.mdx), [ex_read_raw](../../examples/mne/ex_read_raw.mdx).
 
 ## Authors of this file
 

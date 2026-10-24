@@ -55,7 +55,9 @@ class DISPSHARED_EXPORT FigureExporter
 public:
     //=========================================================================================================
     /**
-     * Returns the figure directory, @c MNE_CPP_FIGURE_DIR, or an empty string when figures are not written.
+     * Returns the directory figures are written to.
+     *
+     * @return The value of @c MNE_CPP_FIGURE_DIR, or an empty string when figures are not written.
      */
     static QString directory();
 

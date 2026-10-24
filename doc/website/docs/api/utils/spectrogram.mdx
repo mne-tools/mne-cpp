@@ -51,25 +51,24 @@ Calculates the spectrogram (tf-representation) of a given signal.
 
 ## Used in examples
 
-### [ex_disp](../../examples/disp/ex_disp.mdx)
-
-Disp library widgets: image map, line plot and time-frequency plot of raw data.
-
-````cpp title="src/examples/ex_disp/main.cpp, line 216"
-//ToDo: Debug tfplot
-//tf plot example
-dataCol = data.row(0).transpose();
-MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
-````
-
 ### [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx)
 
 Spectrogram of one evoked channel shown as a time-frequency plot.
 
-````cpp title="src/examples/ex_tf_plot/main.cpp, line 78"
+````cpp title="src/examples/ex_tf_plot/main.cpp, line 79"
 //tf plot
 VectorXd dataCol = p_FiffEvoked.data.row(83).transpose();
 MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
+````
+
+### [ex_disp](../../examples/disp/ex_disp.mdx)
+
+Disp library widgets: image map, line plot and time-frequency plot of raw data.
+
+````cpp title="src/examples/ex_disp/main.cpp, line 215"
+//tf plot example: spectrogram of the same channel
+MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
+TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet);
 ````
 
 ## Authors of this file

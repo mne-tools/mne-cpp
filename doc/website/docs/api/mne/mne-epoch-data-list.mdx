@@ -316,14 +316,14 @@ MNELIB::MNEEpochDataList epochs;
 
 Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
-````cpp title="src/examples/ex_averaging/main.cpp, line 151"
+````cpp title="src/examples/ex_averaging/main.cpp, line 155"
 FiffEvoked evoked = MNEEpochDataList::computeAverage(raw,
                                                      events,
                                                      fTMin,
                                                      fTMax,
                                                      event,
-                                                     false,
-                                                     0.0f,
+                                                     true,
+                                                     fTMin,
                                                      0.0f,
                                                      mapReject,
                                                      QStringList(),
