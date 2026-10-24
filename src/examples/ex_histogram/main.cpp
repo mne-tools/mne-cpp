@@ -35,6 +35,7 @@
 #include <utils/generics/mne_logger.h>
 
 #include <disp/plots/bar.h>
+#include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/spline.h>
 
 //includes for source localization data
@@ -221,6 +222,11 @@ int main(int argc, char* argv[])
 
     qDebug() << "Histogram timer:" << myTimerHistogram.elapsed();
 
+    FigureExporter::save(*displayObj, "histogram", QString("Distribution of the %1 source amplitudes at sample 10 in %2 classes, with three threshold markers.").arg(sourceEstimateData.size()).arg(classAmount));
+    if (!FigureExporter::directory().isEmpty()) {
+        delete displayObj;
+        return 0;
+    }
     displayObj->resize(800, 600);
     displayObj->show();
 

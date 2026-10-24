@@ -52,10 +52,13 @@
   "examples": [
     {
       "name": "ex_averaging",
+      "title": "Average epochs into an evoked response",
       "brief": "Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection",
+      "thumbnail": "/img/examples/ex_averaging/01_evoked.png",
       "url": "/docs/examples/mne/ex_averaging/",
       "library": "mne",
       "libraries": [
+        "disp",
         "mne",
         "fiff",
         "utils"
@@ -75,7 +78,9 @@
     },
     {
       "name": "ex_bids",
+      "title": "Read and write BIDS datasets",
       "brief": "BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip",
+      "thumbnail": "",
       "url": "/docs/examples/bids/ex_bids/",
       "library": "bids",
       "libraries": [
@@ -93,7 +98,9 @@
     },
     {
       "name": "ex_cancel_noise",
+      "title": "Change the CTF gradient compensation grade",
       "brief": "Build the CTF software gradient compensator that converts an evoked data set between compensation grades",
+      "thumbnail": "",
       "url": "/docs/examples/mne/ex_cancel_noise/",
       "library": "mne",
       "libraries": [
@@ -112,7 +119,9 @@
     },
     {
       "name": "ex_clustered_inverse_mne",
+      "title": "MNE, dSPM and sLORETA with a clustered forward model",
       "brief": "Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_clustered_inverse_mne/",
       "library": "inv",
       "libraries": [
@@ -138,7 +147,9 @@
     },
     {
       "name": "ex_clustered_inverse_mne_raw",
+      "title": "Source estimate from raw data with a clustered forward model",
       "brief": "Average a raw recording and compute an MNE, dSPM or sLORETA estimate with a parcellation-clustered forward solution",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_clustered_inverse_mne_raw/",
       "library": "inv",
       "libraries": [
@@ -163,7 +174,9 @@
     },
     {
       "name": "ex_clustered_inverse_pwl_rap_music_raw",
+      "title": "Powell RAP-MUSIC on raw data with a clustered forward model",
       "brief": "Average a raw recording and localize dipole pairs with Powell RAP-MUSIC on a parcellation-clustered forward solution",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_clustered_inverse_pwl_rap_music_raw/",
       "library": "inv",
       "libraries": [
@@ -186,7 +199,9 @@
     },
     {
       "name": "ex_clustered_inverse_rap_music_raw",
+      "title": "RAP-MUSIC on raw data with a clustered forward model",
       "brief": "Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellation-clustered forward solution",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_clustered_inverse_rap_music_raw/",
       "library": "inv",
       "libraries": [
@@ -211,7 +226,9 @@
     },
     {
       "name": "ex_compute_forward",
+      "title": "Compute the MEG/EEG forward solution",
       "brief": "Compute the MEG/EEG forward solution of the sample subject from its BEM, source space and head-MRI transform",
+      "thumbnail": "",
       "url": "/docs/examples/fwd/ex_compute_forward/",
       "library": "fwd",
       "libraries": [
@@ -235,7 +252,9 @@
     },
     {
       "name": "ex_connectivity",
+      "title": "Functional connectivity shown as a 3D network",
       "brief": "Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network",
+      "thumbnail": "",
       "url": "/docs/examples/connectivity/ex_connectivity/",
       "library": "connectivity",
       "libraries": [
@@ -264,7 +283,9 @@
     },
     {
       "name": "ex_connectivity_comparison",
+      "title": "Compare connectivity metrics side by side",
       "brief": "Compare connectivity metrics side by side on the same averaged sensor- or source-level data",
+      "thumbnail": "",
       "url": "/docs/examples/connectivity/ex_connectivity_comparison/",
       "library": "connectivity",
       "libraries": [
@@ -291,7 +312,9 @@
     },
     {
       "name": "ex_connectivity_metrics",
+      "title": "Connectivity metrics on simulated coupled signals",
       "brief": "Connectivity metrics on synthetic data with a known coupling",
+      "thumbnail": "",
       "url": "/docs/examples/connectivity/ex_connectivity_metrics/",
       "library": "connectivity",
       "libraries": [
@@ -310,7 +333,9 @@
     },
     {
       "name": "ex_connectivity_performance",
+      "title": "Benchmark connectivity methods",
       "brief": "Benchmark the run time of connectivity methods over channel and sample counts",
+      "thumbnail": "",
       "url": "/docs/examples/connectivity/ex_connectivity_performance/",
       "library": "connectivity",
       "libraries": [
@@ -332,7 +357,9 @@
     },
     {
       "name": "ex_coreg",
+      "title": "Coregister digitizer points to the head surface",
       "brief": "Coregistration workflow: fit digitizer points to the head surface with ICP",
+      "thumbnail": "",
       "url": "/docs/examples/disp3D/ex_coreg/",
       "library": "disp3D",
       "libraries": [
@@ -352,7 +379,9 @@
     },
     {
       "name": "ex_decoding",
+      "title": "Spatial decoding and ICA component labelling",
       "brief": "Spatial decoders and ICA labelling on synthetic mixtures with a known ground truth",
+      "thumbnail": "",
       "url": "/docs/examples/decoding/ex_decoding/",
       "library": "decoding",
       "libraries": [
@@ -369,7 +398,9 @@
     },
     {
       "name": "ex_disp",
+      "title": "Plot raw data as image, line and time-frequency maps",
       "brief": "Disp library widgets: image map, line plot and time-frequency plot of raw data",
+      "thumbnail": "/img/examples/ex_disp/01_image_sc.png",
       "url": "/docs/examples/disp/ex_disp/",
       "library": "disp",
       "libraries": [
@@ -390,7 +421,9 @@
     },
     {
       "name": "ex_disp3d_scene",
+      "title": "Build a 3D scene of sensors, electrodes and MRI slices",
       "brief": "Disp3D scene data: sensor-to-surface interpolation, electrodes, MRI slices, video overlay and layers",
+      "thumbnail": "",
       "url": "/docs/examples/disp3D/ex_disp3d_scene/",
       "library": "disp3D",
       "libraries": [
@@ -413,7 +446,9 @@
     },
     {
       "name": "ex_disp_3D",
+      "title": "Show a source estimate on the cortex in 3D",
       "brief": "Compute a clustered MNE, dSPM or sLORETA estimate of the sample evoked response and show it on the cortex with Disp3D",
+      "thumbnail": "",
       "url": "/docs/examples/disp3D/ex_disp_3D/",
       "library": "disp3D",
       "libraries": [
@@ -437,7 +472,9 @@
     },
     {
       "name": "ex_disp_plots",
+      "title": "Plot types and colour maps",
       "brief": "Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps",
+      "thumbnail": "/img/examples/ex_disp_plots/01_line_plot.png",
       "url": "/docs/examples/disp/ex_disp_plots/",
       "library": "disp",
       "libraries": [
@@ -454,7 +491,9 @@
     },
     {
       "name": "ex_dsp_analysis",
+      "title": "Spectra, filters, peaks and envelopes",
       "brief": "DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation",
+      "thumbnail": "",
       "url": "/docs/examples/dsp/ex_dsp_analysis/",
       "library": "dsp",
       "libraries": [
@@ -475,7 +514,9 @@
     },
     {
       "name": "ex_dsp_artifacts",
+      "title": "Detect and repair artifacts",
       "brief": "Artifact detection and repair with the dsp library on a recording with planted defects",
+      "thumbnail": "",
       "url": "/docs/examples/dsp/ex_dsp_artifacts/",
       "library": "dsp",
       "libraries": [
@@ -494,7 +535,9 @@
     },
     {
       "name": "ex_dsp_filter",
+      "title": "Design and apply an FIR filter",
       "brief": "FIR filter design, application and storage with the dsp library",
+      "thumbnail": "",
       "url": "/docs/examples/dsp/ex_dsp_filter/",
       "library": "dsp",
       "libraries": [
@@ -513,7 +556,9 @@
     },
     {
       "name": "ex_dsp_maxwell",
+      "title": "Maxwell filtering (SSS) and movement compensation",
       "brief": "DSP Maxwell filtering: SSS, bad-channel detection, movement compensation, fine calibration and cHPI removal",
+      "thumbnail": "",
       "url": "/docs/examples/dsp/ex_dsp_maxwell/",
       "library": "dsp",
       "libraries": [
@@ -531,7 +576,9 @@
     },
     {
       "name": "ex_dsp_preprocessing",
+      "title": "Preprocessing tools on simulated data",
       "brief": "Preprocessing tools of the dsp library on synthetic data with a known ground truth",
+      "thumbnail": "",
       "url": "/docs/examples/dsp/ex_dsp_preprocessing/",
       "library": "dsp",
       "libraries": [
@@ -550,7 +597,9 @@
     },
     {
       "name": "ex_dsp_rt",
+      "title": "Real-time averaging, covariance and inverse workers",
       "brief": "DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators",
+      "thumbnail": "",
       "url": "/docs/examples/dsp/ex_dsp_rt/",
       "library": "dsp",
       "libraries": [
@@ -575,7 +624,9 @@
     },
     {
       "name": "ex_dsp_spectral",
+      "title": "Spectral analysis and filtering of known signals",
       "brief": "Spectral and filtering tools of the dsp library on signals with known content",
+      "thumbnail": "",
       "url": "/docs/examples/dsp/ex_dsp_spectral/",
       "library": "dsp",
       "libraries": [
@@ -594,7 +645,9 @@
     },
     {
       "name": "ex_evoked_grad_amp",
+      "title": "Tangential amplitude of planar gradiometers",
       "brief": "Compute tangential gradient amplitudes from planar gradiometer data",
+      "thumbnail": "",
       "url": "/docs/examples/mne/ex_evoked_grad_amp/",
       "library": "mne",
       "libraries": [
@@ -613,7 +666,9 @@
     },
     {
       "name": "ex_fiff_api",
+      "title": "Tour of the FIFF data structures",
       "brief": "FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure",
+      "thumbnail": "",
       "url": "/docs/examples/fiff/ex_fiff_api/",
       "library": "fiff",
       "libraries": [
@@ -635,7 +690,9 @@
     },
     {
       "name": "ex_fiff_io",
+      "title": "Read any FIFF file with FiffIO",
       "brief": "Read the data sets of a FIFF file through the generic FiffIO interface and write its raw data back to disk",
+      "thumbnail": "",
       "url": "/docs/examples/mne/ex_fiff_io/",
       "library": "mne",
       "libraries": [
@@ -654,7 +711,9 @@
     },
     {
       "name": "ex_fiff_sniffer",
+      "title": "Parse a FIFF file from a memory buffer",
       "brief": "Read a FIFF file from a memory buffer with a chosen byte order and summarise its contents",
+      "thumbnail": "",
       "url": "/docs/examples/fiff/ex_fiff_sniffer/",
       "library": "fiff",
       "libraries": [
@@ -674,7 +733,9 @@
     },
     {
       "name": "ex_fiff_structure",
+      "title": "Epochs, compensation and the FIFF file directory",
       "brief": "FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application",
+      "thumbnail": "",
       "url": "/docs/examples/fiff/ex_fiff_structure/",
       "library": "fiff",
       "libraries": [
@@ -694,7 +755,9 @@
     },
     {
       "name": "ex_filtering",
+      "title": "Band-pass filter a raw recording",
       "brief": "Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filter and write the result",
+      "thumbnail": "",
       "url": "/docs/examples/dsp/ex_filtering/",
       "library": "dsp",
       "libraries": [
@@ -716,7 +779,9 @@
     },
     {
       "name": "ex_find_evoked",
+      "title": "List the conditions of an evoked file",
       "brief": "List the evoked data sets (conditions) stored in a FIFF file",
+      "thumbnail": "",
       "url": "/docs/examples/mne/ex_find_evoked/",
       "library": "mne",
       "libraries": [
@@ -738,7 +803,9 @@
     },
     {
       "name": "ex_fs",
+      "title": "Read FreeSurfer surfaces, labels and atlases",
       "brief": "FreeSurfer library: surfaces, curvature, parcellations, labels and an atlas volume",
+      "thumbnail": "",
       "url": "/docs/examples/fs/ex_fs/",
       "library": "fs",
       "libraries": [
@@ -756,7 +823,9 @@
     },
     {
       "name": "ex_fs_surface",
+      "title": "Show FreeSurfer surfaces in 3D",
       "brief": "Load the pial, inflated, original and white FreeSurfer surfaces of a subject and show them in 3D",
+      "thumbnail": "",
       "url": "/docs/examples/fs/ex_fs_surface/",
       "library": "fs",
       "libraries": [
@@ -776,7 +845,9 @@
     },
     {
       "name": "ex_fwd_api",
+      "title": "Coils, BEM models and forward solutions",
       "brief": "Forward library: coil definitions, BEM and sphere models, field maps and forward solutions",
+      "thumbnail": "",
       "url": "/docs/examples/fwd/ex_fwd_api/",
       "library": "fwd",
       "libraries": [
@@ -798,7 +869,9 @@
     },
     {
       "name": "ex_histogram",
+      "title": "Histogram of source amplitudes",
       "brief": "Histogram of the source amplitudes of a clustered MNE, dSPM or sLORETA estimate of the sample evoked response",
+      "thumbnail": "/img/examples/ex_histogram/01_histogram.png",
       "url": "/docs/examples/inv/ex_histogram/",
       "library": "inv",
       "libraries": [
@@ -822,7 +895,9 @@
     },
     {
       "name": "ex_hpiFit",
+      "title": "Fit continuous HPI coils",
       "brief": "Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_hpiFit/",
       "library": "inv",
       "libraries": [
@@ -845,7 +920,9 @@
     },
     {
       "name": "ex_ieeg",
+      "title": "sEEG leads, bipolar montages and surface painting",
       "brief": "IEEG library: group sEEG contacts into a lead, derive a bipolar montage and paint contact values onto a surface",
+      "thumbnail": "",
       "url": "/docs/examples/ieeg/ex_ieeg/",
       "library": "ieeg",
       "libraries": [
@@ -862,7 +939,9 @@
     },
     {
       "name": "ex_interpolation",
+      "title": "Interpolate sensor values onto a surface",
       "brief": "Map evoked MEG values onto a surface mesh with surface-constrained distances (GeometryInfo) and interpolation weights",
+      "thumbnail": "",
       "url": "/docs/examples/disp3D/ex_interpolation/",
       "library": "disp3D",
       "libraries": [
@@ -883,7 +962,9 @@
     },
     {
       "name": "ex_inv_api",
+      "title": "Tour of the inverse library",
       "brief": "Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_inv_api/",
       "library": "inv",
       "libraries": [
@@ -907,7 +988,9 @@
     },
     {
       "name": "ex_inv_beamformer",
+      "title": "LCMV and DICS beamformers and RAP-MUSIC scanners",
       "brief": "Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_inv_beamformer/",
       "library": "inv",
       "libraries": [
@@ -931,7 +1014,9 @@
     },
     {
       "name": "ex_inv_dipole_fit",
+      "title": "Fit an equivalent current dipole",
       "brief": "Inverse library: equivalent current dipole fitting in a sphere model",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_inv_dipole_fit/",
       "library": "inv",
       "libraries": [
@@ -952,7 +1037,9 @@
     },
     {
       "name": "ex_inv_hpi",
+      "title": "Estimate the head position from HPI coils",
       "brief": "Inverse library: continuous head position (HPI) fitting",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_inv_hpi/",
       "library": "inv",
       "libraries": [
@@ -973,7 +1060,9 @@
     },
     {
       "name": "ex_inverse_cmne",
+      "title": "Contextual minimum-norm estimate (CMNE)",
       "brief": "Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_inverse_cmne/",
       "library": "inv",
       "libraries": [
@@ -996,11 +1085,14 @@
     },
     {
       "name": "ex_inverse_mne",
+      "title": "Compute an MNE or dSPM source estimate",
       "brief": "L2 minimum-norm or dSPM estimate of the sample evoked response from a precomputed inverse operator",
+      "thumbnail": "/img/examples/ex_inverse_mne/01_time_courses.png",
       "url": "/docs/examples/inv/ex_inverse_mne/",
       "library": "inv",
       "libraries": [
         "inv",
+        "disp",
         "mne",
         "fiff",
         "utils"
@@ -1019,7 +1111,9 @@
     },
     {
       "name": "ex_inverse_mne_raw",
+      "title": "Source estimate of an evoked response from raw data",
       "brief": "Average epochs of a raw recording and compute an MNE, dSPM or sLORETA source estimate of the response",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_inverse_mne_raw/",
       "library": "inv",
       "libraries": [
@@ -1045,7 +1139,9 @@
     },
     {
       "name": "ex_inverse_pwl_rap_music",
+      "title": "Localize dipoles with Powell RAP-MUSIC",
       "brief": "Localize dipole pairs in the sample evoked response with Powell-accelerated RAP-MUSIC on a clustered forward solution",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_inverse_pwl_rap_music/",
       "library": "inv",
       "libraries": [
@@ -1069,7 +1165,9 @@
     },
     {
       "name": "ex_inverse_rap_music",
+      "title": "Localize dipoles with RAP-MUSIC",
       "brief": "Localize dipole pairs in the sample evoked response with RAP-MUSIC on a clustered forward solution",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_inverse_rap_music/",
       "library": "inv",
       "libraries": [
@@ -1093,7 +1191,9 @@
     },
     {
       "name": "ex_lsl",
+      "title": "Stream data with Lab Streaming Layer",
       "brief": "LSL library: publish a stream, discover it and receive its samples over loopback",
+      "thumbnail": "",
       "url": "/docs/examples/lsl/ex_lsl/",
       "library": "lsl",
       "libraries": [
@@ -1113,7 +1213,9 @@
     },
     {
       "name": "ex_make_inverse_operator",
+      "title": "Make and apply MEG, EEG and combined inverse operators",
       "brief": "Assemble MEG+EEG, MEG-only and EEG-only inverse operators from a forward solution and a regularized noise covariance, then apply them",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_make_inverse_operator/",
       "library": "inv",
       "libraries": [
@@ -1136,7 +1238,9 @@
     },
     {
       "name": "ex_make_layout",
+      "title": "Make a 2D channel layout from sensor positions",
       "brief": "Project the 3D sensor positions of a FIFF file onto a 2D channel layout",
+      "thumbnail": "",
       "url": "/docs/examples/fiff/ex_make_layout/",
       "library": "fiff",
       "libraries": [
@@ -1154,7 +1258,9 @@
     },
     {
       "name": "ex_math",
+      "title": "Linear algebra and numerics helpers",
       "brief": "Math library on inputs with known answers",
+      "thumbnail": "",
       "url": "/docs/examples/math/ex_math/",
       "library": "math",
       "libraries": [
@@ -1171,7 +1277,9 @@
     },
     {
       "name": "ex_ml",
+      "title": "Run ONNX models with the ML library",
       "brief": "ML library: tensors, ONNX inference through the MlModel interface, and the Python trainer",
+      "thumbnail": "",
       "url": "/docs/examples/ml/ex_ml/",
       "library": "ml",
       "libraries": [
@@ -1188,7 +1296,9 @@
     },
     {
       "name": "ex_mna",
+      "title": "Build and run an MNA processing graph",
       "brief": "MNA library: register operations, build and run a graph, bind parameters and save a project",
+      "thumbnail": "",
       "url": "/docs/examples/mna/ex_mna/",
       "library": "mna",
       "libraries": [
@@ -1205,7 +1315,9 @@
     },
     {
       "name": "ex_mne_api",
+      "title": "BEM surfaces, source spaces and epochs",
       "brief": "MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs",
+      "thumbnail": "",
       "url": "/docs/examples/fs/ex_mne_api/",
       "library": "fs",
       "libraries": [
@@ -1226,7 +1338,9 @@
     },
     {
       "name": "ex_mri",
+      "title": "Read MGH, MGZ and NIfTI volumes",
       "brief": "MRI library: MGH/MGZ and NIfTI volumes, voxel/RAS transforms, slicing and COR sets",
+      "thumbnail": "",
       "url": "/docs/examples/mri/ex_mri/",
       "library": "mri",
       "libraries": [
@@ -1245,7 +1359,9 @@
     },
     {
       "name": "ex_read_bem",
+      "title": "Read and write a BEM model",
       "brief": "Read a BEM model from FIFF, write it back and verify the round trip",
+      "thumbnail": "",
       "url": "/docs/examples/mne/ex_read_bem/",
       "library": "mne",
       "libraries": [
@@ -1266,7 +1382,9 @@
     },
     {
       "name": "ex_read_epochs",
+      "title": "Read epochs from a raw recording",
       "brief": "Read stimulus-locked epochs from a raw FIFF recording with event selection and artifact rejection",
+      "thumbnail": "",
       "url": "/docs/examples/mne/ex_read_epochs/",
       "library": "mne",
       "libraries": [
@@ -1289,10 +1407,13 @@
     },
     {
       "name": "ex_read_evoked",
+      "title": "Read an evoked response",
       "brief": "Read an evoked data set from FIFF and print its measurement info and coordinate transforms",
+      "thumbnail": "/img/examples/ex_read_evoked/01_eeg.png",
       "url": "/docs/examples/mne/ex_read_evoked/",
       "library": "mne",
       "libraries": [
+        "disp",
         "mne",
         "fiff",
         "utils"
@@ -1311,7 +1432,9 @@
     },
     {
       "name": "ex_read_fwd",
+      "title": "Read and cluster a forward solution",
       "brief": "Read a forward solution, print its gain matrix and source geometry, and cluster it by cortical parcellation",
+      "thumbnail": "",
       "url": "/docs/examples/fs/ex_read_fwd/",
       "library": "fs",
       "libraries": [
@@ -1334,7 +1457,9 @@
     },
     {
       "name": "ex_read_fwd_disp_3D",
+      "title": "Show a source space with its parcellation in 3D",
       "brief": "Read a forward solution and show its source space with the FreeSurfer parcellation in 3D",
+      "thumbnail": "",
       "url": "/docs/examples/disp3D/ex_read_fwd_disp_3D/",
       "library": "disp3D",
       "libraries": [
@@ -1356,10 +1481,13 @@
     },
     {
       "name": "ex_read_raw",
+      "title": "Read a segment of raw data",
       "brief": "Read a segment of a raw FIFF recording with channel picking, SSP projectors and CTF compensation",
+      "thumbnail": "/img/examples/ex_read_raw/01_raw.png",
       "url": "/docs/examples/mne/ex_read_raw/",
       "library": "mne",
       "libraries": [
+        "disp",
         "mne",
         "fiff",
         "utils"
@@ -1379,7 +1507,9 @@
     },
     {
       "name": "ex_read_write_raw",
+      "title": "Copy a raw recording to a new FIFF file",
       "brief": "Copy a raw FIFF recording buffer by buffer into a new file with FiffStream",
+      "thumbnail": "",
       "url": "/docs/examples/fiff/ex_read_write_raw/",
       "library": "fiff",
       "libraries": [
@@ -1400,7 +1530,9 @@
     },
     {
       "name": "ex_roi_clustered_inverse_pwl_rap_music",
+      "title": "Powell RAP-MUSIC restricted to regions of interest",
       "brief": "Restrict the forward solution to selected parcellation labels and localize dipole pairs with Powell RAP-MUSIC",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_roi_clustered_inverse_pwl_rap_music/",
       "library": "inv",
       "libraries": [
@@ -1423,7 +1555,9 @@
     },
     {
       "name": "ex_spectral",
+      "title": "Multitaper spectra and cross-spectral density",
       "brief": "Multitaper spectra, power spectral density and cross-spectral density of random test signals",
+      "thumbnail": "/img/examples/ex_spectral/01_hanning.png",
       "url": "/docs/examples/disp/ex_spectral/",
       "library": "disp",
       "libraries": [
@@ -1443,7 +1577,9 @@
     },
     {
       "name": "ex_st_clustered_inverse_pwl_rap_music",
+      "title": "Single-trial dipole localization with Powell RAP-MUSIC",
       "brief": "Localize dipole pairs in single trials of a raw recording with Powell RAP-MUSIC on a clustered forward solution",
+      "thumbnail": "",
       "url": "/docs/examples/inv/ex_st_clustered_inverse_pwl_rap_music/",
       "library": "inv",
       "libraries": [
@@ -1465,7 +1601,9 @@
     },
     {
       "name": "ex_sts_statistics",
+      "title": "Statistical tests on data with known answers",
       "brief": "Statistics library on small literal data sets with known answers",
+      "thumbnail": "",
       "url": "/docs/examples/sts/ex_sts_statistics/",
       "library": "sts",
       "libraries": [
@@ -1482,7 +1620,9 @@
     },
     {
       "name": "ex_tf_plot",
+      "title": "Time-frequency plot of an evoked channel",
       "brief": "Spectrogram of one evoked channel shown as a time-frequency plot",
+      "thumbnail": "/img/examples/ex_tf_plot/01_spectrogram.png",
       "url": "/docs/examples/disp/ex_tf_plot/",
       "library": "disp",
       "libraries": [
@@ -1505,7 +1645,9 @@
     },
     {
       "name": "ex_utils",
+      "title": "Buffers, logging, montages and reports",
       "brief": "Utilities library: buffers, observers, logging, file formats, montages, layouts and reports",
+      "thumbnail": "",
       "url": "/docs/examples/utils/ex_utils/",
       "library": "utils",
       "libraries": [
@@ -1522,7 +1664,9 @@
     },
     {
       "name": "ex_warp",
+      "title": "Thin-plate-spline warping",
       "brief": "Example demonstrating thin-plate-spline (TPS) warping with UTILSLIB::Warp",
+      "thumbnail": "",
       "url": "/docs/examples/math/ex_warp/",
       "library": "math",
       "libraries": [
@@ -1599,30 +1743,35 @@
         {
           "name": "ex_read_raw",
           "start": true,
+          "title": "Read a segment of raw data",
           "brief": "Read a segment of a raw FIFF recording with channel picking, SSP projectors and CTF compensation",
           "url": "/docs/examples/mne/ex_read_raw/"
         },
         {
           "name": "ex_fiff_api",
           "start": false,
+          "title": "Tour of the FIFF data structures",
           "brief": "FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure",
           "url": "/docs/examples/fiff/ex_fiff_api/"
         },
         {
           "name": "ex_read_write_raw",
           "start": false,
+          "title": "Copy a raw recording to a new FIFF file",
           "brief": "Copy a raw FIFF recording buffer by buffer into a new file with FiffStream",
           "url": "/docs/examples/fiff/ex_read_write_raw/"
         },
         {
           "name": "ex_fiff_structure",
           "start": false,
+          "title": "Epochs, compensation and the FIFF file directory",
           "brief": "FIFF library: fixed-length epochs, CTF compensation, the file directory and raw buffers, and handing recordings to another application",
           "url": "/docs/examples/fiff/ex_fiff_structure/"
         },
         {
           "name": "ex_read_evoked",
           "start": false,
+          "title": "Read an evoked response",
           "brief": "Read an evoked data set from FIFF and print its measurement info and coordinate transforms",
           "url": "/docs/examples/mne/ex_read_evoked/"
         }
@@ -1678,18 +1827,21 @@
         {
           "name": "ex_averaging",
           "start": true,
+          "title": "Average epochs into an evoked response",
           "brief": "Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection",
           "url": "/docs/examples/mne/ex_averaging/"
         },
         {
           "name": "ex_read_epochs",
           "start": false,
+          "title": "Read epochs from a raw recording",
           "brief": "Read stimulus-locked epochs from a raw FIFF recording with event selection and artifact rejection",
           "url": "/docs/examples/mne/ex_read_epochs/"
         },
         {
           "name": "ex_find_evoked",
           "start": false,
+          "title": "List the conditions of an evoked file",
           "brief": "List the evoked data sets (conditions) stored in a FIFF file",
           "url": "/docs/examples/mne/ex_find_evoked/"
         }
@@ -1736,18 +1888,21 @@
         {
           "name": "ex_read_raw",
           "start": true,
+          "title": "Read a segment of raw data",
           "brief": "Read a segment of a raw FIFF recording with channel picking, SSP projectors and CTF compensation",
           "url": "/docs/examples/mne/ex_read_raw/"
         },
         {
           "name": "ex_fiff_api",
           "start": false,
+          "title": "Tour of the FIFF data structures",
           "brief": "FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure",
           "url": "/docs/examples/fiff/ex_fiff_api/"
         },
         {
           "name": "ex_hpiFit",
           "start": false,
+          "title": "Fit continuous HPI coils",
           "brief": "Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter",
           "url": "/docs/examples/inv/ex_hpiFit/"
         }
@@ -1784,12 +1939,14 @@
         {
           "name": "ex_make_inverse_operator",
           "start": true,
+          "title": "Make and apply MEG, EEG and combined inverse operators",
           "brief": "Assemble MEG+EEG, MEG-only and EEG-only inverse operators from a forward solution and a regularized noise covariance, then apply them",
           "url": "/docs/examples/inv/ex_make_inverse_operator/"
         },
         {
           "name": "ex_fiff_api",
           "start": false,
+          "title": "Tour of the FIFF data structures",
           "brief": "FIFF library: measurement info, channels, digitizer, transforms, projectors, covariance, events, annotations, evoked sets and the low-level file structure",
           "url": "/docs/examples/fiff/ex_fiff_api/"
         }
@@ -1827,18 +1984,21 @@
         {
           "name": "ex_dsp_filter",
           "start": true,
+          "title": "Design and apply an FIR filter",
           "brief": "FIR filter design, application and storage with the dsp library",
           "url": "/docs/examples/dsp/ex_dsp_filter/"
         },
         {
           "name": "ex_filtering",
           "start": false,
+          "title": "Band-pass filter a raw recording",
           "brief": "Band-pass filter the MEG channels of a raw FIFF recording with a cosine FIR filter and write the result",
           "url": "/docs/examples/dsp/ex_filtering/"
         },
         {
           "name": "ex_dsp_analysis",
           "start": false,
+          "title": "Spectra, filters, peaks and envelopes",
           "brief": "DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation",
           "url": "/docs/examples/dsp/ex_dsp_analysis/"
         }
@@ -1876,18 +2036,21 @@
         {
           "name": "ex_dsp_spectral",
           "start": true,
+          "title": "Spectral analysis and filtering of known signals",
           "brief": "Spectral and filtering tools of the dsp library on signals with known content",
           "url": "/docs/examples/dsp/ex_dsp_spectral/"
         },
         {
           "name": "ex_dsp_analysis",
           "start": false,
+          "title": "Spectra, filters, peaks and envelopes",
           "brief": "DSP library: Welch PSD, FIR filtering, peak finding, envelope correlation, SPHARA and simulation",
           "url": "/docs/examples/dsp/ex_dsp_analysis/"
         },
         {
           "name": "ex_tf_plot",
           "start": false,
+          "title": "Time-frequency plot of an evoked channel",
           "brief": "Spectrogram of one evoked channel shown as a time-frequency plot",
           "url": "/docs/examples/disp/ex_tf_plot/"
         }
@@ -1947,24 +2110,28 @@
         {
           "name": "ex_compute_forward",
           "start": true,
+          "title": "Compute the MEG/EEG forward solution",
           "brief": "Compute the MEG/EEG forward solution of the sample subject from its BEM, source space and head-MRI transform",
           "url": "/docs/examples/fwd/ex_compute_forward/"
         },
         {
           "name": "ex_fwd_api",
           "start": false,
+          "title": "Coils, BEM models and forward solutions",
           "brief": "Forward library: coil definitions, BEM and sphere models, field maps and forward solutions",
           "url": "/docs/examples/fwd/ex_fwd_api/"
         },
         {
           "name": "ex_read_fwd",
           "start": false,
+          "title": "Read and cluster a forward solution",
           "brief": "Read a forward solution, print its gain matrix and source geometry, and cluster it by cortical parcellation",
           "url": "/docs/examples/fs/ex_read_fwd/"
         },
         {
           "name": "ex_read_bem",
           "start": false,
+          "title": "Read and write a BEM model",
           "brief": "Read a BEM model from FIFF, write it back and verify the round trip",
           "url": "/docs/examples/mne/ex_read_bem/"
         }
@@ -2033,30 +2200,35 @@
         {
           "name": "ex_inverse_mne",
           "start": true,
+          "title": "Compute an MNE or dSPM source estimate",
           "brief": "L2 minimum-norm or dSPM estimate of the sample evoked response from a precomputed inverse operator",
           "url": "/docs/examples/inv/ex_inverse_mne/"
         },
         {
           "name": "ex_make_inverse_operator",
           "start": false,
+          "title": "Make and apply MEG, EEG and combined inverse operators",
           "brief": "Assemble MEG+EEG, MEG-only and EEG-only inverse operators from a forward solution and a regularized noise covariance, then apply them",
           "url": "/docs/examples/inv/ex_make_inverse_operator/"
         },
         {
           "name": "ex_inv_api",
           "start": false,
+          "title": "Tour of the inverse library",
           "brief": "Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O",
           "url": "/docs/examples/inv/ex_inv_api/"
         },
         {
           "name": "ex_inverse_mne_raw",
           "start": false,
+          "title": "Source estimate of an evoked response from raw data",
           "brief": "Average epochs of a raw recording and compute an MNE, dSPM or sLORETA source estimate of the response",
           "url": "/docs/examples/inv/ex_inverse_mne_raw/"
         },
         {
           "name": "ex_clustered_inverse_mne",
           "start": false,
+          "title": "MNE, dSPM and sLORETA with a clustered forward model",
           "brief": "Cluster the forward solution by cortical parcellation and compute an MNE, dSPM or sLORETA estimate of an evoked response",
           "url": "/docs/examples/inv/ex_clustered_inverse_mne/"
         }
@@ -2094,6 +2266,7 @@
         {
           "name": "ex_inverse_cmne",
           "start": true,
+          "title": "Contextual minimum-norm estimate (CMNE)",
           "brief": "Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices",
           "url": "/docs/examples/inv/ex_inverse_cmne/"
         }
@@ -2131,6 +2304,7 @@
         {
           "name": "ex_inv_api",
           "start": true,
+          "title": "Tour of the inverse library",
           "brief": "Inverse library: minimum-norm estimates, resolution matrices, label time courses, sparse solvers and source-estimate I/O",
           "url": "/docs/examples/inv/ex_inv_api/"
         }
@@ -2163,6 +2337,7 @@
         {
           "name": "ex_inv_beamformer",
           "start": true,
+          "title": "LCMV and DICS beamformers and RAP-MUSIC scanners",
           "brief": "Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners",
           "url": "/docs/examples/inv/ex_inv_beamformer/"
         }
@@ -2200,24 +2375,28 @@
         {
           "name": "ex_inverse_rap_music",
           "start": true,
+          "title": "Localize dipoles with RAP-MUSIC",
           "brief": "Localize dipole pairs in the sample evoked response with RAP-MUSIC on a clustered forward solution",
           "url": "/docs/examples/inv/ex_inverse_rap_music/"
         },
         {
           "name": "ex_inverse_pwl_rap_music",
           "start": false,
+          "title": "Localize dipoles with Powell RAP-MUSIC",
           "brief": "Localize dipole pairs in the sample evoked response with Powell-accelerated RAP-MUSIC on a clustered forward solution",
           "url": "/docs/examples/inv/ex_inverse_pwl_rap_music/"
         },
         {
           "name": "ex_inv_beamformer",
           "start": false,
+          "title": "LCMV and DICS beamformers and RAP-MUSIC scanners",
           "brief": "Inverse library: LCMV and DICS beamformers and the RAP-MUSIC family of dipole scanners",
           "url": "/docs/examples/inv/ex_inv_beamformer/"
         },
         {
           "name": "ex_clustered_inverse_rap_music_raw",
           "start": false,
+          "title": "RAP-MUSIC on raw data with a clustered forward model",
           "brief": "Average a raw recording and localize dipole pairs with RAP-MUSIC on a parcellation-clustered forward solution",
           "url": "/docs/examples/inv/ex_clustered_inverse_rap_music_raw/"
         }
@@ -2259,6 +2438,7 @@
         {
           "name": "ex_inv_dipole_fit",
           "start": true,
+          "title": "Fit an equivalent current dipole",
           "brief": "Inverse library: equivalent current dipole fitting in a sphere model",
           "url": "/docs/examples/inv/ex_inv_dipole_fit/"
         }
@@ -2286,18 +2466,21 @@
         {
           "name": "ex_inv_hpi",
           "start": true,
+          "title": "Estimate the head position from HPI coils",
           "brief": "Inverse library: continuous head position (HPI) fitting",
           "url": "/docs/examples/inv/ex_inv_hpi/"
         },
         {
           "name": "ex_hpiFit",
           "start": false,
+          "title": "Fit continuous HPI coils",
           "brief": "Fit continuous HPI coils on raw data with SSP and write the head positions for comparison with MaxFilter",
           "url": "/docs/examples/inv/ex_hpiFit/"
         },
         {
           "name": "ex_dsp_rt",
           "start": false,
+          "title": "Real-time averaging, covariance and inverse workers",
           "brief": "DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators",
           "url": "/docs/examples/dsp/ex_dsp_rt/"
         }
@@ -2344,24 +2527,28 @@
         {
           "name": "ex_connectivity_metrics",
           "start": true,
+          "title": "Connectivity metrics on simulated coupled signals",
           "brief": "Connectivity metrics on synthetic data with a known coupling",
           "url": "/docs/examples/connectivity/ex_connectivity_metrics/"
         },
         {
           "name": "ex_connectivity",
           "start": false,
+          "title": "Functional connectivity shown as a 3D network",
           "brief": "Sensor- or source-level functional connectivity of averaged MEG/EEG data with a selectable metric, shown as a 3D network",
           "url": "/docs/examples/connectivity/ex_connectivity/"
         },
         {
           "name": "ex_connectivity_comparison",
           "start": false,
+          "title": "Compare connectivity metrics side by side",
           "brief": "Compare connectivity metrics side by side on the same averaged sensor- or source-level data",
           "url": "/docs/examples/connectivity/ex_connectivity_comparison/"
         },
         {
           "name": "ex_connectivity_performance",
           "start": false,
+          "title": "Benchmark connectivity methods",
           "brief": "Benchmark the run time of connectivity methods over channel and sample counts",
           "url": "/docs/examples/connectivity/ex_connectivity_performance/"
         }
@@ -2408,12 +2595,14 @@
         {
           "name": "ex_dsp_rt",
           "start": true,
+          "title": "Real-time averaging, covariance and inverse workers",
           "brief": "DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators",
           "url": "/docs/examples/dsp/ex_dsp_rt/"
         },
         {
           "name": "ex_lsl",
           "start": false,
+          "title": "Stream data with Lab Streaming Layer",
           "brief": "LSL library: publish a stream, discover it and receive its samples over loopback",
           "url": "/docs/examples/lsl/ex_lsl/"
         }

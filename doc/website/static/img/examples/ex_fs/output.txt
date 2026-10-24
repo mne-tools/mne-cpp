@@ -1,0 +1,86 @@
+Reading surface...
+
+	resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white is a triangle file (nvert = 155407 ntri = 310810)
+
+	created by gramfort on Thu Sep 15 19:44:31 2011
+
+	computing normals
+
+	
+Reading curvature...
+[done]
+
+	Read a surface with 155407 vertices from resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white
+[done]
+
+  ok   lh.white: 155407 vertices, 310810 triangles, first vertex and curvature = nibabel
+Reading surface...
+
+	resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white is a triangle file (nvert = 155407 ntri = 310810)
+
+	created by gramfort on Thu Sep 15 19:44:31 2011
+
+	computing normals
+
+	
+Reading curvature...
+[done]
+
+	Read a surface with 155407 vertices from resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white
+[done]
+
+Reading surface...
+
+	resources/data/mne-cpp-test-data/subjects/sample/surf/rh.white is a triangle file (nvert = 156866 ntri = 313728)
+
+	created by gramfort on Thu Sep 15 22:04:14 2011
+
+	computing normals
+
+	
+Reading curvature...
+[done]
+
+	Read a surface with 156866 vertices from resources/data/mne-cpp-test-data/subjects/sample/surf/rh.white
+[done]
+
+  ok   FsSurfaceSet holds 2 hemispheres
+Reading annotation...
+
+	Reading from version 2
+
+	colortable with 36 entries read
+	(originally /autofs/space/terrier_001/users/nicks/freesurfer/average/colortable_desikan_killiany.txt)
+
+[done]
+
+Converting labels from annotation...
+[done]
+
+  ok   aparc: 36 colour-table entries, precentral 9505 vertices (9505)
+Reading annotation...
+
+	Reading from version 2
+
+	colortable with 36 entries read
+	(originally /autofs/space/terrier_001/users/nicks/freesurfer/average/colortable_desikan_killiany.txt)
+
+[done]
+
+Reading annotation...
+
+	Reading from version 2
+
+	colortable with 36 entries read
+	(originally /autofs/space/terrier_001/users/nicks/freesurfer/average/colortable_desikan_killiany.txt)
+
+[done]
+
+  ok   FsAnnotationSet holds both hemispheres
+Reading label...
+[done]
+
+  ok   lh.V1.label: 5638 vertices = mne.read_label
+  ok   growLabel adds 447 vertices (447); splitLabel parts 3
+  ok   atlas lookup: Left-Hippocampus, Right-Hippocampus, Unknown
+All fs checks passed.

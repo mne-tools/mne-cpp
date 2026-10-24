@@ -1,0 +1,242 @@
+Reading resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif...
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Found the data of interest:
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+		nave = 55 - aspect type = 100
+
+	Preprocessing...
+	376 channels remain after picking
+	Created an SSP operator (subspace dimension = 4)
+	4 projection items activated.
+	SSP projectors applied to the evoked data
+	No baseline correction applied
+Reading forward solution from resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif...
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+	Completing triangulation info...
+[done]
+	Completing selection triangulation info...
+[done]
+	Completing triangle and vertex neighboring info...
+[done]
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+	Completing triangulation info...
+[done]
+	Completing selection triangulation info...
+[done]
+	Completing triangle and vertex neighboring info...
+[done]
+	2 source spaces read
+MEG solution found
+EEG solution found
+	Read MEG forward solution (7498 sources, 306 channels, free orientations)
+	Read EEG forward solution (7498 sources, 60 channels, free orientations)
+	MEG and EEG forward solutions combined
+	Source spaces transformed to the forward solution coordinate frame
+	Converting to surface-based source orientations...
+	Average patch normals will be employed in the rotation to the local surface coordinates...
+[done]
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif...
+	366 x 366 full covariance (kind = 1) found.
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	8 projection items activated.
+	Regularize EEG: 0.100000
+	Created an SSP operator for EEG (dimension = 1).
+	Regularize GRAD: 0.050000
+	Regularize MAG: 0.050000
+	Created an SSP operator for MAG (dimension = 3).
+	306 out of 366 channels remain after picking
+Reading forward solution from resources/data/MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif...
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+	Completing triangulation info...
+[done]
+	Completing selection triangulation info...
+[done]
+	Completing triangle and vertex neighboring info...
+[done]
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+	Completing triangulation info...
+[done]
+	Completing selection triangulation info...
+[done]
+	Completing triangle and vertex neighboring info...
+[done]
+	2 source spaces read
+EEG solution found
+	Read EEG forward solution (7498 sources, 60 channels, free orientations)
+	Source spaces transformed to the forward solution coordinate frame
+	Converting to surface-based source orientations...
+	Average patch normals will be employed in the rotation to the local surface coordinates...
+[done]
+Computing inverse operator with 364 channels.
+Created an SSP operator (subspace dimension = 4)
+Setting small MEG eigenvalues to zero.
+Not doing PCA for MEG
+Setting small EEG eigenvalues to zero.
+Not doing PCA for EEG
+Creating non pca whitener.
+	Total rank is 360
+	Creating the depth weighting matrix...
+	203 planar channels
+	limit = 7262/7498 = 10.020865
+	scale = 2.58122e-08 exp = 0.8
+	Computing inverse operator with 364 channels.
+	Creating the source covariance matrix
+	Applying loose dipole orientations. Loose value of 0.200000.
+	Whitening the forward solution.
+	Adjusting source covariance matrix.
+Computing SVD of whitened and weighted lead field matrix.
+	largest singular value = 5.102447
+	scaling factor to adjust the trace = 10628205842891309056.000000
+Computing inverse operator with 305 channels.
+Created an SSP operator (subspace dimension = 3)
+Setting small MEG eigenvalues to zero.
+Not doing PCA for MEG
+Creating non pca whitener.
+	Total rank is 302
+	Creating the depth weighting matrix...
+	203 planar channels
+	limit = 7262/7498 = 10.020865
+	scale = 2.58122e-08 exp = 0.8
+	Computing inverse operator with 305 channels.
+	Creating the source covariance matrix
+	Applying loose dipole orientations. Loose value of 0.200000.
+	Whitening the forward solution.
+	Adjusting source covariance matrix.
+Computing SVD of whitened and weighted lead field matrix.
+	largest singular value = 4.562623
+	scaling factor to adjust the trace = 7297101451576620032.000000
+Computing inverse operator with 59 channels.
+Created an SSP operator (subspace dimension = 1)
+Setting small EEG eigenvalues to zero.
+Not doing PCA for EEG
+Creating non pca whitener.
+	Total rank is 58
+	Creating the depth weighting matrix...
+	59 EEG channels
+	limit = 7499/7498 = 2.118742
+	scale = 155292 exp = 0.8
+	Computing inverse operator with 59 channels.
+	Creating the source covariance matrix
+	Applying loose dipole orientations. Loose value of 0.200000.
+	Whitening the forward solution.
+	Adjusting source covariance matrix.
+Computing SVD of whitened and weighted lead field matrix.
+	largest singular value = 2.793292
+	scaling factor to adjust the trace = 17337892957894696960.000000
+	Set minimum norm method to dSPM.
+Preparing the inverse operator for use...
+	Scaled noise and source covariance from nave = 1 to nave = 55
+	Created the regularized inverter
+	Created an SSP operator (subspace dimension = 4)
+	Created the whitener using a full noise covariance matrix (4 small eigenvalues omitted)
+	Computing noise-normalization factors (dSPM)...
+[done]
+Computing inverse...
+(eigenleads need to be weighted)...
+K 22494 x 364
+Picked 364 channels from the data
+combining the current components...
+(dSPM)...
+[done]
+	Set minimum norm method to dSPM.
+Preparing the inverse operator for use...
+	Scaled noise and source covariance from nave = 1 to nave = 55
+	Created the regularized inverter
+	Created an SSP operator (subspace dimension = 3)
+	Created the whitener using a full noise covariance matrix (3 small eigenvalues omitted)
+	Computing noise-normalization factors (dSPM)...
+[done]
+Computing inverse...
+(eigenleads need to be weighted)...
+K 22494 x 305
+Picked 305 channels from the data
+combining the current components...
+(dSPM)...
+[done]
+	Set minimum norm method to dSPM.
+Preparing the inverse operator for use...
+	Scaled noise and source covariance from nave = 1 to nave = 55
+	Created the regularized inverter
+	Created an SSP operator (subspace dimension = 1)
+	Created the whitener using a full noise covariance matrix (1 small eigenvalues omitted)
+	Computing noise-normalization factors (dSPM)...
+[done]
+Computing inverse...
+(eigenleads need to be weighted)...
+K 22494 x 59
+Picked 59 channels from the data
+combining the current components...
+(dSPM)...
+[done]
+
+sourceEstimate_meeg:
+5.79935 5.55216 5.34541 5.19647 5.11564 5.10558 5.16096 5.26871 5.40926  5.5591
+3.47834 3.48836 3.50438 3.53005 3.56667 3.61203 3.65996  3.7008  3.7229 3.71462
+8.64414 8.81622 8.91731 8.94199 8.89569 8.79356 8.65769 8.51336 8.38482 8.29149
+4.79687  4.9638 5.11182 5.22714 5.30057 5.32834 5.31184 5.25677 5.17171 5.06649
+4.99867 4.89286 4.76679  4.6295 4.49189 4.36541 4.26059  4.1857 4.14567 4.14154
+11.1302 11.3434 11.5214 11.6521 11.7291 11.7517 11.7233  11.651 11.5434 11.4095
+12.4724 12.2647 11.9785 11.6333 11.2558 10.8779  10.533 10.2526 10.0625 9.97992
+8.37088 8.26639 8.19847 8.17309 8.19082 8.24673 8.33111  8.4307 8.53039  8.6152
+4.73707 4.64691 4.57189 4.51615 4.48102 4.46576 4.46808 4.48441 4.51021 4.54038
+1.56006 1.44158 1.34287 1.28492 1.27668 1.31058 1.36793 1.42868 1.47785 1.50713
+time
+-0.199795  -0.19813 -0.196465   -0.1948 -0.193135  -0.19147 -0.189805  -0.18814 -0.186475 -0.184811
+
+sourceEstimate_meg:
+3.91639 3.72372 3.56356 3.44185  3.3604  3.3215 3.32941 3.38691 3.48988 3.62423
+5.46316 5.50424 5.56846 5.65982 5.77792  5.9168 6.06467 6.20482 6.31755 6.38265
+10.1816 10.3598 10.4651 10.4911 10.4428 10.3348 10.1891 10.0309 9.88463 9.76987
+7.21388 7.43519 7.63613 7.80098 7.91891 7.98474 7.99876 7.96603 7.89521 7.79705
+7.48084 7.59085 7.69429 7.78346 7.85012 7.88658 7.88726 7.85024 7.77832 7.67929
+9.31961 9.57695 9.79715 9.96789 10.0828 10.1412 10.1467 10.1057 10.0261 9.91558
+6.65334 6.46976 6.18888 5.83102 5.42581 5.00935 4.61996 4.29336 4.05793 3.93186
+4.37793 4.28491 4.22672 4.20894 4.23334 4.29804 4.39719 4.52063 4.65429 4.78171
+3.63324 3.64821 3.65894  3.6601 3.64814 3.62337 3.59045  3.5572 3.53225 3.52241
+2.36111 2.56679 2.80474 3.05871 3.31161 3.54713 3.75107 3.91231 4.02355 4.08146
+time
+-0.199795  -0.19813 -0.196465   -0.1948 -0.193135  -0.19147 -0.189805  -0.18814 -0.186475 -0.184811
+
+sourceEstimate_eeg:
+11.9602 11.9218 11.8762 11.8245 11.7676 11.7061 11.6406 11.5716 11.4996 11.4254
+4.28047 4.26203  4.2447 4.22981 4.21888 4.21341 4.21466 4.22349 4.24016 4.26432
+7.02022 7.00128 6.98864   6.981  6.9759 6.96985 6.95873 6.93827 6.90464 6.85505
+6.95018 6.93562 6.93277 6.94109 6.95945 6.98619 7.01918 7.05596 7.09401 7.13087
+7.62502 7.61036  7.6002 7.59317 7.58785 7.58287 7.57706 7.56949 7.55958 7.54703
+8.21009 8.21784 8.23003 8.24462 8.25958 8.27316 8.28401 8.29125 8.29455 8.29398
+15.0623 15.0003 14.9456    14.9  14.865 14.8421 14.8317 14.8337 14.8467 14.8684
+13.4116 13.3999 13.3829 13.3603 13.3321 13.2984 13.2596  13.216 13.1681 13.1167
+7.60988 7.65468 7.70601 7.75906 7.80887 7.85084 7.88117  7.8972 7.89762 7.88251
+ 6.6432 6.60395 6.57171 6.54734 6.53075 6.52086 6.51562 6.51214 6.50707 6.49702
+time
+-0.199795  -0.19813 -0.196465   -0.1948 -0.193135  -0.19147 -0.189805  -0.18814 -0.186475 -0.184811
+Line frequency is not defined
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available

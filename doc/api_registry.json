@@ -3623,6 +3623,28 @@
       "python_url": null
     },
     {
+      "name": "FigureExporter",
+      "module": "disp",
+      "header": "disp/plots/helpers/figureexporter.h",
+      "origin": "custom",
+      "mne_c_tool": null,
+      "mne_python": null,
+      "sklearn": null,
+      "test": "test_disp_plots",
+      "example": "ex_disp_plots",
+      "example_snippet": [
+        "ex_disp_plots/main.cpp#figure_export"
+      ],
+      "example_mode": "run",
+      "status": "documented",
+      "skigen_candidate": false,
+      "documented": true,
+      "sidebar_position": 70,
+      "guide": null,
+      "python_equiv": null,
+      "python_url": null
+    },
+    {
       "name": "MNEOperator",
       "module": "disp",
       "header": "disp/viewers/helpers/mneoperator.h",
@@ -15127,7 +15149,7 @@
     ]
   },
   "examples": {
-    "$comment": "Explorer metadata of every src/examples program: what it is for (tasks), which recordings it handles (modalities) and how much background it assumes (level). 'library' overrides the primary library, which otherwise is the most specific library the example includes. Libraries and source dependencies are derived from the #include lines, not stored here.",
+    "$comment": "Explorer metadata of every src/examples program: its human-readable title, what it is for (tasks), which recordings it handles (modalities) and how much background it assumes (level). 'library' overrides the primary library, which otherwise is the most specific library the example includes. Libraries and source dependencies are derived from the #include lines, not stored here.",
     "facets": {
       "tasks": {
         "io": "Read & write data",
@@ -15158,6 +15180,7 @@
     },
     "entries": {
       "ex_averaging": {
+        "title": "Average epochs into an evoked response",
         "tasks": [
           "preprocessing",
           "io"
@@ -15166,9 +15189,11 @@
           "meg",
           "eeg"
         ],
-        "level": "start"
+        "level": "start",
+        "library": "mne"
       },
       "ex_bids": {
+        "title": "Read and write BIDS datasets",
         "tasks": [
           "io"
         ],
@@ -15179,6 +15204,7 @@
         "level": "start"
       },
       "ex_cancel_noise": {
+        "title": "Change the CTF gradient compensation grade",
         "tasks": [
           "preprocessing"
         ],
@@ -15188,6 +15214,7 @@
         "level": "intermediate"
       },
       "ex_clustered_inverse_mne": {
+        "title": "MNE, dSPM and sLORETA with a clustered forward model",
         "tasks": [
           "source-estimation"
         ],
@@ -15199,6 +15226,7 @@
         "level": "advanced"
       },
       "ex_clustered_inverse_mne_raw": {
+        "title": "Source estimate from raw data with a clustered forward model",
         "tasks": [
           "source-estimation"
         ],
@@ -15210,6 +15238,7 @@
         "level": "advanced"
       },
       "ex_clustered_inverse_pwl_rap_music_raw": {
+        "title": "Powell RAP-MUSIC on raw data with a clustered forward model",
         "tasks": [
           "source-localization"
         ],
@@ -15220,6 +15249,7 @@
         "level": "advanced"
       },
       "ex_clustered_inverse_rap_music_raw": {
+        "title": "RAP-MUSIC on raw data with a clustered forward model",
         "tasks": [
           "source-localization"
         ],
@@ -15230,6 +15260,7 @@
         "level": "advanced"
       },
       "ex_compute_forward": {
+        "title": "Compute the MEG/EEG forward solution",
         "tasks": [
           "forward-modeling"
         ],
@@ -15241,6 +15272,7 @@
         "level": "intermediate"
       },
       "ex_connectivity": {
+        "title": "Functional connectivity shown as a 3D network",
         "tasks": [
           "connectivity",
           "visualization"
@@ -15252,6 +15284,7 @@
         "level": "advanced"
       },
       "ex_connectivity_comparison": {
+        "title": "Compare connectivity metrics side by side",
         "tasks": [
           "connectivity"
         ],
@@ -15262,6 +15295,7 @@
         "level": "advanced"
       },
       "ex_connectivity_metrics": {
+        "title": "Connectivity metrics on simulated coupled signals",
         "tasks": [
           "connectivity"
         ],
@@ -15271,6 +15305,7 @@
         "level": "start"
       },
       "ex_connectivity_performance": {
+        "title": "Benchmark connectivity methods",
         "tasks": [
           "connectivity"
         ],
@@ -15280,6 +15315,7 @@
         "level": "intermediate"
       },
       "ex_coreg": {
+        "title": "Coregister digitizer points to the head surface",
         "tasks": [
           "anatomy",
           "visualization"
@@ -15291,6 +15327,7 @@
         "level": "intermediate"
       },
       "ex_decoding": {
+        "title": "Spatial decoding and ICA component labelling",
         "tasks": [
           "statistics-ml"
         ],
@@ -15300,6 +15337,7 @@
         "level": "intermediate"
       },
       "ex_disp": {
+        "title": "Plot raw data as image, line and time-frequency maps",
         "tasks": [
           "visualization"
         ],
@@ -15309,6 +15347,7 @@
         "level": "start"
       },
       "ex_disp3d_scene": {
+        "title": "Build a 3D scene of sensors, electrodes and MRI slices",
         "tasks": [
           "visualization"
         ],
@@ -15322,6 +15361,7 @@
         "library": "disp3D"
       },
       "ex_disp_3D": {
+        "title": "Show a source estimate on the cortex in 3D",
         "tasks": [
           "source-estimation",
           "visualization"
@@ -15334,6 +15374,7 @@
         "library": "disp3D"
       },
       "ex_disp_plots": {
+        "title": "Plot types and colour maps",
         "tasks": [
           "visualization"
         ],
@@ -15343,6 +15384,7 @@
         "level": "start"
       },
       "ex_dsp_analysis": {
+        "title": "Spectra, filters, peaks and envelopes",
         "tasks": [
           "signal-analysis"
         ],
@@ -15353,6 +15395,7 @@
         "library": "dsp"
       },
       "ex_dsp_artifacts": {
+        "title": "Detect and repair artifacts",
         "tasks": [
           "preprocessing"
         ],
@@ -15363,6 +15406,7 @@
         "level": "intermediate"
       },
       "ex_dsp_filter": {
+        "title": "Design and apply an FIR filter",
         "tasks": [
           "signal-analysis"
         ],
@@ -15372,6 +15416,7 @@
         "level": "start"
       },
       "ex_dsp_maxwell": {
+        "title": "Maxwell filtering (SSS) and movement compensation",
         "tasks": [
           "preprocessing"
         ],
@@ -15381,6 +15426,7 @@
         "level": "advanced"
       },
       "ex_dsp_preprocessing": {
+        "title": "Preprocessing tools on simulated data",
         "tasks": [
           "preprocessing"
         ],
@@ -15391,6 +15437,7 @@
         "level": "intermediate"
       },
       "ex_dsp_rt": {
+        "title": "Real-time averaging, covariance and inverse workers",
         "tasks": [
           "real-time"
         ],
@@ -15402,6 +15449,7 @@
         "library": "dsp"
       },
       "ex_dsp_spectral": {
+        "title": "Spectral analysis and filtering of known signals",
         "tasks": [
           "signal-analysis"
         ],
@@ -15411,6 +15459,7 @@
         "level": "start"
       },
       "ex_evoked_grad_amp": {
+        "title": "Tangential amplitude of planar gradiometers",
         "tasks": [
           "signal-analysis"
         ],
@@ -15420,6 +15469,7 @@
         "level": "intermediate"
       },
       "ex_fiff_api": {
+        "title": "Tour of the FIFF data structures",
         "tasks": [
           "io"
         ],
@@ -15430,6 +15480,7 @@
         "level": "start"
       },
       "ex_fiff_io": {
+        "title": "Read any FIFF file with FiffIO",
         "tasks": [
           "io"
         ],
@@ -15440,6 +15491,7 @@
         "level": "start"
       },
       "ex_fiff_sniffer": {
+        "title": "Parse a FIFF file from a memory buffer",
         "tasks": [
           "io"
         ],
@@ -15451,6 +15503,7 @@
         "library": "fiff"
       },
       "ex_fiff_structure": {
+        "title": "Epochs, compensation and the FIFF file directory",
         "tasks": [
           "io"
         ],
@@ -15461,6 +15514,7 @@
         "level": "intermediate"
       },
       "ex_filtering": {
+        "title": "Band-pass filter a raw recording",
         "tasks": [
           "signal-analysis",
           "io"
@@ -15471,6 +15525,7 @@
         "level": "start"
       },
       "ex_find_evoked": {
+        "title": "List the conditions of an evoked file",
         "tasks": [
           "io"
         ],
@@ -15481,6 +15536,7 @@
         "level": "start"
       },
       "ex_fs": {
+        "title": "Read FreeSurfer surfaces, labels and atlases",
         "tasks": [
           "anatomy",
           "io"
@@ -15491,6 +15547,7 @@
         "level": "start"
       },
       "ex_fs_surface": {
+        "title": "Show FreeSurfer surfaces in 3D",
         "tasks": [
           "anatomy",
           "visualization"
@@ -15502,6 +15559,7 @@
         "library": "fs"
       },
       "ex_fwd_api": {
+        "title": "Coils, BEM models and forward solutions",
         "tasks": [
           "forward-modeling"
         ],
@@ -15512,6 +15570,7 @@
         "level": "intermediate"
       },
       "ex_histogram": {
+        "title": "Histogram of source amplitudes",
         "tasks": [
           "source-estimation"
         ],
@@ -15522,6 +15581,7 @@
         "level": "intermediate"
       },
       "ex_hpiFit": {
+        "title": "Fit continuous HPI coils",
         "tasks": [
           "preprocessing"
         ],
@@ -15531,6 +15591,7 @@
         "level": "advanced"
       },
       "ex_ieeg": {
+        "title": "sEEG leads, bipolar montages and surface painting",
         "tasks": [
           "visualization"
         ],
@@ -15540,6 +15601,7 @@
         "level": "start"
       },
       "ex_interpolation": {
+        "title": "Interpolate sensor values onto a surface",
         "tasks": [
           "visualization"
         ],
@@ -15550,6 +15612,7 @@
         "library": "disp3D"
       },
       "ex_inv_api": {
+        "title": "Tour of the inverse library",
         "tasks": [
           "source-estimation"
         ],
@@ -15560,6 +15623,7 @@
         "level": "intermediate"
       },
       "ex_inv_beamformer": {
+        "title": "LCMV and DICS beamformers and RAP-MUSIC scanners",
         "tasks": [
           "source-localization"
         ],
@@ -15570,6 +15634,7 @@
         "level": "intermediate"
       },
       "ex_inv_dipole_fit": {
+        "title": "Fit an equivalent current dipole",
         "tasks": [
           "source-localization"
         ],
@@ -15580,6 +15645,7 @@
         "level": "intermediate"
       },
       "ex_inv_hpi": {
+        "title": "Estimate the head position from HPI coils",
         "tasks": [
           "preprocessing"
         ],
@@ -15589,6 +15655,7 @@
         "level": "intermediate"
       },
       "ex_inverse_cmne": {
+        "title": "Contextual minimum-norm estimate (CMNE)",
         "tasks": [
           "source-estimation"
         ],
@@ -15599,6 +15666,7 @@
         "level": "intermediate"
       },
       "ex_inverse_mne": {
+        "title": "Compute an MNE or dSPM source estimate",
         "tasks": [
           "source-estimation"
         ],
@@ -15609,6 +15677,7 @@
         "level": "start"
       },
       "ex_inverse_mne_raw": {
+        "title": "Source estimate of an evoked response from raw data",
         "tasks": [
           "source-estimation"
         ],
@@ -15619,6 +15688,7 @@
         "level": "intermediate"
       },
       "ex_inverse_pwl_rap_music": {
+        "title": "Localize dipoles with Powell RAP-MUSIC",
         "tasks": [
           "source-localization"
         ],
@@ -15628,6 +15698,7 @@
         "level": "advanced"
       },
       "ex_inverse_rap_music": {
+        "title": "Localize dipoles with RAP-MUSIC",
         "tasks": [
           "source-localization"
         ],
@@ -15637,6 +15708,7 @@
         "level": "advanced"
       },
       "ex_lsl": {
+        "title": "Stream data with Lab Streaming Layer",
         "tasks": [
           "real-time",
           "io"
@@ -15647,6 +15719,7 @@
         "level": "start"
       },
       "ex_make_inverse_operator": {
+        "title": "Make and apply MEG, EEG and combined inverse operators",
         "tasks": [
           "source-estimation"
         ],
@@ -15657,6 +15730,7 @@
         "level": "intermediate"
       },
       "ex_make_layout": {
+        "title": "Make a 2D channel layout from sensor positions",
         "tasks": [
           "visualization"
         ],
@@ -15666,6 +15740,7 @@
         "level": "start"
       },
       "ex_math": {
+        "title": "Linear algebra and numerics helpers",
         "tasks": [
           "infrastructure"
         ],
@@ -15675,6 +15750,7 @@
         "level": "start"
       },
       "ex_ml": {
+        "title": "Run ONNX models with the ML library",
         "tasks": [
           "statistics-ml"
         ],
@@ -15684,6 +15760,7 @@
         "level": "intermediate"
       },
       "ex_mna": {
+        "title": "Build and run an MNA processing graph",
         "tasks": [
           "infrastructure"
         ],
@@ -15693,6 +15770,7 @@
         "level": "intermediate"
       },
       "ex_mne_api": {
+        "title": "BEM surfaces, source spaces and epochs",
         "tasks": [
           "anatomy",
           "forward-modeling"
@@ -15704,6 +15782,7 @@
         "level": "intermediate"
       },
       "ex_mri": {
+        "title": "Read MGH, MGZ and NIfTI volumes",
         "tasks": [
           "anatomy",
           "io"
@@ -15714,6 +15793,7 @@
         "level": "start"
       },
       "ex_read_bem": {
+        "title": "Read and write a BEM model",
         "tasks": [
           "io",
           "forward-modeling"
@@ -15724,6 +15804,7 @@
         "level": "start"
       },
       "ex_read_epochs": {
+        "title": "Read epochs from a raw recording",
         "tasks": [
           "io",
           "preprocessing"
@@ -15735,6 +15816,7 @@
         "level": "start"
       },
       "ex_read_evoked": {
+        "title": "Read an evoked response",
         "tasks": [
           "io"
         ],
@@ -15742,9 +15824,11 @@
           "meg",
           "eeg"
         ],
-        "level": "start"
+        "level": "start",
+        "library": "mne"
       },
       "ex_read_fwd": {
+        "title": "Read and cluster a forward solution",
         "tasks": [
           "io",
           "forward-modeling"
@@ -15756,6 +15840,7 @@
         "level": "start"
       },
       "ex_read_fwd_disp_3D": {
+        "title": "Show a source space with its parcellation in 3D",
         "tasks": [
           "forward-modeling",
           "visualization"
@@ -15767,6 +15852,7 @@
         "level": "start"
       },
       "ex_read_raw": {
+        "title": "Read a segment of raw data",
         "tasks": [
           "io"
         ],
@@ -15774,9 +15860,11 @@
           "meg",
           "eeg"
         ],
-        "level": "start"
+        "level": "start",
+        "library": "mne"
       },
       "ex_read_write_raw": {
+        "title": "Copy a raw recording to a new FIFF file",
         "tasks": [
           "io"
         ],
@@ -15787,6 +15875,7 @@
         "level": "start"
       },
       "ex_roi_clustered_inverse_pwl_rap_music": {
+        "title": "Powell RAP-MUSIC restricted to regions of interest",
         "tasks": [
           "source-localization"
         ],
@@ -15797,6 +15886,7 @@
         "level": "advanced"
       },
       "ex_spectral": {
+        "title": "Multitaper spectra and cross-spectral density",
         "tasks": [
           "signal-analysis"
         ],
@@ -15806,6 +15896,7 @@
         "level": "start"
       },
       "ex_st_clustered_inverse_pwl_rap_music": {
+        "title": "Single-trial dipole localization with Powell RAP-MUSIC",
         "tasks": [
           "source-localization"
         ],
@@ -15815,6 +15906,7 @@
         "level": "advanced"
       },
       "ex_sts_statistics": {
+        "title": "Statistical tests on data with known answers",
         "tasks": [
           "statistics-ml"
         ],
@@ -15824,6 +15916,7 @@
         "level": "start"
       },
       "ex_tf_plot": {
+        "title": "Time-frequency plot of an evoked channel",
         "tasks": [
           "signal-analysis",
           "visualization"
@@ -15834,6 +15927,7 @@
         "level": "start"
       },
       "ex_utils": {
+        "title": "Buffers, logging, montages and reports",
         "tasks": [
           "infrastructure"
         ],
@@ -15843,6 +15937,7 @@
         "level": "start"
       },
       "ex_warp": {
+        "title": "Thin-plate-spline warping",
         "tasks": [
           "infrastructure"
         ],

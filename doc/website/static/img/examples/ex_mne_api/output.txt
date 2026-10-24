@@ -1,0 +1,421 @@
+Creating tag directory for resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif...
+	Reading a BEM surface...
+	Completing triangulation info...
+Adding additional geometry info
+
+[done]
+
+	[done]
+
+	1 bem surfaces read
+
+  ok   MNEBem/MNEBemSurface: inner skull with 2562 vertices and normals like mne.read_bem_surfaces
+  ok   MNEProjectToSurface: closest triangles, points and distances match an exhaustive search
+[MNELIB::discardOutliers]  0 digitizers discarded.
+[MNELIB::icp] ICP was successful and converged after  1  iterations with RMSE dist:  6.8275e-06  mm.
+  ok   fitMatchedPoints/discard3DPointOutliers/performIcp recover the known head-to-MRI transform
+Creating tag directory for resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif...
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	2 source spaces read
+
+  ok   MNESourceSpaces/MNEHemisphere: oct-6 source space with patches like mne.read_source_spaces
+Triangle file : 
+created by gramfort on Thu Sep 15 19:44:31 2011 nvert = 155407 ntri = 310810
+
+	Triangle 
+and vertex 
+normals and neighboring triangles...
+[done]
+
+	Vertex neighbors...
+[done]
+
+	Distances between neighboring vertices...
+[932430 distances done]
+
+  ok   MNESourceSpace::load_surface reads lh.white like nibabel read_geometry
+Creating tag directory for resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif...
+Source spaces are in 
+MRI coordinates.
+
+Checking that the sources are inside the inner skull 
+and at least    5.0 mm away
+ (will take a few...)
+
+2 source space points omitted because they are outside the inner skull surface.
+
+364 source space points omitted because of the    5.0-mm distance limit.
+
+1 source space points omitted because they are outside the inner skull surface.
+
+331 source space points omitted because of the    5.0-mm distance limit.
+
+Computing patch statistics...
+
+	Triangle 
+normals and neighboring triangles...
+[done]
+
+	Vertex neighbors...
+[done]
+
+	Distances between neighboring vertices...
+[932430 distances done]
+
+	areas, average normals, and mean deviations...
+ 3732/3732 [done]
+
+Computing patch statistics...
+
+	Triangle 
+normals and neighboring triangles...
+[done]
+
+	Vertex neighbors...
+[done]
+
+	Distances between neighboring vertices...
+[941184 distances done]
+
+	areas, average normals, and mean deviations...
+ 3766/3766 [done]
+
+Thank you for waiting.
+
+
+  ok   MNESourceSpace::filter_source_spaces keeps the sources mne keeps at mindist 5 mm
+Opening raw data resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+		Average EEG reference (1 x 60) idle
+
+	Range : 12900 ... 18906  =     42.956 ...    62.955 secs
+Ready.
+[MNEEpochDataList::readEpochs] 6 matching events found
+[MNEEpochDataList::readEpochs] Read a total of 6 epochs of type 1 and marked 0 for rejection.
+[MNEEpochDataList::average] Calculate evoked. 
+[MNEEpochDataList::average] 6 averages used [done]
+	No projector specified for these data.
+
+  ok   MNEEpochDataList/MNEEpochData: 6 epochs of event 1 match mne.Epochs
+  ok   MNEEpochDataList::average matches mne Epochs.average
+[MNEEpochDataList::readEpochs] 6 matching events found
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel MEG0143
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel EEG015
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel MEG0143
+[MNEEpochDataList::readEpochs] Read a total of 6 epochs of type 1 and marked 3 for rejection.
+  ok   MNEEpochDataList rejection keeps the epochs mne.Epochs(reject=...) keeps
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+No compensation data in resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
+
+Compensation in file : uncompensated
+
+Setting up compensation data...
+
+	No compensation set. Nothing more to do.
+
+No compensation was requested.
+
+A new compensation value (uncompensated) was assigned to 306 MEG channels.
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+No SSS data in resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+2 bad channels read from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif:
+
+	
+MEG2443 
+EEG053
+
+filter :   0.000 ...   40.0 Hz   bins : 0 ... 1091 of 4097 hpw : 3 lpw : 68
+
+Highpass filter will work as specified.
+
+filter :   0.000 ...   40.0 Hz   bins : 0 ... 1091 of 4097 hpw : 3 lpw : 68
+
+Highpass filter will work as specified.
+
+Initial dc offsets determined
+
+Raw data file resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif:
+
+	nchan  = 376
+
+	nsamp  = 6007
+
+	sfreq  = 300.307  Hz
+
+	length = 20.003   sec
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Loaded projection from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif:
+	# 1 : PCA-v1 : 1 vecs : 102 chs MEG idle
+	# 2 : PCA-v2 : 1 vecs : 102 chs MEG idle
+	# 3 : PCA-v3 : 1 vecs : 102 chs MEG idle
+	# 4 : Average EEG reference : 1 vecs : 60 chs EEG idle
+  ok   MNERawData/MNERawInfo/MNERawBufDef: buffer directory of the sample recording like mne.io.read_raw_fif
+  ok   MNEChSelection/MNEFilterDef: plain, projected and filtered reads match mne
+  ok   MNEProjOp/MNEProjItem: 4 active SSP vectors like raw.info['projs']
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+
+		nave = 55 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	No projector specified for these data.
+
+	No baseline correction applied
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Loaded projection from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif:
+	# 1 : PCA-v1 : 1 vecs : 102 chs MEG active
+	# 2 : PCA-v2 : 1 vecs : 102 chs MEG active
+	# 3 : PCA-v3 : 1 vecs : 102 chs MEG active
+	# 4 : Average EEG reference : 1 vecs : 60 chs EEG active
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif...
+
+	Estimated covariance matrix rank = 302 (0.000131779)
+
+	302 MEG and 0 EEG-like channels remain in the whitened data
+
+  ok   MNECovMatrix: projected noise covariance whitens like mne's pseudo-inverse
+Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+Read 5 compensation data sets from src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif
+
+Compensation in file : third order gradiometer
+
+Setting up compensation data...
+
+	7 out of 36 channels have the compensation set.
+
+	Desired compensation data (third order gradiometer) found.
+
+	All compensation channels found.
+
+	Preselector created.
+
+	Compensation data matrix created.
+
+	Postselector created.
+
+	Compensation set up.
+
+No compensation was requested.
+
+A new compensation value (uncompensated) was assigned to 7 MEG channels.
+
+Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+No SSS data in src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif
+
+Creating tag directory for src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif...
+0 bad channels read from src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif
+
+Initial dc offsets determined
+
+Raw data file src/examples/ex_mne_api/../../testframes/test_mne_ctf_comp_python/data/ctf_grade3_raw.fif:
+
+	nchan  = 36
+
+	nsamp  = 21
+
+	sfreq  = 480.000  Hz
+
+	length = 0.044    sec
+
+  ok   MNECTFCompDataSet/MNECTFCompData/MNENamedMatrix: grade 3 -> 0 like raw.apply_gradient_compensation
+  ok   MNEDescriptionParser: an .ave description averages like mne.Epochs with a baseline
+[FiffCov::compute_from_epochs] Rejected epoch at 13988 EEG001 : 0.0 uV > 0.0 uV
+[FiffCov::compute_from_epochs] Rejected epoch at 14385 EEG015 : 0.0 uV > 0.0 uV
+[FiffCov::compute_from_epochs] Rejected epoch at 14826 EEG007 : 0.0 uV > 0.0 uV
+[FiffCov::compute_from_epochs] Rejected epoch at 15620 EEG001 : 0.0 uV > 0.0 uV
+[FiffCov::compute_from_epochs] Rejected epoch at 16856 EEG015 : 0.0 uV > 0.0 uV
+[FiffCov::compute_from_epochs] Rejected epoch at 17266 EEG001 : 0.1 uV > 0.0 uV
+[FiffCov::compute_from_epochs] Computed: 376 channels, 6 epochs, 366 total samples.
+  ok   MNEDescriptionParser: a .cov description with EEG rejection gives nfree 365 like mne.compute_covariance
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+
+		nave = 55 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	No projector specified for these data.
+
+	No baseline correction applied
+
+	Measurement file id: 1.3 0x-43cfa44d6d530000 Mon Nov 18 20:31:55 2013
+
+	Data time range:   -199.8 ...    499.5 ms
+
+	Using MEG <-> head transform from the present data set
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+	Loaded projection from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif:
+
+		# 1 : PCA-v1 : 1 vecs : 102 chs MEG active
+		# 2 : PCA-v2 : 1 vecs : 102 chs MEG active
+		# 3 : PCA-v3 : 1 vecs : 102 chs MEG active
+		# 4 : Average EEG reference : 1 vecs : 60 chs EEG active
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+	2 bad channels read from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif:
+
+		
+MEG2443 
+EEG053
+
+	Loaded dataset Left Auditory from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif
+	Left Auditory : using baseline  -199.8 ...     0.0 ms
+
+  ok   MNEMeasData/MNEMeasDataSet: evoked set, baseline and interpolated values match mne
+Creating tag directory for src/examples/ex_mne_api/../../testframes/test_fiff_raw_formats_python/data/raw_sss_raw.fif...
+  ok   MNESssData: Maxwell filter parameters like info['proc_history'] of the fixture
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_mne_api-WPGknb/audvis-eve.fif...
+Binary event file /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_mne_api-WPGknb/audvis-eve.fif read
+
+	4 projection items activated.
+
+  ok   MNE: event file round trip and SSP projector like mne.find_events / make_projector
+Creating tag directory for resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif...
+	Triangle 
+normals and neighboring triangles...
+[done]
+
+	Vertex neighbors...
+[done]
+
+	Distances between neighboring vertices...
+[15360 distances done]
+
+Loading BEM surface inner skull (id = 1) from resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif...
+	Triangle 
+normals and neighboring triangles...
+[done]
+
+	Vertex neighbors...
+[done]
+
+	Distances between neighboring vertices...
+[15360 distances done]
+
+  ok   MNESurface: solid angles show the inner skull is closed, like mne._get_solids
+  ok   MNEMshDisplaySurfaceSet/MNEMshDisplaySurface: the BEM surface and its extent in the viewer
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_mne_api-WPGknb/commented-eve.fif...
+  ok   MNEEventList/MNEEvent: commented event file, onsets selected like mne.find_events
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_mne_api-WPGknb/montage-deriv.fif...
+MNEDerivSet::match - 1 of 2 derivations were matched.
+1 of 1 of the matched derivations are valid for these raw data.
+  ok   MNEDerivSet/MNEDeriv/MNESparseNamedMatrix: MNE-C montage file, matched to the recording and read by MNERawData
+  ok   MNELayout/MNELayoutPort: Vectorview layout like mne.channels.read_layout, zoom and channel matching
+Reading surface...
+
+	src/examples/ex_mne_api/../../testframes/test_mne_source_space_ops_python/data/morph-subjects/small/surf/lh.sphere.reg is a triangle file (nvert = 162 ntri = 320)
+
+	
+
+	computing normals
+
+	Read a surface with 162 vertices from src/examples/ex_mne_api/../../testframes/test_mne_source_space_ops_python/data/morph-subjects/small/surf/lh.sphere.reg
+[done]
+
+Reading surface...
+
+	src/examples/ex_mne_api/../../testframes/test_mne_source_space_ops_python/data/morph-subjects/large/surf/lh.sphere.reg is a triangle file (nvert = 642 ntri = 1280)
+
+	
+
+	computing normals
+
+	Read a surface with 642 vertices from src/examples/ex_mne_api/../../testframes/test_mne_source_space_ops_python/data/morph-subjects/large/surf/lh.sphere.reg
+[done]
+
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_mne_api-WPGknb/small-large-morph.fif...
+  ok   MNEMorphMap: sphere-registered morph map like mne.read_morph_map, saved and reloaded
+All mne checks passed.

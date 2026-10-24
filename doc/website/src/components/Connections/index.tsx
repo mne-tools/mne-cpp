@@ -93,9 +93,9 @@ function Panel({ topic, context, current }: { topic: Topic; context?: Context; c
                 <ul className={styles.list}>
                     {topic.examples.map((e) => (
                         <li key={e.name}>
-                            <Link to={e.url} className={clsx(styles.code, e.name === current && context === 'example' && styles.linkHere)}
-                                title={e.brief}>
-                                {e.name}
+                            <Link to={e.url} className={clsx(e.name === current && context === 'example' && styles.linkHere)}
+                                title={`${e.name} — ${e.brief}`}>
+                                {e.title}
                             </Link>
                             {e.start && <span className={styles.start}>Start here</span>}
                         </li>

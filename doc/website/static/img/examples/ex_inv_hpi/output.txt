@@ -1,0 +1,12 @@
+Opening raw data resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif...
+	Range : 6600 ... 12720  =     11.000 ...    21.200 secs
+Ready.
+84 coil definitions read
+  ok   InvSensorSetCreator/InvSensorSet: 306 MEG sensors with 8 integration points each
+84 coil definitions read
+  ok   InvHpiDataUpdater/InvHpiModelParameters/InvHpiFit: coils ordered 166/154/161/158 Hz, head position within 0.460 mm of MaxFilter
+  ok   InvSignalModel: sine and cosine amplitudes of the 4 coils for every channel
+  ok   InvHpiFitData: the single-coil fit returns to within 1.52 mm of the full fit
+All HPI checks passed.

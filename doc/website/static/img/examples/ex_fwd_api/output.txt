@@ -1,0 +1,200 @@
+Opening raw data resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+		Average EEG reference (1 x 60) idle
+
+	Range : 12900 ... 18906  =     42.956 ...    62.955 secs
+Ready.
+84 coil definitions read
+  ok   FwdCoilSet/FwdCoil: 306 accurate MEG coils, MEG0113 a planar gradiometer with 8 points
+Creating tag directory for resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif...
+	Triangle 
+normals and neighboring triangles...
+[done]
+
+	Vertex neighbors...
+[done]
+
+	Distances between neighboring vertices...
+[15360 distances done]
+
+Creating tag directory for resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem-sol.fif...
+
+Loaded linear collocation BEM solution from resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem-sol.fif
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif...
+  ok   FwdBemModel/FwdBemSolution: single-layer BEM field matches mne.make_forward_dipole
+Selected model: Default
+Equiv. model fitting -> RV = 0.00561599 %
+mu1 = 0.944851	lambda1 = 0.136825
+mu2 = 0.667792	lambda2 = 0.683665
+mu3 = -0.296584	lambda3 = -0.01012
+Defined EEG sphere model with rad =   90.00 mm
+  ok   FwdEegSphereModel/FwdEegSphereModelSet/FwdEegSphereLayer: 4-layer sphere potentials match mne
+  ok   FwdFieldMap maps 305 good MEG channels onto surface points like mne
+Source space                 : resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif
+MRI -> head transform source : resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif
+Measurement data             : resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
+Sphere model                 : origin at (   0.00    0.00   40.00) mm
+EEG model file not specified; using default.
+Available EEG sphere models:
+	Default : 4 :   0.900 :   0.330 :   0.920 :   1.000 :   0.970 :   0.004 :   1.000 :   0.330
+Selected model: Default
+Equiv. model fitting -> RV = 0.00561599 %
+mu1 = 0.944851	lambda1 = 0.136825
+mu2 = 0.667792	lambda2 = 0.683665
+mu3 = -0.296584	lambda3 = -0.01012
+Defined EEG sphere model with rad =   90.00 mm
+Using EEG sphere model "Default" with scalp radius    90.0 mm
+Do not scale the electrode locations to scalp
+Accurate field computations
+Do computations in head coordinates.
+Free source orientations
+Destination for the solution : /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fwd_api-HKotXT/V1-fwd.fif
+Source space will be restricted to sources in 1 labels
+Reading resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif...
+Read 2 source spaces a total of 8196 active source locations
+Processed label file /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fwd_api-HKotXT/V1-lh.label
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif...
+Coordinate transformation: MRI (surface RAS) -> head
+	 0.999310  0.009985 -0.035787	  -3.17 mm
+	 0.012759  0.812405  0.582954	   6.86 mm
+	 0.034894 -0.583009  0.811716	  28.88 mm
+	 0.000000  0.000000  0.000000      1.00
+Read 306 MEG channels from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
+Read  60 EEG channels from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
+Coordinate transformation: MEG device -> head
+	 0.991420 -0.039936 -0.124467	  -6.13 mm
+	 0.060661  0.984012  0.167456	   0.06 mm
+	 0.115790 -0.173570  0.977991	  64.74 mm
+	 0.000000  0.000000  0.000000      1.00
+84 coil definitions read
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Head coordinate coil definitions created.
+Source spaces are now in head coordinates.
+Using the sphere model.
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+No coils to duplicate
+Computing MEG at 78 source locations (free orientations, no threads)...
+done.
+Using the equivalent source approach in the homogeneous sphere for EEG
+Computing EEG at 78 source locations (free orientations, no threads)...
+done.
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fwd_api-HKotXT/V1-fwd.fif...
+  ok   ComputeFwd: 78 V1 sources, 366 channels, sphere-model gain matches mne
+Reading forward solution from /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fwd_api-HKotXT/V1-fwd.fif...
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fwd_api-HKotXT/V1-fwd.fif...
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	2 source spaces read
+
+MEG solution found
+EEG solution found
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read MEG forward solution (78 sources, 306 channels, free orientations)
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read EEG forward solution (78 sources, 60 channels, free orientations)
+	MEG and EEG forward solutions combined
+	Source spaces transformed to the forward solution coordinate frame
+	Cartesian source orientations...
+[done]
+Reading forward solution from /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fwd_api-HKotXT/V1-fwd.fif...
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fwd_api-HKotXT/V1-fwd.fif...
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	2 source spaces read
+
+	2 bad channels ( 
+"MEG2443" 
+"EEG053" 
+) read
+MEG solution found
+EEG solution found
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read MEG forward solution (78 sources, 306 channels, free orientations)
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read EEG forward solution (78 sources, 60 channels, free orientations)
+	MEG and EEG forward solutions combined
+	Source spaces transformed to the forward solution coordinate frame
+	Cartesian source orientations...
+[done]
+	364 out of 366 channels remain after picking
+  ok   Fwd::read_forward_solution reads all 366 rows back; bExcludeBads drops the 2 bads
+All fwd checks passed.

@@ -1,0 +1,208 @@
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+
+		nave = 55 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+Reading label...
+[done]
+
+Reading forward solution from resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif...
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	2 source spaces read
+
+MEG solution found
+EEG solution found
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read MEG forward solution (7928 sources, 306 channels, free orientations)
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read EEG forward solution (7928 sources, 60 channels, free orientations)
+	MEG and EEG forward solutions combined
+	Source spaces transformed to the forward solution coordinate frame
+	Cartesian source orientations...
+[done]
+	305 out of 366 channels remain after picking
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif...
+	366 x 366 full covariance (kind = 1) found.
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+Created an SSP operator (subspace dimension = 3)
+
+Setting small MEG eigenvalues to zero.
+Not doing PCA for MEG
+InvLCMV::makeLCMV - Leadfield: 305 channels x 70 sources (n_orient=3)
+InvLCMV::makeLCMV - Done. Filter: 70 x 305 (sources=70, orient=1)
+  ok   InvLCMV/InvBeamformer: max-power LCMV power on V1 matches mne.beamformer.apply_lcmv_cov
+InvDICS::makeDICS - Leadfield: 305 channels x 70 sources (n_orient=3), 1 frequencies
+InvDICS::makeDICS - Done. 1 frequency filters computed.
+  ok   InvDICS: DICS power for a 10 Hz CSD matches mne.beamformer.apply_dics_csd
+OpenMP disabled (to enable it: VS2010->Project Properties->C/C++->Language, then modify OpenMP Support)
+Available Threats:  1
+##### Initialization RAP MUSIC started ######
+
+
+Calculate gain matrix combinations. 
+
+Gain matrix combinations calculated. 
+
+
+Number of grid points:  70 
+
+
+Number of combinated points:  2485 
+
+
+Number of sources to find:  1 
+
+
+Threshold:  0.5 
+
+
+##### Initialization RAP MUSIC completed ######
+
+
+
+##### Calculation of RAP MUSIC started ######
+
+
+Time Elapsed:  90.897  ms
+Iteration:  1  of  1 ; Correlation:  1 ; Position (Idx+1):  11  -  51 
+
+
+##### Calculation of RAP MUSIC completed ######
+Total Time Elapsed:  94.306  ms
+OpenMP disabled (to enable it: VS2010->Project Properties->C/C++->Language, then modify OpenMP Support)
+Available Threats:  1
+##### Initialization RAP MUSIC started ######
+
+
+Calculate gain matrix combinations. 
+
+Gain matrix combinations calculated. 
+
+
+Number of grid points:  70 
+
+
+Number of combinated points:  2485 
+
+
+Number of sources to find:  1 
+
+
+Threshold:  0.5 
+
+
+##### Initialization RAP MUSIC completed ######
+
+
+
+OpenMP disabled (to enable it: VS2010->Project Properties->C/C++->Language, then modify OpenMP Support)
+Available Threats:  1
+##### Initialization RAP MUSIC started ######
+
+
+Calculate gain matrix combinations. 
+
+Gain matrix combinations calculated. 
+
+
+Number of grid points:  70 
+
+
+Number of combinated points:  2485 
+
+
+Number of sources to find:  1 
+
+
+Threshold:  0.5 
+
+
+##### Initialization RAP MUSIC completed ######
+
+
+
+##### Calculation of PWL RAP MUSIC started ######
+
+
+Time Elapsed:  5.549  ms
+Iteration:  1  of  1 ; Correlation:  0.996174 ; Position (Idx+1):  3  -  27 
+
+
+##### Calculation of PWL RAP MUSIC completed ######
+Total Time Elapsed:  10.148  ms
+  ok   InvRapMusic/InvPwlRapMusic/InvDipolePair: the exhaustive scan finds sources 10 and 50 (correlation 1), Powell a pair at 0.9962
+  ok   InvTrapMusic: TRAP-MUSIC finds both sources one at a time, oriented along z
+All beamformer checks passed.

@@ -1,0 +1,160 @@
+Reading annotation...
+
+	Reading from version 2
+
+	colortable with 36 entries read
+	(originally /autofs/space/terrier_001/users/nicks/freesurfer/average/colortable_desikan_killiany.txt)
+
+[done]
+
+Reading annotation...
+
+	Reading from version 2
+
+	colortable with 36 entries read
+	(originally /autofs/space/terrier_001/users/nicks/freesurfer/average/colortable_desikan_killiany.txt)
+
+[done]
+
+Reading surface...
+
+	resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white is a triangle file (nvert = 155407 ntri = 310810)
+
+	created by gramfort on Thu Sep 15 19:44:31 2011
+
+	computing normals
+
+	
+Reading curvature...
+[done]
+
+	Read a surface with 155407 vertices from resources/data/mne-cpp-test-data/subjects/sample/surf/lh.white
+[done]
+
+Reading surface...
+
+	resources/data/mne-cpp-test-data/subjects/sample/surf/rh.white is a triangle file (nvert = 156866 ntri = 313728)
+
+	created by gramfort on Thu Sep 15 22:04:14 2011
+
+	computing normals
+
+	
+Reading curvature...
+[done]
+
+	Read a surface with 156866 vertices from resources/data/mne-cpp-test-data/subjects/sample/surf/rh.white
+[done]
+
+Converting labels from annotation...
+[done]
+
+Converting labels from annotation...
+[done]
+
+Reading forward solution from resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif...
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	2 source spaces read
+
+MEG solution found
+EEG solution found
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read MEG forward solution (7928 sources, 306 channels, free orientations)
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read EEG forward solution (7928 sources, 60 channels, free orientations)
+	MEG and EEG forward solutions combined
+	Source spaces transformed to the forward solution coordinate frame
+	Changing to fixed-orientation forward solution...
+[done]
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif...
+	366 x 366 full covariance (kind = 1) found.
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+
+		nave = 55 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+  [dSPM kernel] Eigendecomposition of noise covariance ( 366 x 366 ) …
+  [dSPM kernel] Whitening gain matrix …
+  [dSPM kernel] Computing MNE kernel (LDLT solve, 366 x 366 ) …
+  [dSPM kernel] Normalizing 329 source rows …
+[InvCMNE] No model: control estimate with look-back 20
+  ok   329 auditory sources x 421 samples; the dSPM kernel maps sensor noise to unit variance
+  ok   the first k = 20 samples have no context: CMNE equals the rectified, z-scored dSPM
+  ok   without a model, CMNE is the control estimate
+  dSPM peak: lh vertex 89333 at 88 ms
+  CMNE peak: lh vertex 115210 at 92 ms
+All CMNE checks passed.

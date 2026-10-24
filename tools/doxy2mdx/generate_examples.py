@@ -12,11 +12,17 @@
 """Generate the website examples gallery from ``src/examples``.
 
 Every ``src/examples/ex_*`` directory becomes one page under
-``doc/website/docs/examples/<library>/``: the ``@brief`` and description of its
-``main.cpp``, the scientific topics it demonstrates (with the manual sections
-and API pages of each), the data it needs, how to build and run it, its
-command-line options, the registered classes it uses, the API pages that quote
-it, related examples and the full source.
+``doc/website/docs/examples/<library>/``, titled with the ``title`` of its
+registry entry: the ``@brief`` and description of its ``main.cpp``, the figures
+and console output of its last run, the scientific topics it demonstrates (with
+the manual sections and API pages of each), the data it needs, how to build and
+run it, its command-line options, the registered classes it uses, the API pages
+that quote it, related examples and the full source.
+
+The figures and console output are committed under
+``doc/website/static/img/examples/<name>/`` by ``tools/doxy2mdx/run_examples.py``:
+``*.png`` written by ``DISPLIB::FigureExporter`` (caption in the PNG's
+``Description`` text chunk) and ``output.txt``.
 
 Examples are filed under their primary library: the ``library`` of their entry
 in ``doc/api_registry.json`` ``examples``, else the most specific library they
@@ -44,9 +50,11 @@ import argparse
 import functools
 import json
 import re
+import struct
 import sys
 import tempfile
 import textwrap
+import zlib
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -59,6 +67,8 @@ OUT = Path("doc/website/docs/examples")
 API = Path("doc/website/docs/api")
 DATA = Path("doc/website/src/data/knowledge.json")
 REDIRECTS = Path("doc/website/static/docs/examples")
+GALLERY = Path("doc/website/static/img/examples")
+OUTPUT_LINES = 60
 GITHUB_BLOB = "https://github.com/mne-tools/mne-cpp/blob/staging"
 
 # Most specific first: an example is filed under the first library it includes.
@@ -120,7 +130,7 @@ def _header_text(main: str) -> tuple[str, str]:
     brief = [match.group(1).strip()]
     rest = []
     target = brief
-    for line in lines[1:]:
+    for line in lines[1:] if "*/" not in lines[0] else []:
         if "*/" in line:
             break
         body = re.sub(r"^\s*\*\s?", "", line).rstrip()
@@ -151,6 +161,69 @@ def _registry_examples(root: Path) -> dict[str, dict]:
     if not path.is_file():
         return {}
     return json.loads(path.read_text(encoding="utf-8")).get("examples", {}).get("entries", {})
+
+
+def title_of(name: str, root: Path = REPO_ROOT) -> str:
+    """Human-readable title of an example: its registry ``title``, else the program name."""
+    return _registry_examples(root).get(name, {}).get("title") or name
+
+
+def png_caption(path: Path) -> str:
+    """``Description`` text chunk of a PNG, or an empty string."""
+    data = path.read_bytes()
+    pos = 8
+    while pos + 8 <= len(data):
+        length, kind = struct.unpack(">I4s", data[pos:pos + 8])
+        body = data[pos + 8:pos + 8 + length]
+        if body.startswith(b"Description\x00"):
+            text = body[len(b"Description\x00"):]
+            if kind == b"tEXt":
+                return text.decode("latin-1")
+            if kind == b"zTXt":
+                return zlib.decompress(text[1:]).decode("latin-1")
+            if kind == b"iTXt":
+                # compression flag, method, language tag \0, translated keyword \0, text
+                compressed, rest = text[0], text[2:].split(b"\x00", 2)[2]
+                return (zlib.decompress(rest) if compressed else rest).decode("utf-8")
+        if kind == b"IDAT":
+            break
+        pos += 12 + length
+    return ""
+
+
+def gallery(name: str, root: Path = REPO_ROOT) -> tuple[list[tuple[str, str]], str]:
+    """([(site URL, caption)] of the committed figures in file order, console output) of one example."""
+    folder = root / GALLERY / name
+    if not folder.is_dir():
+        return [], ""
+    figures = [("/" + png.relative_to(root / "doc/website/static").as_posix(), png_caption(png))
+               for png in sorted(folder.glob("*.png"))]
+    output = folder / "output.txt"
+    return figures, output.read_text(encoding="utf-8").rstrip() if output.is_file() else ""
+
+
+def _results(name: str, root: Path) -> list[str]:
+    figures, output = gallery(name, root)
+    if not figures and not output:
+        return []
+    lines = ["## Results", ""]
+    if figures:
+        lines += ["<ExampleFigures>"]
+        lines += [f'  <ExampleFigure src="{url}" caption={{{json.dumps(caption, ensure_ascii=False)}}} />'
+                  for url, caption in figures]
+        lines += ["</ExampleFigures>", ""]
+    if output:
+        text = []
+        for line in output.splitlines():
+            repeats = re.fullmatch(r"(.*) \[×(\d+)\]", text[-1]) if text else None
+            if text and line == (repeats.group(1) if repeats else text[-1]):
+                text[-1] = f"{line} [×{int(repeats.group(2)) + 1 if repeats else 2}]"
+            else:
+                text.append(line)
+        if len(text) > OUTPUT_LINES:
+            text = text[:OUTPUT_LINES] + [f"… {len(text) - OUTPUT_LINES} more lines"]
+        lines += ["````text title=\"Console output\"", *text, "````", ""]
+    return lines
 
 
 def primary_library(src: Path, root: Path = REPO_ROOT) -> str | None:
@@ -194,7 +267,8 @@ def usages(name: str, library: str, root: Path = REPO_ROOT) -> list[dict]:
             continue
         file = next(f for f in files if hits[f])
         start, excerpt = _excerpt(files[file], hits[file][0])
-        found.append({"name": src.name, "group": primary_library(src, root), "brief": brief, "uses": count,
+        found.append({"name": src.name, "title": title_of(src.name, root), "group": primary_library(src, root),
+                      "brief": brief, "uses": count,
                       "file": f"{EXAMPLES.as_posix()}/{src.name}/{file}", "line": start + 1, "code": excerpt})
     return sorted(found, key=lambda u: (-u["uses"], u["name"]))
 
@@ -221,16 +295,19 @@ def render(name: str, src: Path, refs: list[tuple[str, str]], know: kn.Knowledge
     group = primary_library(src, root)
     meta = know.examples.get(name) if know else None
     topics = kn.topics_of_example(know, name) if know else []
+    title = title_of(name, root)
     lines = [
-        "---", f"title: {json.dumps(name)}", f"description: {json.dumps(brief)}", "---", "",
+        "---", f"title: {json.dumps(title)}", f"sidebar_label: {json.dumps(title)}",
+        f"description: {json.dumps(brief)}", "---", "",
         "{/* Generated by tools/doxy2mdx/generate_examples.py from src/examples — do not edit. */}", "",
-        f"# {name}", "", f"{mdx_text(brief)}.", "",
+        f"# {mdx_text(title)}", "", f"{mdx_text(brief)}.", "",
     ]
     if meta:
         lines += [f'<ExampleFacts name="{name}" />', ""]
     lines += ["**Libraries:** " + ", ".join(f"[{LIBRARIES[lib]}](../../api/{api_slug(lib)}/index.mdx)" for lib in libs), ""]
     if description:
         lines += ["## What it demonstrates", "", mdx_text(description), ""]
+    lines += _results(name, root)
     if topics:
         lines += ["## Background", "", f"<Connections topics={{{json.dumps(topics)}}} context=\"example\" "
                                        f"current=\"{name}\" />", ""]
@@ -265,7 +342,7 @@ def render(name: str, src: Path, refs: list[tuple[str, str]], know: kn.Knowledge
         lines += ["## Related examples", ""]
         for other in related:
             other_src = root / EXAMPLES / other
-            lines.append(f"- [{other}](../{primary_library(other_src, root)}/{other}.mdx) — "
+            lines.append(f"- [{mdx_text(title_of(other, root))}](../{primary_library(other_src, root)}/{other}.mdx) — "
                          f"{mdx_text(example_info(other_src)[1])}.")
         lines.append("")
     return group, brief, "\n".join(lines)
@@ -300,14 +377,17 @@ def _knowledge_json(root: Path, know: kn.Knowledge, briefs: dict[str, str]) -> s
     for name in sorted(briefs):
         libs = example_info(root / EXAMPLES / name)[0]
         entry = know.examples.get(name, {})
-        examples.append({"name": name, "brief": briefs[name], "url": example_url(name),
+        figures = gallery(name, root)[0]
+        examples.append({"name": name, "title": title_of(name, root), "brief": briefs[name],
+                         "thumbnail": figures[0][0] if figures else "", "url": example_url(name),
                          "library": primary_library(root / EXAMPLES / name, root), "libraries": libs,
                          "tasks": entry.get("tasks", []), "modalities": entry.get("modalities", []),
                          "level": entry.get("level", ""), "topics": kn.topics_of_example(know, name)})
     topics = []
     for topic in know.topics:
         topic = dict(topic)
-        topic["examples"] = [dict(e, brief=briefs[e["name"]], url=example_url(e["name"])) for e in topic["examples"]]
+        topic["examples"] = [dict(e, title=title_of(e["name"], root), brief=briefs[e["name"]], url=example_url(e["name"]))
+                             for e in topic["examples"]]
         topics.append(topic)
     data = {"$comment": "Generated by tools/doxy2mdx/generate_examples.py from doc/api_registry.json — do not edit.",
             "facets": know.facets, "libraries": LIBRARIES, "examples": examples, "topics": topics}
@@ -355,7 +435,8 @@ def generate(root: Path, out: Path, data: Path | None = None, redirects: Path | 
             encoding="utf-8")
         if not (know and know.examples):
             index += [f"## {LIBRARIES[group]}", "", "| Example | What it shows |", "|---|---|"]
-            index += [f"| [{name}](./{group}/{name}.mdx) | {mdx_text(brief)} |" for name, brief in groups[group]] + [""]
+            index += [f"| [{mdx_text(title_of(name, root))}](./{group}/{name}.mdx) | {mdx_text(brief)} |"
+                      for name, brief in groups[group]] + [""]
     (out / "index.mdx").write_text("\n".join(index), encoding="utf-8")
     if data is not None and know is not None:
         data.parent.mkdir(parents=True, exist_ok=True)

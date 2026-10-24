@@ -1,0 +1,85 @@
+Reading resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif...
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Found the data of interest:
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+		nave = 55 - aspect type = 100
+
+	Preprocessing...
+	376 channels remain after picking
+	Created an SSP operator (subspace dimension = 4)
+	4 projection items activated.
+	SSP projectors applied to the evoked data
+	No baseline correction applied
+Reading inverse operator decomposition from resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif...
+	Reading inverse operator info...
+[done]
+	Reading inverse operator decomposition...
+[done]
+	364 x 364 full covariance (kind = 1) found.
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Noise covariance matrix read.
+	22494 x 22494 diagonal covariance (kind = 2) found.
+	Source covariance matrix read.
+	22494 x 22494 diagonal covariance (kind = 6) found.
+	Orientation priors read.
+	22494 x 22494 diagonal covariance (kind = 5) found.
+	Depth priors read.
+Did not find the desired covariance matrix
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+	2 source spaces read
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Source spaces transformed to the inverse solution coordinate frame
+	Set minimum norm method to dSPM.
+Preparing the inverse operator for use...
+	Scaled noise and source covariance from nave = 1 to nave = 55
+	Created the regularized inverter
+	Created an SSP operator (subspace dimension = 4)
+	Created the whitener using a full noise covariance matrix (4 small eigenvalues omitted)
+	Computing noise-normalization factors (dSPM)...
+[done]
+Computing inverse...
+(eigenleads need to be weighted)...
+K 22494 x 364
+Picked 364 channels from the data
+combining the current components...
+(dSPM)...
+[done]
+
+part ( block( 0, 0, 10, 10) ) of the inverse solution:
+ 15.3491  15.2401  15.2007  15.2336  15.3331  15.4854  15.6711  15.8672  16.0509  16.2022
+  8.3266  8.33862  8.35313  8.36961  8.38659  8.40123  8.40922  8.40511   8.3832  8.33872
+0.350981 0.331501 0.338259 0.310341 0.295356 0.390501 0.579351 0.786456 0.958623  1.06172
+ 12.3715  12.5464  12.6595  12.7034  12.6795  12.5972  12.4711  12.3191   12.159  12.0064
+ 25.2427  25.0666  24.8842   24.704  24.5332  24.3772  24.2388  24.1182  24.0134  23.9203
+ 17.4164  17.5659  17.6728  17.7325  17.7458  17.7178  17.6554  17.5658  17.4547  17.3254
+ 33.9461   33.605  33.2293  32.8363  32.4453  32.0774  31.7538  31.4946  31.3172  31.2344
+ 23.1626   23.177   23.214  23.2689  23.3351  23.4044  23.4687  23.5207  23.5552  23.5693
+ 13.8371  13.7946  13.7967  13.8385  13.9103  13.9987  14.0887  14.1659  14.2184  14.2384
+ 15.3913  15.0661  14.7653   14.501  14.2794  14.1019  13.9649  13.8619  13.7847  13.7257
+tmin = -0.199795 s
+tstep = 0.001665 s
+Line frequency is not defined
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+FiffStream::read_named_matrix - Number of columns in matrix data and column names do not match
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match

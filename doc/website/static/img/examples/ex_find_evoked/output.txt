@@ -1,0 +1,91 @@
+Exploring resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif...
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Found 4 datasets
+>> Processing Left Auditory <<
+Reading resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif...
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Found the data of interest:
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+		nave = 55 - aspect type = 100
+
+	Preprocessing...
+	376 channels remain after picking
+	Created an SSP operator (subspace dimension = 4)
+	4 projection items activated.
+	SSP projectors applied to the evoked data
+	No baseline correction applied
+>> Processing Right Auditory <<
+Reading resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif...
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Found the data of interest:
+		t =    -199.80 ...     499.49 ms (Right Auditory)
+		nave = 61 - aspect type = 100
+
+	Preprocessing...
+	376 channels remain after picking
+	Created an SSP operator (subspace dimension = 4)
+	4 projection items activated.
+	SSP projectors applied to the evoked data
+	No baseline correction applied
+>> Processing Left visual <<
+Reading resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif...
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Found the data of interest:
+		t =    -199.80 ...     499.49 ms (Left visual)
+		nave = 67 - aspect type = 100
+
+	Preprocessing...
+	376 channels remain after picking
+	Created an SSP operator (subspace dimension = 4)
+	4 projection items activated.
+	SSP projectors applied to the evoked data
+	No baseline correction applied
+>> Processing Right visual <<
+Reading resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif...
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Found the data of interest:
+		t =    -199.80 ...     499.49 ms (Right visual)
+		nave = 58 - aspect type = 100
+
+	Preprocessing...
+	376 channels remain after picking
+	Created an SSP operator (subspace dimension = 4)
+	4 projection items activated.
+	SSP projectors applied to the evoked data
+	No baseline correction applied
+
+Found 4 evoked response data sets in resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif :
+Left Auditory (Average)
+Right Auditory (Average)
+Left visual (Average)
+Right visual (Average)
+Line frequency is not defined
+Line frequency is not defined
+Line frequency is not defined
+Line frequency is not defined
+Line frequency is not defined

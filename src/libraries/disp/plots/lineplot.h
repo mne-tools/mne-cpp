@@ -36,10 +36,14 @@
 
 #include <Eigen/Core>
 
+#include <functional>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QColor>
+#include <QRectF>
 #include <QWidget>
 #include <QSharedPointer>
 #include <QVector>
@@ -159,6 +163,26 @@ public:
     void updateData(const QVector<double>& x,
                     const QVector<double>& y);
 
+    //=========================================================================================================
+    /**
+     * Adds a series to the plot; the axes grow to include it and a legend lists the labelled series.
+     *
+     * @param[in] x         X-Axis data to plot.
+     * @param[in] y         Y-Axis data to plot.
+     * @param[in] label     Legend entry; series without a label are not listed.
+     * @param[in] color     Line colour; an invalid colour takes the next colour of the default palette.
+     */
+    void addSeries(const QVector<double>& x,
+                   const QVector<double>& y,
+                   const QString& label = QString(),
+                   const QColor& color = QColor());
+
+    //=========================================================================================================
+    /**
+     * Returns the number of series in the plot.
+     */
+    int seriesCount() const;
+
 protected:
     //=========================================================================================================
     /**
@@ -169,15 +193,31 @@ protected:
     void paintEvent(QPaintEvent* event) override;
 
 private:
-    QString m_sTitle;           /**< Title. */
-    QString m_sXLabel;          /**< X axis label. */
-    QString m_sYLabel;          /**< Y axis label. */
-    QVector<double> m_vecXData; /**< X data points. */
-    QVector<double> m_vecYData; /**< Y data points. */
-    double m_dMinX;             /**< Minimum X value. */
-    double m_dMaxX;             /**< Maximum X value. */
-    double m_dMinY;             /**< Minimum Y value. */
-    double m_dMaxY;             /**< Maximum Y value. */
+    //=========================================================================================================
+    /**
+     * Returns the length in pixels of the lines inside @p rect, for the given data-to-pixel mapping.
+     */
+    double hiddenLength(const QRectF& rect,
+                        const std::function<double(double)>& toPixelX,
+                        const std::function<double(double)>& toPixelY) const;
+
+    /** One line of the plot. */
+    struct Series
+    {
+        QVector<double> x; /**< X data points. */
+        QVector<double> y; /**< Y data points. */
+        QString label;     /**< Legend entry. */
+        QColor color;      /**< Line colour. */
+    };
+
+    QString m_sTitle;        /**< Title. */
+    QString m_sXLabel;       /**< X axis label. */
+    QString m_sYLabel;       /**< Y axis label. */
+    QVector<Series> m_series; /**< The plotted series. */
+    double m_dMinX;          /**< Minimum X value. */
+    double m_dMaxX;          /**< Maximum X value. */
+    double m_dMinY;          /**< Minimum Y value. */
+    double m_dMaxY;          /**< Maximum Y value. */
 };
 
 //=============================================================================================================

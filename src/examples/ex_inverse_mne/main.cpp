@@ -33,11 +33,14 @@
 
 #include <utils/generics/mne_logger.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/lineplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
 
@@ -45,6 +48,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
+using namespace Eigen;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace INVLIB;
@@ -66,7 +71,7 @@ using namespace UTILSLIB;
 int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -124,6 +129,25 @@ int main(int argc, char* argv[])
     printf("tmin = %f s\n", sourceEstimate.tmin);
     printf("tstep = %f s\n", sourceEstimate.tstep);
 
+    // Time courses of the five sources with the largest peak
+    QVector<double> times(sourceEstimate.data.cols());
+    for (int s = 0; s < times.size(); ++s) {
+        times[s] = 1000.0 * (sourceEstimate.tmin + s * sourceEstimate.tstep);
+    }
+    VectorXd peaks = sourceEstimate.data.cwiseAbs().rowwise().maxCoeff();
+    LinePlot courses;
+    courses.setTitle(QString("%1 source time courses of '%2'").arg(method, evoked.comment));
+    courses.setXLabel("Time [ms]");
+    courses.setYLabel(method);
+    for (int i = 0; i < 5; ++i) {
+        Index source;
+        peaks.maxCoeff(&source);
+        peaks(source) = -1.0;
+        const VectorXd row = sourceEstimate.data.row(source).transpose();
+        courses.addSeries(times, QVector<double>(row.data(), row.data() + row.size()), QString("source %1").arg(source));
+    }
+    FigureExporter::save(courses, "time_courses", QString("%1 time courses of the five sources with the largest peak, SNR %2.").arg(method).arg(snr));
+
     if (!t_sFileNameStc.isEmpty()) {
         QFile t_fileStc(t_sFileNameStc);
         sourceEstimate.write(t_fileStc);
@@ -137,5 +161,5 @@ int main(int argc, char* argv[])
         printf("tstep = %f s\n", readSourceEstimate.tstep);
     }
 
-    return 0; //app.exec();
+    return 0;
 }

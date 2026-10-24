@@ -1,0 +1,4 @@
+ok   IeegImplantation: one depth lead LA, ordered by contact number
+  ok   IeegReference: LA1-LA2 = -5, LA2-LA3 = -15
+  ok   IeegSurfaceMap: vertex 0 = 28.75, vertex 1 = 0
+All iEEG checks passed.

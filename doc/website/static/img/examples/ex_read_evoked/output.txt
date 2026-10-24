@@ -1,0 +1,24 @@
+Reading resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif...
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Found the data of interest:
+		t =    -199.80 ...     499.49 ms (Left visual)
+		nave = 67 - aspect type = 100
+
+	Preprocessing...
+	376 channels remain after picking
+	Created an SSP operator (subspace dimension = 4)
+	4 projection items activated.
+	SSP projectors applied to the evoked data
+	No baseline correction applied
+Employing the Neuromag head coordinate system
+
+Condition 'Left visual': 67 epochs, 376 channels, 421 samples from -0.199795 s to 0.499488 s
+Applying baseline correction ... (mode: mean)
+[Numerics::rescale] Applying baseline correction ... (mode: mean)
+Line frequency is not defined
+QCommandLineParser: option not defined: "useCTFComp"

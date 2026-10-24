@@ -1,0 +1,449 @@
+Coordinate transformation: MRI (surface RAS) -> head
+	 1.000000  0.000000  0.000000	   0.00 mm
+	 0.000000  1.000000  0.000000	   0.00 mm
+	 0.000000  0.000000  1.000000	   0.00 mm
+	 0.000000  0.000000  0.000000      1.00
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Coordinate transformation: MEG device -> head
+	 0.991420 -0.039936 -0.124467	  -6.13 mm
+	 0.060661  0.984012  0.167456	   0.06 mm
+	 0.115790 -0.173570  0.977991	  64.74 mm
+	 0.000000  0.000000  0.000000      1.00
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+2 bad channels read from the data file.
+2 bad channels total.
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+Will use 305 MEG channels from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif
+84 coil definitions read
+Head coordinate coil definitions created.
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+No coils to duplicate
+Sphere model origin :    0.0    0.0   40.0 mm.
+No coils to duplicate
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Loaded projection from resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif:
+	# 1 : PCA-v1 : 1 vecs : 102 chs MEG active
+	# 2 : PCA-v2 : 1 vecs : 102 chs MEG active
+	# 3 : PCA-v3 : 1 vecs : 102 chs MEG active
+	# 4 : Average EEG reference : 1 vecs : 60 chs EEG active
+Final projection operator is:
+	# 1 : PCA-v1 : 1 vecs : 102 chs MEG active
+	# 2 : PCA-v2 : 1 vecs : 102 chs MEG active
+	# 3 : PCA-v3 : 1 vecs : 102 chs MEG active
+	# 4 : Average EEG reference : 1 vecs : 60 chs EEG active
+Using standard noise values (MEG grad :    5.0 fT/cm MEG mag :   20.0 fT EEG :    0.2 uV)
+
+Picked appropriate channels from the noise-covariance matrix.
+Projection applied to the covariance matrix.
+Decomposing the noise covariance...
+Decomposition not needed for a diagonal covariance matrix.
+Making a spherical guess space with radius    80.0 mm...
+Creating tag directory for resources/general/surf2bem/icos.fif...
+	Triangle 
+and vertex 
+normals and neighboring triangles...
+[done]
+
+	Vertex neighbors...
+[done]
+
+	Distances between neighboring vertices...
+[3840 distances done]
+
+Filtering (grid =     15 mm)...
+FsSurface CM = (   0.0   -0.0   40.0) mm
+
+FsSurface fits inside a sphere with radius   80.0 mm
+
+FsSurface extent:
+	x =  -80.0 ...   80.0 mm
+	y =  -80.0 ...   80.0 mm
+	z =  -40.0 ...  120.0 mm
+
+Grid extent:
+	x =  -90.0 ...   90.0 mm
+	y =  -90.0 ...   90.0 mm
+	z =  -45.0 ...  135.0 mm
+
+2197 sources before omitting any.
+
+628 sources after omitting infeasible sources.
+
+Source spaces are in 
+MRI coordinates.
+
+Checking that the sources are inside the bounding surface 
+ (will take a few...)
+
+1 source space points omitted because they are outside the inner skull surface.
+
+Thank you for waiting.
+
+627 sources remaining after excluding the sources outside the surface and less than    0.0 mm inside.
+
+Adjusting the neighborhood info...
+[done]
+
+Guess locations are now in head coordinates.
+
+Go through all guess source locations...
+[done 627 sources]
+
+  ok   InvDipoleFitData/InvGuessData/InvDipoleForward/InvEcd: one sample fits the dipole like mne.fit_dipole
+Exploring resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found 4 datasets
+
+>> Processing Left Auditory <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+
+		nave = 55 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+>> Processing Right Auditory <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Right Auditory)
+
+		nave = 61 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+>> Processing Left visual <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left visual)
+
+		nave = 67 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+>> Processing Right visual <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Right visual)
+
+		nave = 58 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+[FiffEvokedSet::save] Saved 1 average(s) to "/var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif"
+  ok   FiffEvokedSet writes the synthetic field
+Sphere model     : origin at (   0.00    0.00   40.00) mm
+Using standard MEG coil definitions.
+Spherical guess space, rad = 80.0 mm
+Guess grid       :   10.0 mm
+Guess exclude    :   20.0 mm
+Data             : /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif
+SSP sources      :
+	/var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif
+dip output      : /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/fit.dat
+---- Setting up...
+
+Coordinate transformation: MRI (surface RAS) -> head
+	 1.000000  0.000000  0.000000	   0.00 mm
+	 0.000000  1.000000  0.000000	   0.00 mm
+	 0.000000  0.000000  1.000000	   0.00 mm
+	 0.000000  0.000000  0.000000      1.00
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+Coordinate transformation: MEG device -> head
+	 0.991420 -0.039936 -0.124467	  -6.13 mm
+	 0.060661  0.984012  0.167456	   0.06 mm
+	 0.115790 -0.173570  0.977991	  64.74 mm
+	 0.000000  0.000000  0.000000      1.00
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+0 bad channels total.
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+Will use 305 MEG channels from /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif
+84 coil definitions read
+Head coordinate coil definitions created.
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+No coils to duplicate
+Sphere model origin :    0.0    0.0   40.0 mm.
+No coils to duplicate
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+Loaded projection from /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif:
+	# 1 : PCA-v1 : 1 vecs : 102 chs MEG active
+	# 2 : PCA-v2 : 1 vecs : 102 chs MEG active
+	# 3 : PCA-v3 : 1 vecs : 102 chs MEG active
+	# 4 : Average EEG reference : 1 vecs : 60 chs EEG active
+Final projection operator is:
+	# 1 : PCA-v1 : 1 vecs : 102 chs MEG active
+	# 2 : PCA-v2 : 1 vecs : 102 chs MEG active
+	# 3 : PCA-v3 : 1 vecs : 102 chs MEG active
+	# 4 : Average EEG reference : 1 vecs : 60 chs EEG active
+Using standard noise values (MEG grad :    5.0 fT/cm MEG mag :   20.0 fT EEG :    0.2 uV)
+
+Picked appropriate channels from the noise-covariance matrix.
+Projection applied to the covariance matrix.
+Decomposing the noise covariance...
+Decomposition not needed for a diagonal covariance matrix.
+
+---- Reading data...
+
+Reading /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif ...
+
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =       0.00 ...       1.66 ms (Left Auditory)
+
+		nave = 1 - aspect type = 100
+
+
+	Preprocessing...
+
+	305 channels remain after picking
+
+	No projector specified for these data.
+
+	No baseline correction applied
+
+	Measurement file id: 1.3 0x200000 Sat Oct 24 14:09:21 2026
+
+	Data time range:      0.0 ...      1.7 ms
+
+	Using MEG <-> head transform from the present data set
+
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+	Loaded projection from /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif:
+
+		# 1 : PCA-v1 : 1 vecs : 102 chs MEG active
+		# 2 : PCA-v2 : 1 vecs : 102 chs MEG active
+		# 3 : PCA-v3 : 1 vecs : 102 chs MEG active
+		# 4 : Average EEG reference : 1 vecs : 60 chs EEG active
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif...
+	0 bad channels read from /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif
+
+	Loaded dataset Left Auditory from /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif
+	No baseline setting in effect.
+	Read data set 1 from /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/synthetic-ave.fif : 305 MEG and 0 EEG
+
+---- Computing the forward solution for the guesses...
+
+Making a spherical guess space with radius    80.0 mm...
+Creating tag directory for resources/general/surf2bem/icos.fif...
+	Triangle 
+and vertex 
+normals and neighboring triangles...
+[done]
+
+	Vertex neighbors...
+[done]
+
+	Distances between neighboring vertices...
+[3840 distances done]
+
+Filtering (grid =     10 mm)...
+FsSurface CM = (   0.0   -0.0   40.0) mm
+
+FsSurface fits inside a sphere with radius   80.0 mm
+
+FsSurface extent:
+	x =  -80.0 ...   80.0 mm
+	y =  -80.0 ...   80.0 mm
+	z =  -40.0 ...  120.0 mm
+
+Grid extent:
+	x =  -90.0 ...   90.0 mm
+	y =  -90.0 ...   90.0 mm
+	z =  -50.0 ...  130.0 mm
+
+6859 sources before omitting any.
+
+2079 sources after omitting infeasible sources.
+
+Source spaces are in 
+MRI coordinates.
+
+Checking that the sources are inside the bounding surface 
+ (will take a few...)
+
+6 source space points omitted because they are outside the inner skull surface.
+
+Thank you for waiting.
+
+2073 sources remaining after excluding the sources outside the surface and less than    0.0 mm inside.
+
+Adjusting the neighborhood info...
+[done]
+
+Guess locations are now in head coordinates.
+
+Go through all guess source locations...
+[done 2073 sources]
+
+
+---- Fitting :     0.0 ...     1.7 ms (step:    1.7 ms integ:    0.0 ms)
+
+[done]
+1 dipoles fitted
+Save 1 dipoles in dip format to /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/fit.dip
+
+Read 1 dipoles in dip format from /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_inv_dipole_fit-tzjCHZ/fit.dip
+
+  ok   InvDipoleFitSettings/InvDipoleFit/InvEcdSet: the pipeline fit matches mne.fit_dipole and round-trips through .dip
+All dipole fit checks passed.

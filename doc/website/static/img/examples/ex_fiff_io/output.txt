@@ -1,0 +1,43 @@
+---------------------- Fiff data read summary ---------------------- 
+fiff data contains
+1 raw data sets
+0 evoked sets
+
+Opening fiff data resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+Line frequency is not defined
+
+	Read a total of 3 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+Opening raw data resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+Line frequency is not defined
+
+	Read a total of 3 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+	Range : 25800 ... 192599  =     42.956 ...   320.670 secs
+Ready.
+Finished reading raw data!
+
+------------------------ Writing fiff data ------------------------
+
+Writing set with index 0 to file resources/data/MNE-sample-data/MEG/sample/sample_write/sample_out_raw-0.fif ...
+
+Cannot write to resources/data/MNE-sample-data/MEG/sample/sample_write/sample_out_raw-0.fif
+
+
+Finished Writing 1 raw data sets!

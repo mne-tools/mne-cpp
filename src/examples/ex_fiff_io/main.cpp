@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         qDebug() << "Could not read raw segment.";
     }
 
-    return a.exec();
+    return 0;
 }
 
 //=============================================================================================================

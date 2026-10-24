@@ -176,11 +176,7 @@ void TFplot::calc_plot(Eigen::MatrixXd tf_matrix,
     QGraphicsView* view = new QGraphicsView();
     view->setObjectName("tf_view");
     view->setScene(tf_scene);
-    QLinearGradient lgrad(tf_scene->sceneRect().topLeft(), tf_scene->sceneRect().bottomRight());
-    lgrad.setColorAt(0.0, Qt::white);
-    lgrad.setColorAt(1.0, Qt::lightGray);
-
-    tf_scene->setBackgroundBrush(lgrad); //Qt::white);
+    tf_scene->setBackgroundBrush(Qt::white);
 
     //setup x-axis
     QGraphicsTextItem* x_axis_name = new QGraphicsTextItem("time [sec]", tf_pixmap);

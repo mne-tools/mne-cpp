@@ -24,11 +24,14 @@
 #include <mne/mne.h>
 #include <utils/generics/mne_logger.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/lineplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
 
@@ -36,9 +39,43 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
+
+//=============================================================================================================
+// DEFINE GLOBAL METHODS
+//=============================================================================================================
+
+namespace
+{
+
+/** Writes a butterfly plot of the channels of @p evoked of @p kind measured in @p unit, scaled by @p scale. */
+void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, const QString& name, const QString& yLabel, const QColor& color)
+{
+    QVector<double> times(evoked.times.size());
+    for (int s = 0; s < times.size(); ++s) {
+        times[s] = 1000.0 * evoked.times(s);
+    }
+    LinePlot plot;
+    plot.setTitle(QString("%1 (%2 epochs)").arg(evoked.comment).arg(evoked.nave));
+    plot.setXLabel("Time [ms]");
+    plot.setYLabel(yLabel);
+    for (int c = 0; c < evoked.data.rows(); ++c) {
+        if (evoked.info.chs[c].kind != kind || evoked.info.chs[c].unit != unit || evoked.info.bads.contains(evoked.info.ch_names[c])) {
+            continue;
+        }
+        QVector<double> values(times.size());
+        for (int s = 0; s < times.size(); ++s) {
+            values[s] = scale * evoked.data(c, s);
+        }
+        plot.addSeries(times, values, QString(), color);
+    }
+    FigureExporter::save(plot, name, QString("%1 of the '%2' response: one line per channel, baseline-corrected, bad channels excluded.").arg(yLabel.section(' ', 0, 0), evoked.comment));
+}
+
+} // namespace
 
 //=============================================================================================================
 // MAIN
@@ -56,7 +93,7 @@ using namespace UTILSLIB;
 int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -106,7 +143,19 @@ int main(int argc, char* argv[])
     //N.B. If a nonstandard (in MNE sense) coil def file is used, do
     //ToDo: MATLAB root fct mne_load_coil_def, mne_add_coil_defs needs to be implemented
 
-    return a.exec();
+    std::cout << "Condition '" << p_FiffEvoked.comment.toStdString() << "': " << p_FiffEvoked.nave << " epochs, "
+              << p_FiffEvoked.info.nchan << " channels, " << p_FiffEvoked.times.size() << " samples from "
+              << p_FiffEvoked.times(0) << " s to " << p_FiffEvoked.times(p_FiffEvoked.times.size() - 1) << " s" << std::endl;
+
+    // Plot a copy corrected over the prestimulus interval, as mne.Evoked.plot shows it
+    FiffEvoked corrected(p_FiffEvoked);
+    QPair<float, float> baseline(p_FiffEvoked.times(0), 0.0f);
+    corrected.applyBaselineCorrection(baseline);
+    saveButterfly(corrected, FIFFV_EEG_CH, FIFF_UNIT_V, 1e6, "eeg", "EEG [µV]", QColor(150, 40, 40, 90));
+    saveButterfly(corrected, FIFFV_MEG_CH, FIFF_UNIT_T_M, 1e13, "gradiometers", "Gradiometers [fT/cm]", QColor(30, 60, 110, 70));
+    saveButterfly(corrected, FIFFV_MEG_CH, FIFF_UNIT_T, 1e15, "magnetometers", "Magnetometers [fT]", QColor(30, 110, 70, 90));
+
+    return 0;
 }
 
 //=============================================================================================================

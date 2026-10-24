@@ -1,0 +1,10 @@
+ok   CSP log-power features separate 40 of 40 epochs
+  ok   SPoC power follows log(target): |r| 0.995637 > 0.9
+  ok   SSD component 0 recovers the 10 Hz source: |r| 0.991483 > 0.9
+component 0 eog confidence 0.970832
+component 1 ecg confidence 0.940644
+component 2 muscle confidence 0.99956
+component 3 brain confidence 0.974132
+  ok   ICA labels: EOG, ECG, muscle, brain
+  ok   components 0-2 are rejected
+All decoding checks passed.

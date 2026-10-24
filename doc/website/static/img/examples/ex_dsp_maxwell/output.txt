@@ -1,0 +1,24 @@
+Opening raw data resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+		Average EEG reference (1 x 60) idle
+
+	Range : 12900 ... 18906  =     42.956 ...    62.955 secs
+Ready.
+  ok   SSS keeps the inside dipole (error 0.00052) and removes the uniform field (residual 6.97e-13)
+[findBadChannelsMaxwell] Detected 3 bad channel(s) out of 306 MEG channels.
+  ok   findBadChannelsMaxwell ranks MEG0423 worst (z = 151), flagged: MEG0422, MEG0423, MEG0421
+  ok   MaxwellMovementComp without movement equals SSS; head positions round-trip
+  ok   FineCalibration round-trips a magnetometer line
+  ok   filterChpi keeps 10 Hz (1.000) and removes the 83 Hz coil (-0.000)
+All dsp Maxwell checks passed.

@@ -27,11 +27,14 @@
 
 #include <utils/generics/mne_logger.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/lineplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
 
@@ -39,6 +42,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
@@ -64,7 +68,7 @@ int main(int argc, char* argv[])
 #endif
 
     qInstallMessageHandler(MNELogger::customLogWriter);
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -93,8 +97,8 @@ int main(int argc, char* argv[])
 
     qint32 event = parser.value(evokedIdxOption).toInt();
     QString t_sEventName = parser.value(eventsFileOption);
-    float fTMin = -1.5f;
-    float fTMax = 1.5f;
+    float fTMin = -0.2f;
+    float fTMax = 0.5f;
 
     bool keep_comp = false;
     if (parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
@@ -153,12 +157,36 @@ int main(int argc, char* argv[])
                                                          fTMin,
                                                          fTMax,
                                                          event,
-                                                         false,
-                                                         0.0f,
+                                                         true,
+                                                         fTMin,
                                                          0.0f,
                                                          mapReject,
                                                          QStringList(),
                                                          picks);
+
+    qInfo().noquote() << QString("Averaged %1 epochs of event %2 over %3 channels and %4 samples.")
+                             .arg(evoked.nave).arg(event).arg(evoked.data.rows()).arg(evoked.data.cols());
+
+    // Butterfly plot of the gradiometers in fT/cm against time in ms
+    QVector<double> times(evoked.times.size());
+    for (int s = 0; s < times.size(); ++s) {
+        times[s] = 1000.0 * evoked.times(s);
+    }
+    LinePlot butterfly;
+    butterfly.setTitle(QString("Evoked response to event %1 (%2 epochs)").arg(event).arg(evoked.nave));
+    butterfly.setXLabel("Time [ms]");
+    butterfly.setYLabel("Gradiometers [fT/cm]");
+    for (int c = 0; c < evoked.data.rows(); ++c) {
+        if (evoked.info.chs[c].unit == FIFF_UNIT_T_M && !evoked.info.bads.contains(evoked.info.ch_names[c])) {
+            QVector<double> values(times.size());
+            for (int s = 0; s < times.size(); ++s) {
+                values[s] = 1e13 * evoked.data(c, s);
+            }
+            butterfly.addSeries(times, values, QString(), QColor(30, 60, 110, 70));
+        }
+    }
+    FigureExporter::save(butterfly, "evoked", QString("Butterfly plot of the %1 good gradiometers averaged over %2 epochs of event %3, baseline-corrected over the prestimulus interval.")
+                                                   .arg(butterfly.seriesCount()).arg(evoked.nave).arg(event));
 
     return 0;
 }

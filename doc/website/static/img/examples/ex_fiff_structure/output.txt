@@ -1,0 +1,51 @@
+Opening raw data resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+		Average EEG reference (1 x 60) idle
+
+	Range : 12900 ... 18906  =     42.956 ...    62.955 secs
+Ready.
+  ok   FiffEpochs/FiffEpochData: 13 fixed-length epochs like mne.make_fixed_length_epochs, averaged over 13
+  ok   FiffRawDir/FiffDirEntry: 2 data buffers cover the 6007 samples from sample 12900
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+  ok   FiffDirEntry/FiffTime: the 640 tags of mne fiff_open plus the end entry; the file id was written at 1411146352 s
+  ok   FiffDataRef: 24-byte record with 64-bit size and offset
+Opening raw data src/examples/ex_fiff_structure/../../testframes/test_mne_ctf_comp_python/data/ctf_grade0_raw.fif...
+
+Creating tag directory for src/examples/ex_fiff_structure/../../testframes/test_mne_ctf_comp_python/data/ctf_grade0_raw.fif...
+Line frequency is not defined
+
+	Read 5 compensation matrices
+
+	Range : 0 ... 20  =      0.000 ...     0.042 secs
+Ready.
+  ok   FiffCtfComp: 5 compensation grades; the grade-1 compensator matches mne make_compensator
+Opening raw data /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fiff_structure-Awzpwo/shared/realtime_file0_raw.fif...
+
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fiff_structure-Awzpwo/shared/realtime_file0_raw.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+		Average EEG reference (1 x 60) idle
+
+	Range : 12900 ... 18906  =     42.956 ...    62.955 secs
+Ready.
+  ok   FiffFileSharer: the copied recording arrives at the watcher and reads back with all 6007 samples
+All fiff structure checks passed.

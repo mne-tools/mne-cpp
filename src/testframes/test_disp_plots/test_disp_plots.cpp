@@ -17,6 +17,7 @@
 //=============================================================================================================
 
 #include <disp/plots/helpers/colormap.h>
+#include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
 #include <disp/plots/imagesc.h>
 #include <disp/plots/plot.h>
@@ -37,6 +38,9 @@
 #include <QVector>
 #include <QVector3D>
 #include <QSignalSpy>
+#include <QFileInfo>
+#include <QImageReader>
+#include <QTemporaryDir>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -79,6 +83,10 @@ private slots:
     void testLinePlotWithXYData();
     void testLinePlotUpdateData();
     void testLinePlotSetLabels();
+    void testLinePlotAddSeries();
+
+    // ── FigureExporter ──────────────────────────────────────────────────────────────
+    void testFigureExporter();
 
     // ── Graph base class ──────────────────────────────────────────────
     void testGraphInit();
@@ -334,23 +342,33 @@ void TestDispPlots::testLinePlotUpdateData()
     QVector<double> y2 = {0.0, 1.0, 4.0, 9.0};
     plot.updateData(x2, y2);
 
-    // The curve spans the plot area: (0, 0) at the bottom-left, (3, 9) at the top-right corner
-    plot.resize(280, 175);
+    // The curve rises from (0, 0) at the bottom-left of its extent to (3, 9) at the top-right
+    plot.resize(400, 300);
     const QImage image = plot.grab().toImage();
-    const auto isCurve = [&image](int x, int y) {
-        for (int dy = -2; dy <= 2; ++dy) {
-            const QColor c = image.pixelColor(x, y + dy);
+    QRect extent;
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            const QColor c = image.pixelColor(x, y);
             if (c.blue() > c.red() + 60) {
-                return true;
+                extent |= QRect(x, y, 1, 1);
             }
         }
-        return false;
+    }
+    QVERIFY(extent.width() > 250 && extent.height() > 150);
+    const auto curveY = [&image](int x) {
+        for (int y = 0; y < image.height(); ++y) {
+            const QColor c = image.pixelColor(x, y);
+            if (c.blue() > c.red() + 60) {
+                return y;
+            }
+        }
+        return -1;
     };
-    // Plot area: left 60, right 20, top 35, bottom 40
-    QVERIFY(isCurve(61, 175 - 40 - 1));
-    QVERIFY(isCurve(280 - 20 - 1, 35 + 1));
+    QVERIFY(curveY(extent.left() + 1) > extent.bottom() - 4);
+    QVERIFY(curveY(extent.right() - 1) < extent.top() + 4);
     // y = x^2: at x = 2 the curve is at 4/9 of the height
-    QVERIFY(isCurve(60 + 200 * 2 / 3, 35 + 100 - 100 * 4 / 9));
+    const int mid = curveY(extent.left() + extent.width() * 2 / 3);
+    QVERIFY(qAbs(extent.bottom() - mid - extent.height() * 4 / 9) <= 4);
 
     // A constant series is drawn instead of dividing by a zero range
     plot.updateData(QVector<double>{5.0, 5.0, 5.0});
@@ -369,6 +387,92 @@ void TestDispPlots::testLinePlotSetLabels()
     plot.setXLabel("X Axis");
     plot.setYLabel("Y Axis");
     QVERIFY(plot.grab().toImage() != plain);
+}
+
+//=============================================================================================================
+
+void TestDispPlots::testLinePlotAddSeries()
+{
+    LinePlot plot;
+    plot.resize(400, 300);
+    plot.addSeries({0.0, 0.5}, {0.0, 0.5}, QString(), QColor(255, 0, 0));
+    plot.addSeries({0.0, 1.0}, {1.0, 0.0}, "falling", QColor(0, 0, 255));
+    QCOMPARE(plot.seriesCount(), 2);
+    const auto count = [](const QImage& image, QRgb color) {
+        int n = 0;
+        for (int y = 0; y < image.height(); ++y) {
+            for (int x = 0; x < image.width(); ++x) {
+                const QColor c = image.pixelColor(x, y);
+                n += qAbs(c.red() - qRed(color)) < 60 && qAbs(c.green() - qGreen(color)) < 60 && qAbs(c.blue() - qBlue(color)) < 60;
+            }
+        }
+        return n;
+    };
+    const QImage image = plot.grab().toImage();
+    QVERIFY(count(image, qRgb(0, 0, 255)) > 250);
+    QVERIFY(count(image, qRgb(255, 0, 0)) > 120);
+
+    // Only the labelled series gets a legend swatch, in the free top-right corner
+    LinePlot unlabelled;
+    unlabelled.resize(400, 300);
+    unlabelled.addSeries({0.0, 0.5}, {0.0, 0.5}, QString(), QColor(255, 0, 0));
+    unlabelled.addSeries({0.0, 1.0}, {1.0, 0.0}, QString(), QColor(0, 0, 255));
+    QVERIFY(count(image, qRgb(0, 0, 255)) > count(unlabelled.grab().toImage(), qRgb(0, 0, 255)) + 10);
+
+    // A series that crosses every corner pushes the legend out to the right of the axes
+    const auto frameRight = [](const QImage& frame) {
+        for (int x = frame.width() - 1; x >= 0; --x) {
+            int run = 0;
+            for (int y = 0; y < frame.height(); ++y) {
+                const QColor c = frame.pixelColor(x, y);
+                run += c.red() == c.green() && c.green() == c.blue() && c.red() < 200;
+            }
+            if (run > frame.height() / 2) {
+                return x;
+            }
+        }
+        return -1;
+    };
+    QVector<double> x(200);
+    QVector<double> zigzag(200);
+    for (int i = 0; i < 200; ++i) {
+        x[i] = i;
+        zigzag[i] = i % 2;
+    }
+    LinePlot crowded;
+    crowded.resize(400, 300);
+    crowded.addSeries(x, zigzag);
+    const int inside = frameRight(crowded.grab().toImage());
+    crowded.addSeries(x, zigzag, "zigzag");
+    QVERIFY(frameRight(crowded.grab().toImage()) < inside - 40);
+
+    plot.updateData(QVector<double>{1.0, 2.0});
+    QCOMPARE(plot.seriesCount(), 1);
+}
+
+//=============================================================================================================
+
+void TestDispPlots::testFigureExporter()
+{
+    LinePlot plot(QVector<double>{0.0, 1.0}, QVector<double>{0.0, 1.0}, "ramp");
+    qunsetenv("MNE_CPP_FIGURE_DIR");
+    QVERIFY(FigureExporter::save(plot, "ramp", "A ramp").isEmpty());
+
+    QTemporaryDir dir;
+    qputenv("MNE_CPP_FIGURE_DIR", QFile::encodeName(dir.filePath("figures")));
+    const QString first = FigureExporter::save(plot, "ramp", "A ramp \u00b5V", QSize(320, 200));
+    QImage plain(10, 10, QImage::Format_RGB32);
+    plain.fill(Qt::white);
+    const QString second = FigureExporter::save(plain, "a b/c", "Plain");
+    qunsetenv("MNE_CPP_FIGURE_DIR");
+
+    QCOMPARE(QFileInfo(first).fileName(), QString("01_ramp.png"));
+    QCOMPARE(QFileInfo(second).fileName(), QString("02_a_b_c.png"));
+    QImageReader reader(first);
+    QCOMPARE(reader.text("Description"), QString("A ramp \u00b5V"));
+    const QImage image = reader.read();
+    QCOMPARE(image.size(), QSize(640, 400));
+    QVERIFY(plot.isHidden());
 }
 
 //=============================================================================================================

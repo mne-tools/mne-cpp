@@ -1,0 +1,11 @@
+ok   ECG: 12 beats, first at sample 100 (12 beats every 200 samples from 100)
+  ok   EOG: 3 blinks, second at sample 1125 (3 blinks around 325, 1125, 1925)
+  ok   BadChannelDetect: flat 2, bad 4 (flat 2, noisy 5)
+  ok   LOF scores = sklearn (far point 44.4779); 0 EEG channel(s) flagged
+  ok   bridged electrodes: 1 pair(s), first 6-7 (6-7)
+  ok   EOG regression: beta 0.404152 (0.4), blink on EEG0 8.26491e-05 -> -3.08556e-06 V
+  ok   average reference: EEG sums to zero, ECG unchanged
+  ok   stimulus artefact replaced by linear interpolation (max deviation 2.5411e-21 V)
+  ok   annotateAmplitude: 1 flat span(s), bad EEG2
+  ok   annotateMusclZscore marks 1 EMG burst(s), first at 1.563 s for 0.875 s (mne: 1.563 s, 0.875 s)
+All dsp artifact checks passed.

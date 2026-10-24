@@ -22,6 +22,7 @@
 #include <utils/generics/mne_logger.h>
 
 #include <disp/plots/tfplot.h>
+#include <disp/plots/helpers/figureexporter.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -80,6 +81,10 @@ int main(int argc, char* argv[])
     MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
 
     TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 1, 50, ColorMaps::Jet);
+    FigureExporter::save(tfplot, "spectrogram", QString("Spectrogram (1-50 Hz) of %1 in the '%2' evoked response.").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));
+    if (!FigureExporter::directory().isEmpty()) {
+        return 0;
+    }
     tfplot.show();
 
     return a.exec();

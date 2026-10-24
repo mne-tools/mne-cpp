@@ -18,17 +18,21 @@
 
 #include <iostream>
 #include <vector>
-#include <math.h>
+#include <algorithm>
+#include <cmath>
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <utils/generics/mne_logger.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/lineplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
 
@@ -36,6 +40,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
@@ -58,7 +63,7 @@ using namespace Eigen;
 int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -185,6 +190,34 @@ int main(int argc, char* argv[])
     qInfo("Read %d samples.\n", (qint32)data.cols());
 
     std::cout << data.block(0, 0, 10, 10) << std::endl;
+
+    // Six gradiometers in fT/cm, stacked six standard deviations apart
+    QVector<int> grads;
+    for (int c = 0; c < data.rows() && grads.size() < 6; ++c) {
+        if (raw.info.chs[picks(c)].unit == FIFF_UNIT_T_M) {
+            grads.append(c);
+        }
+    }
+    double spread = 0.0;
+    for (int c : grads) {
+        const RowVectorXd row = 1e13 * data.row(c);
+        spread = std::max(spread, std::sqrt((row.array() - row.mean()).square().mean()));
+    }
+    LinePlot traces;
+    traces.setTitle(QString("Raw MEG from %1 s to %2 s").arg(from).arg(to));
+    traces.setXLabel("Time [s]");
+    traces.setYLabel("Gradiometers [fT/cm], offset");
+    const QVector<double> seconds(times.data(), times.data() + times.size());
+    for (int i = 0; i < grads.size(); ++i) {
+        const int c = grads[i];
+        const double mean = 1e13 * data.row(c).mean();
+        QVector<double> values(data.cols());
+        for (int s = 0; s < data.cols(); ++s) {
+            values[s] = 1e13 * data(c, s) - mean - 6.0 * spread * i;
+        }
+        traces.addSeries(seconds, values, raw.info.ch_names[picks(c)]);
+    }
+    FigureExporter::save(traces, "raw", "The first six gradiometers of the segment with the SSP projectors applied.", QSize(800, 520));
 
     return 0;
 }

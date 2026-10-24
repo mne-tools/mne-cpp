@@ -1,0 +1,63 @@
+------------ Fiff Sniffer ------------
+Input file : resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif
+Num. raw dat sets: 1
+Num. evoked sets: 0
+--- 
+Raw Set 0
+Sample frequency: 600.615
+LineFreq: -1 | Highpass: 0.1 | Lowpass: 172.176
+First sample: 25800 | Last sample: 192599
+Number of samples: 166799 | Time: 277.714 sec. 
+Number of digitizer points: 146
+HPI Point 1 - 0.0329227, 0.0989798, 0.0798433
+HPI Point 2 - -0.0699811, 0.0677165, 0.0688845
+HPI Point 3 - -0.0726083, -0.0208683, 0.0971474
+HPI Point 4 - 0.0499686, -0.00723305, 0.12289
+--- 
+--------------------------------------
+Digitizer data found.
+Number of digitizer points: 146
+HPI Point 1 - 0.0329227, 0.0989798, 0.0798433
+HPI Point 2 - -0.0699811, 0.0677165, 0.0688845
+HPI Point 3 - -0.0726083, -0.0208683, 0.0971474
+HPI Point 4 - 0.0499686, -0.00723305, 0.12289
+Creating tag directory for TCPSocket...
+Line frequency is not defined
+
+	Read a total of 3 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+Opening fiff data resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+Line frequency is not defined
+
+	Read a total of 3 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+Opening raw data resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+Line frequency is not defined
+
+	Read a total of 3 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+	Range : 25800 ... 192599  =     42.956 ...   320.670 secs
+Ready.
+Finished reading raw data!

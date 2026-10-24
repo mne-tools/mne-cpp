@@ -5,7 +5,7 @@
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
 cmake_minimum_required(VERSION 3.14)
-project(ex_fiff LANGUAGES CXX)
+project(ex_fiff_io LANGUAGES CXX)
 
 #Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
@@ -51,9 +51,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
-    MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
-    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE FALSE
+    WIN32_EXECUTABLE FALSE
 )
 
 install(TARGETS ${PROJECT_NAME}

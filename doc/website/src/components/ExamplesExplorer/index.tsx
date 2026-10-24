@@ -8,6 +8,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import { useHistory, useLocation } from '@docusaurus/router';
 import { examples, facets, libraries, topics, type Example } from '../knowledge';
 import styles from './styles.module.css';
@@ -25,7 +26,7 @@ function matches(example: Example, selection: Selection, terms: string[]): boole
     if (selection.library && !example.libraries.includes(selection.library)) return false;
     if (terms.length === 0) return true;
     const topicTitles = example.topics.map((id) => topics.find((t) => t.id === id)?.title ?? '');
-    const haystack = [example.name, example.brief, ...example.libraries.map((l) => libraries[l]), ...topicTitles]
+    const haystack = [example.title, example.name, example.brief, ...example.libraries.map((l) => libraries[l]), ...topicTitles]
         .join(' ')
         .toLowerCase();
     return terms.every((term) => haystack.includes(term));
@@ -69,6 +70,31 @@ function Chips({ filter, label, options, selection, terms, onSelect }: {
     );
 }
 
+function Card({ example }: { example: Example }) {
+    const thumbnail = useBaseUrl(example.thumbnail || '/');
+    return (
+        <li className={styles.card}>
+            <Link to={example.url} className={styles.cardLink}>
+                <div className={clsx(styles.thumb, !example.thumbnail && styles.thumbEmpty)} aria-hidden="true">
+                    {example.thumbnail ? (
+                        <img src={thumbnail} alt="" loading="lazy" />
+                    ) : (
+                        <span className={styles.thumbLabel}>{libraries[example.library]}</span>
+                    )}
+                </div>
+                <div className={styles.cardBody}>
+                    <span className={styles.title}>{example.title}</span>
+                    <p className={styles.brief}>{example.brief}.</p>
+                </div>
+            </Link>
+            <div className={styles.cardFooter}>
+                <code className={styles.program}>{example.name}</code>
+                <span className={clsx('mc-tag', example.level === 'start' && 'mc-tag--teal')}>{facets.levels[example.level]}</span>
+            </div>
+        </li>
+    );
+}
+
 export default function ExamplesExplorer(): React.JSX.Element {
     const location = useLocation();
     const history = useHistory();
@@ -106,7 +132,8 @@ export default function ExamplesExplorer(): React.JSX.Element {
         () =>
             examples
                 .filter((e) => matches(e, selection, terms))
-                .sort((a, b) => LEVEL_ORDER.indexOf(a.level) - LEVEL_ORDER.indexOf(b.level) || a.name.localeCompare(b.name)),
+                .sort((a, b) => LEVEL_ORDER.indexOf(a.level) - LEVEL_ORDER.indexOf(b.level)
+                    || Number(Boolean(b.thumbnail)) - Number(Boolean(a.thumbnail)) || a.title.localeCompare(b.title)),
         [selection, terms],
     );
     const usedLibraries = useMemo(
@@ -172,22 +199,8 @@ export default function ExamplesExplorer(): React.JSX.Element {
                     </p>
                 </div>
             ) : (
-                <ul className={styles.results}>
-                    {results.map((e) => (
-                        <li key={e.name} className={styles.result}>
-                            <div className={styles.resultMain}>
-                                <Link to={e.url} className={styles.name}>{e.name}</Link>
-                                <p className={styles.brief}>{e.brief}.</p>
-                            </div>
-                            <div className={styles.resultTags}>
-                                <span className={clsx('mc-tag', e.level === 'start' && 'mc-tag--teal')}>{facets.levels[e.level]}</span>
-                                <span className="mc-tag">{libraries[e.library]}</span>
-                                {e.modalities.filter((m) => m !== 'generic').map((m) => (
-                                    <span key={m} className={clsx('mc-tag', styles.modality)}>{facets.modalities[m]}</span>
-                                ))}
-                            </div>
-                        </li>
-                    ))}
+                <ul className={styles.cards}>
+                    {results.map((e) => <Card key={e.name} example={e} />)}
                 </ul>
             )}
         </div>

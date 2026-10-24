@@ -1,0 +1,8 @@
+ok   WelchPsd: P(10 Hz) = 0.333333, P(40 Hz) = 0.0833333 match mne psd_array_welch
+  ok   FirFilter 20 Hz low-pass keeps 10 Hz (0.9998) and removes 40 Hz (0.0000)
+  ok   FirFilter::filterData = mne.filter.filter_data (y[500] = 0.000125243259843)
+  ok   peakFinder (height, distance, prominence) and peakProminences match scipy
+  ok   ConnectivityAec: r(a,b) = 0.980067, r(a,c) = -0.007012 match scipy
+  ok   SPHARA projector replaces channels 1, 3, 5 by their mean and leaves the others
+  ok   simulateStcFromWaveforms places rows on their vertices; simulateStc draws a unit Gaussian bump
+All dsp analysis checks passed.

@@ -1,0 +1,39 @@
+Reading resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif ...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif...
+	Read a total of 4 projection items:
+		PCA-v1 (1 x 102) active
+		PCA-v2 (1 x 102) active
+		PCA-v3 (1 x 102) active
+		Average EEG reference (1 x 60) active
+	Found the data of interest:
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+		nave = 55 - aspect type = 100
+
+	Preprocessing...
+	376 channels remain after picking
+	Created an SSP operator (subspace dimension = 4)
+	4 projection items activated.
+	SSP projectors applied to the evoked data
+	No baseline correction applied
+Creating tag directory for resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif...
+	Reading a BEM surface...
+	Completing triangulation info...
+Adding additional geometry info
+[done]
+	[done]
+	Reading a BEM surface...
+	Completing triangulation info...
+Adding additional geometry info
+[done]
+	[done]
+	Reading a BEM surface...
+	Completing triangulation info...
+Adding additional geometry info
+[done]
+	[done]
+	3 bem surfaces read
+Projecting duration: 1 ms 
+SCDC duration: 10 ms 
+Weight matrix duration: 6 ms 
+Real time interpol. : 0 ms 
+Line frequency is not defined

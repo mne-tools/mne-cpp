@@ -1,0 +1,55 @@
+/**
+ * SPDX-License-Identifier: BSD-3-Clause
+ * Copyright (c) 2026 MNE-CPP Authors
+ *
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ */
+
+.figures {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin: 0.5rem 0 1.5rem;
+}
+
+.single {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 52rem;
+}
+
+.figure {
+    margin: 0;
+}
+
+.frame {
+    display: block;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-lg);
+    background: #fff;
+    overflow: hidden;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.frame:hover {
+    border-color: var(--mc-border-strong);
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
+}
+
+.frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.figure figcaption {
+    margin-top: 0.55rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--mc-text-2);
+}
+
+@media (max-width: 760px) {
+    .figures {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

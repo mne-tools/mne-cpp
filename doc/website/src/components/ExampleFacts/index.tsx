@@ -9,7 +9,7 @@ import React from 'react';
 import Link from '@docusaurus/Link';
 import { exampleByName, facets } from '../knowledge';
 
-/** Level, tasks and modalities of an example, each linking to the filtered explorer. */
+/** Program name, level, tasks and modalities of an example, the facets linking to the filtered explorer. */
 export default function ExampleFacts({ name }: { name: string }): React.JSX.Element | null {
     const example = exampleByName(name);
     if (!example) {
@@ -22,6 +22,7 @@ export default function ExampleFacts({ name }: { name: string }): React.JSX.Elem
     ];
     return (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', margin: '-0.25rem 0 1.1rem' }}>
+            <code className="mc-tag" title="Program name: the build target and executable">{example.name}</code>
             {tags.map((tag) => (
                 <Link key={tag.key} to={tag.to} className={`mc-tag ${tag.tone ?? ''}`} style={{ textDecoration: 'none' }}>
                     {tag.label}

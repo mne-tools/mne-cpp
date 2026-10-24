@@ -1,0 +1,8 @@
+ok   ColorMap viridis, jet and cool match matplotlib to 1-5 levels
+  ok   Bar heights 38, 158, 78, 118 px for counts 5, 20, 10, 15
+  ok   Spline draws its curve
+  ok   LinePlot spans 193 px vertically for a full sine period
+  ok   ImageSc maps the minimum and maximum columns to the ends of viridis
+  ok   Plot renders axes and data
+  ok   TFplot draws the 20-30 Hz band in the top colour over a bottom-colour background
+All disp plot checks passed.

@@ -18,7 +18,8 @@
 //=============================================================================================================
 
 #include <math.h>
-#include <disp/plots/plot.h>
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/lineplot.h>
 #include <math/spectral.h>
 #include <utils/generics/mne_logger.h>
 #include <mne/mne.h>
@@ -80,31 +81,27 @@ int main(int argc, char* argv[])
     QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNSamples, QString("hanning"));
     MatrixXd matTaps = tapers.first;
     VectorXd vecTapWeights = tapers.second;
+    int iNfft = iNSamples;
+
+    // Frequency of every FFT bin in Hz
+    QVector<double> freqs(iNfft / 2 + 1);
+    for (int k = 0; k < freqs.size(); ++k) {
+        freqs[k] = k * dSampFreq / iNfft;
+    }
+    const auto toVector = [](const VectorXd& v) { return QVector<double>(v.data(), v.data() + v.size()); };
 
     //Plot hanning window
     VectorXd hann = matTaps.row(0).transpose();
-    Plot plotWindow(hann);
-    plotWindow.setTitle("Hanning window");
-    plotWindow.setXLabel("X Axes");
-    plotWindow.setYLabel("Y Axes");
-    plotWindow.setWindowTitle("Corresponding function to MATLABs plot");
-    plotWindow.show();
+    LinePlot plotWindow(toVector(hann), "Hanning window");
+    plotWindow.setXLabel("Sample");
+    plotWindow.setYLabel("Weight");
 
     //Compute Spectrum of first row of input data
-    int iNfft = iNSamples;
     MatrixXcd matTapSpectrumSeed = Spectral::computeTaperedSpectraRow(inputData.row(0), matTaps, iNfft);
 
     //Compute PSD
     RowVectorXd vecPsd = Spectral::psdFromTaperedSpectra(matTapSpectrumSeed, vecTapWeights, iNfft, dSampFreq);
-
-    //Plot PSD
     VectorXd psd = vecPsd.transpose();
-    Plot plotPsd(psd);
-    plotPsd.setTitle("PSD of Row 0");
-    plotPsd.setXLabel("X Axes");
-    plotPsd.setYLabel("Y Axes");
-    plotPsd.setWindowTitle("Corresponding function to MATLABs plot");
-    plotPsd.show();
 
     //Check PSD
     VectorXd psdTest = matTapSpectrumSeed.row(0).cwiseAbs2().transpose();
@@ -116,26 +113,10 @@ int main(int argc, char* argv[])
     //Normalization
     psdTest /= dSampFreq;
 
-    //Plot PSDTest
-    Plot plotPsdTest(psdTest);
-    plotPsdTest.setTitle("PSD of Row 0");
-    plotPsdTest.setXLabel("X Axes");
-    plotPsdTest.setYLabel("Y Axes");
-    plotPsdTest.setWindowTitle("Corresponding function to MATLABs plot");
-    plotPsdTest.show();
-
     //Compute CSD of matTapSpectrumSeed and matTapSpectrumSeed
     //The real part should be equivalent to the PSD of matTapSpectrumSeed)
     RowVectorXcd vecCsdSeed = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumSeed, vecTapWeights, vecTapWeights, iNfft, dSampFreq);
     VectorXd psdTest2 = vecCsdSeed.real();
-
-    //Plot PSDTest2
-    Plot plotPsdTest2(psdTest2);
-    plotPsdTest2.setTitle("PSD of Row 0");
-    plotPsdTest2.setXLabel("X Axes");
-    plotPsdTest2.setYLabel("Y Axes");
-    plotPsdTest2.setWindowTitle("Corresponding function to MATLABs plot");
-    plotPsdTest2.show();
 
     //Check that sums of different psds of the same signal are equal
     qDebug() << psd.sum();
@@ -149,14 +130,30 @@ int main(int argc, char* argv[])
 
     //Compute CSD between seed and target
     RowVectorXcd vecCsd = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumTarget, vecTapWeights, vecTapWeights, iNfft, dSampFreq);
-
-    //Plot real part of CSD
     VectorXd csd = vecCsd.transpose().real();
-    Plot plotCsd(csd);
-    plotCsd.setTitle("Real part of the CSD of Row 0 and 1");
-    plotCsd.setXLabel("X Axes");
-    plotCsd.setYLabel("Y Axes");
-    plotCsd.setWindowTitle("Corresponding function to MATLABs plot");
+
+    //Plot the PSD of row 0 computed three ways: they coincide
+    LinePlot plotPsd;
+    plotPsd.setTitle("PSD of row 0");
+    plotPsd.setXLabel("Frequency [Hz]");
+    plotPsd.setYLabel("Power spectral density");
+    plotPsd.addSeries(freqs, toVector(psd), "psdFromTaperedSpectra");
+    plotPsd.addSeries(freqs, toVector(psdTest), "|spectrum|\u00b2, one-sided");
+    plotPsd.addSeries(freqs, toVector(psdTest2), "Re csdFromTaperedSpectra(x, x)");
+
+    //Plot real part of the CSD between row 0 and 1
+    LinePlot plotCsd(freqs, toVector(csd), "Real part of the CSD of rows 0 and 1");
+    plotCsd.setXLabel("Frequency [Hz]");
+    plotCsd.setYLabel("Cross-spectral density");
+
+    FigureExporter::save(plotWindow, "hanning", "The single Hanning taper applied before the FFT.");
+    FigureExporter::save(plotPsd, "psd", "PSD of row 0 from the tapered spectrum, by hand and as the CSD of the signal with itself.");
+    FigureExporter::save(plotCsd, "csd", "Real part of the cross-spectral density of rows 0 and 1: only their shared component remains.");
+    if (!FigureExporter::directory().isEmpty()) {
+        return 0;
+    }
+    plotWindow.show();
+    plotPsd.show();
     plotCsd.show();
 
     return a.exec();

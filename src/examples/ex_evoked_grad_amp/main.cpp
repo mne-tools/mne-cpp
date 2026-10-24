@@ -203,7 +203,7 @@ int main(int argc, char* argv[])
     //Optionally write an output file
     //ToDo: implement MNE root function fiff_write_evoked
 
-    return a.exec();
+    return 0;
 }
 
 //=============================================================================================================

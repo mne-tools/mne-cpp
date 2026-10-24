@@ -1,0 +1,14 @@
+Opening raw data resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+	Read a total of 3 projection items:
+		PCA-v1 (1 x 102) idle
+		PCA-v2 (1 x 102) idle
+		PCA-v3 (1 x 102) idle
+	Range : 25800 ... 192599  =     42.956 ...   320.670 secs
+Ready.
+Channels found for layout: 204
+best fitting sphere:
+torigin: 0, 0, 0; tradius: 0
+Successfully wrote the layout file.
+Line frequency is not defined
+Maximum number of evaluations exceeded.

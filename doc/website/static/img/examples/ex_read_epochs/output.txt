@@ -1,0 +1,22 @@
+Opening raw data resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+	Read a total of 3 projection items:
+		PCA-v1 (1 x 102) idle
+		PCA-v2 (1 x 102) idle
+		PCA-v3 (1 x 102) idle
+	Range : 25800 ... 192599  =     42.956 ...   320.670 secs
+Ready.
+3 projection items activated
+Created an SSP operator (subspace dimension = 3)
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif...
+Binary event file resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif read
+[MNEEpochDataList::readEpochs] 73 matching events found
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
+[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
+[MNEEpochDataList::readEpochs] Read a total of 73 epochs of type 3 and marked 7 for rejection.
+Line frequency is not defined

@@ -1,0 +1,97 @@
+Opening raw data resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+	Read a total of 3 projection items:
+		PCA-v1 (1 x 102) idle
+		PCA-v2 (1 x 102) idle
+		PCA-v3 (1 x 102) idle
+	Range : 25800 ... 192599  =     42.956 ...   320.670 secs
+Ready.
+Filtering...Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif...
+Filtering and writing block 25800 to 27745
+Filtering and writing block 27746 to 29691
+Filtering and writing block 29692 to 31637
+Filtering and writing block 31638 to 33583
+Filtering and writing block 33584 to 35529
+Filtering and writing block 35530 to 37475
+Filtering and writing block 37476 to 39421
+Filtering and writing block 39422 to 41367
+Filtering and writing block 41368 to 43313
+Filtering and writing block 43314 to 45259
+Filtering and writing block 45260 to 47205
+Filtering and writing block 47206 to 49151
+Filtering and writing block 49152 to 51097
+Filtering and writing block 51098 to 53043
+Filtering and writing block 53044 to 54989
+Filtering and writing block 54990 to 56935
+Filtering and writing block 56936 to 58881
+Filtering and writing block 58882 to 60827
+Filtering and writing block 60828 to 62773
+Filtering and writing block 62774 to 64719
+Filtering and writing block 64720 to 66665
+Filtering and writing block 66666 to 68611
+Filtering and writing block 68612 to 70557
+Filtering and writing block 70558 to 72503
+Filtering and writing block 72504 to 74449
+Filtering and writing block 74450 to 76395
+Filtering and writing block 76396 to 78341
+Filtering and writing block 78342 to 80287
+Filtering and writing block 80288 to 82233
+Filtering and writing block 82234 to 84179
+Filtering and writing block 84180 to 86125
+Filtering and writing block 86126 to 88071
+Filtering and writing block 88072 to 90017
+Filtering and writing block 90018 to 91963
+Filtering and writing block 91964 to 93909
+Filtering and writing block 93910 to 95855
+Filtering and writing block 95856 to 97801
+Filtering and writing block 97802 to 99747
+Filtering and writing block 99748 to 101693
+Filtering and writing block 101694 to 103639
+Filtering and writing block 103640 to 105585
+Filtering and writing block 105586 to 107531
+Filtering and writing block 107532 to 109477
+Filtering and writing block 109478 to 111423
+Filtering and writing block 111424 to 113369
+Filtering and writing block 113370 to 115315
+Filtering and writing block 115316 to 117261
+Filtering and writing block 117262 to 119207
+Filtering and writing block 119208 to 121153
+Filtering and writing block 121154 to 123099
+Filtering and writing block 123100 to 125045
+Filtering and writing block 125046 to 126991
+Filtering and writing block 126992 to 128937
+Filtering and writing block 128938 to 130883
+Filtering and writing block 130884 to 132829
+Filtering and writing block 132830 to 134775
+Filtering and writing block 134776 to 136721
+Filtering and writing block 136722 to 138667
+Filtering and writing block 138668 to 140613
+Filtering and writing block 140614 to 142559
+Filtering and writing block 142560 to 144505
+Filtering and writing block 144506 to 146451
+Filtering and writing block 146452 to 148397
+Filtering and writing block 148398 to 150343
+Filtering and writing block 150344 to 152289
+Filtering and writing block 152290 to 154235
+Filtering and writing block 154236 to 156181
+Filtering and writing block 156182 to 158127
+Filtering and writing block 158128 to 160073
+Filtering and writing block 160074 to 162019
+Filtering and writing block 162020 to 163965
+Filtering and writing block 163966 to 165911
+Filtering and writing block 165912 to 167857
+Filtering and writing block 167858 to 169803
+Filtering and writing block 169804 to 171749
+Filtering and writing block 171750 to 173695
+Filtering and writing block 173696 to 175641
+Filtering and writing block 175642 to 177587
+Filtering and writing block 177588 to 179533
+Filtering and writing block 179534 to 181479
+Filtering and writing block 181480 to 183425
+Filtering and writing block 183426 to 185371
+Filtering and writing block 185372 to 187317
+Filtering and writing block 187318 to 189263
+Filtering and writing block 189264 to 191209
+Filtering and writing block 191210 to 192599
+[done]
+Line frequency is not defined

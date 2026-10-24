@@ -1,0 +1,25 @@
+WeightedPhaseLagIndex::calculate - Resetting to full spectrum
+Total 2
+Connectivity::calculateMultiMethods - Calculated QList("COH", "PLV", "WPLI") for 20 trials in 2 msecs.
+WPLI 0-1: 0.831883
+COH 0-1: 0.764147
+PLV 0-1: 0.682129
+  ok   Connectivity::calculate returns one network per method
+  ok   COH 0-1 0.764147 > 0-2 0.247097 + 0.3
+  ok   |ImCOH| 0-1 0.517693 > 0.2 (12 ms lag)
+  ok   Coherency::calculateAbs equals Coherence
+  ok   PLI 0-1 0.622222 > 0-2 0.2 + 0.3
+  ok   WPLI 0-1 0.831883 > 0-2 0.333126 + 0.3
+  ok   USPLI 0-1 0.450292 > 0-2 0.0128655 + 0.3
+  ok   DSWPLI 0-1 0.69213 > 0-2 0.0865436 + 0.3
+  ok   PLV 0-1 0.682129 > 0-2 0.226117 + 0.3
+  ok   COR 0-1 0.4214 within 0.05 of 0.42, |0-2| < 0.1
+  ok   XCOR 0-1 0.538689 > 2 x |0-2|
+  ok   MvarModel stores order 4 and evaluates H(f) at 5 frequencies
+  ok   |A_3(1,0)| 0.989627 > 0.5: channel 1 depends on channel 0 three samples back
+  ok   GC 0->1 0.998062 > 2 x 1->0 0.0223088
+  ok   DTF 0->1 0.467926 > 2 x 1->0 0.0348477
+  ok   PDC 0->1 0.674185 > 2 x 1->0 0.176825
+  ok   manual network: mirrored adjacency, one edge above 0.5
+  ok   node 1: degree 2, thresholded degree 1, strength 1.1
+All connectivity checks passed.

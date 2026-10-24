@@ -121,7 +121,14 @@ def load(root: Path, example_names: list[str]) -> Knowledge:
             errors.append(f"examples: src/examples/{name} has no entry")
         for name in sorted(entries.keys() - set(example_names)):
             errors.append(f"examples: '{name}' is not a directory in src/examples")
+        titles: dict[str, str] = {}
         for name, entry in entries.items():
+            title = entry.get("title", "").strip()
+            if not title:
+                errors.append(f"examples.{name}: no title")
+            elif title in titles:
+                errors.append(f"examples.{name}: title '{title}' is already used by {titles[title]}")
+            titles.setdefault(title, name)
             for facet, key in (("tasks", "tasks"), ("modalities", "modalities")):
                 if not entry.get(key):
                     errors.append(f"examples.{name}: no {key}")

@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/imagesc.h>
 #include <disp/plots/plot.h>
 #include <disp/plots/tfplot.h>
@@ -196,29 +197,33 @@ int main(int argc, char* argv[])
 
     printf("Read %d samples.\n", (qint32)data.cols());
 
-    //ImageSc example
+    //ImageSc example: one row per channel, one column per sample
     ImageSc imagesc(data);
-    imagesc.setTitle("Data ImageSc");
-    imagesc.setXLabel("X Axes");
-    imagesc.setYLabel("Y Axes");
-    imagesc.setColorMap("Hot"); //imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
-    imagesc.show();
+    imagesc.setTitle("MEG channels over time");
+    imagesc.setXLabel("Sample");
+    imagesc.setYLabel("Channel");
+    imagesc.setColorMap("Hot"); // also "Jet", "RedBlue", "Bone", "Viridis"
 
-    //Plot example
-    VectorXd dataCol = data.col(0);
+    //Plot example: the first channel over time
+    VectorXd dataCol = data.row(0).transpose();
     Plot plot(dataCol);
-    plot.setTitle("Data Row 0 Plot");
-    plot.setXLabel("X Axes");
-    plot.setYLabel("Y Axes");
+    plot.setTitle(raw.info.ch_names[picks(0)]);
+    plot.setXLabel("Sample");
+    plot.setYLabel("Amplitude");
     plot.setWindowTitle("Corresponding function to MATLABs plot");
-    plot.show();
 
-    //ToDo: Debug tfplot
-    //tf plot example
-    dataCol = data.row(0).transpose();
+    //tf plot example: spectrogram of the same channel
     MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
-
     TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet);
+
+    FigureExporter::save(imagesc, "image_sc", QString("ImageSc of %1 MEG channels from %2 s to %3 s.").arg(data.rows()).arg(from).arg(to));
+    FigureExporter::save(plot, "plot", QString("Plot of %1 over the same segment.").arg(raw.info.ch_names[picks(0)]));
+    FigureExporter::save(tfplot, "tf_plot", QString("TFplot: spectrogram (0-100 Hz) of %1.").arg(raw.info.ch_names[picks(0)]));
+    if (!FigureExporter::directory().isEmpty()) {
+        return 0;
+    }
+    imagesc.show();
+    plot.show();
     tfplot.show();
 
     return a.exec();

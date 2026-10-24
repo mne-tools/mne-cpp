@@ -143,5 +143,5 @@ int main(int argc, char* argv[])
     std::cout << "time\n"
               << sourceEstimate_eeg.times.block(0, 0, 1, 10) << std::endl;
 
-    return a.exec();
+    return 0;
 }

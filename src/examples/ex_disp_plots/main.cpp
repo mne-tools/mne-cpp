@@ -21,6 +21,7 @@
 #include <disp/plots/bar.h>
 #include <disp/plots/graph.h>
 #include <disp/plots/helpers/colormap.h>
+#include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/imagesc.h>
 #include <disp/plots/lineplot.h>
 #include <disp/plots/plot.h>
@@ -198,6 +199,15 @@ int main(int argc, char* argv[])
     const QImage tfImage = render(tfPlot);
     ok &= expect(countColor(tfImage, ColorMap::valueToJet(1.0), 10) > 100 && countColor(tfImage, ColorMap::valueToJet(0.0), 10) > countColor(tfImage, ColorMap::valueToJet(1.0), 10),
                  "TFplot draws the 20-30 Hz band in the top colour over a bottom-colour background");
+
+    //! [figure_export]
+    // Written only when MNE_CPP_FIGURE_DIR names a directory
+    FigureExporter::save(line, "line_plot", "LinePlot: one period of a sine wave.");
+    //! [figure_export]
+    FigureExporter::save(bar, "bar", "Bar: counts of four amplitude classes.");
+    FigureExporter::save(spline, "spline", "Spline: the same histogram as a smooth curve with three threshold markers.");
+    FigureExporter::save(image, "image_sc", "ImageSc: a left-to-right ramp in the viridis colour map.");
+    FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-30 Hz band.");
 
     qInfo().noquote() << (ok ? "All disp plot checks passed." : "disp plot checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

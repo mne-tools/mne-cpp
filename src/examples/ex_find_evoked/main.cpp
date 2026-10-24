@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     //run find_evoked function
     p_FiffEvokedSet.find_evoked(p_FiffEvokedSet);
 
-    return a.exec();
+    return 0;
 }
 
 //=============================================================================================================

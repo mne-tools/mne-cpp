@@ -1,0 +1,24 @@
+ok   GeometryInfo projects the sensors onto vertices 0 and 15; geodesic distances match scipy
+  ok   Interpolation: sensors kept, vertex 5 = 2, vertex 3 = 2.5
+  ok   ElectrodeObject: 4 contacts on one shaft, a ray through LH3 picks it
+  ok   SliceObject: the axial slice 128 spans [-128, 128] mm in x and y at z = 0
+  ok   VideoOverlay keeps the first frame and ignores the null one
+  ok   MultimodalScene bounds equal the electrode extent
+  ok   Hiding the only layer falls back to the unit cube
+  ok   MultimodalScene keeps the reported contact pick
+	computing normals
+
+  ok   BrainSurface: a downward ray hits the patch 5 cm below, nearest vertex 2
+  ok   SourceEstimateOverlay: the peak is white on Hot, sub-threshold vertices keep the cortex grey
+  ok   DipoleObject: a ray through the second dipole picks index 1 at 0.138 m
+NetworkObject: Built 3 node instances
+NetworkObject: Built 2 edge instances
+NetworkObject: Built 2 node instances
+NetworkObject: Built 1 edge instances
+  ok   NetworkObject: thresholding at 0.5 leaves one edge and its two nodes
+  ok   PolylineObject: four positions with one repeat give two segments
+  ok   MultiViewLayout: a 25 % split puts the bar at x = 200
+  ok   SensorFieldMapper: 50 fT contours, EEG map on bem_head
+QRhiWidget: QRhi is not supported on this platform.
+  ok   BrainView switches between two panes and a single view
+All disp3D scene checks passed.

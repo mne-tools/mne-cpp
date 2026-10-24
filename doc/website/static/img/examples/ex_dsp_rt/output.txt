@@ -1,0 +1,152 @@
+No projector specified for these data.
+
+	No projector specified for these data.
+
+	No projector specified for these data.
+
+	No projector specified for these data.
+
+  ok   RtAveragingWorker: 4 epochs average to 2.5 after the trigger, 0 before it
+	No projector specified for these data.
+
+	No projector specified for these data.
+
+	No projector specified for these data.
+
+	No projector specified for these data.
+
+  ok   RtAveraging delivers the 4-epoch average on the caller's thread
+	0 projection items activated.
+
+	Nothing to regularize within EEG data.
+
+	Nothing to regularize within GRAD data.
+
+	Regularize MAG: 0.050000
+
+  ok   RtCov: covariance of 4000 samples matches numpy.cov off the diagonal (4.83896e-25)
+  ok   RtNoiseWorker: 25 Hz at -9.6521 dB, 50 Hz at -29.6587 dB match scipy.signal.welch
+  ok   RtNoise emits the same spectrum from its worker thread
+Coherence::calculate - Resetting to full spectrum
+Total 0
+Connectivity::calculateMultiMethods - Calculated QList("COH") for 5 trials in 0 msecs.
+Total 0
+Connectivity::calculateMultiMethods - Calculated QList("COH") for 5 trials in 0 msecs.
+  ok   RtConnectivity equals Connectivity::calculate (coherence 0.419)
+Opening raw data resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif...
+	Range : 6600 ... 12720  =     11.000 ...    21.200 secs
+Ready.
+84 coil definitions read
+  ok   RtHpiWorker fits 4 coils (GoF >= 0.9974) like InvHpiFit
+Opening raw data resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+		Average EEG reference (1 x 60) idle
+
+	Range : 12900 ... 18906  =     42.956 ...    62.955 secs
+Ready.
+Reading forward solution from resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif...
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	Reading a source space...
+	Computing patch statistics...
+	Patch information added...
+	[done]
+
+	Completing triangulation info...
+[done]
+
+	Completing selection triangulation info...
+[done]
+
+	Completing triangle and vertex neighboring info...
+[done]
+
+	2 source spaces read
+
+MEG solution found
+EEG solution found
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read MEG forward solution (7928 sources, 306 channels, free orientations)
+FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
+
+Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available
+
+	Read EEG forward solution (7928 sources, 60 channels, free orientations)
+	MEG and EEG forward solutions combined
+	Source spaces transformed to the forward solution coordinate frame
+	Cartesian source orientations...
+[done]
+	8 projection items activated.
+
+	Regularize EEG: 0.100000
+
+	Created an SSP operator for EEG (dimension = 1).
+
+	Regularize GRAD: 0.050000
+
+	Regularize MAG: 0.050000
+
+	Created an SSP operator for MAG (dimension = 3).
+
+	306 out of 366 channels remain after picking
+	Converting to surface-based source orientations...
+	Average patch normals will be employed in the rotation to the local surface coordinates...
+[done]
+Computing inverse operator with 305 channels.
+FiffProj::make_projector - No projectors nproj=0
+
+Warning in FiffCov::prepare_noise_cov: No projections applied since no projectors specified or projector dimensions do not match!
+Setting small MEG eigenvalues to zero.
+Not doing PCA for MEG
+Creating non pca whitener.
+	Total rank is 302
+	Creating the depth weighting matrix...
+	203 planar channels
+	limit = 7616/7928 = 10.006489
+	scale = 3.15697e-08 exp = 0.8
+	Computing inverse operator with 305 channels.
+
+	Creating the source covariance matrix
+
+	Applying loose dipole orientations. Loose value of 0.200000.
+	Whitening the forward solution.
+
+	Adjusting source covariance matrix.
+
+Computing SVD of whitened and weighted lead field matrix.
+
+	largest singular value = 4.652959
+
+	scaling factor to adjust the trace = 68204494022090729715662848.000000
+
+  ok   RtInvOp builds a 305-channel operator for 7928 sources
+All dsp real-time checks passed.

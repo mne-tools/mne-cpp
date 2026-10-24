@@ -38,6 +38,7 @@ set(SOURCES
     plots/spline.cpp
     plots/lineplot.cpp
     plots/helpers/colormap.cpp
+    plots/helpers/figureexporter.cpp
     viewers/abstractview.cpp
     viewers/applytoview.cpp
     viewers/coregsettingsview.cpp
@@ -107,6 +108,7 @@ set(HEADERS
     plots/spline.h
     plots/lineplot.h
     plots/helpers/colormap.h
+    plots/helpers/figureexporter.h
     viewers/abstractview.h
     viewers/applytoview.h
     viewers/coregsettingsview.h

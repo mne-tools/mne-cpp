@@ -12,7 +12,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Concurrent Network)
+set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -38,7 +38,8 @@ set(MNE_LIBS_REQUIRED
   mne_fiff
   mne_fs
   mne_utils
-    mne_math
+  mne_math
+  mne_disp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -48,9 +49,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
-    MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
-    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE FALSE
+    WIN32_EXECUTABLE FALSE
 )
 
 install(TARGETS ${PROJECT_NAME}

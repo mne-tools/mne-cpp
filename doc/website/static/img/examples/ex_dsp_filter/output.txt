@@ -1,0 +1,8 @@
+ok   lp40 (Cosine): |H(10 Hz)| 1.00088, |H(100 Hz)| 5.34946e-05
+  ok   lp40pm (Tschebyscheff): |H(10 Hz)| 1.00109, |H(100 Hz)| 0.00099451
+  ok   CosineFilter response at 10/40/100 Hz: 1 / 0.345491 / 0
+  ok   ParksMcClellan 65 taps: |H(10 Hz)| 0.96602, |H(100 Hz)| 0.00986415
+  ok   filterData removes 100 Hz and keeps 10 Hz in phase (max error 0.00092553)
+  ok   overlap-add over 4 blocks equals the delayed 10 Hz tone (max error 0.00092553)
+  ok   FilterIO round trip keeps 256 taps (max error 4.22132e-08)
+All dsp filter checks passed.

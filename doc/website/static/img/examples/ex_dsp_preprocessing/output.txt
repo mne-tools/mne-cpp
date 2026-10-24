@@ -1,0 +1,9 @@
+ok   FastICA recovers all sources (worst |r| 0.999958)
+  ok   excluding a component removes exactly its back-projection
+  ok   Picard recovers all sources (worst |r| 0.999914)
+  ok   extended Infomax recovers the sub-Gaussian sources (worst |r| 0.999668)
+  ok   40 epochs of 126 samples; evoked peak 1.97911 on channel 0 (2.0), -0.0076733 on channel 3 (0)
+  ok   xDAWN pattern ratio ch1/ch0 0.509721 (0.5), ch2 0.00486205 (0)
+  ok   bipolar = LH1 - LH2, LH2 - LH3; average reference sums to zero
+  ok   surface Laplacian = mne compute_current_source_density (relative error 1.2143e-13)
+All dsp preprocessing checks passed.

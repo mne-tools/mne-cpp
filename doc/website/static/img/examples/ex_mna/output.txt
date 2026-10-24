@@ -1,0 +1,8 @@
+MnaRegistryLoader: Loaded 9 ops from "out/Release/resources/mna/mna-registry.json" (provider: "mne-cpp" )
+MnaRegistryLoader: Loaded 2 ops from "/var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_mna-vDYQIF/ex-registry.json" (provider: "ex_mna" )
+  ok   MnaRegistryLoader loads 2 ops; missingOps reports the unknown one
+  ok   MnaOpSchema accepts the wired node and rejects a missing required attribute; graph order source -> scale -> shift
+  ok   MnaGraphExecutor: shift::out = 6.5, then 5.5 after the binding sets gain to 5
+  ok   MnaVerification: FAIL [error]: Output is positive
+  ok   MnaIO round-trips the 3-node pipeline through .mna and .mnx
+All mna checks passed.

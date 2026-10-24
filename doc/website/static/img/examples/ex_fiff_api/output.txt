@@ -1,0 +1,413 @@
+Opening raw data resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) idle
+
+		PCA-v2 (1 x 102) idle
+
+		PCA-v3 (1 x 102) idle
+
+		Average EEG reference (1 x 60) idle
+
+	Range : 12900 ... 18906  =     42.956 ...    62.955 secs
+Ready.
+  ok   FiffInfo: 376 channels at 300.307 Hz, 2 bads, 4 projectors, 305 good MEG channels
+  ok   FiffChInfo/FiffChPos: MEG0113 is a 3012 planar gradiometer at (-0.1066, 0.0464, -0.0604) m
+  ok   FiffDigPointSet/FiffDigPoint: 146 points, LPA at x = -71.38 mm
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif...
+  ok   FiffCoordTrans: device origin maps to (-6.13, 0.06, 64.74) mm in head coordinates
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/../../subjects/sample/mri/brain-neuromag/sets/COR.fif...
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif...
+  ok   FiffCoordTransSet: head point at (36.47, -65.50, 57.83) mm MNI like mne.head_to_mni
+	4 projection items activated.
+
+  ok   FiffProj/FiffNamedMatrix: PCA-v1 is 1 x 102 and inactive until activated
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif...
+	366 x 366 full covariance (kind = 1) found.
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+  ok   FiffCov: 366 channels, 15972 degrees of freedom, C[0,0] matches mne.read_cov
+Creating tag directory for /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_fiff_api-CHvkEq/sample-eve.fif...
+  ok   FiffEvents: 25 trigger events match mne.find_events and round-trip through -eve.fif
+  ok   FiffAnnotations: events become onsets in seconds and back, with descriptions as codes
+Exploring resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found 4 datasets
+
+>> Processing Left Auditory <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+
+		nave = 55 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+>> Processing Right Auditory <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Right Auditory)
+
+		nave = 61 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+>> Processing Left visual <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left visual)
+
+		nave = 67 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+>> Processing Right visual <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Right visual)
+
+		nave = 58 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+  ok   FiffEvokedSet/FiffEvoked: 4 conditions; Left Auditory averages 55 epochs over 421 samples
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+  ok   FiffStream/FiffDirNode/FiffTag/FiffId: the FIFF_NCHAN tag of the measurement block reads 376
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif...
+  ok   FiffExplain/FiffDirNode::print: the tree of all-trans.fif lists the blocks and tags mne.io.show_fiff shows
+  ok   FiffDigitizerData moves the 3 cardinal fiducials into MRI coordinates
+  ok   FiffSparseMatrix round-trips an Eigen sparse matrix
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif...
+  ok   Fiff::open and Fiff::read_bad_channels find the same 2 bads as FiffInfo
+Opening fiff data resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+Opening raw data resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+Maxshield data found
+
+No raw data in resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif
+
+[FiffIO::read] Could not read raw data: Error during fiff setup raw read
+Exploring resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found 4 datasets
+
+>> Processing Left Auditory <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left Auditory)
+
+		nave = 55 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+>> Processing Right Auditory <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Right Auditory)
+
+		nave = 61 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+>> Processing Left visual <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Left visual)
+
+		nave = 67 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+>> Processing Right visual <<
+
+Reading resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif ...
+
+Creating tag directory for resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif...
+Line frequency is not defined
+
+	Read a total of 4 projection items:
+
+		PCA-v1 (1 x 102) active
+
+		PCA-v2 (1 x 102) active
+
+		PCA-v3 (1 x 102) active
+
+		Average EEG reference (1 x 60) active
+
+	Found the data of interest:
+
+		t =    -199.80 ...     499.49 ms (Right visual)
+
+		nave = 58 - aspect type = 100
+
+
+	Preprocessing...
+
+	376 channels remain after picking
+
+	Created an SSP operator (subspace dimension = 4)
+
+	4 projection items activated.
+
+	SSP projectors applied to the evoked data
+
+	No baseline correction applied
+
+  ok   FiffIO finds the 4 evoked sets in an -ave.fif file
+All fiff checks passed.

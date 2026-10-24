@@ -21,6 +21,7 @@ export interface ApiLink {
 
 export interface TopicExample {
     name: string;
+    title: string;
     brief: string;
     url: string;
     start: boolean;
@@ -38,7 +39,10 @@ export interface Topic {
 
 export interface Example {
     name: string;
+    title: string;
     brief: string;
+    /** First figure of the example's last run, empty when it draws none. */
+    thumbnail: string;
     url: string;
     library: string;
     libraries: string[];

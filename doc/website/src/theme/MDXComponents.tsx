@@ -9,11 +9,14 @@
 import MDXComponents from '@theme-original/MDXComponents';
 import Connections from '@site/src/components/Connections';
 import ExampleFacts from '@site/src/components/ExampleFacts';
+import { ExampleFigure, ExampleFigures } from '@site/src/components/ExampleFigures';
 import ExamplesExplorer from '@site/src/components/ExamplesExplorer';
 
 export default {
     ...MDXComponents,
     Connections,
     ExampleFacts,
+    ExampleFigure,
+    ExampleFigures,
     ExamplesExplorer,
 };

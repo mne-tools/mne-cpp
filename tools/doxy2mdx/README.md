@@ -115,3 +115,26 @@ An example-eligible class (not exempted here or by the rules in
 `tools/quality/api_evidence_policy.json`) must have an `example` and at least
 one `example_snippet`. Classes that do not yet are listed in the policy's
 `example_debt`; that list and its `ceiling` may only shrink.
+
+## Examples gallery
+
+`generate_examples.py` writes one page per `src/examples/ex_*` under
+`doc/website/docs/examples/<library>/`. Each `examples.entries` item of
+`doc/api_registry.json` carries a unique human-readable `title` (the page title
+and sidebar label; the program name appears as a tag) besides its `tasks`,
+`modalities` and `level`.
+
+Figures come from running the examples. A program writes a figure with
+`DISPLIB::FigureExporter::save(widget, name, caption)`, which does nothing
+unless `MNE_CPP_FIGURE_DIR` is set. To refresh the gallery after building the
+examples (sample data in `resources/data`):
+
+```bash
+python3 tools/doxy2mdx/run_examples.py [ex_name ...]
+python3 tools/doxy2mdx/generate_examples.py
+```
+
+`run_examples.py` stores the PNGs and the console output (`output.txt`) under
+`doc/website/static/img/examples/<name>/`; the generator embeds them as the
+page's `## Results` section and uses the first figure as the explorer
+thumbnail. These files are committed, so CI only checks the pages against them.

@@ -1,0 +1,11 @@
+ok   MlTensor: {2, 3} from Eigen, reshape shares data, matrix() maps it back
+2026-10-24 14:09:52.934 ex_ml[77266:159157584] 2026-10-24 14:09:52.934123 [W:onnxruntime:mne-cpp, telemetry_1ds.cc:600 operator()] Failed to persist telemetry device ID; using an in-memory identifier
+MlOnnxModel::load – Session created for "src/examples/ex_ml/data/affine_softmax.onnx" ( 1 inputs, 1 outputs)
+  ok   MlOnnxModel: p(task) = 0.331812, 0.997648 match NumPy; classes 'rest,task'
+[MLTrainer] Running training script: "/var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_ml-PCpHRr/train.py"
+[PythonRunner] Launching: "python3" "-u /var/folders/lk/dqv220515jx568p47_pgxkm80000gn/T/ex_ml-PCpHRr/train.py 5"
+[Python stdout] "trained on 5 epochs"
+[PythonRunner] Script finished successfully.
+[MLTrainer] Missing Python packages: "no_such_package_xyz"
+  ok   MLTrainer runs the script with its arguments and reports the missing package
+All ml checks passed.
