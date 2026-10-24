@@ -11800,7 +11800,7 @@
     }
   ],
   "parity": {
-    "$comment": "Qualitative MNE-CPP<->MNE-Python parity map. Hand-curated data (NOT generated): each record classifies one public MNE-Python API against the pinned reference. Existing C++ classes above with a 'mne_python'/'python_equiv' field are auto-counted as implemented and need NOT be repeated here; this array captures APIs realised as CLI tools/methods, partial coverage, genuine gaps (missing), and out-of-scope (not-applicable). tools/parity/gap_analysis.py extracts the pinned MNE-Python inventory, checks every symbol is classified here or in 'classes', and renders doc/release/v2.4.0/mne-python-gap.{json,md}. A record or class may add 'equivalence': 'equivalent' (or 'exceeds' with an 'exceeds' note) only when its 'test' compares with embedded MNE-Python reference values; tools/validate_api_registry.py enforces this (G6).",
+    "$comment": "Qualitative MNE-CPP<->MNE-Python parity map. Hand-curated data (NOT generated): each record classifies one public MNE-Python API against the pinned reference. Existing C++ classes above with a 'mne_python'/'python_equiv' field are auto-counted as implemented and need NOT be repeated here; this array captures APIs realised as CLI tools/methods, partial coverage, genuine gaps (missing), and out-of-scope (not-applicable). scripts/parity/gap_analysis.py extracts the pinned MNE-Python inventory, checks every symbol is classified here or in 'classes', and renders doc/release/v2.4.0/mne-python-gap.{json,md}. A record or class may add 'equivalence': 'equivalent' (or 'exceeds' with an 'exceeds' note) only when its 'test' compares with embedded MNE-Python reference values; scripts/validate_api_registry.py enforces this (G6).",
     "mne_python_pinned": "1.11",
     "status_values": [
       "implemented",
@@ -14770,7 +14770,7 @@
     }
   ],
   "topics": {
-    "$comment": "Scientific topics linking manual sections (paths relative to doc/website/docs, optional #anchor), command-line tool pages, registered classes, Class::method references and src/examples programs. tools/doxy2mdx/generate_examples.py resolves every reference and fails on unknown ones; doc/website/src/components/Connections renders them on manual, API and example pages.",
+    "$comment": "Scientific topics linking manual sections (paths relative to doc/website/docs, optional #anchor), command-line tool pages, registered classes, Class::method references and src/examples programs. scripts/doxy2mdx/generate_examples.py resolves every reference and fails on unknown ones; doc/website/src/components/Connections renders them on manual, API and example pages.",
     "entries": [
       {
         "id": "fiff-io",

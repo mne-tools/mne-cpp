@@ -6,11 +6,11 @@
 # Build the MNE-CPP API documentation from a clean state:
 #   1) Doxygen (pinned version) extracts XML from the public headers into a
 #      freshly emptied doc/xml_out/.
-#   2) tools/quality/check_doxygen_warnings.py fails on any Doxygen warning
-#      outside tools/quality/doxygen_warning_allowlist.json.
-#   3) tools/doxy2mdx/audit_registry.py fails when the XML and
+#   2) scripts/quality/check_doxygen_warnings.py fails on any Doxygen warning
+#      outside scripts/quality/doxygen_warning_allowlist.json.
+#   3) scripts/doxy2mdx/audit_registry.py fails when the XML and
 #      doc/api_registry.json disagree.
-#   4) tools/doxy2mdx/doxy2mdx.py turns XML into MDX + a sidebar fragment,
+#   4) scripts/doxy2mdx/doxy2mdx.py turns XML into MDX + a sidebar fragment,
 #      or with --check verifies the committed ones without rewriting them.
 #   5) Docusaurus builds the static site in doc/website/build/.
 #
@@ -52,23 +52,23 @@ fi
 # Doxyfile paths are relative to doc/ (INPUT=../src/libraries).
 rm -rf doc/xml_out
 ( cd doc && doxygen Doxyfile )
-python3 tools/quality/check_doxygen_warnings.py doc/xml_out/doxygen-warnings.log
-python3 tools/doxy2mdx/audit_registry.py --check --xml-dir doc/xml_out/xml
+python3 scripts/quality/check_doxygen_warnings.py doc/xml_out/doxygen-warnings.log
+python3 scripts/doxy2mdx/audit_registry.py --check --xml-dir doc/xml_out/xml
 
 if $CHECK_ONLY; then
-  python3 tools/doxy2mdx/check_generated.py --xml-dir doc/xml_out/xml
+  python3 scripts/doxy2mdx/check_generated.py --xml-dir doc/xml_out/xml
   exit 0
 fi
 # Pages of removed classes would otherwise linger; index.mdx is hand-written (check_generated.py KEEP).
 find doc/website/docs/api -type f ! -path doc/website/docs/api/index.mdx -delete
-python3 tools/doxy2mdx/doxy2mdx.py \
+python3 scripts/doxy2mdx/doxy2mdx.py \
     --xml-dir doc/xml_out/xml \
     --out-dir doc/website/docs/api \
     --registry doc/api_registry.json \
     --generate-sidebars \
     --strict
 # The gallery lists the API pages that quote each example, so it follows them.
-python3 tools/doxy2mdx/generate_examples.py
+python3 scripts/doxy2mdx/generate_examples.py
 
 if $BUILD_SITE; then
   ( cd doc/website && npm ci && npm run build )

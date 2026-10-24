@@ -1,5 +1,5 @@
 # One canonical identity per contributor, used by git shortlog/log and by
-# tools/generate_contributors.py for the website. Names follow the Zenodo
+# scripts/generate_contributors.py for the website. Names follow the Zenodo
 # record (10.5281/zenodo.593102) and the contributors' GitHub profiles.
 
 Christoph Dinh <christoph.dinh@mne-cpp.org> <chdinh@nmr.mgh.harvard.edu>

@@ -104,7 +104,7 @@ jobs:
         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         APPLE_INSTALLER_CERT_BASE64: ${{ secrets.APPLE_INSTALLER_CERT_BASE64 }}
         APPLE_INSTALLER_CERT_PASSWORD: ${{ secrets.APPLE_INSTALLER_CERT_PASSWORD }}
-      run: python3 tools/release/macos_signing.py check-credentials --mode production
+      run: python3 scripts/release/macos_signing.py check-credentials --mode production
     - name: Import Apple Developer ID certificate
       if: startsWith(github.ref, 'refs/tags/') && vars.MACOS_SIGNING != 'unavailable'
       uses: ./.github/actions/macos-codesign-setup
@@ -144,7 +144,7 @@ jobs:
         fi
     - name: Notarization accepted by Apple
       if: env.MACOS_SIGNING_MODE != ''
-      run: python3 tools/release/macos_signing.py require-production-evidence macos-notarization-dynamic.json
+      run: python3 scripts/release/macos_signing.py require-production-evidence macos-notarization-dynamic.json
     - name: Upload release binaries
       if: steps.release-info.outputs.should_upload == 'true'
       env:
@@ -157,7 +157,7 @@ jobs:
         if [ -f mne-cpp-macos-dynamic-arm64.dmg ]; then
           cp mne-cpp-macos-dynamic-arm64.dmg "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg"
           gh release upload "${{ steps.release-info.outputs.tag }}" "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg" --clobber
-          python3 tools/release/artifact_evidence.py inspect "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg" --out evidence-macos-dynamic.json
+          python3 scripts/release/artifact_evidence.py inspect "${{ steps.release-info.outputs.prefix }}-macos-dynamic-arm64.dmg" --out evidence-macos-dynamic.json
         else
           echo "No .dmg artefact present; uploading tarball only."
         fi

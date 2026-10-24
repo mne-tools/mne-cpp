@@ -20,7 +20,7 @@ from scipy.sparse import csc_array, csr_array
 from mne._fiff.constants import FIFF
 from mne._fiff.write import _write, start_and_end_file, write_complex64, write_complex_float_matrix, write_dau_pack16, write_double, write_double_matrix, write_float_sparse, write_julian
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "scripts" / "parity"))
 from reference import require_reference  # noqa: E402
 
 require_reference()

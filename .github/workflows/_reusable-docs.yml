@@ -62,7 +62,7 @@ jobs:
         sudo install -m 755 doxygen-1.16.1/bin/doxygen /usr/local/bin/doxygen
 
     - name: Generate contributor data
-      run: python3 tools/generate_contributors.py
+      run: python3 scripts/generate_contributors.py
 
     - name: Download documentation screenshots
       uses: actions/download-artifact@v8

@@ -3,7 +3,7 @@
 #   Christoph Dinh <christoph.dinh@mne-cpp.org>
 #
 # Doxyfile — Doxygen configuration for the mne-cpp public C++ API.
-# Generates XML consumed by tools/doxy2mdx/doxy2mdx.py to produce
+# Generates XML consumed by scripts/doxy2mdx/doxy2mdx.py to produce
 # Docusaurus MDX pages (one per registered class). HTML/LaTeX output
 # is intentionally disabled; the XML AST is the contract.
 #
@@ -43,8 +43,8 @@ HIDE_UNDOC_CLASSES     = YES
 
 # ---------------------------------------------------------------------------
 # Warnings (gate G3). Every warning goes to WARN_LOGFILE, and
-# tools/quality/check_doxygen_warnings.py fails on any that is not in the
-# shrink-only tools/quality/doxygen_warning_allowlist.json. Doxygen itself
+# scripts/quality/check_doxygen_warnings.py fails on any that is not in the
+# shrink-only scripts/quality/doxygen_warning_allowlist.json. Doxygen itself
 # does not fail, so the whole list is reported in one run.
 # ---------------------------------------------------------------------------
 WARNINGS               = YES

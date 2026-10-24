@@ -78,7 +78,7 @@ interface PlatformDef {
     match: (name: string) => boolean;
 }
 
-/** Release and dev_build assets share these suffixes (tools/release/verify_release.py REQUIRED). */
+/** Release and dev_build assets share these suffixes (scripts/release/verify_release.py REQUIRED). */
 const asset = (label: string, suffix: string): PlatformDef => ({ label, match: (n) => n.endsWith(suffix) });
 
 const INSTALLER_PLATFORMS: PlatformDef[] = [

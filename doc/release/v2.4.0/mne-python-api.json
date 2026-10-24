@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_by": "tools/parity/extract_mne_python_api.py",
+  "generated_by": "scripts/parity/extract_mne_python_api.py",
   "mne_python": "1.11.0",
   "mne_python_pinned": "1.11",
   "namespaces": [

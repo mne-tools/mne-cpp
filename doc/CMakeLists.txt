@@ -4,7 +4,7 @@
 #
 # doc/CMakeLists.txt — wires the `mne_cpp_docs_api` custom target which runs
 # Doxygen against doc/Doxyfile to emit the XML AST consumed by
-# tools/doxy2mdx/doxy2mdx.py (see v2.3.0-requirements.md TASK 18).
+# scripts/doxy2mdx/doxy2mdx.py (see v2.3.0-requirements.md TASK 18).
 #
 # Note: skigen (vendored under src/external/skigen) defines its own
 # `docs_api` target, so ours carries the `mne_cpp_` prefix to coexist with

@@ -54,7 +54,7 @@ so the signature ties the binary to the public source and build scripts of the t
 
 Before a request is submitted, the pipeline checks that every file the artifact configuration
 selects carries a Windows version resource with `ProductName` **MNE-CPP** and the release version
-as `ProductVersion` ([`tools/release/pe_metadata.py`](https://github.com/mne-tools/mne-cpp/blob/staging/tools/release/pe_metadata.py));
+as `ProductVersion` ([`scripts/release/pe_metadata.py`](https://github.com/mne-tools/mne-cpp/blob/staging/scripts/release/pe_metadata.py));
 SignPath enforces the same restrictions on its side and refuses to sign any file that does
 not match. The resource is generated for every MNE-CPP executable and library from
 [`cmake/mne_version_info.rc.in`](https://github.com/mne-tools/mne-cpp/blob/staging/cmake/mne_version_info.rc.in)

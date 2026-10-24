@@ -21,7 +21,7 @@ from mne._fiff.open import fiff_open
 from mne._fiff.write import end_block, start_and_end_file, start_block, write_double, write_float, write_float_matrix, write_int, write_name_list, write_string
 from mne.cov import _read_cov
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "scripts" / "parity"))
 from reference import require_reference  # noqa: E402
 
 require_reference()

@@ -1,8 +1,0 @@
-{
-  "$comment": "Doxygen compounds deliberately left out of the API registry and site (release gate G3, v2.4.0 T4.2). tools/doxy2mdx/audit_registry.py --check fails on any public class in the Doxygen XML that is neither registered nor matched here, and on any entry here that matches nothing. Every entry needs a reason.",
-  "namespaces": {
-    "std": "Standard library.",
-    "Ui": "Qt Designer generated form classes.",
-    "SURFACEKEYS": "String-key constants for disp3D surface lookups, not types."
-  }
-}

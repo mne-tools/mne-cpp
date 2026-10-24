@@ -15,7 +15,7 @@ import numpy as np
 
 import mne
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "tools" / "parity"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "scripts" / "parity"))
 from reference import require_reference  # noqa: E402
 
 require_reference()

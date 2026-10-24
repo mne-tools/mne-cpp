@@ -51,8 +51,8 @@ runs:
       FILE: ${{ inputs.file }}
       CONFIGURATION: .signpath/artifact-configurations/${{ inputs.artifact-configuration-slug }}.xml
     run: |
-      VERSION=$(python tools/release/pe_metadata.py version)
-      python tools/release/pe_metadata.py check --artifact-configuration "$CONFIGURATION" --version "$VERSION" "$FILE"
+      VERSION=$(python scripts/release/pe_metadata.py version)
+      python scripts/release/pe_metadata.py check --artifact-configuration "$CONFIGURATION" --version "$VERSION" "$FILE"
       echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
   - name: Upload unsigned file

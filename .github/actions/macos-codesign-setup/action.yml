@@ -7,7 +7,7 @@ description: >
   Import the Developer ID Application certificate into a temporary keychain,
   select the one identity of the given Apple Team ID and export
   CODESIGN_IDENTITY (SHA-1), KEYCHAIN_PATH and MACOS_SIGNING_MODE for
-  scripts/deploy/deploy.sh and tools/release/macos_signing.py. Production mode
+  scripts/deploy/deploy.sh and scripts/release/macos_signing.py. Production mode
   accepts only an identity that macOS trusts; mock mode (pipeline test) accepts
   the ephemeral self-signed test identity. Remove the keychain afterwards with
   `security delete-keychain "$KEYCHAIN_PATH"`. See doc/wiki/MacOS-Code-Signing.md.
@@ -70,7 +70,7 @@ runs:
       # One argument per existing keychain.
       # shellcheck disable=SC2046
       security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
-      SELECTED=$(python3 "$ACTION_PATH/../../../tools/release/macos_signing.py" select-identity --mode "$MODE" \
+      SELECTED=$(python3 "$ACTION_PATH/../../../scripts/release/macos_signing.py" select-identity --mode "$MODE" \
         --keychain "$KEYCHAIN_PATH") || exit 1
       {
         echo "CODESIGN_IDENTITY=${SELECTED%%$'\t'*}"

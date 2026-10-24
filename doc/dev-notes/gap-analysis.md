@@ -8,7 +8,7 @@ MNE-C SVN) to identify features and algorithms not yet ported.
 > [`doc/release/v2.4.0/mne-python-gap.json`](../release/v2.4.0/mne-python-gap.json)
 > and its rendered view
 > [`mne-python-gap.md`](../release/v2.4.0/mne-python-gap.md), both produced
-> by `tools/parity/gap_analysis.py`. Regenerate them before quoting any
+> by `scripts/parity/gap_analysis.py`. Regenerate them before quoting any
 > parity figure. The domain narratives further below are hand-maintained
 > context and must not contradict the generated data.
 

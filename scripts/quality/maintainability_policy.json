@@ -1,0 +1,36 @@
+{
+  "$comment": "Policy for scripts/quality/audit_maintainability.py (v2.4.0 T0.5). Lexical debt metrics for gate G5. Counts are candidates, not verdicts: every metric names the files it found so T6.4-T6.8 can assign path-disjoint tranches. Paths are relative to the repository root.",
+  "scan_roots": [
+    "src/libraries",
+    "src/applications",
+    "src/tools"
+  ],
+  "extensions": [
+    ".h",
+    ".hpp",
+    ".cpp",
+    ".cc",
+    ".cxx"
+  ],
+  "exclude_path_fragments": {
+    "/FormFiles/": "Qt Designer generated forms (uic input); not hand-maintained C++.",
+    "_autogen/": "moc/uic/rcc output; generated at build time."
+  },
+  "suppressions": {
+    "$comment": "Map metric -> { 'path': 'reason' }. A suppression hides one file from one metric and must say why.",
+    "console_io": {
+      "src/libraries/utils/generics/mne_logger.cpp": "The Qt message handler itself: the one place that writes log records to stdout/stderr."
+    }
+  },
+  "ceilings": {
+    "$comment": "Per-metric upper bound enforced in CI (audit_maintainability.py --ceilings). Lower a ceiling in the same commit that retires debt; it may never rise. 0 means the construct is gone for good.",
+    "null_macro": 0,
+    "typedef_struct": 0,
+    "c_style_cast": 0,
+    "raw_new": 0,
+    "raw_delete": 50,
+    "console_io": 0,
+    "numeric_define": 0,
+    "qt_new_unparented": 922
+  }
+}

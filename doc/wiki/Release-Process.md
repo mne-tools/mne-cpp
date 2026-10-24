@@ -25,7 +25,7 @@ GitHub Release.
 
 1. Run **Release Candidate** (`release-candidate.yml`, *Run workflow* on
    `staging`). It is GO only when the Staging run of that commit is green,
-   `tools/release/preflight.py` passes, every dashboard criterion is met
+   `scripts/release/preflight.py` passes, every dashboard criterion is met
    (`generate_quality_report.py --gates`), the signing credentials are set and
    the evidence bundle verifies. Approve the `release` environment; the bundle
    stays attached to the run for 90 days.
@@ -33,7 +33,7 @@ GitHub Release.
    commit has no successful candidate run:
 
 ```bash
-python3 tools/release/preflight.py --commit <SHA> --remote origin
+python3 scripts/release/preflight.py --commit <SHA> --remote origin
 git checkout main
 git pull --ff-only origin main
 git merge --ff-only <SHA>
@@ -98,7 +98,7 @@ repository and must be pasted unchanged into SignPath:
 Both restrict every signed file to `product-name="MNE-CPP"` and
 `product-version="${version}"`, as the SignPath Foundation requires. The action
 passes `version` (from `src/CMakeLists.txt`) with each request and first runs
-`tools/release/pe_metadata.py check` against the same XML, so a binary without
+`scripts/release/pe_metadata.py check` against the same XML, so a binary without
 the version resource of
 [`cmake/mne_version_info.rc.in`](https://github.com/mne-tools/mne-cpp/blob/main/cmake/mne_version_info.rc.in)
 fails the build with its name. The installer template `installerbase.exe` gets

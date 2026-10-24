@@ -24,8 +24,8 @@ long it may run, and what it needs.
                  [PLATFORMS <Linux|Darwin|Windows>... SKIP_REASON <text>])
 
   ``LABELS`` and ``TIMEOUT`` are mandatory. The label vocabulary and the timeout
-  band are read from ``tools/quality/test_inventory_policy.json``, the same file
-  ``tools/quality/validate_test_inventory.py`` enforces.
+  band are read from ``scripts/quality/test_inventory_policy.json``, the same file
+  ``scripts/quality/validate_test_inventory.py`` enforces.
 
   Without ``COMMAND`` the test runs the executable target ``<name>`` exactly as
   a bare ``add_test(NAME <name> COMMAND <name>)`` would; the target's name and
@@ -57,7 +57,7 @@ if(CMAKE_VERSION VERSION_LESS 3.19)
 endif()
 
 get_filename_component(_mne_testing_repo_root "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
-set(_mne_testing_policy_file "${_mne_testing_repo_root}/tools/quality/test_inventory_policy.json")
+set(_mne_testing_policy_file "${_mne_testing_repo_root}/scripts/quality/test_inventory_policy.json")
 
 file(READ "${_mne_testing_policy_file}" _mne_testing_policy)
 string(JSON _mne_testing_label_count ERROR_VARIABLE _mne_testing_json_error

@@ -67,40 +67,40 @@ jobs:
         python-version: '3.11'
 
     - name: Validate API registry
-      run: python3 tools/validate_api_registry.py --repo-root "$GITHUB_WORKSPACE"
+      run: python3 scripts/validate_api_registry.py --repo-root "$GITHUB_WORKSPACE"
 
     # Gate T6.2: the tree was reformatted once with the pinned clang-format, so
     # every C/C++ file under src/ (minus src/external) must stay formatted.
     - name: Check C/C++ formatting
       run: |
         python3 -m pip install --quiet clang-format==21.1.8
-        python3 tools/quality/check_format.py --all
+        python3 scripts/quality/check_format.py --all
 
     # Gate G1: a test that is built but not registered runs nowhere and is
     # counted nowhere. This catches that statically, before a build exists.
     - name: Validate test inventory
       run: |
-        python3 -m unittest discover -s tools/quality/tests
-        python3 tools/quality/validate_test_inventory.py
+        python3 -m unittest discover -s scripts/quality/tests
+        python3 scripts/quality/validate_test_inventory.py
 
     # T10.8a: onboarding CI runs the commands the build guide shows, so both must change together.
     - name: Check documented onboarding commands
-      run: python3 tools/onboarding/extract_setup_commands.py --check
+      run: python3 scripts/onboarding/extract_setup_commands.py --check
 
     # Gate G6: the rendered gap analysis must reflect the parity records it is generated from.
     - name: Check gap analysis is current
       run: |
         python3 -m pip install --quiet mne==1.11.0 numpy==2.2.6 scipy==1.15.3 scikit-learn==1.7.2
-        python3 tools/parity/gap_analysis.py --check
+        python3 scripts/parity/gap_analysis.py --check
 
     # Gate G5: layering violations and dependency cycles are cheap to prevent
     # and expensive to unpick once they have been built on.
     - name: Audit dependency architecture
-      run: python3 tools/quality/audit_dependencies.py --check
+      run: python3 scripts/quality/audit_dependencies.py --check
 
     # Gate G5: retired debt (NULL, typedef struct, console I/O) stays at zero; the rest may only shrink.
     - name: Check maintainability ceilings
-      run: python3 tools/quality/audit_maintainability.py --ceilings
+      run: python3 scripts/quality/audit_maintainability.py --ceilings
 
     - name: Lint GitHub workflows
       run: |
@@ -111,16 +111,16 @@ jobs:
         "$RUNNER_TEMP/actionlint"
 
     - name: Validate SPDX license headers
-      run: python3 -m tools.license_headers.validate
+      run: python3 -m scripts.license_headers.validate
 
     - name: Check parity fixtures match their manifest
-      run: python3 tools/parity/check_fixtures.py --check
+      run: python3 scripts/parity/check_fixtures.py --check
 
     - name: Check committed quality reports are current
-      run: python3 tools/quality/generate_quality_report.py --check
+      run: python3 scripts/quality/generate_quality_report.py --check
 
     - name: Generate quality dashboard
-      run: python3 tools/quality/generate_quality_report.py --out-dir "$RUNNER_TEMP/quality"
+      run: python3 scripts/quality/generate_quality_report.py --out-dir "$RUNNER_TEMP/quality"
 
     - name: Upload quality dashboard
       uses: actions/upload-artifact@v7

@@ -32,7 +32,7 @@ from mne._fiff.write import (
     write_string,
 )
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "scripts" / "parity"))
 from reference import require_reference  # noqa: E402
 
 require_reference()

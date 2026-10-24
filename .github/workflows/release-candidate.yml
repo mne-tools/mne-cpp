@@ -53,13 +53,13 @@ jobs:
         echo "Staging run: $run" | tee -a "$GITHUB_STEP_SUMMARY"
 
     - name: Release invariants (versions, changelog, untagged)
-      run: python3 tools/release/preflight.py --commit "$GITHUB_SHA" --remote "https://github.com/$GITHUB_REPOSITORY.git"
+      run: python3 scripts/release/preflight.py --commit "$GITHUB_SHA" --remote "https://github.com/$GITHUB_REPOSITORY.git"
 
     - name: Committed reports are current
-      run: python3 tools/quality/generate_quality_report.py --check
+      run: python3 scripts/quality/generate_quality_report.py --check
 
     - name: Every measured release criterion is met (G1-G6, G8)
-      run: python3 tools/quality/generate_quality_report.py --gates | tee -a "$GITHUB_STEP_SUMMARY"
+      run: python3 scripts/quality/generate_quality_report.py --gates | tee -a "$GITHUB_STEP_SUMMARY"
 
     - name: Signing credentials are configured (G7)
       env:
@@ -85,15 +85,15 @@ jobs:
           echo "::warning::macOS ships unsigned (MACOS_SIGNING=unavailable); the release notes record it."
           echo "macOS ships unsigned (MACOS_SIGNING=unavailable); the release notes record it." >> "$GITHUB_STEP_SUMMARY"
         else
-          python3 tools/release/macos_signing.py check-credentials --mode production || missing=1
+          python3 scripts/release/macos_signing.py check-credentials --mode production || missing=1
         fi
         exit $missing
 
     - name: Build and verify the evidence bundle
       run: |
-        python3 tools/release/evidence_bundle.py build --out "$RUNNER_TEMP/evidence" \
+        python3 scripts/release/evidence_bundle.py build --out "$RUNNER_TEMP/evidence" \
           --ci-run "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-        python3 tools/release/evidence_bundle.py verify "$RUNNER_TEMP/evidence"
+        python3 scripts/release/evidence_bundle.py verify "$RUNNER_TEMP/evidence"
 
     - name: Keep the evidence bundle
       uses: actions/upload-artifact@v7

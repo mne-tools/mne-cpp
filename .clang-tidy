@@ -4,8 +4,8 @@
 #
 # clang-tidy configuration for the T6.2/T6.3 static gate (pinned clang-tidy 22.1.8).
 # High-signal bug-finding checks only; style is clang-format's job. Run through
-# tools/quality/check_tidy.py, which ratchets findings per check against
-# tools/quality/tidy_baseline.json. Every disabled check below names its reason.
+# scripts/quality/check_tidy.py, which ratchets findings per check against
+# scripts/quality/tidy_baseline.json. Every disabled check below names its reason.
 Checks: >
   -*,
   bugprone-*,

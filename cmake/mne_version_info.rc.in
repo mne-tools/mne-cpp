@@ -4,7 +4,7 @@
 //
 // Windows version resource of every first-party MNE-CPP binary. SignPath
 // rejects a signed file whose ProductName or ProductVersion differs from
-// .signpath/artifact-configurations/*.xml; tools/release/check_pe_metadata.py
+// .signpath/artifact-configurations/*.xml; scripts/release/check_pe_metadata.py
 // checks the same before submission. Numeric constants (winver.h values) keep
 // the file compilable by a bare rc.exe without the SDK include path.
 

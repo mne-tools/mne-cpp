@@ -72,5 +72,5 @@ jobs:
       run: |
         PREFIX="${PREFIX:-mne-cpp-${TAG#v}}"
         # shellcheck disable=SC2086
-        python tools/release/verify_release.py "$RUNNER_TEMP/assets" --prefix "$PREFIX" \
+        python scripts/release/verify_release.py "$RUNNER_TEMP/assets" --prefix "$PREFIX" \
           --platform "$PLATFORM" $REQUIRE_SIGNED $UNSIGNED_MACOS

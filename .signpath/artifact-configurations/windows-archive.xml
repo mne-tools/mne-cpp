@@ -7,7 +7,7 @@
   Only MNE-CPP's own executables, libraries and plugins are signed; Qt and the
   other bundled third-party DLLs stay as their publishers shipped them.
   Every signed file must identify itself as MNE-CPP of this release.
-  Keep identical to the configuration stored in SignPath; tools/release/pe_metadata.py
+  Keep identical to the configuration stored in SignPath; scripts/release/pe_metadata.py
   applies this file before every signing request.
 -->
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">

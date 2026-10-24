@@ -6,7 +6,7 @@ name: macOS Signing Pipeline Test
 
 # Mode B of doc/wiki/MacOS-Code-Signing.md: runs the release signing chain of
 # release-macos.yml and release-installer.yml on the current dev_build with the
-# dummy values of tools/release/fixtures/macos-signing-dummy.env and an
+# dummy values of scripts/release/fixtures/macos-signing-dummy.env and an
 # ephemeral self-signed identity. Apple is never contacted, no repository
 # secret is read, nothing is published: every result is MOCK — NOT SIGNED OR
 # NOTARIZED. The negative job proves that production mode rejects the dummies.
@@ -18,8 +18,8 @@ on:
     - .github/workflows/macos-signing-test.yml
     - .github/actions/macos-codesign-setup/**
     - scripts/deploy/macos_release_signing.sh
-    - tools/release/macos_signing.py
-    - tools/release/fixtures/macos-signing-dummy.env
+    - scripts/release/macos_signing.py
+    - scripts/release/fixtures/macos-signing-dummy.env
 
 permissions:
   contents: read
@@ -42,20 +42,20 @@ jobs:
 
     - name: Load the dummy credentials
       run: |
-        grep -v '^#' tools/release/fixtures/macos-signing-dummy.env | grep . >> "$GITHUB_ENV"
+        grep -v '^#' scripts/release/fixtures/macos-signing-dummy.env | grep . >> "$GITHUB_ENV"
         echo "## MOCK — NOT SIGNED OR NOTARIZED" >> "$GITHUB_STEP_SUMMARY"
 
     - name: Dummy credentials pass mock and fail production
       run: |
-        python3 tools/release/macos_signing.py check-credentials --mode mock
-        if python3 tools/release/macos_signing.py check-credentials --mode production; then
+        python3 scripts/release/macos_signing.py check-credentials --mode mock
+        if python3 scripts/release/macos_signing.py check-credentials --mode production; then
           echo "::error::production mode accepted the dummy credentials"
           exit 1
         fi
 
     - name: Create an ephemeral test identity
       run: |
-        P12=$(python3 tools/release/macos_signing.py make-test-identity "$RUNNER_TEMP/test-identity")
+        P12=$(python3 scripts/release/macos_signing.py make-test-identity "$RUNNER_TEMP/test-identity")
         echo "TEST_P12_BASE64=$(base64 -i "$P12" | tr -d '\n')" >> "$GITHUB_ENV"
 
     - name: Import the test identity (mock)
@@ -68,7 +68,7 @@ jobs:
 
     - name: Production identity selection rejects the test identity
       run: |
-        if python3 tools/release/macos_signing.py select-identity --mode production --keychain "$KEYCHAIN_PATH"; then
+        if python3 scripts/release/macos_signing.py select-identity --mode production --keychain "$KEYCHAIN_PATH"; then
           echo "::error::production mode accepted a self-signed identity"
           exit 1
         fi
@@ -96,7 +96,7 @@ jobs:
       run: |
         tar czf signed.tar.gz -C out bin lib include resources
         mkdir roundtrip && tar xzf signed.tar.gz -C roundtrip
-        python3 tools/release/macos_signing.py verify --mode mock roundtrip/bin roundtrip/lib
+        python3 scripts/release/macos_signing.py verify --mode mock roundtrip/bin roundtrip/lib
 
     - name: Build, sign and mock-notarize the application DMG
       run: |
@@ -117,11 +117,11 @@ jobs:
     - name: Publish gate refuses mock evidence
       run: |
         cat "$MACOS_NOTARY_EVIDENCE"
-        if python3 tools/release/macos_signing.py require-production-evidence "$MACOS_NOTARY_EVIDENCE"; then
+        if python3 scripts/release/macos_signing.py require-production-evidence "$MACOS_NOTARY_EVIDENCE"; then
           echo "::error::the publish gate accepted mock evidence"
           exit 1
         fi
-        if python3 tools/release/macos_signing.py verify --mode production out/bin; then
+        if python3 scripts/release/macos_signing.py verify --mode production out/bin; then
           echo "::error::production verification accepted mock signatures"
           exit 1
         fi
@@ -130,7 +130,7 @@ jobs:
     # The runner resets GITHUB_REF for every step, so the tag is set on the command itself
     - name: Mock signing refuses release tags
       run: |
-        if GITHUB_REF=refs/tags/v0.0.0 python3 tools/release/macos_signing.py check-credentials --mode mock; then
+        if GITHUB_REF=refs/tags/v0.0.0 python3 scripts/release/macos_signing.py check-credentials --mode mock; then
           echo "::error::mock mode ran for a release tag"
           exit 1
         fi

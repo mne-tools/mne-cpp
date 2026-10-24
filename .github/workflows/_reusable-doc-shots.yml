@@ -83,7 +83,7 @@ jobs:
     # Gate G4: every manifest shot exists, decodes, has its declared size and is
     # neither blank nor transparent; every guide image has a producer.
     - name: Validate screenshots
-      run: python3 tools/quality/validate_screenshots.py
+      run: python3 scripts/quality/validate_screenshots.py
 
     - name: Upload screenshots
       if: always()

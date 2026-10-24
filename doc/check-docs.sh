@@ -50,16 +50,16 @@ step "API docs (Doxygen, registry, generated pages)"
 doc/build-api-docs.sh --check
 
 step "Examples gallery"
-python3 tools/doxy2mdx/generate_examples.py --check
+python3 scripts/doxy2mdx/generate_examples.py --check
 
 step "Doxygen @snippet contract"
-MNE_REQUIRE_DOXYGEN=1 python3 -m unittest tools/quality/tests/test_doxygen_snippets.py
+MNE_REQUIRE_DOXYGEN=1 python3 -m unittest scripts/quality/tests/test_doxygen_snippets.py
 
 step "Quality page"
-python3 tools/quality/render_quality_pages.py --check
+python3 scripts/quality/render_quality_pages.py --check
 
 step "Screenshots"
-python3 tools/quality/validate_screenshots.py --images "$SCREENSHOTS"
+python3 scripts/quality/validate_screenshots.py --images "$SCREENSHOTS"
 
 if ! $BUILD_SITE; then
   echo "PASS: documentation checks (site build skipped)."
@@ -84,6 +84,6 @@ fi
     && node scripts/check-diagrams.mjs && npm run build )
 
 step "Version routing"
-python3 tools/quality/check_website_build.py doc/website/build --channel "$CHANNEL"
+python3 scripts/quality/check_website_build.py doc/website/build --channel "$CHANNEL"
 
 echo "PASS: documentation checks ($CHANNEL)."

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "tools/quality/audit_api_evidence.py",
-  "policy": "tools/quality/api_evidence_policy.json",
+  "generated_by": "scripts/quality/audit_api_evidence.py",
+  "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 468,
     "exported_free_functions": 119,

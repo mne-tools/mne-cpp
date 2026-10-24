@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_by": "tools/quality/audit_tests.py",
+  "generated_by": "scripts/quality/audit_tests.py",
   "ci_source": {
     "run_url": "https://github.com/mne-tools/mne-cpp/actions/runs/39457390522",
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"

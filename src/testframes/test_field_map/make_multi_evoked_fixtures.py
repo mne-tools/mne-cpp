@@ -46,7 +46,7 @@ from mne.forward._field_interpolation import (
 from mne.forward._lead_dots import _do_self_dots, _do_surface_dots
 from mne.forward._make_forward import _create_meg_coils, _create_eeg_els
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "scripts" / "parity"))
 from reference import require_reference  # noqa: E402
 
 

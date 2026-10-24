@@ -1,10 +1,10 @@
 {
   "meta": {
-    "generated_by": "tools/parity/gap_analysis.py",
+    "generated_by": "scripts/parity/gap_analysis.py",
     "mne_python_ref": "1.11.0",
     "mne_python_pinned": "1.11",
     "registry": "doc/api_registry.json",
-    "note": "Machine-rendered from doc/api_registry.json ('classes' + 'parity'). Do not hand-edit; edit the registry and rerun tools/parity/gap_analysis.py."
+    "note": "Machine-rendered from doc/api_registry.json ('classes' + 'parity'). Do not hand-edit; edit the registry and rerun scripts/parity/gap_analysis.py."
   },
   "summary": {
     "total": 443,

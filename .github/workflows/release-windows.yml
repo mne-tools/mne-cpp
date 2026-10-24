@@ -103,7 +103,7 @@ jobs:
         }
     - name: Check product metadata
       shell: bash
-      run: python tools/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-archive.xml mne-cpp-windows-dynamic-x86_64.zip
+      run: python scripts/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-archive.xml mne-cpp-windows-dynamic-x86_64.zip
     - name: Authenticode-sign the archive
       if: startsWith(github.ref, 'refs/tags/')
       uses: ./.github/actions/signpath-sign
@@ -120,7 +120,7 @@ jobs:
       run: |
         cp mne-cpp-windows-dynamic-x86_64.zip "${{ steps.release-info.outputs.prefix }}-windows-dynamic-x86_64.zip"
         gh release upload "${{ steps.release-info.outputs.tag }}" "${{ steps.release-info.outputs.prefix }}-windows-dynamic-x86_64.zip" --clobber
-        python tools/release/artifact_evidence.py inspect "${{ steps.release-info.outputs.prefix }}-windows-dynamic-x86_64.zip" --out evidence-windows-dynamic.json
+        python scripts/release/artifact_evidence.py inspect "${{ steps.release-info.outputs.prefix }}-windows-dynamic-x86_64.zip" --out evidence-windows-dynamic.json
 
     - name: Upload signing evidence
       if: steps.release-info.outputs.should_upload == 'true'
@@ -229,7 +229,7 @@ jobs:
         ./scripts/deploy/deploy.bat static pack
     - name: Check product metadata
       shell: bash
-      run: python tools/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-archive.xml mne-cpp-windows-static-x86_64.zip
+      run: python scripts/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-archive.xml mne-cpp-windows-static-x86_64.zip
     - name: Authenticode-sign the archive
       if: startsWith(github.ref, 'refs/tags/')
       uses: ./.github/actions/signpath-sign
@@ -246,7 +246,7 @@ jobs:
       run: |
         cp mne-cpp-windows-static-x86_64.zip "${{ steps.release-info.outputs.prefix }}-windows-static-x86_64.zip"
         gh release upload "${{ steps.release-info.outputs.tag }}" "${{ steps.release-info.outputs.prefix }}-windows-static-x86_64.zip" --clobber
-        python tools/release/artifact_evidence.py inspect "${{ steps.release-info.outputs.prefix }}-windows-static-x86_64.zip" --out evidence-windows-static.json
+        python scripts/release/artifact_evidence.py inspect "${{ steps.release-info.outputs.prefix }}-windows-static-x86_64.zip" --out evidence-windows-static.json
 
     - name: Upload signing evidence
       if: steps.release-info.outputs.should_upload == 'true'

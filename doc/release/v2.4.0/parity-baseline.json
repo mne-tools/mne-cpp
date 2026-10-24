@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_by": "tools/quality/audit_parity_baseline.py",
+  "generated_by": "scripts/quality/audit_parity_baseline.py",
   "reference_environment": {
     "registry_mne_python_ref": "1.11.0",
     "registry_mne_python_pinned": "1.11",
@@ -17,7 +17,7 @@
       "scipy==1.15.3"
     ],
     "ci_unpinned_packages": [],
-    "lock_file": "tools/parity/reference_lock.json",
+    "lock_file": "scripts/parity/reference_lock.json",
     "lock_mismatch": []
   },
   "summary": {

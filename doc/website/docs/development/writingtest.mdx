@@ -20,7 +20,7 @@ A good starting point is to look at existing tests under `src/testframes/`. You 
 3. Register the new test in the parent `src/testframes/CMakeLists.txt` via `add_subdirectory()`.
 4. Register it with CTest through `mne_add_test()` from `cmake/MneTesting.cmake` instead of a bare `add_test()`.
 
-`mne_add_test()` requires `LABELS` and `TIMEOUT`; leaving either out, or using a label or timeout outside `tools/quality/test_inventory_policy.json`, stops the configure step.
+`mne_add_test()` requires `LABELS` and `TIMEOUT`; leaving either out, or using a label or timeout outside `scripts/quality/test_inventory_policy.json`, stops the configure step.
 
 ```cmake
 mne_add_test(${PROJECT_NAME}

@@ -17,7 +17,7 @@
  * and @c buildHash() for runtime provenance reporting --- e.g.
  * when @c mne_analyze prints the linked-library version table
  * in its About dialog or when the registry validator in
- * @c tools/validate_api_registry.py needs to confirm which MRI
+ * @c scripts/validate_api_registry.py needs to confirm which MRI
  * library snapshot is wired into a deployed binary.
  */
 

@@ -1,4 +1,4 @@
-# .clang-format — MNE-CPP code style (clang-format 21.1.8, pinned in tools/quality/check_format.py).
+# .clang-format — MNE-CPP code style (clang-format 21.1.8, pinned in scripts/quality/check_format.py).
 # Follows the class templates in resources/wizards/mnecpp and the conventions in
 # doc/website/docs/development/contr-style.mdx.
 Language: Cpp

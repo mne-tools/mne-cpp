@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-TOOL="python3 $(cd "$(dirname "$0")/../.." && pwd)/tools/release/macos_signing.py"
+TOOL="python3 $(cd "$(dirname "$0")/../.." && pwd)/scripts/release/macos_signing.py"
 MODE="${MACOS_SIGNING_MODE:?MACOS_SIGNING_MODE must be production or mock}"
 IDENTITY="${CODESIGN_IDENTITY:?CODESIGN_IDENTITY is not set (macos-codesign-setup)}"
 EVIDENCE="${MACOS_NOTARY_EVIDENCE:?MACOS_NOTARY_EVIDENCE is not set}"

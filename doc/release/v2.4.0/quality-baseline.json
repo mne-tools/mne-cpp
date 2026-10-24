@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_by": "tools/quality/generate_quality_report.py",
+  "generated_by": "scripts/quality/generate_quality_report.py",
   "thresholds": {
     "coverage_line_libraries": 80.0,
     "coverage_branch_libraries": 65.0,
@@ -82,7 +82,7 @@
     "G6_parity": {
       "reference": "1.11.0",
       "unpinned_ci_packages": [],
-      "lock_file": "tools/parity/reference_lock.json",
+      "lock_file": "scripts/parity/reference_lock.json",
       "lock_mismatch": [],
       "inventoried_apis": 443,
       "by_status": {

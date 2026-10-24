@@ -1,0 +1,5 @@
+{
+  "$comment": "Doxygen warnings tolerated by scripts/quality/check_doxygen_warnings.py (release gate G3, v2.4.0 T4.1). Keys are '<file>: <message>' without line numbers; values are how often the key may occur. The list may only shrink: fix a warning, then run the checker with --update.",
+  "total": 0,
+  "warnings": {}
+}

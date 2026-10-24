@@ -9,7 +9,7 @@
 #
 #   * The public ``Doxyfile`` documents ONLY the reusable library contract
 #     (INPUT = ../src/libraries), emits XML, and is consumed by
-#     tools/doxy2mdx/doxy2mdx.py to publish the website API reference.
+#     scripts/doxy2mdx/doxy2mdx.py to publish the website API reference.
 #
 #   * This file additionally covers the application & plugin code under
 #     ../src/applications, turns on INTERNAL_DOCS so ``@internal`` sections

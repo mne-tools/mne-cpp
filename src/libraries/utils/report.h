@@ -17,8 +17,8 @@
  * readable in restricted enterprise environments where the
  * MEG/EEG processing reports are typically reviewed.
  *
- * Used by the demo applications in @c src/applications and by
- * the integration tests in @c tools/ to produce a one-page
+ * Used by the demo applications in @c src/applications, by
+ * @c ex_utils and by @c test_report to produce a one-page
  * summary of each pipeline run (input files, channel counts,
  * forward / inverse parameters, output checksums).
  */

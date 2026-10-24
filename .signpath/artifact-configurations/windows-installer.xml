@@ -6,7 +6,7 @@
   Qt Installer Framework installer MNE-CPP-<version>-win64.exe. The installer
   executable itself is signed; its payload is the windows-archive content,
   whose MNE-CPP binaries were signed before packaging.
-  Keep identical to the configuration stored in SignPath; tools/release/pe_metadata.py
+  Keep identical to the configuration stored in SignPath; scripts/release/pe_metadata.py
   applies this file before every signing request.
 -->
 <artifact-configuration xmlns="http://signpath.io/artifact-configuration/v1">

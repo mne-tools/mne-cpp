@@ -1,0 +1,10 @@
+{
+  "$comment": "MNE-Python reference environment for parity fixtures (v2.4.0 T7.1). CI installs exactly these versions (_reusable-tests.yml); fixture generators call reference.require_reference(). To move the reference, follow the procedure in scripts/parity/reference.py.",
+  "python": "3.10",
+  "packages": {
+    "mne": "1.11.0",
+    "numpy": "2.2.6",
+    "scipy": "1.15.3",
+    "scikit-learn": "1.7.2"
+  }
+}

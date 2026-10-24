@@ -27,7 +27,7 @@ on:
         default: false
         type: boolean
       enforce_coverage_gate:
-        description: "Fail below the floor or on regression, as set in tools/quality/coverage_policy.json"
+        description: "Fail below the floor or on regression, as set in scripts/quality/coverage_policy.json"
         required: false
         default: false
         type: boolean
@@ -220,7 +220,7 @@ jobs:
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DMNE_WARNINGS_AS_ERRORS=ON ${COV_FLAG}
         cmake --build build -j "$(nproc)"
 
-    # Gate T6.3: findings per file and check may only shrink (tools/quality/tidy_baseline.json).
+    # Gate T6.3: findings per file and check may only shrink (scripts/quality/tidy_baseline.json).
     # Units are cached by tool version, config, compile command and included file contents.
     - name: Restore clang-tidy cache
       if: matrix.os == 'ubuntu-24.04' && inputs.qt_version == 'max'
@@ -235,7 +235,7 @@ jobs:
       run: |
         python3 -m pip install --quiet clang-tidy==22.1.8
         git fetch --quiet origin staging || true
-        python3 tools/quality/check_tidy.py -p build --jobs "$(nproc)"
+        python3 scripts/quality/check_tidy.py -p build --jobs "$(nproc)"
 
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-26'
@@ -292,7 +292,7 @@ jobs:
       shell: bash
       run: |
         ctest --test-dir build -C Release --show-only=json-v1 > ctest-inventory.json
-        python tools/quality/validate_test_inventory.py --ctest-json ctest-inventory.json
+        python scripts/quality/validate_test_inventory.py --ctest-json ctest-inventory.json
 
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-24.04'
@@ -379,7 +379,7 @@ jobs:
       if: always() && hashFiles('build/test-results.xml') != ''
       shell: bash
       run: |
-        python tools/quality/summarize_test_run.py build/test-results.xml \
+        python scripts/quality/summarize_test_run.py build/test-results.xml \
           --platform "${{ matrix.os }} (Qt ${{ inputs.qt_version }})" \
           --require-reasons >> "$GITHUB_STEP_SUMMARY"
 
@@ -410,7 +410,7 @@ jobs:
         fastcov -C coverage.json --lcov -o coverage_raw.info \
              --include src/libraries/ src/applications/ src/tools/ \
              --exclude /usr Qt eigen
-        python tools/quality/summarize_coverage.py coverage_raw.info \
+        python scripts/quality/summarize_coverage.py coverage_raw.info \
              --repo-root . --lcov-out coverage_filtered.info \
              --commit "${{ github.sha }}" \
              --source-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
@@ -430,7 +430,7 @@ jobs:
         disable_file_fixes: true
         fail_ci_if_error: true
 
-    # ── Coverage: floor & regression gate (tools/quality/coverage_policy.json) ──
+    # ── Coverage: floor & regression gate (scripts/quality/coverage_policy.json) ──
     # Saved keys carry the run id, so the exact key never matches; the prefix in
     # restore-keys picks the most recent baseline for this branch.
     - name: Restore previous coverage baseline
@@ -446,7 +446,7 @@ jobs:
     - name: Check coverage gate
       id: coverage-gate
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.enforce_coverage_gate
-      run: python tools/quality/check_coverage_gate.py coverage_filtered.info --baseline .coverage-baseline
+      run: python scripts/quality/check_coverage_gate.py coverage_filtered.info --baseline .coverage-baseline
 
     - name: Save coverage baseline
       if: matrix.os == 'ubuntu-24.04' && inputs.with_code_coverage && inputs.enforce_coverage_gate && steps.coverage-gate.outcome == 'success'

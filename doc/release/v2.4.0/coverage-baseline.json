@@ -79,7 +79,7 @@
     "untracked": []
   },
   "notes": [
-    "Totals exclude only the files matched by the reasoned exclusions in tools/quality/coverage_policy.json.",
+    "Totals exclude only the files matched by the reasoned exclusions in scripts/quality/coverage_policy.json.",
     "A null branch percentage means the LCOV input did not contain branch counters.",
     "codecov_model counts lines the way Codecov does with partials_as_hits: a line with branch counters is a hit when any of its branches was taken."
   ],

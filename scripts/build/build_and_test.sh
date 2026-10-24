@@ -249,13 +249,13 @@ if [ "$WITH_COVERAGE" = "true" ]; then
 
   if [ -n "$COVERAGE_TOOL" ]; then
     # Same normalisation, exclusions and completeness check as CI.
-    python3 "${BASE_DIR}/tools/quality/summarize_coverage.py" \
+    python3 "${BASE_DIR}/scripts/quality/summarize_coverage.py" \
       "${BUILD_DIR}/coverage_raw.info" \
       --repo-root "$BASE_DIR" \
       --lcov-out "${BUILD_DIR}/coverage_filtered.info" \
       --json "${BUILD_DIR}/coverage-baseline.json" \
       --markdown "${BUILD_DIR}/coverage-baseline.md" || true
-    python3 "${BASE_DIR}/tools/quality/check_coverage_gate.py" \
+    python3 "${BASE_DIR}/scripts/quality/check_coverage_gate.py" \
       "${BUILD_DIR}/coverage_filtered.info" || true
     echo ""
     echo "  Filtered report: ${BUILD_DIR}/coverage_filtered.info"

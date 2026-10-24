@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_by": "tools/quality/audit_visual_assets.py",
+  "generated_by": "scripts/quality/audit_visual_assets.py",
   "summary": {
     "manifest_shots": 19,
     "referenced_images": 19,

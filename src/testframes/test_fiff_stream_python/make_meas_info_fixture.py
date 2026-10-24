@@ -21,7 +21,7 @@ from mne._fiff.constants import FIFF
 from mne._fiff.write import end_block, start_and_end_file, start_block, write_ch_info, write_coord_trans, write_dig_points, write_float, write_id, write_int, write_string
 from mne.transforms import Transform
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools" / "parity"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "scripts" / "parity"))
 from reference import require_reference  # noqa: E402
 
 require_reference()
