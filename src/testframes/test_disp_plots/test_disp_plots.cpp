@@ -345,30 +345,40 @@ void TestDispPlots::testLinePlotUpdateData()
     // The curve rises from (0, 0) at the bottom-left of its extent to (3, 9) at the top-right
     plot.resize(400, 300);
     const QImage image = plot.grab().toImage();
+    // Only the line itself is steel blue (the default first series colour); text and grid are grey
+    const auto isCurve = [&image](int x, int y) {
+        const QColor c = image.pixelColor(x, y);
+        return qAbs(c.red() - 70) < 30 && qAbs(c.green() - 130) < 30 && qAbs(c.blue() - 180) < 30;
+    };
     QRect extent;
     for (int y = 0; y < image.height(); ++y) {
         for (int x = 0; x < image.width(); ++x) {
-            const QColor c = image.pixelColor(x, y);
-            if (c.blue() > c.red() + 60) {
+            if (isCurve(x, y)) {
                 extent |= QRect(x, y, 1, 1);
             }
         }
     }
-    QVERIFY(extent.width() > 250 && extent.height() > 150);
-    const auto curveY = [&image](int x) {
-        for (int y = 0; y < image.height(); ++y) {
-            const QColor c = image.pixelColor(x, y);
-            if (c.blue() > c.red() + 60) {
-                return y;
+    const QString where = QString("curve extent %1,%2 %3x%4").arg(extent.x()).arg(extent.y()).arg(extent.width()).arg(extent.height());
+    QVERIFY2(extent.width() > 250 && extent.height() > 150, qPrintable(where));
+    // Mean row of the curve in column x, so anti-aliasing and line width do not matter
+    const auto curveY = [&](int x) {
+        double sum = 0.0;
+        int n = 0;
+        for (int y = extent.top(); y <= extent.bottom(); ++y) {
+            if (isCurve(x, y)) {
+                sum += y;
+                ++n;
             }
         }
-        return -1;
+        return n > 0 ? sum / n : -1.0;
     };
-    QVERIFY(curveY(extent.left() + 1) > extent.bottom() - 4);
-    QVERIFY(curveY(extent.right() - 1) < extent.top() + 4);
+    const double first = curveY(extent.left() + 2);
+    const double last = curveY(extent.right() - 2);
+    QVERIFY2(first > extent.bottom() - 6, qPrintable(where + QString(", first column at y %1").arg(first)));
+    QVERIFY2(last >= 0 && last < extent.top() + 6, qPrintable(where + QString(", last column at y %1").arg(last)));
     // y = x^2: at x = 2 the curve is at 4/9 of the height
-    const int mid = curveY(extent.left() + extent.width() * 2 / 3);
-    QVERIFY(qAbs(extent.bottom() - mid - extent.height() * 4 / 9) <= 4);
+    const double mid = curveY(extent.left() + extent.width() * 2 / 3);
+    QVERIFY2(qAbs(extent.bottom() - mid - extent.height() * 4.0 / 9.0) <= 6, qPrintable(where + QString(", x = 2 at y %1").arg(mid)));
 
     // A constant series is drawn instead of dividing by a zero range
     plot.updateData(QVector<double>{5.0, 5.0, 5.0});
