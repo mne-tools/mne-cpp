@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
     parser.addHelpOption();
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/resources/data.";
 
-    QCommandLineOption inFile("fileIn", "The input file.", "in", QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+    QCommandLineOption inFile("fileIn", "The input file.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
     QCommandLineOption inWindow("window", "The window size for the HPI fit in ms.", "in", "400");
     QCommandLineOption inStep("step", "The step size in ms.", "in", "10");
     QCommandLineOption inFreqs("freqs", "The frequencies used.", "in", "154,158,161,166");
