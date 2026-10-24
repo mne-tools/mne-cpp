@@ -25,6 +25,7 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_dig_point.h>
 #include <mne/mne_bem.h>
+#include <mne/mne_forward_solution.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -1656,15 +1657,23 @@ private slots:
         QCOMPARE(runToolExitCode("mne_compute_cmne", {"--mode", "compute", "--fwd", fwdFile, "--cov", covFile, "--evoked", evokedFile, "--setno", "0", "--look-back", "8", "--out", outPrefix}, 180000),
                  0);
 
-        INVLIB::InvSourceEstimate dspm;
-        QFile dspmFile(outPrefix + "-dspm.stc");
+        // One file per hemisphere, holding the forward solution's vertex numbers
+        INVLIB::InvSourceEstimate dspm, dspmRh;
+        QFile dspmFile(outPrefix + "-dspm-lh.stc");
+        QFile dspmRhFile(outPrefix + "-dspm-rh.stc");
         QVERIFY(INVLIB::InvSourceEstimate::read(dspmFile, dspm));
+        QVERIFY(INVLIB::InvSourceEstimate::read(dspmRhFile, dspmRh));
 
         INVLIB::InvSourceEstimate cmne;
-        QFile cmneFile(outPrefix + "-cmne.stc");
+        QFile cmneFile(outPrefix + "-cmne-lh.stc");
         QVERIFY(INVLIB::InvSourceEstimate::read(cmneFile, cmne));
+        QVERIFY(QFile::exists(outPrefix + "-cmne-rh.stc"));
 
-        QCOMPARE(dspm.data.rows(), 7928);
+        QFile fwdIn(fwdFile);
+        const QList<Eigen::VectorXi> vertno = MNELIB::MNEForwardSolution(fwdIn).src.get_vertno();
+        QVERIFY(dspm.vertices == vertno[0]);
+        QVERIFY(dspmRh.vertices == vertno[1]);
+        QCOMPARE(dspm.data.rows() + dspmRh.data.rows(), 7928);
         QCOMPARE(dspm.data.cols(), 421);
         QCOMPARE(cmne.data.rows(), dspm.data.rows());
         QCOMPARE(cmne.data.cols(), dspm.data.cols());

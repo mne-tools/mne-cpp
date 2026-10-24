@@ -244,11 +244,16 @@ static int doCompute(const QCommandLineParser& parser)
         return 1;
     }
 
-    // Propagate timing from evoked data
-    result.stcDspm.tmin = tmin;
-    result.stcDspm.tstep = tstep;
-    result.stcCmne.tmin = tmin;
-    result.stcCmne.tstep = tstep;
+    // Propagate the source space and timing
+    const QList<VectorXi> vertno = fwd.src.get_vertno();
+    VectorXi vertices(nSources);
+    vertices << vertno[0], vertno[1];
+    for (InvSourceEstimate* stc : {&result.stcDspm, &result.stcCmne}) {
+        stc->vertices = vertices;
+        stc->nVerticesLh = static_cast<int>(vertno[0].size());
+        stc->tmin = tmin;
+        stc->tstep = tstep;
+    }
 
     out << "  dSPM: " << result.stcDspm.data.rows() << " sources x "
         << result.stcDspm.data.cols() << " samples\n";
@@ -256,22 +261,17 @@ static int doCompute(const QCommandLineParser& parser)
         << result.stcCmne.data.cols() << " samples\n";
 
     // ── Write STC files ────────────────────────────────────────────────
-    const QString dspmStcPath = outPrefix + QStringLiteral("-dspm.stc");
-    const QString cmneStcPath = outPrefix + QStringLiteral("-cmne.stc");
-
-    QFile dspmFile(dspmStcPath);
-    if (!result.stcDspm.write(dspmFile)) {
+    if (!result.stcDspm.writeHemispherePair(outPrefix + QStringLiteral("-dspm"))) {
         err << "Error: Failed to write dSPM STC.\n";
         return 1;
     }
-    out << "Wrote dSPM STC: " << dspmStcPath << "\n";
+    out << "Wrote dSPM STC: " << outPrefix << "-dspm-{lh,rh}.stc\n";
 
-    QFile cmneFile(cmneStcPath);
-    if (!result.stcCmne.write(cmneFile)) {
+    if (!result.stcCmne.writeHemispherePair(outPrefix + QStringLiteral("-cmne"))) {
         err << "Error: Failed to write CMNE STC.\n";
         return 1;
     }
-    out << "Wrote CMNE STC: " << cmneStcPath << "\n";
+    out << "Wrote CMNE STC: " << outPrefix << "-cmne-{lh,rh}.stc\n";
 
     out << "Done.\n";
     return 0;
@@ -493,7 +493,7 @@ int main(int argc, char* argv[])
                       QStringLiteral("ONNX model with cmne_config metadata (compute mode); without it the control estimate is written."),
                       QStringLiteral("file")});
     parser.addOption({QStringLiteral("out"),
-                      QStringLiteral("Output STC prefix; writes <prefix>-dspm.stc and <prefix>-cmne.stc."),
+                      QStringLiteral("Output STC prefix; writes <prefix>-dspm-{lh,rh}.stc and <prefix>-cmne-{lh,rh}.stc."),
                       QStringLiteral("prefix")});
     parser.addOption({QStringLiteral("setno"),
                       QStringLiteral("Evoked data set number (default: 0)."),

@@ -123,7 +123,7 @@ echo "=== mne_compute_cmne — Compute Mode ==="
 echo "  Forward   : $FwdFile"
 echo "  Covariance: $CovFile"
 echo "  Evoked    : $EvokedFile"
-echo "  Output    : ${OUT_PREFIX}-dspm.stc / ${OUT_PREFIX}-cmne.stc"
+echo "  Output    : ${OUT_PREFIX}-dspm-{lh,rh}.stc / ${OUT_PREFIX}-cmne-{lh,rh}.stc"
 echo
 
 CMD_ARGS=(
