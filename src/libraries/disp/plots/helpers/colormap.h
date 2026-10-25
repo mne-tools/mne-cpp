@@ -699,7 +699,7 @@ inline QRgb ColorMap::valueToColor(double v, const QString& sMap)
     }
 
     if (sMap == "RedBlue") {
-        return valueToRedBlue(v);
+        return valueToRedBlue(2.0 * v - 1.0); // valueToRedBlue spans [-1, 1]
     }
 
     if (sMap == "Cool") {
