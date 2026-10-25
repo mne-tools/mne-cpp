@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <disp/plots/detail/niceticks.h>
 #include <disp/plots/helpers/colormap.h>
 #include <disp/plots/helpers/figureexporter.h>
 #include <disp/plots/lineplot.h>
@@ -97,6 +98,8 @@ private slots:
     void testImageScFloatMatrix();
     void testImageScIntMatrix();
     void testImageScUpdateData();
+    void testImageScColorRangeAndExtent();
+    void testNiceTicks();
 
     // ── Plot ──────────────────────────────────────────────────────────
     void testPlotDefaultCtor();
@@ -241,7 +244,7 @@ void TestDispPlots::testViridisNegatedInverse()
 void TestDispPlots::testValueToColorDispatcher()
 {
     // Test all named colormaps through the dispatcher
-    QStringList maps = {"Jet", "Hot", "Hot Negative 1", "Hot Negative 2",
+    QStringList maps = {"Jet", "Hot", "HotNegative1", "HotNegative2",
                         "Bone", "RedBlue", "Cool", "Viridis"};
     for (const auto& name : maps) {
         QRgb c = ColorMap::valueToColor(0.5, name);
@@ -289,6 +292,12 @@ void TestDispPlots::testRedBlueSymmetry()
     // At +0.8 should be reddish, at -0.8 should be bluish
     QVERIFY(qRed(cPos) > qBlue(cPos));
     QVERIFY(qBlue(cNeg) > qRed(cNeg));
+
+    // valueToColor takes [0, 1] for every map: RedBlue runs from blue through white to red
+    QCOMPARE(ColorMap::valueToColor(0.0, "RedBlue"), ColorMap::valueToRedBlue(-1.0));
+    QCOMPARE(ColorMap::valueToColor(0.5, "RedBlue"), qRgb(255, 255, 255));
+    QCOMPARE(ColorMap::valueToColor(1.0, "RedBlue"), ColorMap::valueToRedBlue(1.0));
+    QVERIFY(qBlue(ColorMap::valueToColor(0.0, "RedBlue")) > qRed(ColorMap::valueToColor(0.0, "RedBlue")));
 }
 
 //=============================================================================================================
@@ -578,6 +587,47 @@ void TestDispPlots::testImageScUpdateData()
     image = img.grab().toImage();
     QCOMPARE(image.pixelColor(110, 150), image.pixelColor(240, 150));
     QCOMPARE(image.pixelColor(110, 150).rgb(), ColorMap::valueToColor(0.0, QStringLiteral("Jet")));
+}
+
+//=============================================================================================================
+
+void TestDispPlots::testImageScColorRangeAndExtent()
+{
+    ImageSc img;
+    img.resize(400, 300);
+    img.setColorMap(QStringLiteral("Jet"));
+    MatrixXd values(1, 3);
+    values << -1.0, 0.0, 4.0;
+    img.updateData(values);
+    // A fixed range maps 0 to the middle of the map and clips 4 to its high end
+    img.setColorRange(-1.0, 1.0);
+    const QImage image = img.grab().toImage();
+    QList<QRgb> colors;
+    for (int x = 0; x < image.width(); ++x) {
+        const QRgb c = image.pixel(x, 150);
+        if (colors.isEmpty() ? c == ColorMap::valueToColor(0.0, QStringLiteral("Jet")) : c != colors.last()) {
+            colors.append(c);
+        }
+    }
+    QVERIFY(colors.size() >= 3);
+    QCOMPARE(colors[1], ColorMap::valueToColor(0.5, QStringLiteral("Jet")));
+    QCOMPARE(colors[2], ColorMap::valueToColor(1.0, QStringLiteral("Jet")));
+
+    // Axis ticks follow the extent: the plot gains a label wider than any column index
+    QImage indices = img.grab().toImage();
+    img.setExtent(-200.0, 600.0, 10.0, 1.0);
+    QVERIFY(img.grab().toImage() != indices);
+}
+
+//=============================================================================================================
+
+void TestDispPlots::testNiceTicks()
+{
+    QCOMPARE(detail::niceTicks(0.0, 1.0, 5), QVector<double>({0.0, 0.2, 0.4, 0.6, 0.8, 1.0}));
+    QCOMPARE(detail::niceTicks(-200.0, 500.0, 8), QVector<double>({-200.0, -100.0, 0.0, 100.0, 200.0, 300.0, 400.0, 500.0}));
+    // Index axes of a 3 x 3 image span [-0.5, 2.5]: whole numbers only
+    QCOMPARE(detail::niceTicks(-0.5, 2.5, 8, 1.0), QVector<double>({0.0, 1.0, 2.0}));
+    QVERIFY(detail::niceTicks(1.0, 1.0, 5).isEmpty());
 }
 
 //=============================================================================================================

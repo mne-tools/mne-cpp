@@ -39,6 +39,7 @@ set(SOURCES
     plots/lineplot.cpp
     plots/helpers/colormap.cpp
     plots/helpers/figureexporter.cpp
+    plots/detail/niceticks.h
     viewers/abstractview.cpp
     viewers/applytoview.cpp
     viewers/coregsettingsview.cpp

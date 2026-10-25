@@ -159,7 +159,34 @@ public:
      */
     void setColorMap(const QString& p_sColorMap);
 
+    //=========================================================================================================
+    /**
+     * Labels the axes in data units instead of column and row indices, as matplotlib's @c imshow(extent=...).
+     *
+     * @param[in] left       X value of the first column.
+     * @param[in] right      X value of the last column.
+     * @param[in] bottom     Y value of the last row, drawn at the bottom.
+     * @param[in] top        Y value of the first row, drawn at the top.
+     */
+    void setExtent(double left, double right, double bottom, double top);
+
+    //=========================================================================================================
+    /**
+     * Maps @p min and @p max to the ends of the colour map instead of the data minimum and maximum; values
+     * outside are clipped. A range symmetric around zero centres diverging maps such as "RedBlue".
+     *
+     * @param[in] min    Value drawn with the low end of the colour map.
+     * @param[in] max    Value drawn with the high end of the colour map.
+     */
+    void setColorRange(double min, double max);
+
 protected:
+    //=========================================================================================================
+    /**
+     * Maps the data to [0, 1] by the colour range, clipping values outside it.
+     */
+    void normalize();
+
     //=========================================================================================================
     /**
      * Updates data and colorbar pixmap
@@ -172,25 +199,29 @@ protected:
      *
      * @param[in] event    The event.
      */
-    void paintEvent(QPaintEvent* event);
+    void paintEvent(QPaintEvent* event) override;
 
     QPixmap m_pixmapData;     /**< data pixmap. */
     QPixmap m_pixmapColorbar; /**< colorbar pixmap. */
 
     QString m_sColorMap; /**< The colorbar. */
 
-    Eigen::MatrixXd m_matCentNormData; /**< centralized and normalized data. */
+    Eigen::MatrixXd m_matData;         /**< The data as given. */
+    Eigen::MatrixXd m_matCentNormData; /**< Data mapped to [0, 1] by the colour range. */
 
-    double m_dMinValue; /**< Minimal data value. */
-    double m_dMaxValue; /**< Maximal data value. */
+    double m_dMinValue;    /**< Value at the low end of the colour map. */
+    double m_dMaxValue;    /**< Value at the high end of the colour map. */
+    bool m_bColorRangeSet; /**< Whether setColorRange() fixed the colour range. */
 
-    bool m_bColorbar;                  /**< If colorbar is visible. */
-    QVector<double> m_qVecScaleValues; /**< Scale values. */
-    qint32 m_iColorbarWidth;           /**< Colorbar width. */
-    qint32 m_iColorbarSteps;           /**< Number of colorbar vaues to display. */
-    qint32 m_iColorbarGradSteps;       /**< Gradient steps of the colorbar. */
-    QFont m_qFontColorbar;             /**< Colorbar font. */
-    QPen m_qPenColorbar;               /**< Colorbar pen. */
+    double m_dLeft;    /**< X value of the first column. */
+    double m_dRight;   /**< X value of the last column. */
+    double m_dBottom;  /**< Y value of the last row. */
+    double m_dTop;     /**< Y value of the first row. */
+    bool m_bExtentSet; /**< Whether setExtent() gave data units. */
+
+    bool m_bColorbar;            /**< If colorbar is visible. */
+    qint32 m_iColorbarWidth;     /**< Colorbar width. */
+    qint32 m_iColorbarGradSteps; /**< Gradient steps of the colorbar. */
 
     QRgb (*pColorMapper)(double, const QString&); /**< Function pointer to current colormap. */
 };

@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include "lineplot.h"
+#include "detail/niceticks.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -42,6 +43,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace DISPLIB::detail;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -55,28 +57,6 @@ const QVector<QColor> kPalette = {QColor(70, 130, 180), QColor(221, 132, 82), QC
                                   QColor(196, 78, 82), QColor(129, 114, 179), QColor(147, 120, 96),
                                   QColor(218, 139, 195), QColor(140, 140, 140), QColor(204, 185, 116),
                                   QColor(100, 181, 205)};
-
-/** Ticks at 1, 2 or 5 times a power of ten, about @p target of them across [lo, hi]. */
-QVector<double> niceTicks(double lo, double hi, int target)
-{
-    const double raw = (hi - lo) / target;
-    const double magnitude = std::pow(10.0, std::floor(std::log10(raw)));
-    const double norm = raw / magnitude;
-    const double step = (norm < 1.5 ? 1.0 : norm < 3.0 ? 2.0
-                             : norm < 7.0              ? 5.0
-                                                       : 10.0) *
-        magnitude;
-    QVector<double> ticks;
-    for (double v = std::ceil(lo / step) * step; v <= hi + step * 1e-9; v += step) {
-        ticks.append(std::abs(v) < step * 1e-9 ? 0.0 : v);
-    }
-    return ticks;
-}
-
-QString tickLabel(double value)
-{
-    return QString::number(value, 'g', 6);
-}
 
 } // namespace
 

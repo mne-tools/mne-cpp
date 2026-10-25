@@ -17,19 +17,24 @@
 //=============================================================================================================
 
 #include "imagesc.h"
+#include "detail/niceticks.h"
 #include "helpers/colormap.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFontMetrics>
 #include <QPainter>
+
+#include <algorithm>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace DISPLIB::detail;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -84,16 +89,19 @@ void ImageSc::init()
     //Parent init
     Graph::init();
 
-    m_iBorderTopBottom = 20;
-    m_iBorderLeftRight = 60;
+    m_dMinValue = 0.0;
+    m_dMaxValue = 0.0;
+    m_bColorRangeSet = false;
+    m_dLeft = m_dRight = m_dBottom = m_dTop = 0.0;
+    m_bExtentSet = false;
 
     //Colorbar
     m_bColorbar = true;
-    m_qFontColorbar.setPixelSize(10);
-    m_qPenColorbar = QPen(Qt::black);
-    m_iColorbarWidth = 12;
-    m_iColorbarSteps = 7; //>= 2!!
-    m_iColorbarGradSteps = 200;
+    m_iColorbarWidth = 14;
+    m_iColorbarGradSteps = 256;
+
+    setBackgroundRole(QPalette::Base);
+    setAutoFillBackground(true);
 }
 
 //=============================================================================================================
@@ -101,19 +109,12 @@ void ImageSc::init()
 void ImageSc::updateData(MatrixXd& p_dMat)
 {
     if (p_dMat.rows() > 0 && p_dMat.cols() > 0) {
-        m_dMinValue = p_dMat.minCoeff();
-        m_dMaxValue = p_dMat.maxCoeff();
-
-        // -- data --
-        m_matCentNormData = p_dMat;
-        double minValue = m_matCentNormData.minCoeff();
-        m_matCentNormData.array() -= minValue;
-        double maxValue = m_matCentNormData.maxCoeff();
-        // A constant matrix has no range: keep it at 0 instead of dividing 0 by 0
-        if (maxValue > 0.0) {
-            m_matCentNormData.array() /= maxValue;
+        m_matData = p_dMat;
+        if (!m_bColorRangeSet) {
+            m_dMinValue = p_dMat.minCoeff();
+            m_dMaxValue = p_dMat.maxCoeff();
         }
-
+        normalize();
         updateMaps();
     }
 }
@@ -136,63 +137,42 @@ void ImageSc::updateData(MatrixXi& p_iMat)
 
 //=============================================================================================================
 
+void ImageSc::normalize()
+{
+    m_matCentNormData = m_matData;
+    m_matCentNormData.array() -= m_dMinValue;
+    // A constant matrix has no range: keep it at 0 instead of dividing 0 by 0
+    if (m_dMaxValue > m_dMinValue) {
+        m_matCentNormData.array() /= (m_dMaxValue - m_dMinValue);
+    }
+    m_matCentNormData = m_matCentNormData.cwiseMax(0.0).cwiseMin(1.0);
+}
+
+//=============================================================================================================
+
 void ImageSc::updateMaps()
 {
     m_pixmapData = QPixmap();
     m_pixmapColorbar = QPixmap();
 
     if (m_matCentNormData.rows() > 0 && m_matCentNormData.cols() > 0) {
-        // --Data--
-        qint32 x = m_matCentNormData.cols();
-        qint32 y = m_matCentNormData.rows();
-        QImage t_qImageData(x, y, QImage::Format_RGB32);
-        for (qint32 i = 0; i < x; ++i)
-            for (qint32 j = 0; j < y; ++j)
-                t_qImageData.setPixel(i, j, pColorMapper(m_matCentNormData(j, i), m_sColorMap));
+        const qint32 cols = m_matCentNormData.cols();
+        const qint32 rows = m_matCentNormData.rows();
+        QImage imageData(cols, rows, QImage::Format_RGB32);
+        for (qint32 i = 0; i < cols; ++i) {
+            for (qint32 j = 0; j < rows; ++j) {
+                imageData.setPixel(i, j, pColorMapper(m_matCentNormData(j, i), m_sColorMap));
+            }
+        }
+        m_pixmapData = QPixmap::fromImage(imageData);
 
-        m_pixmapData = QPixmap::fromImage(t_qImageData);
-
-        // --Colorbar--
-        QImage t_qImageColorbar(1, m_iColorbarGradSteps, QImage::Format_RGB32);
-
-        double t_dQuantile = 1.0 / (static_cast<double>(m_iColorbarGradSteps) - 1);
+        QImage imageColorbar(1, m_iColorbarGradSteps, QImage::Format_RGB32);
         for (qint32 j = 0; j < m_iColorbarGradSteps; ++j) {
-            QRgb t_qRgb = pColorMapper(t_dQuantile * (static_cast<double>(m_iColorbarGradSteps - 1 - j)) * 1.0, m_sColorMap);
-            t_qImageColorbar.setPixel(0, j, t_qRgb);
+            imageColorbar.setPixel(0, j, pColorMapper(static_cast<double>(m_iColorbarGradSteps - 1 - j) / (m_iColorbarGradSteps - 1), m_sColorMap));
         }
-        m_pixmapColorbar = QPixmap::fromImage(t_qImageColorbar);
-
-        // --Scale Values--
-        m_qVecScaleValues.clear();
-        if (m_dMaxValue <= m_dMinValue) {
-            update();
-            return;
-        }
-
-        double scale = pow(10, floor(log(m_dMaxValue - m_dMinValue) / log(10.0)));
-
-        //Zero Based Scale?
-        if (m_dMaxValue > 0 && m_dMinValue < 0) {
-            double quantum = floor((((m_dMaxValue - m_dMinValue) / scale) / (m_iColorbarSteps - 1)) * 10.0) * (scale / 10.0);
-            double start = 0;
-            while (m_dMinValue < (start - quantum))
-                start -= quantum;
-            //Create Steps
-            m_qVecScaleValues.push_back(start);
-            for (qint32 i = 1; i < m_iColorbarSteps - 1; ++i)
-                m_qVecScaleValues.push_back(m_qVecScaleValues[i - 1] + quantum);
-        } else {
-            double quantum = floor((((m_dMaxValue - m_dMinValue) / scale) / (m_iColorbarSteps - 1)) * 10.0) * (scale / 10.0);
-            double start = floor(((m_dMaxValue - m_dMinValue) / 2.0 + m_dMinValue) / scale) * scale;
-            while (m_dMinValue < (start - quantum))
-                start -= quantum;
-            //Create Steps
-            m_qVecScaleValues.push_back(start);
-            for (qint32 i = 1; i < m_iColorbarSteps - 1; ++i)
-                m_qVecScaleValues.push_back(m_qVecScaleValues[i - 1] + quantum);
-        }
-        update();
+        m_pixmapColorbar = QPixmap::fromImage(imageColorbar);
     }
+    update();
 }
 
 //=============================================================================================================
@@ -206,98 +186,139 @@ void ImageSc::setColorMap(const QString& p_sColorMap)
 
 //=============================================================================================================
 
+void ImageSc::setExtent(double left, double right, double bottom, double top)
+{
+    m_dLeft = left;
+    m_dRight = right;
+    m_dBottom = bottom;
+    m_dTop = top;
+    m_bExtentSet = true;
+    update();
+}
+
+//=============================================================================================================
+
+void ImageSc::setColorRange(double min, double max)
+{
+    m_dMinValue = min;
+    m_dMaxValue = max;
+    m_bColorRangeSet = true;
+    if (m_matData.size() > 0) {
+        normalize();
+        updateMaps();
+    }
+}
+
+//=============================================================================================================
+
 void ImageSc::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
 
+    if (m_pixmapData.isNull()) {
+        return;
+    }
+
     QPainter painter(this);
-    if (!m_pixmapData.isNull()) {
-        QPoint t_qPointTopLeft(0, 0);
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    const QColor text(51, 51, 51);
+    const QFontMetrics metrics(font());
+    const int line = metrics.height();
 
-        // -- Data --
-        QSize t_qSizePixmapData = m_qSizeWidget;
+    // Column and row centres in data units: without an extent, column and row indices
+    const int cols = m_matCentNormData.cols();
+    const int rows = m_matCentNormData.rows();
+    const double left = m_bExtentSet ? m_dLeft : 0.0;
+    const double right = m_bExtentSet ? m_dRight : cols - 1;
+    const double top = m_bExtentSet ? m_dTop : 0.0;
+    const double bottom = m_bExtentSet ? m_dBottom : rows - 1;
+    // Half a cell beyond the first and last centre, so each cell is centred on its value
+    const double halfX = cols > 1 ? (right - left) / (cols - 1) / 2.0 : 0.5;
+    const double halfY = rows > 1 ? (bottom - top) / (rows - 1) / 2.0 : 0.5;
+    const double x0 = left - halfX;
+    const double x1 = right + halfX;
+    const double y0 = top - halfY;
+    const double y1 = bottom + halfY;
 
-        t_qSizePixmapData.setHeight(t_qSizePixmapData.height() - m_iBorderTopBottom * 2);
-        t_qSizePixmapData.setWidth(t_qSizePixmapData.width() - m_iBorderLeftRight * 2);
-        // Scale data
-        QPixmap t_qPixmapScaledData = m_pixmapData.scaled(t_qSizePixmapData, Qt::IgnoreAspectRatio); //Qt::KeepAspectRatio);
-        // Calculate data position
-        t_qPointTopLeft.setX((m_qSizeWidget.width() - t_qPixmapScaledData.width()) / 2);
-        t_qPointTopLeft.setY((m_qSizeWidget.height() - t_qPixmapScaledData.height()) / 2);
-        //Draw data
-        painter.drawPixmap(t_qPointTopLeft, t_qPixmapScaledData);
-        //Draw border
-        painter.drawRect(t_qPointTopLeft.x() - 1, t_qPointTopLeft.y() - 1, t_qPixmapScaledData.width() + 1, t_qPixmapScaledData.height() + 1);
+    // Column and row indices are whole numbers
+    const double minStep = m_bExtentSet ? 0.0 : 1.0;
+    const QVector<double> xTicks = niceTicks(std::min(x0, x1), std::max(x0, x1), 8, minStep);
+    const QVector<double> yTicks = niceTicks(std::min(y0, y1), std::max(y0, y1), 6, minStep);
+    const QVector<double> cTicks = niceTicks(m_dMinValue, m_dMaxValue, 6);
 
-        // -- Colorbar --
-        if (m_bColorbar && !m_pixmapColorbar.isNull() && m_qVecScaleValues.size() >= 2) {
-            QSize t_qSizePixmapColorbar = m_qSizeWidget;
+    int yTickWidth = 0;
+    for (double v : yTicks) {
+        yTickWidth = std::max(yTickWidth, metrics.horizontalAdvance(tickLabel(v)));
+    }
+    int cTickWidth = 0;
+    for (double v : cTicks) {
+        cTickWidth = std::max(cTickWidth, metrics.horizontalAdvance(tickLabel(v)));
+    }
 
-            t_qSizePixmapColorbar.setWidth(m_iColorbarWidth);
-            t_qSizePixmapColorbar.setHeight(t_qPixmapScaledData.height());
+    const int mLeft = yTickWidth + 14 + (m_sYLabel.isEmpty() ? 0 : line + 6);
+    const int mRight = 16 + (m_bColorbar ? m_iColorbarWidth + 14 + cTickWidth : 0);
+    const int mTop = m_sTitle.isEmpty() ? 12 : 2 * line + 8;
+    const int mBottom = line + 14 + (m_sXLabel.isEmpty() ? 0 : line + 6);
+    const QRect area(mLeft, mTop, width() - mLeft - mRight, height() - mTop - mBottom);
+    if (area.width() <= 0 || area.height() <= 0) {
+        return;
+    }
 
-            // Scale colorbar
-            QPixmap t_qPixmapScaledColorbar = m_pixmapColorbar.scaled(t_qSizePixmapColorbar, Qt::IgnoreAspectRatio);
-            // Calculate colorbar position
-            t_qPointTopLeft.setY(t_qPointTopLeft.y());
-            t_qPointTopLeft.setX(t_qPointTopLeft.x() + t_qPixmapScaledData.width() + m_iBorderLeftRight / 3);
-            //Draw colorbar
-            painter.drawPixmap(t_qPointTopLeft, t_qPixmapScaledColorbar);
-            //Draw border
-            painter.drawRect(t_qPointTopLeft.x() - 1, t_qPointTopLeft.y() - 1, m_iColorbarWidth + 1, t_qPixmapScaledData.height() + 1);
+    const auto toPixelX = [&](double x) {
+        return area.left() + (x - x0) / (x1 - x0) * area.width();
+    };
+    const auto toPixelY = [&](double y) {
+        return area.top() + (y - y0) / (y1 - y0) * area.height();
+    };
 
-            // -- Scale --
-            painter.setPen(m_qPenColorbar);
-            painter.setFont(m_qFontColorbar);
+    painter.drawPixmap(area, m_pixmapData);
+    painter.setPen(QPen(QColor(136, 136, 136), 1));
+    painter.setBrush(Qt::NoBrush);
+    painter.drawRect(area.adjusted(0, 0, -1, -1));
 
-            qint32 x = t_qPointTopLeft.x() + m_iColorbarWidth + m_qFontColorbar.pixelSize() / 2;
-            qint32 x_markLeft = x - m_iColorbarWidth - m_qFontColorbar.pixelSize() / 2;
-            qint32 x_markRight = x_markLeft + m_iColorbarWidth;
+    painter.setPen(text);
+    for (double v : xTicks) {
+        const double px = toPixelX(v);
+        painter.drawLine(QPointF(px, area.bottom()), QPointF(px, area.bottom() + 4));
+        painter.drawText(QRectF(px - 50, area.bottom() + 6, 100, line), Qt::AlignHCenter | Qt::AlignTop, tickLabel(v));
+    }
+    for (double v : yTicks) {
+        const double py = toPixelY(v);
+        painter.drawLine(QPointF(area.left() - 4, py), QPointF(area.left(), py));
+        painter.drawText(QRectF(0, py - line, area.left() - 8, 2 * line), Qt::AlignRight | Qt::AlignVCenter, tickLabel(v));
+    }
 
-            // max
-            painter.save();
-            qint32 y_max = t_qPointTopLeft.y() - m_qFontColorbar.pixelSize() / 2;
-            painter.translate(x, y_max - 1);
-            painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMaxValue));
-            painter.restore();
-            //draw max marks
-            qint32 y_max_mark = y_max + m_qFontColorbar.pixelSize() / 2;
-            painter.drawLine(x_markLeft, y_max_mark, x_markLeft + 2, y_max_mark);
-            painter.drawLine(x_markRight - 3, y_max_mark, x_markRight - 1, y_max_mark);
-
-            // min
-            painter.save();
-            qint32 y_min = t_qPointTopLeft.y() + t_qSizePixmapColorbar.height() - 1 - m_qFontColorbar.pixelSize() / 2;
-            painter.translate(x, y_min - 1);
-            painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_dMinValue));
-            painter.restore();
-            //draw min marks
-            qint32 y_min_mark = y_min + m_qFontColorbar.pixelSize() / 2;
-            painter.drawLine(x_markLeft, y_min_mark, x_markLeft + 2, y_min_mark);
-            painter.drawLine(x_markRight - 3, y_min_mark, x_markRight - 1, y_min_mark);
-
-            //Scale values
-            qint32 y_dist = y_min - y_max;
-            double minPercent = (m_qVecScaleValues[0] - m_dMinValue) / (m_dMaxValue - m_dMinValue);
-            double distPercent = (m_qVecScaleValues[1] - m_qVecScaleValues[0]) / (m_dMaxValue - m_dMinValue);
-            qint32 y_current = y_min - (minPercent * y_dist);
-            qint32 y_current_mark;
-            //draw scale
-            for (qint32 i = 0; i < m_qVecScaleValues.size(); ++i) {
-                painter.save();
-                painter.translate(x, y_current - 1);
-                painter.drawText(QRect(0, 0, 100, 12), Qt::AlignLeft, QString::number(m_qVecScaleValues[i]));
-                painter.restore();
-                //draw marks
-                y_current_mark = y_current + m_qFontColorbar.pixelSize() / 2;
-                painter.drawLine(x_markLeft, y_current_mark, x_markLeft + 2, y_current_mark);
-                painter.drawLine(x_markRight - 3, y_current_mark, x_markRight - 1, y_current_mark);
-                //update y_current
-                y_current -= distPercent * y_dist;
+    if (m_bColorbar && !m_pixmapColorbar.isNull()) {
+        const QRect bar(area.right() + 16, area.top(), m_iColorbarWidth, area.height());
+        painter.drawPixmap(bar, m_pixmapColorbar);
+        painter.setPen(QPen(QColor(136, 136, 136), 1));
+        painter.drawRect(bar.adjusted(0, 0, -1, -1));
+        painter.setPen(text);
+        if (m_dMaxValue > m_dMinValue) {
+            for (double v : cTicks) {
+                const double py = bar.bottom() - (v - m_dMinValue) / (m_dMaxValue - m_dMinValue) * bar.height();
+                painter.drawLine(QPointF(bar.right(), py), QPointF(bar.right() + 4, py));
+                painter.drawText(QRectF(bar.right() + 7, py - line, cTickWidth + 4, 2 * line), Qt::AlignLeft | Qt::AlignVCenter, tickLabel(v));
             }
         }
+    }
 
-        //Draw title & axes
-        Graph::drawLabels(t_qPixmapScaledData.width(), t_qPixmapScaledData.height());
+    if (!m_sTitle.isEmpty()) {
+        QFont titleFont = font();
+        titleFont.setBold(true);
+        titleFont.setPointSizeF(titleFont.pointSizeF() * 1.25);
+        painter.setFont(titleFont);
+        painter.drawText(QRectF(0, 4, width(), mTop - 4), Qt::AlignCenter, m_sTitle);
+        painter.setFont(font());
+    }
+    if (!m_sXLabel.isEmpty()) {
+        painter.drawText(QRectF(area.left(), height() - line - 6, area.width(), line), Qt::AlignCenter, m_sXLabel);
+    }
+    if (!m_sYLabel.isEmpty()) {
+        painter.save();
+        painter.translate(6, area.center().y());
+        painter.rotate(-90);
+        painter.drawText(QRectF(-area.height() / 2.0, 0, area.height(), line), Qt::AlignCenter, m_sYLabel);
+        painter.restore();
     }
 }
