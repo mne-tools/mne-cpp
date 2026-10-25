@@ -2,3 +2,4 @@
 	path = resources/data/mne-cpp-test-data
 	url = https://github.com/mne-tools/mne-cpp-test-data.git
 	branch = master
+	ignore = untracked
