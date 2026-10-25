@@ -314,11 +314,12 @@
       "name": "ex_connectivity_metrics",
       "title": "Connectivity metrics on simulated coupled signals",
       "brief": "Connectivity metrics on synthetic data with a known coupling",
-      "thumbnail": "",
+      "thumbnail": "/img/examples/ex_connectivity_metrics/01_trials.png",
       "url": "/docs/examples/connectivity/ex_connectivity_metrics/",
       "library": "connectivity",
       "libraries": [
-        "connectivity"
+        "connectivity",
+        "disp"
       ],
       "tasks": [
         "connectivity"
@@ -537,10 +538,11 @@
       "name": "ex_dsp_filter",
       "title": "Design and apply an FIR filter",
       "brief": "FIR filter design, application and storage with the dsp library",
-      "thumbnail": "",
+      "thumbnail": "/img/examples/ex_dsp_filter/01_frequency_response.png",
       "url": "/docs/examples/dsp/ex_dsp_filter/",
       "library": "dsp",
       "libraries": [
+        "disp",
         "dsp"
       ],
       "tasks": [
@@ -626,10 +628,11 @@
       "name": "ex_dsp_spectral",
       "title": "Spectral analysis and filtering of known signals",
       "brief": "Spectral and filtering tools of the dsp library on signals with known content",
-      "thumbnail": "",
+      "thumbnail": "/img/examples/ex_dsp_spectral/01_multitaper_psd.png",
       "url": "/docs/examples/dsp/ex_dsp_spectral/",
       "library": "dsp",
       "libraries": [
+        "disp",
         "dsp"
       ],
       "tasks": [
@@ -1062,11 +1065,12 @@
       "name": "ex_inverse_cmne",
       "title": "Contextual minimum-norm estimate (CMNE)",
       "brief": "Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices",
-      "thumbnail": "",
+      "thumbnail": "/img/examples/ex_inverse_cmne/01_cmne_left.png",
       "url": "/docs/examples/inv/ex_inverse_cmne/",
       "library": "inv",
       "libraries": [
         "inv",
+        "disp",
         "fs",
         "mne",
         "fiff"
@@ -1384,10 +1388,11 @@
       "name": "ex_read_epochs",
       "title": "Read epochs from a raw recording",
       "brief": "Read stimulus-locked epochs from a raw FIFF recording with event selection and artifact rejection",
-      "thumbnail": "",
+      "thumbnail": "/img/examples/ex_read_epochs/01_epochs_image.png",
       "url": "/docs/examples/mne/ex_read_epochs/",
       "library": "mne",
       "libraries": [
+        "disp",
         "mne",
         "fiff",
         "utils"

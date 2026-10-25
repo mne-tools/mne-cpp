@@ -67,6 +67,6 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 if(BUILD_TESTS)
-    mne_add_test(${PROJECT_NAME} LABELS example integration TIMEOUT 120
+    mne_add_test(${PROJECT_NAME} LABELS example integration TIMEOUT 120 ENVIRONMENT QT_QPA_PLATFORM=offscreen
         REQUIRES_DATA mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif)
 endif()

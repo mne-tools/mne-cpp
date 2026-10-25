@@ -11,12 +11,6 @@ Created an SSP operator (subspace dimension = 3)
 Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif...
 Binary event file resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif read
 [MNEEpochDataList::readEpochs] 73 matching events found
-[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
-[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
-[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
-[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
-[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
-[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
-[MNEEpochDataList::checkForArtifact] Reject trial because of channel EOG061
-[MNEEpochDataList::readEpochs] Read a total of 73 epochs of type 3 and marked 7 for rejection.
+[MNEEpochDataList::readEpochs] Read a total of 73 epochs of type 3 and marked 0 for rejection.
+Read 73 epochs of event 3, 0 rejected.
 Line frequency is not defined

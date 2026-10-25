@@ -69,7 +69,7 @@ Compare connectivity metrics side by side on the same averaged sensor- or source
 
 Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 296"
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 302"
 const MatrixXd adjacency = network.getFullConnectivityMatrix(); // symmetric by default
 const int strongEdges = network.getThresholdedEdges().size();
 const NetworkNode::SPtr hub = network.getNodeAt(1);

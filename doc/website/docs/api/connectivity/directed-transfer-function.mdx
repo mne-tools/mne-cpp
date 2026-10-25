@@ -75,7 +75,7 @@ Calculates the Directed Transfer Function between all channel pairs.
 
 Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 263"
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 269"
 Network granger = GrangerCausality::calculate(settings); // edge j -> i: j Granger-causes i
 Network dtf = DirectedTransferFunction::calculate(settings);
 Network pdc = PartialDirectedCoherence::calculate(settings);

@@ -26,11 +26,14 @@
 #include <dsp/parksmcclellan.h>
 #include <dsp/rt/rt_filter.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/lineplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QDebug>
 #include <QTemporaryDir>
 
@@ -46,6 +49,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace UTILSLIB;
 using namespace RTPROCESSINGLIB;
 using namespace Eigen;
@@ -98,7 +102,7 @@ RowVectorXd tone(double freq, int n)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
     bool ok = true;
 
     //! [filter_kernel_design]
@@ -177,6 +181,46 @@ int main(int argc, char* argv[])
     const double ioErr = (reloaded.getCoefficients() - lowPass.getCoefficients()).cwiseAbs().maxCoeff();
     ok &= expect(written && read && reloaded.getCoefficients().size() == lowPass.getCoefficients().size() && ioErr < 1e-6,
                  QString("FilterIO round trip keeps %1 taps (max error %2)").arg(reloaded.getCoefficients().size()).arg(ioErr));
+
+    // Magnitude responses of the three designs from 0 to 150 Hz
+    QVector<double> freqs;
+    QVector<double> gainCosine;
+    QVector<double> gainTscheb;
+    QVector<double> gainPm;
+    for (double f = 0.0; f <= 150.0; f += 0.5) {
+        freqs.append(f);
+        gainCosine.append(gain(lowPass.getCoefficients(), f, kSFreq));
+        gainTscheb.append(gain(lowPassPm.getCoefficients(), f, kSFreq));
+        gainPm.append(gain(parksMcClellan.FirCoeff, f, kSFreq));
+    }
+    LinePlot designs;
+    designs.setTitle("40 Hz low-pass designs");
+    designs.setXLabel("Frequency [Hz]");
+    designs.setYLabel("|H(f)|");
+    designs.addSeries(freqs, gainCosine, "FilterKernel, cosine, 256 taps");
+    designs.addSeries(freqs, gainTscheb, "FilterKernel, Tschebyscheff, 256 taps");
+    designs.addSeries(freqs, gainPm, "ParksMcClellan, 65 taps");
+    FigureExporter::save(designs, "frequency_response", "Magnitude response of the three 40 Hz low-pass designs: 10 Hz passes, 100 Hz is stopped.");
+
+    // The first 200 ms of the 10 + 100 Hz input, filtered at once and streamed block by block
+    QVector<double> ms;
+    QVector<double> input;
+    QVector<double> once;
+    QVector<double> stream;
+    for (int t = 0; t < 200; ++t) {
+        ms.append(t);
+        input.append(data(0, t + 1000));
+        once.append(filtered(0, t + 1000));
+        stream.append(streamed(0, t + 1000 + delay));
+    }
+    LinePlot traces;
+    traces.setTitle("10 Hz + 100 Hz through the 40 Hz low-pass");
+    traces.setXLabel("Time [ms]");
+    traces.setYLabel("Amplitude");
+    traces.addSeries(ms, input, "input", QColor(190, 190, 190));
+    traces.addSeries(ms, once, "filterData (zero phase)");
+    traces.addSeries(ms, stream, "FilterOverlapAdd, delay removed", QColor(221, 132, 82));
+    FigureExporter::save(traces, "filtered_signal", "filterData and the block-wise FilterOverlapAdd both keep the 10 Hz tone and remove the 100 Hz tone.");
 
     qInfo() << (ok ? "All dsp filter checks passed." : "dsp filter checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

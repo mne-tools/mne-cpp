@@ -93,17 +93,17 @@ Compute multitaper power at every sample with frequency-specific DPSS wavelets, 
 
 ## Example
 
-- Start here: [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx) — Spectral and filtering tools of the dsp library on signals with known content.
+- Start here: [ex_dsp_spectral](../../examples/disp/ex_dsp_spectral.mdx) — Spectral and filtering tools of the dsp library on signals with known content.
 - Full source: [`src/examples/ex_dsp_spectral/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_dsp_spectral/main.cpp)
 - Build target: `ex_dsp_spectral` (runs under CTest)
 
 ## Used in examples
 
-### [ex_dsp_spectral](../../examples/dsp/ex_dsp_spectral.mdx)
+### [ex_dsp_spectral](../../examples/disp/ex_dsp_spectral.mdx)
 
 Spectral and filtering tools of the dsp library on signals with known content.
 
-````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 145"
+````cpp title="src/examples/ex_dsp_spectral/main.cpp, line 150"
 const MultitaperTfrResult tfr = MultitaperTfr::compute(signal, kSFreq, 128, 32); // 128-sample windows, 32-sample hop
 const RowVectorXd tfrMean = tfr.tfrData[0].rowwise().mean().transpose();
 ok &= expect(std::fabs(frequencyOfMax(tfrMean, tfr.vecFreqs) - 20.0) < 2.0 && tfr.vecTimes.size() == tfr.tfrData[0].cols(),

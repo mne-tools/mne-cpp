@@ -40,17 +40,22 @@
 #include <connectivity/network/networkedge.h>
 #include <connectivity/network/networknode.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/imagesc.h>
+#include <disp/plots/lineplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QDebug>
 
 //=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <random>
@@ -60,6 +65,7 @@
 //=============================================================================================================
 
 using namespace CONNECTIVITYLIB;
+using namespace DISPLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -136,7 +142,7 @@ bool expect(bool condition, const QString& what)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
     std::seed_seq seed{42}; // fixed on purpose: the checks below need reproducible data
     std::mt19937 gen(seed);
     bool ok = true;
@@ -305,6 +311,63 @@ int main(int argc, char* argv[])
                  "manual network: mirrored adjacency, one edge above 0.5");
     ok &= expect(hub->getFullDegree() == 2 && hub->getThresholdedDegree() == 1 && std::fabs(hub->getFullStrength() - 1.1) < 1e-12,
                  "node 1: degree 2, thresholded degree 1, strength 1.1");
+
+    // The first trial: channel 1 follows channel 0, channel 2 is unrelated noise
+    QVector<double> ms(kSamples / 2);
+    for (int t = 0; t < ms.size(); ++t) {
+        ms[t] = 1000.0 * t / kSFreq;
+    }
+    LinePlot traces;
+    traces.setTitle("First of 20 trials, channels offset by 4");
+    traces.setXLabel("Time [ms]");
+    traces.setYLabel("Amplitude");
+    for (int ch = 0; ch < 3; ++ch) {
+        QVector<double> values(ms.size());
+        for (int t = 0; t < ms.size(); ++t) {
+            values[t] = settings.at(0).matData(ch, t) - 4.0 * ch;
+        }
+        traces.addSeries(ms, values, QStringList{"0: 10 Hz source", "1: source 12 ms later + noise", "2: noise"}[ch]);
+    }
+    FigureExporter::save(traces, "trials", "Simulated data: channel 1 repeats channel 0 12 ms later with independent noise; channel 2 is independent noise.");
+
+    // Per-bin coherence of the coupled and the uncoupled pair
+    const auto spectrum = [](const Network& net, int start, int end) {
+        for (const NetworkEdge::SPtr& edge : net.getFullEdges()) {
+            if (edge->getStartNodeID() == start && edge->getEndNodeID() == end) {
+                const VectorXd w = edge->getMatrixWeight().col(0);
+                return QVector<double>(w.data(), w.data() + w.size());
+            }
+        }
+        return QVector<double>();
+    };
+    const QVector<double> coherent = spectrum(coherence, 0, 1);
+    const QVector<double> independent = spectrum(coherence, 0, 2);
+    QVector<double> hz(coherent.size());
+    for (int k = 0; k < hz.size(); ++k) {
+        hz[k] = static_cast<double>(k) * kSFreq / kSamples;
+    }
+    const int shown = static_cast<int>(std::count_if(hz.cbegin(), hz.cend(), [](double f) { return f <= 40.0; }));
+    LinePlot coherenceSpectrum;
+    coherenceSpectrum.setTitle("Coherence over 20 trials");
+    coherenceSpectrum.setXLabel("Frequency [Hz]");
+    coherenceSpectrum.setYLabel("Coherence");
+    coherenceSpectrum.addSeries(hz.mid(0, shown), coherent.mid(0, shown), "channels 0-1");
+    coherenceSpectrum.addSeries(hz.mid(0, shown), independent.mid(0, shown), "channels 0-2");
+    FigureExporter::save(coherenceSpectrum, "coherence", "Coherence::calculate: the coupled pair is coherent at the 10 Hz source frequency, the independent pair is not.");
+
+    // Granger causality as a source x target matrix: only 0 -> 1 stands out
+    MatrixXd directed = MatrixXd::Zero(3, 3);
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            directed(i, j) = i == j ? 0.0 : std::max(0.0, edgeWeight(granger, i, j));
+        }
+    }
+    ImageSc grangerImage(directed);
+    grangerImage.setColorMap("Viridis");
+    grangerImage.setTitle("Granger causality, source (row) to target (column)");
+    grangerImage.setXLabel("Target channel");
+    grangerImage.setYLabel("Source channel");
+    FigureExporter::save(grangerImage, "granger", "GrangerCausality::calculate recovers the direction of the coupling: channel 0 drives channel 1.", QSize(560, 450));
 
     qInfo() << (ok ? "All connectivity checks passed." : "Connectivity checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

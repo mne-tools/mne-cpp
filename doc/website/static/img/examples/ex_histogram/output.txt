@@ -543,8 +543,8 @@ Creating non pca whitener.
 	Whitening the forward solution.
 	Adjusting source covariance matrix.
 Computing SVD of whitened and weighted lead field matrix.
-	largest singular value = 4.226178
-	scaling factor to adjust the trace = 558405969060437120.000000
+	largest singular value = 4.262618
+	scaling factor to adjust the trace = 560025367829739264.000000
 	Set minimum norm method to dSPM.
 Preparing the inverse operator for use...
 	Scaled noise and source covariance from nave = 1 to nave = 55
@@ -560,26 +560,26 @@ Picked 364 channels from the data
 combining the current components...
 (dSPM)...
 [done]
-resultClassLimits = 0.710819
- 4.23896
-  7.7671
- 11.2952
- 14.8234
- 18.3515
- 21.8797
- 25.4078
-  28.936
- 32.4641
- 35.9922
-resultFrequency =  61
+resultClassLimits = 0.991229
+ 4.44392
+ 7.89661
+ 11.3493
+  14.802
+ 18.2547
+ 21.7074
+ 25.1601
+ 28.6128
+ 32.0655
+ 35.5182
+resultFrequency =  64
 105
- 79
- 63
- 33
- 28
- 18
-  9
- 11
+ 77
+ 59
+ 30
+ 30
+ 23
+ 13
+  6
   4
 Line frequency is not defined
 FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match

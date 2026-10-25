@@ -88,7 +88,7 @@ Constructs [`TFplot`](/docs/api/disp/t-fplot) class.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 195"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 207"
 MatrixXd tf = MatrixXd::Zero(50, 40);   // frequency rows x time columns
 tf.middleRows(20, 10).setConstant(1.0); // 20-30 Hz band at 100 Hz sampling
 TFplot tfPlot(tf, 100.0, 0.0, 50.0, Jet);

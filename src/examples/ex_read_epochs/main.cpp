@@ -29,13 +29,16 @@
 
 #include <mne/mne_epoch_data_list.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/imagesc.h>
+
 #include <utils/generics/mne_logger.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QFile>
 
@@ -43,6 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
@@ -64,7 +68,7 @@ using namespace Eigen;
 int main(int argc, char* argv[])
 {
     qInstallMessageHandler(MNELogger::customLogWriter);
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
 
     // Command Line Parser
     QCommandLineParser parser;
@@ -74,7 +78,7 @@ int main(int argc, char* argv[])
     QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
-    QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
+    QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "false");
     QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");
     QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "0");
 
@@ -93,8 +97,8 @@ int main(int argc, char* argv[])
 
     qint32 event = parser.value(evokedIdxOption).toInt();
     QString t_sEventName = parser.value(eventsFileOption);
-    float fTMin = -1.5f;
-    float fTMax = 1.5f;
+    float fTMin = -0.2f;
+    float fTMax = 0.5f;
 
     bool keep_comp = false;
     if (parser.value(keepCompOption) == "false" || parser.value(keepCompOption) == "0") {
@@ -156,6 +160,50 @@ int main(int argc, char* argv[])
                                                          mapReject,
                                                          QStringList(),
                                                          picks);
+
+    // Epochs image of the gradiometer with the largest average response, as mne.Epochs.plot_image draws it
+    QList<MNEEpochData::SPtr> kept;
+    for (const MNEEpochData::SPtr& epoch : data) {
+        if (!epoch->isRejected()) {
+            kept.append(epoch);
+        }
+    }
+    qInfo().noquote() << QString("Read %1 epochs of event %2, %3 rejected.").arg(data.size()).arg(event).arg(data.size() - kept.size());
+    if (kept.isEmpty()) {
+        return 0;
+    }
+    const Index nSamples = kept.first()->epoch.cols();
+    const double sfreq = raw.info.sfreq;
+    int channel = -1;
+    double strongest = -1.0;
+    for (int c = 0; c < picks.size(); ++c) {
+        if (raw.info.chs[picks(c)].unit != FIFF_UNIT_T_M) {
+            continue;
+        }
+        RowVectorXd mean = RowVectorXd::Zero(nSamples);
+        for (const MNEEpochData::SPtr& epoch : kept) {
+            mean += epoch->epoch.row(c) / kept.size();
+        }
+        if (mean.cwiseAbs().maxCoeff() > strongest) {
+            strongest = mean.cwiseAbs().maxCoeff();
+            channel = c;
+        }
+    }
+    const int baselineEnd = static_cast<int>(-fTMin * sfreq);
+    MatrixXd image(kept.size(), nSamples);
+    for (int e = 0; e < kept.size(); ++e) {
+        const RowVectorXd row = 1e13 * kept[e]->epoch.row(channel);
+        image.row(e) = row.array() - row.head(baselineEnd).mean();
+    }
+    const double limit = image.cwiseAbs().maxCoeff() * 0.6;
+    ImageSc epochsImage(image);
+    epochsImage.setColorMap("RedBlue");
+    epochsImage.setColorRange(-limit, limit);
+    epochsImage.setTitle(QString("%1, %2 epochs [fT/cm]").arg(raw.info.ch_names[picks(channel)]).arg(kept.size()));
+    epochsImage.setXLabel("Time [ms]");
+    epochsImage.setYLabel("Epoch");
+    epochsImage.setExtent(1000.0 * fTMin, 1000.0 * fTMax, kept.size(), 1.0);
+    FigureExporter::save(epochsImage, "epochs_image", QString("Every epoch of event %1 in %2, baseline-corrected: the evoked response after the stimulus recurs from trial to trial under the noise.").arg(event).arg(raw.info.ch_names[picks(channel)]));
 
     return 0;
 }

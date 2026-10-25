@@ -30,11 +30,14 @@
 #include <fs/fs_label.h>
 #include <fs/fs_surfaceset.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/lineplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QFile>
@@ -45,11 +48,13 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <tuple>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace INVLIB;
 using namespace MNELIB;
 using namespace FIFFLIB;
@@ -89,7 +94,7 @@ QString describePeak(const InvSourceEstimate& stc, int from, int to)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
     QCommandLineParser parser;
     parser.setApplicationDescription("Contextual minimum-norm estimate (CMNE) example");
     parser.addHelpOption();
@@ -166,6 +171,26 @@ int main(int argc, char* argv[])
     const int to = static_cast<int>(std::lround((0.15 - evoked.times(0)) * evoked.info.sfreq));
     qInfo().noquote() << "  dSPM peak:" << describePeak(cmne.stcDspm, from, to);
     qInfo().noquote() << "  CMNE peak:" << describePeak(cmne.stcCmne, from, to);
+
+    // Mean over the auditory sources of each hemisphere
+    QVector<double> ms(n);
+    for (int s = 0; s < n; ++s) {
+        ms[s] = 1000.0 * (evoked.times(0) + s / evoked.info.sfreq);
+    }
+    const auto meanOver = [](const MatrixXd& m, int first, int count) {
+        const VectorXd mean = m.middleRows(first, count).colwise().mean().transpose();
+        return QVector<double>(mean.data(), mean.data() + mean.size());
+    };
+    const QList<std::tuple<QString, int, int>> hemispheres = {{"left", 0, nLh}, {"right", nLh, fwd.nsource - nLh}};
+    for (const auto& [hemi, first, count] : hemispheres) {
+        LinePlot courses;
+        courses.setTitle(QString("Auditory cortex, %1 hemisphere: mean of %2 sources").arg(hemi).arg(count));
+        courses.setXLabel("Time [ms]");
+        courses.setYLabel("z-score");
+        courses.addSeries(ms, meanOver(cmne.stcSensing.data, first, count), "dSPM, rectified and z-scored", QColor(150, 150, 150));
+        courses.addSeries(ms, meanOver(cmne.stcCmne.data, first, count), settings.onnxModelPath.isEmpty() ? "CMNE, control estimate" : "CMNE, LSTM context");
+        FigureExporter::save(courses, "cmne_" + hemi, QString("'Left Auditory' response in the %1 superior and transverse temporal sources: CMNE weights each sample by its %2-sample context.").arg(hemi).arg(k));
+    }
 
     if (parser.isSet(stcOption)) {
         const QString prefix = parser.value(stcOption);

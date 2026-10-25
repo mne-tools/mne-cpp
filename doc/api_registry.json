@@ -15413,7 +15413,8 @@
         "modalities": [
           "generic"
         ],
-        "level": "start"
+        "level": "start",
+        "library": "dsp"
       },
       "ex_dsp_maxwell": {
         "title": "Maxwell filtering (SSS) and movement compensation",
@@ -15456,7 +15457,8 @@
         "modalities": [
           "generic"
         ],
-        "level": "start"
+        "level": "start",
+        "library": "dsp"
       },
       "ex_evoked_grad_amp": {
         "title": "Tangential amplitude of planar gradiometers",
@@ -15813,7 +15815,8 @@
           "meg",
           "eeg"
         ],
-        "level": "start"
+        "level": "start",
+        "library": "mne"
       },
       "ex_read_evoked": {
         "title": "Read an evoked response",

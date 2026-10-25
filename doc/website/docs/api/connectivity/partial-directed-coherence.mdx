@@ -75,7 +75,7 @@ Calculates Partial Directed [`Coherence`](/docs/api/connectivity/coherence) betw
 
 Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 266"
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 272"
 Network dtf = DirectedTransferFunction::calculate(settings);
 Network pdc = PartialDirectedCoherence::calculate(settings);
 for (const Network* network : {&granger, &dtf, &pdc}) {

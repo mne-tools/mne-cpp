@@ -89,7 +89,7 @@ Computes the network based on the current settings.
 
 Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 166"
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 172"
 settings.setConnectivityMethods({"COH", "PLV", "WPLI"});
 const QList<Network> networks = Connectivity::calculate(settings);
 for (Network network : networks) {

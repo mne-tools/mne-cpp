@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(ex_connectivity_metrics LANGUAGES CXX)
 
-set(QT_REQUIRED_COMPONENTS Core Concurrent Network)
+set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -17,7 +17,9 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+  mne_disp
   Qt${QT_VERSION_MAJOR}::Core
+  Qt${QT_VERSION_MAJOR}::Widgets
   mne_connectivity
   Eigen3::Eigen
 )
@@ -27,5 +29,5 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 
 if(BUILD_TESTS)
-    mne_add_test(${PROJECT_NAME} LABELS example unit TIMEOUT 120)
+    mne_add_test(${PROJECT_NAME} LABELS example unit TIMEOUT 120 ENVIRONMENT QT_QPA_PLATFORM=offscreen)
 endif()

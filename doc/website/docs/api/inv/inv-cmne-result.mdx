@@ -49,7 +49,7 @@ for (InvSourceEstimate* stc : {&cmne.stcDspm, &cmne.stcSensing, &cmne.stcCmne}) 
 
 Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both auditory cortices.
 
-````cpp title="src/examples/ex_inverse_cmne/main.cpp, line 136"
+````cpp title="src/examples/ex_inverse_cmne/main.cpp, line 141"
 const MatrixXd sourceCov = MatrixXd::Identity(fwd.nsource, fwd.nsource);
 InvCMNEResult cmne = InvCMNE::compute(evoked.data, fwd.sol->data, noiseCov.data, sourceCov, settings);
 if (cmne.stcCmne.isEmpty()) {

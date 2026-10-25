@@ -12,13 +12,18 @@ Contextual minimum-norm estimate (CMNE) of the auditory evoked response in both 
 
 <ExampleFacts name="ex_inverse_cmne" />
 
-**Libraries:** [Inverse](../../api/inv/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
+**Libraries:** [Inverse](../../api/inv/index.mdx), [Visualization](../../api/disp/index.mdx), [FreeSurfer](../../api/fs/index.mdx), [MNE Core](../../api/mne/index.mdx), [FIFF I/O](../../api/fiff/index.mdx)
 
 ## What it demonstrates
 
 Computes the dSPM estimate of the "Left Auditory" response on the superior and transverse temporal sources of the sample subject, rectifies and z-scores it, and weights every sample by its temporal context (Dinh et al., 2021). With --onnx an LSTM exported by cmne.export_onnx (or trained with mne_compute_cmne --mode train) predicts the context; without it the paper's control estimate is used. The peaks of dSPM and CMNE are compared, and --stcOut writes both estimates as .stc files. Exits non-zero when a check fails.
 
 ## Results
+
+<ExampleFigures>
+  <ExampleFigure src="/img/examples/ex_inverse_cmne/01_cmne_left.png" caption={"'Left Auditory' response in the left superior and transverse temporal sources: CMNE weights each sample by its 20-sample context."} />
+  <ExampleFigure src="/img/examples/ex_inverse_cmne/02_cmne_right.png" caption={"'Left Auditory' response in the right superior and transverse temporal sources: CMNE weights each sample by its 20-sample context."} />
+</ExampleFigures>
 
 ````text title="Console output"
 Reading annotation...
@@ -116,10 +121,10 @@ The documented classes this example uses most:
 | [`InvSourceEstimate`](../../api/inv/inv-source-estimate.mdx) | Inverse |
 | [`FiffCov`](../../api/fiff/fiff-cov.mdx) | FIFF I/O |
 | [`FiffEvoked`](../../api/fiff/fiff-evoked.mdx) | FIFF I/O |
+| [`FigureExporter`](../../api/disp/figure-exporter.mdx) | Visualization |
 | [`FsAnnotationSet`](../../api/fs/fs-annotation-set.mdx) | FreeSurfer |
 | [`FsLabel`](../../api/fs/fs-label.mdx) | FreeSurfer |
 | [`FsSurfaceSet`](../../api/fs/fs-surface-set.mdx) | FreeSurfer |
-| [`InvCMNEResult`](../../api/inv/inv-cmne-result.mdx) | Inverse |
 
 ## Used in the API reference
 
@@ -164,11 +169,14 @@ The documented classes this example uses most:
 #include <fs/fs_label.h>
 #include <fs/fs_surfaceset.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/lineplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QFile>
@@ -179,11 +187,13 @@ The documented classes this example uses most:
 
 #include <cmath>
 #include <cstdlib>
+#include <tuple>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace INVLIB;
 using namespace MNELIB;
 using namespace FIFFLIB;
@@ -223,7 +233,7 @@ QString describePeak(const InvSourceEstimate& stc, int from, int to)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
     QCommandLineParser parser;
     parser.setApplicationDescription("Contextual minimum-norm estimate (CMNE) example");
     parser.addHelpOption();
@@ -300,6 +310,26 @@ int main(int argc, char* argv[])
     const int to = static_cast<int>(std::lround((0.15 - evoked.times(0)) * evoked.info.sfreq));
     qInfo().noquote() << "  dSPM peak:" << describePeak(cmne.stcDspm, from, to);
     qInfo().noquote() << "  CMNE peak:" << describePeak(cmne.stcCmne, from, to);
+
+    // Mean over the auditory sources of each hemisphere
+    QVector<double> ms(n);
+    for (int s = 0; s < n; ++s) {
+        ms[s] = 1000.0 * (evoked.times(0) + s / evoked.info.sfreq);
+    }
+    const auto meanOver = [](const MatrixXd& m, int first, int count) {
+        const VectorXd mean = m.middleRows(first, count).colwise().mean().transpose();
+        return QVector<double>(mean.data(), mean.data() + mean.size());
+    };
+    const QList<std::tuple<QString, int, int>> hemispheres = {{"left", 0, nLh}, {"right", nLh, fwd.nsource - nLh}};
+    for (const auto& [hemi, first, count] : hemispheres) {
+        LinePlot courses;
+        courses.setTitle(QString("Auditory cortex, %1 hemisphere: mean of %2 sources").arg(hemi).arg(count));
+        courses.setXLabel("Time [ms]");
+        courses.setYLabel("z-score");
+        courses.addSeries(ms, meanOver(cmne.stcSensing.data, first, count), "dSPM, rectified and z-scored", QColor(150, 150, 150));
+        courses.addSeries(ms, meanOver(cmne.stcCmne.data, first, count), settings.onnxModelPath.isEmpty() ? "CMNE, control estimate" : "CMNE, LSTM context");
+        FigureExporter::save(courses, "cmne_" + hemi, QString("'Left Auditory' response in the %1 superior and transverse temporal sources: CMNE weights each sample by its %2-sample context.").arg(hemi).arg(k));
+    }
 
     if (parser.isSet(stcOption)) {
         const QString prefix = parser.value(stcOption);

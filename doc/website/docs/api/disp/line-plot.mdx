@@ -224,28 +224,26 @@ plotWindow.setXLabel("Sample");
 plotWindow.setYLabel("Weight");
 ````
 
-### [ex_averaging](../../examples/mne/ex_averaging.mdx)
+### [ex_connectivity_metrics](../../examples/connectivity/ex_connectivity_metrics.mdx)
 
-Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
+Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_averaging/main.cpp, line 178"
-LinePlot butterfly;
-butterfly.setTitle(QString("Evoked response to event %1 (%2 epochs)").arg(event).arg(evoked.nave));
-butterfly.setXLabel("Time [ms]");
-butterfly.setYLabel("Gradiometers [fT/cm]");
-for (int c = 0; c < evoked.data.rows(); ++c) {
-    if (evoked.info.chs[c].unit == FIFF_UNIT_T_M && !evoked.info.bads.contains(evoked.info.ch_names[c])) {
-        QVector<double> values(times.size());
-        for (int s = 0; s < times.size(); ++s) {
-            values[s] = 1e13 * evoked.data(c, s);
-        }
-        butterfly.addSeries(times, values, QString(), QColor(30, 60, 110, 70));
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 320"
+LinePlot traces;
+traces.setTitle("First of 20 trials, channels offset by 4");
+traces.setXLabel("Time [ms]");
+traces.setYLabel("Amplitude");
+for (int ch = 0; ch < 3; ++ch) {
+    QVector<double> values(ms.size());
+    for (int t = 0; t < ms.size(); ++t) {
+        values[t] = settings.at(0).matData(ch, t) - 4.0 * ch;
     }
+    traces.addSeries(ms, values, QStringList{"0: 10 Hz source", "1: source 12 ms later + noise", "2: noise"}[ch]);
 }
-FigureExporter::save(butterfly, "evoked", QString("Butterfly plot of the %1 good gradiometers averaged over %2 epochs of event %3, baseline-corrected over the prestimulus interval.").arg(butterfly.seriesCount()).arg(evoked.nave).arg(event));
+FigureExporter::save(traces, "trials", "Simulated data: channel 1 repeats channel 0 12 ms later with independent noise; channel 2 is independent noise.");
 ````
 
-Also used in [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_read_evoked](../../examples/mne/ex_read_evoked.mdx), [ex_read_raw](../../examples/mne/ex_read_raw.mdx).
+Also used in [ex_dsp_filter](../../examples/disp/ex_dsp_filter.mdx), [ex_dsp_spectral](../../examples/disp/ex_dsp_spectral.mdx), [ex_averaging](../../examples/mne/ex_averaging.mdx), [ex_inverse_cmne](../../examples/inv/ex_inverse_cmne.mdx), [ex_inverse_mne](../../examples/inv/ex_inverse_mne.mdx), [ex_read_evoked](../../examples/mne/ex_read_evoked.mdx), [ex_read_raw](../../examples/mne/ex_read_raw.mdx).
 
 ## Authors of this file
 

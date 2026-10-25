@@ -131,7 +131,7 @@ Computes the spectral matrix S(f) = H(f) * Sigma * H(f)^H.
 
 Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 251"
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 257"
 MvarModel mvar;
 mvar.fit(average, 4);                                       // pass 0 to select the order by BIC
 const QVector<MatrixXd> coefficients = mvar.coefficients(); // A_1 .. A_p

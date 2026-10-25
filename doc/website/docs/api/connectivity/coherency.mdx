@@ -95,7 +95,7 @@ Calculates the imaginary part of coherency of the rows of the data matrix.
 
 Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 200"
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 206"
 Coherency::calculateAbs(coherency, settings);
 coherency.setFrequencyRange(8.0f, 12.0f);
 ok &= expect(std::fabs(edgeWeight(coherency, 0, 1) - coh01) < 1e-9, "Coherency::calculateAbs equals Coherence");

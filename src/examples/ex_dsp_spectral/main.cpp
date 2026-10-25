@@ -29,11 +29,15 @@
 #include <dsp/resample.h>
 #include <dsp/spectrogram.h>
 
+#include <disp/plots/helpers/figureexporter.h>
+#include <disp/plots/imagesc.h>
+#include <disp/plots/lineplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QDebug>
 
 //=============================================================================================================
@@ -49,6 +53,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace DISPLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 
@@ -112,7 +117,7 @@ double gainAt(const QVector<IirBiquad>& sos, double freq)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
     bool ok = true;
 
     const int n = 400;
@@ -214,6 +219,40 @@ int main(int argc, char* argv[])
     // scipy.signal.find_peaks / peak_prominences
     ok &= expect(allPeaks.size() == 4 && allPeaks[3].first == 7 && strongPeaks.size() == 2 && strongPeaks[0].first == 3 && maxError(prominences, {1.0, 3.0, 2.0, 5.0}) == 0.0,
                  "peaks [1, 3, 5, 7], prominences [1, 3, 2, 5], prominence >= 2.5 keeps [3, 7] (scipy)");
+
+    const auto toVector = [](const auto& v) {
+        return QVector<double>(v.data(), v.data() + v.size());
+    };
+
+    LinePlot psdPlot(toVector(psd.vecFreqs), toVector(RowVectorXd(psd.matPsd.row(0))), "Multitaper PSD of 20 Hz + 0.5 x 55 Hz");
+    psdPlot.setXLabel("Frequency [Hz]");
+    psdPlot.setYLabel("Power spectral density [1/Hz]");
+    FigureExporter::save(psdPlot, "multitaper_psd", "MultitaperPsd::compute: peaks at 20 and 55 Hz with a quarter of the power at 55 Hz, as the amplitudes 1 and 0.5 predict.");
+
+    // Morlet power over 5-95 Hz: two horizontal bands
+    const RowVectorXd scanFreqs = RowVectorXd::LinSpaced(46, 5.0, 95.0);
+    const MorletTfrResult scan = MorletTfr::compute(signal, kSFreq, scanFreqs, 7.0);
+    MatrixXd morletPower = scan.matPower.colwise().reverse(); // highest frequency in the first row, drawn at the top
+    ImageSc tfrImage(morletPower);
+    tfrImage.setColorMap("Viridis");
+    tfrImage.setTitle("Morlet power, 7 cycles");
+    tfrImage.setXLabel("Time [s]");
+    tfrImage.setYLabel("Frequency [Hz]");
+    tfrImage.setExtent(0.0, (n - 1) / kSFreq, scanFreqs(0), scanFreqs(scanFreqs.size() - 1)); // bottom row 5 Hz, top 95 Hz
+    FigureExporter::save(tfrImage, "morlet_tfr", "MorletTfr::compute from 5 to 95 Hz: constant power in the 20 Hz and 55 Hz bands, blurred at the edges by the wavelet length.");
+
+    QVector<double> times(n);
+    for (int t = 0; t < n; ++t) {
+        times[t] = t / kSFreq;
+    }
+    LinePlot butterworth;
+    butterworth.setTitle("Zero-phase 4th-order Butterworth low-pass at 30 Hz");
+    butterworth.setXLabel("Time [s]");
+    butterworth.setYLabel("Amplitude");
+    butterworth.addSeries(times.mid(100, 100), toVector(signal).mid(100, 100), "input", QColor(190, 190, 190));
+    butterworth.addSeries(times.mid(100, 100), toVector(lowPassed).mid(100, 100), "applyZeroPhase");
+    butterworth.addSeries(times.mid(100, 100), toVector(only20).mid(100, 100), "20 Hz component", QColor(221, 132, 82));
+    FigureExporter::save(butterworth, "butterworth", "IirFilter::applyZeroPhase removes the 55 Hz tone and leaves the 20 Hz tone in phase.");
 
     qInfo() << (ok ? "All dsp spectral checks passed." : "dsp spectral checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

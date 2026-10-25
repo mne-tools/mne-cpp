@@ -33,7 +33,7 @@ ok   ColorMap viridis, jet and cool match matplotlib to 1-5 levels
   ok   Bar heights 38, 158, 78, 118 px for counts 5, 20, 10, 15
   ok   Spline draws its curve
   ok   LinePlot spans 193 px vertically for a full sine period
-  ok   ImageSc maps the minimum and maximum columns to the ends of viridis
+  ok   ImageSc maps the first and last columns to the ends of viridis (x 55 and 311)
   ok   Plot renders axes and data
   ok   TFplot draws the 20-30 Hz band in the top colour over a bottom-colour background
 All disp plot checks passed.
@@ -255,11 +255,23 @@ int main(int argc, char* argv[])
     ImageSc image(ramp); // min..max mapped to 0..1, "Hot" by default
     image.setColorMap("Viridis");
     image.setTitle("ramp");
+    image.setExtent(0.0, 0.7, 4.0, 1.0); // columns at 0 .. 0.7 s, rows 1 .. 4 from the top
+    image.setXLabel("Time [s]");
+    image.setYLabel("Trial");
     //! [image_sc_usage]
     const QImage scImage = render(image);
-    // Data area: x in [60, 340); first and last columns are the colour map ends
-    ok &= expect(close(scImage.pixel(70, 150), qRgb(68, 1, 84), 4) && close(scImage.pixel(330, 150), qRgb(253, 231, 37), 4),
-                 "ImageSc maps the minimum and maximum columns to the ends of viridis");
+    // Along the middle row the first viridis-dark pixel sits left of the first viridis-yellow pixel
+    int darkX = -1;
+    int brightX = -1;
+    for (int px = 0; px < scImage.width(); ++px) {
+        if (darkX < 0 && close(scImage.pixel(px, 150), qRgb(68, 1, 84), 4)) {
+            darkX = px;
+        }
+        if (brightX < 0 && close(scImage.pixel(px, 150), qRgb(253, 231, 37), 4)) {
+            brightX = px;
+        }
+    }
+    ok &= expect(darkX >= 0 && brightX > darkX + 150, QString("ImageSc maps the first and last columns to the ends of viridis (x %1 and %2)").arg(darkX).arg(brightX));
 
     //! [plot_usage]
     VectorXd samples = VectorXd::LinSpaced(50, -1.0, 1.0);

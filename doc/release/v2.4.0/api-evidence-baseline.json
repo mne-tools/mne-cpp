@@ -2002,10 +2002,15 @@
       "example_state": "built",
       "including_examples": [
         "ex_averaging",
+        "ex_connectivity_metrics",
         "ex_disp",
         "ex_disp_plots",
+        "ex_dsp_filter",
+        "ex_dsp_spectral",
         "ex_histogram",
+        "ex_inverse_cmne",
         "ex_inverse_mne",
+        "ex_read_epochs",
         "ex_read_evoked",
         "ex_read_raw",
         "ex_spectral",
@@ -2033,8 +2038,11 @@
       "example_state": "built",
       "including_examples": [
         "ex_connectivity",
+        "ex_connectivity_metrics",
         "ex_disp",
-        "ex_disp_plots"
+        "ex_disp_plots",
+        "ex_dsp_spectral",
+        "ex_read_epochs"
       ],
       "snippets": [
         "ex_disp_plots/main.cpp#image_sc_usage"
@@ -2058,7 +2066,11 @@
       "example_state": "built",
       "including_examples": [
         "ex_averaging",
+        "ex_connectivity_metrics",
         "ex_disp_plots",
+        "ex_dsp_filter",
+        "ex_dsp_spectral",
+        "ex_inverse_cmne",
         "ex_inverse_mne",
         "ex_read_evoked",
         "ex_read_raw",

@@ -180,7 +180,7 @@ Returns the current frequency bins to average from/to.
 
 Connectivity metrics on synthetic data with a known coupling.
 
-````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 115"
+````cpp title="src/examples/ex_connectivity_metrics/main.cpp, line 121"
     for (const NetworkEdge::SPtr& edge : network.getFullEdges()) {
         if (edge->getStartNodeID() == start && edge->getEndNodeID() == end) {
             return edge->getWeight();
