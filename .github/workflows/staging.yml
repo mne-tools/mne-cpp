@@ -7,7 +7,8 @@
 # ═══════════════════════════════════════════════════════════════════════════
 #
 # Every push to `staging` runs the quality and docs gates, all tests (three
-# OSes, minimum and maximum Qt) and the WebAssembly build. The release builds,
+# OSes, minimum and maximum Qt) and the WebAssembly build, and deploys the dev
+# website once the quality and docs gates pass. The release builds,
 # installers and deployments (including the WebAssembly one) run nightly (only when `staging` moved since the last
 # nightly), on manual dispatch, and after a push that changed the build or
 # packaging since the last dev build, as a separate run that later pushes do
@@ -396,8 +397,8 @@ jobs:
         retention-days: 30
 
   # ── Documentation gate (T4.4): API docs, screenshots, site build ────────
-  # Runs on every push (Linux only, ~20 min): it is the docs/API gate. Only
-  # the Website deployment waits for the nightly.
+  # Runs on every push (Linux only, ~20 min): it is the docs/API gate, and the
+  # dev Website deploys its build.
   Docs:
     uses: ./.github/workflows/_reusable-docs.yml
     with:
@@ -405,10 +406,15 @@ jobs:
     secrets: inherit
 
   # ── Website deployment (dev) ──────────────────────────────────────
+  # Not tied to dev_build: a push that changes only sources or docs updates the site too.
   Website:
     runs-on: ubuntu-24.04
-    needs: [CreateDevRelease, Quality, Docs]
-    if: ${{ !cancelled() && needs.CreateDevRelease.result == 'success' && needs.Quality.result == 'success' && needs.Docs.result == 'success' }}
+    needs: [Quality, Docs]
+    if: ${{ !cancelled() && needs.Quality.result == 'success' && needs.Docs.result == 'success' }}
+    # A push run and a release run may deploy at once; the second push would be rejected
+    concurrency:
+      group: website-dev
+      cancel-in-progress: false
 
     steps:
     - name: Clone repository

@@ -130,6 +130,13 @@ class TestStrictConfig(unittest.TestCase):
                 self.assertIn(f"name: website-{channel}", body)
                 self.assertNotIn("npm run build", body[:body.index("\n  # ", 1) if "\n  # " in body[1:] else None])
 
+    def test_dev_website_deploys_on_every_green_docs_gate(self) -> None:
+        """The dev site follows staging: a push that only changes sources or docs still deploys it."""
+        text = (_WORKFLOWS / "staging.yml").read_text(encoding="utf-8")
+        job = text[text.index("\n  Website:\n"):text.index("\n  # ── WebAssembly")]
+        self.assertNotIn("CreateDevRelease", job)
+        self.assertRegex(job, r"concurrency:\s*\n\s+group: website-dev")
+
     def test_no_node20_actions(self) -> None:
         """GitHub deprecated Node.js 20 actions; these majors still declare it."""
         node20 = re.compile(r"uses: actions/(checkout@v4|cache(/\w+)?@v4|upload-artifact@v4|download-artifact@v[4-6]|"
