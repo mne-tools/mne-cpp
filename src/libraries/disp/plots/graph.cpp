@@ -62,11 +62,14 @@ void Graph::init()
     this->setMinimumHeight(m_iBorderTopBottom * 2.5);
 
     //Set Fonts
+    // Grayscale antialiasing: subpixel fringes would colour the text differently per platform
     m_qFontAxes.setPixelSize(12);
+    m_qFontAxes.setStyleStrategy(QFont::NoSubpixelAntialias);
     m_qPenAxes = QPen(Qt::black);
 
     m_qFontTitle.setPixelSize(20);
     m_qFontTitle.setBold(true);
+    m_qFontTitle.setStyleStrategy(QFont::NoSubpixelAntialias);
     m_qPenTitle = QPen(Qt::black);
 }
 
