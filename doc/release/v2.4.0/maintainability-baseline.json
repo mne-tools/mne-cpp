@@ -3,7 +3,7 @@
   "generated_by": "scripts/quality/audit_maintainability.py",
   "policy": "scripts/quality/maintainability_policy.json",
   "scanned_files": 1506,
-  "scanned_lines": 394278,
+  "scanned_lines": 394089,
   "metrics": {
     "null_macro": {
       "total": 0,
@@ -108,11 +108,11 @@
       "all_files": {}
     },
     "qt_new_unparented": {
-      "total": 922,
-      "files": 106,
+      "total": 907,
+      "files": 105,
       "by_scope": {
         "applications": 784,
-        "libraries": 138
+        "libraries": 123
       },
       "suppressed": [],
       "top": {
@@ -127,10 +127,10 @@
         "src/applications/mne_browse/Windows/icawindow.cpp": 17,
         "src/libraries/disp/viewers/hpisettingsview.cpp": 16,
         "src/applications/mne_browse/Windows/covariancewindow.cpp": 15,
-        "src/libraries/disp/plots/tfplot.cpp": 15,
         "src/applications/mne_analyze/plugins/averaging/averaging.cpp": 13,
         "src/applications/mne_analyze/plugins/dataloader/dataloader.cpp": 13,
-        "src/applications/mne_scan/mne_scan/mainwindow.cpp": 13
+        "src/applications/mne_scan/mne_scan/mainwindow.cpp": 13,
+        "src/applications/mne_scan/mne_scan/plugingui.cpp": 10
       },
       "all_files": {
         "src/applications/mne_align/align_3d_view.cpp": 1,
@@ -205,7 +205,6 @@
         "src/applications/mne_scan/plugins/rtclustmne/rtclustmne.cpp": 1,
         "src/applications/mne_scan/plugins/rtfwd/rtfwd.cpp": 1,
         "src/applications/mne_scan/plugins/writetofile/writetofile.cpp": 1,
-        "src/libraries/disp/plots/tfplot.cpp": 15,
         "src/libraries/disp/viewers/artifactsettingsview.cpp": 5,
         "src/libraries/disp/viewers/averagelayoutview.cpp": 3,
         "src/libraries/disp/viewers/averageselectionview.cpp": 3,

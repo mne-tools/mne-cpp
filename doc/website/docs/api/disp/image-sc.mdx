@@ -40,6 +40,8 @@ image.setYLabel("Trial");
 classDiagram
     Graph <|-- ImageSc
     click Graph href "../../disp/graph/"
+    ImageSc <|-- TFplot
+    click TFplot href "../../disp/t-fplot/"
 ```
 
 ---
@@ -190,6 +192,19 @@ A range symmetric around zero centres diverging maps such as "RedBlue".
 
 - **max** : *double*
   Value drawn with the high end of the colour map.
+
+---
+
+### setColorbarLabel(label)
+
+Names the quantity the colour bar shows, e.g.
+
+"Power (normalized)".
+
+**Parameters:**
+
+- **label** : *const QString &*
+  The colour bar label; empty hides it.
 
 ---
 

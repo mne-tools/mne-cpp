@@ -25,7 +25,7 @@ Colour maps are compared with matplotlib 3.10; every widget is rendered offscree
   <ExampleFigure src="/img/examples/ex_disp_plots/02_bar.png" caption={"Bar: counts of four amplitude classes."} />
   <ExampleFigure src="/img/examples/ex_disp_plots/03_spline.png" caption={"Spline: the same histogram as a smooth curve with three threshold markers."} />
   <ExampleFigure src="/img/examples/ex_disp_plots/04_image_sc.png" caption={"ImageSc: a left-to-right ramp in the viridis colour map."} />
-  <ExampleFigure src="/img/examples/ex_disp_plots/05_tf_plot.png" caption={"TFplot: power confined to the 20-30 Hz band."} />
+  <ExampleFigure src="/img/examples/ex_disp_plots/05_tf_plot.png" caption={"TFplot: power confined to the 20-29 Hz bins."} />
 </ExampleFigures>
 
 ````text title="Console output"
@@ -284,8 +284,8 @@ int main(int argc, char* argv[])
     ok &= expect(countColor(plotImage, qRgb(255, 255, 255), 0) < plotImage.width() * plotImage.height(), "Plot renders axes and data");
 
     //! [tf_plot_usage]
-    MatrixXd tf = MatrixXd::Zero(50, 40);   // frequency rows x time columns
-    tf.middleRows(20, 10).setConstant(1.0); // 20-30 Hz band at 100 Hz sampling
+    MatrixXd tf = MatrixXd::Zero(50, 100);  // 100 samples at 100 Hz: 50 frequency rows of 1 Hz x 100 times
+    tf.middleRows(20, 10).setConstant(1.0); // power in the 20-29 Hz bins
     TFplot tfPlot(tf, 100.0, 0.0, 50.0, Jet);
     //! [tf_plot_usage]
     const QImage tfImage = render(tfPlot);
@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
     FigureExporter::save(bar, "bar", "Bar: counts of four amplitude classes.");
     FigureExporter::save(spline, "spline", "Spline: the same histogram as a smooth curve with three threshold markers.");
     FigureExporter::save(image, "image_sc", "ImageSc: a left-to-right ramp in the viridis colour map.");
-    FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-30 Hz band.");
+    FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-29 Hz bins.");
 
     qInfo().noquote() << (ok ? "All disp plot checks passed." : "disp plot checks FAILED.");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;

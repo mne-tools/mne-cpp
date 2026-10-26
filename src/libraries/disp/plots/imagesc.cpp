@@ -211,6 +211,14 @@ void ImageSc::setColorRange(double min, double max)
 
 //=============================================================================================================
 
+void ImageSc::setColorbarLabel(const QString& label)
+{
+    m_sColorbarLabel = label;
+    update();
+}
+
+//=============================================================================================================
+
 void ImageSc::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
@@ -256,7 +264,7 @@ void ImageSc::paintEvent(QPaintEvent* event)
     }
 
     const int mLeft = yTickWidth + 14 + (m_sYLabel.isEmpty() ? 0 : line + 6);
-    const int mRight = 16 + (m_bColorbar ? m_iColorbarWidth + 14 + cTickWidth : 0);
+    const int mRight = 16 + (m_bColorbar ? m_iColorbarWidth + 14 + cTickWidth + (m_sColorbarLabel.isEmpty() ? 0 : line + 6) : 0);
     const int mTop = m_sTitle.isEmpty() ? 12 : 2 * line + 8;
     const int mBottom = line + 14 + (m_sXLabel.isEmpty() ? 0 : line + 6);
     const QRect area(mLeft, mTop, width() - mLeft - mRight, height() - mTop - mBottom);
@@ -300,6 +308,13 @@ void ImageSc::paintEvent(QPaintEvent* event)
                 painter.drawLine(QPointF(bar.right(), py), QPointF(bar.right() + 4, py));
                 painter.drawText(QRectF(bar.right() + 7, py - line, cTickWidth + 4, 2 * line), Qt::AlignLeft | Qt::AlignVCenter, tickLabel(v));
             }
+        }
+        if (!m_sColorbarLabel.isEmpty()) {
+            painter.save();
+            painter.translate(bar.right() + 13 + cTickWidth, bar.center().y());
+            painter.rotate(-90);
+            painter.drawText(QRectF(-bar.height() / 2.0, 0, bar.height(), line), Qt::AlignCenter, m_sColorbarLabel);
+            painter.restore();
         }
     }
 

@@ -331,6 +331,7 @@ int main(int argc, char* argv[])
     tfrImage.setTitle("Morlet power, 7 cycles");
     tfrImage.setXLabel("Time [s]");
     tfrImage.setYLabel("Frequency [Hz]");
+    tfrImage.setColorbarLabel("Power");
     tfrImage.setExtent(0.0, (n - 1) / kSFreq, scanFreqs(0), scanFreqs(scanFreqs.size() - 1)); // bottom row 5 Hz, top 95 Hz
     FigureExporter::save(tfrImage, "morlet_tfr", "MorletTfr::compute from 5 to 95 Hz: constant power in the 20 Hz and 55 Hz bands, blurred at the edges by the wavelet length.");
 

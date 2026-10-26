@@ -10,14 +10,12 @@
  *           Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     July 2018
- * @brief    Time-frequency spectrogram widget rendering an Eigen matrix as a colour image.
+ * @brief    Time-frequency power image of a spectrogram, with time and frequency axes and a colour bar.
  *
- * TFplot accepts a spectrogram matrix (rows = frequency bins, columns
- * = time samples) together with a sample rate and a colour-map choice
- * (@c Hot, @c Jet, @c Bone, @c RedBlue and signed variants) and paints
- * it into a @c QWidget with frequency-band cropping support. It is
- * used by the TF-MNE viewer to inspect Wavelet / STFT spectrograms in
- * stand-alone windows without depending on the heavier 3-D pipeline.
+ * TFplot accepts a spectrogram as produced by @c DSPLIB::Spectrogram::makeSpectrogram (rows = the
+ * first N/2 frequency bins of an N-point FFT, columns = the N time samples) together with the sample
+ * rate, an optional frequency band, a colour map and the time of the first sample, and draws it with
+ * @c ImageSc: time in seconds, frequency in Hz and power normalized to its maximum in the band.
  */
 
 #ifndef TFPLOT_H
@@ -28,20 +26,13 @@
 //=============================================================================================================
 
 #include "../disp_global.h"
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QWidget>
+#include "imagesc.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
-#include <Eigen/SparseCore>
-#include <unsupported/Eigen/FFT>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -70,16 +61,14 @@ enum ColorMaps
 
 //=============================================================================================================
 /**
- * @brief Time-frequency spectrogram QWidget rendering an Eigen matrix as a colour image.
+ * @brief Time-frequency power image of a spectrogram: time in seconds, frequency in Hz, normalized power.
  *
- * Two constructors accept either a full or a frequency-cropped
- * @c MatrixXd spectrogram together with a sample rate and a
- * @c DISPLIB::ColorMaps "ColorMaps" enum entry; @c calc_plot() builds the cached
- * @c QImage that subsequent @c paintEvents draw.
+ * Row k of the spectrogram is the FFT bin at k * sample_rate / N Hz, where N, the number of columns, is
+ * the FFT length; column j is the time tmin + j / sample_rate s.
  *
  * @snippet ex_disp_plots/main.cpp tf_plot_usage
  */
-class DISPSHARED_EXPORT TFplot : public QWidget
+class DISPSHARED_EXPORT TFplot : public ImageSc
 {
     Q_OBJECT
 
@@ -89,53 +78,35 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs TFplot class
+     * Plots the frequency bins from @p lower_frq to @p upper_frq.
      *
-     * @param[in] tf_matrix         given spectrogram.
-     * @param[in] sample_rate       given sample rate of signal related to th spectrogram.
-     * @param[in] lower_frq         lower bound frequency, that should be plotted.
-     * @param[in] upper_frq         upper bound frequency, that should be plotted.
-     * @param[in] cmap              colormap used to plot the spectrogram.
-     *
+     * @param[in] tf_matrix         Spectrogram power, N/2 frequency bins x N time samples.
+     * @param[in] sample_rate       Sample rate of the signal in Hz.
+     * @param[in] lower_frq         Lowest frequency to plot in Hz.
+     * @param[in] upper_frq         Highest frequency to plot in Hz.
+     * @param[in] cmap              Colour map.
+     * @param[in] tmin              Time of the first sample in s, e.g. the start of an epoch.
      */
-    TFplot(Eigen::MatrixXd tf_matrix,
+    TFplot(const Eigen::MatrixXd& tf_matrix,
            qreal sample_rate,
            qreal lower_frq,
            qreal upper_frq,
-           ColorMaps cmap);
+           ColorMaps cmap,
+           qreal tmin = 0.0);
 
     //=========================================================================================================
     /**
-     * Constructs TFplot class
+     * Plots all frequency bins.
      *
-     * @param[in] tf_matrix         given spectrogram.
-     * @param[in] sample_rate       given sample rate of signal related to th spectrogram.
-     * @param[in] cmap              colormap used to plot the spectrogram.
-     *
+     * @param[in] tf_matrix         Spectrogram power, N/2 frequency bins x N time samples.
+     * @param[in] sample_rate       Sample rate of the signal in Hz.
+     * @param[in] cmap              Colour map.
+     * @param[in] tmin              Time of the first sample in s, e.g. the start of an epoch.
      */
-    TFplot(Eigen::MatrixXd tf_matrix,
+    TFplot(const Eigen::MatrixXd& tf_matrix,
            qreal sample_rate,
-           ColorMaps cmap);
-
-protected:
-    //=========================================================================================================
-    /**
-     * Calculates a image to plot the tf_matrix
-     *
-     * @param[in] tf_matrix         given spectrogram.
-     * @param[in] sample_rate       given sample rate of signal related to th spectrogram.
-     * @param[in] cmap              colormap used to plot the spectrogram.
-     * @param[in] lower_frq         lower bound frequency, that should be plotted.
-     * @param[in] upper_frq         upper bound frequency, that should be plotted.
-     *
-     */
-    void calc_plot(Eigen::MatrixXd tf_matrix,
-                   qreal sample_rate,
-                   ColorMaps cmap,
-                   qreal lower_frq,
-                   qreal upper_frq);
-
-    virtual void resizeEvent(QResizeEvent* event);
+           ColorMaps cmap,
+           qreal tmin = 0.0);
 };
 } // NAMESPACE
 

@@ -80,8 +80,9 @@ int main(int argc, char* argv[])
     VectorXd dataCol = p_FiffEvoked.data.row(83).transpose();
     MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
 
-    TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 1, 50, ColorMaps::Jet);
-    FigureExporter::save(tfplot, "spectrogram", QString("Spectrogram (1-50 Hz) of %1 in the '%2' evoked response.").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));
+    TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 1, 50, ColorMaps::Jet, p_FiffEvoked.times(0));
+    tfplot.setTitle(QString("%1, %2").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));
+    FigureExporter::save(tfplot, "spectrogram", QString("Gaussian-window spectrogram (1-50 Hz) of %1 in the '%2' evoked response; time 0 is the stimulus.").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));
     if (!FigureExporter::directory().isEmpty()) {
         return 0;
     }

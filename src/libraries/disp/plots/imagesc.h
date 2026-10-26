@@ -180,6 +180,14 @@ public:
      */
     void setColorRange(double min, double max);
 
+    //=========================================================================================================
+    /**
+     * Names the quantity the colour bar shows, e.g. "Power (normalized)".
+     *
+     * @param[in] label  The colour bar label; empty hides it.
+     */
+    void setColorbarLabel(const QString& label);
+
 protected:
     //=========================================================================================================
     /**
@@ -220,6 +228,7 @@ protected:
     bool m_bExtentSet; /**< Whether setExtent() gave data units. */
 
     bool m_bColorbar;            /**< If colorbar is visible. */
+    QString m_sColorbarLabel;    /**< Quantity shown by the colour bar. */
     qint32 m_iColorbarWidth;     /**< Colorbar width. */
     qint32 m_iColorbarGradSteps; /**< Gradient steps of the colorbar. */
 

@@ -17,7 +17,7 @@ Spectrogram of one evoked channel shown as a time-frequency plot.
 ## Results
 
 <ExampleFigures>
-  <ExampleFigure src="/img/examples/ex_tf_plot/01_spectrogram.png" caption={"Spectrogram (1-50 Hz) of MEG0741 in the 'Right Auditory' evoked response."} />
+  <ExampleFigure src="/img/examples/ex_tf_plot/01_spectrogram.png" caption={"Gaussian-window spectrogram (1-50 Hz) of MEG0741 in the 'Right Auditory' evoked response; time 0 is the stimulus."} />
 </ExampleFigures>
 
 ````text title="Console output"
@@ -68,9 +68,9 @@ The documented classes this example uses most:
 | Class | Library |
 |---|---|
 | [`FigureExporter`](../../api/disp/figure-exporter.mdx) | Visualization |
-| [`Spectrogram`](../../api/utils/spectrogram.mdx) | Utilities |
 | [`FiffEvoked`](../../api/fiff/fiff-evoked.mdx) | FIFF I/O |
 | [`Plot`](../../api/disp/plot.mdx) | Visualization |
+| [`Spectrogram`](../../api/utils/spectrogram.mdx) | Utilities |
 | [`TFplot`](../../api/disp/t-fplot.mdx) | Visualization |
 
 ## Used in the API reference
@@ -164,8 +164,9 @@ int main(int argc, char* argv[])
     VectorXd dataCol = p_FiffEvoked.data.row(83).transpose();
     MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
 
-    TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 1, 50, ColorMaps::Jet);
-    FigureExporter::save(tfplot, "spectrogram", QString("Spectrogram (1-50 Hz) of %1 in the '%2' evoked response.").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));
+    TFplot tfplot(dataSpectrum, p_FiffEvoked.info.sfreq, 1, 50, ColorMaps::Jet, p_FiffEvoked.times(0));
+    tfplot.setTitle(QString("%1, %2").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));
+    FigureExporter::save(tfplot, "spectrogram", QString("Gaussian-window spectrogram (1-50 Hz) of %1 in the '%2' evoked response; time 0 is the stimulus.").arg(p_FiffEvoked.info.ch_names[83], p_FiffEvoked.comment));
     if (!FigureExporter::directory().isEmpty()) {
         return 0;
     }

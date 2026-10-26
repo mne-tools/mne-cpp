@@ -776,31 +776,57 @@ void TestDispPlots::testBarSetData()
 // TFplot
 //=============================================================================================================
 
+namespace
+{
+struct TFplotProbe : public TFplot
+{
+    using TFplot::TFplot;
+    MatrixXd data() const
+    {
+        return m_matData;
+    }
+    QVector<double> extent() const
+    {
+        return {m_dLeft, m_dRight, m_dBottom, m_dTop};
+    }
+    QString colorbarLabel() const
+    {
+        return m_sColorbarLabel;
+    }
+};
+} // namespace
+
 void TestDispPlots::testTFplotConstruction()
 {
-    MatrixXd tfMatrix(10, 20);
-    tfMatrix.setRandom();
-    tfMatrix = tfMatrix.cwiseAbs(); // Make positive for plotting
-
-    TFplot* tf = new TFplot(tfMatrix, 1000.0, ColorMaps::Jet);
-    QVERIFY(tf != nullptr);
-    delete tf;
+    // Spectrogram shape: N/2 frequency rows of an N-point FFT x N time samples
+    MatrixXd tfMatrix = MatrixXd::Random(10, 20).cwiseAbs();
+    TFplotProbe tf(tfMatrix, 1000.0, ColorMaps::Jet);
+    QCOMPARE(tf.data().rows(), 10);
+    QCOMPARE(tf.extent(), QVector<double>({0.0, 19 / 1000.0, 0.0, 9 * 1000.0 / 20}));
+    QCOMPARE(tf.colorbarLabel(), QStringLiteral("Power (normalized)"));
+    QVERIFY(!tf.grab().isNull());
 }
 
 //=============================================================================================================
 
 void TestDispPlots::testTFplotWithFreqRange()
 {
-    // Use enough frequency bins so the requested range [1..40] Hz maps to
-    // at least one pixel row.  sample_rate=100 → max_frq=50 Hz,
-    // 50 rows → frq_per_px=1 Hz → lower_px=1, upper_px=40 → 39 rows.
-    MatrixXd tfMatrix(50, 20);
-    tfMatrix.setRandom();
-    tfMatrix = tfMatrix.cwiseAbs();
+    // 100 samples at 100 Hz: row k is k Hz
+    MatrixXd tfMatrix = MatrixXd::Zero(50, 100);
+    tfMatrix.row(40).setConstant(2.0);
+    TFplotProbe tf(tfMatrix, 100.0, 1.0, 40.0, ColorMaps::Hot, -0.2);
+    // Rows 1..40 Hz, highest frequency first, normalized to the maximum
+    QCOMPARE(tf.data().rows(), 40);
+    QCOMPARE(tf.data().row(0).minCoeff(), 1.0);
+    QCOMPARE(tf.data().bottomRows(39).maxCoeff(), 0.0);
+    // Times start at tmin; frequencies are the bin centres, not the requested bounds
+    QCOMPARE(tf.extent(), QVector<double>({-0.2, -0.2 + 99 / 100.0, 1.0, 40.0}));
 
-    TFplot* tf = new TFplot(tfMatrix, 100.0, 1.0, 40.0, ColorMaps::Hot);
-    QVERIFY(tf != nullptr);
-    delete tf;
+    // Odd sample count: bins are sfreq / N apart, not (sfreq / 2) / (N / 2)
+    const double sfreq = 600.614990234375;
+    TFplotProbe odd(MatrixXd::Ones(210, 421), sfreq, 1.0, 50.0, ColorMaps::Jet);
+    QCOMPARE(odd.extent()[2], sfreq / 421);
+    QCOMPARE(odd.extent()[3], 35 * sfreq / 421);
 }
 
 //=============================================================================================================
