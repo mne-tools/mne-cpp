@@ -319,7 +319,7 @@ int main(int argc, char* argv[])
 
     LinePlot psdPlot(toVector(psd.vecFreqs), toVector(RowVectorXd(psd.matPsd.row(0))), "Multitaper PSD of 20 Hz + 0.5 x 55 Hz");
     psdPlot.setXLabel("Frequency [Hz]");
-    psdPlot.setYLabel("Power spectral density [1/Hz]");
+    psdPlot.setYLabel("Power spectral density [a.u.\u00b2/Hz]");
     FigureExporter::save(psdPlot, "multitaper_psd", "MultitaperPsd::compute: peaks at 20 and 55 Hz with a quarter of the power at 55 Hz, as the amplitudes 1 and 0.5 predict.");
 
     // Morlet power over 5-95 Hz: two horizontal bands
@@ -345,7 +345,7 @@ int main(int argc, char* argv[])
     butterworth.setYLabel("Amplitude");
     butterworth.addSeries(times.mid(100, 100), toVector(signal).mid(100, 100), "input", QColor(190, 190, 190));
     butterworth.addSeries(times.mid(100, 100), toVector(lowPassed).mid(100, 100), "applyZeroPhase");
-    butterworth.addSeries(times.mid(100, 100), toVector(only20).mid(100, 100), "20 Hz component", QColor(221, 132, 82));
+    butterworth.addSeries(times.mid(100, 100), toVector(only20).mid(100, 100), "20 Hz component", QColor(), Qt::DashLine);
     FigureExporter::save(butterworth, "butterworth", "IirFilter::applyZeroPhase removes the 55 Hz tone and leaves the 20 Hz tone in phase.");
 
     qInfo() << (ok ? "All dsp spectral checks passed." : "dsp spectral checks FAILED.");

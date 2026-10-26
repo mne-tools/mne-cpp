@@ -120,6 +120,8 @@ int main(int argc, char* argv[])
     VectorXi counts(4); // counts per class
     counts << 5, 20, 10, 15;
     bar.setData(classLimits, counts, 2); // 2 digits on the axis labels
+    bar.setXLabel("Amplitude");
+    bar.setYLabel("Count");
     //! [bar_usage]
     const QImage barImage = render(bar);
     // Plot height 300 - 40 - 100 = 160 px and the tallest bar (20 counts) fills it, so heights follow the counts
@@ -138,6 +140,8 @@ int main(int argc, char* argv[])
     Spline spline(nullptr, "Amplitude spline");
     spline.setData(classLimits, counts);
     spline.setThreshold(QVector3D(1.0f, 2.0f, 3.0f)); // three vertical marker lines
+    spline.setXLabel("Amplitude");
+    spline.setYLabel("Count");
     //! [spline_usage]
     ok &= expect(countColor(render(spline), steelBlue, 30) > 50, "Spline draws its curve");
 
@@ -178,6 +182,7 @@ int main(int argc, char* argv[])
     image.setExtent(0.0, 0.7, 4.0, 1.0); // columns at 0 .. 0.7 s, rows 1 .. 4 from the top
     image.setXLabel("Time [s]");
     image.setYLabel("Trial");
+    image.setColorbarLabel("Value");
     //! [image_sc_usage]
     const QImage scImage = render(image);
     // Along the middle row the first viridis-dark pixel sits left of the first viridis-yellow pixel

@@ -219,7 +219,7 @@ int main(int argc, char* argv[])
     traces.setYLabel("Amplitude");
     traces.addSeries(ms, input, "input", QColor(190, 190, 190));
     traces.addSeries(ms, once, "filterData (zero phase)");
-    traces.addSeries(ms, stream, "FilterOverlapAdd, delay removed", QColor(221, 132, 82));
+    traces.addSeries(ms, stream, "FilterOverlapAdd, delay removed", QColor(), Qt::DashLine);
     FigureExporter::save(traces, "filtered_signal", "filterData and the block-wise FilterOverlapAdd both keep the 10 Hz tone and remove the 100 Hz tone.");
 
     qInfo() << (ok ? "All dsp filter checks passed." : "dsp filter checks FAILED.");

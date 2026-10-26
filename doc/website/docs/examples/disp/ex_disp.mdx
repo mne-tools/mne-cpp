@@ -285,19 +285,34 @@ int main(int argc, char* argv[])
 
     printf("Read %d samples.\n", (qint32)data.cols());
 
-    //ImageSc example: one row per channel, one column per sample
-    ImageSc imagesc(data);
-    imagesc.setTitle("MEG channels over time");
-    imagesc.setXLabel("Sample");
-    imagesc.setYLabel("Channel");
-    imagesc.setColorMap("Hot"); // also "Jet", "RedBlue", "Bone", "Viridis"
+    //ImageSc example: one row per gradiometer, one column per sample, in fT/cm
+    QVector<int> grads;
+    for (int c = 0; c < data.rows(); ++c) {
+        if (raw.info.chs[picks(c)].unit == FIFF_UNIT_T_M) {
+            grads.append(c);
+        }
+    }
+    MatrixXd gradData(grads.size(), data.cols());
+    for (int i = 0; i < grads.size(); ++i) {
+        gradData.row(i) = 1e13 * data.row(grads[i]);
+    }
+    const double limit = gradData.cwiseAbs().maxCoeff();
+    ImageSc imagesc(gradData);
+    imagesc.setTitle(QString("%1 gradiometers").arg(grads.size()));
+    imagesc.setXLabel("Time [s]");
+    imagesc.setYLabel("Gradiometer");
+    imagesc.setColorbarLabel("fT/cm");
+    imagesc.setColorMap("RedBlue"); // also "Jet", "Hot", "Bone", "Viridis"
+    imagesc.setColorRange(-limit, limit);
+    imagesc.setExtent(times(0, 0), times(0, times.cols() - 1), grads.size(), 1);
 
     //Plot example: the first channel over time
     VectorXd dataCol = data.row(0).transpose();
-    Plot plot(dataCol);
+    VectorXd dataColFtCm = 1e13 * dataCol;
+    Plot plot(dataColFtCm);
     plot.setTitle(raw.info.ch_names[picks(0)]);
     plot.setXLabel("Sample");
-    plot.setYLabel("Amplitude");
+    plot.setYLabel("Amplitude [fT/cm]");
     plot.setWindowTitle("Corresponding function to MATLABs plot");
 
     //tf plot example: spectrogram of the same channel

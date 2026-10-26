@@ -326,7 +326,7 @@ int main(int argc, char* argv[])
         for (int t = 0; t < ms.size(); ++t) {
             values[t] = settings.at(0).matData(ch, t) - 4.0 * ch;
         }
-        traces.addSeries(ms, values, QStringList{"0: 10 Hz source", "1: source 12 ms later + noise", "2: noise"}[ch]);
+        traces.addSeries(ms, values, QStringList{"0: 10 Hz sine + noise", "1: channel 0, 12 ms later, + noise", "2: noise"}[ch]);
     }
     FigureExporter::save(traces, "trials", "Simulated data: channel 1 repeats channel 0 12 ms later with independent noise; channel 2 is independent noise.");
 
@@ -353,7 +353,7 @@ int main(int argc, char* argv[])
     coherenceSpectrum.setYLabel("Coherence");
     coherenceSpectrum.addSeries(hz.mid(0, shown), coherent.mid(0, shown), "channels 0-1");
     coherenceSpectrum.addSeries(hz.mid(0, shown), independent.mid(0, shown), "channels 0-2");
-    FigureExporter::save(coherenceSpectrum, "coherence", "Coherence::calculate: the coupled pair is coherent at the 10 Hz source frequency, the independent pair is not.");
+    FigureExporter::save(coherenceSpectrum, "coherence", "Coherence::calculate: the coupled pair is coherent at every frequency, since channel 1 also carries the noise of channel 0, and most of all at the 10 Hz sine; the independent pair is not.");
 
     // Granger causality as a source x target matrix: only 0 -> 1 stands out
     MatrixXd directed = MatrixXd::Zero(3, 3);
@@ -367,6 +367,7 @@ int main(int argc, char* argv[])
     grangerImage.setTitle("Granger causality, source (row) to target (column)");
     grangerImage.setXLabel("Target channel");
     grangerImage.setYLabel("Source channel");
+    grangerImage.setColorbarLabel("Granger causality");
     FigureExporter::save(grangerImage, "granger", "GrangerCausality::calculate recovers the direction of the coupling: channel 0 drives channel 1.", QSize(560, 450));
 
     qInfo() << (ok ? "All connectivity checks passed." : "Connectivity checks FAILED.");

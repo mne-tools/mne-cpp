@@ -14,7 +14,8 @@ Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audv
 	Created an SSP operator (subspace dimension = 4)
 	4 projection items activated.
 	SSP projectors applied to the evoked data
-	No baseline correction applied
+Applying baseline correction ... (mode: mean)
+[Numerics::rescale] Applying baseline correction ... (mode: mean)
 evoked first -120; last 300
 Reading forward solution from resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif...
 Creating tag directory for resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif...
@@ -543,8 +544,8 @@ Creating non pca whitener.
 	Whitening the forward solution.
 	Adjusting source covariance matrix.
 Computing SVD of whitened and weighted lead field matrix.
-	largest singular value = 4.262618
-	scaling factor to adjust the trace = 560025367829739264.000000
+	largest singular value = 4.208897
+	scaling factor to adjust the trace = 563445650834065216.000000
 	Set minimum norm method to dSPM.
 Preparing the inverse operator for use...
 	Scaled noise and source covariance from nave = 1 to nave = 55
@@ -560,27 +561,27 @@ Picked 364 channels from the data
 combining the current components...
 (dSPM)...
 [done]
-resultClassLimits = 0.991229
- 4.44392
- 7.89661
- 11.3493
-  14.802
- 18.2547
- 21.7074
- 25.1601
- 28.6128
- 32.0655
- 35.5182
-resultFrequency =  64
-105
- 77
- 59
- 30
- 30
- 23
- 13
-  6
+resultClassLimits = 0.0715277
+  2.58582
+   5.1001
+  7.61439
+  10.1287
+   12.643
+  15.1573
+  17.6715
+  20.1858
+  22.7001
+  25.2144
+resultFrequency = 260
+ 87
+ 28
+ 12
+ 15
   4
+  1
+  1
+  1
+  2
 Line frequency is not defined
 FiffStream::read_named_matrix - Number of rows in matrix data and row names do not match
 Fiff::read_named_matrix: Desired named matrix (kind = 3523) not available

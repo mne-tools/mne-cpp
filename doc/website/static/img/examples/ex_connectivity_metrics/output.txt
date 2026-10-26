@@ -1,6 +1,6 @@
 WeightedPhaseLagIndex::calculate - Resetting to full spectrum
-Total 2
-Connectivity::calculateMultiMethods - Calculated QList("COH", "PLV", "WPLI") for 20 trials in 2 msecs.
+Total 1
+Connectivity::calculateMultiMethods - Calculated QList("COH", "PLV", "WPLI") for 20 trials in 1 msecs.
 WPLI 0-1: 0.831883
 COH 0-1: 0.764147
 PLV 0-1: 0.682129

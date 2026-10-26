@@ -18,8 +18,8 @@ Multitaper spectra, power spectral density and cross-spectral density of random 
 
 <ExampleFigures>
   <ExampleFigure src="/img/examples/ex_spectral/01_hanning.png" caption={"The single Hanning taper applied before the FFT."} />
-  <ExampleFigure src="/img/examples/ex_spectral/02_psd.png" caption={"PSD of row 0 from the tapered spectrum, by hand and as the CSD of the signal with itself."} />
-  <ExampleFigure src="/img/examples/ex_spectral/03_csd.png" caption={"Real part of the cross-spectral density of rows 0 and 1: only their shared component remains."} />
+  <ExampleFigure src="/img/examples/ex_spectral/02_psd.png" caption={"PSD of channel 0 (sines at 0.46, 4.6 and 9.2 Hz) from the tapered spectrum, by hand and as the CSD of the signal with itself: the three curves coincide."} />
+  <ExampleFigure src="/img/examples/ex_spectral/03_csd.png" caption={"Real part of the cross-spectral density of channels 0 and 1: only their shared 4.6 Hz sine remains."} />
 </ExampleFigures>
 
 ## Build and run
@@ -186,23 +186,23 @@ int main(int argc, char* argv[])
     RowVectorXcd vecCsd = Spectral::csdFromTaperedSpectra(matTapSpectrumSeed, matTapSpectrumTarget, vecTapWeights, vecTapWeights, iNfft, dSampFreq);
     VectorXd csd = vecCsd.transpose().real();
 
-    //Plot the PSD of row 0 computed three ways: they coincide
+    //Plot the PSD of channel 0 computed three ways: they coincide, so the later ones are dashed and dotted
     LinePlot plotPsd;
-    plotPsd.setTitle("PSD of row 0");
+    plotPsd.setTitle("PSD of channel 0, computed three ways");
     plotPsd.setXLabel("Frequency [Hz]");
-    plotPsd.setYLabel("Power spectral density");
+    plotPsd.setYLabel("Power spectral density [a.u.\u00b2/Hz]");
     plotPsd.addSeries(freqs, toVector(psd), "psdFromTaperedSpectra");
-    plotPsd.addSeries(freqs, toVector(psdTest), "|spectrum|\u00b2, one-sided");
-    plotPsd.addSeries(freqs, toVector(psdTest2), "Re csdFromTaperedSpectra(x, x)");
+    plotPsd.addSeries(freqs, toVector(psdTest), "|spectrum|\u00b2, one-sided", QColor(), Qt::DashLine);
+    plotPsd.addSeries(freqs, toVector(psdTest2), "Re csdFromTaperedSpectra(x, x)", QColor(), Qt::DotLine);
 
-    //Plot real part of the CSD between row 0 and 1
-    LinePlot plotCsd(freqs, toVector(csd), "Real part of the CSD of rows 0 and 1");
+    //Plot real part of the CSD between channels 0 and 1
+    LinePlot plotCsd(freqs, toVector(csd), "Real part of the CSD of channels 0 and 1");
     plotCsd.setXLabel("Frequency [Hz]");
-    plotCsd.setYLabel("Cross-spectral density");
+    plotCsd.setYLabel("Cross-spectral density [a.u.\u00b2/Hz]");
 
     FigureExporter::save(plotWindow, "hanning", "The single Hanning taper applied before the FFT.");
-    FigureExporter::save(plotPsd, "psd", "PSD of row 0 from the tapered spectrum, by hand and as the CSD of the signal with itself.");
-    FigureExporter::save(plotCsd, "csd", "Real part of the cross-spectral density of rows 0 and 1: only their shared component remains.");
+    FigureExporter::save(plotPsd, "psd", "PSD of channel 0 (sines at 0.46, 4.6 and 9.2 Hz) from the tapered spectrum, by hand and as the CSD of the signal with itself: the three curves coincide.");
+    FigureExporter::save(plotCsd, "csd", "Real part of the cross-spectral density of channels 0 and 1: only their shared 4.6 Hz sine remains.");
     if (!FigureExporter::directory().isEmpty()) {
         return 0;
     }
