@@ -285,6 +285,7 @@ void FwdSettingsView::showAtlasDirDialog()
         m_bAnnotaionsLoaded = true;
     } else {
         m_pUi->m_qLabel_atlasStat->setText("not loaded");
+        m_bAnnotaionsLoaded = false;
     }
 }
 
