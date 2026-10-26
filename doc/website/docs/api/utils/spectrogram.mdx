@@ -35,11 +35,11 @@ Calculates the spectrogram (tf-representation) of a given signal.
   input-signal to calculate spectrogram of.
 
 - **windowSize** : *qint32*
-  size of the window which is used (resolution in time an frequency is depending on it).
+  width of the Gaussian window in samples (trades time against frequency resolution).
 
 **Returns:**
 
-- *Eigen::MatrixXd* — spectrogram-matrix (tf-representation of the input signal).
+- *Eigen::MatrixXd* — Power |STFT|^2, N/2 x N for a signal of N samples: row k is the FFT bin at k * sfreq / N Hz, column j the window centred on sample j.
 
 ---
 
@@ -51,6 +51,16 @@ Calculates the spectrogram (tf-representation) of a given signal.
 
 ## Used in examples
 
+### [ex_disp](../../examples/disp/ex_disp.mdx)
+
+Disp library widgets: image map, line plot and time-frequency plot of raw data.
+
+````cpp title="src/examples/ex_disp/main.cpp, line 215"
+//tf plot example: spectrogram of the same channel
+MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
+TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet, times(0, 0));
+````
+
 ### [ex_tf_plot](../../examples/disp/ex_tf_plot.mdx)
 
 Spectrogram of one evoked channel shown as a time-frequency plot.
@@ -59,16 +69,6 @@ Spectrogram of one evoked channel shown as a time-frequency plot.
 //tf plot
 VectorXd dataCol = p_FiffEvoked.data.row(83).transpose();
 MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, p_FiffEvoked.info.sfreq * 0.1);
-````
-
-### [ex_disp](../../examples/disp/ex_disp.mdx)
-
-Disp library widgets: image map, line plot and time-frequency plot of raw data.
-
-````cpp title="src/examples/ex_disp/main.cpp, line 215"
-//tf plot example: spectrogram of the same channel
-MatrixXd dataSpectrum = Spectrogram::makeSpectrogram(dataCol, raw.info.sfreq * 0.2);
-TFplot tfplot(dataSpectrum, raw.info.sfreq, 0, 100, ColorMaps::Jet);
 ````
 
 ## Authors of this file

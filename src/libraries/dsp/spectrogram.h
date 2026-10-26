@@ -71,9 +71,10 @@ public:
      * Calculates the spectrogram (tf-representation) of a given signal
      *
      * @param[in] signal         input-signal to calculate spectrogram of.
-     * @param[in] windowSize     size of the window which is used (resolution in time an frequency is depending on it).
+     * @param[in] windowSize     width of the Gaussian window in samples (trades time against frequency resolution).
      *
-     * @return spectrogram-matrix (tf-representation of the input signal).
+     * @return Power |STFT|^2, N/2 x N for a signal of N samples: row k is the FFT bin at k * sfreq / N Hz,
+     *         column j the window centred on sample j.
      */
     static Eigen::MatrixXd makeSpectrogram(Eigen::VectorXd signal,
                                            qint32 windowSize);

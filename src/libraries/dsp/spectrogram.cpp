@@ -20,6 +20,8 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <cmath>
+
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
 
@@ -88,7 +90,7 @@ VectorXd Spectrogram::gaussWindow(qint32 sample_count, qreal scale, quint32 tran
 
     for (qint32 n = 0; n < sample_count; n++) {
         qreal t = (qreal(n) - translation) / scale;
-        gauss[n] = exp(-3.14 * pow(t, 2)) * pow(sqrt(scale), (-1)) * pow(qreal(2), (0.25));
+        gauss[n] = exp(-M_PI * pow(t, 2)) * pow(sqrt(scale), (-1)) * pow(qreal(2), (0.25));
     }
 
     return gauss;
