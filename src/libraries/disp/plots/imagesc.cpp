@@ -248,10 +248,9 @@ void ImageSc::paintEvent(QPaintEvent* event)
     const double y0 = top - halfY;
     const double y1 = bottom + halfY;
 
-    // Column and row indices are whole numbers
-    const double minStep = m_bExtentSet ? 0.0 : 1.0;
-    const QVector<double> xTicks = niceTicks(std::min(x0, x1), std::max(x0, x1), 8, minStep);
-    const QVector<double> yTicks = niceTicks(std::min(y0, y1), std::max(y0, y1), 6, minStep);
+    // No ticks between cell centres: whole numbers for indices, at least one cell apart in data units
+    const QVector<double> xTicks = niceTicks(std::min(x0, x1), std::max(x0, x1), 8, std::fabs(2.0 * halfX));
+    const QVector<double> yTicks = niceTicks(std::min(y0, y1), std::max(y0, y1), 6, std::fabs(2.0 * halfY));
     const QVector<double> cTicks = niceTicks(m_dMinValue, m_dMaxValue, 6);
 
     int yTickWidth = 0;

@@ -17,11 +17,13 @@
 //=============================================================================================================
 
 #include "plot.h"
+#include "detail/niceticks.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFontMetrics>
 #include <QPoint>
 #include <QPainter>
 
@@ -30,6 +32,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace DISPLIB::detail;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -65,6 +68,8 @@ void Plot::init()
 {
     //Parent init
     Graph::init();
+    setBackgroundRole(QPalette::Base);
+    setAutoFillBackground(true);
 
     m_qListVecPointFPaths.clear();
 
@@ -150,9 +155,26 @@ void Plot::paintEvent(QPaintEvent* event)
                                  QPointF(t_qPointTopLeft.x() + (path[k].x() - m_dMinX) * scale_x, bottom - (path[k].y() - m_dMinY) * scale_y));
             }
         }
+
+        // -- Ticks --
+        painter.setPen(m_qPenAxes);
+        painter.setFont(m_qFontAxes);
+        const int line = QFontMetrics(m_qFontAxes).height();
+        const double frameBottom = t_qPointTopLeft.y() + t_qSizePlot.height();
+        for (double v : niceTicks(m_dMinX, m_dMinX + rangeX, 8)) {
+            const double px = t_qPointTopLeft.x() + (v - m_dMinX) * scale_x;
+            painter.drawLine(QPointF(px, frameBottom), QPointF(px, frameBottom + 4));
+            painter.drawText(QRectF(px - 50, frameBottom + 5, 100, line), Qt::AlignHCenter | Qt::AlignTop, tickLabel(v));
+        }
+        const double padY = 0.05 * t_qSizePlot.height() / scale_y;
+        for (double v : niceTicks(m_dMinY - padY, m_dMinY + rangeY + padY, 6)) {
+            const double py = bottom - (v - m_dMinY) * scale_y;
+            painter.drawLine(QPointF(t_qPointTopLeft.x() - 5, py), QPointF(t_qPointTopLeft.x() - 1, py));
+            painter.drawText(QRectF(0, py - line, t_qPointTopLeft.x() - 8, 2 * line), Qt::AlignRight | Qt::AlignVCenter, tickLabel(v));
+        }
         painter.end();
 
         //Draw title & axes
-        Graph::drawLabels(t_qSizePlot.width(), t_qSizePlot.height());
+        Graph::drawLabels(t_qSizePlot.height());
     }
 }

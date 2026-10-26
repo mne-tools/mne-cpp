@@ -83,7 +83,7 @@ public:
     /**
      * The constructor for Spline
      * @param[in] parent    sets the behaviour of Spline as an object, defaults to no parent QWidget.
-     * @param[in] title     string to specify the title displayed on the histogram, defaults to "Spline Histogram".
+     * @param[in] title     title drawn above the histogram, defaults to "Spline Histogram".
      */
     Spline(QWidget* parent = nullptr, const QString& title = "Spline Histogram");
 
@@ -122,22 +122,6 @@ public:
 
     //=========================================================================================================
     /**
-     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent
-     * and normalizes them.
-     *
-     * @param[in] matClassLimitData      vector input filled with values of class limits.
-     * @param[in] iClassAmount           amount of classes in the histogram.
-     * @param[out] vecCoefficientResults  vector filled with values of coefficient only.
-     * @param[out] vecExponentValues      vector filled with values of exponent only.
-     */
-    template<typename T>
-    void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
-                                     int iClassAmount,
-                                     Eigen::VectorXd& vecCoefficientResults,
-                                     Eigen::VectorXi& vecExponentValues);
-
-    //=========================================================================================================
-    /**
      * setThreshold takes in QVector3D value and creates the corresponding lines in the histogram
      *
      * @param[in] vecThresholdValues      QVector3D consisting of 3 values corresponding to the threshold lines.
@@ -154,26 +138,30 @@ public:
 
     //=========================================================================================================
     /**
-     * correctionDisplayTrueValue creates necessary adjustment of exponential multiplication with base 10
-     *
-     * @param[in] vecOriginalValues     QVector3D consisting of 3 original values.
-     * @param[in] upOrDown              Choice between "up" or "down" conversion direction.
-     * @return     returns QVector3D after necessary adjustment.
-     */
-    QVector3D correctionDisplayTrueValue(QVector3D vecOriginalValues,
-                                         QString upOrDown);
-
-    //=========================================================================================================
-    /**
      * setColorMap sets the color mapping on the histogram background
      *
      * @param[in] colorMap  qstring of the color gradient from user input.
      */
     void setColorMap(const QString& colorMap);
 
-    Eigen::VectorXi m_vecResultExponentValues; /**< Common exponent values for the entire histogram*/
-    double m_dMinAxisX;                        /**< Display value of the smallest point of the series in x-axis. */
-    double m_dMaxAxisX;                        /**< Display value of the largest point on the series in x-axis. */
+    //=========================================================================================================
+    /**
+     * Sets the label of the x axis, e.g. the quantity and unit of the class limits.
+     *
+     * @param[in] label  The x axis label.
+     */
+    void setXLabel(const QString& label);
+
+    //=========================================================================================================
+    /**
+     * Sets the label of the y axis.
+     *
+     * @param[in] label  The y axis label.
+     */
+    void setYLabel(const QString& label);
+
+    double m_dMinAxisX; /**< Smallest class limit. */
+    double m_dMaxAxisX; /**< Largest class limit. */
 
 protected:
     //=========================================================================================================
@@ -251,13 +239,16 @@ protected:
     /**
      * Returns the bottom margin in pixels.
      *
-     * @return Bottom plot margin in pixels (40).
+     * @return Bottom plot margin in pixels (60).
      */
     int bottomMargin() const
     {
-        return 40;
+        return 60;
     }
 
+    QString m_sTitle;            /**< Title. */
+    QString m_sXLabel;           /**< X axis label. */
+    QString m_sYLabel;           /**< Y axis label. */
     QList<QPointF> m_seriesData; /**< Spline data points (classMark, frequency). */
     double m_dLeftThreshold;     /**< X-axis value of the left threshold line. */
     double m_dMiddleThreshold;   /**< X-axis value of the middle threshold line. */
@@ -310,21 +301,18 @@ template<typename T>
 void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
                         const Eigen::VectorXi& matClassFrequencyData)
 {
-    Eigen::VectorXd resultDisplayValues;
     int iClassAmount = std::min(static_cast<int>(matClassFrequencyData.rows()),
                                 static_cast<int>(matClassLimitData.rows()) - 1);
     if (iClassAmount < 1)
         return;
-    this->splitCoefficientAndExponent(matClassLimitData, iClassAmount, resultDisplayValues, m_vecResultExponentValues);
-
-    m_dMinAxisX = resultDisplayValues(0);
-    m_dMaxAxisX = resultDisplayValues(iClassAmount);
+    m_dMinAxisX = static_cast<double>(matClassLimitData(0));
+    m_dMaxAxisX = static_cast<double>(matClassLimitData(iClassAmount));
 
     m_seriesData.clear();
     m_iMaximumFrequency = 0;
 
     for (int ir = 0; ir < iClassAmount; ++ir) {
-        double classMark = (resultDisplayValues(ir) + resultDisplayValues(ir + 1)) / 2.0;
+        double classMark = (static_cast<double>(matClassLimitData(ir)) + static_cast<double>(matClassLimitData(ir + 1))) / 2.0;
         m_seriesData.append(QPointF(classMark, matClassFrequencyData(ir)));
         if (matClassFrequencyData(ir) > m_iMaximumFrequency) {
             m_iMaximumFrequency = matClassFrequencyData(ir);
@@ -340,64 +328,6 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
     QWidget::update();
 }
 
-//=============================================================================================================
-
-template<typename T>
-void Spline::splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
-                                         int iClassAmount,
-                                         Eigen::VectorXd& vecCoefficientResults,
-                                         Eigen::VectorXi& vecExponentValues)
-{
-    vecCoefficientResults.resize(iClassAmount + 1);
-    vecExponentValues.resize(iClassAmount + 1);
-    double originalValue(0.0),
-        limitDisplayValue(0.0),
-        doubleExponentValue(0.0);
-    int limitExponentValue(0);
-    for (int ir = 0; ir <= iClassAmount; ++ir) {
-        originalValue = matClassLimitData(ir);
-        if (originalValue == 0.0) {
-            doubleExponentValue = 0.0;
-        } else {
-            doubleExponentValue = log10(std::fabs(originalValue));
-        }
-
-        limitExponentValue = round(doubleExponentValue);
-        limitDisplayValue = originalValue * (pow(10, -(limitExponentValue)));
-        vecCoefficientResults(ir) = limitDisplayValue;
-        vecExponentValues(ir) = limitExponentValue;
-    }
-
-    int lowestExponentValue{0},
-        highestExponentValue{0};
-
-    for (int ir = 0; ir <= iClassAmount; ++ir) {
-        if (vecExponentValues(ir) < lowestExponentValue) {
-            lowestExponentValue = vecExponentValues(ir);
-        }
-        if (vecExponentValues(ir) > highestExponentValue) {
-            highestExponentValue = vecExponentValues(ir);
-        }
-    }
-
-    if (highestExponentValue > 0) {
-        for (int ir = 0; ir <= iClassAmount; ++ir) {
-            while (vecExponentValues(ir) < highestExponentValue) {
-                vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
-                vecExponentValues(ir)++;
-            }
-        }
-    }
-
-    if (lowestExponentValue < 0) {
-        for (int ir = 0; ir <= iClassAmount; ++ir) {
-            while (vecExponentValues(ir) > lowestExponentValue) {
-                vecCoefficientResults(ir) = vecCoefficientResults(ir) * 10;
-                vecExponentValues(ir)--;
-            }
-        }
-    }
-}
 } // NAMESPACE
 
 #endif // SPLINE_H

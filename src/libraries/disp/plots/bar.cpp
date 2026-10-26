@@ -12,10 +12,8 @@
  * @date     July 2018
  * @brief    Implementation of the Bar histogram widget (axis layout and bar drawing).
  *
- * Computes the per-bin pixel rectangles from the class limits, formats
- * the tick labels via @ref Bar::splitCoefficientAndExponent() so very
- * small or very large class-limit values render compactly, and paints
- * the bars and axes in @c paintEvent().
+ * Computes the per-bin pixel rectangles from the class limits and paints
+ * the bars, the class-limit labels and the axes in @c paintEvent().
  */
 
 //=============================================================================================================
@@ -23,11 +21,13 @@
 //=============================================================================================================
 
 #include "bar.h"
+#include "detail/niceticks.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFontMetrics>
 #include <QPainter>
 #include <QPaintEvent>
 
@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace DISPLIB::detail;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -54,6 +55,22 @@ Bar::Bar(const QString& title,
     setMinimumSize(200, 150);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
+}
+
+//=============================================================================================================
+
+void Bar::setXLabel(const QString& label)
+{
+    m_sXLabel = label;
+    update();
+}
+
+//=============================================================================================================
+
+void Bar::setYLabel(const QString& label)
+{
+    m_sYLabel = label;
+    update();
 }
 
 //=============================================================================================================
@@ -98,12 +115,10 @@ void Bar::paintEvent(QPaintEvent* /*event*/)
     painter.drawLine(marginLeft, marginTop + plotH, marginLeft + plotW, marginTop + plotH);
 
     // Y-axis ticks
-    const int nYTicks = 5;
-    for (int i = 0; i <= nYTicks; ++i) {
-        int yVal = maxFreq * i / nYTicks;
-        int y = marginTop + plotH - (plotH * i / nYTicks);
-        painter.drawLine(marginLeft - 5, y, marginLeft, y);
-        painter.drawText(QRect(0, y - 10, marginLeft - 8, 20), Qt::AlignRight | Qt::AlignVCenter, QString::number(yVal));
+    for (double yVal : niceTicks(0.0, maxFreq, 5, 1.0)) {
+        const double y = marginTop + plotH - plotH * yVal / maxFreq;
+        painter.drawLine(QPointF(marginLeft - 5, y), QPointF(marginLeft, y));
+        painter.drawText(QRectF(0, y - 10, marginLeft - 8, 20), Qt::AlignRight | Qt::AlignVCenter, tickLabel(yVal));
     }
 
     // Draw bars
@@ -127,8 +142,13 @@ void Bar::paintEvent(QPaintEvent* /*event*/)
     smallFont.setPointSize(smallFont.pointSize() - 1);
     painter.setFont(smallFont);
 
+    const QFontMetrics labelMetrics(smallFont);
     for (int i = 0; i < nBars && i < m_categories.size(); ++i) {
         double cx = marginLeft + (i + 0.5) * barWidth;
+        if (labelMetrics.horizontalAdvance(m_categories[i]) < barWidth - 4) {
+            painter.drawText(QRectF(cx - barWidth / 2.0, marginTop + plotH + 6, barWidth, 20), Qt::AlignHCenter | Qt::AlignTop, m_categories[i]);
+            continue;
+        }
         painter.save();
         painter.translate(cx, marginTop + plotH + 5);
         painter.rotate(45);
@@ -136,10 +156,15 @@ void Bar::paintEvent(QPaintEvent* /*event*/)
         painter.restore();
     }
 
-    // Legend
-    if (!m_sLegend.isEmpty()) {
-        painter.setFont(QFont());
-        painter.setPen(Qt::black);
-        painter.drawText(QRect(0, h - 20, w, 20), Qt::AlignCenter, m_sLegend);
+    painter.setFont(QFont());
+    if (!m_sXLabel.isEmpty()) {
+        painter.drawText(QRect(marginLeft, h - 22, plotW, 20), Qt::AlignCenter, m_sXLabel);
+    }
+    if (!m_sYLabel.isEmpty()) {
+        painter.save();
+        painter.translate(4, marginTop + plotH / 2.0);
+        painter.rotate(-90);
+        painter.drawText(QRectF(-plotH / 2.0, 0, plotH, 20), Qt::AlignCenter, m_sYLabel);
+        painter.restore();
     }
 }

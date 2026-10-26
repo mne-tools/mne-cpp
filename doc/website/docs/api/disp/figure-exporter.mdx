@@ -93,7 +93,7 @@ Writes `image` as the next figure.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 216"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 221"
 // Written only when MNE_CPP_FIGURE_DIR names a directory
 FigureExporter::save(line, "line_plot", "LinePlot: one period of a sine wave.");
 FigureExporter::save(bar, "bar", "Bar: counts of four amplitude classes.");
@@ -106,7 +106,7 @@ FigureExporter::save(tfPlot, "tf_plot", "TFplot: power confined to the 20-29 Hz 
 
 Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
-````cpp title="src/examples/ex_disp/main.cpp, line 219"
+````cpp title="src/examples/ex_disp/main.cpp, line 234"
 FigureExporter::save(imagesc, "image_sc", QString("ImageSc of %1 MEG channels from %2 s to %3 s.").arg(data.rows()).arg(from).arg(to));
 FigureExporter::save(plot, "plot", QString("Plot of %1 over the same segment.").arg(raw.info.ch_names[picks(0)]));
 FigureExporter::save(tfplot, "tf_plot", QString("TFplot: spectrogram (0-100 Hz) of %1.").arg(raw.info.ch_names[picks(0)]));
@@ -124,8 +124,8 @@ Multitaper spectra, power spectral density and cross-spectral density of random 
 
 ````cpp title="src/examples/ex_spectral/main.cpp, line 151"
 FigureExporter::save(plotWindow, "hanning", "The single Hanning taper applied before the FFT.");
-FigureExporter::save(plotPsd, "psd", "PSD of row 0 from the tapered spectrum, by hand and as the CSD of the signal with itself.");
-FigureExporter::save(plotCsd, "csd", "Real part of the cross-spectral density of rows 0 and 1: only their shared component remains.");
+FigureExporter::save(plotPsd, "psd", "PSD of channel 0 (sines at 0.46, 4.6 and 9.2 Hz) from the tapered spectrum, by hand and as the CSD of the signal with itself: the three curves coincide.");
+FigureExporter::save(plotCsd, "csd", "Real part of the cross-spectral density of channels 0 and 1: only their shared 4.6 Hz sine remains.");
 if (!FigureExporter::directory().isEmpty()) {
     return 0;
 }

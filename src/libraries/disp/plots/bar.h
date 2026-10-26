@@ -66,9 +66,8 @@ namespace DISPLIB
  *
  * Templated on the value type so callers can pass either integer or
  * floating bin limits. Use @ref setData to install a new dataset and
- * @ref updatePlot to refresh an existing chart in place; both call
- * @ref splitCoefficientAndExponent internally to format the tick
- * labels with a configurable number of significant digits.
+ * @ref updatePlot to refresh an existing chart in place; each bar is
+ * labelled with its class limits in data units.
  *
  * @snippet ex_disp_plots/main.cpp bar_usage
  */
@@ -95,7 +94,7 @@ public:
      *
      * @param[in] matClassLimitData      vector input filled with class limits.
      * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class.
-     * @param[in] iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram.
+     * @param[in] iPrecisionValue        significant digits of the class limits on the x axis.
      */
     template<typename T>
     void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData,
@@ -112,7 +111,7 @@ public:
      *
      * @param[in] matClassLimitData      vector input filled with class limits.
      * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class.
-     * @param[in] iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram.
+     * @param[in] iPrecisionValue        significant digits of the class limits on the x axis.
      */
     template<typename T>
     void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
@@ -121,19 +120,19 @@ public:
 
     //=========================================================================================================
     /**
-     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent
-     * and normalizes them.
+     * Sets the label of the x axis, e.g. the quantity and unit of the class limits.
      *
-     * @param[in] matClassLimitData      vector input filled with values of class limits.
-     * @param[in] iClassAmount           amount of classes in the histogram.
-     * @param[out] vecCoefficientResults  vector filled with values of coefficient only.
-     * @param[out] vecExponentValues      vector filled with values of exponent only.
+     * @param[in] label  The x axis label.
      */
-    template<typename T>
-    void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
-                                     int iClassAmount,
-                                     Eigen::VectorXd& vecCoefficientResults,
-                                     Eigen::VectorXi& vecExponentValues);
+    void setXLabel(const QString& label);
+
+    //=========================================================================================================
+    /**
+     * Sets the label of the y axis.
+     *
+     * @param[in] label  The y axis label.
+     */
+    void setYLabel(const QString& label);
 
 protected:
     //=========================================================================================================
@@ -146,7 +145,8 @@ protected:
 
 private:
     QString m_sTitle;         /**< Chart title. */
-    QString m_sLegend;        /**< Legend text (exponent scale info). */
+    QString m_sXLabel;        /**< X axis label. */
+    QString m_sYLabel;        /**< Y axis label. */
     QStringList m_categories; /**< Category labels for x-axis. */
     QList<int> m_frequencies; /**< Frequency values for each bar. */
     int m_iMaxFrequency;      /**< Maximum frequency value (for y-axis scaling). */
@@ -185,17 +185,10 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
                      const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData,
                      int iPrecisionValue)
 {
-    Eigen::VectorXd resultDisplayValues;
-    Eigen::VectorXi resultExponentValues;
     int iClassAmount = std::min(static_cast<int>(matClassFrequencyData.rows()),
                                 static_cast<int>(matClassLimitData.rows()) - 1);
     if (iClassAmount < 1)
         return;
-    this->splitCoefficientAndExponent(matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
-
-    // Setup legend text
-    m_sLegend = "X-axis scale: 10e" + QString::number(resultExponentValues(0));
-
     // Build category labels and frequency list
     m_categories.clear();
     m_frequencies.clear();
@@ -203,7 +196,7 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
 
     for (int kr = 0; kr < iClassAmount; ++kr) {
         int classFreq = matClassFrequencyData(kr);
-        QString currentLimits = QString::number(resultDisplayValues(kr), 'g', iPrecisionValue) + " to " + QString::number(resultDisplayValues(kr + 1), 'g', iPrecisionValue);
+        QString currentLimits = QString::number(static_cast<double>(matClassLimitData(kr)), 'g', iPrecisionValue) + " to " + QString::number(static_cast<double>(matClassLimitData(kr + 1)), 'g', iPrecisionValue);
         m_categories << currentLimits;
         m_frequencies << classFreq;
         if (classFreq > m_iMaxFrequency) {
@@ -214,63 +207,6 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
     QWidget::update();
 }
 
-//=============================================================================================================
-
-template<typename T>
-void Bar::splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
-                                      int iClassAmount,
-                                      Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
-{
-    vecCoefficientResults.resize(iClassAmount + 1);
-    vecExponentValues.resize(iClassAmount + 1);
-    double originalValue(0.0),
-        limitDisplayValue(0.0),
-        doubleExponentValue(0.0);
-    int limitExponentValue(0);
-    for (int ir = 0; ir <= iClassAmount; ++ir) {
-        originalValue = matClassLimitData(ir);
-        if (originalValue == 0.0) {
-            doubleExponentValue = 0.0;
-        } else {
-            doubleExponentValue = log10(std::fabs(originalValue));
-        }
-
-        limitExponentValue = round(doubleExponentValue);
-        limitDisplayValue = originalValue * (pow(10, -(limitExponentValue)));
-        vecCoefficientResults(ir) = limitDisplayValue;
-        vecExponentValues(ir) = limitExponentValue;
-    }
-
-    int lowestExponentValue{0},
-        highestExponentValue{0};
-
-    for (int ir = 0; ir <= iClassAmount; ++ir) {
-        if (vecExponentValues(ir) < lowestExponentValue) {
-            lowestExponentValue = vecExponentValues(ir);
-        }
-        if (vecExponentValues(ir) > highestExponentValue) {
-            highestExponentValue = vecExponentValues(ir);
-        }
-    }
-
-    if (highestExponentValue > 0) {
-        for (int ir = 0; ir <= iClassAmount; ++ir) {
-            while (vecExponentValues(ir) < highestExponentValue) {
-                vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
-                vecExponentValues(ir)++;
-            }
-        }
-    }
-
-    if (lowestExponentValue < 0) {
-        for (int ir = 0; ir <= iClassAmount; ++ir) {
-            while (vecExponentValues(ir) > lowestExponentValue) {
-                vecCoefficientResults(ir) = vecCoefficientResults(ir) * 10;
-                vecExponentValues(ir)--;
-            }
-        }
-    }
-}
 } // NAMESPACE
 
 #endif // BAR_H

@@ -96,7 +96,7 @@ void Graph::setYLabel(const QString& p_sYLabel)
 
 //=============================================================================================================
 
-void Graph::drawLabels(qint32 p_iContentWidth, qint32 p_iContentHeight)
+void Graph::drawLabels(qint32 p_iContentHeight)
 {
     QPainter painter(this);
 
@@ -122,7 +122,8 @@ void Graph::drawLabels(qint32 p_iContentWidth, qint32 p_iContentHeight)
     // X FsLabel
     if (!m_sXLabel.isEmpty()) {
         painter.save();
-        painter.translate((m_qSizeWidget.width() - t_iLabelWidth) / 2, p_iContentHeight + ((m_qSizeWidget.height() - p_iContentHeight - m_iBorderTopBottom) / 2));
+        // Centred 12 px above the bottom edge, below the tick labels
+        painter.translate((m_qSizeWidget.width() - t_iLabelWidth) / 2, m_qSizeWidget.height() - 12 - t_iLabelHeight / 2);
         painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sXLabel);
         painter.restore();
     }
@@ -131,7 +132,8 @@ void Graph::drawLabels(qint32 p_iContentWidth, qint32 p_iContentHeight)
     if (!m_sYLabel.isEmpty()) {
         painter.save();
         painter.rotate(270);
-        painter.translate(-(m_qSizeWidget.height() + t_iLabelWidth) / 2, (m_qSizeWidget.width() - p_iContentWidth) / 2 - t_iLabelHeight * 0.75);
+        // Centred 16 px from the left edge, left of the tick labels
+        painter.translate(-(m_qSizeWidget.height() + t_iLabelWidth) / 2, 16 - t_iLabelHeight / 2);
         painter.drawText(QRect(0, 0, t_iLabelWidth, t_iLabelHeight), Qt::AlignCenter, m_sYLabel);
         painter.restore();
     }

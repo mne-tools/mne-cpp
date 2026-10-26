@@ -112,13 +112,14 @@ DISPLIB::ImageSc* m_pImageConnWeights = nullptr;
 
 Disp library widgets: image map, line plot and time-frequency plot of raw data.
 
-````cpp title="src/examples/ex_disp/main.cpp, line 207"
+````cpp title="src/examples/ex_disp/main.cpp, line 221"
 //Plot example: the first channel over time
 VectorXd dataCol = data.row(0).transpose();
-Plot plot(dataCol);
+VectorXd dataColFtCm = 1e13 * dataCol;
+Plot plot(dataColFtCm);
 plot.setTitle(raw.info.ch_names[picks(0)]);
 plot.setXLabel("Sample");
-plot.setYLabel("Amplitude");
+plot.setYLabel("Amplitude [fT/cm]");
 plot.setWindowTitle("Corresponding function to MATLABs plot");
 ````
 
@@ -126,7 +127,7 @@ plot.setWindowTitle("Corresponding function to MATLABs plot");
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 197"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 202"
 VectorXd samples = VectorXd::LinSpaced(50, -1.0, 1.0);
 Plot plot(samples); // Plot is a Graph with title and axis labels
 plot.setTitle("ramp");

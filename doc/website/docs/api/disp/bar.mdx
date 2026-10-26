@@ -17,7 +17,7 @@ class DISPLIB::Bar
 
 [`Bar`](/docs/api/disp/bar) chart / histogram QWidget rendering Eigen class-limit + frequency vectors with QPainter.
 
-Templated on the value type so callers can pass either integer or floating bin limits. Use `setData` to install a new dataset and `updatePlot` to refresh an existing chart in place; both call `splitCoefficientAndExponent` internally to format the tick labels with a configurable number of significant digits.
+Templated on the value type so callers can pass either integer or floating bin limits. Use `setData` to install a new dataset and `updatePlot` to refresh an existing chart in place; each bar is labelled with its class limits in data units.
 
 ```cpp title="src/examples/ex_disp_plots/main.cpp"
 Bar bar("Amplitude histogram");
@@ -26,6 +26,8 @@ classLimits << 0.0, 1.0, 2.0, 3.0, 4.0;
 VectorXi counts(4); // counts per class
 counts << 5, 20, 10, 15;
 bar.setData(classLimits, counts, 2); // 2 digits on the axis labels
+bar.setXLabel("Amplitude");
+bar.setYLabel("Count");
 ```
 
 ### Inheritance
@@ -66,7 +68,7 @@ Sets new data to the bar chart.
   vector input filled with class frequency to the corresponding class.
 
 - **iPrecisionValue** : *int*
-  user input to determine the amount of digits of coefficient shown in the histogram.
+  significant digits of the class limits on the x axis.
 
 ---
 
@@ -87,27 +89,31 @@ Updates the bar plot with the new data.
   vector input filled with class frequency to the corresponding class.
 
 - **iPrecisionValue** : *int*
-  user input to determine the amount of digits of coefficient shown in the histogram.
+  significant digits of the class limits on the x axis.
 
 ---
 
-### splitCoefficientAndExponent(matClassLimitData, iClassAmount, vecCoefficientResults, vecExponentValues)
+### setXLabel(label)
 
-splitCoefficientAndExponent takes in QVector value of coefficient and exponent and normalizes them.
+Sets the label of the x axis, e.g.
+
+the quantity and unit of the class limits.
 
 **Parameters:**
 
-- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
-  vector input filled with values of class limits.
+- **label** : *const QString &*
+  The x axis label.
 
-- **iClassAmount** : *int*
-  amount of classes in the histogram.
+---
 
-- **vecCoefficientResults** : *Eigen::VectorXd &*
-  vector filled with values of coefficient only.
+### setYLabel(label)
 
-- **vecExponentValues** : *Eigen::VectorXi &*
-  vector filled with values of exponent only.
+Sets the label of the y axis.
+
+**Parameters:**
+
+- **label** : *const QString &*
+  The y axis label.
 
 ---
 
@@ -130,13 +136,13 @@ classLimits << 0.0, 1.0, 2.0, 3.0, 4.0;
 VectorXi counts(4); // counts per class
 counts << 5, 20, 10, 15;
 bar.setData(classLimits, counts, 2); // 2 digits on the axis labels
+bar.setXLabel("Amplitude");
+bar.setYLabel("Count");
 const QImage barImage = render(bar);
 // Plot height 300 - 40 - 100 = 160 px and the tallest bar (20 counts) fills it, so heights follow the counts
 QList<int> heights;
 for (int b = 0; b < 4; ++b) {
     int h = 0;
-    for (int py = 0; py < barImage.height(); ++py) {
-        h += close(barImage.pixel(60 + 80 * b + 40, py), steelBlue, 2);
 ````
 
 ## Authors of this file

@@ -20,6 +20,7 @@
 
 #include "spline.h"
 
+#include "detail/niceticks.h"
 #include "helpers/colormap.h"
 
 //=============================================================================================================
@@ -42,6 +43,7 @@
 //=============================================================================================================
 
 using namespace DISPLIB;
+using namespace DISPLIB::detail;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -58,7 +60,7 @@ Spline::Spline(QWidget* parent, const QString& title)
 , m_bHasThresholds(false)
 , m_iMaximumFrequency(0)
 {
-    Q_UNUSED(title)
+    m_sTitle = title;
     setMinimumSize(200, 150);
     setBackgroundRole(QPalette::Base);
     setAutoFillBackground(true);
@@ -79,7 +81,8 @@ double Spline::dataToPixelX(double dataX) const
 double Spline::dataToPixelY(double dataY) const
 {
     const int plotH = height() - topMargin() - bottomMargin();
-    const double maxY = (m_iMaximumFrequency > 0) ? static_cast<double>(m_iMaximumFrequency) : 1.0;
+    // Headroom for the curve, which overshoots between the class marks
+    const double maxY = (m_iMaximumFrequency > 0) ? 1.1 * m_iMaximumFrequency : 1.0;
     return topMargin() + plotH - (dataY / maxY) * plotH;
 }
 
@@ -108,8 +111,6 @@ void Spline::paintEvent(QPaintEvent* /*event*/)
     const int mBottom = bottomMargin();
     const int plotW = w - mLeft - mRight;
     const int plotH = h - mTop - mBottom;
-
-    Q_UNUSED(h)
 
     if (plotW <= 0 || plotH <= 0)
         return;
@@ -146,22 +147,36 @@ void Spline::paintEvent(QPaintEvent* /*event*/)
     painter.drawLine(mLeft, mTop + plotH, mLeft + plotW, mTop + plotH);
 
     // Y-axis ticks
-    const int maxFreq = (m_iMaximumFrequency > 0) ? m_iMaximumFrequency : 1;
-    const int nYTicks = 5;
-    for (int i = 0; i <= nYTicks; ++i) {
-        int yVal = maxFreq * i / nYTicks;
-        int y = mTop + plotH - (plotH * i / nYTicks);
-        painter.drawLine(mLeft - 5, y, mLeft, y);
-        painter.drawText(QRect(0, y - 10, mLeft - 8, 20), Qt::AlignRight | Qt::AlignVCenter, QString::number(yVal));
+    const double maxFreq = (m_iMaximumFrequency > 0) ? 1.1 * m_iMaximumFrequency : 1.0;
+    for (double yVal : niceTicks(0.0, maxFreq, 5, 1.0)) {
+        const double y = dataToPixelY(yVal);
+        painter.drawLine(QPointF(mLeft - 5, y), QPointF(mLeft, y));
+        painter.drawText(QRectF(0, y - 10, mLeft - 8, 20), Qt::AlignRight | Qt::AlignVCenter, tickLabel(yVal));
     }
 
     // X-axis ticks
-    const int nXTicks = 5;
-    for (int i = 0; i <= nXTicks; ++i) {
-        double dataVal = m_dMinAxisX + (m_dMaxAxisX - m_dMinAxisX) * i / nXTicks;
-        int x = mLeft + plotW * i / nXTicks;
-        painter.drawLine(x, mTop + plotH, x, mTop + plotH + 5);
-        painter.drawText(QRect(x - 30, mTop + plotH + 6, 60, 20), Qt::AlignCenter, QString::number(dataVal, 'g', 3));
+    for (double dataVal : niceTicks(m_dMinAxisX, m_dMaxAxisX, 6)) {
+        const double x = dataToPixelX(dataVal);
+        painter.drawLine(QPointF(x, mTop + plotH), QPointF(x, mTop + plotH + 5));
+        painter.drawText(QRectF(x - 40, mTop + plotH + 6, 80, 20), Qt::AlignCenter, tickLabel(dataVal));
+    }
+
+    if (!m_sTitle.isEmpty()) {
+        QFont titleFont = painter.font();
+        titleFont.setBold(true);
+        painter.setFont(titleFont);
+        painter.drawText(QRect(0, 0, w, mTop), Qt::AlignCenter, m_sTitle);
+        painter.setFont(font());
+    }
+    if (!m_sXLabel.isEmpty()) {
+        painter.drawText(QRect(mLeft, h - 22, plotW, 20), Qt::AlignCenter, m_sXLabel);
+    }
+    if (!m_sYLabel.isEmpty()) {
+        painter.save();
+        painter.translate(4, mTop + plotH / 2.0);
+        painter.rotate(-90);
+        painter.drawText(QRectF(-plotH / 2.0, 0, plotH, 20), Qt::AlignCenter, m_sYLabel);
+        painter.restore();
     }
 
     if (!m_bHasData || m_seriesData.isEmpty())
@@ -259,10 +274,7 @@ void Spline::mousePressEvent(QMouseEvent* event)
         }
     }
 
-    double emitLeft = m_dLeftThreshold * pow(10, m_vecResultExponentValues[0]);
-    double emitMiddle = m_dMiddleThreshold * pow(10, m_vecResultExponentValues[0]);
-    double emitRight = m_dRightThreshold * pow(10, m_vecResultExponentValues[0]);
-    emit borderChanged(emitLeft, emitMiddle, emitRight);
+    emit borderChanged(m_dLeftThreshold, m_dMiddleThreshold, m_dRightThreshold);
 
     setColorMap(m_colorMap);
     QWidget::update();
@@ -277,7 +289,7 @@ void Spline::setThreshold(const QVector3D& vecThresholdValues)
         return;
     }
 
-    QVector3D correctedVectorThreshold = correctionDisplayTrueValue(vecThresholdValues, "up");
+    const QVector3D& correctedVectorThreshold = vecThresholdValues;
 
     // Check if all values are within range
     if (correctedVectorThreshold.x() < m_dMinAxisX || correctedVectorThreshold.y() < m_dMinAxisX || correctedVectorThreshold.z() < m_dMinAxisX ||
@@ -316,42 +328,22 @@ void Spline::setColorMap(const QString& colorMap)
 
 const QVector3D& Spline::getThreshold()
 {
-    QVector3D originalVector;
-    originalVector.setX(static_cast<float>(m_dLeftThreshold));
-    originalVector.setY(static_cast<float>(m_dMiddleThreshold));
-    originalVector.setZ(static_cast<float>(m_dRightThreshold));
-    m_vecReturnVector = correctionDisplayTrueValue(originalVector, "down");
+    m_vecReturnVector = m_bHasData ? QVector3D(static_cast<float>(m_dLeftThreshold), static_cast<float>(m_dMiddleThreshold), static_cast<float>(m_dRightThreshold)) : QVector3D();
     return m_vecReturnVector;
 }
 
 //=============================================================================================================
 
-QVector3D Spline::correctionDisplayTrueValue(QVector3D vecOriginalValues, QString upOrDown)
+void Spline::setXLabel(const QString& label)
 {
-    QVector3D returnCorrectedVector;
+    m_sXLabel = label;
+    QWidget::update();
+}
 
-    if (m_vecResultExponentValues.rows() > 0) {
-        int exponent = 0;
-        if (upOrDown == "up") {
-            if (m_vecResultExponentValues[0] < 0) {
-                exponent = std::abs(m_vecResultExponentValues[0]);
-            } else if (m_vecResultExponentValues[0] > 0) {
-                exponent = -(std::abs(m_vecResultExponentValues[0]));
-            }
-        } else if (upOrDown == "down") {
-            if (m_vecResultExponentValues[0] < 0) {
-                exponent = -(std::abs(m_vecResultExponentValues[0]));
-            } else if (m_vecResultExponentValues[0] > 0) {
-                exponent = std::abs(m_vecResultExponentValues[0]);
-            }
-        } else {
-            qDebug() << "Spline::correctionDisplayTrueValue error.";
-        }
+//=============================================================================================================
 
-        returnCorrectedVector.setX(vecOriginalValues.x() * static_cast<float>(pow(10, exponent)));
-        returnCorrectedVector.setY(vecOriginalValues.y() * static_cast<float>(pow(10, exponent)));
-        returnCorrectedVector.setZ(vecOriginalValues.z() * static_cast<float>(pow(10, exponent)));
-    }
-
-    return returnCorrectedVector;
+void Spline::setYLabel(const QString& label)
+{
+    m_sYLabel = label;
+    QWidget::update();
 }

@@ -168,7 +168,8 @@ void LinePlot::updateData(const QVector<double>& x,
 void LinePlot::addSeries(const QVector<double>& x,
                          const QVector<double>& y,
                          const QString& label,
-                         const QColor& color)
+                         const QColor& color,
+                         Qt::PenStyle style)
 {
     const int n = qMin(x.size(), y.size());
     const bool empty = std::all_of(m_series.cbegin(), m_series.cend(), [](const Series& s) { return s.x.isEmpty(); });
@@ -179,7 +180,17 @@ void LinePlot::addSeries(const QVector<double>& x,
         m_dMinY = first ? y[i] : qMin(m_dMinY, y[i]);
         m_dMaxY = first ? y[i] : qMax(m_dMaxY, y[i]);
     }
-    m_series.append({x.mid(0, n), y.mid(0, n), label, color.isValid() ? color : kPalette[m_series.size() % kPalette.size()]});
+    QColor lineColor = color;
+    if (!lineColor.isValid()) {
+        lineColor = kPalette[m_series.size() % kPalette.size()];
+        for (const QColor& candidate : kPalette) {
+            if (std::none_of(m_series.cbegin(), m_series.cend(), [&](const Series& s) { return s.color == candidate; })) {
+                lineColor = candidate;
+                break;
+            }
+        }
+    }
+    m_series.append({x.mid(0, n), y.mid(0, n), label, lineColor, style});
 
     setWindowTitle(m_sTitle);
     QWidget::update();
@@ -314,7 +325,7 @@ void LinePlot::paintEvent(QPaintEvent* /*event*/)
         for (int i = 1; i < series.x.size(); ++i) {
             path.lineTo(toPixelX(series.x[i]), toPixelY(series.y[i]));
         }
-        painter.setPen(QPen(series.color, penWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+        painter.setPen(QPen(series.color, penWidth, series.style, series.style == Qt::SolidLine ? Qt::RoundCap : Qt::FlatCap, Qt::RoundJoin));
         painter.setBrush(Qt::NoBrush);
         painter.drawPath(path);
     }
@@ -334,7 +345,7 @@ void LinePlot::paintEvent(QPaintEvent* /*event*/)
                 continue;
             }
             const double y = legend.top() + 5 + row++ * (line + 2) + line / 2.0;
-            painter.setPen(QPen(series.color, 2.5, Qt::SolidLine, Qt::RoundCap));
+            painter.setPen(QPen(series.color, 2.5, series.style, series.style == Qt::SolidLine ? Qt::RoundCap : Qt::FlatCap));
             painter.drawLine(QPointF(legend.left() + 8, y), QPointF(legend.left() + 26, y));
             painter.setPen(text);
             painter.drawText(QRectF(legend.left() + 32, y - line / 2.0, labelWidth + 4, line), Qt::AlignLeft | Qt::AlignVCenter, series.label);

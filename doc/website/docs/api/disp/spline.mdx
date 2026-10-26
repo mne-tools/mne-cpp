@@ -23,6 +23,8 @@ Click-drag drops left / middle / right threshold lines that are emitted as data-
 Spline spline(nullptr, "Amplitude spline");
 spline.setData(classLimits, counts);
 spline.setThreshold(QVector3D(1.0f, 2.0f, 3.0f)); // three vertical marker lines
+spline.setXLabel("Amplitude");
+spline.setYLabel("Count");
 ```
 
 ### Inheritance
@@ -46,7 +48,7 @@ The constructor for [`Spline`](/docs/api/disp/spline).
   sets the behaviour of [`Spline`](/docs/api/disp/spline) as an object, defaults to no parent QWidget.
 
 - **title** : *const QString &*
-  string to specify the title displayed on the histogram, defaults to "Spline Histogram".
+  title drawn above the histogram, defaults to "Spline Histogram".
 
 ---
 
@@ -93,26 +95,6 @@ constructor for mouse press event behaviour to create threshold lines and signal
 
 ---
 
-### splitCoefficientAndExponent(matClassLimitData, iClassAmount, vecCoefficientResults, vecExponentValues)
-
-splitCoefficientAndExponent takes in QVector value of coefficient and exponent and normalizes them.
-
-**Parameters:**
-
-- **matClassLimitData** : *const Eigen::Matrix&lt; T, Eigen::Dynamic, Eigen::Dynamic &gt; &*
-  vector input filled with values of class limits.
-
-- **iClassAmount** : *int*
-  amount of classes in the histogram.
-
-- **vecCoefficientResults** : *Eigen::VectorXd &*
-  vector filled with values of coefficient only.
-
-- **vecExponentValues** : *Eigen::VectorXi &*
-  vector filled with values of exponent only.
-
----
-
 ### setThreshold(vecThresholdValues)
 
 setThreshold takes in QVector3D value and creates the corresponding lines in the histogram
@@ -134,24 +116,6 @@ getThreshold retrieves the current threshold values
 
 ---
 
-### correctionDisplayTrueValue(vecOriginalValues, upOrDown)
-
-correctionDisplayTrueValue creates necessary adjustment of exponential multiplication with base 10
-
-**Parameters:**
-
-- **vecOriginalValues** : *QVector3D*
-  QVector3D consisting of 3 original values.
-
-- **upOrDown** : *QString*
-  Choice between "up" or "down" conversion direction.
-
-**Returns:**
-
-- *QVector3D* — returns QVector3D after necessary adjustment.
-
----
-
 ### setColorMap(colorMap)
 
 setColorMap sets the color mapping on the histogram background
@@ -160,6 +124,30 @@ setColorMap sets the color mapping on the histogram background
 
 - **colorMap** : *const QString &*
   qstring of the color gradient from user input.
+
+---
+
+### setXLabel(label)
+
+Sets the label of the x axis, e.g.
+
+the quantity and unit of the class limits.
+
+**Parameters:**
+
+- **label** : *const QString &*
+  The x axis label.
+
+---
+
+### setYLabel(label)
+
+Sets the label of the y axis.
+
+**Parameters:**
+
+- **label** : *const QString &*
+  The y axis label.
 
 ---
 
@@ -175,10 +163,12 @@ setColorMap sets the color mapping on the histogram background
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 138"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 140"
 Spline spline(nullptr, "Amplitude spline");
 spline.setData(classLimits, counts);
 spline.setThreshold(QVector3D(1.0f, 2.0f, 3.0f)); // three vertical marker lines
+spline.setXLabel("Amplitude");
+spline.setYLabel("Count");
 ok &= expect(countColor(render(spline), steelBlue, 30) > 50, "Spline draws its curve");
 ````
 
@@ -186,9 +176,9 @@ ok &= expect(countColor(render(spline), steelBlue, 30) > 50, "Spline draws its c
 
 Histogram of the source amplitudes of a clustered MNE, dSPM or sLORETA estimate of the sample evoked response.
 
-````cpp title="src/examples/ex_histogram/main.cpp, line 213"
+````cpp title="src/examples/ex_histogram/main.cpp, line 218"
 //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
-Spline* displayObj = new Spline(0, "MNE-CPP Histogram Example (Spline)");
+Spline* displayObj = new Spline(0, QString("%1 of %2 clustered sources at 100 ms").arg(method).arg(sourceEstimateData.size()));
 //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
 ````
 

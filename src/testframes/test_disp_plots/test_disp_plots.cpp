@@ -473,6 +473,19 @@ void TestDispPlots::testLinePlotAddSeries()
     crowded.addSeries(x, zigzag, "zigzag");
     QVERIFY(frameRight(crowded.grab().toImage()) < inside - 40);
 
+    // A default colour skips the palette colours already in use; a dashed line leaves gaps
+    LinePlot palette;
+    palette.resize(400, 300);
+    palette.addSeries({0.0, 1.0}, {0.0, 0.0}, QString(), QColor(221, 132, 82));
+    palette.addSeries({0.0, 1.0}, {1.0, 1.0});
+    const int solidPixels = count(palette.grab().toImage(), qRgb(70, 130, 180));
+    QVERIFY(solidPixels > 100);
+    LinePlot dashed;
+    dashed.resize(400, 300);
+    dashed.addSeries({0.0, 1.0}, {0.0, 0.0}, QString(), QColor(70, 130, 180));
+    dashed.addSeries({0.0, 1.0}, {1.0, 1.0}, QString(), QColor(70, 130, 180), Qt::DashLine);
+    QVERIFY(count(dashed.grab().toImage(), qRgb(70, 130, 180)) < 1.8 * solidPixels);
+
     plot.updateData(QVector<double>{1.0, 2.0});
     QCOMPARE(plot.seriesCount(), 1);
 }
@@ -628,6 +641,8 @@ void TestDispPlots::testNiceTicks()
     // Index axes of a 3 x 3 image span [-0.5, 2.5]: whole numbers only
     QCOMPARE(detail::niceTicks(-0.5, 2.5, 8, 1.0), QVector<double>({0.0, 1.0, 2.0}));
     QVERIFY(detail::niceTicks(1.0, 1.0, 5).isEmpty());
+    // A step of 1 would put ticks closer than minStep: the next nice step up
+    QCOMPARE(detail::niceTicks(0.0, 10.0, 20, 1.43), QVector<double>({0.0, 2.0, 4.0, 6.0, 8.0, 10.0}));
 }
 
 //=============================================================================================================
@@ -741,6 +756,19 @@ void TestDispPlots::testSplineThreshold()
     QCOMPARE(borderSpy.size(), 1);
     QVERIFY(std::fabs(borderSpy.at(0).at(0).toDouble() - 1.0) < 1e-6);
     QVERIFY(!spline.grab().isNull());
+
+    // The title is drawn above the plot area
+    Spline titled(nullptr, QStringLiteral("Amplitudes"));
+    titled.resize(320, 250);
+    titled.setData(limits, freq);
+    const QImage top = titled.grab().toImage().copy(80, 0, 200, 24);
+    int dark = 0;
+    for (int y = 0; y < top.height(); ++y) {
+        for (int x = 0; x < top.width(); ++x) {
+            dark += qGray(top.pixel(x, y)) < 128;
+        }
+    }
+    QVERIFY(dark > 20);
 }
 
 //=============================================================================================================

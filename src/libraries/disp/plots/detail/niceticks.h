@@ -34,9 +34,14 @@ inline QVector<double> niceTicks(double lo, double hi, int target, double minSte
     const double raw = std::max((hi - lo) / target, minStep);
     const int exponent = static_cast<int>(std::floor(std::log10(raw)));
     const double norm = raw / std::pow(10.0, exponent);
-    const double multiple = norm < 1.5 ? 1.0 : norm < 3.0 ? 2.0
-        : norm < 7.0                                      ? 5.0
-                                                          : 10.0;
+    double multiple = norm < 1.5 ? 1.0 : norm < 3.0 ? 2.0
+        : norm < 7.0                                ? 5.0
+                                                    : 10.0;
+    // Rounding to the nearest multiple may fall below minStep: take the next one up
+    if (multiple * std::pow(10.0, exponent) < minStep * (1.0 - 1e-9)) {
+        multiple = multiple == 1.0 ? 2.0 : multiple == 2.0 ? 5.0
+                                                           : 10.0;
+    }
     // tick k is k * multiple * 10^exponent; dividing by an exact 10^-exponent gives the nearest double (0.6, not 0.6000000000000001)
     const double scale = std::pow(10.0, std::abs(exponent));
     const auto tick = [&](double k) {

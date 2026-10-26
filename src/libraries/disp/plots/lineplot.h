@@ -170,12 +170,14 @@ public:
      * @param[in] x         X-Axis data to plot.
      * @param[in] y         Y-Axis data to plot.
      * @param[in] label     Legend entry; series without a label are not listed.
-     * @param[in] color     Line colour; an invalid colour takes the next colour of the default palette.
+     * @param[in] color     Line colour; an invalid colour takes the first palette colour no other series uses.
+     * @param[in] style     Line style, e.g. Qt::DashLine for a series that may coincide with another.
      */
     void addSeries(const QVector<double>& x,
                    const QVector<double>& y,
                    const QString& label = QString(),
-                   const QColor& color = QColor());
+                   const QColor& color = QColor(),
+                   Qt::PenStyle style = Qt::SolidLine);
 
     //=========================================================================================================
     /**
@@ -212,10 +214,11 @@ private:
     /** One line of the plot. */
     struct Series
     {
-        QVector<double> x; /**< X data points. */
-        QVector<double> y; /**< Y data points. */
-        QString label;     /**< Legend entry. */
-        QColor color;      /**< Line colour. */
+        QVector<double> x;  /**< X data points. */
+        QVector<double> y;  /**< Y data points. */
+        QString label;      /**< Legend entry. */
+        QColor color;       /**< Line colour. */
+        Qt::PenStyle style; /**< Line style. */
     };
 
     QString m_sTitle;         /**< Title. */

@@ -154,7 +154,7 @@ Updates the plot using the given vectors.
 
 ---
 
-### addSeries(x, y, label, color)
+### addSeries(x, y, label, color, style)
 
 Adds a series to the plot; the axes grow to include it and a legend lists the labelled series.
 
@@ -170,7 +170,10 @@ Adds a series to the plot; the axes grow to include it and a legend lists the la
   Legend entry; series without a label are not listed.
 
 - **color** : *const QColor &*
-  Line colour; an invalid colour takes the next colour of the default palette.
+  Line colour; an invalid colour takes the first palette colour no other series uses.
+
+- **style** : *Qt::PenStyle*
+  Line style, e.g. Qt::DashLine for a series that may coincide with another.
 
 ---
 
@@ -196,7 +199,7 @@ Returns the number of series in the plot.
 
 Disp plots: colour maps, bar and spline histograms, line plots, image and time-frequency maps.
 
-````cpp title="src/examples/ex_disp_plots/main.cpp, line 151"
+````cpp title="src/examples/ex_disp_plots/main.cpp, line 155"
 LinePlot line(x, y, "sin(2 pi t)");
 line.setXLabel("t [s]");
 line.setYLabel("amplitude");
@@ -238,7 +241,7 @@ for (int ch = 0; ch < 3; ++ch) {
     for (int t = 0; t < ms.size(); ++t) {
         values[t] = settings.at(0).matData(ch, t) - 4.0 * ch;
     }
-    traces.addSeries(ms, values, QStringList{"0: 10 Hz source", "1: source 12 ms later + noise", "2: noise"}[ch]);
+    traces.addSeries(ms, values, QStringList{"0: 10 Hz sine + noise", "1: channel 0, 12 ms later, + noise", "2: noise"}[ch]);
 }
 FigureExporter::save(traces, "trials", "Simulated data: channel 1 repeats channel 0 12 ms later with independent noise; channel 2 is independent noise.");
 ````
