@@ -10,8 +10,15 @@ name: macOS Signing Pipeline Test
 # ephemeral self-signed identity. Apple is never contacted, no repository
 # secret is read, nothing is published: every result is MOCK — NOT SIGNED OR
 # NOTARIZED. The negative job proves that production mode rejects the dummies.
+# Dispatching with production=true additionally signs and notarizes the dev
+# build with the real APPLE_* secrets; the result is only a workflow artifact.
 on:
   workflow_dispatch:
+    inputs:
+      production:
+        description: Also sign and notarize the dev build with the real Apple credentials
+        type: boolean
+        default: false
   push:
     branches: [staging]
     paths:
@@ -134,6 +141,73 @@ jobs:
           echo "::error::mock mode ran for a release tag"
           exit 1
         fi
+
+    - name: Cleanup keychain
+      if: always() && env.KEYCHAIN_PATH != ''
+      run: security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
+
+  ProductionSigning:
+    if: github.event_name == 'workflow_dispatch' && inputs.production
+    runs-on: macos-26
+    env:
+      MACOS_NOTARY_EVIDENCE: ${{ github.workspace }}/notarization.json
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v5
+      with:
+        persist-credentials: false
+
+    - name: Check Apple signing credentials
+      env:
+        APPLE_APPLICATION_CERT_BASE64: ${{ secrets.APPLE_APPLICATION_CERT_BASE64 }}
+        APPLE_APPLICATION_CERT_PASSWORD: ${{ secrets.APPLE_APPLICATION_CERT_PASSWORD }}
+        APPLE_INSTALLER_CERT_BASE64: ${{ secrets.APPLE_INSTALLER_CERT_BASE64 }}
+        APPLE_INSTALLER_CERT_PASSWORD: ${{ secrets.APPLE_INSTALLER_CERT_PASSWORD }}
+      run: python3 scripts/release/macos_signing.py check-credentials --mode production
+
+    - name: Import Apple Developer ID certificate
+      uses: ./.github/actions/macos-codesign-setup
+      with:
+        certificate-base64: ${{ secrets.APPLE_APPLICATION_CERT_BASE64 }}
+        certificate-password: ${{ secrets.APPLE_APPLICATION_CERT_PASSWORD }}
+        team-id: ${{ secrets.APPLE_TEAM_ID }}
+        keychain-password: ${{ secrets.APPLE_KEYCHAIN_PASSWORD }}
+        mode: production
+
+    - name: Download the macOS dev build
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        gh release download dev_build --repo "$GITHUB_REPOSITORY" -p 'mne-cpp-dev-macos-dynamic-arm64.tar.gz'
+        mkdir -p out
+        tar xzf mne-cpp-dev-macos-dynamic-arm64.tar.gz -C out
+
+    - name: Sign, verify, notarize and staple the release tree
+      run: scripts/deploy/macos_release_signing.sh tree out
+
+    - name: Build, sign, notarize and staple the application DMG
+      run: |
+        brew list create-dmg >/dev/null 2>&1 || brew install create-dmg
+        mkdir dmg_stage && for app in out/bin/*.app; do ditto "$app" "dmg_stage/$(basename "$app")"; done
+        create-dmg --volname "MNE-CPP dev" --no-internet-enable mne-cpp-dev-macos-dynamic-arm64.dmg dmg_stage
+        scripts/deploy/macos_release_signing.sh dmg mne-cpp-dev-macos-dynamic-arm64.dmg
+
+    - name: Notarization accepted by Apple
+      run: |
+        python3 scripts/release/macos_signing.py require-production-evidence "$MACOS_NOTARY_EVIDENCE"
+        python3 scripts/release/macos_signing.py verify --mode production out/bin out/lib
+        echo "Signed and notarized with the production Developer ID; nothing was published." | tee -a "$GITHUB_STEP_SUMMARY"
+
+    - name: Keep the signed DMG for a Gatekeeper check on a real Mac
+      uses: actions/upload-artifact@v7
+      with:
+        name: mne-cpp-dev-macos-signed-dmg
+        path: mne-cpp-dev-macos-dynamic-arm64.dmg
+        retention-days: 7
 
     - name: Cleanup keychain
       if: always() && env.KEYCHAIN_PATH != ''
