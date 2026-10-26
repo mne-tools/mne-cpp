@@ -17,6 +17,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 // MSVC builds already define _USE_MATH_DEFINES globally (see src/CMakeLists.txt),
 // so define it here only for the toolchains that do not.
@@ -142,7 +144,8 @@ int main(int argc, char* argv[])
 
     // Load data
     fiff_int_t setno = 0;
-    QPair<float, float> baseline(-1.0f, -1.0f);
+    // Without a baseline the DC offset of the average dominates the estimate
+    QPair<float, float> baseline(-0.2f, 0.0f);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
     if (evoked.isEmpty())
         return 1;
@@ -188,7 +191,9 @@ int main(int argc, char* argv[])
     //
     InvMinimumNorm minimumNorm(inverse_operator, lambda2, method);
     InvSourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
-    VectorXd sourceEstimateData = sourceEstimate.data.col(10);
+    // The source amplitudes at 100 ms, near the peak of the auditory response
+    const int peakSample = static_cast<int>(std::lround((0.1f - sourceEstimate.tmin) / sourceEstimate.tstep));
+    VectorXd sourceEstimateData = sourceEstimate.data.col(peakSample);
 
     bool bMakeSymmetrical;
     bMakeSymmetrical = false; //bMakeSymmetrical option: false means data is unchanged, true means histogram x axis is symmetrical to the right and left
@@ -211,18 +216,25 @@ int main(int argc, char* argv[])
     qDebug() << "HistCounts timer:" << myTimerHistCounts.elapsed();
 
     //displayObj can be in either Bar or Spline form; uncomment the preferred one and comment the other
-    Spline* displayObj = new Spline(0, "MNE-CPP Histogram Example (Spline)");
+    Spline* displayObj = new Spline(0, QString("%1 of %2 clustered sources at 100 ms").arg(method).arg(sourceEstimateData.size()));
     //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
 
     QElapsedTimer myTimerHistogram;
     myTimerHistogram.start();
     displayObj->setData(resultClassLimit, resultFrequency);
-    QVector3D thresholdLines1(2.1e-10f, 5.0e-8f, 6.0e-7f);
-    displayObj->setThreshold(thresholdLines1);
+    displayObj->setXLabel(method);
+    displayObj->setYLabel("Sources");
+    // Markers at the 50th, 90th and 99th percentile, e.g. as the limits of a colour map
+    VectorXd sorted = sourceEstimateData;
+    std::sort(sorted.data(), sorted.data() + sorted.size());
+    const auto percentile = [&](double q) {
+        return static_cast<float>(sorted(static_cast<Index>(q * (sorted.size() - 1))));
+    };
+    displayObj->setThreshold(QVector3D(percentile(0.5), percentile(0.9), percentile(0.99)));
 
     qDebug() << "Histogram timer:" << myTimerHistogram.elapsed();
 
-    FigureExporter::save(*displayObj, "histogram", QString("Distribution of the %1 source amplitudes at sample 10 in %2 classes, with three threshold markers.").arg(sourceEstimateData.size()).arg(classAmount));
+    FigureExporter::save(*displayObj, "histogram", QString("Distribution of the %1 values of the %2 clustered sources at 100 ms in %3 classes, with markers at the 50th, 90th and 99th percentile.").arg(method).arg(sourceEstimateData.size()).arg(classAmount));
     if (!FigureExporter::directory().isEmpty()) {
         delete displayObj;
         return 0;

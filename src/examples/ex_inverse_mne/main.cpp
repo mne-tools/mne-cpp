@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 
     QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption invFileOption("inv", "Path to inverse operator <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
-    QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");
+    QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "3.0");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");
 
@@ -105,7 +105,8 @@ int main(int argc, char* argv[])
     //   Read the data first
     //
     fiff_int_t setno = 0;
-    QPair<float, float> baseline(-1.0f, -1.0f);
+    // Without a baseline the DC offset of the average dominates the estimate
+    QPair<float, float> baseline(-0.2f, 0.0f);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
     if (evoked.isEmpty())
         return 1;
@@ -144,9 +145,11 @@ int main(int argc, char* argv[])
         peaks.maxCoeff(&source);
         peaks(source) = -1.0;
         const VectorXd row = sourceEstimate.data.row(source).transpose();
-        courses.addSeries(times, QVector<double>(row.data(), row.data() + row.size()), QString("source %1").arg(source));
+        const QString hemi = sourceEstimate.nVerticesLh < 0 ? QString("source") : source < sourceEstimate.nVerticesLh ? QString("lh vertex")
+                                                                                                                      : QString("rh vertex");
+        courses.addSeries(times, QVector<double>(row.data(), row.data() + row.size()), QString("%1 %2").arg(hemi).arg(sourceEstimate.vertices(source)));
     }
-    FigureExporter::save(courses, "time_courses", QString("%1 time courses of the five sources with the largest peak, SNR %2.").arg(method).arg(snr));
+    FigureExporter::save(courses, "time_courses", QString("%1 time courses of the five sources with the largest peak, SNR %2, baseline -200 to 0 ms.").arg(method).arg(snr));
 
     if (!t_sFileNameStc.isEmpty()) {
         QFile t_fileStc(t_sFileNameStc);
