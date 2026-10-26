@@ -99,7 +99,7 @@ class Identity(unittest.TestCase):
                          ("2" * 40, "Developer ID Application: Signer (AB12CD34EF)"))
 
     def test_untrusted_test_identity_only_in_mock_mode(self):
-        with self.assertRaisesRegex(ms.SigningError, "valid"):
+        with self.assertRaisesRegex(ms.SigningError, r"valid.*MNE-CPP TEST ONLY \(TESTONLY00\)\" \(CSSMERR_TP_NOT_TRUSTED\)"):
             ms.select_identity("production", "TESTONLY00", self.LISTING)
         self.assertEqual(ms.select_identity("mock", "TESTONLY00", self.LISTING)[0], "4" * 40)
 
@@ -290,11 +290,13 @@ class Workflows(unittest.TestCase):
 
     def test_pipeline_test_is_mock_only_and_cannot_publish(self):
         text = self.text("macos-signing-test.yml")
-        self.assertNotRegex(text, r"secrets\.APPLE_")
+        mock, production = text.split("  ProductionSigning:")
+        self.assertNotRegex(mock, r"secrets\.APPLE_")
+        self.assertIn("mode: mock", mock)
+        self.assertNotIn("mode: production", mock)
+        self.assertIn("if: github.event_name == 'workflow_dispatch' && inputs.production", production)
         self.assertNotIn("gh release upload", text)
         self.assertIn("contents: read", text)
-        self.assertIn("mode: mock", text)
-        self.assertNotIn("mode: production", text)
         self.assertNotIn("tags:", text)
 
 

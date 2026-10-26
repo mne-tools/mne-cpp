@@ -130,7 +130,10 @@ def select_identity(mode: str, team: str, find_identity_output: str) -> tuple[st
     unique = {(sha, name) for sha, name, _status in matches}
     if not unique:
         kind = "valid (trusted)" if mode == "production" else ""
-        raise SigningError(f"no {kind} 'Developer ID Application' identity for team {team} in the keychain".replace("  ", " "))
+        found = sorted({line.split('"', 1)[1].strip() for line in find_identity_output.splitlines()
+                        if re.match(r'^\s*\d+\)\s+[0-9A-F]{40}\s+"', line)})
+        raise SigningError(f"no {kind} 'Developer ID Application' identity for team {team} in the keychain".replace("  ", " ")
+                           + "; found: " + ('"' + '; "'.join(found) if found else "none"))
     if len(unique) > 1:
         raise SigningError(f"{len(unique)} Developer ID Application identities for team {team}; import exactly one")
     return unique.pop()
@@ -359,8 +362,8 @@ def main(argv: list[str] | None = None) -> int:
                 _banner(args.mode, "Apple signing credentials are complete for " + args.mode)
             return 1 if problems else 0
         if args.command == "select-identity":
-            listing = run(["security", "find-identity", "-p", "codesigning"]
-                          + (["-v"] if args.mode == "production" else []) + [args.keychain])
+            # Without -v untrusted identities are listed with their status, which select_identity rejects in production.
+            listing = run(["security", "find-identity", "-p", "codesigning", args.keychain])
             sha, name = select_identity(args.mode, environ.get("APPLE_TEAM_ID", ""), listing.stdout)
             print(f"{sha}\t{name}")
             return 0
@@ -378,7 +381,8 @@ def main(argv: list[str] | None = None) -> int:
             staple(args.mode, args.paths)
             return 0
     except (SigningError, KeyError) as error:
-        print(f"::error::{error}")
+        # stderr, because callers capture stdout (e.g. CODESIGN_IDENTITY=$(... select-identity))
+        print(f"::error::{error}", file=sys.stderr)
         return 1
     return 2
 
