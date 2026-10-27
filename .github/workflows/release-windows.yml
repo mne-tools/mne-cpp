@@ -105,7 +105,7 @@ jobs:
       shell: bash
       run: python scripts/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-archive.xml mne-cpp-windows-dynamic-x86_64.zip
     - name: Authenticode-sign the archive
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/') && vars.WINDOWS_SIGNING != 'unavailable'
       uses: ./.github/actions/signpath-sign
       with:
         file: mne-cpp-windows-dynamic-x86_64.zip
@@ -231,7 +231,7 @@ jobs:
       shell: bash
       run: python scripts/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-archive.xml mne-cpp-windows-static-x86_64.zip
     - name: Authenticode-sign the archive
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/') && vars.WINDOWS_SIGNING != 'unavailable'
       uses: ./.github/actions/signpath-sign
       with:
         file: mne-cpp-windows-static-x86_64.zip

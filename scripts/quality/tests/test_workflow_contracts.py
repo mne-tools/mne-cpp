@@ -86,18 +86,22 @@ class WorkflowContracts(unittest.TestCase):
                                text=True, check=True).stdout
         self.assertEqual(notes.strip(), "New.")
 
-    def test_unsigned_macos_is_one_explicit_switch(self) -> None:
-        # G7: macOS ships unsigned only when the owner sets MACOS_SIGNING=unavailable, never on a missing secret
-        switch = "vars.MACOS_SIGNING"
-        for name in ("release-macos.yml", "release-installer.yml"):
-            text = (WORKFLOWS / name).read_text(encoding="utf-8")
-            imports = re.findall(r"- name: Import Apple Developer ID certificate\n\s+if: ([^\n]+)", text)
-            self.assertTrue(imports, name)
-            for condition in imports:
-                self.assertIn(f"{switch} != 'unavailable'", condition, name)
-        self.assertIn(f"{switch} == 'unavailable'", (WORKFLOWS / "release-candidate.yml").read_text(encoding="utf-8"))
-        self.assertIn(f"unsigned_macos: ${{{{ {switch} == 'unavailable' }}}}",
-                      (WORKFLOWS / "main.yml").read_text(encoding="utf-8"))
+    def test_unsigned_platform_is_one_explicit_switch(self) -> None:
+        # G7: a platform ships unsigned only when the owner sets <OS>_SIGNING=unavailable, never on a missing secret
+        for os_name, step, files in (
+                ("MACOS", "Import Apple Developer ID certificate", ("release-macos.yml", "release-installer.yml")),
+                ("WINDOWS", "Authenticode-sign the [a-z]+", ("release-windows.yml", "release-installer.yml"))):
+            switch = f"vars.{os_name}_SIGNING"
+            for name in files:
+                text = (WORKFLOWS / name).read_text(encoding="utf-8")
+                steps = re.findall(rf"- name: {step}\n\s+if: ([^\n]+)", text)
+                self.assertTrue(steps, name)
+                for condition in steps:
+                    self.assertIn(f"{switch} != 'unavailable'", condition, name)
+            self.assertIn(f"{switch} == 'unavailable'",
+                          (WORKFLOWS / "release-candidate.yml").read_text(encoding="utf-8"))
+            self.assertIn(f"unsigned_{os_name.lower()}: ${{{{ {switch} == 'unavailable' }}}}",
+                          (WORKFLOWS / "main.yml").read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

@@ -27,6 +27,11 @@ on:
         required: false
         type: boolean
         default: false
+      unsigned_windows:
+        description: Windows ships without Authenticode (WINDOWS_SIGNING=unavailable)
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   Verify:
@@ -69,8 +74,9 @@ jobs:
         PLATFORM: ${{ matrix.platform }}
         REQUIRE_SIGNED: ${{ inputs.require_signed && '--require-signed' || '' }}
         UNSIGNED_MACOS: ${{ inputs.unsigned_macos && '--unsigned-macos' || '' }}
+        UNSIGNED_WINDOWS: ${{ inputs.unsigned_windows && '--unsigned-windows' || '' }}
       run: |
         PREFIX="${PREFIX:-mne-cpp-${TAG#v}}"
         # shellcheck disable=SC2086
         python scripts/release/verify_release.py "$RUNNER_TEMP/assets" --prefix "$PREFIX" \
-          --platform "$PLATFORM" $REQUIRE_SIGNED $UNSIGNED_MACOS
+          --platform "$PLATFORM" $REQUIRE_SIGNED $UNSIGNED_MACOS $UNSIGNED_WINDOWS

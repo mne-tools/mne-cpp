@@ -73,14 +73,20 @@ jobs:
         APPLE_INSTALLER_CERT_BASE64: ${{ secrets.APPLE_INSTALLER_CERT_BASE64 }}
         APPLE_INSTALLER_CERT_PASSWORD: ${{ secrets.APPLE_INSTALLER_CERT_PASSWORD }}
         MACOS_UNSIGNED: ${{ vars.MACOS_SIGNING == 'unavailable' }}
+        WINDOWS_UNSIGNED: ${{ vars.WINDOWS_SIGNING == 'unavailable' }}
       run: |
         missing=0
-        for name in SIGNPATH_API_TOKEN SIGNPATH_ORGANIZATION_ID; do
-          if [ -z "${!name}" ]; then
-            echo "::error::$name is not configured"
-            missing=1
-          fi
-        done
+        if [ "$WINDOWS_UNSIGNED" = true ]; then
+          echo "::warning::Windows ships unsigned (WINDOWS_SIGNING=unavailable); the release notes record it."
+          echo "Windows ships unsigned (WINDOWS_SIGNING=unavailable); the release notes record it." >> "$GITHUB_STEP_SUMMARY"
+        else
+          for name in SIGNPATH_API_TOKEN SIGNPATH_ORGANIZATION_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not configured"
+              missing=1
+            fi
+          done
+        fi
         if [ "$MACOS_UNSIGNED" = true ]; then
           echo "::warning::macOS ships unsigned (MACOS_SIGNING=unavailable); the release notes record it."
           echo "macOS ships unsigned (MACOS_SIGNING=unavailable); the release notes record it." >> "$GITHUB_STEP_SUMMARY"

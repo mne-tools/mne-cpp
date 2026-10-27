@@ -340,7 +340,7 @@ jobs:
       run: python scripts/release/pe_metadata.py check --artifact-configuration .signpath/artifact-configurations/windows-installer.xml "MNE-CPP-${MNE_CPP_VERSION}-win64.exe"
 
     - name: Authenticode-sign the installer
-      if: startsWith(github.ref, 'refs/tags/')
+      if: startsWith(github.ref, 'refs/tags/') && vars.WINDOWS_SIGNING != 'unavailable'
       uses: ./.github/actions/signpath-sign
       with:
         file: MNE-CPP-${{ env.MNE_CPP_VERSION }}-win64.exe

@@ -86,6 +86,11 @@ class VerifyReleaseTest(unittest.TestCase):
         (self.assets / "release-evidence.json").write_text(json.dumps(evidence))
         self.write_sums()
         self.assertIn(f"{PREFIX}-windows-installer-x86_64.exe is unsigned, expected signed", check())
+        # WINDOWS_SIGNING=unavailable: the .exe and .zip assets must then be recorded as unsigned
+        windows = verify_release.check_assets(self.assets, PREFIX, sorted(verify_release.REQUIRED), True,
+                                              unsigned_macos=True, unsigned_windows=True)
+        self.assertEqual(windows, [f"{PREFIX}-windows-dynamic-x86_64.zip is signed, expected unsigned",
+                                   f"{PREFIX}-windows-static-x86_64.zip is signed, expected unsigned"])
 
     def test_smoke_reports_an_archive_without_the_tool(self):
         archive = self.assets / "empty.tar.gz"

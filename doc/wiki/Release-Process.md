@@ -119,6 +119,12 @@ mark both `.dmg` images as unsigned and explain how to open them, and the
 release verification requires exactly that. Delete the variable once the Apple
 secrets are configured.
 
+Likewise, to release before SignPath's release certificate is active, set
+`WINDOWS_SIGNING` to `unavailable`. The Windows `.zip` and `.exe` assets are
+then not submitted to SignPath, the release notes mark them as unsigned and
+explain the SmartScreen warning, and the release verification requires exactly
+that. Delete the variable once the `release-signing` policy is valid.
+
 ## Post-release
 
 1. Verify all artifacts are attached to the release page.

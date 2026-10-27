@@ -144,6 +144,10 @@ def notes_section(records: list[dict]) -> str:
                   "them on first launch. Allow them in System Settings > Privacy & Security > "
                   "Open Anyway, or remove the quarantine flag from the downloaded image with "
                   "`xattr -dr com.apple.quarantine <file>.dmg` before opening it."]
+    if any(r["name"].endswith(".exe") and r["signature"] == "unsigned" for r in records):
+        lines += ["", "The Windows builds are not Authenticode signed yet, so Microsoft Defender "
+                  "SmartScreen warns on first launch. Choose More info > Run anyway, after checking "
+                  "the file against `SHA256SUMS`."]
     lines += [NOTES_END]
     return "\n".join(lines)
 

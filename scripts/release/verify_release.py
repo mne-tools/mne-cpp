@@ -7,7 +7,7 @@
 Download the assets first (``gh release download TAG -D assets``), then::
 
     python3 scripts/release/verify_release.py assets --prefix mne-cpp-2.4.0 \\
-        [--platform linux|macos|windows] [--require-signed [--unsigned-macos]]
+        [--platform linux|macos|windows] [--require-signed [--unsigned-macos] [--unsigned-windows]]
 
 Every required asset must be present and match ``SHA256SUMS``, every asset must
 be listed there, ``release-evidence.json`` must record the signature status of
@@ -55,7 +55,7 @@ def _sha256(path: Path) -> str:
 
 
 def check_assets(assets: Path, prefix: str, platforms: list[str], require_signed: bool,
-                 unsigned_macos: bool = False) -> list[str]:
+                 unsigned_macos: bool = False, unsigned_windows: bool = False) -> list[str]:
     problems = []
     names = {p.name for p in assets.iterdir() if p.is_file()}
     for platform in platforms:
@@ -76,7 +76,9 @@ def check_assets(assets: Path, prefix: str, platforms: list[str], require_signed
     for platform in platforms:
         for suffix in REQUIRED[platform]:
             name = f"{prefix}-{suffix}"
-            wanted = "unsigned" if unsigned_macos and name.endswith(".dmg") else SIGNED.get(Path(name).suffix)
+            unsigned = (unsigned_macos and name.endswith(".dmg")
+                        or unsigned_windows and name.endswith((".exe", ".zip")))
+            wanted = "unsigned" if unsigned else SIGNED.get(Path(name).suffix)
             if wanted and require_signed and name in names and evidence.get(name) != wanted:
                 problems.append(f"{name} is {evidence.get(name, 'not recorded')}, expected {wanted}")
     return problems
@@ -159,9 +161,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--require-signed", action="store_true", help="fail unless signable assets are signed")
     parser.add_argument("--unsigned-macos", action="store_true",
                         help="the release ships macOS without a Developer ID (MACOS_SIGNING=unavailable)")
+    parser.add_argument("--unsigned-windows", action="store_true",
+                        help="the release ships Windows without Authenticode (WINDOWS_SIGNING=unavailable)")
     args = parser.parse_args(argv)
 
-    problems = check_assets(args.assets, args.prefix, sorted(REQUIRED), args.require_signed, args.unsigned_macos)
+    problems = check_assets(args.assets, args.prefix, sorted(REQUIRED), args.require_signed, args.unsigned_macos,
+                            args.unsigned_windows)
     if args.platform and not problems:
         archive = args.assets / f"{args.prefix}-{REQUIRED[args.platform][0]}"
         workdir = Path(tempfile.mkdtemp())

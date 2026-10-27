@@ -552,3 +552,4 @@ jobs:
       tag: ${{ github.ref_name }}
       require_signed: true
       unsigned_macos: ${{ vars.MACOS_SIGNING == 'unavailable' }}
+      unsigned_windows: ${{ vars.WINDOWS_SIGNING == 'unavailable' }}
