@@ -2,7 +2,7 @@
 
 All notable changes to MNE-CPP will be documented in this file.
 
-## [2.4.0-rc] - 2026-10-23
+## [2.4.0] - 2026-10-27
 
 **Theme: correctness you can check.** v2.4.0 compares MNE-CPP against
 MNE-Python 1.11 wherever both compute the same thing. That comparison found and
@@ -12,16 +12,18 @@ support, about 60 new MNE-Python ports, a WebAssembly renderer that matches the
 desktop, and a signing pipeline for the Windows and macOS installers. 970
 commits since v2.3.0.
 
-This release candidate replaces the v2.4.0 tag of 2026-10-22, whose Windows
-downloads could not be signed.
+This release replaces the v2.4.0 tag of 2026-10-22, which was withdrawn before
+its Windows downloads could be signed.
 
 ### Highlights
 
 - **Code signing** — every Windows executable and DLL carries a version
   resource with product name MNE-CPP and the release version, checked before
   each SignPath request against the artifact configurations in `.signpath/`.
-  The macOS release is prepared for Developer ID signing and notarization of
-  the apps, the `.dmg` images and the installer. The
+  The macOS apps, `.dmg` images and installer are Developer ID signed and
+  notarized. The Windows downloads of 2.4.0 are not yet Authenticode signed;
+  signed Windows builds follow with 2.4.1 once the SignPath certificate is
+  issued. The
   [code signing policy](https://mne-cpp.github.io/code-signing-policy/) states
   what is signed, by whom, and what the applications send over the network.
 - **Connected documentation** — the manual, API reference and examples link to

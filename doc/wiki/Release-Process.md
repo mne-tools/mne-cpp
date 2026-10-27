@@ -72,8 +72,9 @@ and uploads run only in CI from repository secrets.
 
 ## Code signing
 
-Tagged releases are signed or they fail; `staging` and `main` builds stay
-unsigned. `release-evidence.json` and the release notes record the status of
+Tagged releases are signed or they fail, unless a platform is opted out below.
+The macOS `staging` and `main` builds are signed and notarized too; their
+Windows builds stay unsigned. `release-evidence.json` and the release notes record the status of
 every artifact, and `SHA256SUMS` covers all of them.
 
 **Windows (Authenticode via [SignPath Foundation](https://signpath.org)).**
