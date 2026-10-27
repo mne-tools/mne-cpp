@@ -43,7 +43,7 @@ jobs:
         rm -f assets/SHA256SUMS assets/release-evidence.json
         gh release view "$TAG" --json body -q .body > release-notes.md
         python3 scripts/release/artifact_evidence.py publish --assets assets \
-          --evidence evidence/*.json --sums SHA256SUMS \
+          --evidence evidence/evidence-*.json --sums SHA256SUMS \
           --report release-evidence.json --notes release-notes.md
         gh release upload "$TAG" SHA256SUMS release-evidence.json --clobber
         gh release edit "$TAG" --notes-file release-notes.md

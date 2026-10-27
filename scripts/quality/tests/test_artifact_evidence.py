@@ -106,6 +106,12 @@ class ArtifactEvidenceTest(unittest.TestCase):
         self.assertEqual(unrecorded["mne-cpp-macos-installer.dmg"], "unverified")
         self.assertEqual(unrecorded["mne-cpp-linux.tar.gz"], "checksum-only")
 
+    def test_workflow_passes_only_inspection_records(self):
+        # The signing-evidence artifacts also hold macos-notarization-*.json, which has no asset name
+        workflow = (Path(__file__).resolve().parents[3] / ".github" / "workflows"
+                    / "_reusable-release-evidence.yml").read_text()
+        self.assertIn("--evidence evidence/evidence-*.json ", workflow)
+
     def test_publish_rejects_replaced_or_missing_installers(self):
         recorded = self._evidence("mne-cpp-windows-installer.exe", "signed")
         (self.assets / "mne-cpp-windows-installer.exe").write_bytes(b"other")
