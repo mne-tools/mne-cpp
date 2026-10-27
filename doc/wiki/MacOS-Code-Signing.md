@@ -4,9 +4,9 @@
 
 | Mode | When | Credentials | Apple contacted | Result |
 |---|---|---|---|---|
-| **A — Development** | pull requests, `staging`, `main` | none | no | apps ad-hoc signed (required on Apple silicon), labelled development builds |
+| **A — Development** | pull requests, forks | none | no | apps ad-hoc signed (required on Apple silicon), labelled development builds |
 | **B — Pipeline test** | [`macos-signing-test.yml`](../../.github/workflows/macos-signing-test.yml) (manual, or on changes to the signing code) | [`macos-signing-dummy.env`](../../scripts/release/fixtures/macos-signing-dummy.env) + ephemeral self-signed identity | no | `MOCK — NOT SIGNED OR NOTARIZED`; cannot publish |
-| **C — Production** | release tags `v*` | the `APPLE_*` secrets | yes | Developer ID signed, notarized, stapled, verified, then published |
+| **C — Production** | release tags `v*`, and `main` (`latest`) and `staging` (`dev_build`) in mne-tools/mne-cpp | the `APPLE_*` secrets | yes | Developer ID signed, notarized, stapled, verified, then published |
 
 Production (`release-macos.yml`, `release-installer.yml`):
 
