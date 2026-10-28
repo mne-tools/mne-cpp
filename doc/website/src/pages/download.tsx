@@ -749,7 +749,12 @@ Get-FileHash <downloaded-file> -Algorithm SHA256`}</code></pre>
                                     </tr>
                                     <tr>
                                         <td>Linux</td>
-                                        <td>Ubuntu 24.04 or equivalent (glibc 2.38, GCC 13 libstdc++)</td>
+                                        <td>
+                                            Ubuntu 24.04 or equivalent (glibc 2.38, GCC 13 libstdc++). Desktop
+                                            systems have the needed graphics libraries; on servers and containers
+                                            install them with{' '}
+                                            <code>sudo apt install libegl1 libopengl0 libgl1 libxkbcommon0 libfontconfig1 libdbus-1-3</code>
+                                        </td>
                                         <td>x86_64</td>
                                     </tr>
                                     <tr>

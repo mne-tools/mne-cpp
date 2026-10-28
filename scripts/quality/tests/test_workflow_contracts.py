@@ -86,6 +86,16 @@ class WorkflowContracts(unittest.TestCase):
                                text=True, check=True).stdout
         self.assertEqual(notes.strip(), "New.")
 
+    def test_linux_verification_installs_the_documented_system_libraries(self) -> None:
+        # Qt links libEGL/libOpenGL from the system; the clean runner must have exactly what users are told to install
+        verify = (WORKFLOWS / "_reusable-release-verify.yml").read_text(encoding="utf-8")
+        download = (REPO_ROOT / "doc" / "website" / "src" / "pages" / "download.tsx").read_text(encoding="utf-8")
+        packages = re.search(r"apt-get install -y --no-install-recommends ([a-z0-9. -]+)", verify)
+        self.assertIsNotNone(packages)
+        self.assertIn("libegl1", packages.group(1))
+        self.assertIn(f"sudo apt install {packages.group(1).strip()}", download)
+        self.assertIn("workflow_dispatch:", verify)
+
     def test_unsigned_platform_is_one_explicit_switch(self) -> None:
         # G7: a platform ships unsigned only when the owner sets <OS>_SIGNING=unavailable, never on a missing secret
         for os_name, step, files in (
