@@ -1,0 +1,13 @@
+{
+  "name": "minimatch",
+  "description": "minimatch 3.x CommonJS call signature backed by minimatch 11 (GHSA-g3hv-75wg-m249), vendored for the MNE-CPP website until serve-handler moves off minimatch 3.",
+  "version": "3.1.5-mne.1",
+  "license": "ISC",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "minimatch-upstream": "npm:minimatch@^11.0.3"
+  }
+}
