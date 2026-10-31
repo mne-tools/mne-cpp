@@ -9,8 +9,8 @@ identifiers:
     value: 10.5281/zenodo.593102
     description: "Concept DOI for all versions of MNE-CPP (always resolves to the latest version)"
   - type: doi
-    value: 10.5281/zenodo.19139238
-    description: "Version-specific DOI for MNE-CPP 2.0.0"
+    value: 10.5281/zenodo.23637855
+    description: "Version-specific DOI for MNE-CPP 2.4.0"
 license: BSD-3-Clause
 repository-code: "https://github.com/mne-tools/mne-cpp"
 url: "https://mne-cpp.github.io"
@@ -37,11 +37,11 @@ keywords:
   - "signal processing"
   - "neuroscience software"
 authors:
-  - family-names: Esch
-    given-names: Lorenz
   - family-names: Dinh
     given-names: Christoph
     affiliation: "Carl Zeiss (Germany)"
+  - family-names: Esch
+    given-names: Lorenz
   - family-names: Motta
     given-names: Gabriel
   - family-names: Garcia-Prieto
@@ -50,30 +50,34 @@ authors:
     given-names: Ruben
   - family-names: Debor
     given-names: Lars
-  - family-names: Knobl
-    given-names: Daniel
-  - family-names: Klüber
-    given-names: Viktor
   - family-names: Henfling
     given-names: Martin
+  - family-names: Klüber
+    given-names: Viktor
+  - family-names: Knobl
+    given-names: Daniel
   - family-names: Tjen
     given-names: Ricky
   - family-names: Kiesel
     given-names: Jana
   - family-names: Sun
     given-names: Limin
+  - family-names: Heinke
+    given-names: Simon
   - family-names: Schlembach
     given-names: Florian
   - family-names: Strohmeier
     given-names: Daniel
-  - family-names: Heinke
-    given-names: Simon
+  - family-names: Lew
+    given-names: Seok
   - family-names: Parfenov
     given-names: Andrey
-  - family-names: Kunze
-    given-names: Tim
   - family-names: Arndt
     given-names: Felix
+  - family-names: Kunze
+    given-names: Tim
+  - family-names: Pieloth
+    given-names: Christof
   - family-names: Mead
     given-names: Wayne
   - family-names: Eichhorst
@@ -86,34 +90,36 @@ authors:
     given-names: Chiran
   - family-names: Behrens
     given-names: Johannes
-  - family-names: Pieloth
-    given-names: Christof
-  - family-names: Rockhill
-    given-names: Alex
   - family-names: Dicamillo
     given-names: Robert
+  - family-names: Griesshammer
+    given-names: Andreas
+  - family-names: Rockhill
+    given-names: Alex
   - family-names: Sachdeva
     given-names: Sugandha
   - family-names: Hornberger
     given-names: Erik
   - family-names: Yahya
     given-names: Faris
-  - name: ag-fieldline
+  - family-names: Hamzallari
+    given-names: Blerta
+  - family-names: Larson
+    given-names: Eric
   - family-names: Polo
     given-names: Franco
-  - family-names: Klamke
-    given-names: Marco
-  - name: betaha
   - family-names: Lerm
     given-names: Julius
+  - family-names: Klamke
+    given-names: Marco
+  - family-names: Simidyan
+    given-names: Petros
   - family-names: Kay
     given-names: Benjamin
   - family-names: Jas
     given-names: Mainak
-  - family-names: Simidyan
-    given-names: Petros
-  - family-names: Larson
-    given-names: Eric
+  - family-names: Luessi
+    given-names: Martin
   - family-names: Baumgarten
     given-names: Daniel
     affiliation: "University Innsbruck"
