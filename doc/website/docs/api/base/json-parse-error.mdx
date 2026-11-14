@@ -1,0 +1,74 @@
+---
+id: json-parse-error
+title: "BASELIB::JsonParseError"
+sidebar_label: JsonParseError
+sidebar_position: 80
+---
+
+# JsonParseError
+
+**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/json.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/json.h)
+
+`#include <base/json.h>`
+
+```cpp
+struct BASELIB::JsonParseError
+```
+
+Reports where and why parsing JSON failed, like QJsonParseError.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QJsonParseError error;
+//       QJsonObject cfg = QJsonDocument::fromJson(bytes, &error).object();
+//       int rate = cfg.value("sfreq").toInt(1000);
+//       cfg["channels"] = QJsonArray{"MEG 0113", "EEG 001"};
+//       QByteArray out = QJsonDocument(cfg).toJson(QJsonDocument::Compact);
+JsonParseError parseError;
+JsonObject cfg = JsonDocument::from_json(R"({"sfreq": 600, "device": "neuromag"})", &parseError).object();
+const int rate = cfg.value("sfreq").to_int(1000);       // safe fallback on a missing key or wrong type
+const bool hasGain = !cfg.value("gain").is_undefined(); // missing keys are undefined; non-const [] inserts, as in Qt
+cfg["channels"] = JsonArray{"MEG 0113", "EEG 001"};
+const std::string out = JsonDocument(cfg).to_json(JsonDocument::Compact); // keys sorted, like Qt
+```
+
+---
+
+## Public Methods
+
+### error_string()
+
+**Returns:**
+
+- *std::string_view* — A human-readable description of error, with Qt's wording, e.g. "unterminated string".
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 135"
+//       int rate = cfg.value("sfreq").toInt(1000);
+//       cfg["channels"] = QJsonArray{"MEG 0113", "EEG 001"};
+//       QByteArray out = QJsonDocument(cfg).toJson(QJsonDocument::Compact);
+JsonParseError parseError;
+JsonObject cfg = JsonDocument::from_json(R"({"sfreq": 600, "device": "neuromag"})", &parseError).object();
+const int rate = cfg.value("sfreq").to_int(1000);       // safe fallback on a missing key or wrong type
+const bool hasGain = !cfg.value("gain").is_undefined(); // missing keys are undefined; non-const [] inserts, as in Qt
+cfg["channels"] = JsonArray{"MEG 0113", "EEG 001"};
+const std::string out = JsonDocument(cfg).to_json(JsonDocument::Compact); // keys sorted, like Qt
+ok &= expect(parseError.error == JsonParseError::NoError && rate == 600 && !hasGain && out == R"({"channels":["MEG 0113","EEG 001"],"device":"neuromag","sfreq":600})",
+             "JsonDocument parsed, edited and wrote the configuration");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

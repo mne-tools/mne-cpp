@@ -77,7 +77,7 @@ Forgets the messages recorded so far.
 
 ## Example
 
-- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, the thread pool and the circular buffer.
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
 - Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
 - Build target: `ex_base` (runs under CTest)
 
@@ -85,9 +85,9 @@ Forgets the messages recorded so far.
 
 ### [ex_base](../../examples/base/ex_base.mdx)
 
-Base library: logging, byte streams, string and path helpers, the thread pool and the circular buffer.
+Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 88"
+````cpp title="src/examples/ex_base/main.cpp, line 90"
 LogCapture capture; // in a test: record instead of printing
 Log::warning("channel MEG 0113 is flat");
 const int flat = capture.count(Log::Level::Warning, "flat");

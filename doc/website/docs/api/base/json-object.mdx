@@ -1,0 +1,332 @@
+---
+id: json-object
+title: "BASELIB::JsonObject"
+sidebar_label: JsonObject
+sidebar_position: 79
+---
+
+# JsonObject
+
+**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/json.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/json.h)
+
+`#include <base/json.h>`
+
+```cpp
+class BASELIB::JsonObject
+```
+
+A set of JSON values keyed by unique strings, like QJsonObject.
+
+The members live in one vector sorted by key: lookups are binary searches without allocating, and iteration visits the keys in byte order, as in Qt. Inserting a new key moves the members after it, so build large objects through `JsonDocument::from_json()` or in key order where that matters.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QJsonParseError error;
+//       QJsonObject cfg = QJsonDocument::fromJson(bytes, &error).object();
+//       int rate = cfg.value("sfreq").toInt(1000);
+//       cfg["channels"] = QJsonArray{"MEG 0113", "EEG 001"};
+//       QByteArray out = QJsonDocument(cfg).toJson(QJsonDocument::Compact);
+JsonParseError parseError;
+JsonObject cfg = JsonDocument::from_json(R"({"sfreq": 600, "device": "neuromag"})", &parseError).object();
+const int rate = cfg.value("sfreq").to_int(1000);       // safe fallback on a missing key or wrong type
+const bool hasGain = !cfg.value("gain").is_undefined(); // missing keys are undefined; non-const [] inserts, as in Qt
+cfg["channels"] = JsonArray{"MEG 0113", "EEG 001"};
+const std::string out = JsonDocument(cfg).to_json(JsonDocument::Compact); // keys sorted, like Qt
+```
+
+---
+
+## Public Methods
+
+### JsonObject()
+
+---
+
+### JsonObject(members)
+
+**Parameters:**
+
+- **members** : *std::initializer_list&lt; std::pair&lt; std::string_view, [JsonValue](/docs/api/base/json-value) &gt; &gt;*
+  Key-value pairs, e.g. [`JsonObject`](/docs/api/base/json-object)\{\{"name", "MEG 0113"\}, \{"kind", 1\}\}; later duplicates win.
+
+---
+
+### size()
+
+**Returns:**
+
+- *std::size_t* — The number of members.
+
+---
+
+### count()
+
+**Returns:**
+
+- *std::size_t* — The number of members, like QJsonObject::count().
+
+---
+
+### length()
+
+**Returns:**
+
+- *std::size_t* — The number of members, like QJsonObject::length().
+
+---
+
+### is_empty()
+
+**Returns:**
+
+- *bool* — Whether there are no members.
+
+---
+
+### empty()
+
+**Returns:**
+
+- *bool* — Whether there are no members, for generic code.
+
+---
+
+### keys()
+
+**Returns:**
+
+- *std::vector&lt; std::string &gt;* — The keys in ascending byte order.
+
+---
+
+### contains(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *bool* — Whether the object has a member called `key`.
+
+---
+
+### value(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *const [JsonValue](/docs/api/base/json-value) &* — The value of the member called `key`, or an undefined value if there is none.
+
+---
+
+### operator\[\](key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *const [JsonValue](/docs/api/base/json-value) &* — The value of the member called `key`, or an undefined value if there is none.
+
+---
+
+### operator\[\](key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *[JsonValue](/docs/api/base/json-value) &* — The value of the member called `key` to be changed in place; a null member is added if there is none.
+
+---
+
+### insert(key, value)
+
+Sets the member called `key`, replacing an existing value.
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+- **value** : *[JsonValue](/docs/api/base/json-value)*
+  The value.
+
+**Returns:**
+
+- *iterator* — The member.
+
+---
+
+### remove(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  Key of the member to remove; nothing happens if there is none.
+
+---
+
+### take(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  Key of the member to remove.
+
+**Returns:**
+
+- *[JsonValue](/docs/api/base/json-value)* — The value of the removed member, or an undefined value if there is none.
+
+---
+
+### find(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *iterator* — The member called `key`, or end().
+
+---
+
+### find(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *const_iterator* — The member called `key`, or end().
+
+---
+
+### const_find(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *const_iterator* — The member called `key`, or const_end().
+
+---
+
+### erase(it)
+
+**Parameters:**
+
+- **it** : *const_iterator*
+  A member of this object.
+
+**Returns:**
+
+- *iterator* — The member after it.
+
+---
+
+### reserve(capacity)
+
+**Parameters:**
+
+- **capacity** : *std::size_t*
+  Number of members to allocate room for.
+
+---
+
+### clear()
+
+Removes all members.
+
+---
+
+### begin()
+
+---
+
+### end()
+
+---
+
+### begin()
+
+---
+
+### end()
+
+---
+
+### cbegin()
+
+---
+
+### cend()
+
+---
+
+### const_begin()
+
+---
+
+### const_end()
+
+---
+
+### operator==(other)
+
+**Parameters:**
+
+- **other** : *const JsonObject &*
+  Another object.
+
+**Returns:**
+
+- *bool* — Whether both hold the same keys with equal values.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 136"
+//       cfg["channels"] = QJsonArray{"MEG 0113", "EEG 001"};
+//       QByteArray out = QJsonDocument(cfg).toJson(QJsonDocument::Compact);
+JsonParseError parseError;
+JsonObject cfg = JsonDocument::from_json(R"({"sfreq": 600, "device": "neuromag"})", &parseError).object();
+const int rate = cfg.value("sfreq").to_int(1000);       // safe fallback on a missing key or wrong type
+const bool hasGain = !cfg.value("gain").is_undefined(); // missing keys are undefined; non-const [] inserts, as in Qt
+cfg["channels"] = JsonArray{"MEG 0113", "EEG 001"};
+const std::string out = JsonDocument(cfg).to_json(JsonDocument::Compact); // keys sorted, like Qt
+ok &= expect(parseError.error == JsonParseError::NoError && rate == 600 && !hasGain && out == R"({"channels":["MEG 0113","EEG 001"],"device":"neuromag","sfreq":600})",
+             "JsonDocument parsed, edited and wrote the configuration");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -1,0 +1,229 @@
+---
+id: json-document
+title: "BASELIB::JsonDocument"
+sidebar_label: JsonDocument
+sidebar_position: 75
+---
+
+# JsonDocument
+
+**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/json.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/json.h)
+
+`#include <base/json.h>`
+
+```cpp
+class BASELIB::JsonDocument
+```
+
+A JSON document whose root is an array or an object, parsed from or written as UTF-8 text, like QJsonDocument.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QJsonParseError error;
+//       QJsonObject cfg = QJsonDocument::fromJson(bytes, &error).object();
+//       int rate = cfg.value("sfreq").toInt(1000);
+//       cfg["channels"] = QJsonArray{"MEG 0113", "EEG 001"};
+//       QByteArray out = QJsonDocument(cfg).toJson(QJsonDocument::Compact);
+JsonParseError parseError;
+JsonObject cfg = JsonDocument::from_json(R"({"sfreq": 600, "device": "neuromag"})", &parseError).object();
+const int rate = cfg.value("sfreq").to_int(1000);       // safe fallback on a missing key or wrong type
+const bool hasGain = !cfg.value("gain").is_undefined(); // missing keys are undefined; non-const [] inserts, as in Qt
+cfg["channels"] = JsonArray{"MEG 0113", "EEG 001"};
+const std::string out = JsonDocument(cfg).to_json(JsonDocument::Compact); // keys sorted, like Qt
+```
+
+---
+
+## Public Methods
+
+### JsonDocument()
+
+Constructs a null document.
+
+---
+
+### JsonDocument(array)
+
+**Parameters:**
+
+- **array** : *[JsonArray](/docs/api/base/json-array)*
+  The root array.
+
+---
+
+### JsonDocument(object)
+
+**Parameters:**
+
+- **object** : *[JsonObject](/docs/api/base/json-object)*
+  The root object.
+
+---
+
+### to_json(format)
+
+**Parameters:**
+
+- **format** : *JsonFormat*
+  Layout; Indented, the default as in Qt, matches QJsonDocument::toJson() byte for byte.
+
+**Returns:**
+
+- *std::string* — The document as UTF-8 text, or empty text for a null document.
+
+---
+
+### is_null()
+
+**Returns:**
+
+- *bool* — Whether the document has neither an array nor an object, e.g. after a parse error.
+
+---
+
+### is_empty()
+
+**Returns:**
+
+- *bool* — Whether the document has neither an array nor an object, like QJsonDocument::isEmpty().
+
+---
+
+### is_array()
+
+**Returns:**
+
+- *bool* — Whether the root is an array.
+
+---
+
+### is_object()
+
+**Returns:**
+
+- *bool* — Whether the root is an object.
+
+---
+
+### array()
+
+**Returns:**
+
+- *const [JsonArray](/docs/api/base/json-array) &* — The root array, or an empty array if the root is not one.
+
+---
+
+### object()
+
+**Returns:**
+
+- *const [JsonObject](/docs/api/base/json-object) &* — The root object, or an empty object if the root is not one.
+
+---
+
+### set_array(array)
+
+**Parameters:**
+
+- **array** : *[JsonArray](/docs/api/base/json-array)*
+  The new root array.
+
+---
+
+### set_object(object)
+
+**Parameters:**
+
+- **object** : *[JsonObject](/docs/api/base/json-object)*
+  The new root object.
+
+---
+
+### operator\[\](key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *const [JsonValue](/docs/api/base/json-value) &* — The member of the root object called `key`, or an undefined value.
+
+---
+
+### operator\[\](i)
+
+**Parameters:**
+
+- **i** : *std::size_t*
+  An index.
+
+**Returns:**
+
+- *const [JsonValue](/docs/api/base/json-value) &* — The element `i` of the root array, or an undefined value.
+
+---
+
+### operator==(other)
+
+**Parameters:**
+
+- **other** : *const [JsonDocument](/docs/api/base/json-document) &*
+  Another document.
+
+**Returns:**
+
+- *bool* — Whether both have equal roots.
+
+---
+
+## Static Methods
+
+### from_json(json, error)
+
+Parses a whole document like QJsonDocument::fromJson(): the root must be an object or an array and only whitespace may follow it.
+
+A UTF-8 byte order mark is skipped. Nesting is limited to 1024 levels, as in Qt.
+
+**Parameters:**
+
+- **json** : *std::string_view*
+  UTF-8 text.
+
+- **error** : *[JsonParseError](/docs/api/base/json-parse-error) **
+  Receives the outcome if not null; error is NoError on success.
+
+**Returns:**
+
+- *[JsonDocument](/docs/api/base/json-document)* — The document, or a null document if `json` is not valid JSON.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 136"
+//       cfg["channels"] = QJsonArray{"MEG 0113", "EEG 001"};
+//       QByteArray out = QJsonDocument(cfg).toJson(QJsonDocument::Compact);
+JsonParseError parseError;
+JsonObject cfg = JsonDocument::from_json(R"({"sfreq": 600, "device": "neuromag"})", &parseError).object();
+const int rate = cfg.value("sfreq").to_int(1000);       // safe fallback on a missing key or wrong type
+const bool hasGain = !cfg.value("gain").is_undefined(); // missing keys are undefined; non-const [] inserts, as in Qt
+cfg["channels"] = JsonArray{"MEG 0113", "EEG 001"};
+const std::string out = JsonDocument(cfg).to_json(JsonDocument::Compact); // keys sorted, like Qt
+ok &= expect(parseError.error == JsonParseError::NoError && rate == 600 && !hasGain && out == R"({"channels":["MEG 0113","EEG 001"],"device":"neuromag","sfreq":600})",
+             "JsonDocument parsed, edited and wrote the configuration");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

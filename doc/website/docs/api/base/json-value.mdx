@@ -1,0 +1,412 @@
+---
+id: json-value
+title: "BASELIB::JsonValue"
+sidebar_label: JsonValue
+sidebar_position: 77
+---
+
+# JsonValue
+
+**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/json.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/json.h)
+
+`#include <base/json.h>`
+
+```cpp
+class BASELIB::JsonValue
+```
+
+A JSON value: null, a boolean, a number, a string, an array or an object, like QJsonValue.
+
+Numbers stay integers when they are given or parsed as integers that fit std::int64_t. Strings, arrays and objects are held in place, so short strings need no allocation at all.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QJsonParseError error;
+//       QJsonObject cfg = QJsonDocument::fromJson(bytes, &error).object();
+//       int rate = cfg.value("sfreq").toInt(1000);
+//       cfg["channels"] = QJsonArray{"MEG 0113", "EEG 001"};
+//       QByteArray out = QJsonDocument(cfg).toJson(QJsonDocument::Compact);
+JsonParseError parseError;
+JsonObject cfg = JsonDocument::from_json(R"({"sfreq": 600, "device": "neuromag"})", &parseError).object();
+const int rate = cfg.value("sfreq").to_int(1000);       // safe fallback on a missing key or wrong type
+const bool hasGain = !cfg.value("gain").is_undefined(); // missing keys are undefined; non-const [] inserts, as in Qt
+cfg["channels"] = JsonArray{"MEG 0113", "EEG 001"};
+const std::string out = JsonDocument(cfg).to_json(JsonDocument::Compact); // keys sorted, like Qt
+```
+
+---
+
+## Public Methods
+
+### JsonValue(type)
+
+**Parameters:**
+
+- **type** : *Type*
+  The type; the value is null, false, 0, empty or undefined accordingly.
+
+---
+
+### JsonValue()
+
+Constructs null.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *bool*
+  A boolean.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *T*
+  An integer; unsigned values beyond std::int64_t become doubles.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *T*
+  A floating-point number; NaN and infinities are written as null.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *const char **
+  Null-terminated UTF-8 text.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *std::string_view*
+  UTF-8 text.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *const std::string &*
+  UTF-8 text.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *std::string &&*
+  UTF-8 text, moved in.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *const [JsonArray](/docs/api/base/json-array) &*
+  An array.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *[JsonArray](/docs/api/base/json-array) &&*
+  An array, moved in.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *const [JsonObject](/docs/api/base/json-object) &*
+  An object.
+
+---
+
+### JsonValue(value)
+
+**Parameters:**
+
+- **value** : *[JsonObject](/docs/api/base/json-object) &&*
+  An object, moved in.
+
+---
+
+### JsonValue()
+
+Pointers other than text would silently become booleans.
+
+---
+
+### type()
+
+**Returns:**
+
+- *Type* — The type; integers report Double, as in Qt 6.
+
+---
+
+### is_null()
+
+**Returns:**
+
+- *bool* — Whether the value is null.
+
+---
+
+### is_bool()
+
+**Returns:**
+
+- *bool* — Whether the value is a boolean.
+
+---
+
+### is_double()
+
+**Returns:**
+
+- *bool* — Whether the value is a number, integer or not, like QJsonValue::isDouble().
+
+---
+
+### is_number()
+
+**Returns:**
+
+- *bool* — Whether the value is a number, integer or not.
+
+---
+
+### is_integer()
+
+**Returns:**
+
+- *bool* — Whether the value is a number held as std::int64_t.
+
+---
+
+### is_string()
+
+**Returns:**
+
+- *bool* — Whether the value is a string.
+
+---
+
+### is_array()
+
+**Returns:**
+
+- *bool* — Whether the value is an array.
+
+---
+
+### is_object()
+
+**Returns:**
+
+- *bool* — Whether the value is an object.
+
+---
+
+### is_undefined()
+
+**Returns:**
+
+- *bool* — Whether the value is undefined.
+
+---
+
+### to_bool(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *bool*
+  Fallback.
+
+**Returns:**
+
+- *bool* — The boolean, or `defaultValue` if the value is not one.
+
+---
+
+### to_int(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *int*
+  Fallback.
+
+**Returns:**
+
+- *int* — The number if it is a whole number within the range of int, else `defaultValue`, like QJsonValue::toInt().
+
+---
+
+### to_integer(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *std::int64_t*
+  Fallback.
+
+**Returns:**
+
+- *std::int64_t* — The number if it is a whole number within the range of std::int64_t, else `defaultValue`, like QJsonValue::toInteger().
+
+---
+
+### to_double(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *double*
+  Fallback.
+
+**Returns:**
+
+- *double* — The number as double, or `defaultValue` if the value is not a number.
+
+---
+
+### to_string(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *std::string_view*
+  Fallback.
+
+**Returns:**
+
+- *std::string_view* — A view of the string, valid while this value lives unchanged, or `defaultValue` if the value is not a string; numbers are not converted, as in Qt.
+
+---
+
+### to_std_string()
+
+**Returns:**
+
+- *std::string* — A copy of the string, or empty text if the value is not a string.
+
+---
+
+### to_array()
+
+**Returns:**
+
+- *const [JsonArray](/docs/api/base/json-array) &* — The array, or an empty array if the value is not one.
+
+---
+
+### to_array(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *const [JsonArray](/docs/api/base/json-array) &*
+  Fallback.
+
+**Returns:**
+
+- *[JsonArray](/docs/api/base/json-array)* — A copy of the array, or `defaultValue` if the value is not one.
+
+---
+
+### to_object()
+
+**Returns:**
+
+- *const [JsonObject](/docs/api/base/json-object) &* — The object, or an empty object if the value is not one.
+
+---
+
+### to_object(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *const [JsonObject](/docs/api/base/json-object) &*
+  Fallback.
+
+**Returns:**
+
+- *[JsonObject](/docs/api/base/json-object)* — A copy of the object, or `defaultValue` if the value is not one.
+
+---
+
+### operator\[\](key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *const [JsonValue](/docs/api/base/json-value) &* — The member called `key` if the value is an object with one, else an undefined value.
+
+---
+
+### operator\[\](i)
+
+**Parameters:**
+
+- **i** : *std::size_t*
+  An index.
+
+**Returns:**
+
+- *const [JsonValue](/docs/api/base/json-value) &* — The element at `i` if the value is an array that long, else an undefined value.
+
+---
+
+### operator==(other)
+
+**Parameters:**
+
+- **other** : *const [JsonValue](/docs/api/base/json-value) &*
+  Another value.
+
+**Returns:**
+
+- *bool* — Whether both have the same type and content; numbers compare by value, so 1 equals 1.0, as in Qt.
+
+---
+
+## Static Methods
+
+### undefined_value()
+
+**Returns:**
+
+- *const [JsonValue](/docs/api/base/json-value) &* — The shared undefined value that lookups return when nothing is found.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

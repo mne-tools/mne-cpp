@@ -29,11 +29,12 @@
       "com",
       "decoding",
       "fs",
+      "inv",
       "math",
       "ml",
       "report"
     ],
-    "tokens": 12772,
+    "tokens": 12704,
     "gui_outside_design": []
   },
   "libraries": {
@@ -101,7 +102,7 @@
       },
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 14,
+      "files": 18,
       "modules": [
         "Core",
         "ZlibPrivate"
@@ -239,19 +240,18 @@
       ]
     },
     "fiff": {
-      "tokens": 112,
+      "tokens": 50,
       "by_category": {
         "containers": 1,
         "files": 8,
-        "global": 16,
-        "json": 37,
+        "global": 15,
         "network": 5,
         "other": 3,
         "regex": 2,
-        "strings": 39,
+        "strings": 15,
         "time": 1
       },
-      "public_header_includes": 3,
+      "public_header_includes": 1,
       "q_object": 0,
       "files": 73,
       "modules": [
@@ -296,17 +296,12 @@
       ]
     },
     "inv": {
-      "tokens": 6,
-      "by_category": {
-        "json": 2,
-        "strings": 4
-      },
+      "tokens": 0,
+      "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
       "files": 81,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "lsl": {
       "tokens": 167,

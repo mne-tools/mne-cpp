@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 473,
+    "exported_classes": 480,
     "exported_free_functions": 195,
-    "registered_classes": 565,
+    "registered_classes": 572,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
     "registered_header_only": 80,
     "registered_stale": 0,
-    "registered_with_test": 231,
+    "registered_with_test": 238,
     "registered_test_unresolved": 0,
-    "registered_with_example": 414,
+    "registered_with_example": 421,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 97,
     "registered_without_api_page": 0,
-    "with_snippet": 448,
-    "public_api_units": 567,
-    "example_eligible": 414,
+    "with_snippet": 455,
+    "public_api_units": 574,
+    "example_eligible": 421,
     "example_exempt": 153,
-    "eligible_backed_by_registry_example": 412,
-    "eligible_used_by_some_example": 356,
+    "eligible_backed_by_registry_example": 419,
+    "eligible_used_by_some_example": 363,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -36,13 +36,13 @@
       "with_snippet": 49
     },
     "base": {
-      "public": 9,
-      "registered": 9,
-      "with_test": 9,
-      "eligible": 9,
-      "eligible_with_registry_example": 9,
-      "eligible_used_by_example": 7,
-      "with_snippet": 9
+      "public": 16,
+      "registered": 16,
+      "with_test": 16,
+      "eligible": 16,
+      "eligible_with_registry_example": 16,
+      "eligible_used_by_example": 14,
+      "with_snippet": 16
     },
     "bids": {
       "public": 14,
@@ -2652,6 +2652,189 @@
         "ex_fiff_api/main.cpp#expected_usage"
       ],
       "api_page": "doc/website/docs/api/base/expected.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "JsonArray",
+      "header": "base/json.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_json",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/json-array.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "JsonDocument",
+      "header": "base/json.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_json",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/json-document.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "JsonObject",
+      "header": "base/json.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_json",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/json-object.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "JsonParseError",
+      "header": "base/json.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_json",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/json-parse-error.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "JsonValue",
+      "header": "base/json.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_json",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage",
+        "ex_base/main.cpp#json_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/json-value.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "JsonHandler",
+      "header": "base/json_stream_parser.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_json",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#json_stream_parser_usage",
+        "ex_base/main.cpp#json_stream_parser_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/json-handler.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "JsonStreamParser",
+      "header": "base/json_stream_parser.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_json",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#json_stream_parser_usage",
+        "ex_base/main.cpp#json_stream_parser_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/json-stream-parser.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

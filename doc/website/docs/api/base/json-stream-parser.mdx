@@ -1,0 +1,250 @@
+---
+id: json-stream-parser
+title: "BASELIB::JsonStreamParser"
+sidebar_label: JsonStreamParser
+sidebar_position: 76
+---
+
+# JsonStreamParser
+
+**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/json_stream_parser.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/json_stream_parser.h)
+
+`#include <base/json_stream_parser.h>`
+
+```cpp
+class BASELIB::JsonStreamParser
+```
+
+Incremental JSON parser for real-time streams: feed bytes as they arrive, get documents as they close.
+
+The stream holds root objects or arrays back to back, with or without whitespace in between, which covers NDJSON (one document per line) and concatenated JSON (\{"event":1\}\{"event":2\}). Every root that closes is either
+
+- queued for `take_document()`, the default,
+- passed to the callback set with `set_document_callback()`, or
+- reported token by token to the [`JsonHandler`](/docs/api/base/json-handler) set with `set_handler()`, without building any [`JsonDocument`](/docs/api/base/json-document).
+
+Memory is bounded by `Options`: nesting depth, the bytes of one string or number held between chunks, and the bytes of one document. On malformed input `feed()` returns false, `error()` tells why and where, and the parser ignores input until `reset()`. Nothing throws, apart from std::bad_alloc and exceptions thrown by callbacks.
+
+```cpp title="src/examples/ex_base/main.cpp"
+JsonStreamParser stream; // NDJSON from a socket, split anywhere
+std::vector<double> latencies;
+stream.set_document_callback([&](JsonDocument&& event) { latencies.push_back(event["latency"].to_double()); });
+for (const std::string_view packet : {"{\"latency\":1.5}\n{\"lat", "ency\":2", ".25}\n{\"latency\":3}"}) {
+    if (!stream.feed(packet)) { // malformed input: report and resynchronize
+        Log::warning("bad JSON at byte {}: {}", stream.error().offset, stream.error().error_string());
+        stream.reset();
+    }
+}
+```
+
+---
+
+## Public Methods
+
+### JsonStreamParser()
+
+Constructs a parser with the default `Options`.
+
+---
+
+### JsonStreamParser(options)
+
+**Parameters:**
+
+- **options** : *const Options &*
+  Limits and stream layout.
+
+---
+
+### ~JsonStreamParser()
+
+---
+
+### JsonStreamParser()
+
+---
+
+### operator=()
+
+---
+
+### JsonStreamParser()
+
+---
+
+### operator=()
+
+---
+
+### set_document_callback(callback)
+
+Passes completed documents to `callback` instead of queueing them; call it between documents.
+
+**Parameters:**
+
+- **callback** : *DocumentCallback*
+  Receives each document; an empty function queues documents again.
+
+---
+
+### set_handler(handler)
+
+Reports tokens to `handler` instead of building documents; call it between documents.
+
+**Parameters:**
+
+- **handler** : *[JsonHandler](/docs/api/base/json-handler) **
+  Receives the tokens and must outlive its use; nullptr builds documents again.
+
+---
+
+### feed(chunk)
+
+Parses the next piece of the stream; tokens may be split anywhere, even inside a UTF-8 sequence.
+
+**Parameters:**
+
+- **chunk** : *std::string_view*
+  The next bytes of the stream, of any length; they need not stay valid after the call.
+
+**Returns:**
+
+- *bool* — Whether the stream is still valid JSON; false once an error occurred, until `reset()`.
+
+---
+
+### feed(chunk)
+
+Parses the next piece of the stream; tokens may be split anywhere, even inside a UTF-8 sequence.
+
+**Parameters:**
+
+- **chunk** : *std::span&lt; const std::byte &gt;*
+  The next bytes of the stream, of any length; they need not stay valid after the call.
+
+**Returns:**
+
+- *bool* — Whether the stream is still valid JSON; false once an error occurred, until `reset()`.
+
+---
+
+### finish()
+
+Ends the stream: input that stops inside a document is an error, e.g.
+
+UnterminatedObject. The parser stays usable for a new stream if this succeeds.
+
+**Returns:**
+
+- *bool* — Whether the stream ended between documents.
+
+---
+
+### reset()
+
+Clears the error and any partial document so that parsing restarts with the next byte fed, e.g.
+
+after a corrupt line of NDJSON; the options, handler, callback and the queue of complete documents are kept.
+
+---
+
+### has_error()
+
+**Returns:**
+
+- *bool* — Whether an error occurred since construction or the last `reset()`.
+
+---
+
+### error()
+
+**Returns:**
+
+- *const [JsonParseError](/docs/api/base/json-parse-error) &* — The error, or NoError; offsets count the bytes fed since construction or the last `reset()`.
+
+---
+
+### has_document()
+
+**Returns:**
+
+- *bool* — Whether complete documents are waiting in the queue.
+
+---
+
+### document_count()
+
+**Returns:**
+
+- *std::size_t* — The number of complete documents waiting in the queue.
+
+---
+
+### take_document()
+
+**Returns:**
+
+- *[JsonDocument](/docs/api/base/json-document)* — The oldest complete document from the queue, or a null document if there is none.
+
+---
+
+### bytes_fed()
+
+**Returns:**
+
+- *std::size_t* — The number of bytes fed since construction or the last `reset()`.
+
+---
+
+### depth()
+
+**Returns:**
+
+- *std::size_t* — The current nesting depth: 0 between documents.
+
+---
+
+### is_idle()
+
+**Returns:**
+
+- *bool* — Whether the parser is between documents, i.e. no document is partially parsed.
+
+---
+
+### options()
+
+**Returns:**
+
+- *const Options &* — The limits and stream layout.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 149"
+JsonStreamParser stream; // NDJSON from a socket, split anywhere
+std::vector<double> latencies;
+stream.set_document_callback([&](JsonDocument&& event) { latencies.push_back(event["latency"].to_double()); });
+for (const std::string_view packet : {"{\"latency\":1.5}\n{\"lat", "ency\":2", ".25}\n{\"latency\":3}"}) {
+    if (!stream.feed(packet)) { // malformed input: report and resynchronize
+        Log::warning("bad JSON at byte {}: {}", stream.error().offset, stream.error().error_string());
+        stream.reset();
+    }
+}
+ok &= expect(latencies == std::vector<double>({1.5, 2.25, 3.0}), "JsonStreamParser emitted each event as it closed");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

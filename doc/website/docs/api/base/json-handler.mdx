@@ -1,0 +1,131 @@
+---
+id: json-handler
+title: "BASELIB::JsonHandler"
+sidebar_label: JsonHandler
+sidebar_position: 81
+---
+
+# JsonHandler
+
+**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/json_stream_parser.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/json_stream_parser.h)
+
+`#include <base/json_stream_parser.h>`
+
+```cpp
+class BASELIB::JsonHandler
+```
+
+Receives the tokens of a JSON stream from [`JsonStreamParser`](/docs/api/base/json-stream-parser), in document order, without a DOM.
+
+Override the callbacks of interest; the others do nothing. Strings and keys are views that are valid only during the call: they point into the chunk passed to `JsonStreamParser::feed()` when the token was complete and unescaped in it, and into a reused buffer otherwise, so no callback allocates. Callbacks must not call feed(), finish() or reset() of the parser that calls them.
+
+```cpp title="src/examples/ex_base/main.cpp"
+JsonStreamParser stream; // NDJSON from a socket, split anywhere
+std::vector<double> latencies;
+stream.set_document_callback([&](JsonDocument&& event) { latencies.push_back(event["latency"].to_double()); });
+for (const std::string_view packet : {"{\"latency\":1.5}\n{\"lat", "ency\":2", ".25}\n{\"latency\":3}"}) {
+    if (!stream.feed(packet)) { // malformed input: report and resynchronize
+        Log::warning("bad JSON at byte {}: {}", stream.error().offset, stream.error().error_string());
+        stream.reset();
+    }
+}
+```
+
+---
+
+## Public Methods
+
+### ~JsonHandler()
+
+---
+
+### on_start_object()
+
+An object starts: '\{'.
+
+---
+
+### on_end_object()
+
+The innermost object ends: '\}'.
+
+---
+
+### on_start_array()
+
+An array starts: '['.
+
+---
+
+### on_end_array()
+
+The innermost array ends: ']'.
+
+---
+
+### on_key(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  Key of the next member of the innermost object, unescaped UTF-8.
+
+---
+
+### on_string(value)
+
+**Parameters:**
+
+- **value** : *std::string_view*
+  A string value, unescaped UTF-8.
+
+---
+
+### on_integer(value)
+
+**Parameters:**
+
+- **value** : *std::int64_t*
+  A number written without fraction and exponent that fits std::int64_t; calls `on_number()` unless overridden.
+
+---
+
+### on_number(value)
+
+**Parameters:**
+
+- **value** : *double*
+  Any other number.
+
+---
+
+### on_bool(value)
+
+**Parameters:**
+
+- **value** : *bool*
+  true or false.
+
+---
+
+### on_null()
+
+null.
+
+---
+
+### on_end_document()
+
+The root object or array closed: one document of the stream is complete.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

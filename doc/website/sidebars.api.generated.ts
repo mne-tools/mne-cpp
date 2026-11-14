@@ -488,7 +488,14 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/base/byte-stream',
         'api/base/memory-byte-stream',
         'api/base/file-byte-stream',
-        'api/base/thread-pool'
+        'api/base/thread-pool',
+        'api/base/json-document',
+        'api/base/json-stream-parser',
+        'api/base/json-value',
+        'api/base/json-array',
+        'api/base/json-object',
+        'api/base/json-parse-error',
+        'api/base/json-handler'
       ],
     },
     {

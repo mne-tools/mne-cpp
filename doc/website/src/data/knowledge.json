@@ -207,7 +207,7 @@
     {
       "name": "ex_base",
       "title": "Log, read binary files and run work on a thread pool",
-      "brief": "Base library: logging, byte streams, string and path helpers, the thread pool and the circular buffer",
+      "brief": "Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer",
       "thumbnail": "",
       "url": "/docs/examples/base/ex_base/",
       "library": "base",
