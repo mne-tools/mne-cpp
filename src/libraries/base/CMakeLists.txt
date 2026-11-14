@@ -33,6 +33,8 @@ endif()
 set(SOURCES
   base_global.cpp
   byte_stream.cpp
+  json.cpp
+  json_stream_parser.cpp
   log.cpp
   string_utils.cpp
   thread_pool.cpp
@@ -45,6 +47,8 @@ set(HEADERS
   endian.h
   error.h
   circular_buffer.h
+  json.h
+  json_stream_parser.h
   log.h
   string_utils.h
   thread_pool.h

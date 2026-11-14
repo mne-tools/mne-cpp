@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Base library: logging, byte streams, string and path helpers, the thread pool and the circular buffer.
+ * @brief    Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
  *
  * Every step checks its result and the example exits non-zero on a mismatch.
  * All files are written to a temporary directory.
@@ -19,6 +19,8 @@
 
 #include <base/byte_stream.h>
 #include <base/circular_buffer.h>
+#include <base/json.h>
+#include <base/json_stream_parser.h>
 #include <base/log.h>
 #include <base/string_utils.h>
 #include <base/thread_pool.h>
@@ -126,6 +128,35 @@ int main()
     const bool isGz = equalsIgnoreCase(utf8FromPath(pathFromUtf8("T1.NII.GZ").extension()), ".gz");
     //! [string_utils_usage]
     ok &= expect(fields[0] == "MEG 0113" && scale == 1.5e-13 && isGz, "string helpers parsed the line");
+
+    //! [json_usage]
+    // Qt:   QJsonParseError error;
+    //       QJsonObject cfg = QJsonDocument::fromJson(bytes, &error).object();
+    //       int rate = cfg.value("sfreq").toInt(1000);
+    //       cfg["channels"] = QJsonArray{"MEG 0113", "EEG 001"};
+    //       QByteArray out = QJsonDocument(cfg).toJson(QJsonDocument::Compact);
+    JsonParseError parseError;
+    JsonObject cfg = JsonDocument::from_json(R"({"sfreq": 600, "device": "neuromag"})", &parseError).object();
+    const int rate = cfg.value("sfreq").to_int(1000);       // safe fallback on a missing key or wrong type
+    const bool hasGain = !cfg.value("gain").is_undefined(); // missing keys are undefined; non-const [] inserts, as in Qt
+    cfg["channels"] = JsonArray{"MEG 0113", "EEG 001"};
+    const std::string out = JsonDocument(cfg).to_json(JsonDocument::Compact); // keys sorted, like Qt
+    //! [json_usage]
+    ok &= expect(parseError.error == JsonParseError::NoError && rate == 600 && !hasGain && out == R"({"channels":["MEG 0113","EEG 001"],"device":"neuromag","sfreq":600})",
+                 "JsonDocument parsed, edited and wrote the configuration");
+
+    //! [json_stream_parser_usage]
+    JsonStreamParser stream; // NDJSON from a socket, split anywhere
+    std::vector<double> latencies;
+    stream.set_document_callback([&](JsonDocument&& event) { latencies.push_back(event["latency"].to_double()); });
+    for (const std::string_view packet : {"{\"latency\":1.5}\n{\"lat", "ency\":2", ".25}\n{\"latency\":3}"}) {
+        if (!stream.feed(packet)) { // malformed input: report and resynchronize
+            Log::warning("bad JSON at byte {}: {}", stream.error().offset, stream.error().error_string());
+            stream.reset();
+        }
+    }
+    //! [json_stream_parser_usage]
+    ok &= expect(latencies == std::vector<double>({1.5, 2.25, 3.0}), "JsonStreamParser emitted each event as it closed");
 
     //! [circular_buffer_usage]
     CircularBuffer<double> buffer(4); // one thread pushes, another pops

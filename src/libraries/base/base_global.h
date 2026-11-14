@@ -12,7 +12,7 @@
  * @date     March 2013
  * @brief    Export macro and build-info accessors of BASELIB.
  *
- * BASELIB is the bottom of the library stack: logging, error results, byte streams, string and path
+ * BASELIB is the bottom of the library stack: logging, error results, byte streams, JSON, string and path
  * helpers, the thread pool and the circular buffer. It depends on the C++ standard library, zlib and
  * Qt Core only, so every other library can use it.
  */

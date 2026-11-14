@@ -21,6 +21,7 @@ aliases; replace the old spelling as below.
 | `T::SPtr`, `T::ConstSPtr` (`QSharedPointer`) | `std::shared_ptr<T>`, `std::shared_ptr<const T>`, `std::make_shared<T>()` |
 | `T::UPtr` | `std::unique_ptr<T>` |
 | `ptr.data()`, `ptr.isNull()`, `ptr.clear()` | `ptr.get()`, `!ptr`, `ptr.reset()` |
+| `QJsonDocument`, `QJsonObject`, `QJsonArray`, `QJsonValue`, `QJsonParseError` | `BASELIB::JsonDocument`, `JsonObject`, `JsonArray`, `JsonValue`, `JsonParseError` in `base/json.h`, with snake_case methods (`from_json()`, `to_json()`, `to_int()`, `is_undefined()`, ...); incremental NDJSON / SAX parsing with `BASELIB::JsonStreamParser` in `base/json_stream_parser.h` |
 | `qInstallMessageHandler(MNELogger::customLogWriter)` | `BASELIB::Log::install_qt_message_handler()` |
 | `MNELogger::setLogFile(QString)`, `logFile()` | `BASELIB::Log::set_file(path)`, `Log::file()` |
 | `utils/generics/mne_logger.h`, `utils/generics/log.h` | `base/log.h` |
