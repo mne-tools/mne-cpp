@@ -24,10 +24,6 @@
 
 #include <base/string_utils.h>
 
-#include <QByteArray>
-#include <QJsonDocument>
-#include <QJsonValue>
-#include <QString>
 
 #include <algorithm>
 #include <cmath>
@@ -50,74 +46,72 @@ using BASELIB::fail;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-QJsonArray FIFFLIB::namesToJson(const std::vector<std::string>& names)
+BASELIB::JsonArray FIFFLIB::names_to_json(const std::vector<std::string>& names)
 {
-    QJsonArray array;
+    BASELIB::JsonArray array;
+    array.reserve(names.size());
     for (const std::string& name : names) {
-        array.append(QString::fromStdString(name));
+        array.push_back(name);
     }
     return array;
 }
 
 //=============================================================================================================
 
-std::vector<std::string> FIFFLIB::namesFromJson(const QJsonArray& array)
+std::vector<std::string> FIFFLIB::names_from_json(const BASELIB::JsonArray& array)
 {
     std::vector<std::string> names;
-    names.reserve(static_cast<std::size_t>(array.size()));
-    for (const QJsonValueConstRef name : array) {
-        names.push_back(name.toString().toStdString());
+    names.reserve(array.size());
+    for (const BASELIB::JsonValue& name : array) {
+        names.push_back(name.to_std_string());
     }
     return names;
 }
 
 //=============================================================================================================
 
-QJsonObject FIFFLIB::extrasToJson(const FiffAnnotation::Extras& extras)
+BASELIB::JsonObject FIFFLIB::extras_to_json(const FiffAnnotation::Extras& extras)
 {
-    QJsonObject object;
+    BASELIB::JsonObject object;
+    object.reserve(extras.size());
     for (const auto& [key, value] : extras) {
-        object.insert(QString::fromStdString(key), std::visit([](const auto& v) -> QJsonValue {
-                          using T = std::decay_t<decltype(v)>;
-                          if constexpr (std::is_same_v<T, std::monostate>) {
-                              return QJsonValue(QJsonValue::Null);
-                          } else if constexpr (std::is_same_v<T, std::string>) {
-                              return QString::fromStdString(v);
-                          } else if constexpr (std::is_same_v<T, std::int64_t>) {
-                              return static_cast<std::int64_t>(v);
+        object.insert(key, std::visit([](const auto& v) -> BASELIB::JsonValue {
+                          if constexpr (std::is_same_v<std::decay_t<decltype(v)>, std::monostate>) {
+                              return nullptr;
                           } else {
                               return v;
                           }
                       },
-                                                              value));
+                                      value));
     }
     return object;
 }
 
 //=============================================================================================================
 
-FiffAnnotation::Extras FIFFLIB::extrasFromJson(const QJsonObject& object)
+FiffAnnotation::Extras FIFFLIB::extras_from_json(const BASELIB::JsonObject& object)
 {
     FiffAnnotation::Extras extras;
-    for (auto it = object.begin(); it != object.end(); ++it) {
-        const QJsonValue value = it.value();
+    for (const auto& [key, value] : object) {
         FiffAnnotation::Extra extra;
-        if (value.isBool()) {
-            extra = value.toBool();
-        } else if (value.isDouble()) {
-            const double number = value.toDouble();
+        if (value.is_bool()) {
+            extra = value.to_bool();
+        } else if (value.is_integer()) {
+            extra = value.to_integer();
+        } else if (value.is_number()) {
+            const double number = value.to_double();
             // JSON has one number type; integral values come back as int, as from Python's json
             if (std::trunc(number) == number && std::abs(number) < 9.007199254740992e15) {
                 extra = static_cast<std::int64_t>(number);
             } else {
                 extra = number;
             }
-        } else if (value.isString()) {
-            extra = value.toString().toStdString();
-        } else if (!value.isNull()) {
+        } else if (value.is_string()) {
+            extra = value.to_std_string();
+        } else if (!value.is_null()) {
             continue;
         }
-        extras.insert_or_assign(it.key().toStdString(), std::move(extra));
+        extras.insert_or_assign(key, std::move(extra));
     }
     return extras;
 }
@@ -226,22 +220,21 @@ Expected<FiffAnnotations> FiffAnnotations::read_json(const std::filesystem::path
     if (!bytes) {
         return std::unexpected(bytes.error());
     }
-    QJsonParseError parseError;
-    const QJsonDocument doc = QJsonDocument::fromJson(QByteArray::fromStdString(*bytes), &parseError);
-    if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
-        return fail(ErrorCode::Format, "{} is not an annotation JSON file: {}", BASELIB::utf8FromPath(path), parseError.errorString().toStdString());
+    BASELIB::JsonParseError parseError;
+    const BASELIB::JsonDocument doc = BASELIB::JsonDocument::from_json(*bytes, &parseError);
+    if (parseError.error != BASELIB::JsonParseError::NoError || !doc.is_object()) {
+        return fail(ErrorCode::Format, "{} is not an annotation JSON file: {}", BASELIB::utf8FromPath(path), parseError.error_string());
     }
 
     FiffAnnotations annot;
-    const QJsonArray entries = doc.object().value(QStringLiteral("annotations")).toArray();
-    for (const QJsonValueConstRef entry : entries) {
-        const QJsonObject obj = entry.toObject();
-        annot.m_annotations.push_back({obj.value(QStringLiteral("onset")).toDouble(0.0),
-                                       obj.value(QStringLiteral("duration")).toDouble(0.0),
-                                       obj.value(QStringLiteral("description")).toString().toStdString(),
-                                       namesFromJson(obj.value(QStringLiteral("channel_names")).toArray()),
-                                       obj.value(QStringLiteral("comment")).toString().toStdString(),
-                                       extrasFromJson(obj.value(QStringLiteral("extras")).toObject())});
+    for (const BASELIB::JsonValue& entry : doc.object().value("annotations").to_array()) {
+        const BASELIB::JsonObject& obj = entry.to_object();
+        annot.m_annotations.push_back({obj.value("onset").to_double(0.0),
+                                       obj.value("duration").to_double(0.0),
+                                       obj.value("description").to_std_string(),
+                                       names_from_json(obj.value("channel_names").to_array()),
+                                       obj.value("comment").to_std_string(),
+                                       extras_from_json(obj.value("extras").to_object())});
     }
     return annot;
 }
@@ -250,20 +243,17 @@ Expected<FiffAnnotations> FiffAnnotations::read_json(const std::filesystem::path
 
 Expected<void> FiffAnnotations::write_json(const std::filesystem::path& path) const
 {
-    QJsonArray arr;
+    BASELIB::JsonArray arr;
+    arr.reserve(m_annotations.size());
     for (const FiffAnnotation& a : m_annotations) {
-        QJsonObject obj;
-        obj[QStringLiteral("onset")] = a.onset;
-        obj[QStringLiteral("duration")] = a.duration;
-        obj[QStringLiteral("description")] = QString::fromStdString(a.description);
-        obj[QStringLiteral("channel_names")] = namesToJson(a.ch_names);
-        obj[QStringLiteral("comment")] = QString::fromStdString(a.comment);
-        obj[QStringLiteral("extras")] = extrasToJson(a.extras);
-        arr.append(obj);
+        arr.push_back(BASELIB::JsonObject{{"onset", a.onset},
+                                          {"duration", a.duration},
+                                          {"description", a.description},
+                                          {"channel_names", names_to_json(a.ch_names)},
+                                          {"comment", a.comment},
+                                          {"extras", extras_to_json(a.extras)}});
     }
-    QJsonObject root;
-    root[QStringLiteral("annotations")] = arr;
-    return writeBytes(path, QJsonDocument(root).toJson(QJsonDocument::Indented).toStdString());
+    return writeBytes(path, BASELIB::JsonDocument(BASELIB::JsonObject{{"annotations", std::move(arr)}}).to_json());
 }
 
 //=============================================================================================================

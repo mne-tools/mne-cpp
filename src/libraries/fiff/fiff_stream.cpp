@@ -72,9 +72,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QDebug>
 #include <cstdint>
 
@@ -539,8 +536,8 @@ bool FiffStream::read_annotations(const std::shared_ptr<FiffDirNode>& p_Node, Fi
     std::vector<float> onsets;
     std::vector<float> ends;
     std::vector<std::string> descriptions;
-    QJsonArray channelNames;
-    QJsonArray extras;
+    BASELIB::JsonDocument channelNames;
+    BASELIB::JsonDocument extras;
     std::optional<FiffTag> tag;
     for (const FiffDirEntry& entry : blocks.front()->dir) {
         if (tag = this->read_tag(entry.pos); !tag) {
@@ -575,10 +572,10 @@ bool FiffStream::read_annotations(const std::shared_ptr<FiffDirNode>& p_Node, Fi
                 }
                 break;
             case FIFF_MNE_EPOCHS_DROP_LOG:
-                channelNames = QJsonDocument::fromJson(QByteArray::fromStdString(tag->to_string())).array();
+                channelNames = BASELIB::JsonDocument::from_json(tag->to_string());
                 break;
             case FIFF_FREE_LIST:
-                extras = QJsonDocument::fromJson(QByteArray::fromStdString(tag->to_string())).array();
+                extras = BASELIB::JsonDocument::from_json(tag->to_string());
                 break;
             default:
                 break;
@@ -586,13 +583,12 @@ bool FiffStream::read_annotations(const std::shared_ptr<FiffDirNode>& p_Node, Fi
     }
     const std::size_t count = std::min({onsets.size(), ends.size(), descriptions.size()});
     for (std::size_t i = 0; i < count; ++i) {
-        const auto at = static_cast<qsizetype>(i);
         annotations.push_back({static_cast<double>(onsets[i]),
                                static_cast<double>(ends[i] - onsets[i]), // float32, as MNE-Python
                                std::move(descriptions[i]),
-                               namesFromJson(channelNames.at(at).toArray()),
+                               names_from_json(channelNames.array().at(i).to_array()),
                                {},
-                               extrasFromJson(extras.at(at).toObject())});
+                               extras_from_json(extras.array().at(i).to_object())});
     }
     return true;
 }
@@ -606,8 +602,10 @@ fiff_long_t FiffStream::write_annotations(const FiffAnnotations& annotations, co
     std::vector<float> onsets;
     std::vector<float> ends;
     std::string descriptions;
-    QJsonArray channelNames;
-    QJsonArray extras;
+    BASELIB::JsonArray channelNames;
+    BASELIB::JsonArray extras;
+    channelNames.reserve(annotations.size());
+    extras.reserve(annotations.size());
     bool anyChannels = false;
     bool anyExtras = false;
     for (const FiffAnnotation& annotation : annotations) {
@@ -619,8 +617,8 @@ fiff_long_t FiffStream::write_annotations(const FiffAnnotations& annotations, co
         for (const char c : annotation.description) {
             descriptions += c == ':' ? std::string_view("{COLON}") : std::string_view(&c, 1);
         }
-        channelNames.append(namesToJson(annotation.ch_names));
-        extras.append(extrasToJson(annotation.extras));
+        channelNames.push_back(names_to_json(annotation.ch_names));
+        extras.push_back(extras_to_json(annotation.extras));
         anyChannels = anyChannels || !annotation.ch_names.empty();
         anyExtras = anyExtras || !annotation.extras.empty();
     }
@@ -632,10 +630,10 @@ fiff_long_t FiffStream::write_annotations(const FiffAnnotations& annotations, co
         write_double(FIFF_MEAS_DATE, stamp, 2);
     }
     if (anyChannels) {
-        write_string(FIFF_MNE_EPOCHS_DROP_LOG, QString::fromUtf8(QJsonDocument(channelNames).toJson(QJsonDocument::Compact)).toStdString());
+        write_string(FIFF_MNE_EPOCHS_DROP_LOG, BASELIB::JsonDocument(std::move(channelNames)).to_json(BASELIB::JsonDocument::Compact));
     }
     if (anyExtras) {
-        write_string(FIFF_FREE_LIST, QString::fromUtf8(QJsonDocument(extras).toJson(QJsonDocument::Compact)).toStdString());
+        write_string(FIFF_FREE_LIST, BASELIB::JsonDocument(std::move(extras)).to_json(BASELIB::JsonDocument::Compact));
     }
     end_block(FIFFB_MNE_ANNOTATIONS);
     return pos;

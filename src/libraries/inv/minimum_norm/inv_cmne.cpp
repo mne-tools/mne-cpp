@@ -25,6 +25,7 @@
 #include "inv_cmne.h"
 
 #include <base/log.h>
+#include <base/json.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -34,11 +35,9 @@
 #include <Eigen/Eigenvalues>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QJsonDocument>
-#include <QJsonObject>
 
 #include <algorithm>
 #include <filesystem>
@@ -206,9 +205,10 @@ bool InvCMNE::applyCmne(const MatrixXd& matDspmData,
         BASELIB::Log::warning("[InvCMNE] Cannot load CMNE model {}", onnxModelPath);
         return false;
     }
-    const QJsonObject config = QJsonDocument::fromJson(QByteArray::fromStdString(model.metadata("cmne_config"))).object();
-    const int k = config.value(QStringLiteral("look_back")).toInt();
-    const int nSources = config.value(QStringLiteral("n_sources")).toInt();
+    const BASELIB::JsonDocument metadata = BASELIB::JsonDocument::from_json(model.metadata("cmne_config"));
+    const BASELIB::JsonObject& config = metadata.object();
+    const int k = config.value("look_back").to_int();
+    const int nSources = config.value("n_sources").to_int();
     if (k <= 0 || nSources != matDspmData.rows()) {
         BASELIB::Log::warning("[InvCMNE] Model {} has no cmne_config for {} sources (look_back {} , n_sources {} ).", onnxModelPath, matDspmData.rows(), k, nSources);
         return false;
@@ -217,7 +217,7 @@ bool InvCMNE::applyCmne(const MatrixXd& matDspmData,
         BASELIB::Log::warning("[InvCMNE] Need more than look_back = {} samples, got {}", k, matDspmData.cols());
         return false;
     }
-    sensing = config.value(QStringLiteral("rectify")).toBool(true) ? zScoreRectify(matDspmData) : standardize(matDspmData);
+    sensing = config.value("rectify").to_bool(true) ? zScoreRectify(matDspmData) : standardize(matDspmData);
 
     // The network sees float32 time-major windows of the contextual estimate b (Eq. 13).
     const MatrixXf q = sensing.cast<float>();

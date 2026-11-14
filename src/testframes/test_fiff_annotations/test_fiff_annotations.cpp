@@ -275,7 +275,7 @@ void TestFiffAnnotations::testWriteReadJson()
     FiffAnnotations original;
     original.append(0.0, 0.5, "event/1", {"MEG 0111"});
     original[0].comment = "comment1";
-    original[0].extras = {{"hed", std::string("Sensory-event")}, {"trial", std::int64_t{3}}, {"score", 0.25}, {"valid", true}, {"note", std::monostate{}}};
+    original[0].extras = {{"hed", std::string("Sensory-event")}, {"trial", std::int64_t{3}}, {"sample", std::int64_t{9007199254740993}}, {"score", 0.25}, {"valid", true}, {"note", std::monostate{}}};
     original.append(1.0, 0.3, "event/2");
 
     const std::filesystem::path path = file("annot_test.json");

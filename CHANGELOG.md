@@ -519,8 +519,13 @@ aliases; replace the old spelling as below.
   `coil_def.dat`, `icos.fif` and the test data with them instead of
   `QCoreApplication::applicationDirPath()`, so these lookups also work in
   programs without a Qt application object.
-- The inv library is Qt-free in its public headers and links Qt Core only
-  privately (for the CMNE model metadata). Migration, per class:
+- FIFF annotation channel names and extras, and `FiffAnnotations::read_json`/
+  `write_json`, use `BASELIB::JsonDocument` instead of Qt's JSON classes; the
+  files are unchanged. The helpers in `fiff/fiff_annotations_json.h` are now
+  `names_to_json`, `names_from_json`, `extras_to_json` and `extras_from_json`
+  and take or return `BASELIB::JsonArray`/`JsonObject`.
+- The inv library no longer uses or links Qt; it reads the CMNE model
+  metadata with `BASELIB::JsonDocument`. Migration, per class:
   - `InvMinimumNorm(inverse, lambda, method)` and `setMethod(method)` take
     `std::string_view`; `doInverseSetup` takes `int`. Pass
     `method.toStdString()` for a `QString`.

@@ -126,8 +126,8 @@
       ]
     },
     "fiff": {
-      "tokens": 112,
-      "public_header_includes": 3,
+      "tokens": 50,
+      "public_header_includes": 1,
       "modules": [
         "Core",
         "Network"
@@ -154,11 +154,9 @@
       ]
     },
     "inv": {
-      "tokens": 6,
+      "tokens": 0,
       "public_header_includes": 0,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "lsl": {
       "tokens": 167,

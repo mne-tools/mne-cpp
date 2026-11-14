@@ -15,8 +15,7 @@
 
 #include "fiff_annotations.h"
 
-#include <QJsonArray>
-#include <QJsonObject>
+#include <base/json.h>
 
 #include <string>
 #include <vector>
@@ -29,28 +28,28 @@ namespace FIFFLIB
  *
  * @return The names as a JSON array of strings.
  */
-QJsonArray namesToJson(const std::vector<std::string>& names);
+BASELIB::JsonArray names_to_json(const std::vector<std::string>& names);
 
 /**
  * @param[in] array   A JSON array of strings.
  *
  * @return The strings.
  */
-std::vector<std::string> namesFromJson(const QJsonArray& array);
+std::vector<std::string> names_from_json(const BASELIB::JsonArray& array);
 
 /**
  * @param[in] extras   Annotation extras.
  *
  * @return The extras as a JSON object.
  */
-QJsonObject extrasToJson(const FiffAnnotation::Extras& extras);
+BASELIB::JsonObject extras_to_json(const FiffAnnotation::Extras& extras);
 
 /**
  * @param[in] object   A JSON object.
  *
  * @return Its values as extras; values other than null, bool, number or string are skipped.
  */
-FiffAnnotation::Extras extrasFromJson(const QJsonObject& object);
+FiffAnnotation::Extras extras_from_json(const BASELIB::JsonObject& object);
 
 } // namespace FIFFLIB
 
