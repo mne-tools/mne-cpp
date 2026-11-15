@@ -556,6 +556,11 @@ aliases; replace the old spelling as below.
   `std::optional<std::chrono::sys_time<std::chrono::microseconds>>` instead of
   a `QDateTime`, empty for the all-zero placeholder. New
   `FiffInfo::set_meas_date(time)` sets the date from a UTC time point.
+- New `BASELIB::CborValue`, `CborArray`, `CborMap` and `CborParseError`
+  (`base/cbor.h`): CBOR (RFC 8949) values in standard C++, the counterpart
+  of Qt's `QCborValue`, `QCborArray` and `QCborMap`, with the same encoded
+  bytes and JSON conversion. Decoding rejects malformed input, trailing
+  bytes and nesting deeper than 1024 without throwing.
 - `BrainVisionReader` decodes `.vhdr` and `.vmrk` files like MNE-Python:
   UTF-8, Windows-1252 for `Codepage=ANSI`, and Latin-1 when the bytes are
   not valid in that encoding. Latin-1 headers from older recorders kept raw

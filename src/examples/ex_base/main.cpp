@@ -18,6 +18,7 @@
 //=============================================================================================================
 
 #include <base/byte_stream.h>
+#include <base/cbor.h>
 #include <base/circular_buffer.h>
 #include <base/json.h>
 #include <base/json_stream_parser.h>
@@ -144,6 +145,23 @@ int main()
     //! [json_usage]
     ok &= expect(parseError.error == JsonParseError::NoError && rate == 600 && !hasGain && out == R"({"channels":["MEG 0113","EEG 001"],"device":"neuromag","sfreq":600})",
                  "JsonDocument parsed, edited and wrote the configuration");
+
+    //! [cbor_usage]
+    // Qt:   QCborMap header;
+    //       header["sfreq"] = 600;
+    //       header["payload"] = QByteArray(raw, 3);
+    //       QByteArray encoded = QCborValue(header).toCbor();
+    //       QCborValue decoded = QCborValue::fromCbor(encoded, &error);
+    CborMap header{{"sfreq", 600}, {"device", "neuromag"}};
+    header["payload"] = CborByteArray{std::byte{1}, std::byte{2}, std::byte{3}}; // binary stays binary
+    const CborByteArray encoded = CborValue(header).to_cbor();                   // same bytes as QCborValue::toCbor()
+    CborParseError cborError;
+    const CborValue decoded = CborValue::from_cbor(encoded, &cborError);
+    const std::int64_t sfreq = decoded["sfreq"].to_integer();
+    const JsonValue asJson = decoded.to_json_value(); // byte strings become base64url text
+    //! [cbor_usage]
+    ok &= expect(cborError.error == CborParseError::NoError && sfreq == 600 && decoded["payload"].to_byte_array().size() == 3 && asJson["payload"].to_string() == "AQID",
+                 "CborValue encoded and decoded a header with a byte string");
 
     //! [json_stream_parser_usage]
     JsonStreamParser stream; // NDJSON from a socket, split anywhere
