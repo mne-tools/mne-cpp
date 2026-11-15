@@ -258,7 +258,7 @@ mne::PythonRunnerResult InvCMNE::train_lstm(
     const std::string& pythonExe)
 {
     namespace fs = std::filesystem;
-    using mne::utf8FromPath;
+    using mne::utf8_from_path;
 
     // Training package directory (pyproject.toml + script): <app_dir>/../scripts/ml/training/cmne/, with the source
     // tree relative to the working directory as fallback
@@ -272,13 +272,13 @@ mne::PythonRunnerResult InvCMNE::train_lstm(
 
     if (!fs::exists(scriptPath, ec)) {
         mne::PythonRunnerResult result;
-        result.std_err = "Training script not found: " + utf8FromPath(scriptPath);
+        result.std_err = "Training script not found: " + utf8_from_path(scriptPath);
         mne::Log::warning("[InvCMNE::train_lstm] {}", result.std_err);
         return result;
     }
 
-    mne::Log::debug("[InvCMNE::train_lstm] Script: {}", utf8FromPath(scriptPath));
-    mne::Log::debug("[InvCMNE::train_lstm] Package dir: {}", utf8FromPath(cmneDir));
+    mne::Log::debug("[InvCMNE::train_lstm] Script: {}", utf8_from_path(scriptPath));
+    mne::Log::debug("[InvCMNE::train_lstm] Package dir: {}", utf8_from_path(cmneDir));
 
     const char* method = "dSPM";
     switch (settings.method) {
@@ -299,10 +299,10 @@ mne::PythonRunnerResult InvCMNE::train_lstm(
 
     // Argument list of the train_cmne_lstm.py command line
     mne::StringList args = {
-        "--fwd", utf8FromPath(fwdPath),
-        "--cov", utf8FromPath(covPath),
-        "--epochs", utf8FromPath(epochsPath),
-        "--out", utf8FromPath(outOnnxPath),
+        "--fwd", utf8_from_path(fwdPath),
+        "--cov", utf8_from_path(covPath),
+        "--epochs", utf8_from_path(epochsPath),
+        "--out", utf8_from_path(outOnnxPath),
         "--look-back", std::to_string(settings.lookBack),
         "--method", method,
         "--snr", std::format("{:.6g}", snr),
@@ -315,7 +315,7 @@ mne::PythonRunnerResult InvCMNE::train_lstm(
         args.insert(args.end(), {"--gt-stc", gtStcPrefix});
     }
     if (!finetuneOnnxPath.empty()) {
-        args.insert(args.end(), {"--finetune", utf8FromPath(finetuneOnnxPath)});
+        args.insert(args.end(), {"--finetune", utf8_from_path(finetuneOnnxPath)});
     }
 
     // The venv lives inside the cmne package directory as .venv/

@@ -110,18 +110,18 @@ private slots:
 
 void TestUtilsByteStream::byteSwapReversesBytes()
 {
-    static_assert(byteSwap(std::uint16_t{0x1234}) == 0x3412);
-    static_assert(byteSwap(std::uint32_t{0x12345678}) == 0x78563412);
-    static_assert(byteSwap(std::uint64_t{0x0102030405060708}) == 0x0807060504030201);
-    static_assert(byteSwap(std::int8_t{-5}) == -5);
-    QCOMPARE(byteSwap(std::int16_t{-2}), std::int16_t{-257});
-    QCOMPARE(byteSwap(byteSwap(-123456789)), -123456789);
-    QCOMPARE(byteSwap(byteSwap(3.25f)), 3.25f);
-    QCOMPARE(byteSwap(byteSwap(-1.0e300)), -1.0e300);
-    QVERIFY(std::isnan(byteSwap(byteSwap(std::numeric_limits<double>::quiet_NaN()))));
+    static_assert(byte_swap(std::uint16_t{0x1234}) == 0x3412);
+    static_assert(byte_swap(std::uint32_t{0x12345678}) == 0x78563412);
+    static_assert(byte_swap(std::uint64_t{0x0102030405060708}) == 0x0807060504030201);
+    static_assert(byte_swap(std::int8_t{-5}) == -5);
+    QCOMPARE(byte_swap(std::int16_t{-2}), std::int16_t{-257});
+    QCOMPARE(byte_swap(byte_swap(-123456789)), -123456789);
+    QCOMPARE(byte_swap(byte_swap(3.25f)), 3.25f);
+    QCOMPARE(byte_swap(byte_swap(-1.0e300)), -1.0e300);
+    QVERIFY(std::isnan(byte_swap(byte_swap(std::numeric_limits<double>::quiet_NaN()))));
 
-    QCOMPARE(fromBigEndian(toBigEndian(std::int64_t{-42})), std::int64_t{-42});
-    std::uint32_t big = toBigEndian(std::uint32_t{0x01020304});
+    QCOMPARE(from_big_endian(to_big_endian(std::int64_t{-42})), std::int64_t{-42});
+    std::uint32_t big = to_big_endian(std::uint32_t{0x01020304});
     unsigned char raw[4];
     std::memcpy(raw, &big, 4);
     QCOMPARE(raw[0], static_cast<unsigned char>(0x01));
@@ -138,10 +138,10 @@ void TestUtilsByteStream::bigEndianMatchesQDataStream()
 
     MemoryByteStream stream;
     for (const std::int32_t v : ints) {
-        QVERIFY(stream.writeBigEndian(v));
+        QVERIFY(stream.write_big_endian(v));
     }
-    QVERIFY(stream.writeBigEndian(floats.data(), floats.size()));
-    QVERIFY(stream.writeBigEndian(doubles.data(), doubles.size()));
+    QVERIFY(stream.write_big_endian(floats.data(), floats.size()));
+    QVERIFY(stream.write_big_endian(doubles.data(), doubles.size()));
 
     QCOMPARE(stream.data(), toBytes(qtBigEndian(ints, floats, doubles)));
     QCOMPARE(stream.size(), std::uint64_t(5 * 4 + 4 * 4 + 3 * 8));
@@ -158,18 +158,18 @@ void TestUtilsByteStream::readsWhatQDataStreamWrote()
 
     std::int32_t i0 = 0;
     std::int32_t i1 = 0;
-    QVERIFY(stream.readBigEndian(i0) && stream.readBigEndian(i1));
+    QVERIFY(stream.read_big_endian(i0) && stream.read_big_endian(i1));
     QCOMPARE(i0, 7);
     QCOMPARE(i1, -300000);
     float f[2] = {};
-    QVERIFY(stream.readBigEndian(f, 2));
+    QVERIFY(stream.read_big_endian(f, 2));
     QCOMPARE(f[0], 1.5f);
     QCOMPARE(f[1], -0.125f);
     double d = 0.0;
-    QVERIFY(stream.readBigEndian(d));
+    QVERIFY(stream.read_big_endian(d));
     QCOMPARE(d, 2.0e-9);
-    QVERIFY(stream.atEnd());
-    QVERIFY(!stream.readBigEndian(d));
+    QVERIFY(stream.at_end());
+    QVERIFY(!stream.read_big_endian(d));
 }
 
 //=============================================================================================================
@@ -177,11 +177,11 @@ void TestUtilsByteStream::readsWhatQDataStreamWrote()
 void TestUtilsByteStream::arraysSwapInPlace()
 {
     std::vector<std::int16_t> values = {0x0102, 0x0304, -1};
-    byteSwapInPlace(values.data(), values.size());
+    byte_swap_in_place(values.data(), values.size());
     QCOMPARE(values[0], std::int16_t{0x0201});
     QCOMPARE(values[1], std::int16_t{0x0403});
     QCOMPARE(values[2], std::int16_t{-1});
-    byteSwapInPlace(values.data(), 0);
+    byte_swap_in_place(values.data(), 0);
     QCOMPARE(values[0], std::int16_t{0x0201});
 }
 
@@ -195,14 +195,14 @@ void TestUtilsByteStream::memoryStreamSeeksAndReportsShortReads()
     std::byte buffer[4] = {};
     QCOMPARE(stream.read(buffer, 4), std::size_t(1));
     QCOMPARE(buffer[0], std::byte{3});
-    QVERIFY(stream.atEnd());
+    QVERIFY(stream.at_end());
     QVERIFY(stream.seek(3));
     QVERIFY(!stream.seek(4));
     QCOMPARE(stream.pos(), std::uint64_t(3));
 
     std::int32_t value = 0;
     QVERIFY(stream.seek(0));
-    QVERIFY(!stream.readBigEndian(value)); // three bytes only
+    QVERIFY(!stream.read_big_endian(value)); // three bytes only
 }
 
 //=============================================================================================================
@@ -210,18 +210,18 @@ void TestUtilsByteStream::memoryStreamSeeksAndReportsShortReads()
 void TestUtilsByteStream::memoryStreamOverwritesAndGrows()
 {
     MemoryByteStream stream;
-    QVERIFY(stream.writeBigEndian(std::int32_t{1}));
-    QVERIFY(stream.writeBigEndian(std::int32_t{2}));
+    QVERIFY(stream.write_big_endian(std::int32_t{1}));
+    QVERIFY(stream.write_big_endian(std::int32_t{2}));
     QVERIFY(stream.seek(0));
-    QVERIFY(stream.writeBigEndian(std::int32_t{9}));
+    QVERIFY(stream.write_big_endian(std::int32_t{9}));
     QCOMPARE(stream.size(), std::uint64_t(8));
     QVERIFY(stream.seek(6));
-    QVERIFY(stream.writeBigEndian(std::int32_t{0x0A0B0C0D}));
+    QVERIFY(stream.write_big_endian(std::int32_t{0x0A0B0C0D}));
     QCOMPARE(stream.size(), std::uint64_t(10));
 
     QVERIFY(stream.seek(0));
     std::int32_t first = 0;
-    QVERIFY(stream.readBigEndian(first));
+    QVERIFY(stream.read_big_endian(first));
     QCOMPARE(first, 9);
     QCOMPARE(stream.data()[6], std::byte{0x0A});
     QCOMPARE(stream.data()[9], std::byte{0x0D});
@@ -238,8 +238,8 @@ void TestUtilsByteStream::fileStreamRoundTripAndModes()
     {
         auto stream = FileByteStream::open(path, FileByteStream::Mode::Write);
         QVERIFY(stream);
-        QVERIFY(stream->writeBigEndian(std::int32_t{3}));
-        QVERIFY(stream->writeBigEndian(values.data(), values.size()));
+        QVERIFY(stream->write_big_endian(std::int32_t{3}));
+        QVERIFY(stream->write_big_endian(values.data(), values.size()));
         QCOMPARE(stream->size(), std::uint64_t(4 + 3 * 8));
     }
     {
@@ -247,7 +247,7 @@ void TestUtilsByteStream::fileStreamRoundTripAndModes()
         auto stream = FileByteStream::open(path, FileByteStream::Mode::ReadWrite);
         QVERIFY(stream);
         QVERIFY(stream->seek(0));
-        QVERIFY(stream->writeBigEndian(std::int32_t{-3}));
+        QVERIFY(stream->write_big_endian(std::int32_t{-3}));
         QCOMPARE(stream->size(), std::uint64_t(28));
     }
     QFile file(QString::fromStdString(path.string()));
@@ -267,9 +267,9 @@ void TestUtilsByteStream::fileStreamRoundTripAndModes()
     QVERIFY(stream);
     QVERIFY(stream->seek(4));
     std::vector<double> back(3);
-    QVERIFY(stream->readBigEndian(back.data(), back.size()));
+    QVERIFY(stream->read_big_endian(back.data(), back.size()));
     QCOMPARE(back, values);
-    QVERIFY(stream->atEnd());
+    QVERIFY(stream->at_end());
     QCOMPARE(stream->write("x", 1), std::size_t(0)); // read-only
     QVERIFY(!stream->resize(4));
     stream.reset();
@@ -281,12 +281,12 @@ void TestUtilsByteStream::fileStreamRoundTripAndModes()
     QVERIFY(update->resize(12));
     QCOMPARE(update->size(), std::uint64_t(12));
     QCOMPARE(update->pos(), std::uint64_t(12));
-    QVERIFY(update->writeBigEndian(4.5));
+    QVERIFY(update->write_big_endian(4.5));
     update.reset();
     QCOMPARE(std::filesystem::file_size(path), std::uintmax_t(20));
     auto reread = FileByteStream::open(path, FileByteStream::Mode::Read);
     QVERIFY(reread && reread->seek(4));
-    QVERIFY(reread->readBigEndian(back.data(), 2));
+    QVERIFY(reread->read_big_endian(back.data(), 2));
     QCOMPARE(back[0], 1.0);
     QCOMPARE(back[1], 4.5);
 }
@@ -309,10 +309,10 @@ void TestUtilsByteStream::fileStreamCloseWritesAndEnds()
     const std::filesystem::path path = dir.filePath(QStringLiteral("closed.bin")).toStdString();
     auto stream = FileByteStream::open(path, FileByteStream::Mode::Write);
     QVERIFY(stream);
-    QVERIFY(stream->isOpen());
-    QVERIFY(stream->writeBigEndian(std::int32_t{7}));
+    QVERIFY(stream->is_open());
+    QVERIFY(stream->write_big_endian(std::int32_t{7}));
     stream->close();
-    QVERIFY(!stream->isOpen());
+    QVERIFY(!stream->is_open());
     // The bytes are on disk while the stream object still exists, and later calls fail instead of crashing.
     QCOMPARE(std::filesystem::file_size(path), std::uintmax_t(4));
     QCOMPARE(stream->write("x", 1), std::size_t(0));
@@ -323,9 +323,9 @@ void TestUtilsByteStream::fileStreamCloseWritesAndEnds()
 
     // Reopening reads what was written, without truncating it
     QVERIFY(stream->reopen());
-    QVERIFY(stream->isOpen());
+    QVERIFY(stream->is_open());
     std::int32_t value = 0;
-    QVERIFY(stream->readBigEndian(value));
+    QVERIFY(stream->read_big_endian(value));
     QCOMPARE(value, std::int32_t{7});
     QCOMPARE(std::filesystem::file_size(path), std::uintmax_t(4));
     QVERIFY(stream->reopen());
@@ -370,7 +370,7 @@ void TestUtilsByteStream::readFileBytesPlainAndGzip()
 void TestUtilsByteStream::textFilesRoundTripExactly()
 {
     QTemporaryDir dir;
-    const std::filesystem::path path = pathFromUtf8(dir.filePath(QStringLiteral("text.json")).toStdString());
+    const std::filesystem::path path = path_from_utf8(dir.filePath(QStringLiteral("text.json")).toStdString());
     // Bytes are written as given: no CR is added, and NUL and UTF-8 survive.
     const std::string text("{\n  \"Name\": \"\xc3\xa4\"\n}\n\0end", 23);
     QVERIFY(write_text_file(path, text).has_value());
@@ -433,14 +433,14 @@ void TestUtilsByteStream::benchmarkReadBigEndianFloats()
         QBENCHMARK
         {
             auto stream = FileByteStream::open(path.toStdString(), FileByteStream::Mode::Read);
-            stream->readBigEndian(back.data(), back.size());
+            stream->read_big_endian(back.data(), back.size());
         }
     } else {
         const std::vector<std::byte> raw = toBytes(bytes);
         QBENCHMARK
         {
             MemoryByteStream stream(raw);
-            stream.readBigEndian(back.data(), back.size());
+            stream.read_big_endian(back.data(), back.size());
         }
     }
     QCOMPARE(back, floats);

@@ -90,7 +90,7 @@ private slots:
 void TestUtilsThreadPool::submitReturnsResultsAndRunsOnWorkers()
 {
     ThreadPool pool(2);
-    QCOMPARE(pool.threadCount(), std::size_t(2));
+    QCOMPARE(pool.thread_count(), std::size_t(2));
     const std::thread::id caller = std::this_thread::get_id();
     auto answer = pool.submit([] { return 6 * 7; });
     auto where = pool.submit([] { return std::this_thread::get_id(); });
@@ -137,7 +137,7 @@ void TestUtilsThreadPool::parallelForCoversEveryIndexOnce()
     ThreadPool pool(static_cast<std::size_t>(threads));
     const std::size_t count = end > begin ? static_cast<std::size_t>(end - begin) : 0;
     std::vector<std::atomic<int>> hits(count + 1);
-    pool.parallelFor(static_cast<std::size_t>(begin), static_cast<std::size_t>(end), [&](std::size_t i) {
+    pool.parallel_for(static_cast<std::size_t>(begin), static_cast<std::size_t>(end), [&](std::size_t i) {
         hits[i - static_cast<std::size_t>(begin)].fetch_add(1);
     });
     for (std::size_t i = 0; i < count; ++i) {
@@ -152,17 +152,17 @@ void TestUtilsThreadPool::parallelForRethrowsAndFinishes()
 {
     ThreadPool pool(4);
     std::atomic<int> visited{0};
-    QVERIFY_THROWS_EXCEPTION(std::out_of_range, pool.parallelFor(0, 1000, [&](std::size_t i) {
+    QVERIFY_THROWS_EXCEPTION(std::out_of_range, pool.parallel_for(0, 1000, [&](std::size_t i) {
         visited.fetch_add(1);
         if (i == 500) {
             throw std::out_of_range("index 500");
         }
     }));
-    // Every chunk ran to its end or its exception before parallelFor returned.
+    // Every chunk ran to its end or its exception before parallel_for returned.
     QVERIFY(visited.load() >= 1);
     QVERIFY(visited.load() <= 1000);
     std::atomic<int> after{0};
-    pool.parallelFor(0, 100, [&](std::size_t) { after.fetch_add(1); });
+    pool.parallel_for(0, 100, [&](std::size_t) { after.fetch_add(1); });
     QCOMPARE(after.load(), 100);
 }
 
@@ -173,12 +173,12 @@ void TestUtilsThreadPool::parallelForNestsWithoutDeadlock()
     // Each outer item occupies a worker and starts an inner loop on the same pool; the callers work through it.
     ThreadPool pool(2);
     std::atomic<int> total{0};
-    pool.parallelFor(0, 8, [&](std::size_t) {
-        pool.parallelFor(0, 50, [&](std::size_t) { total.fetch_add(1); });
+    pool.parallel_for(0, 8, [&](std::size_t) {
+        pool.parallel_for(0, 50, [&](std::size_t) { total.fetch_add(1); });
     });
     QCOMPARE(total.load(), 8 * 50);
 
-    auto nested = pool.submit([&pool] { return pool.parallelMap(std::vector<int>{1, 2, 3}, [](int v) { return v * v; }); });
+    auto nested = pool.submit([&pool] { return pool.parallel_map(std::vector<int>{1, 2, 3}, [](int v) { return v * v; }); });
     QCOMPARE(nested.get(), (std::vector<int>{1, 4, 9}));
 }
 
@@ -189,12 +189,12 @@ void TestUtilsThreadPool::parallelMapKeepsOrder()
     ThreadPool pool(4);
     std::vector<int> input(10000);
     std::iota(input.begin(), input.end(), 0);
-    const std::vector<double> mapped = pool.parallelMap(input, [](int v) { return 0.5 * v; });
+    const std::vector<double> mapped = pool.parallel_map(input, [](int v) { return 0.5 * v; });
     QCOMPARE(mapped.size(), input.size());
     for (std::size_t i = 0; i < input.size(); ++i) {
         QCOMPARE(mapped[i], 0.5 * static_cast<double>(input[i]));
     }
-    QVERIFY(pool.parallelMap(std::vector<int>{}, [](int v) { return v; }).empty());
+    QVERIFY(pool.parallel_map(std::vector<int>{}, [](int v) { return v; }).empty());
 }
 
 //=============================================================================================================
@@ -219,9 +219,9 @@ void TestUtilsThreadPool::destructorRunsQueuedTasks()
 void TestUtilsThreadPool::globalPoolUsesEveryCore()
 {
     const std::size_t cores = std::max(1u, std::thread::hardware_concurrency());
-    QCOMPARE(ThreadPool::global().threadCount(), cores);
+    QCOMPARE(ThreadPool::global().thread_count(), cores);
     QCOMPARE(&ThreadPool::global(), &ThreadPool::global());
-    QCOMPARE(ThreadPool(0).threadCount(), cores);
+    QCOMPARE(ThreadPool(0).thread_count(), cores);
 }
 
 //=============================================================================================================
@@ -230,7 +230,7 @@ void TestUtilsThreadPool::benchmarkMap_data()
 {
     QTest::addColumn<bool>("qt");
     QTest::newRow("QtConcurrent::blockingMapped") << true;
-    QTest::newRow("ThreadPool::parallelMap") << false;
+    QTest::newRow("ThreadPool::parallel_map") << false;
 }
 
 //=============================================================================================================
@@ -249,7 +249,7 @@ void TestUtilsThreadPool::benchmarkMap()
     } else {
         QBENCHMARK
         {
-            out = ThreadPool::global().parallelMap(input, work);
+            out = ThreadPool::global().parallel_map(input, work);
         }
     }
     QCOMPARE(out.size(), input.size());

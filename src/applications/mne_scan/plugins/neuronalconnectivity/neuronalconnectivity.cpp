@@ -449,7 +449,7 @@ void NeuronalConnectivity::generateNodeVertices()
         m_vecPicks.resize(0);
 
         for (int i = 0; i < picksTmp.cols() - 1; i += 2) {
-            if (!mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(picksTmp(i)))) {
+            if (!std::ranges::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(picksTmp(i)))) {
                 m_vecPicks.conservativeResize(m_vecPicks.cols() + 1);
                 m_vecPicks(m_vecPicks.cols() - 1) = picksTmp(i);
             }

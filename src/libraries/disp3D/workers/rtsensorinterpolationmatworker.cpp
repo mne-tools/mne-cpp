@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include "rtsensorinterpolationmatworker.h"
 
 #include <vector>
@@ -201,7 +202,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
 
     for (int k = 0; k < std::ssize(evoked.info.chs); ++k) {
         const auto& ch = evoked.info.chs[k];
-        if (bads.contains(ch.ch_name) || mne::contains(evoked.info.bads, ch.ch_name))
+        if (bads.contains(ch.ch_name) || std::ranges::contains(evoked.info.bads, ch.ch_name))
             continue;
 
         QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));

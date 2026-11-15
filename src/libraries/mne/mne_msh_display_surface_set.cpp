@@ -123,13 +123,13 @@ std::unique_ptr<MNEMshDisplaySurfaceSet> MNEMshDisplaySurfaceSet::load(const std
       * Load new display surface data
       */
 {
-    const std::filesystem::path surfDir = subjects_dir / mne::pathFromUtf8(subject_id) / "surf";
-    const std::filesystem::path pathLh = surfDir / mne::pathFromUtf8("lh." + surf);
+    const std::filesystem::path surfDir = subjects_dir / mne::path_from_utf8(subject_id) / "surf";
+    const std::filesystem::path pathLh = surfDir / mne::path_from_utf8("lh." + surf);
     const std::filesystem::path pathLhCurv = surfDir / "lh.curv";
-    const std::filesystem::path pathRh = surfDir / mne::pathFromUtf8("rh." + surf);
+    const std::filesystem::path pathRh = surfDir / mne::path_from_utf8("rh." + surf);
     const std::filesystem::path pathRhCurv = surfDir / "rh.curv";
 
-    mne::Log::info("Loading surface {} ...\n", mne::utf8FromPath(pathLh));
+    mne::Log::info("Loading surface {} ...\n", mne::utf8_from_path(pathLh));
     auto left = MNESourceSpace::load_surface(pathLh, pathLhCurv);
     if (!left) {
         left = MNESourceSpace::load_surface(pathLh, {});
@@ -138,7 +138,7 @@ std::unique_ptr<MNEMshDisplaySurfaceSet> MNEMshDisplaySurfaceSet::load(const std
         left->add_uniform_curv();
     }
 
-    mne::Log::info("Loading surface {} ...\n", mne::utf8FromPath(pathRh));
+    mne::Log::info("Loading surface {} ...\n", mne::utf8_from_path(pathRh));
     auto right = MNESourceSpace::load_surface(pathRh, pathRhCurv);
     if (!right) {
         right = MNESourceSpace::load_surface(pathRh, {});
@@ -193,7 +193,7 @@ int MNEMshDisplaySurfaceSet::add_bem_surface(const std::filesystem::path& filepa
                                              int full_geom,
                                              int check)
 {
-    mne::Log::info("Loading BEM surface {} (id = {}) from {} ...\n", bemname, kind, mne::utf8FromPath(filepath));
+    mne::Log::info("Loading BEM surface {} (id = {}) from {} ...\n", bemname, kind, mne::utf8_from_path(filepath));
 
     std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(filepath, kind, full_geom));
     if (!surf)

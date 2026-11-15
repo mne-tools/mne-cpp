@@ -102,15 +102,15 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData* d, MNECTFCompDataSet
         /*
          * Set up the boundary-element model
          */
-        d->bemname = mne::utf8FromPath(FwdBemModel::fwd_bem_make_bem_sol_name(mne::pathFromUtf8(d->bemname)));
+        d->bemname = mne::utf8_from_path(FwdBemModel::fwd_bem_make_bem_sol_name(mne::path_from_utf8(d->bemname)));
 
         mne::Log::info("\nSetting up the BEM model using {}...", d->bemname);
         mne::Log::info("\nLoading surfaces...");
-        d->bem_model = FwdBemModel::fwd_bem_load_three_layer_surfaces(mne::pathFromUtf8(d->bemname));
+        d->bem_model = FwdBemModel::fwd_bem_load_three_layer_surfaces(mne::path_from_utf8(d->bemname));
         if (d->bem_model) {
             mne::Log::info("Three-layer model surfaces loaded.");
         } else {
-            d->bem_model = FwdBemModel::fwd_bem_load_homog_surface(mne::pathFromUtf8(d->bemname));
+            d->bem_model = FwdBemModel::fwd_bem_load_homog_surface(mne::path_from_utf8(d->bemname));
             if (!d->bem_model)
                 return FAIL;
             mne::Log::info("Homogeneous model surface loaded.");
@@ -120,7 +120,7 @@ int InvDipoleFitData::setup_forward_model(InvDipoleFitData* d, MNECTFCompDataSet
             return FAIL;
         }
         mne::Log::info("\nLoading the solution matrix...");
-        if (d->bem_model->fwd_bem_load_recompute_solution(mne::pathFromUtf8(d->bemname), FWD_BEM_UNKNOWN, false) == FAIL)
+        if (d->bem_model->fwd_bem_load_recompute_solution(mne::path_from_utf8(d->bemname), FWD_BEM_UNKNOWN, false) == FAIL)
             return FAIL;
         mne::Log::info("Employing the head->MRI coordinate transform with the BEM model.");
         assert(d->mri_head_t);
@@ -421,7 +421,7 @@ int InvDipoleFitData::select_dipole_fit_noise_cov(InvDipoleFitData* f,
             /* Check whether this channel is selected in the measurement */
             bool selected = false;
             for (int c = 0; c < meas->nchan; c++) {
-                if (mne::equalsIgnoreCase(f->noise_orig->names[k], meas->chs[c].ch_name)) {
+                if (mne::iequals(f->noise_orig->names[k], meas->chs[c].ch_name)) {
                     selected = sels[c] != 0;
                     break;
                 }
@@ -506,7 +506,7 @@ InvDipoleFitData* InvDipoleFitData::setup_dipole_fit_data(const std::string& mri
        * Read the coordinate transformations
        */
     if (!mriname.empty()) {
-        const auto mriHead = FiffCoordTrans::read(mne::pathFromUtf8(mriname), FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
+        const auto mriHead = FiffCoordTrans::read(mne::path_from_utf8(mriname), FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
         if (!mriHead) {
             mne::Log::critical("{}", mriHead.error().what());
             return nullptr;
@@ -529,7 +529,7 @@ InvDipoleFitData* InvDipoleFitData::setup_dipole_fit_data(const std::string& mri
     }
 
     res->mri_head_t->print();
-    const auto megHead = FiffCoordTrans::read(mne::pathFromUtf8(measname), FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD);
+    const auto megHead = FiffCoordTrans::read(mne::path_from_utf8(measname), FIFFV_COORD_DEVICE, FIFFV_COORD_HEAD);
     if (!megHead) {
         mne::Log::critical("{}", megHead.error().what());
         return nullptr;
@@ -546,7 +546,7 @@ InvDipoleFitData* InvDipoleFitData::setup_dipole_fit_data(const std::string& mri
         mne::Log::info("{} bad channels read from {}.", nbad, badname);
     }
     {
-        FiffStream measStream(mne::pathFromUtf8(measname));
+        FiffStream measStream(mne::path_from_utf8(measname));
         if (measStream.open()) {
             file_bads = measStream.read_bad_channels(measStream.dirtree());
             file_nbad = static_cast<int>(file_bads.size());
@@ -623,7 +623,7 @@ InvDipoleFitData* InvDipoleFitData::setup_dipole_fit_data(const std::string& mri
     /*
        * Compensation data
        */
-    comp_data = MNECTFCompDataSet::read(mne::pathFromUtf8(measname));
+    comp_data = MNECTFCompDataSet::read(mne::path_from_utf8(measname));
     if (!comp_data)
         return nullptr;
     if (comp_data->ncomp > 0) { /* Compensation channel information may be needed */
@@ -632,7 +632,7 @@ InvDipoleFitData* InvDipoleFitData::setup_dipole_fit_data(const std::string& mri
 
         mne::Log::info("{} compensation data sets in {}", comp_data->ncomp, measname);
         {
-            FiffStream compStream(mne::pathFromUtf8(measname));
+            FiffStream compStream(mne::path_from_utf8(measname));
             if (!compStream.open())
                 return nullptr;
             FiffInfo compInfo;
@@ -674,7 +674,7 @@ InvDipoleFitData* InvDipoleFitData::setup_dipole_fit_data(const std::string& mri
     std::vector<std::filesystem::path> projPaths;
     projPaths.reserve(projnames.size());
     for (const std::string& projname : projnames)
-        projPaths.emplace_back(mne::pathFromUtf8(projname));
+        projPaths.emplace_back(mne::path_from_utf8(projname));
     auto projection = MNEProjOp::make_projection(projPaths, std::span(res->chs).first(static_cast<std::size_t>(res->nmeg) + static_cast<std::size_t>(res->neeg)));
     if (!projection) {
         mne::Log::critical("{}", projection.error().what());
@@ -699,7 +699,7 @@ InvDipoleFitData* InvDipoleFitData::setup_dipole_fit_data(const std::string& mri
         * Noise covariance
         */
     if (!noisename.empty()) {
-        if ((cov = MNECovMatrix::read(mne::pathFromUtf8(noisename), FIFFV_MNE_SENSOR_COV)) == nullptr)
+        if ((cov = MNECovMatrix::read(mne::path_from_utf8(noisename), FIFFV_MNE_SENSOR_COV)) == nullptr)
             return nullptr;
         mne::Log::info("Read a {} noise-covariance matrix from {}", cov->cov_diag.size() > 0 ? "diagonal" : "full", noisename);
     } else {

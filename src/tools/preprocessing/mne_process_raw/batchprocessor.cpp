@@ -68,7 +68,7 @@ bool BatchProcessor::composeSaveNames(std::string_view rawName,
     }
 
     const auto stripSuffix = [](std::string_view& name, std::string_view suffix) {
-        if (name.size() >= suffix.size() && equalsIgnoreCase(name.substr(name.size() - suffix.size()), suffix)) {
+        if (name.size() >= suffix.size() && iequals(name.substr(name.size() - suffix.size()), suffix)) {
             name.remove_suffix(suffix.size());
             return true;
         }
@@ -101,7 +101,7 @@ bool BatchProcessor::writeLog(const std::string& logFile, std::string_view log)
     if (logFile.empty() || log.empty())
         return true;
 
-    std::ofstream out(pathFromUtf8(logFile));
+    std::ofstream out(path_from_utf8(logFile));
     if (!out || !(out << log)) {
         qWarning() << "[BatchProcessor::writeLog] Cannot open log file" << logFile.c_str();
         return false;
@@ -144,7 +144,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
         // Open raw data file
         std::optional<FiffRawData> rawData;
         try {
-            rawData.emplace(pathFromUtf8(rawName));
+            rawData.emplace(path_from_utf8(rawName));
         } catch (const std::exception& error) {
             qCritical() << "Failed to open raw data file:" << rawName.c_str() << error.what();
             return 1;
@@ -170,7 +170,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
 
         if (!eventInFile.empty()) {
             qInfo() << "Loading events from" << eventInFile.c_str();
-            if (auto read = FiffEvents::read(pathFromUtf8(eventInFile))) {
+            if (auto read = FiffEvents::read(path_from_utf8(eventInFile))) {
                 fiffEvents = std::move(*read);
             } else {
                 qWarning() << read.error().what();
@@ -197,7 +197,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
 
         if (!eventOutFile.empty()) {
             qInfo() << "\n--- Saving events to" << eventOutFile.c_str() << "---\n";
-            if (auto written = fiffEvents.write(pathFromUtf8(eventOutFile), raw.info.sfreq); !written) {
+            if (auto written = fiffEvents.write(path_from_utf8(eventOutFile), raw.info.sfreq); !written) {
                 qWarning() << written.error().what();
             }
         }
@@ -279,7 +279,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
 
         if (!saveFile.empty()) {
             qInfo() << "\n--- Saving data to" << saveFile.c_str() << "(decim =" << settings.decimation << ") ---\n";
-            if (!raw.save(pathFromUtf8(saveFile), RowVectorXi(), settings.decimation)) {
+            if (!raw.save(path_from_utf8(saveFile), RowVectorXi(), settings.decimation)) {
                 qCritical() << "Failed to save raw data.";
                 return 1;
             }
@@ -293,7 +293,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
         if (!aveDescFile.empty()) {
             qInfo() << "\n--- Averaging according to" << aveDescFile.c_str() << "---\n";
 
-            const std::optional<AverageDescription> parsedAve = MNEDescriptionParser::read_average(pathFromUtf8(aveDescFile));
+            const std::optional<AverageDescription> parsedAve = MNEDescriptionParser::read_average(path_from_utf8(aveDescFile));
             if (!parsedAve || parsedAve->categories.empty()) {
                 qCritical() << "Failed to parse averaging description file:" << aveDescFile.c_str();
                 return 1;
@@ -319,7 +319,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
             }
 
             if (!aveSaveName.empty()) {
-                if (const auto saved = evokedSet.save(pathFromUtf8(aveSaveName)); !saved) {
+                if (const auto saved = evokedSet.save(path_from_utf8(aveSaveName)); !saved) {
                     qCritical("%s", saved.error().what());
                 }
             }
@@ -336,7 +336,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
         if (!covDescFile.empty()) {
             qInfo() << "\n--- Computing covariance matrix according to" << covDescFile.c_str() << "---\n";
 
-            const std::optional<CovDescription> parsedCov = MNEDescriptionParser::read_covariance(pathFromUtf8(covDescFile));
+            const std::optional<CovDescription> parsedCov = MNEDescriptionParser::read_covariance(path_from_utf8(covDescFile));
             if (!parsedCov || parsedCov->defs.empty()) {
                 qCritical() << "Failed to parse covariance description file:" << covDescFile.c_str();
                 return 1;
@@ -388,7 +388,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
                 }
 
                 if (!covSaveName.empty()) {
-                    if (const auto saved = cov.save(pathFromUtf8(covSaveName)); !saved) {
+                    if (const auto saved = cov.save(path_from_utf8(covSaveName)); !saved) {
                         qCritical("%s", saved.error().what());
                     }
                 }
@@ -425,7 +425,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
                 grandAvg.evoked.push_back(avg);
             }
             if (!grandAvg.evoked.empty()) {
-                if (const auto saved = grandAvg.save(pathFromUtf8(settings.grandAveFile)); !saved) {
+                if (const auto saved = grandAvg.save(path_from_utf8(settings.grandAveFile)); !saved) {
                     qCritical("%s", saved.error().what());
                 }
             }
@@ -435,7 +435,7 @@ int BatchProcessor::run(const ProcessingSettings& settings)
             qInfo() << "\n--- Computing grand average covariance ---";
             FiffCov grandCov = FiffCov::compute_grand_average(allCovariances);
             if (grandCov.dim > 0) {
-                if (const auto saved = grandCov.save(pathFromUtf8(settings.grandCovFile)); !saved) {
+                if (const auto saved = grandCov.save(path_from_utf8(settings.grandCovFile)); !saved) {
                     qCritical("%s", saved.error().what());
                 }
             }

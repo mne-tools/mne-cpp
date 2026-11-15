@@ -12,6 +12,7 @@
  * @brief    Implements the embedded raw FIFF browser widget for the FIFF extension.
  */
 
+#include <algorithm>
 #include "rawdatabrowserwidget.h"
 #include <base/string_utils.h>
 
@@ -439,7 +440,7 @@ bool RawDataBrowserWidget::eventFilter(QObject* watched, QEvent* event)
                     const QModelIndex idx = m_tableView->indexAt(mouseEvent->pos());
                     if (idx.isValid() && !m_rawModel->channelInfoList().empty()) {
                         const std::string& chName = m_rawModel->channelInfoList().at(idx.row()).ch_name;
-                        const bool isBad = mne::contains(m_rawModel->fiffInfo()->bads, chName);
+                        const bool isBad = std::ranges::contains(m_rawModel->fiffInfo()->bads, chName);
                         QModelIndexList colOneList;
                         colOneList << m_rawModel->index(idx.row(), 1);
                         m_rawModel->markChBad(colOneList, !isBad);

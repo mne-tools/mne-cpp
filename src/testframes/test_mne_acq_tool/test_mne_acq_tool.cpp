@@ -286,7 +286,7 @@ void TestMneAcqTool::recordWritesTheSource()
         if (names[c].rfind("EEG", 0) != 0) {
             continue;
         }
-        const auto row = static_cast<Eigen::Index>(mne::indexOf(raw.info.ch_names, names[c]));
+        const auto row = static_cast<Eigen::Index>(mne::index_of(raw.info.ch_names, names[c]));
         QVERIFY2(row >= 0, names[c].c_str());
         for (std::size_t s = 0; s < 2000; ++s) {
             const double want = expected[s * names.size() + c];

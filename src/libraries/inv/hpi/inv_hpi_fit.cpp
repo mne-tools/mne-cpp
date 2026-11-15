@@ -259,7 +259,7 @@ CoilParam InvHpiFit::dipfit(const MatrixXd matCoilsSeed,
     CoilParam coil(iNumCoils);
 
     if (!lCoilData.empty()) {
-        mne::ThreadPool::global().parallelFor(0, lCoilData.size(), [&lCoilData](std::size_t i) { lCoilData[i].doDipfitConcurrent(); });
+        mne::ThreadPool::global().parallel_for(0, lCoilData.size(), [&lCoilData](std::size_t i) { lCoilData[i].doDipfitConcurrent(); });
 
         //Transform results to final coil information
         for (Eigen::Index i = 0; i < std::ssize(lCoilData); ++i) {

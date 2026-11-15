@@ -148,7 +148,7 @@ std::string TMSI::uri() const
 void TMSI::applyElectrodeLayout(FiffInfo& info) const
 {
     // Only works for ANT Neuro Waveguard Duke caps
-    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8(m_sElcFilePath.toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8(m_sElcFilePath.toStdString()));
     if (!layout) {
         qWarning() << "[TMSI] Cannot read the electrode positions in" << m_sElcFilePath;
         return;

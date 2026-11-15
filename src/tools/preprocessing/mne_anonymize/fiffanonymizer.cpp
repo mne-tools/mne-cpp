@@ -212,7 +212,7 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose("Reading info in the file.");
     processHeaderTags();
 
-    while ((m_pTag->next != -1) && (!m_pInStream->byte_stream().atEnd())) {
+    while ((m_pTag->next != -1) && (!m_pInStream->byte_stream().at_end())) {
         readTag();
         censorTag();
         writeTag();

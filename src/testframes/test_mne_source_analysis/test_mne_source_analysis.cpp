@@ -13,6 +13,7 @@
  *           InvMinimumNorm, MNESourceSpaces, FiffCov, and MNENamedMatrix.
  */
 
+#include <algorithm>
 #include <QtTest/QtTest>
 #include <QTemporaryDir>
 #include <base/string_utils.h>
@@ -306,7 +307,7 @@ private slots:
         StringList chNames;
         for (int i = 0; i < sel.size(); ++i) {
             const std::string& name = raw.info.ch_names[sel(i)];
-            if (mne::contains(cov.names, name))
+            if (std::ranges::contains(cov.names, name))
                 chNames.push_back(name);
         }
         QVERIFY2(!chNames.empty(), "No intersecting channels between cov and info");

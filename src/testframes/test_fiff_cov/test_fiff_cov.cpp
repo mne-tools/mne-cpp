@@ -306,8 +306,8 @@ void TestFiffCov::computeFromEpochs_matchesPython()
     rej.eegReject = static_cast<float>(eegReject);
     const FiffCov cov = FiffCov::compute_from_epochs(raw, events, codes, tmin, tmax, tmin, bmax, baseline, removeMean, 0, delay, eegReject > 0.0 ? &rej : nullptr);
     QCOMPARE(cov.nfree, nfree);
-    const int i = mne::indexOf(cov.names, "MEG 0113");
-    const int e = mne::indexOf(cov.names, "EEG 001");
+    const int i = mne::index_of(cov.names, "MEG 0113");
+    const int e = mne::index_of(cov.names, "EEG 001");
     const Vector3d got(cov.data(i, i), cov.data(e, e), cov.data(i, e));
     for (int k = 0; k < 3; ++k)
         QVERIFY2(std::abs(got[k] - ref[k]) <= 1e-6 * std::abs(ref[k]), qPrintable(QString("entry %1: %2 vs %3").arg(k).arg(got[k], 0, 'g', 17).arg(ref[k], 0, 'g', 17)));

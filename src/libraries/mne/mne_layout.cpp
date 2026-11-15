@@ -68,7 +68,7 @@ std::string MNELayoutPort::cleanName(std::string_view name)
 
 bool MNELayoutPort::contains(std::string_view channel) const
 {
-    return mne::contains(names, cleanName(channel));
+    return std::ranges::contains(names, cleanName(channel));
 }
 
 //=============================================================================================================
@@ -77,12 +77,12 @@ std::optional<MNELayout> MNELayout::read(const std::filesystem::path& path)
 {
     std::ifstream file(path);
     if (!file) {
-        Log::warning("MNELayout::read - Cannot open {}", utf8FromPath(path));
+        Log::warning("MNELayout::read - Cannot open {}", utf8_from_path(path));
         return std::nullopt;
     }
 
     MNELayout layout;
-    layout.fileName = utf8FromPath(path);
+    layout.fileName = utf8_from_path(path);
     bool haveExtent = false;
     std::string raw;
     while (std::getline(file, raw)) {
@@ -94,7 +94,7 @@ std::optional<MNELayout> MNELayout::read(const std::filesystem::path& path)
         if (!haveExtent) {
             double v[4];
             if (!(fields >> v[0] >> v[1] >> v[2] >> v[3])) {
-                Log::warning("MNELayout::read - Illegal extent in {}", utf8FromPath(path));
+                Log::warning("MNELayout::read - Illegal extent in {}", utf8_from_path(path));
                 return std::nullopt;
             }
             layout.m_extent = Eigen::AlignedBox2d(Eigen::Vector2d(v[0], v[2]), Eigen::Vector2d(v[1], v[3]));
@@ -107,7 +107,7 @@ std::optional<MNELayout> MNELayout::read(const std::filesystem::path& path)
         double w = 0.0;
         double h = 0.0;
         if (!(fields >> port.portno >> x0 >> y0 >> w >> h)) {
-            Log::warning("MNELayout::read - Bad layout item in {}: {}", utf8FromPath(path), line);
+            Log::warning("MNELayout::read - Bad layout item in {}: {}", utf8_from_path(path), line);
             return std::nullopt;
         }
         port.xmin = static_cast<float>(x0);
@@ -125,7 +125,7 @@ std::optional<MNELayout> MNELayout::read(const std::filesystem::path& path)
         layout.ports.push_back(std::move(port));
     }
     if (!haveExtent) {
-        Log::warning("MNELayout::read - No extent in {}", utf8FromPath(path));
+        Log::warning("MNELayout::read - No extent in {}", utf8_from_path(path));
         return std::nullopt;
     }
     layout.m_visible = layout.m_extent;

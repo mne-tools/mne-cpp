@@ -95,7 +95,7 @@ bool MNEDescriptionParser::get_int(std::istream& in, int& val)
         mne::Log::warning("MNEDescriptionParser: expected integer, got EOF");
         return false;
     }
-    const std::optional<int> parsed = mne::toInt(word);
+    const std::optional<int> parsed = mne::to_int(word);
     if (!parsed) {
         mne::Log::warning("MNEDescriptionParser: bad integer: {}", word);
         return false;
@@ -113,7 +113,7 @@ bool MNEDescriptionParser::get_float(std::istream& in, float& val)
         mne::Log::warning("MNEDescriptionParser: expected float, got EOF");
         return false;
     }
-    const std::optional<double> parsed = mne::toDouble(word);
+    const std::optional<double> parsed = mne::to_double(word);
     if (!parsed) {
         mne::Log::warning("MNEDescriptionParser: bad float: {}", word);
         return false;
@@ -130,47 +130,47 @@ bool MNEDescriptionParser::parse_rejection_param(std::string_view keyword, std::
     ok = true;
     float fval;
 
-    if (mne::equalsIgnoreCase(keyword, "gradReject")) {
+    if (mne::iequals(keyword, "gradReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.megGradReject = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "magReject")) {
+    } else if (mne::iequals(keyword, "magReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.megMagReject = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "eegReject")) {
+    } else if (mne::iequals(keyword, "eegReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.eegReject = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "eogReject")) {
+    } else if (mne::iequals(keyword, "eogReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.eogReject = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "ecgReject")) {
+    } else if (mne::iequals(keyword, "ecgReject")) {
         ok = get_float(in, fval);
         if (ok)
             rej.ecgReject = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "gradFlat")) {
+    } else if (mne::iequals(keyword, "gradFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.megGradFlat = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "magFlat")) {
+    } else if (mne::iequals(keyword, "magFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.megMagFlat = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "eegFlat")) {
+    } else if (mne::iequals(keyword, "eegFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.eegFlat = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "eogFlat")) {
+    } else if (mne::iequals(keyword, "eogFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.eogFlat = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "ecgFlat")) {
+    } else if (mne::iequals(keyword, "ecgFlat")) {
         ok = get_float(in, fval);
         if (ok)
             rej.ecgFlat = fval;
-    } else if (mne::equalsIgnoreCase(keyword, "stimIgnore")) {
+    } else if (mne::iequals(keyword, "stimIgnore")) {
         ok = get_float(in, fval);
         if (ok)
             rej.stimIgnore = std::fabs(fval);
@@ -188,7 +188,7 @@ std::optional<mne::AverageDescription> MNEDescriptionParser::read_average(const 
 {
     std::ifstream in(path);
     if (!in) {
-        mne::Log::warning("MNEDescriptionParser: cannot open {}", mne::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: cannot open {}", mne::utf8_from_path(path));
         return std::nullopt;
     }
     mne::AverageDescription desc;
@@ -263,7 +263,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // Top-level: "average" keyword
-        if (mne::equalsIgnoreCase(word, "average")) {
+        if (mne::iequals(word, "average")) {
             if (inAverage || inCategory) {
                 mne::Log::warning("MNEDescriptionParser: nested average");
                 return false;
@@ -274,8 +274,8 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // Category start
-        if (mne::equalsIgnoreCase(word, "category") ||
-            mne::equalsIgnoreCase(word, "condition")) {
+        if (mne::iequals(word, "category") ||
+            mne::iequals(word, "condition")) {
             if (!inAverage || inCategory) {
                 mne::Log::warning("MNEDescriptionParser: misplaced category");
                 return false;
@@ -287,7 +287,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // "name" keyword
-        if (mne::equalsIgnoreCase(word, "name")) {
+        if (mne::iequals(word, "name")) {
             const std::string val = next_word(in);
             if (val.empty()) {
                 mne::Log::warning("MNEDescriptionParser: name requires a value");
@@ -305,7 +305,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // "outfile" keyword
-        if (mne::equalsIgnoreCase(word, "outfile")) {
+        if (mne::iequals(word, "outfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
                 mne::Log::warning("MNEDescriptionParser: outfile requires a value");
@@ -321,7 +321,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // "eventfile" keyword
-        if (mne::equalsIgnoreCase(word, "eventfile")) {
+        if (mne::iequals(word, "eventfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
                 mne::Log::warning("MNEDescriptionParser: eventfile requires a value");
@@ -337,7 +337,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // "logfile" keyword
-        if (mne::equalsIgnoreCase(word, "logfile")) {
+        if (mne::iequals(word, "logfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
                 mne::Log::warning("MNEDescriptionParser: logfile requires a value");
@@ -353,7 +353,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // "fixskew" keyword
-        if (mne::equalsIgnoreCase(word, "fixskew")) {
+        if (mne::iequals(word, "fixskew")) {
             if (inAverage && !inCategory)
                 desc.fixSkew = true;
             else {
@@ -364,7 +364,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
         }
 
         // --- Category-level keywords ---
-        if (mne::equalsIgnoreCase(word, "tmin")) {
+        if (mne::iequals(word, "tmin")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -376,7 +376,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "tmax")) {
+        if (mne::iequals(word, "tmax")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -388,8 +388,8 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "basemin") ||
-            mne::equalsIgnoreCase(word, "bmin")) {
+        if (mne::iequals(word, "basemin") ||
+            mne::iequals(word, "bmin")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -402,8 +402,8 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "basemax") ||
-            mne::equalsIgnoreCase(word, "bmax")) {
+        if (mne::iequals(word, "basemax") ||
+            mne::iequals(word, "bmax")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -416,7 +416,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "event")) {
+        if (mne::iequals(word, "event")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -432,7 +432,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "nextevent")) {
+        if (mne::iequals(word, "nextevent")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -448,7 +448,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "prevevent")) {
+        if (mne::iequals(word, "prevevent")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -464,7 +464,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "ignore")) {
+        if (mne::iequals(word, "ignore")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -480,7 +480,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "prevignore")) {
+        if (mne::iequals(word, "prevignore")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -496,7 +496,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "nextignore")) {
+        if (mne::iequals(word, "nextignore")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -512,7 +512,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "mask")) {
+        if (mne::iequals(word, "mask")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -529,7 +529,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "prevmask")) {
+        if (mne::iequals(word, "prevmask")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -546,7 +546,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "nextmask")) {
+        if (mne::iequals(word, "nextmask")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -563,7 +563,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "delay")) {
+        if (mne::iequals(word, "delay")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -575,7 +575,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "stderr")) {
+        if (mne::iequals(word, "stderr")) {
             if (inCategory)
                 currentCat.doStdErr = true;
             else {
@@ -584,7 +584,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "abs")) {
+        if (mne::iequals(word, "abs")) {
             if (inCategory)
                 currentCat.doAbs = true;
             else {
@@ -593,7 +593,7 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "color")) {
+        if (mne::iequals(word, "color")) {
             float r, g, b;
             if (!get_float(in, r) || !get_float(in, g) || !get_float(in, b))
                 return false;
@@ -624,11 +624,11 @@ bool MNEDescriptionParser::parse_average(std::istream& in, const std::filesystem
             continue;
         }
 
-        mne::Log::warning("MNEDescriptionParser: unknown keyword {} in {}", word, mne::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: unknown keyword {} in {}", word, mne::utf8_from_path(path));
     }
 
     if (desc.categories.empty()) {
-        mne::Log::warning("MNEDescriptionParser: no categories found in {}", mne::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: no categories found in {}", mne::utf8_from_path(path));
         return false;
     }
 
@@ -643,7 +643,7 @@ std::optional<CovDescription> MNEDescriptionParser::read_covariance(const std::f
 {
     std::ifstream in(path);
     if (!in) {
-        mne::Log::warning("MNEDescriptionParser: cannot open {}", mne::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: cannot open {}", mne::utf8_from_path(path));
         return std::nullopt;
     }
     CovDescription desc;
@@ -703,7 +703,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             continue;
         }
 
-        if (mne::equalsIgnoreCase(word, "cov")) {
+        if (mne::iequals(word, "cov")) {
             if (inCov || inDef) {
                 mne::Log::warning("MNEDescriptionParser: nested cov");
                 return false;
@@ -714,7 +714,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             continue;
         }
 
-        if (mne::equalsIgnoreCase(word, "def")) {
+        if (mne::iequals(word, "def")) {
             if (!inCov || inDef) {
                 mne::Log::warning("MNEDescriptionParser: misplaced def");
                 return false;
@@ -726,7 +726,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
         }
 
         // Cov-level keywords
-        if (mne::equalsIgnoreCase(word, "outfile")) {
+        if (mne::iequals(word, "outfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
                 mne::Log::warning("MNEDescriptionParser: outfile requires a value");
@@ -740,7 +740,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "eventfile")) {
+        if (mne::iequals(word, "eventfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
                 mne::Log::warning("MNEDescriptionParser: eventfile requires a value");
@@ -754,7 +754,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "logfile")) {
+        if (mne::iequals(word, "logfile")) {
             const std::string val = next_word(in);
             if (val.empty()) {
                 mne::Log::warning("MNEDescriptionParser: logfile requires a value");
@@ -768,7 +768,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "keepsamplemean")) {
+        if (mne::iequals(word, "keepsamplemean")) {
             if (inCov && !inDef)
                 desc.removeSampleMean = false;
             else {
@@ -777,7 +777,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "fixskew")) {
+        if (mne::iequals(word, "fixskew")) {
             if (inCov && !inDef)
                 desc.fixSkew = true;
             else {
@@ -788,7 +788,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
         }
 
         // Def-level keywords
-        if (mne::equalsIgnoreCase(word, "tmin")) {
+        if (mne::iequals(word, "tmin")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -800,7 +800,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "tmax")) {
+        if (mne::iequals(word, "tmax")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -812,8 +812,8 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "basemin") ||
-            mne::equalsIgnoreCase(word, "bmin")) {
+        if (mne::iequals(word, "basemin") ||
+            mne::iequals(word, "bmin")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -826,8 +826,8 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "basemax") ||
-            mne::equalsIgnoreCase(word, "bmax")) {
+        if (mne::iequals(word, "basemax") ||
+            mne::iequals(word, "bmax")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -840,7 +840,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "event")) {
+        if (mne::iequals(word, "event")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -856,7 +856,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "ignore")) {
+        if (mne::iequals(word, "ignore")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -872,7 +872,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "mask")) {
+        if (mne::iequals(word, "mask")) {
             int ival;
             if (!get_int(in, ival))
                 return false;
@@ -889,7 +889,7 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             }
             continue;
         }
-        if (mne::equalsIgnoreCase(word, "delay")) {
+        if (mne::iequals(word, "delay")) {
             float fval;
             if (!get_float(in, fval))
                 return false;
@@ -914,11 +914,11 @@ bool MNEDescriptionParser::parse_covariance(std::istream& in, const std::filesys
             continue;
         }
 
-        mne::Log::warning("MNEDescriptionParser: unknown keyword {} in {}", word, mne::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: unknown keyword {} in {}", word, mne::utf8_from_path(path));
     }
 
     if (!seenCov) {
-        mne::Log::warning("MNEDescriptionParser: nothing useful read from {}", mne::utf8FromPath(path));
+        mne::Log::warning("MNEDescriptionParser: nothing useful read from {}", mne::utf8_from_path(path));
         return false;
     }
 

@@ -55,7 +55,7 @@ std::optional<std::vector<double>> coordinates(std::string_view line, std::strin
     }
     std::vector<double> values;
     for (const std::string& field : split(line, ' ', true)) {
-        const auto value = toDouble(field);
+        const auto value = to_double(field);
         if (!value)
             return std::nullopt;
         values.push_back(*value);
@@ -71,7 +71,7 @@ std::optional<std::vector<double>> coordinates(std::string_view line, std::strin
 
 std::optional<ElectrodeLayout> LayoutLoader::read_elc(const std::filesystem::path& path)
 {
-    if (toLower(path.extension().string()) != ".elc")
+    if (to_lower(path.extension().string()) != ".elc")
         return std::nullopt;
 
     std::ifstream file(path);

@@ -175,8 +175,8 @@ void TestIeeg::groupsContactsIntoLeads()
     QCOMPARE(leads[2].name, std::string("A"));
     QCOMPARE(leads[3].name, std::string("REF")); // no number: the name is the lead
     QCOMPARE(implantation.contacts()[0].lead, std::string("LA"));
-    QCOMPARE(implantation.indexOf("A1"), 5);
-    QCOMPARE(implantation.indexOf("nope"), -1);
+    QCOMPARE(implantation.index_of("A1"), 5);
+    QCOMPARE(implantation.index_of("nope"), -1);
     QCOMPARE(implantation.positions().row(0), Eigen::RowVector3f(0.0f, 0.0f, 0.0315f));
 
     // Separators between the lead name and the number are not part of the lead

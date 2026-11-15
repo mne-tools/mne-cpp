@@ -61,7 +61,7 @@ namespace mne
  *
  * @return Null-terminated string with the library build date and time.
  */
-BASESHARED_EXPORT const char* buildDateTime();
+BASESHARED_EXPORT const char* build_date_time();
 
 //=============================================================================================================
 /**
@@ -69,7 +69,7 @@ BASESHARED_EXPORT const char* buildDateTime();
  *
  * @return Null-terminated string with the short git commit hash of the build.
  */
-BASESHARED_EXPORT const char* buildHash();
+BASESHARED_EXPORT const char* build_hash();
 
 //=============================================================================================================
 /**
@@ -77,7 +77,7 @@ BASESHARED_EXPORT const char* buildHash();
  *
  * @return Null-terminated string with the full git commit hash of the build.
  */
-BASESHARED_EXPORT const char* buildHashLong();
+BASESHARED_EXPORT const char* build_hash_long();
 }
 
 #endif // MNEBASE_GLOBAL_H

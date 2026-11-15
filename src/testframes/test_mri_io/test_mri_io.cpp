@@ -616,7 +616,7 @@ void TestMriIO::testCorFifWriteRead()
 
     // Scan through the file tags
     stream.byte_stream().seek(0);
-    while (!stream.byte_stream().atEnd()) {
+    while (!stream.byte_stream().at_end()) {
         tag = stream.read_tag();
         if (!tag)
             break;
@@ -976,7 +976,7 @@ void TestMriIO::testCorFifWriteReadSynthetic()
     std::optional<FiffTag> tag;
     int sliceCount = 0;
     stream.byte_stream().seek(0);
-    while (!stream.byte_stream().atEnd()) {
+    while (!stream.byte_stream().at_end()) {
         tag = stream.read_tag();
         if (!tag)
             break;

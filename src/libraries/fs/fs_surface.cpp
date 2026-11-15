@@ -149,7 +149,7 @@ bool FsSurface::read(const std::string& subject_id, std::int32_t hemi, const std
     if (hemi != 0 && hemi != 1)
         return false;
 
-    return read(subjects_dir / pathFromUtf8(subject_id) / "surf", hemi, surf, p_Surface, p_bLoadCurvature);
+    return read(subjects_dir / path_from_utf8(subject_id) / "surf", hemi, surf, p_Surface, p_bLoadCurvature);
 }
 
 //=============================================================================================================
@@ -159,7 +159,7 @@ bool FsSurface::read(const std::filesystem::path& path, std::int32_t hemi, const
     if (hemi != 0 && hemi != 1)
         return false;
 
-    return read(path / pathFromUtf8(std::format("{}.{}", hemi == 0 ? "lh" : "rh", surf)), p_Surface, p_bLoadCurvature);
+    return read(path / path_from_utf8(std::format("{}.{}", hemi == 0 ? "lh" : "rh", surf)), p_Surface, p_bLoadCurvature);
 }
 
 //=============================================================================================================
@@ -174,7 +174,7 @@ Expected<FsSurface::Geometry> FsSurface::read_geometry(const std::filesystem::pa
         return static_cast<std::int64_t>(stream.size() - stream.pos());
     };
     const auto invalid = [&file](std::string_view what) {
-        return std::unexpected(Error(ErrorCode::Format, std::format("{} surface file {}", what, utf8FromPath(file))));
+        return std::unexpected(Error(ErrorCode::Format, std::format("{} surface file {}", what, utf8_from_path(file))));
     };
 
     //   Magic numbers to identify QUAD and TRIANGLE files
@@ -198,11 +198,11 @@ Expected<FsSurface::Geometry> FsSurface::read_geometry(const std::filesystem::pa
         verts.resize(3, nvert);
         if (magic == QUAD_FILE_MAGIC_NUMBER) {
             std::vector<std::int16_t> coords(3 * static_cast<std::size_t>(nvert));
-            stream.readBigEndian(coords.data(), coords.size());
+            stream.read_big_endian(coords.data(), coords.size());
             for (std::size_t i = 0; i < coords.size(); ++i)
                 verts.data()[i] = static_cast<float>(coords[i]) / 100;
         } else {
-            stream.readBigEndian(verts.data(), 3 * static_cast<std::size_t>(nvert));
+            stream.read_big_endian(verts.data(), 3 * static_cast<std::size_t>(nvert));
         }
 
         //  Each quad is split into two triangles
@@ -220,22 +220,22 @@ Expected<FsSurface::Geometry> FsSurface::read_geometry(const std::filesystem::pa
         }
     } else if (magic == TRIANGLE_FILE_MAGIC_NUMBER) {
         // Two text lines: creator and an empty line
-        for (int newlines = 0; newlines < 2 && !stream.atEnd();) {
+        for (int newlines = 0; newlines < 2 && !stream.at_end();) {
             char c = 0;
             stream.read(&c, 1);
             newlines += c == '\n' ? 1 : 0;
         }
         std::int32_t nface = 0;
-        stream.readBigEndian(nvert);
-        stream.readBigEndian(nface);
+        stream.read_big_endian(nvert);
+        stream.read_big_endian(nface);
         if (nvert <= 0 || nface < 0 || (std::int64_t(nvert) + nface) * 12 > remaining())
             return invalid("Invalid or truncated");
 
         verts.resize(3, nvert);
-        stream.readBigEndian(verts.data(), 3 * static_cast<std::size_t>(nvert));
+        stream.read_big_endian(verts.data(), 3 * static_cast<std::size_t>(nvert));
 
         Matrix<int, Dynamic, Dynamic, RowMajor> rowFaces(nface, 3);
-        stream.readBigEndian(rowFaces.data(), 3 * static_cast<std::size_t>(nface));
+        stream.read_big_endian(rowFaces.data(), 3 * static_cast<std::size_t>(nface));
         faces = rowFaces;
     } else {
         return invalid(std::format("Bad magic number ({}) in", magic));
@@ -256,8 +256,8 @@ bool FsSurface::read(const std::filesystem::path& p_sFile, FsSurface& p_Surface,
     p_Surface.clear();
 
     // The name is <hemi>.<surf>, e.g. lh.white
-    const std::string file = utf8FromPath(p_sFile);
-    const std::string name = utf8FromPath(p_sFile.filename());
+    const std::string file = utf8_from_path(p_sFile);
+    const std::string name = utf8_from_path(p_sFile.filename());
     if (!name.starts_with("lh.") && !name.starts_with("rh."))
         return false;
 
@@ -307,15 +307,15 @@ VectorXf FsSurface::read_curv(const std::filesystem::path& p_sFileName)
     if (vnum == NEW_VERSION_MAGIC_NUMBER) {
         std::int32_t fnum = 0;
         std::int32_t valsPerVertex = 0;
-        stream.readBigEndian(vnum);
-        stream.readBigEndian(fnum);
-        stream.readBigEndian(valsPerVertex);
+        stream.read_big_endian(vnum);
+        stream.read_big_endian(fnum);
+        stream.read_big_endian(valsPerVertex);
         if (vnum < 0 || static_cast<std::uint64_t>(vnum) * 4 > stream.size() - stream.pos()) {
             Log::warning("\tError: Truncated curvature file");
             return VectorXf();
         }
         curv.resize(vnum);
-        stream.readBigEndian(curv.data(), static_cast<std::size_t>(vnum));
+        stream.read_big_endian(curv.data(), static_cast<std::size_t>(vnum));
     } else {
         FsSurface::fread3(stream); // number of faces
         if (vnum < 0 || static_cast<std::uint64_t>(vnum) * 2 > stream.size() - stream.pos()) {
@@ -323,7 +323,7 @@ VectorXf FsSurface::read_curv(const std::filesystem::path& p_sFileName)
             return VectorXf();
         }
         std::vector<std::int16_t> values(static_cast<std::size_t>(vnum));
-        stream.readBigEndian(values.data(), values.size());
+        stream.read_big_endian(values.data(), values.size());
         curv.resize(vnum);
         for (std::int32_t i = 0; i < vnum; ++i)
             curv(i) = static_cast<float>(values[static_cast<std::size_t>(i)]) / 100;

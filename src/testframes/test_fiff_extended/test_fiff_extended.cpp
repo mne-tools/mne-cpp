@@ -2,6 +2,7 @@
 // Copyright (c) 2010-2026 MNE-CPP Authors
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
+#include <algorithm>
 #include <QtTest/QtTest>
 #include <base/string_utils.h>
 #include <QBuffer>
@@ -216,7 +217,7 @@ private slots:
         RowVectorXi picks = raw.info.pick_types(true, true, false, {}, raw.info.bads);
         StringList chNames;
         for (int i = 0; i < picks.size(); ++i) {
-            if (mne::contains(cov.names, raw.info.ch_names[picks(i)]))
+            if (std::ranges::contains(cov.names, raw.info.ch_names[picks(i)]))
                 chNames.push_back(raw.info.ch_names[picks(i)]);
         }
         FiffCov prepared = cov.prepare_noise_cov(raw.info, chNames);

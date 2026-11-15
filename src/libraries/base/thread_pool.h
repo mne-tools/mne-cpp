@@ -46,7 +46,7 @@ namespace mne
 /**
  * @brief Runs tasks on a fixed set of worker threads.
  *
- * parallelFor() and parallelMap() block until done, and the calling thread works through the range too, so they
+ * parallel_for() and parallel_map() block until done, and the calling thread works through the range too, so they
  * may be nested or called from a task of the same pool without deadlocking.
  *
  * @snippet ex_base/main.cpp thread_pool_usage
@@ -72,7 +72,7 @@ public:
     static ThreadPool& global();
 
     /** @return The number of workers. */
-    std::size_t threadCount() const
+    std::size_t thread_count() const
     {
         return m_workers.size();
     }
@@ -105,7 +105,7 @@ public:
      *
      * Rethrows the first exception a call threw; indices after it in the same chunk are skipped.
      */
-    void parallelFor(std::size_t begin, std::size_t end, const std::function<void(std::size_t)>& body);
+    void parallel_for(std::size_t begin, std::size_t end, const std::function<void(std::size_t)>& body);
 
     //=========================================================================================================
     /**
@@ -115,16 +115,16 @@ public:
      * @return f applied to every value of @p input, in the order of @p input.
      */
     template<typename T, typename F>
-    auto parallelMap(const std::vector<T>& input, F f) -> std::vector<std::invoke_result_t<F, const T&>>
+    auto parallel_map(const std::vector<T>& input, F f) -> std::vector<std::invoke_result_t<F, const T&>>
     {
         std::vector<std::invoke_result_t<F, const T&>> output(input.size());
-        parallelFor(0, input.size(), [&](std::size_t i) { output[i] = f(input[i]); });
+        parallel_for(0, input.size(), [&](std::size_t i) { output[i] = f(input[i]); });
         return output;
     }
 
 private:
     void enqueue(std::function<void()> task);
-    void workerLoop();
+    void worker_loop();
 
     std::vector<std::thread> m_workers;
     std::deque<std::function<void()>> m_queue;

@@ -44,14 +44,14 @@ BidsCoordinateSystem BidsCoordinateSystem::read_json(const std::filesystem::path
 
     const mne::Expected<std::string> text = mne::read_text_file(path);
     if (!text) {
-        mne::Log::warning("[BidsCoordinateSystem::read_json] Cannot open {}", mne::utf8FromPath(path));
+        mne::Log::warning("[BidsCoordinateSystem::read_json] Cannot open {}", mne::utf8_from_path(path));
         return cs;
     }
 
     mne::JsonParseError error;
     const mne::JsonDocument doc = mne::JsonDocument::from_json(*text, &error);
     if (error.error != mne::JsonParseError::NoError) {
-        mne::Log::warning("[BidsCoordinateSystem::read_json] Parse error in {} : {}", mne::utf8FromPath(path), error.error_string());
+        mne::Log::warning("[BidsCoordinateSystem::read_json] Parse error in {} : {}", mne::utf8_from_path(path), error.error_string());
         return cs;
     }
 
@@ -128,7 +128,7 @@ bool BidsCoordinateSystem::write_json(const std::filesystem::path& path,
     }
 
     if (!mne::write_text_file(path, mne::JsonDocument(std::move(json)).to_json())) {
-        mne::Log::warning("[BidsCoordinateSystem::write_json] Cannot open {} for writing", mne::utf8FromPath(path));
+        mne::Log::warning("[BidsCoordinateSystem::write_json] Cannot open {} for writing", mne::utf8_from_path(path));
         return false;
     }
     return true;

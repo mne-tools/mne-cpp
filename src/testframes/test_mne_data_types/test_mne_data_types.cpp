@@ -976,10 +976,10 @@ private slots:
 
     void mneGlobal_buildInfo()
     {
-        const char* dt = mne::buildDateTime();
+        const char* dt = mne::build_date_time();
         QVERIFY(dt != nullptr && dt[0] != '\0');
 
-        const char* hash = mne::buildHash();
+        const char* hash = mne::build_hash();
         QVERIFY(hash != nullptr);
     }
 

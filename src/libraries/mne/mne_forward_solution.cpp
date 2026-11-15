@@ -146,7 +146,7 @@ Expected<void> MNEForwardSolution::write(const std::filesystem::path& path) cons
     //
     //   Open the file, create the directory
     //
-    const std::string name = utf8FromPath(path);
+    const std::string name = utf8_from_path(path);
     auto t_pStream = FiffStream::start_file(path);
     if (!t_pStream) {
         return fail(ErrorCode::Io, "cannot write {}", name);
@@ -471,7 +471,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const FsAnnotati
         // Calculate clusters
         //
         Log::info("Clustering...");
-        const std::vector<RegionDataOut> res = mne::ThreadPool::global().parallelMap(regionDataIn, [](const RegionData& region) { return region.cluster(); });
+        const std::vector<RegionDataOut> res = mne::ThreadPool::global().parallel_map(regionDataIn, [](const RegionData& region) { return region.cluster(); });
 
         //
         // Assign results
@@ -1045,7 +1045,7 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
         return std::unexpected(opened.error());
     }
     FiffStream& t_pStream = *opened;
-    const std::string name = utf8FromPath(path);
+    const std::string name = utf8_from_path(path);
     Log::info("Reading forward solution from {}...", name);
     //
     //   Find all forward solutions
@@ -1270,7 +1270,7 @@ Expected<MNEForwardSolution> MNEForwardSolution::read(const std::filesystem::pat
     StringList exclude_bads = options.exclude;
     if (bads.size() > 0) {
         for (qint32 k = 0; k < static_cast<int>(bads.size()); ++k)
-            if (std::none_of(exclude_bads.begin(), exclude_bads.end(), [&](const std::string& e) { return mne::equalsIgnoreCase(e, bads[k]); }))
+            if (std::none_of(exclude_bads.begin(), exclude_bads.end(), [&](const std::string& e) { return mne::iequals(e, bads[k]); }))
                 exclude_bads.push_back(bads[k]);
     }
 

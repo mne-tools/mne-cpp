@@ -57,7 +57,7 @@ std::optional<std::chrono::sys_time<std::chrono::microseconds>> parseMarkerDate(
 {
     using namespace std::chrono;
     const auto field = [digits](std::size_t pos, std::size_t count) {
-        return mne::toInt(digits.substr(pos, count)).value_or(-1);
+        return mne::to_int(digits.substr(pos, count)).value_or(-1);
     };
     const year_month_day date{year{field(0, 4)}, month(static_cast<unsigned>(field(4, 2))), day(static_cast<unsigned>(field(6, 2)))};
     const int hour = field(8, 2);
@@ -152,7 +152,7 @@ void forEachEntry(std::string_view text, Entry entry)
         }
         if (line.front() == '[' && line.back() == ']') {
             section = line.substr(1, line.size() - 2);
-            if (mne::equalsIgnoreCase(section, "comment")) {
+            if (mne::iequals(section, "comment")) {
                 return;
             }
             continue;
@@ -181,7 +181,7 @@ T fromLittleEndian(const unsigned char* bytes)
     T value;
     std::memcpy(&value, bytes, sizeof(T));
     if constexpr (std::endian::native == std::endian::big) {
-        value = mne::byteSwap(value);
+        value = mne::byte_swap(value);
     }
     return value;
 }
@@ -204,7 +204,7 @@ FiffChInfo BrainVisionChannelInfo::to_fiff_ch_info() const
     info.logNo = channelNumber;
 
     // Detect channel type from name
-    const std::string lower = mne::toLower(name);
+    const std::string lower = mne::to_lower(name);
     const auto has = [&lower](std::string_view part) {
         return lower.find(part) != std::string::npos;
     };
@@ -267,7 +267,7 @@ bool BrainVisionReader::open(const std::filesystem::path& path)
 
     m_dataFile = mne::FileByteStream::open(m_dataPath, mne::FileByteStream::Mode::Read);
     if (!m_dataFile) {
-        mne::Log::warning("[BrainVisionReader::open] Could not open data file: {}", mne::utf8FromPath(m_dataPath));
+        mne::Log::warning("[BrainVisionReader::open] Could not open data file: {}", mne::utf8_from_path(m_dataPath));
         return false;
     }
     m_sampleCount = static_cast<long>(m_dataFile->size() / (static_cast<std::uint64_t>(bytesPerValue(m_binaryFormat)) * static_cast<std::uint64_t>(m_numChannels)));
@@ -284,7 +284,7 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
 {
     mne::Expected<std::string> text = mne::read_text_file(vhdrPath);
     if (!text) {
-        mne::Log::warning("[BrainVisionReader::parse_header] Could not open header: {}", mne::utf8FromPath(vhdrPath));
+        mne::Log::warning("[BrainVisionReader::parse_header] Could not open header: {}", mne::utf8_from_path(vhdrPath));
         return false;
     }
 
@@ -319,26 +319,26 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
         return false;
     }
     const std::filesystem::path dir = std::filesystem::absolute(vhdrPath).parent_path();
-    m_dataPath = dir / mne::pathFromUtf8(dataFile);
+    m_dataPath = dir / mne::path_from_utf8(dataFile);
     const std::string_view markerFile = value(commonInfos, "MarkerFile");
-    m_markerPath = markerFile.empty() ? std::filesystem::path() : dir / mne::pathFromUtf8(markerFile);
+    m_markerPath = markerFile.empty() ? std::filesystem::path() : dir / mne::path_from_utf8(markerFile);
 
     const std::string_view dataFormat = value(commonInfos, "DataFormat", "BINARY");
-    if (!mne::equalsIgnoreCase(dataFormat, "BINARY")) {
+    if (!mne::iequals(dataFormat, "BINARY")) {
         mne::Log::warning("[BrainVisionReader::parse_header] Only BINARY data is supported, not {}", dataFormat);
         return false;
     }
 
-    m_orientation = mne::equalsIgnoreCase(value(commonInfos, "DataOrientation", "MULTIPLEXED"), "VECTORIZED") ? BVOrientation::VECTORIZED : BVOrientation::MULTIPLEXED;
+    m_orientation = mne::iequals(value(commonInfos, "DataOrientation", "MULTIPLEXED"), "VECTORIZED") ? BVOrientation::VECTORIZED : BVOrientation::MULTIPLEXED;
 
-    m_numChannels = mne::toInt(value(commonInfos, "NumberOfChannels", "0")).value_or(0);
+    m_numChannels = mne::to_int(value(commonInfos, "NumberOfChannels", "0")).value_or(0);
     if (m_numChannels <= 0) {
         mne::Log::warning("[BrainVisionReader::parse_header] Invalid channel count: {}", m_numChannels);
         return false;
     }
 
     // Sampling interval in microseconds
-    const double samplingInterval = mne::toDouble(value(commonInfos, "SamplingInterval", "0")).value_or(0.0);
+    const double samplingInterval = mne::to_double(value(commonInfos, "SamplingInterval", "0")).value_or(0.0);
     m_sfreq = samplingInterval > 0.0 ? static_cast<float>(1.0e6 / samplingInterval) : 0.0f;
 
     static const std::map<std::string, std::string, std::less<>> none;
@@ -348,9 +348,9 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
     };
 
     const std::string_view binaryFormat = value(section("Binary Infos"), "BinaryFormat", "INT_16");
-    if (mne::equalsIgnoreCase(binaryFormat, "INT_32")) {
+    if (mne::iequals(binaryFormat, "INT_32")) {
         m_binaryFormat = BVBinaryFormat::INT_32;
-    } else if (mne::equalsIgnoreCase(binaryFormat, "IEEE_FLOAT_32")) {
+    } else if (mne::iequals(binaryFormat, "IEEE_FLOAT_32")) {
         m_binaryFormat = BVBinaryFormat::IEEE_FLOAT_32;
     } else {
         m_binaryFormat = BVBinaryFormat::INT_16;
@@ -374,7 +374,7 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
                 ch.reference = decodeCommas(parts[1]);
             }
             if (parts.size() >= 3 && !parts[2].empty()) {
-                ch.resolution = static_cast<float>(mne::toDouble(parts[2]).value_or(0.0));
+                ch.resolution = static_cast<float>(mne::to_double(parts[2]).value_or(0.0));
             }
             if (parts.size() >= 4 && !parts[3].empty()) {
                 ch.unit = parts[3];
@@ -391,7 +391,7 @@ bool BrainVisionReader::parse_markers(const std::filesystem::path& vmrkPath)
 {
     mne::Expected<std::string> text = mne::read_text_file(vmrkPath);
     if (!text) {
-        mne::Log::warning("[BrainVisionReader::parse_markers] Could not open marker file: {}", mne::utf8FromPath(vmrkPath));
+        mne::Log::warning("[BrainVisionReader::parse_markers] Could not open marker file: {}", mne::utf8_from_path(vmrkPath));
         return false;
     }
 
@@ -561,5 +561,5 @@ std::string_view BrainVisionReader::format_name() const
 
 bool BrainVisionReader::supports_extension(std::string_view extension) const
 {
-    return mne::equalsIgnoreCase(extension, ".vhdr") || mne::equalsIgnoreCase(extension, ".ahdr");
+    return mne::iequals(extension, ".vhdr") || mne::iequals(extension, ".ahdr");
 }

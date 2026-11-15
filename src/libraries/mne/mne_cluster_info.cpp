@@ -64,7 +64,7 @@ bool MNEClusterInfo::write(const std::filesystem::path& p_sFileName) const
 {
     std::ofstream out(p_sFileName);
     if (!out) {
-        mne::Log::warning("MNEClusterInfo::write - Cannot open {}", mne::utf8FromPath(p_sFileName));
+        mne::Log::warning("MNEClusterInfo::write - Cannot open {}", mne::utf8_from_path(p_sFileName));
         return false;
     }
     out << "MNE Cluster Info\n";

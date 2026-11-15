@@ -64,7 +64,7 @@ mne::Expected<std::filesystem::path> FiffFileSharer::copy_realtime_file(const st
     std::filesystem::path part = target;
     part += ".part";
     if (ec || !std::filesystem::copy_file(source, part, std::filesystem::copy_options::overwrite_existing, ec)) {
-        return fail(ErrorCode::Io, "cannot copy {} to {}: {}", mne::utf8FromPath(source), mne::utf8FromPath(part), ec.message());
+        return fail(ErrorCode::Io, "cannot copy {} to {}: {}", mne::utf8_from_path(source), mne::utf8_from_path(part), ec.message());
     }
     // The copy is cut mid-recording: close its raw data blocks so it reads as a complete file
     if (auto bytes = mne::FileByteStream::open(part, mne::FileByteStream::Mode::ReadWrite)) {
@@ -74,7 +74,7 @@ mne::Expected<std::filesystem::path> FiffFileSharer::copy_realtime_file(const st
     std::filesystem::rename(part, target, ec);
     if (ec) {
         std::filesystem::remove(part, ec);
-        return fail(ErrorCode::Io, "cannot share {}", mne::utf8FromPath(target));
+        return fail(ErrorCode::Io, "cannot share {}", mne::utf8_from_path(target));
     }
     ++m_next;
     return target;

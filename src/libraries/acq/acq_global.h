@@ -47,7 +47,7 @@
 namespace mne
 {
 
-// mne_acq builds without mne_base, so it reports its own build instead of mne::buildDateTime() and friends.
+// mne_acq builds without mne_base, so it reports its own build instead of mne::build_date_time() and friends.
 
 /** @return Null-terminated compile date and time of mne_acq. */
 ACQSHARED_EXPORT const char* acq_build_date_time();

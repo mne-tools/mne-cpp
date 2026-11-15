@@ -912,11 +912,11 @@ void TestInvDipoleRapMne::minimumNorm_sLORETA()
 
 void TestInvDipoleRapMne::inv_globalBuildInfo()
 {
-    const char* dt = mne::buildDateTime();
+    const char* dt = mne::build_date_time();
     QVERIFY(dt != nullptr);
-    const char* h = mne::buildHash();
+    const char* h = mne::build_hash();
     QVERIFY(h != nullptr);
-    const char* hl = mne::buildHashLong();
+    const char* hl = mne::build_hash_long();
     QVERIFY(hl != nullptr);
 }
 

@@ -71,7 +71,7 @@ InvGuessData::InvGuessData(const std::filesystem::path& guessname, const std::fi
             mne::Log::critical("Incorrect number of source spaces in guess file");
             return;
         }
-        mne::Log::info("Read guesses from {}\n", mne::utf8FromPath(guessname));
+        mne::Log::info("Read guesses from {}\n", mne::utf8_from_path(guessname));
         guesses = std::move(sp[0]);
     } else {
         MNESurface* inner_skull = nullptr;
@@ -85,7 +85,7 @@ InvGuessData::InvGuessData(const std::filesystem::path& guessname, const std::fi
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == nullptr)
                 return;
         } else if (!guess_surfname.empty()) {
-            mne::Log::info("Reading inner skull surface from {}...\n", mne::utf8FromPath(guess_surfname));
+            mne::Log::info("Reading inner skull surface from {}...\n", mne::utf8_from_path(guess_surfname));
             inner_skull_owned = MNESurface::read_bem_surface(guess_surfname, FIFFV_BEM_SURF_ID_BRAIN, true);
             if (!inner_skull_owned)
                 return;

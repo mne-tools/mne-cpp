@@ -174,7 +174,7 @@ mne::Expected<FiffCoordTrans> FiffCoordTrans::read(const std::filesystem::path& 
             return from_tag(*tag);
         }
     }
-    return fail(ErrorCode::NotFound, "No coordinate transform in {}", mne::utf8FromPath(path));
+    return fail(ErrorCode::NotFound, "No coordinate transform in {}", mne::utf8_from_path(path));
 }
 
 //=============================================================================================================
@@ -186,7 +186,7 @@ mne::Expected<FiffCoordTrans> FiffCoordTrans::read(const std::filesystem::path& 
         return std::unexpected(stream.error());
     }
     return find_transform(*stream, stream->dir(), from, to).transform_error([&path](const mne::Error& error) {
-        return mne::Error(error.code, std::format("{} in {}", error.what(), mne::utf8FromPath(path)));
+        return mne::Error(error.code, std::format("{} in {}", error.what(), mne::utf8_from_path(path)));
     });
 }
 
@@ -196,7 +196,7 @@ mne::Expected<void> FiffCoordTrans::write(const std::filesystem::path& path) con
 {
     auto stream = FiffStream::start_file(path);
     if (!stream) {
-        return fail(ErrorCode::Io, "Cannot write {}", mne::utf8FromPath(path));
+        return fail(ErrorCode::Io, "Cannot write {}", mne::utf8_from_path(path));
     }
     write_to_stream(*stream);
     stream->end_file();
@@ -494,7 +494,7 @@ FiffCoordTrans FiffCoordTrans::from_cardinal_points(int from, int to,
 
 mne::Expected<FiffCoordTrans> FiffCoordTrans::read_ascii(const std::filesystem::path& path, int from, int to)
 {
-    const std::string name = mne::utf8FromPath(path);
+    const std::string name = mne::utf8_from_path(path);
     std::ifstream in(path);
     if (!in) {
         return fail(ErrorCode::Io, "Cannot open {}", name);

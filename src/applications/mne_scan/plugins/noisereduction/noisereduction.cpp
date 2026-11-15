@@ -349,7 +349,7 @@ void NoiseReduction::run()
             if (m_bSpharaActive) {
                 //Set bad channels to zero so they do not get smeared into
                 for (int i = 0; i < static_cast<int>(m_pFiffInfo->bads.size()); ++i) {
-                    matData.row(mne::indexOf(m_pFiffInfo->ch_names, m_pFiffInfo->bads.at(i))).setZero();
+                    matData.row(mne::index_of(m_pFiffInfo->ch_names, m_pFiffInfo->bads.at(i))).setZero();
                 }
 
                 matData = m_matSparseSpharaMult * matData;
@@ -408,7 +408,7 @@ void NoiseReduction::updateProjection(const std::vector<mne::FiffProj>& projs)
 
         //set columns of matrix to zero depending on bad channels indexes
         for (qint32 j = 0; j < static_cast<int>(m_pFiffInfo->bads.size()); ++j) {
-            int index = mne::indexOf(m_pFiffInfo->ch_names, m_pFiffInfo->bads.at(j));
+            int index = mne::index_of(m_pFiffInfo->ch_names, m_pFiffInfo->bads.at(j));
             if (index >= 0 && index < static_cast<int>(m_pFiffInfo->ch_names.size())) {
                 matProj.col(index).setZero();
             }

@@ -259,7 +259,7 @@ QVector<uint32_t> ElectrodeObject::surfaceColors(const Eigen::MatrixX3f& vertice
 
 void ElectrodeObject::selectContact(const QString& name)
 {
-    m_selectedContact = name.isEmpty() ? -1 : m_implantation.indexOf(name.toStdString());
+    m_selectedContact = name.isEmpty() ? -1 : m_implantation.index_of(name.toStdString());
     buildContactInstances();
 }
 

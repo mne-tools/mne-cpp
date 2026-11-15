@@ -71,7 +71,7 @@ using namespace Eigen;
 
 FiffEvokedSet::FiffEvokedSet()
 {
-    qRegisterMetaType<mne::FiffEvokedSet>("mne::FiffEvokedSet");
+    qRegisterMetaType<mne::FiffEvokedSet>();
     qRegisterMetaType<std::shared_ptr<mne::FiffEvokedSet>>();
 }
 
@@ -216,7 +216,7 @@ Expected<void> FiffEvokedSet::save(const std::filesystem::path& path) const
 {
     auto pStream = path.empty() ? nullptr : FiffStream::start_file(path);
     if (!pStream) {
-        return fail(ErrorCode::Io, "Cannot write the evoked data to '{}'", utf8FromPath(path));
+        return fail(ErrorCode::Io, "Cannot write the evoked data to '{}'", utf8_from_path(path));
     }
 
     pStream->write_evoked_set(*this);

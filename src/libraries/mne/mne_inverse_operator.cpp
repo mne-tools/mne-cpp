@@ -354,7 +354,7 @@ MatrixXd MNEInverseOperator::cluster_kernel(const FsAnnotationSet& p_AnnotationS
         // Calculate clusters
         //
         Log::info("Clustering... ");
-        const std::vector<RegionMTOut> res = mne::ThreadPool::global().parallelMap(m_qListRegionMTIn, [](const RegionMT& region) { return region.cluster(); });
+        const std::vector<RegionMTOut> res = mne::ThreadPool::global().parallel_map(m_qListRegionMTIn, [](const RegionMT& region) { return region.cluster(); });
 
         //
         // Assign results
@@ -839,7 +839,7 @@ Expected<MNEInverseOperator> MNEInverseOperator::read(const std::filesystem::pat
         return std::unexpected(opened.error());
     }
     FiffStream& t_pStream = *opened;
-    const std::string name = utf8FromPath(path);
+    const std::string name = utf8_from_path(path);
     Log::info("Reading inverse operator decomposition from {}...", name);
     //
     //   Find all inverse operators
@@ -1028,7 +1028,7 @@ Expected<void> MNEInverseOperator::write(const std::filesystem::path& path) cons
 {
     auto stream = FiffStream::start_file(path);
     if (!stream) {
-        return fail(ErrorCode::Io, "cannot write {}", utf8FromPath(path));
+        return fail(ErrorCode::Io, "cannot write {}", utf8_from_path(path));
     }
     write_to_stream(*stream);
     stream->end_file();

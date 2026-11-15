@@ -343,7 +343,7 @@ bool FiffInfoBase::readBadChannelsFromFile(const std::string& name, StringList& 
         listOut.clear();
         return true;
     }
-    std::ifstream file(mne::pathFromUtf8(name));
+    std::ifstream file(mne::path_from_utf8(name));
     if (!file) {
         mne::Log::critical("Cannot open bad channel file: {}", name);
         return false;

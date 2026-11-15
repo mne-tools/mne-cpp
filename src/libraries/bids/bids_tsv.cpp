@@ -43,7 +43,7 @@ std::vector<BidsTsvRow> BidsTsv::read_tsv(const std::filesystem::path& path,
 
     std::ifstream file(path, std::ios::binary);
     if (!file) {
-        mne::Log::warning("[BidsTsv::read_tsv] Cannot open {}", mne::utf8FromPath(path));
+        mne::Log::warning("[BidsTsv::read_tsv] Cannot open {}", mne::utf8_from_path(path));
         return rows;
     }
 
@@ -80,7 +80,7 @@ bool BidsTsv::write_tsv(const std::filesystem::path& path,
 {
     std::ofstream out(path, std::ios::binary);
     if (!out) {
-        mne::Log::warning("[BidsTsv::write_tsv] Cannot open {} for writing", mne::utf8FromPath(path));
+        mne::Log::warning("[BidsTsv::write_tsv] Cannot open {} for writing", mne::utf8_from_path(path));
         return false;
     }
 

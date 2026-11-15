@@ -78,9 +78,9 @@ int main(int argc, char* argv[])
         parser.showHelp(1);
     }
 
-    const std::filesystem::path inputPath = mne::pathFromUtf8(sInputFile.toStdString());
+    const std::filesystem::path inputPath = mne::path_from_utf8(sInputFile.toStdString());
     EDFReader reader;
-    if (!reader.supports_extension(mne::utf8FromPath(inputPath.extension()))) {
+    if (!reader.supports_extension(mne::utf8_from_path(inputPath.extension()))) {
         qCritical() << "Not an EDF or BDF file:" << sInputFile;
         return 1;
     }

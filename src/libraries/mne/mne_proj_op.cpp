@@ -618,11 +618,11 @@ mne::Expected<std::unique_ptr<MNEProjOp>> MNEProjOp::make_projection(const std::
     for (const auto& projname : projnames) {
         std::unique_ptr<MNEProjOp> one(MNEProjOp::read(projname));
         if (!one)
-            return mne::fail(mne::ErrorCode::Io, "cannot read the projection in {}", mne::utf8FromPath(projname));
+            return mne::fail(mne::ErrorCode::Io, "cannot read the projection in {}", mne::utf8_from_path(projname));
         if (one->items.empty()) {
-            mne::Log::info("No linear projection information in {}.", mne::utf8FromPath(projname));
+            mne::Log::info("No linear projection information in {}.", mne::utf8_from_path(projname));
         } else {
-            mne::Log::info("Loaded projection from {}:", mne::utf8FromPath(projname));
+            mne::Log::info("Loaded projection from {}:", mne::utf8_from_path(projname));
             {
                 std::ostringstream report;
                 one->report(report, "\t");

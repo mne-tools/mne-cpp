@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include "fiffrawviewmodel.h"
 #include <memory>
 #include <base/string_utils.h>
@@ -207,7 +208,7 @@ QVariant FiffRawViewModel::data(const QModelIndex& index,
 
         // whether channel is marked as bad
         else if (index.column() == 2) {
-            return QVariant(mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[index.row()]));
+            return QVariant(std::ranges::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[index.row()]));
         } else {
             qWarning() << "[FiffRawViewModel::data] Column " << index.column() << " not implemented !";
             return QVariant();

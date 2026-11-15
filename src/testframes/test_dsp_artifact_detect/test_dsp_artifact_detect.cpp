@@ -474,7 +474,7 @@ private slots:
             const double peak = v.cwiseAbs().maxCoeff(&peakIdx);
             QCOMPARE(p.data.col_names.at(static_cast<int>(peakIdx)), peakNames[i]);
             QVERIFY2(qAbs(peak / peaks[i] - 1.0) < 1e-5, qPrintable(QString("%1 peak %2").arg(p.desc).arg(peak, 0, 'g', 12)));
-            const double first = std::fabs(v(mne::indexOf(p.data.col_names, firstNames[i].toStdString())));
+            const double first = std::fabs(v(mne::index_of(p.data.col_names, firstNames[i].toStdString())));
             QVERIFY2(qAbs(first / firsts[i] - 1.0) < 1e-4, qPrintable(QString("%1 first %2").arg(p.desc).arg(first, 0, 'g', 12)));
         }
     }

@@ -171,7 +171,7 @@ void FileByteStream::close()
 
 //=============================================================================================================
 
-void FileByteStream::switchDirection(bool writing)
+void FileByteStream::switch_direction(bool writing)
 {
     if (writing != m_lastWrite) {
         seekFile(m_file, m_pos);
@@ -186,7 +186,7 @@ std::size_t FileByteStream::read(void* data, std::size_t bytes)
     if (!m_file) {
         return 0;
     }
-    switchDirection(false);
+    switch_direction(false);
     const std::size_t n = std::fread(data, 1, bytes, m_file);
     m_pos += n;
     return n;
@@ -199,7 +199,7 @@ std::size_t FileByteStream::write(const void* data, std::size_t bytes)
     if (!m_file || m_mode == Mode::Read || bytes == 0) {
         return 0;
     }
-    switchDirection(true);
+    switch_direction(true);
     const std::size_t n = std::fwrite(data, 1, bytes, m_file);
     m_pos += n;
     m_size = std::max(m_size, m_pos);
@@ -233,7 +233,7 @@ std::uint64_t FileByteStream::size() const
 
 //=============================================================================================================
 
-bool FileByteStream::isOpen() const
+bool FileByteStream::is_open() const
 {
     return m_file != nullptr;
 }
@@ -291,19 +291,19 @@ Expected<std::vector<std::byte>> mne::read_file_bytes(const std::filesystem::pat
 {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
     if (!file) {
-        return std::unexpected(Error(ErrorCode::Io, std::format("cannot open {}", utf8FromPath(path))));
+        return std::unexpected(Error(ErrorCode::Io, std::format("cannot open {}", utf8_from_path(path))));
     }
     std::vector<std::byte> content(static_cast<std::size_t>(std::max<std::streamoff>(file.tellg(), 0)));
     file.seekg(0);
     if (!file.read(reinterpret_cast<char*>(content.data()), static_cast<std::streamsize>(content.size()))) {
-        return std::unexpected(Error(ErrorCode::Io, std::format("cannot read {}", utf8FromPath(path))));
+        return std::unexpected(Error(ErrorCode::Io, std::format("cannot read {}", utf8_from_path(path))));
     }
     if (compression == Compression::None) {
         return content;
     }
 
     const auto damaged = [&path](int code) {
-        return std::unexpected(Error(ErrorCode::Format, std::format("cannot decompress {} (zlib error {})", utf8FromPath(path), code)));
+        return std::unexpected(Error(ErrorCode::Format, std::format("cannot decompress {} (zlib error {})", utf8_from_path(path), code)));
     };
     z_stream strm = {};
     // MAX_WBITS + 16 selects the gzip wrapper
@@ -351,11 +351,11 @@ Expected<std::string> mne::read_text_file(const std::filesystem::path& path)
 {
     std::ifstream file(path, std::ios::binary);
     if (!file) {
-        return std::unexpected(Error(ErrorCode::Io, std::format("cannot open {}", utf8FromPath(path))));
+        return std::unexpected(Error(ErrorCode::Io, std::format("cannot open {}", utf8_from_path(path))));
     }
     std::string text(std::istreambuf_iterator<char>(file), {});
     if (file.bad()) {
-        return std::unexpected(Error(ErrorCode::Io, std::format("cannot read {}", utf8FromPath(path))));
+        return std::unexpected(Error(ErrorCode::Io, std::format("cannot read {}", utf8_from_path(path))));
     }
     return text;
 }
@@ -366,7 +366,7 @@ Expected<void> mne::write_text_file(const std::filesystem::path& path, std::stri
 {
     std::ofstream file(path, std::ios::binary | std::ios::trunc);
     if (!file || !file.write(text.data(), static_cast<std::streamsize>(text.size())) || !file.flush()) {
-        return std::unexpected(Error(ErrorCode::Io, std::format("cannot write {}", utf8FromPath(path))));
+        return std::unexpected(Error(ErrorCode::Io, std::format("cannot write {}", utf8_from_path(path))));
     }
     return {};
 }

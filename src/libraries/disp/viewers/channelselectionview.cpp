@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include "channelselectionview.h"
 #include <memory>
 #include "ui_channelselectionview.h"
@@ -336,7 +337,7 @@ void ChannelSelectionView::updateBadChannels()
             digIndex = m_pChannelInfoModel->index(i, 1);
             QString origChName = m_pChannelInfoModel->data(digIndex, ChannelInfoModelRoles::GetOrigChName).toString();
 
-            if (mne::contains(badChannelList, origChName.toStdString())) {
+            if (std::ranges::contains(badChannelList, origChName.toStdString())) {
                 badChannelMappedNames << mappedChName;
             }
         }
@@ -557,7 +558,7 @@ bool ChannelSelectionView::loadSelectionGroups(const QString& path)
     // and must report failure rather than an indeterminate value.
     std::optional<std::vector<ChannelSelection>> groups;
     if (!path.isEmpty()) {
-        const std::filesystem::path file = mne::pathFromUtf8(newPath.toStdString());
+        const std::filesystem::path file = mne::path_from_utf8(newPath.toStdString());
         if (path.contains(".sel"))
             groups = SelectionIO::read_sel(file);
         if (path.contains(".mon")) {
@@ -740,7 +741,7 @@ void ChannelSelectionView::onBtnSaveUserSelection()
                 group.channels.push_back(channel.toStdString());
             groups.push_back(std::move(group));
         }
-        const std::filesystem::path file = mne::pathFromUtf8(path.toStdString());
+        const std::filesystem::path file = mne::path_from_utf8(path.toStdString());
         if (path.contains(".sel"))
             SelectionIO::write_sel(file, groups);
         if (path.contains(".mon"))

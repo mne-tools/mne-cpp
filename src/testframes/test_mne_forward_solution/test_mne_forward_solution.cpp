@@ -130,10 +130,10 @@ void TestMneForwardSolution::computeForward()
     // recalculate with same meg_head_t to check that we still get the same result
     pFwdComputer->updateHeadPos(pFiffInfo->dev_head_t, *pFwdSolution);
 
-    QVERIFY(pFwdSolution->write(mne::pathFromUtf8(pSettingsMEGEEG->solname)));
+    QVERIFY(pFwdSolution->write(mne::path_from_utf8(pSettingsMEGEEG->solname)));
 
     // Read newly created fwd
-    m_pFwdMEGEEGRead = std::make_shared<MNEForwardSolution>(mne::pathFromUtf8(pSettingsMEGEEG->solname));
+    m_pFwdMEGEEGRead = std::make_shared<MNEForwardSolution>(mne::path_from_utf8(pSettingsMEGEEG->solname));
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 

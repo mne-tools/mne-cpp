@@ -968,14 +968,14 @@ private:
             return;
         }
         if (m_littleEndian != (std::endian::native == std::endian::little))
-            value = mne::byteSwap(value);
+            value = mne::byte_swap(value);
     }
 
     template<mne::Swappable T>
     void write(T value)
     {
         if (m_littleEndian != (std::endian::native == std::endian::little))
-            value = mne::byteSwap(value);
+            value = mne::byte_swap(value);
         m_bytes->write(&value, sizeof(T));
     }
 

@@ -88,7 +88,7 @@ bool MriVolData::isValid() const
 bool MriVolData::read(const std::string& path)
 {
     // One loader for FreeSurfer MGH/MGZ and NIfTI-1 (.nii / .nii.gz), chosen by suffix
-    const std::string lower = mne::toLower(path);
+    const std::string lower = mne::to_lower(path);
     if (lower.ends_with(".nii") || lower.ends_with(".nii.gz")) {
         return MriNiftiIO::read(path, *this);
     }

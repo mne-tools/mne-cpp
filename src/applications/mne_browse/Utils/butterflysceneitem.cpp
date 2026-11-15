@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include "butterflysceneitem.h"
 #include <base/string_utils.h>
 #include "rawsettings.h"
@@ -358,7 +359,7 @@ void ButterflySceneItem::paintAveragePaths(QPainter* painter)
     for (int i = 0; i < std::ssize(m_pFiffInfo->chs); i++) {
         FiffChInfo fiffChInfoTemp = m_pFiffInfo->chs.at(i);
 
-        if (mne::contains(m_pFiffInfo->bads, fiffChInfoTemp.ch_name) == false) {
+        if (std::ranges::contains(m_pFiffInfo->bads, fiffChInfoTemp.ch_name) == false) {
             //Only plot EEG or MEG channels
             if ((fiffChInfoTemp.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH && fiffChInfoTemp.unit == FIFF_UNIT_T_M && m_iSetUnit == FIFF_UNIT_T_M) || //MEG grad
                 (fiffChInfoTemp.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH && fiffChInfoTemp.unit == FIFF_UNIT_T && m_iSetUnit == FIFF_UNIT_T) ||     //MEG mag
@@ -459,7 +460,7 @@ void ButterflySceneItem::paintGFP(QPainter* painter)
     int nChs = static_cast<int>(m_pFiffInfo->chs.size());
     for (int i = 0; i < nChs; ++i) {
         const FiffChInfo& ch = m_pFiffInfo->chs[i];
-        if (mne::contains(m_pFiffInfo->bads, ch.ch_name))
+        if (std::ranges::contains(m_pFiffInfo->bads, ch.ch_name))
             continue;
         if (ch.kind == FIFFV_MEG_CH && m_iSetKind == FIFFV_MEG_CH &&
             ch.unit == m_iSetUnit) {

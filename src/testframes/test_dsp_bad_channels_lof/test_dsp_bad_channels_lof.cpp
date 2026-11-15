@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <dsp/bad_channels_lof.h>
 #include <base/string_utils.h>
 #include <fiff/fiff_info.h>
@@ -160,7 +161,7 @@ private slots:
         params.dThreshold = 2.0;
 
         StringList bads = findBadChannelsLof(data, info, params);
-        QVERIFY2(mne::contains(bads, "EEG6"),
+        QVERIFY2(std::ranges::contains(bads, "EEG6"),
                  qPrintable(QString("Expected EEG6 in bads, got: %1").arg(QString::fromStdString(mne::join(bads, ", ")))));
     }
 
@@ -263,7 +264,7 @@ private slots:
         params.dThreshold = 2.0;
 
         StringList bads = findBadChannelsLof(data, info, params);
-        QVERIFY2(mne::contains(bads, "EEG4"),
+        QVERIFY2(std::ranges::contains(bads, "EEG4"),
                  qPrintable(QString("Expected flat EEG4 in bads, got: %1").arg(QString::fromStdString(mne::join(bads, ", ")))));
     }
 

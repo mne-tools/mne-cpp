@@ -38,7 +38,7 @@ namespace
 
 bool has_extension(const std::filesystem::path& path, std::string_view extension)
 {
-    return toLower(path.extension().string()) == extension;
+    return to_lower(path.extension().string()) == extension;
 }
 
 // A line without its Windows line end.
@@ -127,7 +127,7 @@ bool SelectionIO::write_mon(const std::filesystem::path& directory, std::span<co
             Log::debug("Cannot use the group name '{}' as a file name", group.name);
             return false;
         }
-        const std::filesystem::path fileName = pathFromUtf8(group.name + ".mon");
+        const std::filesystem::path fileName = path_from_utf8(group.name + ".mon");
         std::ofstream file(directory / fileName);
         if (!file) {
             Log::debug("Cannot write the montage file {}", (directory / fileName).string());

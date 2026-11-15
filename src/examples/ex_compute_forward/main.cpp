@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 
     // store calculated forward solution
     timer2.start();
-    if (auto written = pFwdSolution->write(mne::pathFromUtf8(pSettings->solname)); !written) {
+    if (auto written = pFwdSolution->write(mne::path_from_utf8(pSettings->solname)); !written) {
         qCritical() << written.error().what();
         return 1;
     }
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
 
     // read back to verify round-trip
     timer3.start();
-    auto pFwdRead = std::make_shared<MNEForwardSolution>(mne::pathFromUtf8(pSettings->solname));
+    auto pFwdRead = std::make_shared<MNEForwardSolution>(mne::path_from_utf8(pSettings->solname));
     fTime3 = timer3.elapsed();
 
     // update head position and recompute

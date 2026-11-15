@@ -325,7 +325,7 @@ void TestBatchProcessor::testRunGrandAverageWeightsByNave()
     QCOMPARE(BatchProcessor::run(settings), 0);
 
     const mne::FiffRawData raw(rawPath.toStdString());
-    const mne::FiffEvokedSet grand(mne::pathFromUtf8(settings.grandAveFile));
+    const mne::FiffEvokedSet grand(mne::path_from_utf8(settings.grandAveFile));
     QCOMPARE(grand.evoked.size(), 1);
     const mne::FiffEvoked& g = grand.evoked.front();
     QCOMPARE(g.comment, std::string("Auditory Left"));

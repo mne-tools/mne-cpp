@@ -68,7 +68,7 @@ QString toQString(std::string_view text)
 
 QString pathToQString(const std::filesystem::path& path)
 {
-    return toQString(std::string_view(utf8FromPath(path)));
+    return toQString(std::string_view(utf8_from_path(path)));
 }
 
 QStringList toQStringList(const StringList& list)
@@ -156,7 +156,7 @@ std::optional<std::pair<float, std::string>> mne::parse_progress_line(std::strin
 {
     constexpr std::string_view tag = "[progress]";
     line = trimmed(line);
-    if (line.size() <= tag.size() || !equalsIgnoreCase(line.substr(0, tag.size()), tag) ||
+    if (line.size() <= tag.size() || !iequals(line.substr(0, tag.size()), tag) ||
         !std::isspace(static_cast<unsigned char>(line[tag.size()]))) {
         return std::nullopt;
     }
@@ -222,7 +222,7 @@ PythonRunnerResult PythonRunner::run(const std::filesystem::path& script, const 
     if (m_config.unbuffered) {
         fullArgs.emplace_back("-u");
     }
-    fullArgs.push_back(utf8FromPath(script));
+    fullArgs.push_back(utf8_from_path(script));
     fullArgs.insert(fullArgs.end(), args.begin(), args.end());
     return execute(fullArgs);
 }
@@ -309,13 +309,13 @@ PythonRunnerResult PythonRunner::ensure_venv()
     const std::filesystem::path venvPython = venv_python_path();
     std::error_code ec;
     if (!std::filesystem::exists(venvPython, ec)) {
-        Log::debug("[PythonRunner] Creating virtual environment at: {}", utf8FromPath(m_config.venv_dir));
+        Log::debug("[PythonRunner] Creating virtual environment at: {}", utf8_from_path(m_config.venv_dir));
         if (!runSetupStep(m_config.python_exe, {QStringLiteral("-m"), QStringLiteral("venv"), pathToQString(m_config.venv_dir)},
                           kVenvTimeoutMs, "venv creation", result)) {
             return result;
         }
     } else {
-        Log::debug("[PythonRunner] Virtual environment already exists at: {}", utf8FromPath(m_config.venv_dir));
+        Log::debug("[PythonRunner] Virtual environment already exists at: {}", utf8_from_path(m_config.venv_dir));
     }
 
     // Prefer pyproject.toml (package_dir) over requirements.txt
@@ -324,30 +324,30 @@ PythonRunnerResult PythonRunner::ensure_venv()
         const std::filesystem::path toml = m_config.package_dir / "pyproject.toml";
         if (std::filesystem::exists(toml, ec)) {
             pipArgs << QStringLiteral("install") << pathToQString(m_config.package_dir);
-            Log::debug("[PythonRunner] Installing from pyproject.toml in: {}", utf8FromPath(m_config.package_dir));
+            Log::debug("[PythonRunner] Installing from pyproject.toml in: {}", utf8_from_path(m_config.package_dir));
         } else {
-            Log::warning("[PythonRunner] package_dir set but no pyproject.toml found at: {}", utf8FromPath(toml));
+            Log::warning("[PythonRunner] package_dir set but no pyproject.toml found at: {}", utf8_from_path(toml));
         }
     }
     if (pipArgs.isEmpty() && !m_config.requirements_file.empty()) {
         if (std::filesystem::exists(m_config.requirements_file, ec)) {
             pipArgs << QStringLiteral("install") << QStringLiteral("-r") << pathToQString(m_config.requirements_file);
-            Log::debug("[PythonRunner] Installing from requirements.txt: {}", utf8FromPath(m_config.requirements_file));
+            Log::debug("[PythonRunner] Installing from requirements.txt: {}", utf8_from_path(m_config.requirements_file));
         } else {
-            Log::warning("[PythonRunner] requirements_file not found: {}", utf8FromPath(m_config.requirements_file));
+            Log::warning("[PythonRunner] requirements_file not found: {}", utf8_from_path(m_config.requirements_file));
         }
     }
     if (!pipArgs.isEmpty()) {
         // "python -m pip" works whether or not the venv puts a pip launcher next to the interpreter
         pipArgs.prepend(QStringLiteral("pip"));
         pipArgs.prepend(QStringLiteral("-m"));
-        if (!runSetupStep(utf8FromPath(venvPython), pipArgs, kPipTimeoutMs, "pip install", result)) {
+        if (!runSetupStep(utf8_from_path(venvPython), pipArgs, kPipTimeoutMs, "pip install", result)) {
             return result;
         }
         Log::debug("[PythonRunner] Dependencies installed successfully.");
     }
 
-    m_config.python_exe = utf8FromPath(venvPython);
+    m_config.python_exe = utf8_from_path(venvPython);
     result.success = true;
     result.exit_code = 0;
     Log::debug("[PythonRunner] Using venv Python: {}", m_config.python_exe);

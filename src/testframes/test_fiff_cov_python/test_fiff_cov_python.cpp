@@ -34,6 +34,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <fiff/fiff_cov.h>
 #include <base/string_utils.h>
 #include <fiff/fiff_info.h>
@@ -181,8 +182,8 @@ void TestFiffCovPython::channelNames_matchPython()
     QCOMPARE(m_cov.names.front(), QString("MEG 0113"));
     QCOMPARE(m_cov.names.back(), QString("EEG 060"));
     QCOMPARE(m_cov.bads.size(), 2);
-    QVERIFY(mne::contains(m_cov.bads, "MEG 2443"));
-    QVERIFY(mne::contains(m_cov.bads, "EEG 053"));
+    QVERIFY(std::ranges::contains(m_cov.bads, "MEG 2443"));
+    QVERIFY(std::ranges::contains(m_cov.bads, "EEG 053"));
 
     // The name list has to line up with the matrix it describes.
     QCOMPARE(m_cov.names.size(), static_cast<int>(m_cov.data.rows()));
@@ -300,7 +301,7 @@ void TestFiffCovPython::regularize_matchesPython()
 
     const FiffCov reg = cov.regularize(info, 0.1, 0.05, 0.2, proj);
     auto at = [&](const char* a, const char* b) {
-        return reg.data(mne::indexOf(reg.names, a), mne::indexOf(reg.names, b));
+        return reg.data(mne::index_of(reg.names, a), mne::index_of(reg.names, b));
     };
     auto close = [](double got, double want) {
         return std::abs(got - want) <= 1e-9 * std::abs(want);
@@ -313,14 +314,14 @@ void TestFiffCovPython::regularize_matchesPython()
 
     // A zero amount leaves that channel type alone; excluding every EEG channel leaves EEG untouched too
     const FiffCov noEeg = cov.regularize(info, 0.1, 0.05, 0.0, proj);
-    QCOMPARE(noEeg.data(mne::indexOf(noEeg.names, "EEG 001"), mne::indexOf(noEeg.names, "EEG 001")), cov.data(mne::indexOf(cov.names, "EEG 001"), mne::indexOf(cov.names, "EEG 001")));
+    QCOMPARE(noEeg.data(mne::index_of(noEeg.names, "EEG 001"), mne::index_of(noEeg.names, "EEG 001")), cov.data(mne::index_of(cov.names, "EEG 001"), mne::index_of(cov.names, "EEG 001")));
     StringList eegNames;
     for (const FiffChInfo& ch : info.chs) {
         if (ch.kind == FIFFV_EEG_CH)
             eegNames.push_back(ch.ch_name);
     }
     const FiffCov excluded = cov.regularize(info, 0.1, 0.05, 0.2, proj, eegNames);
-    QCOMPARE(excluded.data(mne::indexOf(excluded.names, "EEG 001"), mne::indexOf(excluded.names, "EEG 001")), cov.data(mne::indexOf(cov.names, "EEG 001"), mne::indexOf(cov.names, "EEG 001")));
+    QCOMPARE(excluded.data(mne::index_of(excluded.names, "EEG 001"), mne::index_of(excluded.names, "EEG 001")), cov.data(mne::index_of(cov.names, "EEG 001"), mne::index_of(cov.names, "EEG 001")));
 }
 
 //=============================================================================================================

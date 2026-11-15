@@ -152,7 +152,7 @@ bool RtFwd::start()
         {&m_pFwdSettings->measname, "The meaurement file cannot be opend. Chosse another file."},
     };
     for (const auto& [path, message] : inputs) {
-        if (!FiffStream::open(mne::pathFromUtf8(*path))) {
+        if (!FiffStream::open(mne::path_from_utf8(*path))) {
             QMessageBox msgBox;
             msgBox.setText(message);
             msgBox.setInformativeText(QString::fromStdString(*path));
@@ -400,7 +400,7 @@ void RtFwd::run()
             // compute and store
             pFwdSolution.reset(pFwdComputer->calculateFwd().release());
 
-            if (auto written = pFwdSolution->write(mne::pathFromUtf8(m_pFwdSettings->solname)); !written) {
+            if (auto written = pFwdSolution->write(mne::path_from_utf8(m_pFwdSettings->solname)); !written) {
                 qWarning() << written.error().what();
             }
 

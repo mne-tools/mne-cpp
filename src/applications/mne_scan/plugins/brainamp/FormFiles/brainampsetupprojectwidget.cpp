@@ -170,7 +170,7 @@ void BrainAMPSetupProjectWidget::onCardinalComboBoxChanged()
 
 void BrainAMPSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath)
 {
-    const auto layout = LayoutLoader::read_elc(mne::pathFromUtf8(sPath.toStdString()));
+    const auto layout = LayoutLoader::read_elc(mne::path_from_utf8(sPath.toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;

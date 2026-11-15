@@ -65,7 +65,7 @@ FiffIO::FiffIO(const std::vector<std::filesystem::path>& paths)
 
 bool FiffIO::setup_read(const std::filesystem::path& path, FiffInfo& info, std::shared_ptr<FiffDirNode>& dirTree)
 {
-    mne::Log::info("Opening fiff data {}...\n", mne::utf8FromPath(path));
+    mne::Log::info("Opening fiff data {}...\n", mne::utf8_from_path(path));
     FiffStream stream(path);
     return stream.open() && stream.read_meas_info(stream.dirtree(), info, dirTree);
 }
@@ -138,8 +138,8 @@ bool FiffIO::write(const std::filesystem::path& path, fiff_int_t type, fiff_int_
             bool ok = true;
             for (fiff_int_t i = 0; i < static_cast<fiff_int_t>(raw.size()); ++i) {
                 std::filesystem::path one = path;
-                one.replace_filename(std::format("{}_raw-{}{}", mne::utf8FromPath(path.stem()), i, mne::utf8FromPath(path.extension())));
-                mne::Log::info("Writing raw data set {} to {} ...", i, mne::utf8FromPath(one));
+                one.replace_filename(std::format("{}_raw-{}{}", mne::utf8_from_path(path.stem()), i, mne::utf8_from_path(path.extension())));
+                mne::Log::info("Writing raw data set {} to {} ...", i, mne::utf8_from_path(one));
                 ok &= write_raw(one, i);
             }
             return ok;

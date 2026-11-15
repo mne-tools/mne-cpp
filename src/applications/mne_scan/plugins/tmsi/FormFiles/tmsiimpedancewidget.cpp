@@ -131,7 +131,7 @@ void TMSIImpedanceWidget::initGraphicScene()
     // Clear all items from scene
     m_qGScene->clear();
 
-    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8((layoutDirectory() + "standard_waveguard128.elc").toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8((layoutDirectory() + "standard_waveguard128.elc").toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;
@@ -236,7 +236,7 @@ void TMSIImpedanceWidget::loadLayout()
                                                         layoutDirectory(),
                                                         tr("ELC layout file (*.elc)"));
 
-    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8(sElcFilePath.toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8(sElcFilePath.toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;

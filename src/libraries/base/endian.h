@@ -40,7 +40,7 @@ concept Swappable = std::is_arithmetic_v<T> && (sizeof(T) == 1 || sizeof(T) == 2
  * @return @p value with its bytes in reverse order.
  */
 template<Swappable T>
-[[nodiscard]] constexpr T byteSwap(T value) noexcept
+[[nodiscard]] constexpr T byte_swap(T value) noexcept
 {
     if constexpr (sizeof(T) == 1) {
         return value;
@@ -63,12 +63,12 @@ template<Swappable T>
  * @return @p value in big-endian (network, FIFF) byte order.
  */
 template<Swappable T>
-[[nodiscard]] constexpr T toBigEndian(T value) noexcept
+[[nodiscard]] constexpr T to_big_endian(T value) noexcept
 {
     if constexpr (std::endian::native == std::endian::big) {
         return value;
     } else {
-        return byteSwap(value);
+        return byte_swap(value);
     }
 }
 
@@ -79,9 +79,9 @@ template<Swappable T>
  * @return @p value in host byte order.
  */
 template<Swappable T>
-[[nodiscard]] constexpr T fromBigEndian(T value) noexcept
+[[nodiscard]] constexpr T from_big_endian(T value) noexcept
 {
-    return toBigEndian(value);
+    return to_big_endian(value);
 }
 
 //=============================================================================================================
@@ -92,10 +92,10 @@ template<Swappable T>
  * @param[in]      count   Number of values.
  */
 template<Swappable T>
-void byteSwapInPlace(T* data, std::size_t count) noexcept
+void byte_swap_in_place(T* data, std::size_t count) noexcept
 {
     for (std::size_t i = 0; i < count; ++i) {
-        data[i] = byteSwap(data[i]);
+        data[i] = byte_swap(data[i]);
     }
 }
 

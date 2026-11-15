@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <base/log.h>
 #include <memory>
 #include <base/string_utils.h>
@@ -103,7 +104,7 @@ void TestSensorSet::initTestCase()
             pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
             pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
-            if (!(mne::contains(pFiffInfo->bads, pFiffInfo->ch_names.at(i)))) {
+            if (!(std::ranges::contains(pFiffInfo->bads, pFiffInfo->ch_names.at(i)))) {
                 m_lChannels.push_back(pFiffInfo->chs[i]);
             }
         }

@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include "sensorfieldmapper.h"
 
 #include <vector>
@@ -239,7 +240,7 @@ bool SensorFieldMapper::buildMapping(
     std::vector<std::string> megChNames, eegChNames;
 
     auto isBad = [this](const std::string& name) {
-        return mne::contains(m_evoked.info.bads, name);
+        return std::ranges::contains(m_evoked.info.bads, name);
     };
 
     const int nChs = static_cast<int>(m_evoked.info.chs.size());
@@ -344,7 +345,7 @@ bool SensorFieldMapper::buildMapping(
                         kIntrad, kMegMiss);
                 }
             } else {
-                qWarning() << "MEG coil definitions not found at" << QString::fromStdString(mne::utf8FromPath(mne::resource_path("general/coilDefinitions/coil_def.dat")));
+                qWarning() << "MEG coil definitions not found at" << QString::fromStdString(mne::utf8_from_path(mne::resource_path("general/coilDefinitions/coil_def.dat")));
             }
         }
     }

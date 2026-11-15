@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <base/log.h>
 #include <memory>
 #include <base/string_utils.h>
@@ -123,7 +124,7 @@ void TestHpiDataUpdater::initTestCase()
             m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
             m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
-            if (!(mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(i)))) {
+            if (!(std::ranges::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(i)))) {
                 m_lChannelsWithoutBads.push_back(m_pFiffInfo->chs[i]);
                 m_vecInnerindWithoutBads.append(i);
             }
@@ -139,7 +140,7 @@ void TestHpiDataUpdater::initTestCase()
             m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
             m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
-            if (!(mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(i)))) {
+            if (!(std::ranges::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names.at(i)))) {
                 m_lChannelsWithBads.push_back(m_pFiffInfo->chs[i]);
                 m_vecInnerindWithBads.append(i);
             }

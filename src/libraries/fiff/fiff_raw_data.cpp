@@ -64,9 +64,9 @@ mne::Expected<FiffRawData> FiffRawData::read(const std::filesystem::path& path, 
 {
     auto bytes = mne::FileByteStream::open(path, mne::FileByteStream::Mode::Read);
     if (!bytes) {
-        return mne::fail(mne::ErrorCode::Io, "cannot open {}", mne::utf8FromPath(path));
+        return mne::fail(mne::ErrorCode::Io, "cannot open {}", mne::utf8_from_path(path));
     }
-    return read(std::make_unique<FiffStream>(std::move(bytes), mne::utf8FromPath(path)), allow_maxshield);
+    return read(std::make_unique<FiffStream>(std::move(bytes), mne::utf8_from_path(path)), allow_maxshield);
 }
 
 //=============================================================================================================

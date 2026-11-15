@@ -109,8 +109,8 @@ void TestAnalyzeChannelSelection::publishesTheSelectedChannels()
         QCOMPARE(got, expected);
         QList<int> idx = indices.last();
         std::sort(idx.begin(), idx.end());
-        QList<int> expectedIdx{static_cast<int>(mne::indexOf(raw->getFiffInfo()->ch_names, "MEG 0112")),
-                               static_cast<int>(mne::indexOf(raw->getFiffInfo()->ch_names, "MEG 0113"))};
+        QList<int> expectedIdx{static_cast<int>(mne::index_of(raw->getFiffInfo()->ch_names, "MEG 0112")),
+                               static_cast<int>(mne::index_of(raw->getFiffInfo()->ch_names, "MEG 0113"))};
         std::sort(expectedIdx.begin(), expectedIdx.end());
         QCOMPARE(idx, expectedIdx);
     }

@@ -483,7 +483,7 @@ Expected<void> MNESourceSpaces::write(const std::filesystem::path& path) const
 {
     auto stream = FiffStream::start_file(path);
     if (!stream) {
-        return fail(ErrorCode::Io, "cannot write {}", utf8FromPath(path));
+        return fail(ErrorCode::Io, "cannot write {}", utf8_from_path(path));
     }
     write_to_stream(*stream);
     stream->end_file();

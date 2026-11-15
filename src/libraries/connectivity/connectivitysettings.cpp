@@ -89,7 +89,7 @@ ConnectivitySettings::ConnectivitySettings()
 , m_fFreqResolution(1.0f)
 {
     m_iNfft = int(m_fSFreq / m_fFreqResolution);
-    qRegisterMetaType<mne::ConnectivitySettings>("mne::ConnectivitySettings");
+    qRegisterMetaType<mne::ConnectivitySettings>();
 }
 
 //*******************************************************************************************************

@@ -88,20 +88,20 @@ std::optional<std::chrono::sys_time<std::chrono::microseconds>> EDFReader::parse
         if (const auto fields = splitTriple(recording[1], '-')) {
             static constexpr std::array<std::string_view, 12> months{"JAN", "FEB", "MAR", "APR", "MAY", "JUN",
                                                                      "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
-            const auto month = std::ranges::find_if(months, [&](std::string_view name) { return mne::equalsIgnoreCase(name, (*fields)[1]); });
+            const auto month = std::ranges::find_if(months, [&](std::string_view name) { return mne::iequals(name, (*fields)[1]); });
             if (month != months.end()) {
-                date = civilDate(mne::toInt((*fields)[0]), static_cast<int>(month - months.begin()) + 1, mne::toInt((*fields)[2]));
+                date = civilDate(mne::to_int((*fields)[0]), static_cast<int>(month - months.begin()) + 1, mne::to_int((*fields)[2]));
             }
         }
     }
     // Otherwise the two-digit header year: 85-99 is 1985-1999, 00-84 is 2000-2084
     if (!date) {
         if (const auto fields = splitTriple(startDate, '.')) {
-            std::optional<int> year = mne::toInt((*fields)[2]);
+            std::optional<int> year = mne::to_int((*fields)[2]);
             if (year) {
                 *year += *year < 85 ? 2000 : 1900;
             }
-            date = civilDate(mne::toInt((*fields)[0]), mne::toInt((*fields)[1]), year);
+            date = civilDate(mne::to_int((*fields)[0]), mne::to_int((*fields)[1]), year);
         }
     }
     if (!date) {
@@ -109,9 +109,9 @@ std::optional<std::chrono::sys_time<std::chrono::microseconds>> EDFReader::parse
     }
     sys_time<microseconds> time = *date;
     if (const auto fields = splitTriple(startTime, '.')) {
-        const auto hour = mne::toInt((*fields)[0]);
-        const auto minute = mne::toInt((*fields)[1]);
-        const auto second = mne::toInt((*fields)[2]);
+        const auto hour = mne::to_int((*fields)[0]);
+        const auto minute = mne::to_int((*fields)[1]);
+        const auto second = mne::to_int((*fields)[2]);
         if (hour && minute && second) {
             time += hours(*hour) + minutes(*minute) + seconds(*second);
         }
@@ -129,7 +129,7 @@ namespace
 // mne read_raw_edf stim_channel="auto"
 bool isAutoStimLabel(std::string_view label)
 {
-    return mne::equalsIgnoreCase(label, "status") || mne::equalsIgnoreCase(label, "trigger");
+    return mne::iequals(label, "status") || mne::iequals(label, "trigger");
 }
 
 // EDF header fields are space-padded Latin-1
@@ -149,7 +149,7 @@ FiffChInfo EDFChannelInfo::to_fiff_ch_info() const
     info.scanNo = channelNumber;
     info.logNo = channelNumber;
 
-    const std::string lower = mne::toLower(label);
+    const std::string lower = mne::to_lower(label);
     const auto has = [&lower](std::string_view part) {
         return lower.find(part) != std::string::npos;
     };
@@ -218,14 +218,14 @@ bool EDFReader::open(const std::filesystem::path& path)
 {
     m_file = mne::FileByteStream::open(path, mne::FileByteStream::Mode::Read);
     if (!m_file) {
-        mne::Log::warning("[EDFReader::open] Could not open file: {}", mne::utf8FromPath(path));
+        mne::Log::warning("[EDFReader::open] Could not open file: {}", mne::utf8_from_path(path));
         return false;
     }
 
     // Like mne, the extension decides between EDF (16 bit) and BDF (24 bit)
-    m_bytesPerSample = mne::equalsIgnoreCase(mne::utf8FromPath(path.extension()), ".bdf") ? 3 : 2;
+    m_bytesPerSample = mne::iequals(mne::utf8_from_path(path.extension()), ".bdf") ? 3 : 2;
     if (!parse_header()) {
-        mne::Log::warning("[EDFReader::open] Not an EDF/BDF header: {}", mne::utf8FromPath(path));
+        mne::Log::warning("[EDFReader::open] Not an EDF/BDF header: {}", mne::utf8_from_path(path));
         m_file.reset();
         return false;
     }
@@ -257,11 +257,11 @@ bool EDFReader::parse_header()
     const std::string_view startDate = field(8);
     const std::string_view startTime = field(8);
     m_measDate = parse_start_date(recordingId, startDate, startTime);
-    m_numBytesInHeader = mne::toInt(field(8)).value_or(0);
+    m_numBytesInHeader = mne::to_int(field(8)).value_or(0);
     field(44); // reserved
-    m_numDataRecords = mne::toInt(field(8)).value_or(0);
-    const auto recordDuration = static_cast<float>(mne::toDouble(field(8)).value_or(0.0));
-    const int numChannels = mne::toInt(field(4)).value_or(0);
+    m_numDataRecords = mne::to_int(field(8)).value_or(0);
+    const auto recordDuration = static_cast<float>(mne::to_double(field(8)).value_or(0.0));
+    const int numChannels = mne::to_int(field(4)).value_or(0);
     if (numChannels <= 0 || static_cast<std::uint64_t>(numChannels) * bytesPerSignal + fixedBytes > m_file->size()) {
         return false;
     }
@@ -283,12 +283,12 @@ bool EDFReader::parse_header()
     column(16, [](EDFChannelInfo& ch, std::string_view v) { ch.label = headerText(v); });
     column(80, [](EDFChannelInfo& ch, std::string_view v) { ch.transducerType = headerText(v); });
     column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalDimension = headerText(v); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMin = static_cast<float>(mne::toDouble(v).value_or(0.0)); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMax = static_cast<float>(mne::toDouble(v).value_or(0.0)); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMin = mne::toInt(v).value_or(0); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMax = mne::toInt(v).value_or(0); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMin = static_cast<float>(mne::to_double(v).value_or(0.0)); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMax = static_cast<float>(mne::to_double(v).value_or(0.0)); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMin = mne::to_int(v).value_or(0); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMax = mne::to_int(v).value_or(0); });
     column(80, [](EDFChannelInfo& ch, std::string_view v) { ch.prefiltering = headerText(v); });
-    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.samplesPerRecord = mne::toInt(v).value_or(0); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.samplesPerRecord = mne::to_int(v).value_or(0); });
 
     if (m_numBytesInHeader != static_cast<long>(fixedBytes + count * bytesPerSignal)) {
         mne::Log::warning("[EDFReader::parse_header] Header byte count mismatch: read {} expected {}", fixedBytes + count * bytesPerSignal, m_numBytesInHeader);
@@ -434,5 +434,5 @@ std::string_view EDFReader::format_name() const
 
 bool EDFReader::supports_extension(std::string_view extension) const
 {
-    return mne::equalsIgnoreCase(extension, ".edf") || mne::equalsIgnoreCase(extension, ".bdf");
+    return mne::iequals(extension, ".edf") || mne::iequals(extension, ".bdf");
 }

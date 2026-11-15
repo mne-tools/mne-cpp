@@ -154,7 +154,7 @@ bool MlOnnxModel::load(const std::string& path)
 #ifdef MNE_USE_ONNXRUNTIME
     m_modelPath = path;
 
-    const std::filesystem::path file = mne::pathFromUtf8(path);
+    const std::filesystem::path file = mne::path_from_utf8(path);
     std::error_code ec;
     if (!std::filesystem::exists(file, ec)) {
         mne::Log::warning("MlOnnxModel::load – File does not exist: {}", path);

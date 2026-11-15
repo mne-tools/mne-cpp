@@ -80,7 +80,7 @@ void mne::setEegReference(MatrixXd& data,
                           const StringList& refChannels,
                           bool projection)
 {
-    const bool useAverage = refChannels.empty() || (refChannels.size() == 1 && mne::equalsIgnoreCase(refChannels.front(), "average"));
+    const bool useAverage = refChannels.empty() || (refChannels.size() == 1 && mne::iequals(refChannels.front(), "average"));
 
     if (projection) {
         if (!useAverage) {

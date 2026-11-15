@@ -128,11 +128,11 @@ mne::Expected<void> FiffDigPointSet::write(const std::filesystem::path& path) co
     std::error_code ec;
     const std::filesystem::path dir = path.has_parent_path() ? path.parent_path() : std::filesystem::path(".");
     if (!std::filesystem::is_directory(dir, ec)) {
-        return mne::fail(mne::ErrorCode::NotFound, "the directory {} does not exist", mne::utf8FromPath(dir));
+        return mne::fail(mne::ErrorCode::NotFound, "the directory {} does not exist", mne::utf8_from_path(dir));
     }
     auto stream = FiffStream::start_file(path);
     if (!stream) {
-        return mne::fail(mne::ErrorCode::Io, "cannot open {} for writing", mne::utf8FromPath(path));
+        return mne::fail(mne::ErrorCode::Io, "cannot open {} for writing", mne::utf8_from_path(path));
     }
     write_to_stream(*stream);
     stream->end_file();

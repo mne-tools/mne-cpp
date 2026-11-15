@@ -85,7 +85,7 @@ T readValue(const std::byte* p, bool bigEndian)
 {
     T v;
     std::memcpy(&v, p, sizeof(T));
-    return bigEndian != (std::endian::native == std::endian::big) ? mne::byteSwap(v) : v;
+    return bigEndian != (std::endian::native == std::endian::big) ? mne::byte_swap(v) : v;
 }
 
 // Decodes @p count values of type T from @p p and converts each one with @p convert into @p out
@@ -103,7 +103,7 @@ void readValues(const std::byte*& p, bool bigEndian, std::vector<Out>& out, std:
 
 bool MriNiftiIO::decompress(const std::string& gzFile, std::vector<std::byte>& rawData)
 {
-    auto bytes = mne::read_file_bytes(mne::pathFromUtf8(gzFile), mne::Compression::Gzip);
+    auto bytes = mne::read_file_bytes(mne::path_from_utf8(gzFile), mne::Compression::Gzip);
     if (!bytes) {
         Log::critical("MriNiftiIO::decompress - {}", bytes.error().what());
         return false;
@@ -118,8 +118,8 @@ bool MriNiftiIO::read(const std::string& niiFile, MriVolData& volData, bool verb
 {
     volData.fileName = niiFile;
 
-    const bool compressed = mne::toLower(niiFile).ends_with(".gz");
-    const auto content = mne::read_file_bytes(mne::pathFromUtf8(niiFile), compressed ? mne::Compression::Gzip : mne::Compression::None);
+    const bool compressed = mne::to_lower(niiFile).ends_with(".gz");
+    const auto content = mne::read_file_bytes(mne::path_from_utf8(niiFile), compressed ? mne::Compression::Gzip : mne::Compression::None);
     if (!content) {
         Log::critical("MriNiftiIO::read - {}", content.error().what());
         return false;

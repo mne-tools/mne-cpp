@@ -24,19 +24,19 @@
 
 const char* NEURONALCONNECTIVITYPLUGIN::buildDateTime()
 {
-    return mne::dateTimeNow();
+    return mne::compile_date_time();
 }
 
 //=============================================================================================================
 
 const char* NEURONALCONNECTIVITYPLUGIN::buildHash()
 {
-    return mne::gitHash();
+    return mne::git_hash();
 }
 
 //=============================================================================================================
 
 const char* NEURONALCONNECTIVITYPLUGIN::buildHashLong()
 {
-    return mne::gitHashLong();
+    return mne::git_hash_long();
 }

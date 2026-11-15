@@ -24,19 +24,19 @@
 
 const char* DIPOLEFITPLUGIN::buildDateTime()
 {
-    return mne::dateTimeNow();
+    return mne::compile_date_time();
 }
 
 //=============================================================================================================
 
 const char* DIPOLEFITPLUGIN::buildHash()
 {
-    return mne::gitHash();
+    return mne::git_hash();
 }
 
 //=============================================================================================================
 
 const char* DIPOLEFITPLUGIN::buildHashLong()
 {
-    return mne::gitHashLong();
+    return mne::git_hash_long();
 }

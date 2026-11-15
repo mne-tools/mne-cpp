@@ -1424,7 +1424,7 @@ void TestFiffFsLibrary::fiff_microCoveragePush()
     QVERIFY(stdErrStr.contains("Error", Qt::CaseInsensitive));
     evoked.aspect_kind = 999;
     evoked.aspectKindToString();
-    const char* hashLong = mne::buildHashLong();
+    const char* hashLong = mne::build_hash_long();
     Q_UNUSED(hashLong);
     FiffId id;
     id.version = (1 << 16) | 5;
@@ -1911,11 +1911,11 @@ void TestFiffFsLibrary::fs_surfaceSetIsEmptyCheck()
 
 void TestFiffFsLibrary::fs_globalBuildInfo()
 {
-    const char* dt = mne::buildDateTime();
+    const char* dt = mne::build_date_time();
     QVERIFY(dt != nullptr);
-    const char* h = mne::buildHash();
+    const char* h = mne::build_hash();
     QVERIFY(h != nullptr);
-    const char* hl = mne::buildHashLong();
+    const char* hl = mne::build_hash_long();
     QVERIFY(hl != nullptr);
 }
 

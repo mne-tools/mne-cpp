@@ -75,7 +75,7 @@ NameParts splitName(const std::string& name)
     std::size_t prefixEnd = digits;
     while (prefixEnd > 0 && (isSpace(name[prefixEnd - 1]) || name[prefixEnd - 1] == '_' || name[prefixEnd - 1] == '-'))
         --prefixEnd;
-    return {true, name.substr(0, prefixEnd), mne::toInt(std::string_view(name).substr(digits)).value_or(0)};
+    return {true, name.substr(0, prefixEnd), mne::to_int(std::string_view(name).substr(digits)).value_or(0)};
 }
 
 // "[4x8]", "4 x 8" -> (4, 8)
@@ -92,7 +92,7 @@ std::optional<std::pair<int, int>> parseDimension(std::string_view text)
             ++i;
         if (i == start)
             return std::nullopt;
-        return mne::toInt(text.substr(start, i - start)).value_or(0);
+        return mne::to_int(text.substr(start, i - start)).value_or(0);
     };
     if (i < text.size() && text[i] == '[')
         ++i;
@@ -114,7 +114,7 @@ std::optional<std::pair<int, int>> parseDimension(std::string_view text)
 
 std::optional<float> toCoordinate(std::string_view text)
 {
-    const std::optional<double> value = mne::toDouble(mne::trimmed(text));
+    const std::optional<double> value = mne::to_double(mne::trimmed(text));
     if (!value || !std::isfinite(static_cast<float>(*value)))
         return std::nullopt;
     return static_cast<float>(*value);
@@ -122,7 +122,7 @@ std::optional<float> toCoordinate(std::string_view text)
 
 bool endsWithIgnoreCase(const std::string& text, std::string_view suffix)
 {
-    return text.size() >= suffix.size() && mne::equalsIgnoreCase(std::string_view(text).substr(text.size() - suffix.size()), suffix);
+    return text.size() >= suffix.size() && mne::iequals(std::string_view(text).substr(text.size() - suffix.size()), suffix);
 }
 
 void setError(std::string* error, std::string message)
@@ -176,16 +176,16 @@ IeegImplantation::IeegImplantation(const std::vector<IeegContact>& contacts, con
 
 IeegImplantation IeegImplantation::readBids(const std::string& electrodesTsv, std::string* error)
 {
-    const std::filesystem::path tsvPath = mne::pathFromUtf8(electrodesTsv);
-    const std::string tsvName = mne::utf8FromPath(tsvPath.filename());
+    const std::filesystem::path tsvPath = mne::path_from_utf8(electrodesTsv);
+    const std::string tsvName = mne::utf8_from_path(tsvPath.filename());
     // The coordsystem sidecar sharing the longest name prefix, so sessions are never mixed
     std::vector<std::pair<std::string, std::string>> candidates; // (lower-case name, name), sorted like QDir
     std::error_code ec;
     for (const auto& entry : std::filesystem::directory_iterator(tsvPath.parent_path().empty() ? "." : tsvPath.parent_path(), ec)) {
         std::error_code typeError;
-        const std::string name = mne::utf8FromPath(entry.path().filename());
+        const std::string name = mne::utf8_from_path(entry.path().filename());
         if (entry.is_regular_file(typeError) && endsWithIgnoreCase(name, "_coordsystem.json"))
-            candidates.emplace_back(mne::toLower(name), name);
+            candidates.emplace_back(mne::to_lower(name), name);
     }
     std::sort(candidates.begin(), candidates.end());
     std::string coordPath;
@@ -194,14 +194,14 @@ IeegImplantation IeegImplantation::readBids(const std::string& electrodesTsv, st
         const auto prefix = std::mismatch(candidate.begin(), candidate.end(), tsvName.begin(), tsvName.end()).first - candidate.begin();
         if (prefix > bestPrefix) {
             bestPrefix = prefix;
-            coordPath = mne::utf8FromPath(tsvPath.parent_path() / mne::pathFromUtf8(candidate));
+            coordPath = mne::utf8_from_path(tsvPath.parent_path() / mne::path_from_utf8(candidate));
         }
     }
     if (coordPath.empty()) {
         setError(error, "no *_coordsystem.json next to " + electrodesTsv + ", so the units are unknown");
         return {};
     }
-    const mne::BidsCoordinateSystem coordSystem = mne::BidsCoordinateSystem::read_json(mne::pathFromUtf8(coordPath));
+    const mne::BidsCoordinateSystem coordSystem = mne::BidsCoordinateSystem::read_json(mne::path_from_utf8(coordPath));
     const std::string& units = coordSystem.units;
     const float scale = units == "m" ? 1.0f
         : units == "cm"              ? 0.01f
@@ -215,7 +215,7 @@ IeegImplantation IeegImplantation::readBids(const std::string& electrodesTsv, st
     std::vector<IeegContact> contacts;
     std::unordered_map<std::string, std::string> declaredTypes;
     std::unordered_map<std::string, std::string> declaredDimensions;
-    for (const mne::BidsElectrode& e : mne::BidsElectrode::read_tsv(mne::pathFromUtf8(electrodesTsv))) {
+    for (const mne::BidsElectrode& e : mne::BidsElectrode::read_tsv(mne::path_from_utf8(electrodesTsv))) {
         const std::optional<float> x = toCoordinate(e.x);
         const std::optional<float> y = toCoordinate(e.y);
         const std::optional<float> z = toCoordinate(e.z);
@@ -228,7 +228,7 @@ IeegImplantation IeegImplantation::readBids(const std::string& electrodesTsv, st
         // Declarations are per lead; contacts without a group take their lead from the name later
         const std::string key = contact.lead.empty() ? contact.name : contact.lead;
         if (!e.type.empty())
-            declaredTypes.insert_or_assign(key, mne::toLower(e.type));
+            declaredTypes.insert_or_assign(key, mne::to_lower(e.type));
         if (!e.dimension.empty())
             declaredDimensions.insert_or_assign(key, e.dimension);
         contacts.push_back(std::move(contact));
@@ -288,7 +288,7 @@ bool IeegImplantation::setLeadType(const std::string& lead, IeegLeadType type, i
 
 //=============================================================================================================
 
-int IeegImplantation::indexOf(const std::string& name) const
+int IeegImplantation::index_of(const std::string& name) const
 {
     const auto it = std::find_if(m_contacts.begin(), m_contacts.end(), [&](const IeegContact& c) { return c.name == name; });
     return it == m_contacts.end() ? -1 : static_cast<int>(it - m_contacts.begin());
@@ -298,7 +298,7 @@ int IeegImplantation::indexOf(const std::string& name) const
 
 bool IeegImplantation::isScannerRas() const
 {
-    return mne::equalsIgnoreCase(m_coordinateSystem, "ACPC") || mne::equalsIgnoreCase(m_coordinateSystem, "ScanRAS");
+    return mne::iequals(m_coordinateSystem, "ACPC") || mne::iequals(m_coordinateSystem, "ScanRAS");
 }
 
 //=============================================================================================================

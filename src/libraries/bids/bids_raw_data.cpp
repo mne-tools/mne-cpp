@@ -121,7 +121,7 @@ void applyChannelsTsv(FiffInfo& info, const std::vector<BidsChannel>& channels)
 
         bidsUnitToFiff(rec->units, fiffCh.unit, fiffCh.unit_mul);
 
-        if (mne::equalsIgnoreCase(rec->status, "bad"))
+        if (mne::iequals(rec->status, "bad"))
             info.bads.push_back(fiffCh.ch_name);
     }
 }
@@ -138,9 +138,9 @@ void applyElectrodePositions(FiffInfo& info,
     const int coordFrame = bids_lookup(BIDS_COORD_TO_FIFF_FRAME, coordSystemName).value_or(FIFFV_COORD_UNKNOWN);
 
     float scaleFactor = 1.0f;
-    if (mne::equalsIgnoreCase(coordUnits, "mm"))
+    if (mne::iequals(coordUnits, "mm"))
         scaleFactor = 0.001f;
-    else if (mne::equalsIgnoreCase(coordUnits, "cm"))
+    else if (mne::iequals(coordUnits, "cm"))
         scaleFactor = 0.01f;
 
     // Ident = 1-based ordinal among electrode channels, the order buildElectrodeRecords() reads them back in
@@ -160,9 +160,9 @@ void applyElectrodePositions(FiffInfo& info,
         const auto ordinal = chOrdinal.find(elec.name);
         dp.kind = ordinal != chOrdinal.end() ? FIFFV_POINT_EEG : FIFFV_POINT_EXTRA;
         dp.ident = ordinal != chOrdinal.end() ? ordinal->second : extraIdent++;
-        dp.r[0] = static_cast<float>(mne::toDouble(elec.x).value_or(0.0)) * scaleFactor;
-        dp.r[1] = static_cast<float>(mne::toDouble(elec.y).value_or(0.0)) * scaleFactor;
-        dp.r[2] = static_cast<float>(mne::toDouble(elec.z).value_or(0.0)) * scaleFactor;
+        dp.r[0] = static_cast<float>(mne::to_double(elec.x).value_or(0.0)) * scaleFactor;
+        dp.r[1] = static_cast<float>(mne::to_double(elec.y).value_or(0.0)) * scaleFactor;
+        dp.r[2] = static_cast<float>(mne::to_double(elec.z).value_or(0.0)) * scaleFactor;
         dp.coord_frame = coordFrame;
 
         info.dig.push_back(dp);
@@ -463,11 +463,11 @@ bool fileExists(const std::filesystem::path& path)
 bool copyFile(const std::filesystem::path& src, const std::filesystem::path& dst, bool overwrite)
 {
     if (!fileExists(src)) {
-        mne::Log::warning("[BidsRawData::write] Source file does not exist: {}", mne::utf8FromPath(src));
+        mne::Log::warning("[BidsRawData::write] Source file does not exist: {}", mne::utf8_from_path(src));
         return false;
     }
     if (fileExists(dst) && !overwrite) {
-        mne::Log::warning("[BidsRawData::write] Target file already exists: {}", mne::utf8FromPath(dst));
+        mne::Log::warning("[BidsRawData::write] Target file already exists: {}", mne::utf8_from_path(dst));
         return false;
     }
     std::error_code error;
@@ -489,7 +489,7 @@ void replaceAll(std::string& text, std::string_view from, std::string_view to)
 std::optional<std::string_view> headerValue(std::string_view line, std::string_view key)
 {
     line = mne::trimmed(line);
-    if (line.size() < key.size() || !mne::equalsIgnoreCase(line.substr(0, key.size()), key))
+    if (line.size() < key.size() || !mne::iequals(line.substr(0, key.size()), key))
         return std::nullopt;
     return mne::trimmed(line.substr(key.size()));
 }
@@ -499,7 +499,7 @@ bool copyBrainVisionFiles(const std::filesystem::path& srcVhdr, const BIDSPath& 
 {
     const mne::Expected<std::string> vhdrContent = mne::read_text_file(srcVhdr);
     if (!vhdrContent) {
-        mne::Log::warning("[BidsRawData::write] Cannot open .vhdr file: {}", mne::utf8FromPath(srcVhdr));
+        mne::Log::warning("[BidsRawData::write] Cannot open .vhdr file: {}", mne::utf8_from_path(srcVhdr));
         return false;
     }
 
@@ -528,35 +528,35 @@ bool copyBrainVisionFiles(const std::filesystem::path& srcVhdr, const BIDSPath& 
         replaceAll(vhdr, "MarkerFile=" + markerFileName, "MarkerFile=" + newMarkerFile);
 
     if (fileExists(dstVhdr) && !overwrite) {
-        mne::Log::warning("[BidsRawData::write] Target file already exists: {}", mne::utf8FromPath(dstVhdr));
+        mne::Log::warning("[BidsRawData::write] Target file already exists: {}", mne::utf8_from_path(dstVhdr));
         return false;
     }
     if (!mne::write_text_file(dstVhdr, vhdr)) {
-        mne::Log::warning("[BidsRawData::write] Cannot write .vhdr file: {}", mne::utf8FromPath(dstVhdr));
+        mne::Log::warning("[BidsRawData::write] Cannot write .vhdr file: {}", mne::utf8_from_path(dstVhdr));
         return false;
     }
 
     if (!dataFileName.empty()) {
-        const std::filesystem::path srcData = srcDir / mne::pathFromUtf8(dataFileName);
-        if (!copyFile(srcData, dstDir / mne::pathFromUtf8(newDataFile), overwrite)) {
-            mne::Log::warning("[BidsRawData::write] Failed to copy data file: {}", mne::utf8FromPath(srcData));
+        const std::filesystem::path srcData = srcDir / mne::path_from_utf8(dataFileName);
+        if (!copyFile(srcData, dstDir / mne::path_from_utf8(newDataFile), overwrite)) {
+            mne::Log::warning("[BidsRawData::write] Failed to copy data file: {}", mne::utf8_from_path(srcData));
             return false;
         }
     }
 
     if (!markerFileName.empty()) {
-        const std::filesystem::path srcMarker = srcDir / mne::pathFromUtf8(markerFileName);
-        const std::filesystem::path dstMarker = dstDir / mne::pathFromUtf8(newMarkerFile);
+        const std::filesystem::path srcMarker = srcDir / mne::path_from_utf8(markerFileName);
+        const std::filesystem::path dstMarker = dstDir / mne::path_from_utf8(newMarkerFile);
 
         if (mne::Expected<std::string> marker = mne::read_text_file(srcMarker)) {
             replaceAll(*marker, "DataFile=" + dataFileName, "DataFile=" + newDataFile);
 
             if (fileExists(dstMarker) && !overwrite) {
-                mne::Log::warning("[BidsRawData::write] Target marker file already exists: {}", mne::utf8FromPath(dstMarker));
+                mne::Log::warning("[BidsRawData::write] Target marker file already exists: {}", mne::utf8_from_path(dstMarker));
                 return false;
             }
             if (!mne::write_text_file(dstMarker, *marker))
-                mne::Log::warning("[BidsRawData::write] Cannot write marker file: {}", mne::utf8FromPath(dstMarker));
+                mne::Log::warning("[BidsRawData::write] Cannot write marker file: {}", mne::utf8_from_path(dstMarker));
         }
     }
 
@@ -569,7 +569,7 @@ bool copyRawDataFile(const std::filesystem::path& sourcePath, const BIDSPath& bi
     if (sourcePath.empty())
         return true;
 
-    const std::string ext = mne::toLower(bidsPath.extension());
+    const std::string ext = mne::to_lower(bidsPath.extension());
     if (ext == ".vhdr" || ext == ".ahdr")
         return copyBrainVisionFiles(sourcePath, bidsPath, overwrite);
 
@@ -687,7 +687,7 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     //=========================================================================================================
     std::filesystem::path rawFilePath = bidsPath.file_path();
 
-    if (!fileExists(rawFilePath) && mne::toLower(bidsPath.extension()) == ".edf") {
+    if (!fileExists(rawFilePath) && mne::to_lower(bidsPath.extension()) == ".edf") {
         BIDSPath altPath(bidsPath);
         altPath.set_extension(".EDF");
         if (fileExists(altPath.file_path()))
@@ -695,7 +695,7 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     }
 
     if (!fileExists(rawFilePath)) {
-        mne::Log::warning("[BidsRawData::read] Raw data file not found: {}", mne::utf8FromPath(rawFilePath));
+        mne::Log::warning("[BidsRawData::read] Raw data file not found: {}", mne::utf8_from_path(rawFilePath));
         return result;
     }
 
@@ -709,7 +709,7 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     }
 
     if (!result.reader->open(rawFilePath)) {
-        mne::Log::warning("[BidsRawData::read] Failed to open raw file: {}", mne::utf8FromPath(rawFilePath));
+        mne::Log::warning("[BidsRawData::read] Failed to open raw file: {}", mne::utf8_from_path(rawFilePath));
         return result;
     }
 
@@ -810,7 +810,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     // Step 2 — Create directory structure
     //=========================================================================================================
     if (!bidsPath.mkdirs()) {
-        mne::Log::warning("[BidsRawData::write] Failed to create directory: {}", mne::utf8FromPath(bidsPath.directory()));
+        mne::Log::warning("[BidsRawData::write] Failed to create directory: {}", mne::utf8_from_path(bidsPath.directory()));
         return result;
     }
 
@@ -830,7 +830,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     {
         const std::filesystem::path channelsPath = bidsPath.channels_tsv_path().file_path();
         if (!options.overwrite && fileExists(channelsPath)) {
-            mne::Log::warning("[BidsRawData::write] channels.tsv already exists: {}", mne::utf8FromPath(channelsPath));
+            mne::Log::warning("[BidsRawData::write] channels.tsv already exists: {}", mne::utf8_from_path(channelsPath));
             return result;
         }
 
@@ -893,7 +893,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     if (!events.empty()) {
         const std::filesystem::path eventsPath = bidsPath.events_tsv_path().file_path();
         if (!options.overwrite && fileExists(eventsPath)) {
-            mne::Log::warning("[BidsRawData::write] events.tsv already exists: {}", mne::utf8FromPath(eventsPath));
+            mne::Log::warning("[BidsRawData::write] events.tsv already exists: {}", mne::utf8_from_path(eventsPath));
             return result;
         }
 
@@ -920,7 +920,7 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     {
         const std::filesystem::path sidecarPath = bidsPath.sidecar_json_path().file_path();
         if (!options.overwrite && fileExists(sidecarPath)) {
-            mne::Log::warning("[BidsRawData::write] Sidecar JSON already exists: {}", mne::utf8FromPath(sidecarPath));
+            mne::Log::warning("[BidsRawData::write] Sidecar JSON already exists: {}", mne::utf8_from_path(sidecarPath));
             return result;
         }
 

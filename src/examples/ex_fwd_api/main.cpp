@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <fwd/fwd.h>
 
 #include <vector>
@@ -98,7 +99,7 @@ int main(int argc, char* argv[])
     for (const FiffChInfo& ch : raw.info.chs) {
         if (ch.kind == FIFFV_MEG_CH) {
             meg.push_back(ch);
-            if (!mne::contains(raw.info.bads, ch.ch_name)) {
+            if (!std::ranges::contains(raw.info.bads, ch.ch_name)) {
                 goodMeg.push_back(ch);
             }
         } else if (ch.kind == FIFFV_EEG_CH) {
@@ -178,7 +179,7 @@ int main(int argc, char* argv[])
     settings->pFiffInfo = std::make_shared<FiffInfo>(raw.info);
     settings->checkIntegrity();
     auto fwd = std::make_shared<ComputeFwd>(settings)->calculateFwd();
-    const std::filesystem::path solPath = mne::pathFromUtf8(settings->solname);
+    const std::filesystem::path solPath = mne::path_from_utf8(settings->solname);
     const bool written = fwd->write(solPath).has_value();
     //! [compute_fwd_usage]
     // mne _compute_forwards_meeg on the 78 V1 sources: |G| of source 0, x component, over 306 MEG channels

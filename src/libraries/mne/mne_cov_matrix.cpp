@@ -162,7 +162,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const std::filesystem::path& na
     nodes = stream.dirtree()->dir_tree_find(FIFFB_MNE_COV);
 
     if (nodes.size() == 0) {
-        mne::Log::warning("No covariance matrix available in {}", mne::utf8FromPath(name));
+        mne::Log::warning("No covariance matrix available in {}", mne::utf8_from_path(name));
         stream.close();
         return nullptr;
     }
@@ -179,7 +179,7 @@ std::unique_ptr<MNECovMatrix> MNECovMatrix::read(const std::filesystem::path& na
         }
     }
     if (!covnode || covnode->empty()) {
-        mne::Log::warning("Desired covariance matrix not found from {}", mne::utf8FromPath(name));
+        mne::Log::warning("Desired covariance matrix not found from {}", mne::utf8_from_path(name));
         stream.close();
         return nullptr;
     }

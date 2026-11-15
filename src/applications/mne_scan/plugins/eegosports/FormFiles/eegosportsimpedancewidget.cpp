@@ -153,7 +153,7 @@ void EEGoSportsImpedanceWidget::initGraphicScene()
     m_qGScene->clear();
 
     // Load standard layout file
-    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8((layoutDirectory() + "standard_waveguard66.elc").toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8((layoutDirectory() + "standard_waveguard66.elc").toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;
@@ -262,7 +262,7 @@ void EEGoSportsImpedanceWidget::loadLayout()
                                                         tr("ELC layout file (*.elc)"));
 
     // Load standard layout file
-    const auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8(sElcFilePath.toStdString()));
+    const auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8(sElcFilePath.toStdString()));
     if (!layout) {
         qDebug() << "Error: Reading elc file.";
         return;

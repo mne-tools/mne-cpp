@@ -90,7 +90,7 @@ using namespace Eigen;
 
 FiffStream::FiffStream(const std::filesystem::path& path)
 : m_path(path)
-, m_name(mne::utf8FromPath(path))
+, m_name(mne::utf8_from_path(path))
 {
 }
 
@@ -106,7 +106,7 @@ FiffStream::FiffStream(std::unique_ptr<mne::ByteStream> bytes, std::string name)
 
 mne::Expected<FiffStream> FiffStream::open(const std::filesystem::path& path)
 {
-    const std::string name = mne::utf8FromPath(path);
+    const std::string name = mne::utf8_from_path(path);
     auto bytes = mne::FileByteStream::open(path, mne::FileByteStream::Mode::Read);
     if (!bytes) {
         return fail(ErrorCode::Io, "Cannot open {}", name);
@@ -124,10 +124,10 @@ std::unique_ptr<FiffStream> FiffStream::start_file(const std::filesystem::path& 
 {
     auto bytes = mne::FileByteStream::open(path, mne::FileByteStream::Mode::Write);
     if (!bytes) {
-        Log::warning("Cannot write to {}", mne::utf8FromPath(path));
+        Log::warning("Cannot write to {}", mne::utf8_from_path(path));
         return {};
     }
-    return start_file(std::make_unique<FiffStream>(std::move(bytes), mne::utf8FromPath(path)));
+    return start_file(std::make_unique<FiffStream>(std::move(bytes), mne::utf8_from_path(path)));
 }
 
 //=============================================================================================================
@@ -160,7 +160,7 @@ mne::ByteStream& FiffStream::byte_stream() const
 
 bool FiffStream::is_open() const
 {
-    return m_bytes && m_bytes->isOpen();
+    return m_bytes && m_bytes->is_open();
 }
 
 //=============================================================================================================
@@ -431,7 +431,7 @@ bool FiffStream::open()
 
 bool FiffStream::close()
 {
-    if (m_bytes && m_bytes->isOpen())
+    if (m_bytes && m_bytes->is_open())
         m_bytes->close();
     return true;
 }
@@ -1045,7 +1045,7 @@ mne::Expected<FiffDigitizerData> FiffStream::read_digitizer_data(const std::shar
     for (FiffDigPoint& point : dig.points) {
         point.coord_frame = dig.coord_frame;
     }
-    dig.filename = mne::pathFromUtf8(this->stream_name());
+    dig.filename = mne::path_from_utf8(this->stream_name());
     dig.active.assign(dig.points.size(), true);
     dig.discard.assign(dig.points.size(), false);
     return dig;
@@ -1801,7 +1801,7 @@ std::unique_ptr<FiffStream> FiffStream::start_file(std::unique_ptr<mne::ByteStre
 
 std::unique_ptr<FiffStream> FiffStream::open_update(const std::filesystem::path& path)
 {
-    const std::string name = mne::utf8FromPath(path);
+    const std::string name = mne::utf8_from_path(path);
     auto bytes = mne::FileByteStream::open(path, mne::FileByteStream::Mode::ReadWrite);
     if (!bytes) {
         Log::critical("Cannot open {} for update", name);
@@ -1916,7 +1916,7 @@ std::unique_ptr<FiffStream> FiffStream::start_writing_raw(std::unique_ptr<FiffSt
     bool have_hpi_result = false;
     bool have_isotrak = false;
     if (blocks.size() > 0 && !info.filename.empty()) {
-        FiffStream source(mne::pathFromUtf8(info.filename));
+        FiffStream source(mne::path_from_utf8(info.filename));
 
         if (!source.open()) {
             Log::warning("Cannot copy the measurement blocks of {} ; writing the info without them", info.filename);

@@ -86,7 +86,7 @@ MatrixXi mne::events_from_annotations(const FiffAnnotations& annotations,
         const auto id = event_id.find(a.description);
         result(row, 0) = static_cast<int>(std::round(a.onset * sfreq)) + first_sample;
         result(row, 1) = 0;
-        result(row, 2) = id != event_id.end() ? id->second : mne::toInt(a.description).value_or(0);
+        result(row, 2) = id != event_id.end() ? id->second : mne::to_int(a.description).value_or(0);
         ++row;
     }
     return result;

@@ -128,7 +128,7 @@ private:
 void TestCrossvalCovariance::initTestCase()
 {
     // --- Paths ---
-    m_sDataPath = QString::fromStdString(mne::utf8FromPath(PythonTestHelper::test_data_path())) + "/";
+    m_sDataPath = QString::fromStdString(mne::utf8_from_path(PythonTestHelper::test_data_path())) + "/";
     m_sRawFile = m_sDataPath + "MEG/sample/sample_audvis_trunc_raw.fif";
 
     QVERIFY2(QFile::exists(m_sRawFile),
@@ -247,7 +247,7 @@ void TestCrossvalCovariance::computePythonCovariance()
     QVERIFY2(result.success, std::format("Python failed (exit {}): {}", result.exit_code, result.std_err).c_str());
 
     // Parse shrinkage from stdout
-    const std::optional<double> alpha = mne::toDouble(mne::trimmed(result.std_out));
+    const std::optional<double> alpha = mne::to_double(mne::trimmed(result.std_out));
     QVERIFY2(alpha, std::format("Could not parse shrinkage: '{}'", result.std_out).c_str());
     m_pyAlpha = *alpha;
 

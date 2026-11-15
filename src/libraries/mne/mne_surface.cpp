@@ -413,7 +413,7 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const std::filesystem::
     }
     surfs = stream.dirtree()->dir_tree_find(FIFFB_BEM_SURF);
     if (surfs.size() == 0) {
-        mne::Log::critical("No BEM surfaces found in {}", mne::utf8FromPath(name));
+        mne::Log::critical("No BEM surfaces found in {}", mne::utf8_from_path(name));
         stream.close();
         return nullptr;
     }
@@ -427,7 +427,7 @@ std::unique_ptr<MNESurface> MNESurface::read_bem_surface(const std::filesystem::
             }
         }
         if (id != which) {
-            mne::Log::critical("Desired surface not found in {}", mne::utf8FromPath(name));
+            mne::Log::critical("Desired surface not found in {}", mne::utf8_from_path(name));
             stream.close();
             return nullptr;
         }

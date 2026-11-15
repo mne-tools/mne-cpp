@@ -51,7 +51,7 @@ namespace
  */
 bool parseFloat(const char* arg, float& value)
 {
-    const std::optional<double> parsed = mne::toDouble(arg);
+    const std::optional<double> parsed = mne::to_double(arg);
     if (parsed) {
         value = static_cast<float>(*parsed);
     }
@@ -70,7 +70,7 @@ bool parseFloat(const char* arg, float& value)
  */
 bool parseInt(const char* arg, int& value)
 {
-    const std::optional<int> parsed = mne::toInt(arg);
+    const std::optional<int> parsed = mne::to_int(arg);
     if (parsed) {
         value = *parsed;
     }
@@ -96,7 +96,7 @@ bool parseTriplet(const char* arg, Eigen::Vector3f& values)
 
     Eigen::Vector3f parsed;
     for (int i = 0; i < 3; ++i) {
-        const std::optional<double> part = mne::toDouble(parts[static_cast<std::size_t>(i)]);
+        const std::optional<double> part = mne::to_double(parts[static_cast<std::size_t>(i)]);
         if (!part) {
             return false;
         }

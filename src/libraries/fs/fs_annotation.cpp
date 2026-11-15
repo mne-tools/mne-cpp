@@ -97,7 +97,7 @@ bool FsAnnotation::read(const std::string& subject_id, std::int32_t hemi, const 
     if (hemi != 0 && hemi != 1)
         return false;
 
-    return read(subjects_dir / mne::pathFromUtf8(subject_id) / "label", hemi, atlas, p_Annotation);
+    return read(subjects_dir / mne::path_from_utf8(subject_id) / "label", hemi, atlas, p_Annotation);
 }
 
 //=============================================================================================================
@@ -107,7 +107,7 @@ bool FsAnnotation::read(const std::filesystem::path& path, std::int32_t hemi, co
     if (hemi != 0 && hemi != 1)
         return false;
 
-    return read(path / mne::pathFromUtf8(std::format("{}.{}.annot", hemi == 0 ? "lh" : "rh", atlas)), p_Annotation);
+    return read(path / mne::path_from_utf8(std::format("{}.{}.annot", hemi == 0 ? "lh" : "rh", atlas)), p_Annotation);
 }
 
 //=============================================================================================================
@@ -125,7 +125,7 @@ bool FsAnnotation::read(const std::filesystem::path& p_sFileName, FsAnnotation& 
     mne::MemoryByteStream stream(std::move(*bytes));
     const auto readInt = [&stream]() {
         std::int32_t value = 0;
-        stream.readBigEndian(value);
+        stream.read_big_endian(value);
         return value;
     };
     // A length-prefixed string; FreeSurfer counts the terminating NUL
@@ -139,7 +139,7 @@ bool FsAnnotation::read(const std::filesystem::path& p_sFileName, FsAnnotation& 
     };
     const auto readColor = [&stream](FsColortable& ct, std::int32_t row) {
         std::int32_t rgba[4] = {};
-        stream.readBigEndian(rgba, 4);
+        stream.read_big_endian(rgba, 4);
         for (std::int32_t j = 0; j < 4; ++j)
             ct.table(row, j) = rgba[j];
         ct.table(row, 4) = rgba[0] + rgba[1] * 256 + rgba[2] * 65536 + rgba[3] * 16777216;
@@ -152,7 +152,7 @@ bool FsAnnotation::read(const std::filesystem::path& p_sFileName, FsAnnotation& 
     }
     // Vertex number and label id interleaved
     std::vector<std::int32_t> pairs(2 * static_cast<std::size_t>(numEl));
-    stream.readBigEndian(pairs.data(), pairs.size());
+    stream.read_big_endian(pairs.data(), pairs.size());
     p_Annotation.m_Vertices.resize(numEl);
     p_Annotation.m_LabelIds.resize(numEl);
     for (std::int32_t i = 0; i < numEl; ++i) {
@@ -210,8 +210,8 @@ bool FsAnnotation::read(const std::filesystem::path& p_sFileName, FsAnnotation& 
         mne::Log::warning("\tError! No colortable stored");
     }
 
-    p_Annotation.m_sFileName = mne::utf8FromPath(p_sFileName.filename());
-    p_Annotation.m_sFilePath = mne::utf8FromPath(p_sFileName);
+    p_Annotation.m_sFileName = mne::utf8_from_path(p_sFileName.filename());
+    p_Annotation.m_sFilePath = mne::utf8_from_path(p_sFileName);
     p_Annotation.m_iHemi = p_Annotation.m_sFileName.starts_with("lh.") ? 0 : 1;
 
     mne::Log::info("[done]\n");
@@ -289,7 +289,7 @@ bool FsAnnotation::toLabels(const FsSurface& p_surf,
             p_qListLabels.emplace_back(vertices, pos, values, this->m_iHemi, name, label_id);
             // store the color
             p_qListLabelRGBAs.push_back(label_rgba);
-        } else if (mne::contains(lLabelPicks, name)) {
+        } else if (std::ranges::contains(lLabelPicks, name)) {
             //t_tris
             p_qListLabels.emplace_back(vertices, pos, values, this->m_iHemi, name, label_id);
             // store the color

@@ -24,19 +24,19 @@
 
 const char* DATAMANAGERPLUGIN::buildDateTime()
 {
-    return mne::dateTimeNow();
+    return mne::compile_date_time();
 }
 
 //=============================================================================================================
 
 const char* DATAMANAGERPLUGIN::buildHash()
 {
-    return mne::gitHash();
+    return mne::git_hash();
 }
 
 //=============================================================================================================
 
 const char* DATAMANAGERPLUGIN::buildHashLong()
 {
-    return mne::gitHashLong();
+    return mne::git_hash_long();
 }

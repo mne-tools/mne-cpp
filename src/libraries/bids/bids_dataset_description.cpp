@@ -37,14 +37,14 @@ BidsDatasetDescription BidsDatasetDescription::read(const std::filesystem::path&
 
     const mne::Expected<std::string> text = mne::read_text_file(path);
     if (!text) {
-        mne::Log::warning("[BidsDatasetDescription::read] Cannot open {}", mne::utf8FromPath(path));
+        mne::Log::warning("[BidsDatasetDescription::read] Cannot open {}", mne::utf8_from_path(path));
         return desc;
     }
 
     mne::JsonParseError error;
     const mne::JsonDocument doc = mne::JsonDocument::from_json(*text, &error);
     if (error.error != mne::JsonParseError::NoError) {
-        mne::Log::warning("[BidsDatasetDescription::read] Parse error in {} : {}", mne::utf8FromPath(path), error.error_string());
+        mne::Log::warning("[BidsDatasetDescription::read] Parse error in {} : {}", mne::utf8_from_path(path), error.error_string());
         return desc;
     }
 
@@ -69,7 +69,7 @@ bool BidsDatasetDescription::write(const std::filesystem::path& path,
         json.insert("License", desc.license);
 
     if (!mne::write_text_file(path, mne::JsonDocument(std::move(json)).to_json())) {
-        mne::Log::warning("[BidsDatasetDescription::write] Cannot open {} for writing", mne::utf8FromPath(path));
+        mne::Log::warning("[BidsDatasetDescription::write] Cannot open {} for writing", mne::utf8_from_path(path));
         return false;
     }
     return true;

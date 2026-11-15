@@ -148,7 +148,7 @@ std::optional<MNEDerivSet> MNEDerivSet::read(const std::filesystem::path& path)
         for (const std::shared_ptr<FiffDirNode>& matrix : block->dir_tree_find(FIFFB_MNE_NAMED_MATRIX)) {
             auto data = MNESparseNamedMatrix::read(stream, matrix, FIFF_MNE_DERIVATION_DATA);
             if (!data) {
-                mne::Log::warning("MNEDerivSet::read - Bad derivation data in {}", mne::utf8FromPath(path));
+                mne::Log::warning("MNEDerivSet::read - Bad derivation data in {}", mne::utf8_from_path(path));
                 return std::nullopt;
             }
             auto deriv = std::make_unique<MNEDeriv>();
@@ -166,7 +166,7 @@ std::optional<MNEDerivSet> MNEDerivSet::readText(const std::filesystem::path& pa
 {
     std::ifstream file(path);
     if (!file) {
-        mne::Log::warning("MNEDerivSet::readText - Cannot open {}", mne::utf8FromPath(path));
+        mne::Log::warning("MNEDerivSet::readText - Cannot open {}", mne::utf8_from_path(path));
         return std::nullopt;
     }
     const StringList tokens = tokenize(file);
@@ -187,7 +187,7 @@ std::optional<MNEDerivSet> MNEDerivSet::readText(const std::filesystem::path& pa
     bool havePrev = false;
     double number = 0.0;
     for (const std::string& token : tokens) {
-        const std::optional<double> parsed = mne::toDouble(token);
+        const std::optional<double> parsed = mne::to_double(token);
         const bool isNumber = parsed.has_value();
         const double value = parsed.value_or(0.0);
         const Kind kind = token == "=" ? Kind::Equal : token == "+" ? Kind::Plus
@@ -202,14 +202,14 @@ std::optional<MNEDerivSet> MNEDerivSet::readText(const std::filesystem::path& pa
             definitions.push_back({token, {}});
         } else if (kind == Kind::Equal) {
             if (definitions.empty() || !definitions.back().second.empty()) {
-                mne::Log::warning("MNEDerivSet::readText - Misplaced equal sign in {}", mne::utf8FromPath(path));
+                mne::Log::warning("MNEDerivSet::readText - Misplaced equal sign in {}", mne::utf8_from_path(path));
                 return std::nullopt;
             }
         } else if (kind == Kind::Channel) {
             const double weight = prev == Kind::Minus ? -1.0 : prev == Kind::Number ? number
                                                                                     : 1.0;
             if (definitions.empty()) {
-                mne::Log::warning("MNEDerivSet::readText - Misplaced channel name in {}", mne::utf8FromPath(path));
+                mne::Log::warning("MNEDerivSet::readText - Misplaced channel name in {}", mne::utf8_from_path(path));
                 return std::nullopt;
             }
             definitions.back().second[token] += weight;
@@ -220,11 +220,11 @@ std::optional<MNEDerivSet> MNEDerivSet::readText(const std::filesystem::path& pa
         havePrev = true;
     }
     if (definitions.empty()) {
-        mne::Log::warning("MNEDerivSet::readText - No derivations in {}", mne::utf8FromPath(path));
+        mne::Log::warning("MNEDerivSet::readText - No derivations in {}", mne::utf8_from_path(path));
         return std::nullopt;
     }
     MNEDerivSet set;
-    set.derivs.push_back(makeDeriv(definitions, mne::utf8FromPath(path), {}));
+    set.derivs.push_back(makeDeriv(definitions, mne::utf8_from_path(path), {}));
     if (set.derivs.front()->deriv_data->nrow() == 0) {
         return std::nullopt;
     }

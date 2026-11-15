@@ -986,7 +986,7 @@ struct AcqRecorder::Impl
                 : std::string("n/a");
             data.events.push_back(std::move(event));
         }
-        mne::BIDSPath path(mne::pathFromUtf8(bids->root), bids->subject, bids->session, bids->task, "meg", "meg", ".fif");
+        mne::BIDSPath path(mne::path_from_utf8(bids->root), bids->subject, bids->session, bids->task, "meg", "meg", ".fif");
         path.set_run(bids->run);
         mne::BidsRawData::WriteOptions write;
         write.overwrite = true;
@@ -1189,12 +1189,12 @@ AcqExpected<AcqRecorder> AcqRecorder::start(const AcqStream& stream, const AcqBi
         !optionalLabel(bids.run)) {
         return AcqError(AcqErrorCode::InvalidParameter, "BIDS needs a root, and alphanumeric subject and task labels");
     }
-    mne::BIDSPath path(mne::pathFromUtf8(bids.root), bids.subject, bids.session, bids.task, "meg", "meg", ".fif");
+    mne::BIDSPath path(mne::path_from_utf8(bids.root), bids.subject, bids.session, bids.task, "meg", "meg", ".fif");
     path.set_run(bids.run);
     auto impl = std::make_unique<Impl>();
     impl->options = options;
     impl->bids = bids;
-    if (AcqError e = impl->begin(stream, mne::utf8FromPath(path.file_path())); !e.ok()) {
+    if (AcqError e = impl->begin(stream, mne::utf8_from_path(path.file_path())); !e.ok()) {
         return e;
     }
     return AcqRecorder(std::move(impl));

@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <disp3D/view/brainview.h>
 #include <memory>
 #include <base/string_utils.h>
@@ -241,7 +242,7 @@ int main(int argc, char* argv[])
             picks.resize(0);
 
             for (int i = 0; i < picksTmp.cols() - 1; i += 2) {
-                if (!mne::contains(raw.info.bads, raw.info.ch_names.at(picksTmp(i)))) {
+                if (!std::ranges::contains(raw.info.bads, raw.info.ch_names.at(picksTmp(i)))) {
                     picks.conservativeResize(picks.cols() + 1);
                     picks(picks.cols() - 1) = picksTmp(i);
                 }

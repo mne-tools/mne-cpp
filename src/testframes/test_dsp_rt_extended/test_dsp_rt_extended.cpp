@@ -225,7 +225,7 @@ private slots:
         QCOMPARE(fk.getDesignMethod().getName(), QString("Tschebyscheff"));
         QCOMPARE(fk.getFilterType().getName(), QString("HPF"));
 
-        // Unknown indices (e.g. indexOf() of an unknown name) fall back to the first entry
+        // Unknown indices (e.g. index_of() of an unknown name) fall back to the first entry
         fk.setDesignMethod(-1);
         fk.setFilterType(99);
         QCOMPARE(fk.getDesignMethod().getName(), QString("Cosine"));

@@ -65,16 +65,7 @@ BASESHARED_EXPORT StringList split(std::string_view text, char separator, bool s
  *
  * @return Index of the first occurrence of @p name, or -1, like QStringList::indexOf().
  */
-BASESHARED_EXPORT int indexOf(const StringList& list, std::string_view name);
-
-//=============================================================================================================
-/**
- * @param[in] list   A list of names, e.g. channel names.
- * @param[in] name   The name to look for, compared exactly.
- *
- * @return Whether @p list holds @p name.
- */
-BASESHARED_EXPORT bool contains(const StringList& list, std::string_view name);
+BASESHARED_EXPORT int index_of(const StringList& list, std::string_view name);
 
 //=============================================================================================================
 /**
@@ -90,7 +81,7 @@ BASESHARED_EXPORT std::string join(const StringList& list, std::string_view sepa
  *
  * @return @p text with ASCII letters in lower case; other bytes unchanged.
  */
-BASESHARED_EXPORT std::string toLower(std::string_view text);
+BASESHARED_EXPORT std::string to_lower(std::string_view text);
 
 /**
  * @param[in] a   UTF-8 text.
@@ -98,35 +89,35 @@ BASESHARED_EXPORT std::string toLower(std::string_view text);
  *
  * @return Whether @p a and @p b are equal when ASCII letters are compared without case.
  */
-BASESHARED_EXPORT bool equalsIgnoreCase(std::string_view a, std::string_view b);
+BASESHARED_EXPORT bool iequals(std::string_view a, std::string_view b);
 
 /**
  * @param[in] text   A decimal number with optional surrounding whitespace, independent of the locale.
  *
  * @return The value, or nothing if @p text is not entirely a finite or infinite number, like QString::toDouble().
  */
-BASESHARED_EXPORT std::optional<double> toDouble(std::string_view text);
+BASESHARED_EXPORT std::optional<double> to_double(std::string_view text);
 
 /**
  * @param[in] text   A decimal integer with optional surrounding whitespace.
  *
  * @return The value, or nothing if @p text is not entirely an int in range, like QString::toInt().
  */
-BASESHARED_EXPORT std::optional<int> toInt(std::string_view text);
+BASESHARED_EXPORT std::optional<int> to_int(std::string_view text);
 
 /**
  * @param[in] utf8   A path in UTF-8.
  *
  * @return The path; unlike std::filesystem::path(std::string), correct for non-ASCII names on Windows too.
  */
-BASESHARED_EXPORT std::filesystem::path pathFromUtf8(std::string_view utf8);
+BASESHARED_EXPORT std::filesystem::path path_from_utf8(std::string_view utf8);
 
 /**
  * @param[in] path   Any path.
  *
  * @return @p path in UTF-8 on every platform.
  */
-BASESHARED_EXPORT std::string utf8FromPath(const std::filesystem::path& path);
+BASESHARED_EXPORT std::string utf8_from_path(const std::filesystem::path& path);
 
 /**
  * @param[in] latin1   ISO 8859-1 text, one byte per character.

@@ -16,6 +16,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include "evokedsetmodel.h"
 #include <memory>
 
@@ -439,7 +440,7 @@ bool EvokedSetModel::getIsChannelBad(qint32 row) const
 
     if (row < m_qMapIdxRowSelection.size()) {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        bIsBad = mne::contains(m_pEvokedSet->info.bads, m_pEvokedSet->info.chs[chRow].ch_name);
+        bIsBad = std::ranges::contains(m_pEvokedSet->info.bads, m_pEvokedSet->info.chs[chRow].ch_name);
     }
 
     return bIsBad;

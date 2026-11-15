@@ -24,19 +24,19 @@
 
 const char* DATALOADERPLUGIN::buildDateTime()
 {
-    return mne::dateTimeNow();
+    return mne::compile_date_time();
 }
 
 //=============================================================================================================
 
 const char* DATALOADERPLUGIN::buildHash()
 {
-    return mne::gitHash();
+    return mne::git_hash();
 }
 
 //=============================================================================================================
 
 const char* DATALOADERPLUGIN::buildHashLong()
 {
-    return mne::gitHashLong();
+    return mne::git_hash_long();
 }

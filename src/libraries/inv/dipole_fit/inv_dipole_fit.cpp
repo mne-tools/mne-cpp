@@ -59,7 +59,7 @@ InvEcdSet InvDipoleFit::calculateFit() const
     mne::Log::info("---- Setting up...\n");
     std::unique_ptr<FwdEegSphereModel> eeg_model;
     if (settings->include_eeg) {
-        eeg_model = FwdEegSphereModel::setup_eeg_sphere_model(mne::pathFromUtf8(settings->eeg_model_file), settings->eeg_model_name, settings->eeg_sphere_rad);
+        eeg_model = FwdEegSphereModel::setup_eeg_sphere_model(mne::path_from_utf8(settings->eeg_model_file), settings->eeg_model_name, settings->eeg_sphere_rad);
         if (!eeg_model)
             return set;
     }
@@ -96,7 +96,7 @@ InvEcdSet InvDipoleFit::calculateFit() const
 
     if (settings->is_raw) {
         mne::Log::info("\n---- Opening a raw data file...\n");
-        raw.reset(MNERawData::open_file(mne::pathFromUtf8(settings->measname), true, false, settings->filter));
+        raw.reset(MNERawData::open_file(mne::path_from_utf8(settings->measname), true, false, settings->filter));
         if (!raw)
             return set;
         /*
@@ -126,7 +126,7 @@ InvEcdSet InvDipoleFit::calculateFit() const
         mne::Log::info("\tOpened raw data file {} : {} MEG and {} EEG", settings->measname, fit_data->nmeg, fit_data->neeg);
     } else {
         mne::Log::info("\n---- Reading data...\n");
-        data = MNEMeasData::mne_read_meas_data(mne::pathFromUtf8(settings->measname),
+        data = MNEMeasData::mne_read_meas_data(mne::path_from_utf8(settings->measname),
                                                settings->setno,
                                                nullptr,
                                                nullptr,
@@ -157,8 +157,8 @@ InvEcdSet InvDipoleFit::calculateFit() const
      * Proceed to computing the fits
      */
     mne::Log::info("\n---- Computing the forward solution for the guesses...\n");
-    auto guess = std::make_unique<InvGuessData>(mne::pathFromUtf8(settings->guessname),
-                                                mne::pathFromUtf8(settings->guess_surfname),
+    auto guess = std::make_unique<InvGuessData>(mne::path_from_utf8(settings->guessname),
+                                                mne::path_from_utf8(settings->guess_surfname),
                                                 settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data.get(), settings->guess_rad);
     if (guess->nguess == 0) {
         mne::Log::critical("Could not create the initial guesses.");

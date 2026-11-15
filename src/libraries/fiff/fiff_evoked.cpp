@@ -173,7 +173,7 @@ Expected<FiffEvokedFile> FiffEvokedFile::open(const std::filesystem::path& path)
     if (!opened) {
         return std::unexpected(opened.error());
     }
-    FiffEvokedFile file(std::move(*opened), utf8FromPath(path));
+    FiffEvokedFile file(std::move(*opened), utf8_from_path(path));
     FiffStream& stream = file.m_stream;
     Log::info("Reading {} ...\n", file.m_file);
 

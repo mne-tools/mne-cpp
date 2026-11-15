@@ -111,9 +111,9 @@ mne::FiffDigPointSet BidsElectrode::to_fiff_dig_points(
 
     for (const BidsElectrode& elec : electrodes) {
         // Skip electrodes with "n/a" coordinates
-        const std::optional<double> x = mne::toDouble(elec.x);
-        const std::optional<double> y = mne::toDouble(elec.y);
-        const std::optional<double> z = mne::toDouble(elec.z);
+        const std::optional<double> x = mne::to_double(elec.x);
+        const std::optional<double> y = mne::to_double(elec.y);
+        const std::optional<double> z = mne::to_double(elec.z);
         if (!x || !y || !z) {
             continue;
         }

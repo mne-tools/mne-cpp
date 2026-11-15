@@ -56,12 +56,12 @@ namespace
 
 QString qpath(const std::filesystem::path& path)
 {
-    return QString::fromStdString(mne::utf8FromPath(path));
+    return QString::fromStdString(mne::utf8_from_path(path));
 }
 
 std::filesystem::path stdpath(const QString& path)
 {
-    return mne::pathFromUtf8(path.toStdString());
+    return mne::path_from_utf8(path.toStdString());
 }
 
 mne::JsonObject readJsonObject(const std::filesystem::path& path)
@@ -166,7 +166,7 @@ void TestBids::initTestCase()
 {
     // Verify fixture data exists
     QVERIFY2(std::filesystem::is_directory(bidsRoot()),
-             qPrintable(QString::fromStdString("BIDS test fixture directory not found: " + mne::utf8FromPath(bidsRoot()))));
+             qPrintable(QString::fromStdString("BIDS test fixture directory not found: " + mne::utf8_from_path(bidsRoot()))));
     QVERIFY(std::filesystem::exists(bidsRoot() / "dataset_description.json"));
 }
 
@@ -191,7 +191,7 @@ void TestBids::testPathConstruction()
 
     // filePath should exist on disk
     QVERIFY2(path.exists(),
-             qPrintable(QString::fromStdString("Expected file not found: " + mne::utf8FromPath(path.file_path()))));
+             qPrintable(QString::fromStdString("Expected file not found: " + mne::utf8_from_path(path.file_path()))));
 }
 
 void TestBids::testPathSidecarDerivation()
@@ -288,7 +288,7 @@ void TestBids::testElectrodesReadTsv()
     QVERIFY(electrodes[0].x != "n/a");
 
     // Check a known position
-    float x = static_cast<float>(*mne::toDouble(electrodes[0].x));
+    float x = static_cast<float>(*mne::to_double(electrodes[0].x));
     QVERIFY(std::abs(x - (-0.0254f)) < 0.001f);
 
     // As digitizer points: n/a positions are skipped; without a transform the frame is unknown,
@@ -455,7 +455,7 @@ void TestBids::testReadBrainVision()
     QVERIFY(std::abs(data.raw.info.sfreq - 1000.0f) < 1.0f);
 
     // Bad channels: P4 marked bad in channels.tsv
-    QVERIFY(mne::contains(data.raw.info.bads, "P4"));
+    QVERIFY(std::ranges::contains(data.raw.info.bads, "P4"));
     QCOMPARE(data.raw.info.bads.size(), 1);
 
     // mne.io.read_raw_brainvision: meas_date 2013-11-13 16:14:03.794232 UTC from the New Segment marker
@@ -515,7 +515,7 @@ void TestBids::testReadEdf()
     QVERIFY(std::abs(data.raw.info.sfreq - 128.0f) < 1.0f);
 
     // Bad channels: EEG O1 marked bad in channels.tsv (EDF uses full label)
-    QVERIFY(mne::contains(data.raw.info.bads, "EEG O1"));
+    QVERIFY(std::ranges::contains(data.raw.info.bads, "EEG O1"));
 
     // As mne_bids.read_raw_bids: 25 channels, 128 Hz, bads ['EEG O1'], annotations start, stimulus, response
     QCOMPARE(data.events.size(), std::size_t{3});
@@ -582,10 +582,10 @@ void TestBids::testReadEdf()
     EDFReader reduced;
     QVERIFY(reduced.open(dataPath() / "EEG/test_reduced.edf"));
     const mne::FiffInfo reducedInfo = reduced.info();
-    const int a4 = mne::indexOf(reducedInfo.ch_names, "A4");
-    const int status = mne::indexOf(reducedInfo.ch_names, "Status");
+    const int a4 = mne::index_of(reducedInfo.ch_names, "A4");
+    const int status = mne::index_of(reducedInfo.ch_names, "Status");
     QVERIFY(a4 < 0 && status >= 0); // A4 is sampled below the highest rate
-    const int a10 = mne::indexOf(reducedInfo.ch_names, "A10");
+    const int a10 = mne::index_of(reducedInfo.ch_names, "A10");
     QCOMPARE(reducedInfo.chs[a10].kind, FIFFV_EEG_CH);
     QCOMPARE(reducedInfo.chs[a10].unit, FIFF_UNIT_V);
     QCOMPARE(reducedInfo.chs[status].kind, FIFFV_STIM_CH);
@@ -684,7 +684,7 @@ void TestBids::testWriteRoundTrip()
     for (const BidsElectrode& before : original.electrodes) {
         auto after = std::find_if(readBack.electrodes.cbegin(), readBack.electrodes.cend(),
                                   [&](const BidsElectrode& e) { return e.name == before.name; });
-        QVERIFY2(after != readBack.electrodes.cend() && std::abs(*mne::toDouble(after->z) - *mne::toDouble(before.z)) < 1e-6, before.name.c_str());
+        QVERIFY2(after != readBack.electrodes.cend() && std::abs(*mne::to_double(after->z) - *mne::to_double(before.z)) < 1e-6, before.name.c_str());
     }
 
     // Without overwrite, existing sidecars are left alone and the write is refused
@@ -719,7 +719,7 @@ void TestBids::testWriteRoundTrip()
     QCOMPARE(edfBack.events.size(), std::size_t{3});
     QCOMPARE(edfBack.events[1].trialType, std::string("visual"));
     QCOMPARE(edfBack.events[2].trialType, std::string("response"));
-    QVERIFY(mne::contains(edfBack.raw.info.bads, "EEG O1"));
+    QVERIFY(std::ranges::contains(edfBack.raw.info.bads, "EEG O1"));
 
     // channels.tsv units other than volts, as mne_bids.read_raw_bids: known ones set the unit, unknown ones keep it
     QFile channelsTsv(qpath(edfDst.channels_tsv_path().file_path()));
@@ -1281,11 +1281,11 @@ void TestBids::testPathEquality()
 
 void TestBids::testBidsGlobalBuildInfo()
 {
-    const char* dt = mne::buildDateTime();
+    const char* dt = mne::build_date_time();
     QVERIFY(dt != nullptr);
-    const char* h = mne::buildHash();
+    const char* h = mne::build_hash();
     QVERIFY(h != nullptr);
-    const char* hl = mne::buildHashLong();
+    const char* hl = mne::build_hash_long();
     QVERIFY(hl != nullptr);
 }
 

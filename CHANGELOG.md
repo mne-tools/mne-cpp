@@ -28,6 +28,20 @@ table.
 | `FIFFLIB::buildDateTime()`, `buildHash()`, `buildHashLong()` and the same three in every other library | `mne::buildDateTime()`, `buildHash()`, `buildHashLong()` from `base/base_global.h` only; all libraries are built from one commit |
 | `ACQLIB::buildDateTime()`, `buildHash()`, `buildHashLong()` | `mne::acq_build_date_time()`, `acq_build_hash()`, `acq_build_hash_long()`; `mne_acq` builds without `mne_base` |
 
+The base library's functions are snake_case like the standard library's:
+
+| Before | Now |
+|---|---|
+| `toInt`, `toDouble`, `toLower`, `indexOf`, `equalsIgnoreCase` | `to_int`, `to_double`, `to_lower`, `index_of`, `iequals` |
+| `pathFromUtf8`, `utf8FromPath` | `path_from_utf8`, `utf8_from_path` |
+| `contains(list, name)` | `std::ranges::contains(list, name)` (C++23, `<algorithm>`) |
+| `ByteStream::isOpen`, `atEnd`, `readBigEndian`, `writeBigEndian` | `is_open`, `at_end`, `read_big_endian`, `write_big_endian` |
+| `byteSwap`, `byteSwapInPlace`, `toBigEndian`, `fromBigEndian` | `byte_swap`, `byte_swap_in_place`, `to_big_endian`, `from_big_endian` |
+| `ThreadPool::parallelFor`, `parallelMap`, `threadCount` | `parallel_for`, `parallel_map`, `thread_count` |
+| `buildDateTime`, `buildHash`, `buildHashLong` | `build_date_time`, `build_hash`, `build_hash_long` |
+| `timeNowNow`, `dateToday`, `dateTimeNow`, `gitHash`, `gitHashLong` (`base/buildinfo.h`) | `compile_time`, `compile_date`, `compile_date_time`, `git_hash`, `git_hash_long` |
+| `IeegImplantation::indexOf` | `IeegImplantation::index_of` |
+
 The library interfaces use the C++ standard library instead of Qt for strings,
 paths, containers, smart pointers and logging. There are no compatibility
 aliases; replace the old spelling as below.

@@ -165,12 +165,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Helper function: apparently LSL does not have an '==' operator where one side is const, so this function compares the UIDs instead.
-     */
-    inline static bool contains(const QVector<mne::stream_info>& v, const mne::stream_info& s);
-
-    //=========================================================================================================
-    /**
      * Helper function: simple validity check for stream infos (sometimes the resolved stream infos are empty)
      */
     inline static bool isValid(const mne::stream_info& s);
@@ -217,16 +211,6 @@ inline mne::scan::AbstractPlugin::PluginType LSLAdapter::getType() const
 inline QString LSLAdapter::getName() const
 {
     return "LSL";
-}
-
-//************************************************************************************************************
-
-inline bool LSLAdapter::contains(const QVector<mne::stream_info>& v, const mne::stream_info& s)
-{
-    bool result = false;
-    for (const auto& s2 : v)
-        result = result | (s2.uid() == s.uid());
-    return result;
 }
 
 //************************************************************************************************************

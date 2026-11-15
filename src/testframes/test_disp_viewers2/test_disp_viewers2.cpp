@@ -19,6 +19,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <disp/viewers/abstractview.h>
 #include <base/string_utils.h>
 #include <disp/viewers/hpisettingsview.h>
@@ -2004,12 +2005,12 @@ void TestDispViewers2::rtFiffRawViewModel_dataFlow()
     QCOMPARE(model.getIdxSelMap().size(), 4);
 
     model.markChBad(model.index(0, 0), true);
-    QVERIFY(mne::contains(info->bads, "MEG 0111"));
+    QVERIFY(std::ranges::contains(info->bads, "MEG 0111"));
     model.markChBad(model.index(0, 0), false);
-    QVERIFY(!mne::contains(info->bads, "MEG 0111"));
+    QVERIFY(!std::ranges::contains(info->bads, "MEG 0111"));
     model.markChBad({model.index(0, 0), model.index(2, 0)}, true);
-    QVERIFY(mne::contains(info->bads, "MEG 0111"));
-    QVERIFY(mne::contains(info->bads, "MEG 0113"));
+    QVERIFY(std::ranges::contains(info->bads, "MEG 0111"));
+    QVERIFY(std::ranges::contains(info->bads, "MEG 0113"));
 
     QMap<double, QColor> triggerColors;
     triggerColors.insert(3.0, Qt::red);
@@ -3714,9 +3715,9 @@ void TestDispViewers2::rtFiffRawView_paintsHidesRowsAndAddsEvents()
     QSignalSpy markSpy(&view, &RtFiffRawView::channelMarkingChanged);
     table->selectRow(2);
     contextAction(table->visualRect(model->index(2, 1)).center(), QStringLiteral("Mark as bad"));
-    QVERIFY(mne::contains(info->bads, "MEG 0113"));
+    QVERIFY(std::ranges::contains(info->bads, "MEG 0113"));
     contextAction(table->visualRect(model->index(2, 1)).center(), QStringLiteral("Mark as good"));
-    QVERIFY(!mne::contains(info->bads, "MEG 0113"));
+    QVERIFY(!std::ranges::contains(info->bads, "MEG 0113"));
     QCOMPARE(markSpy.size(), 2);
 
     // Only show / hide / reset the selected rows

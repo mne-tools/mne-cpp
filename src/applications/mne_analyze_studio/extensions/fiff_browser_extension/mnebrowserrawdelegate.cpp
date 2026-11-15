@@ -12,6 +12,7 @@
  * @brief    Implements the waveform delegate for the FIFF browser extension widget.
  */
 
+#include <algorithm>
 #include "mnebrowserrawdelegate.h"
 #include <base/string_utils.h>
 
@@ -59,7 +60,7 @@ void MneBrowseRawDelegate::paint(QPainter* painter,
 
     if (index.column() == 0) {
         const auto* rawModelLabel = qobject_cast<const MNEBROWSE::RawModel*>(index.model());
-        const bool isBad = rawModelLabel && rawModelLabel->fiffInfo() && mne::contains(rawModelLabel->fiffInfo()->bads, rawModelLabel->channelInfoList().at(index.row()).ch_name);
+        const bool isBad = rawModelLabel && rawModelLabel->fiffInfo() && std::ranges::contains(rawModelLabel->fiffInfo()->bads, rawModelLabel->channelInfoList().at(index.row()).ch_name);
         QColor labelColor = isBad ? QColor(0xCC, 0x44, 0x44) : colorForChannel(rawModelLabel, index.row());
         if (isBad) {
             labelColor.setAlphaF(0.7f);
@@ -111,7 +112,7 @@ void MneBrowseRawDelegate::paint(QPainter* painter,
     QPainterPath plotPath(QPointF(option.rect.left(), option.rect.center().y()));
     createPlotPath(index, option, plotPath, listPairs);
     const auto* rawModel = qobject_cast<const MNEBROWSE::RawModel*>(index.model());
-    const bool traceIsBad = rawModel && rawModel->fiffInfo() && mne::contains(rawModel->fiffInfo()->bads, rawModel->channelInfoList().at(index.row()).ch_name);
+    const bool traceIsBad = rawModel && rawModel->fiffInfo() && std::ranges::contains(rawModel->fiffInfo()->bads, rawModel->channelInfoList().at(index.row()).ch_name);
     QColor traceColor = traceIsBad ? QColor(0xCC, 0x44, 0x44) : colorForChannel(rawModel, index.row());
     if (traceIsBad) {
         traceColor.setAlphaF(0.45f);

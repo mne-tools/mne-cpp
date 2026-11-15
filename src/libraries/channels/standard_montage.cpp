@@ -123,7 +123,7 @@ StringList StandardMontage::electrode_names(System system)
 std::optional<Vector3d> StandardMontage::find_electrode(std::string_view name)
 {
     for (const ElectrodePosition& electrode : standard1005Table()) {
-        if (equalsIgnoreCase(electrode.name, name))
+        if (iequals(electrode.name, name))
             return electrode.pos;
     }
     return std::nullopt;

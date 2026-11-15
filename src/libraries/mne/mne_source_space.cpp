@@ -242,11 +242,6 @@ std::unique_ptr<MNEVolGeom> read_vol_geom(std::istream& fp)
     auto vg = std::make_unique<MNEVolGeom>();
 
     // Every line has the shape "<key> = <value>..."; unparsable numbers keep their defaults.
-    const auto toInt = [](std::string_view word) {
-        int value = 0;
-        std::from_chars(word.data(), word.data() + word.size(), value);
-        return value;
-    };
     const auto readFloats = [](const std::vector<std::string_view>& tok, float* dest, int n) {
         for (int i = 0; i < n; ++i) {
             const std::size_t k = 2 + static_cast<std::size_t>(i);
@@ -283,7 +278,7 @@ std::unique_ptr<MNEVolGeom> read_vol_geom(std::istream& fp)
         const std::string_view param = tok.front();
         if (param == "valid") {
             if (tok.size() > 2)
-                vg->valid = toInt(tok[2]);
+                vg->valid = mne::to_int(tok[2]).value_or(vg->valid);
             vgRead = 1;
             counter++;
         } else if (param == "filename") {
@@ -292,9 +287,9 @@ std::unique_ptr<MNEVolGeom> read_vol_geom(std::istream& fp)
             counter++;
         } else if (param == "volume") {
             if (tok.size() > 4) {
-                vg->width = toInt(tok[2]);
-                vg->height = toInt(tok[3]);
-                vg->depth = toInt(tok[4]);
+                vg->width = mne::to_int(tok[2]).value_or(vg->width);
+                vg->height = mne::to_int(tok[3]).value_or(vg->height);
+                vg->depth = mne::to_int(tok[4]).value_or(vg->depth);
             }
             counter++;
         } else if (param == "voxelsize") {
@@ -503,12 +498,12 @@ int read_curvature_file(const std::filesystem::path& fname,
     float fval = 0.0f;
 
     if (!fp) {
-        mne::Log::critical("{}", mne::utf8FromPath(fname));
+        mne::Log::critical("{}", mne::utf8_from_path(fname));
         curv.resize(0);
         return FAIL;
     }
     if (read_int3(fp, magic) != 0) {
-        mne::Log::critical("Bad magic in {}", mne::utf8FromPath(fname));
+        mne::Log::critical("Bad magic in {}", mne::utf8_from_path(fname));
         curv.resize(0);
         return FAIL;
     }
@@ -620,17 +615,17 @@ int read_triangle_file(const std::filesystem::path& fname,
     int which;
 
     if (!fp) {
-        mne::Log::critical("{}", mne::utf8FromPath(fname));
+        mne::Log::critical("{}", mne::utf8_from_path(fname));
         return FAIL;
     }
     if (read_int3(fp, magic) != 0) {
-        mne::Log::critical("Bad magic in {}", mne::utf8FromPath(fname));
+        mne::Log::critical("Bad magic in {}", mne::utf8_from_path(fname));
         return FAIL;
     }
     if (magic != TRIANGLE_FILE_MAGIC_NUMBER &&
         magic != QUAD_FILE_MAGIC_NUMBER &&
         magic != NEW_QUAD_FILE_MAGIC_NUMBER) {
-        mne::Log::critical("Bad magic in {}", mne::utf8FromPath(fname));
+        mne::Log::critical("Bad magic in {}", mne::utf8_from_path(fname));
         return FAIL;
     }
     if (magic == TRIANGLE_FILE_MAGIC_NUMBER) {
@@ -2069,7 +2064,7 @@ int MNESourceSpace::restrict_sources_to_labels(std::vector<std::unique_ptr<MNESo
         /*
          * Which hemi?
          */
-        const std::string labelName = mne::utf8FromPath(labels[k]);
+        const std::string labelName = mne::utf8_from_path(labels[k]);
         if (labelName.find(LH_LABEL_TAG) != std::string::npos) { //strstr(labels[k],LH_LABEL_TAG) != NULL) {
             sp = lh;
             inuse = &lh_inuse;
@@ -2077,7 +2072,7 @@ int MNESourceSpace::restrict_sources_to_labels(std::vector<std::unique_ptr<MNESo
             sp = rh;
             inuse = &rh_inuse;
         } else {
-            mne::Log::warning("\tWarning: cannot assign label file {} to a hemisphere.\n", mne::utf8FromPath(labels[k]));
+            mne::Log::warning("\tWarning: cannot assign label file {} to a hemisphere.\n", mne::utf8_from_path(labels[k]));
             continue;
         }
         if (sp) {
@@ -2089,9 +2084,9 @@ int MNESourceSpace::restrict_sources_to_labels(std::vector<std::unique_ptr<MNESo
                 if (vertex >= 0 && vertex < sp->np)
                     (*inuse)[vertex] = sp->inuse[vertex];
                 else
-                    mne::Log::warning("vertex number out of range in {} ({} vs {})\n", mne::utf8FromPath(labels[k]), vertex, sp->np);
+                    mne::Log::warning("vertex number out of range in {} ({} vs {})\n", mne::utf8_from_path(labels[k]), vertex, sp->np);
             }
-            mne::Log::info("Processed label file {}\n", mne::utf8FromPath(labels[k]));
+            mne::Log::info("Processed label file {}\n", mne::utf8_from_path(labels[k]));
         }
     }
     if (lh)
@@ -2107,11 +2102,11 @@ std::optional<Eigen::VectorXi> MNESourceSpace::read_label(const std::filesystem:
 {
     std::ifstream in(label);
     if (!in) {
-        mne::Log::critical("Cannot open label file {}", mne::utf8FromPath(label));
+        mne::Log::critical("Cannot open label file {}", mne::utf8_from_path(label));
         return std::nullopt;
     }
     if (in.get() != '#') {
-        mne::Log::critical("Label file {} does not start correctly.", mne::utf8FromPath(label));
+        mne::Log::critical("Label file {} does not start correctly.", mne::utf8_from_path(label));
         return std::nullopt;
     }
     in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -2380,10 +2375,10 @@ std::vector<Eigen::VectorXi> MNESourceSpace::gradeToVertices(const std::filesyst
     std::vector<Eigen::VectorXi> vertices;
     const int nIco = 10 * (1 << (2 * grade)) + 2;
     for (const char* hemi : {"lh", "rh"}) {
-        const std::filesystem::path path = subjectsDir / mne::pathFromUtf8(subject) / "surf" / (std::string(hemi) + ".sphere.reg");
+        const std::filesystem::path path = subjectsDir / mne::path_from_utf8(subject) / "surf" / (std::string(hemi) + ".sphere.reg");
         const std::unique_ptr<MNESourceSpace> sphere = load_surface_geom(path, {}, false, false);
         if (!sphere) {
-            mne::Log::warning("[MNESourceSpace::gradeToVertices] Cannot read {}", mne::utf8FromPath(path));
+            mne::Log::warning("[MNESourceSpace::gradeToVertices] Cannot read {}", mne::utf8_from_path(path));
             return {};
         }
         MNEHemisphere h;

@@ -80,7 +80,7 @@ template<typename T, typename Out, typename Convert>
 bool readBigEndianInto(mne::ByteStream& stream, std::vector<Out>& out, std::size_t count, Convert convert)
 {
     std::vector<T> values(count);
-    if (!stream.readBigEndian(values.data(), count))
+    if (!stream.read_big_endian(values.data(), count))
         return false;
     out.resize(count);
     std::transform(values.begin(), values.end(), out.begin(), convert);
@@ -102,8 +102,8 @@ bool MriMghIO::read(const std::string& mgzFile,
     volData.fileName = mgzFile;
 
     // Step 1: Get raw (decompressed) bytes
-    const bool isCompressed = mne::toLower(mgzFile).ends_with(".mgz");
-    const auto fileData = mne::read_file_bytes(mne::pathFromUtf8(mgzFile), isCompressed ? mne::Compression::Gzip : mne::Compression::None);
+    const bool isCompressed = mne::to_lower(mgzFile).ends_with(".mgz");
+    const auto fileData = mne::read_file_bytes(mne::path_from_utf8(mgzFile), isCompressed ? mne::Compression::Gzip : mne::Compression::None);
     if (!fileData) {
         Log::critical("MriMghIO::read - {}", fileData.error().what());
         return false;
@@ -172,7 +172,7 @@ bool MriMghIO::parseHeader(const std::vector<std::byte>& data, MriVolData& volDa
     mne::MemoryByteStream stream({data.begin(), data.begin() + MRI_MGH_DATA_OFFSET});
 
     std::int32_t header[7] = {};
-    stream.readBigEndian(header, 7);
+    stream.read_big_endian(header, 7);
     const auto [version, width, height, depth, nframes, type, dof] = header;
 
     if (version != MRI_MGH_VERSION) {
@@ -193,13 +193,13 @@ bool MriMghIO::parseHeader(const std::vector<std::byte>& data, MriVolData& volDa
     }
 
     std::int16_t goodRASflag = 0;
-    stream.readBigEndian(goodRASflag);
+    stream.read_big_endian(goodRASflag);
     volData.rasGood = (goodRASflag > 0);
 
     if (goodRASflag > 0) {
         // Voxel sizes, then the direction cosines (x, y, z columns) and the centre RAS
         float geometry[15] = {};
-        stream.readBigEndian(geometry, 15);
+        stream.read_big_endian(geometry, 15);
         volData.xsize = geometry[0];
         volData.ysize = geometry[1];
         volData.zsize = geometry[2];
@@ -331,7 +331,7 @@ bool MriMghIO::parseFooter(const std::vector<std::byte>& data,
 
     mne::MemoryByteStream stream({data.begin() + std::ptrdiff_t(footerPos), data.end()});
     float scan[5] = {};
-    stream.readBigEndian(scan, 5);
+    stream.read_big_endian(scan, 5);
     volData.TR = scan[0];
     volData.flipAngle = scan[1];
     volData.TE = scan[2];
@@ -339,19 +339,19 @@ bool MriMghIO::parseFooter(const std::vector<std::byte>& data,
     volData.FoV = scan[4];
 
     // Parse tags
-    while (!stream.atEnd()) {
+    while (!stream.at_end()) {
         std::int32_t tagType = 0;
-        if (!stream.readBigEndian(tagType))
+        if (!stream.read_big_endian(tagType))
             break;
 
         std::int64_t tagLen = 0;
         // TAG_OLD_SURF_GEOM (20) and TAG_OLD_MGH_XFORM (30) have a 4-byte length, newer tags an 8-byte one
         if (tagType == MGH_TAG_OLD_SURF_GEOM || tagType == MGH_TAG_OLD_MGH_XFORM) {
             std::int32_t len32 = 0;
-            if (!stream.readBigEndian(len32))
+            if (!stream.read_big_endian(len32))
                 break;
             tagLen = len32;
-        } else if (!stream.readBigEndian(tagLen)) {
+        } else if (!stream.read_big_endian(tagLen)) {
             break;
         }
 
@@ -372,12 +372,12 @@ bool MriMghIO::parseFooter(const std::vector<std::byte>& data,
             }
 
             // Resolve relative paths using subject MRI directory
-            if (!mne::pathFromUtf8(xfmPath).is_absolute() && !subjectMriDir.empty()) {
-                xfmPath = mne::utf8FromPath(mne::pathFromUtf8(subjectMriDir) / "transforms" / mne::pathFromUtf8(xfmPath));
+            if (!mne::path_from_utf8(xfmPath).is_absolute() && !subjectMriDir.empty()) {
+                xfmPath = mne::utf8_from_path(mne::path_from_utf8(subjectMriDir) / "transforms" / mne::path_from_utf8(xfmPath));
             }
 
             FiffCoordTransSet talairach;
-            if (talairach.addTalairach(mne::pathFromUtf8(xfmPath))) {
+            if (talairach.addTalairach(mne::path_from_utf8(xfmPath))) {
                 additionalTrans.push_back(talairach.RAS_MNI_tal_t);
                 additionalTrans.push_back(talairach.MNI_tal_tal_gtz_t);
                 additionalTrans.push_back(talairach.MNI_tal_tal_ltz_t);

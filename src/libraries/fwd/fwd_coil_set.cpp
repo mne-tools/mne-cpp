@@ -221,7 +221,7 @@ std::unique_ptr<FwdCoilSet> FwdCoilSet::read_coil_defs(const std::filesystem::pa
 {
     std::ifstream file(name);
     if (!file) {
-        mne::Log::warning("FwdCoilSet::read_coil_defs - Cannot open {}", mne::utf8FromPath(name));
+        mne::Log::warning("FwdCoilSet::read_coil_defs - Cannot open {}", mne::utf8_from_path(name));
         return nullptr;
     }
 

@@ -75,7 +75,7 @@ PythonRunnerResult MLTrainer::run(const std::filesystem::path& scriptPath, const
         return result;
     }
 
-    Log::debug("[MLTrainer] Running training script: {}", utf8FromPath(scriptPath));
+    Log::debug("[MLTrainer] Running training script: {}", utf8_from_path(scriptPath));
 
     // If a venv is configured, use run_in_venv (creates venv + installs deps automatically)
     if (!m_runner.config().venv_dir.empty()) {

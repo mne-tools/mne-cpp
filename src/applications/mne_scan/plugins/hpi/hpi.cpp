@@ -381,7 +381,7 @@ void Hpi::updateProjections()
             infoTemp.make_projector(matProjectors);
             //set columns of matrix to zero depending on bad channels indexes
             for (qint32 j = 0; j < static_cast<int>(infoTemp.bads.size()); ++j) {
-                matProjectors.col(mne::indexOf(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
+                matProjectors.col(mne::index_of(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
             }
         }
 
@@ -599,7 +599,7 @@ void Hpi::run()
                     m_bDoSingleHpi = false;
                     fitResult = HpiFitResult();
                 }
-                fitResult.digitizerFile = mne::pathFromUtf8(m_sFilePathDigitzers.toStdString());
+                fitResult.digitizerFile = mne::path_from_utf8(m_sFilePathDigitzers.toStdString());
                 m_mutex.unlock();
 
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols() - iDataIndexCounter) =

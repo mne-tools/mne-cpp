@@ -79,7 +79,7 @@ FiffCov::FiffCov()
 , nfree(-1)
 {
     qRegisterMetaType<std::shared_ptr<mne::FiffCov>>();
-    qRegisterMetaType<mne::FiffCov>("mne::FiffCov");
+    qRegisterMetaType<mne::FiffCov>();
 }
 
 //=============================================================================================================
@@ -99,7 +99,7 @@ mne::Expected<FiffCov> FiffCov::read(const std::filesystem::path& path)
     }
     FiffCov cov;
     if (!stream->read_cov(stream->dirtree(), FIFFV_MNE_NOISE_COV, cov)) {
-        return fail(ErrorCode::NotFound, "No noise covariance in {}", mne::utf8FromPath(path));
+        return fail(ErrorCode::NotFound, "No noise covariance in {}", mne::utf8_from_path(path));
     }
     return cov;
 }
@@ -548,7 +548,7 @@ mne::Expected<void> FiffCov::save(const std::filesystem::path& path) const
 {
     auto pStream = path.empty() ? nullptr : FiffStream::start_file(path);
     if (!pStream) {
-        return fail(ErrorCode::Io, "Cannot write the covariance to '{}'", mne::utf8FromPath(path));
+        return fail(ErrorCode::Io, "Cannot write the covariance to '{}'", mne::utf8_from_path(path));
     }
 
     pStream->start_block(FIFFB_MEAS);

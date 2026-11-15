@@ -1399,13 +1399,13 @@ MNERawData* MNERawData::open_file_comp(const std::filesystem::path& name,
     data->badlist = data->stream->read_bad_channels(data->stream->dirtree());
     for (const auto& bad_name : data->badlist) {
         for (k = 0; k < data->info->nchan; k++) {
-            if (mne::equalsIgnoreCase(data->info->chInfo[k].ch_name, bad_name)) {
+            if (mne::iequals(data->info->chInfo[k].ch_name, bad_name)) {
                 data->bad[k] = 1;
                 break;
             }
         }
     }
-    mne::Log::info("{} bad channels read from {}{}{}", data->badlist.size(), mne::utf8FromPath(name),
+    mne::Log::info("{} bad channels read from {}{}{}", data->badlist.size(), mne::utf8_from_path(name),
                    data->badlist.empty() ? "" : ": ", mne::join(data->badlist, " "));
     /*
        * Initialize the raw data buffers
@@ -1425,7 +1425,7 @@ MNERawData* MNERawData::open_file_comp(const std::filesystem::path& name,
         data->first_sample_val = first.col(0);
         mne::Log::info("Initial dc offsets determined\n");
     }
-    mne::Log::info("Raw data file {}:\n", mne::utf8FromPath(name));
+    mne::Log::info("Raw data file {}:\n", mne::utf8_from_path(name));
     mne::Log::info("\tnchan  = {}\n", data->info->nchan);
     mne::Log::info("\tnsamp  = {}\n", data->nsamp);
     mne::Log::info("\tsfreq  = {:<8.3f} Hz\n", data->info->sfreq);

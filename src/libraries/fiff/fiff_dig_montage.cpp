@@ -82,7 +82,7 @@ std::optional<std::vector<double>> numbers(std::string_view text)
 {
     std::vector<double> values;
     for (const std::string_view word : words(text)) {
-        const std::optional<double> value = mne::toDouble(word);
+        const std::optional<double> value = mne::to_double(word);
         if (!value)
             return std::nullopt;
         values.push_back(*value);
@@ -95,7 +95,7 @@ Expected<std::string> readText(const std::filesystem::path& path)
 {
     std::ifstream file(path, std::ios::binary);
     if (!file)
-        return fail(ErrorCode::Io, "cannot read {}", mne::utf8FromPath(path));
+        return fail(ErrorCode::Io, "cannot read {}", mne::utf8_from_path(path));
     return std::string(std::istreambuf_iterator<char>(file), {});
 }
 
@@ -108,7 +108,7 @@ std::vector<Vector3d> readIsotrakElp(const std::string& text)
         std::smatch match;
         if (!std::regex_search(line, match, coordinates))
             continue;
-        const std::optional<double> x = mne::toDouble(match.str(1)), y = mne::toDouble(match.str(2)), z = mne::toDouble(match.str(3));
+        const std::optional<double> x = mne::to_double(match.str(1)), y = mne::to_double(match.str(2)), z = mne::to_double(match.str(3));
         if (x && y && z)
             points.emplace_back(*x, *y, *z);
     }
@@ -120,7 +120,7 @@ std::vector<Vector3d> readIsotrakHsp(const std::string& text)
 {
     const mne::StringList lines = mne::split(text, '\n');
     const auto fiducials = std::ranges::find_if(lines, [](const std::string& line) {
-        return mne::toLower(line).find("position of fiducials") != std::string::npos;
+        return mne::to_lower(line).find("position of fiducials") != std::string::npos;
     });
     const std::size_t line = static_cast<std::size_t>(fiducials - lines.begin());
     std::vector<Vector3d> points;
@@ -216,7 +216,7 @@ FiffDigMontage makeDigMontage(Montage montage)
 
     std::vector<int> idents;
     for (const std::string& name : montage.chNames) {
-        const std::optional<int> ident = mne::toInt(std::string_view(name).substr(name.size() - std::min<std::size_t>(name.size(), 3)));
+        const std::optional<int> ident = mne::to_int(std::string_view(name).substr(name.size() - std::min<std::size_t>(name.size(), 3)));
         if (!ident) {
             idents.clear();
             break;
@@ -235,7 +235,7 @@ Expected<std::vector<XmlRecord>> readXmlRecords(const std::filesystem::path& pat
 {
     QFile file(QString::fromStdU16String(path.u16string()));
     if (!file.open(QIODevice::ReadOnly))
-        return fail(ErrorCode::Io, "cannot read {}", mne::utf8FromPath(path));
+        return fail(ErrorCode::Io, "cannot read {}", mne::utf8_from_path(path));
     QXmlStreamReader xml(&file);
     std::vector<XmlRecord> records;
     while (!xml.atEnd()) {
@@ -249,7 +249,7 @@ Expected<std::vector<XmlRecord>> readXmlRecords(const std::filesystem::path& pat
         records.push_back(std::move(record));
     }
     if (xml.hasError())
-        return fail(ErrorCode::Format, "{}: {}", mne::utf8FromPath(path), xml.errorString().toStdString());
+        return fail(ErrorCode::Format, "{}: {}", mne::utf8_from_path(path), xml.errorString().toStdString());
     return records;
 }
 
@@ -265,7 +265,7 @@ std::optional<Vector3d> recordPosition(const XmlRecord& record, const std::array
 {
     Vector3d r;
     for (int c = 0; c < 3; ++c) {
-        const std::optional<double> value = mne::toDouble(field(record, keys[static_cast<std::size_t>(c)]));
+        const std::optional<double> value = mne::to_double(field(record, keys[static_cast<std::size_t>(c)]));
         if (!value)
             return std::nullopt;
         r[c] = scale * *value;
@@ -283,7 +283,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_polhemus_isotrak(const std::filesy
                                                                std::span<const std::string> ch_names,
                                                                std::string_view unit)
 {
-    const std::string file = mne::utf8FromPath(path);
+    const std::string file = mne::utf8_from_path(path);
     const std::optional<double> scale = unitScale(unit);
     if (!scale)
         return fail(ErrorCode::Format, "unknown unit {} (use m, cm or mm)", unit);
@@ -322,7 +322,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_polhemus_isotrak(const std::filesy
 
 Expected<MatrixX3d> FiffDigMontage::read_polhemus_fastscan(const std::filesystem::path& path, std::string_view unit, bool require_header)
 {
-    const std::string file = mne::utf8FromPath(path);
+    const std::string file = mne::utf8_from_path(path);
     const std::optional<double> scale = unitScale(unit);
     if (!scale)
         return fail(ErrorCode::Format, "unknown unit {} (use m, cm or mm)", unit);
@@ -363,7 +363,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_captrak(const std::filesystem::pat
     for (const XmlRecord& electrode : *electrodes) {
         const std::optional<Vector3d> r = recordPosition(electrode, {"X", "Y", "Z"}, 1e-3);
         if (!r)
-            return fail(ErrorCode::Format, "electrode without a position in {}", mne::utf8FromPath(path));
+            return fail(ErrorCode::Format, "electrode without a position in {}", mne::utf8_from_path(path));
         const std::string_view name = field(electrode, "Name");
         if (name == "Nasion")
             montage.nasion = r;
@@ -375,7 +375,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_captrak(const std::filesystem::pat
             montage.addElectrode(std::string(name), *r);
     }
     if (!montage.nasion || !montage.lpa || !montage.rpa)
-        return fail(ErrorCode::Format, "{} lacks the Nasion, LPA or RPA electrode", mne::utf8FromPath(path));
+        return fail(ErrorCode::Format, "{} lacks the Nasion, LPA or RPA electrode", mne::utf8_from_path(path));
     return makeDigMontage(std::move(montage));
 }
 
@@ -388,12 +388,12 @@ Expected<FiffDigMontage> FiffDigMontage::read_egi(const std::filesystem::path& p
         return std::unexpected(sensors.error());
     Montage montage;
     for (const XmlRecord& sensor : *sensors) {
-        const std::optional<int> number = mne::toInt(field(sensor, "number"));
+        const std::optional<int> number = mne::to_int(field(sensor, "number"));
         const std::optional<Vector3d> r = recordPosition(sensor, {"x", "y", "z"}, 1e-2);
         if (!number || !r)
-            return fail(ErrorCode::Format, "sensor without a number or position in {}", mne::utf8FromPath(path));
+            return fail(ErrorCode::Format, "sensor without a number or position in {}", mne::utf8_from_path(path));
         const std::string_view name = field(sensor, "name");
-        switch (mne::toInt(field(sensor, "type")).value_or(-1)) {
+        switch (mne::to_int(field(sensor, "type")).value_or(-1)) {
             case 0: // EEG
                 montage.addElectrode(std::format("EEG {:03}", *number), *r);
                 break;
@@ -413,7 +413,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_egi(const std::filesystem::path& p
         }
     }
     if (!montage.nasion || !montage.lpa || !montage.rpa)
-        return fail(ErrorCode::Format, "{} lacks the nasion or a periauricular point", mne::utf8FromPath(path));
+        return fail(ErrorCode::Format, "{} lacks the nasion or a periauricular point", mne::utf8_from_path(path));
     return makeDigMontage(std::move(montage));
 }
 
@@ -424,7 +424,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_localite(const std::filesystem::pa
                                                        std::string_view lpa,
                                                        std::string_view rpa)
 {
-    const std::string file = mne::utf8FromPath(path);
+    const std::string file = mne::utf8_from_path(path);
     const Expected<std::string> text = readText(path);
     if (!text)
         return std::unexpected(text.error());
@@ -437,7 +437,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_localite(const std::filesystem::pa
         Vector3d r;
         bool ok = fields.size() == 5;
         for (int c = 0; ok && c < 3; ++c) {
-            const std::optional<double> value = mne::toDouble(fields[static_cast<std::size_t>(c) + 2]);
+            const std::optional<double> value = mne::to_double(fields[static_cast<std::size_t>(c) + 2]);
             ok = value.has_value();
             r[c] = value.value_or(0.0) / 1000.0;
         }
@@ -454,7 +454,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_localite(const std::filesystem::pa
 
 Expected<FiffDigMontage> FiffDigMontage::read_neuroscan_dat(const std::filesystem::path& path)
 {
-    const std::string file = mne::utf8FromPath(path);
+    const std::string file = mne::utf8_from_path(path);
     const Expected<std::string> text = readText(path);
     if (!text)
         return std::unexpected(text.error());
@@ -467,7 +467,7 @@ Expected<FiffDigMontage> FiffDigMontage::read_neuroscan_dat(const std::filesyste
         Vector3d r;
         bool ok = items.size() == 5;
         for (int c = 0; ok && c < 3; ++c) {
-            const std::optional<double> value = mne::toDouble(items[static_cast<std::size_t>(c) + 2]);
+            const std::optional<double> value = mne::to_double(items[static_cast<std::size_t>(c) + 2]);
             ok = value.has_value();
             r[c] = value.value_or(0.0);
         }

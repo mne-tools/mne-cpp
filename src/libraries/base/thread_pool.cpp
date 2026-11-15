@@ -37,7 +37,7 @@ using namespace mne;
 namespace
 {
 
-/** One parallelFor call; helpers that start after the range is used up find nothing left and return. */
+/** One parallel_for call; helpers that start after the range is used up find nothing left and return. */
 struct Loop
 {
     std::size_t end = 0;
@@ -95,7 +95,7 @@ ThreadPool::ThreadPool(std::size_t threads)
     }
     m_workers.reserve(threads);
     for (std::size_t i = 0; i < threads; ++i) {
-        m_workers.emplace_back([this] { workerLoop(); });
+        m_workers.emplace_back([this] { worker_loop(); });
     }
 }
 
@@ -134,7 +134,7 @@ void ThreadPool::enqueue(std::function<void()> task)
 
 //=============================================================================================================
 
-void ThreadPool::workerLoop()
+void ThreadPool::worker_loop()
 {
     for (;;) {
         std::function<void()> task;
@@ -153,7 +153,7 @@ void ThreadPool::workerLoop()
 
 //=============================================================================================================
 
-void ThreadPool::parallelFor(std::size_t begin, std::size_t end, const std::function<void(std::size_t)>& body)
+void ThreadPool::parallel_for(std::size_t begin, std::size_t end, const std::function<void(std::size_t)>& body)
 {
     if (end <= begin) {
         return;
@@ -162,7 +162,7 @@ void ThreadPool::parallelFor(std::size_t begin, std::size_t end, const std::func
     loop->end = end;
     loop->count = end - begin;
     loop->next = begin;
-    const std::size_t helpers = std::min(threadCount(), loop->count - 1);
+    const std::size_t helpers = std::min(thread_count(), loop->count - 1);
     loop->participants = helpers + 1;
 
     // The helpers share ownership of the loop and the body, so a helper that starts after return is harmless.

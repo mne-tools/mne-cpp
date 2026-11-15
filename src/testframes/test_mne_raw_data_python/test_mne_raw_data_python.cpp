@@ -140,7 +140,7 @@ MNEChSelection TestMneRawDataPython::makeSelection() const
     sel.pick_deriv = VectorXi::Constant(sel.nchan(), -1);
     for (int c = 0; c < sel.nchan(); ++c) {
         std::erase(sel.chspick_nospace[c], ' ');
-        sel.pick[c] = static_cast<int>(mne::indexOf(m_raw->ch_names, sel.chspick[c]));
+        sel.pick[c] = static_cast<int>(mne::index_of(m_raw->ch_names, sel.chspick[c]));
     }
     return sel;
 }
@@ -355,8 +355,8 @@ void TestMneRawDataPython::projectsSegment()
         const Eigen::MatrixXd u = op->proj_data.cast<double>();
         return Eigen::MatrixXd(Eigen::MatrixXd::Identity(u.cols(), u.cols()) - u.transpose() * u);
     };
-    const int eeg1 = mne::indexOf(m_raw->ch_names, "EEG 001");
-    const int meg2443 = mne::indexOf(m_raw->ch_names, "MEG 2443");
+    const int eeg1 = mne::index_of(m_raw->ch_names, "EEG 001");
+    const int meg2443 = mne::index_of(m_raw->ch_names, "MEG 2443");
     QVERIFY(eeg1 >= 0 && meg2443 >= 0);
     int nvec = 0;
     Eigen::MatrixXd p = projector({}, nvec);
@@ -495,8 +495,8 @@ void TestMneRawDataPython::picksDerivedChannel()
     filter.lowpass_width = filter.eog_lowpass_width = 5.0f;
     std::unique_ptr<MNERawData> raw(MNERawData::open_file(m_rawPath.toStdU16String(), false, false, filter));
     QVERIFY(raw);
-    const int a = static_cast<int>(mne::indexOf(raw->ch_names, "MEG 0111"));
-    const int b = static_cast<int>(mne::indexOf(raw->ch_names, "MEG 0121"));
+    const int a = static_cast<int>(mne::index_of(raw->ch_names, "MEG 0111"));
+    const int b = static_cast<int>(mne::index_of(raw->ch_names, "MEG 0121"));
     // A derivation set with one usable row and one whose input is not recorded.
     const MNEDerivSet set = MNEDerivSet::fromDefinitions({{"BIP", {{"MEG 0111", 1.0}, {"MEG 0121", -1.0}}}, {"MISSING", {{"MEG 0111", 1.0}, {"EEG 999", -1.0}}}});
     std::unique_ptr<MNEDeriv> deriv = set.match(raw->ch_names);

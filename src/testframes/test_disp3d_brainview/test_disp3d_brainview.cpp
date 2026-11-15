@@ -18,6 +18,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <disp3D/view/brainview.h>
 #include <base/string_utils.h>
 #include <disp3D/view/brainrenderer.h>
@@ -855,7 +856,7 @@ void TestDisp3dBrainView::rtSensorInterpolationMatWorker_basics()
     QVERIFY(!evoked.info.bads.empty());
     for (int k : pick) {
         QCOMPARE(evoked.info.chs[k].kind, FIFFV_EEG_CH);
-        QVERIFY(!mne::contains(evoked.info.bads, evoked.info.chs[k].ch_name));
+        QVERIFY(!std::ranges::contains(evoked.info.bads, evoked.info.chs[k].ch_name));
     }
 
     // Same mapping as FwdFieldMap with the origin fitted to the head shape (MNE-Python's make_field_map origin="auto")

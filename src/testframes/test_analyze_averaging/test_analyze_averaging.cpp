@@ -118,8 +118,8 @@ void TestAnalyzeAveraging::averagesEveryEventCodeLikePython()
         QCOMPARE(evoked.comment, QString::number(expected[k].code));
         QCOMPARE(evoked.nave, 6);
         QCOMPARE(evoked.data.cols(), Eigen::Index(121));
-        const int meg = static_cast<int>(mne::indexOf(evoked.info.ch_names, "MEG 1332"));
-        const int eeg = static_cast<int>(mne::indexOf(evoked.info.ch_names, "EEG 021"));
+        const int meg = static_cast<int>(mne::index_of(evoked.info.ch_names, "MEG 1332"));
+        const int eeg = static_cast<int>(mne::index_of(evoked.info.ch_names, "EEG 021"));
         QVERIFY(meg >= 0 && eeg >= 0);
         const auto near = [](double a, double b) {
             return std::abs(a - b) < 1e-5 * std::abs(b);

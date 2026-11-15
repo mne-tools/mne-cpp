@@ -198,8 +198,8 @@ std::filesystem::path FwdBemModel::fwd_bem_make_bem_sol_name(const std::filesyst
      * Make a standard BEM solution file name
      */
 {
-    const std::string file = mne::utf8FromPath(name);
-    return mne::pathFromUtf8(std::string(strip_from(strip_from(strip_from(file, ".fif"), "-sol"), "-bem")) + BEM_SOL_SUFFIX);
+    const std::string file = mne::utf8_from_path(name);
+    return mne::path_from_utf8(std::string(strip_from(strip_from(strip_from(file, ".fif"), "-sol"), "-bem")) + BEM_SOL_SUFFIX);
 }
 
 //=============================================================================================================
@@ -372,7 +372,7 @@ int FwdBemModel::fwd_bem_load_solution(const std::filesystem::path& name, int be
         std::vector<std::shared_ptr<FiffDirNode>> nodes = stream.dirtree()->dir_tree_find(FIFFB_BEM);
 
         if (nodes.size() == 0) {
-            mne::Log::warning("No BEM data in {}", mne::utf8FromPath(name));
+            mne::Log::warning("No BEM data in {}", mne::utf8_from_path(name));
             stream.close();
             return NOT_FOUND;
         }
@@ -470,7 +470,7 @@ std::unique_ptr<MNESourceSpace> FwdBemModel::make_guesses(MNESurface* guess_surf
         const std::filesystem::path bemFile = mne::resource_path("general/surf2bem/icos.fif");
         std::error_code error;
         if (!std::filesystem::exists(bemFile, error)) {
-            mne::Log::debug("{} does not exist.", mne::utf8FromPath(bemFile));
+            mne::Log::debug("{} does not exist.", mne::utf8_from_path(bemFile));
             return res;
         }
 
@@ -1086,7 +1086,7 @@ int FwdBemModel::fwd_bem_load_recompute_solution(const std::filesystem::path& na
         fwd_bem_free_solution();
         solres = fwd_bem_load_solution(name, bemMethod);
         if (solres == LOADED) {
-            mne::Log::info("\nLoaded {} BEM solution from {}", fwd_bem_explain_method(this->bem_method), mne::utf8FromPath(name));
+            mne::Log::info("\nLoaded {} BEM solution from {}", fwd_bem_explain_method(this->bem_method), mne::utf8_from_path(name));
             return OK;
         } else if (solres == FAIL)
             return FAIL;

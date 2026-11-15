@@ -110,8 +110,8 @@ std::unique_ptr<FwdEegSphereModelSet> FwdEegSphereModelSet::fwd_load_eeg_sphere_
         const std::string name(mne::trimmed(parts[0]));
         int nlayer = 0;
         for (std::size_t i = 1; i + 1 < parts.size(); i += 2) {
-            const std::optional<double> r = mne::toDouble(parts[i]);
-            const std::optional<double> sg = mne::toDouble(parts[i + 1]);
+            const std::optional<double> r = mne::to_double(parts[i]);
+            const std::optional<double> sg = mne::to_double(parts[i + 1]);
             if (!r || !sg) {
                 nlayer = 0;
                 break;

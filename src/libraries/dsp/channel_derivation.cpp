@@ -168,7 +168,7 @@ bool ChannelDerivation::writeDefinitionFile(const std::filesystem::path& path, c
 {
     std::ofstream out(path);
     if (!out) {
-        Log::warning("ChannelDerivation::writeDefinitionFile - cannot open: {}", utf8FromPath(path));
+        Log::warning("ChannelDerivation::writeDefinitionFile - cannot open: {}", utf8_from_path(path));
         return false;
     }
     // MNE-C mne_make_derivations syntax; names are quoted because they may contain spaces.

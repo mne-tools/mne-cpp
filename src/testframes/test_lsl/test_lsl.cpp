@@ -913,13 +913,13 @@ void TestLsl::testWaitForDatagramsKeepsSocketBound()
 
 void TestLsl::testBuildInfo()
 {
-    const char* dt = mne::buildDateTime();
+    const char* dt = mne::build_date_time();
     QVERIFY(dt != nullptr && std::strlen(dt) > 0);
 
-    const char* hash = mne::buildHash();
+    const char* hash = mne::build_hash();
     QVERIFY(hash != nullptr);
 
-    const char* hashLong = mne::buildHashLong();
+    const char* hashLong = mne::build_hash_long();
     QVERIFY(hashLong != nullptr);
 }
 

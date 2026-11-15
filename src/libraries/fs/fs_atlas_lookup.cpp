@@ -178,11 +178,11 @@ const std::unordered_map<int, std::string>& lookupTable()
 }
 
 template<mne::Swappable T>
-T readBigEndian(const std::byte* data)
+T read_big_endian(const std::byte* data)
 {
     T value;
     std::memcpy(&value, data, sizeof(T));
-    return mne::fromBigEndian(value);
+    return mne::from_big_endian(value);
 }
 
 } // namespace
@@ -195,7 +195,7 @@ bool FsAtlasLookup::load(const std::filesystem::path& parcellation)
 {
     m_loaded = false;
 
-    const bool gzip = mne::toLower(mne::utf8FromPath(parcellation.extension())) == ".mgz";
+    const bool gzip = mne::to_lower(mne::utf8_from_path(parcellation.extension())) == ".mgz";
     const auto bytes = mne::read_file_bytes(parcellation, gzip ? mne::Compression::Gzip : mne::Compression::None);
     if (!bytes) {
         mne::Log::warning("[FsAtlasLookup::load] {}", bytes.error().what());
@@ -206,27 +206,27 @@ bool FsAtlasLookup::load(const std::filesystem::path& parcellation)
     // (int16), voxel sizes, x/y/z direction cosines and centre RAS (float32); the voxels start at byte 284.
     constexpr std::size_t kHeaderSize = 284;
     if (bytes->size() < kHeaderSize) {
-        mne::Log::warning("[FsAtlasLookup::load] File too small: {}", mne::utf8FromPath(parcellation));
+        mne::Log::warning("[FsAtlasLookup::load] File too small: {}", mne::utf8_from_path(parcellation));
         return false;
     }
     const std::byte* raw = bytes->data();
-    if (readBigEndian<std::int32_t>(raw) != 1) {
-        mne::Log::warning("[FsAtlasLookup::load] Unsupported MGH version: {}", readBigEndian<std::int32_t>(raw));
+    if (read_big_endian<std::int32_t>(raw) != 1) {
+        mne::Log::warning("[FsAtlasLookup::load] Unsupported MGH version: {}", read_big_endian<std::int32_t>(raw));
         return false;
     }
-    m_dimX = readBigEndian<std::int32_t>(raw + 4);
-    m_dimY = readBigEndian<std::int32_t>(raw + 8);
-    m_dimZ = readBigEndian<std::int32_t>(raw + 12);
-    const std::int32_t type = readBigEndian<std::int32_t>(raw + 20);
-    if (m_dimX <= 0 || m_dimY <= 0 || m_dimZ <= 0 || readBigEndian<std::int32_t>(raw + 16) <= 0) {
+    m_dimX = read_big_endian<std::int32_t>(raw + 4);
+    m_dimY = read_big_endian<std::int32_t>(raw + 8);
+    m_dimZ = read_big_endian<std::int32_t>(raw + 12);
+    const std::int32_t type = read_big_endian<std::int32_t>(raw + 20);
+    if (m_dimX <= 0 || m_dimY <= 0 || m_dimZ <= 0 || read_big_endian<std::int32_t>(raw + 16) <= 0) {
         mne::Log::warning("[FsAtlasLookup::load] Invalid dimensions: {} {} {}", m_dimX, m_dimY, m_dimZ);
         return false;
     }
 
     Matrix4f vox2ras = Matrix4f::Identity();
-    if (readBigEndian<std::int16_t>(raw + 28) > 0) {
+    if (read_big_endian<std::int16_t>(raw + 28) > 0) {
         const auto f = [raw](std::size_t offset) {
-            return readBigEndian<float>(raw + offset);
+            return read_big_endian<float>(raw + offset);
         };
         Matrix3f MdcD;
         MdcD << f(42), f(54), f(66),
@@ -251,7 +251,7 @@ bool FsAtlasLookup::load(const std::filesystem::path& parcellation)
         return false;
     }
     if ((bytes->size() - kHeaderSize) / width < nVoxels) {
-        mne::Log::warning("[FsAtlasLookup::load] Truncated voxel data in {}", mne::utf8FromPath(parcellation));
+        mne::Log::warning("[FsAtlasLookup::load] Truncated voxel data in {}", mne::utf8_from_path(parcellation));
         return false;
     }
     const std::byte* voxels = raw + kHeaderSize;
@@ -262,13 +262,13 @@ bool FsAtlasLookup::load(const std::filesystem::path& parcellation)
                 m_voxelData[i] = std::to_integer<int>(voxels[i]);
                 break;
             case 1:
-                m_voxelData[i] = readBigEndian<std::int32_t>(voxels + 4 * i);
+                m_voxelData[i] = read_big_endian<std::int32_t>(voxels + 4 * i);
                 break;
             case 3:
-                m_voxelData[i] = static_cast<int>(std::lround(readBigEndian<float>(voxels + 4 * i)));
+                m_voxelData[i] = static_cast<int>(std::lround(read_big_endian<float>(voxels + 4 * i)));
                 break;
             default:
-                m_voxelData[i] = readBigEndian<std::int16_t>(voxels + 2 * i);
+                m_voxelData[i] = read_big_endian<std::int16_t>(voxels + 2 * i);
                 break;
         }
     }

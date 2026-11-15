@@ -425,7 +425,7 @@ void HpiSettingsView::onRemoveCoil()
 
 FiffDigPointSet HpiSettingsView::readDigitizersFromFile(const QString& fileName)
 {
-    auto dig = FiffDigPointSet::read(mne::pathFromUtf8(fileName.toStdString()));
+    auto dig = FiffDigPointSet::read(mne::path_from_utf8(fileName.toStdString()));
     if (!dig || dig->empty()) {
         return {};
     }

@@ -2,6 +2,7 @@
 // Copyright (c) 2010-2026 MNE-CPP Authors
 //   Christoph Dinh <christoph.dinh@mne-cpp.org>
 
+#include <algorithm>
 #include <QtTest/QtTest>
 #include <base/string_utils.h>
 #include <Eigen/Dense>
@@ -205,7 +206,7 @@ private slots:
         FiffInfoBase info = makeSyntheticInfoBase(3);
         StringList types = info.get_channel_types();
         QVERIFY(types.size() > 0);
-        QVERIFY(mne::contains(types, "mag"));
+        QVERIFY(std::ranges::contains(types, "mag"));
     }
 
     void infoBase_equality()
@@ -376,7 +377,7 @@ private slots:
 
         StringList chTypes = raw.info.get_channel_types();
         QVERIFY(chTypes.size() > 0);
-        QVERIFY(mne::contains(chTypes, "mag") || mne::contains(chTypes, "grad") || mne::contains(chTypes, "eeg"));
+        QVERIFY(std::ranges::contains(chTypes, "mag") || std::ranges::contains(chTypes, "grad") || std::ranges::contains(chTypes, "eeg"));
     }
 
     //=========================================================================

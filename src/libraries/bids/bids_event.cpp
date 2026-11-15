@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include "bids_event.h"
 #include "bids_tsv.h"
 
@@ -40,11 +41,11 @@ std::vector<BidsEvent> BidsEvent::read_tsv(const std::filesystem::path& path)
     std::vector<std::string> headers;
     const std::vector<BidsTsvRow> rawRows = BidsTsv::read_tsv(path, headers);
 
-    const bool hasOnset = mne::contains(headers, "onset");
-    const bool hasDuration = mne::contains(headers, "duration");
-    const bool hasSample = mne::contains(headers, "sample");
-    const bool hasValue = mne::contains(headers, "value");
-    const bool hasTrialType = mne::contains(headers, "trial_type");
+    const bool hasOnset = std::ranges::contains(headers, "onset");
+    const bool hasDuration = std::ranges::contains(headers, "duration");
+    const bool hasSample = std::ranges::contains(headers, "sample");
+    const bool hasValue = std::ranges::contains(headers, "value");
+    const bool hasTrialType = std::ranges::contains(headers, "trial_type");
 
     std::vector<BidsEvent> events;
     events.reserve(rawRows.size());
@@ -54,16 +55,16 @@ std::vector<BidsEvent> BidsEvent::read_tsv(const std::filesystem::path& path)
 
         // "n/a" and other non-numbers read as 0
         if (hasOnset)
-            ev.onset = static_cast<float>(mne::toDouble(BidsTsv::value(row, "onset", "0")).value_or(0.0));
+            ev.onset = static_cast<float>(mne::to_double(BidsTsv::value(row, "onset", "0")).value_or(0.0));
 
         if (hasDuration)
-            ev.duration = static_cast<float>(mne::toDouble(BidsTsv::value(row, "duration", "0")).value_or(0.0));
+            ev.duration = static_cast<float>(mne::to_double(BidsTsv::value(row, "duration", "0")).value_or(0.0));
 
         if (hasSample)
-            ev.sample = mne::toInt(BidsTsv::value(row, "sample", "0")).value_or(0);
+            ev.sample = mne::to_int(BidsTsv::value(row, "sample", "0")).value_or(0);
 
         if (hasValue)
-            ev.value = mne::toInt(BidsTsv::value(row, "value", "0")).value_or(0);
+            ev.value = mne::to_int(BidsTsv::value(row, "value", "0")).value_or(0);
 
         if (hasTrialType) {
             const std::string_view trialType = BidsTsv::value(row, "trial_type");

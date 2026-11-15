@@ -10,6 +10,7 @@
  * @brief    Tests the MNE Analyze Studio legacy raw browser model.
  */
 
+#include <algorithm>
 #include <browsercore/Models/rawmodel.h>
 #include <base/string_utils.h>
 #include <rawdatabrowserwidget.h>
@@ -100,12 +101,12 @@ void TestStudioRawModel::loadAndInspect()
 
     QModelIndexList channels{dataIndex};
     const QString channelName = QString::fromStdString(model.channelInfoList().front().ch_name);
-    const bool initiallyBad = mne::contains(model.fiffInfo()->bads, channelName.toStdString());
+    const bool initiallyBad = std::ranges::contains(model.fiffInfo()->bads, channelName.toStdString());
     model.markChBad(channels, !initiallyBad);
-    QCOMPARE(mne::contains(model.fiffInfo()->bads, channelName.toStdString()), !initiallyBad);
+    QCOMPARE(std::ranges::contains(model.fiffInfo()->bads, channelName.toStdString()), !initiallyBad);
     QVERIFY(model.data(dataIndex, Qt::BackgroundRole).isValid());
     model.markChBad(channels, initiallyBad);
-    QCOMPARE(mne::contains(model.fiffInfo()->bads, channelName.toStdString()), initiallyBad);
+    QCOMPARE(std::ranges::contains(model.fiffInfo()->bads, channelName.toStdString()), initiallyBad);
 
     model.updateProjections();
     model.updateCompensator(0);

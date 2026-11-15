@@ -83,7 +83,7 @@ bool MriCorIO::read(const std::string& dir,
         char name[16];
         std::snprintf(name, sizeof(name), "/COR-%03d", k + 1);
         const std::string fileName = dir + name;
-        const auto data = mne::read_file_bytes(mne::pathFromUtf8(fileName));
+        const auto data = mne::read_file_bytes(mne::path_from_utf8(fileName));
         if (!data) {
             mne::Log::critical("MriCorIO::read - Could not open COR file {}", fileName);
             return false;

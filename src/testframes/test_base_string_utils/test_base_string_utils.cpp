@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -126,8 +127,8 @@ void TestUtilsStringUtils::nameListHelpersMatchQStringList()
     const QStringList qnames{"MEG 0113", "EEG 001", "STI 014", "EEG 001"};
     const StringList names{"MEG 0113", "EEG 001", "STI 014", "EEG 001"};
     for (const char* name : {"MEG 0113", "EEG 001", "STI 014", "eeg 001", ""}) {
-        QCOMPARE(indexOf(names, name), static_cast<int>(qnames.indexOf(QString::fromUtf8(name))));
-        QCOMPARE(contains(names, name), qnames.contains(QString::fromUtf8(name)));
+        QCOMPARE(index_of(names, name), static_cast<int>(qnames.indexOf(QString::fromUtf8(name))));
+        QCOMPARE(std::ranges::contains(names, name), qnames.contains(QString::fromUtf8(name)));
     }
     QCOMPARE(QString::fromStdString(join(names, ", ")), qnames.join(", "));
     QCOMPARE(join({}, ","), std::string());
@@ -139,14 +140,14 @@ void TestUtilsStringUtils::nameListHelpersMatchQStringList()
 void TestUtilsStringUtils::caseHelpersMatchQString()
 {
     const QString mixed = QStringLiteral("Brain-Vision_V1.0 eeg");
-    QCOMPARE(QString::fromStdString(toLower(mixed.toStdString())), mixed.toLower());
-    QVERIFY(equalsIgnoreCase("NIFTI", "nifti"));
-    QVERIFY(equalsIgnoreCase("", ""));
-    QVERIFY(!equalsIgnoreCase("nii", "nii.gz"));
-    QVERIFY(!equalsIgnoreCase("abc", "abd"));
-    QCOMPARE(equalsIgnoreCase("Fp1", "fP1"), QString::compare(QStringLiteral("Fp1"), QStringLiteral("fP1"), Qt::CaseInsensitive) == 0);
+    QCOMPARE(QString::fromStdString(to_lower(mixed.toStdString())), mixed.toLower());
+    QVERIFY(iequals("NIFTI", "nifti"));
+    QVERIFY(iequals("", ""));
+    QVERIFY(!iequals("nii", "nii.gz"));
+    QVERIFY(!iequals("abc", "abd"));
+    QCOMPARE(iequals("Fp1", "fP1"), QString::compare(QStringLiteral("Fp1"), QStringLiteral("fP1"), Qt::CaseInsensitive) == 0);
     // Bytes outside ASCII are compared as they are, so UTF-8 text never changes length.
-    QCOMPARE(toLower("\xc3\x84"), std::string("\xc3\x84"));
+    QCOMPARE(to_lower("\xc3\x84"), std::string("\xc3\x84"));
 }
 
 //=============================================================================================================
@@ -168,7 +169,7 @@ void TestUtilsStringUtils::toDoubleMatchesQString()
     QFETCH(QString, text);
     bool ok = false;
     const double expected = text.toDouble(&ok);
-    const std::optional<double> actual = toDouble(text.toStdString());
+    const std::optional<double> actual = to_double(text.toStdString());
     QCOMPARE(actual.has_value(), ok);
     if (ok) {
         if (std::isnan(expected)) {
@@ -196,7 +197,7 @@ void TestUtilsStringUtils::toIntMatchesQString()
     QFETCH(QString, text);
     bool ok = false;
     const int expected = text.toInt(&ok);
-    const std::optional<int> actual = toInt(text.toStdString());
+    const std::optional<int> actual = to_int(text.toStdString());
     QCOMPARE(actual.has_value(), ok);
     if (ok) {
         QCOMPARE(*actual, expected);
@@ -213,8 +214,8 @@ void TestUtilsStringUtils::toDoubleIgnoresTheLocale()
     for (const char* name : {"de_DE.UTF-8", "de_DE.utf8", "German_Germany.1252"}) {
         german = german || std::setlocale(LC_ALL, name) != nullptr;
     }
-    const std::optional<double> point = toDouble("1.5");
-    const std::optional<double> comma = toDouble("1,5");
+    const std::optional<double> point = to_double("1.5");
+    const std::optional<double> comma = to_double("1,5");
     std::setlocale(LC_ALL, previous.c_str());
     if (!german) {
         QSKIP("No German locale installed");
@@ -233,15 +234,15 @@ void TestUtilsStringUtils::utf8PathsRoundTrip()
     const QString name = QStringLiteral("sub-\u00e4\u00f6_\u65e5\u672c.fif");
     const std::string utf8 = QDir(dir.path()).filePath(name).toStdString();
 
-    const std::filesystem::path path = pathFromUtf8(utf8);
-    QCOMPARE(utf8FromPath(path), utf8);
+    const std::filesystem::path path = path_from_utf8(utf8);
+    QCOMPARE(utf8_from_path(path), utf8);
     {
         std::ofstream out(path, std::ios::binary);
         out << "x";
     }
     QVERIFY(QFile::exists(QDir(dir.path()).filePath(name)));
-    QCOMPARE(utf8FromPath(path.filename()), name.toStdString());
-    QCOMPARE(utf8FromPath(path.extension()), std::string(".fif"));
+    QCOMPARE(utf8_from_path(path.filename()), name.toStdString());
+    QCOMPARE(utf8_from_path(path.extension()), std::string(".fif"));
 }
 
 //=============================================================================================================
@@ -269,7 +270,7 @@ void TestUtilsStringUtils::latin1AndUtf8MatchQString()
 
 void TestUtilsStringUtils::executableDirIsTheApplicationDir()
 {
-    const std::filesystem::path expected = pathFromUtf8(QCoreApplication::applicationDirPath().toStdString());
+    const std::filesystem::path expected = path_from_utf8(QCoreApplication::applicationDirPath().toStdString());
     QCOMPARE(executable_dir(), std::filesystem::canonical(expected));
 }
 

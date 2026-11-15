@@ -32,6 +32,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <mne/mne_cov_matrix.h>
 #include <base/string_utils.h>
 #include <mne/mne_proj_op.h>
@@ -119,7 +120,7 @@ void TestMneCovPython::initTestCase()
 
     FiffEvoked evoked((base + "/sample_audvis-ave.fif").toStdU16String(), 0, {}, false);
     for (const std::string& name : evoked.info.ch_names) {
-        if (name.starts_with("MEG") && !mne::contains(evoked.info.bads, name))
+        if (name.starts_with("MEG") && !std::ranges::contains(evoked.info.bads, name))
             m_names.push_back(name);
     }
     QCOMPARE(m_names.size(), 305);

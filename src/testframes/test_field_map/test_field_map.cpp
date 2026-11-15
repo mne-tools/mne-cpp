@@ -26,6 +26,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include <fwd/fwd_field_map.h>
 #include <base/string_utils.h>
 
@@ -387,7 +388,7 @@ void TestFieldMap::initTestCase()
     StringList megChNames, eegChNames;
     for (int k = 0; k < std::ssize(m_evoked.info.chs); ++k) {
         const auto& ch = m_evoked.info.chs[k];
-        if (mne::contains(m_evoked.info.bads, ch.ch_name))
+        if (std::ranges::contains(m_evoked.info.bads, ch.ch_name))
             continue;
         if (ch.kind == FIFFV_MEG_CH) {
             megChs.push_back(ch);
@@ -560,7 +561,7 @@ void TestFieldMap::testMappingProjectorVariants()
 
     StringList eegNames;
     for (const FiffChInfo& ch : m_evoked.info.chs) {
-        if (ch.kind == FIFFV_EEG_CH && !mne::contains(m_evoked.info.bads, ch.ch_name))
+        if (ch.kind == FIFFV_EEG_CH && !std::ranges::contains(m_evoked.info.bads, ch.ch_name))
             eegNames.push_back(ch.ch_name);
     }
 
@@ -724,7 +725,7 @@ void TestFieldMap::testMultiEvokedMegMapping()
         // Build channel pick indices matching Python's channel order
         QVector<int> megPick;
         for (const QString& chName : m_megChNames) {
-            const int idx = mne::indexOf(evoked.info.ch_names, chName.trimmed().toStdString());
+            const int idx = mne::index_of(evoked.info.ch_names, chName.trimmed().toStdString());
             QVERIFY2(idx >= 0,
                      qPrintable(QString("MEG channel '%1' not found in evoked %2")
                                     .arg(chName)
@@ -871,7 +872,7 @@ void TestFieldMap::testMultiEvokedEegMapping()
         // Build EEG channel pick indices
         QVector<int> eegPick;
         for (const QString& chName : m_eegChNames) {
-            const int idx = mne::indexOf(evoked.info.ch_names, chName.trimmed().toStdString());
+            const int idx = mne::index_of(evoked.info.ch_names, chName.trimmed().toStdString());
             QVERIFY2(idx >= 0,
                      qPrintable(QString("EEG channel '%1' not found in evoked %2")
                                     .arg(chName)
@@ -1042,7 +1043,7 @@ void TestFieldMap::testHelmetFieldMap()
     StringList cppMegChNames;
     for (int k = 0; k < std::ssize(m_evoked.info.chs); ++k) {
         const auto& ch = m_evoked.info.chs[k];
-        if (mne::contains(m_evoked.info.bads, ch.ch_name))
+        if (std::ranges::contains(m_evoked.info.bads, ch.ch_name))
             continue;
         if (ch.kind == FIFFV_MEG_CH) {
             megChs.push_back(ch);
@@ -1128,7 +1129,7 @@ void TestFieldMap::testHelmetFieldMap()
         // Build channel pick indices: Python ch_names → C++ evoked rows
         QVector<int> pick;
         for (const QString& pyName : helmetChNames) {
-            const int idx = mne::indexOf(baselinedEvoked.info.ch_names, pyName.trimmed().toStdString());
+            const int idx = mne::index_of(baselinedEvoked.info.ch_names, pyName.trimmed().toStdString());
             QVERIFY2(idx >= 0,
                      qPrintable(QString("Channel '%1' not found").arg(pyName)));
             pick.append(idx);

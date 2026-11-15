@@ -123,7 +123,7 @@ namespace
 
 std::string lowerExtension(const std::filesystem::path& path)
 {
-    return mne::toLower(mne::utf8FromPath(path.extension()));
+    return mne::to_lower(mne::utf8_from_path(path.extension()));
 }
 
 } // namespace
@@ -205,7 +205,7 @@ Expected<FiffAnnotations> FiffAnnotations::read_json(const std::filesystem::path
     mne::JsonParseError parseError;
     const mne::JsonDocument doc = mne::JsonDocument::from_json(*bytes, &parseError);
     if (parseError.error != mne::JsonParseError::NoError || !doc.is_object()) {
-        return fail(ErrorCode::Format, "{} is not an annotation JSON file: {}", mne::utf8FromPath(path), parseError.error_string());
+        return fail(ErrorCode::Format, "{} is not an annotation JSON file: {}", mne::utf8_from_path(path), parseError.error_string());
     }
 
     FiffAnnotations annot;
@@ -256,8 +256,8 @@ Expected<FiffAnnotations> FiffAnnotations::read_csv(const std::filesystem::path&
         if (second == std::string_view::npos) {
             continue;
         }
-        const std::optional<double> onset = mne::toDouble(line.substr(0, first));
-        const std::optional<double> duration = mne::toDouble(line.substr(first + 1, second - first - 1));
+        const std::optional<double> onset = mne::to_double(line.substr(0, first));
+        const std::optional<double> duration = mne::to_double(line.substr(first + 1, second - first - 1));
         if (onset && duration) {
             annot.append(*onset, *duration, std::string(line.substr(second + 1)));
         }

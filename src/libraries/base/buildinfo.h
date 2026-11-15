@@ -42,7 +42,7 @@ namespace mne
  *
  * @return Build time string in "hh:mm:ss" format (value of __TIME__).
  */
-constexpr auto timeNowNow()
+constexpr auto compile_time()
 {
     return __TIME__;
 }
@@ -53,7 +53,7 @@ constexpr auto timeNowNow()
  *
  * @return Build date string in "Mmm dd yyyy" format (value of __DATE__).
  */
-constexpr auto dateToday()
+constexpr auto compile_date()
 {
     return __DATE__;
 }
@@ -65,7 +65,7 @@ constexpr auto dateToday()
  *
  * @return Build date and time string, __DATE__ and __TIME__ separated by a space.
  */
-constexpr auto dateTimeNow()
+constexpr auto compile_date_time()
 {
     return __DATE__ " " __TIME__;
 }
@@ -76,7 +76,7 @@ constexpr auto dateTimeNow()
  *
  * @return Short git commit hash, or a placeholder message if MNE_GIT_HASH_SHORT is not defined.
  */
-constexpr auto gitHash()
+constexpr auto git_hash()
 {
 #ifdef MNE_GIT_HASH_SHORT
     return MNE_GIT_HASH_SHORT;
@@ -91,7 +91,7 @@ constexpr auto gitHash()
  *
  * @return Full git commit hash, or a placeholder message if MNE_GIT_HASH_LONG is not defined.
  */
-constexpr auto gitHashLong()
+constexpr auto git_hash_long()
 {
 #ifdef MNE_GIT_HASH_LONG
     return MNE_GIT_HASH_LONG;

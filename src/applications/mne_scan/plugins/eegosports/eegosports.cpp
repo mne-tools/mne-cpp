@@ -70,7 +70,7 @@ namespace
 /** The positions of an .elc file in metres, turned by 90 degrees into RAS. */
 std::optional<mne::ElectrodeLayout> readLayout(const QString& path)
 {
-    auto layout = mne::LayoutLoader::read_elc(mne::pathFromUtf8(path.toStdString()));
+    auto layout = mne::LayoutLoader::read_elc(mne::path_from_utf8(path.toStdString()));
     if (layout) {
         const Matrix3d rotation = AngleAxisd(std::numbers::pi / 2, Vector3d::UnitZ()).toRotationMatrix();
         for (Vector3d& r : layout->positions_3d) {

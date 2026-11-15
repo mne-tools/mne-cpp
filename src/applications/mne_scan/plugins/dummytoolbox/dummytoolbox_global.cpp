@@ -25,19 +25,19 @@
 
 const char* DUMMYTOOLBOXPLUGIN::buildDateTime()
 {
-    return mne::dateTimeNow();
+    return mne::compile_date_time();
 };
 
 //=============================================================================================================
 
 const char* DUMMYTOOLBOXPLUGIN::buildHash()
 {
-    return mne::gitHash();
+    return mne::git_hash();
 };
 
 //=============================================================================================================
 
 const char* DUMMYTOOLBOXPLUGIN::buildHashLong()
 {
-    return mne::gitHashLong();
+    return mne::git_hash_long();
 };

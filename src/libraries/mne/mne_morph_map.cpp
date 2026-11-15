@@ -304,7 +304,7 @@ std::optional<MNEMorphMap> MNEMorphMap::read(const std::filesystem::path& path, 
         result.to_subj = toSubj;
         return result;
     }
-    mne::Log::warning("MNEMorphMap::read - {} hemisphere morph map from {} to {} not found in {}", hemi == 0 ? "left" : "right", fromSubj, toSubj, mne::utf8FromPath(path));
+    mne::Log::warning("MNEMorphMap::read - {} hemisphere morph map from {} to {} not found in {}", hemi == 0 ? "left" : "right", fromSubj, toSubj, mne::utf8_from_path(path));
     return std::nullopt;
 }
 

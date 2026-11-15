@@ -142,17 +142,10 @@ mne::StringList mne::split(std::string_view text, char separator, bool skipEmpty
 
 //=============================================================================================================
 
-int mne::indexOf(const StringList& list, std::string_view name)
+int mne::index_of(const StringList& list, std::string_view name)
 {
     const auto it = std::find(list.begin(), list.end(), name);
     return it == list.end() ? -1 : static_cast<int>(it - list.begin());
-}
-
-//=============================================================================================================
-
-bool mne::contains(const StringList& list, std::string_view name)
-{
-    return std::find(list.begin(), list.end(), name) != list.end();
 }
 
 //=============================================================================================================
@@ -170,7 +163,7 @@ std::string mne::join(const StringList& list, std::string_view separator)
 
 //=============================================================================================================
 
-std::string mne::toLower(std::string_view text)
+std::string mne::to_lower(std::string_view text)
 {
     std::string out(text);
     std::transform(out.begin(), out.end(), out.begin(), lower);
@@ -179,17 +172,17 @@ std::string mne::toLower(std::string_view text)
 
 //=============================================================================================================
 
-bool mne::equalsIgnoreCase(std::string_view a, std::string_view b)
+bool mne::iequals(std::string_view a, std::string_view b)
 {
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), [](char x, char y) { return lower(x) == lower(y); });
 }
 
 //=============================================================================================================
 
-std::optional<double> mne::toDouble(std::string_view text)
+std::optional<double> mne::to_double(std::string_view text)
 {
     text = stripPlus(trimmed(text));
-    const std::string lowered = toLower(text);
+    const std::string lowered = to_lower(text);
     const bool negative = !lowered.empty() && lowered.front() == '-';
     const std::string_view word = negative ? std::string_view(lowered).substr(1) : std::string_view(lowered);
     if (word == "inf") {
@@ -215,7 +208,7 @@ std::optional<double> mne::toDouble(std::string_view text)
 
 //=============================================================================================================
 
-std::optional<int> mne::toInt(std::string_view text)
+std::optional<int> mne::to_int(std::string_view text)
 {
     text = stripPlus(trimmed(text));
     int value = 0;
@@ -228,14 +221,14 @@ std::optional<int> mne::toInt(std::string_view text)
 
 //=============================================================================================================
 
-std::filesystem::path mne::pathFromUtf8(std::string_view utf8)
+std::filesystem::path mne::path_from_utf8(std::string_view utf8)
 {
     return std::filesystem::path(std::u8string(utf8.begin(), utf8.end()));
 }
 
 //=============================================================================================================
 
-std::string mne::utf8FromPath(const std::filesystem::path& path)
+std::string mne::utf8_from_path(const std::filesystem::path& path)
 {
     const std::u8string utf8 = path.u8string();
     return std::string(utf8.begin(), utf8.end());
@@ -338,7 +331,7 @@ std::filesystem::path mne::executable_dir()
 
 std::filesystem::path mne::resource_path(std::string_view relative)
 {
-    const std::filesystem::path name = pathFromUtf8(relative);
+    const std::filesystem::path name = path_from_utf8(relative);
     std::filesystem::path installed = executable_dir().parent_path() / "resources" / name;
     std::error_code error;
     if (std::filesystem::exists(installed, error)) {

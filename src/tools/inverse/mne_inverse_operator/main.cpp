@@ -486,13 +486,13 @@ int main(int argc, char* argv[])
               badFileName.toUtf8().constData());
         QStringList fileBads = readBadFile(badFileName);
         for (const QString& bad : fileBads) {
-            if (!mne::contains(info.bads, bad.toStdString()))
+            if (!std::ranges::contains(info.bads, bad.toStdString()))
                 info.bads.push_back(bad.toStdString());
         }
     }
     // Also merge bad channels from the noise covariance
     for (const std::string& bad : noiseCov.bads) {
-        if (!mne::contains(info.bads, bad))
+        if (!std::ranges::contains(info.bads, bad))
             info.bads.push_back(bad);
     }
     if (!info.bads.empty()) {

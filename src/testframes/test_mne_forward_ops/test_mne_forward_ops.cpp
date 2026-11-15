@@ -238,7 +238,7 @@ private slots:
             {"EEG 001", {-3.50052778352e-07, 1.34513634827e-08, 4.92685045566e-07}},
             {"EEG 060", {5.92750625114e-09, -2.18851835027e-07, -4.00659174832e-07}}};
         for (const auto& [name, values] : expected) {
-            const int row = static_cast<int>(mne::indexOf(evoked.info.ch_names, name.toStdString()));
+            const int row = static_cast<int>(mne::index_of(evoked.info.ch_names, name.toStdString()));
             QVERIFY2(row >= 0, qPrintable(name));
             for (int k = 0; k < 3; ++k) {
                 const double got = evoked.data(row, 2 * k);

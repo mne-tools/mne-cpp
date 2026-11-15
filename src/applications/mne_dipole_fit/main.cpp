@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 
         // Load brain surface if available
         if (!settings.bemname.empty()) {
-            MNEBem bem(mne::pathFromUtf8(settings.bemname));
+            MNEBem bem(mne::path_from_utf8(settings.bemname));
             for (std::size_t i = 0; i < bem.size(); ++i) {
                 pModel->addBemSurface("Subject", "BEM", bem[i]);
             }
@@ -134,11 +134,11 @@ int main(int argc, char* argv[])
     /*
      * Saving...
      */
-    if (!settings.dipname.empty() && !set.save_dipoles_dip(mne::pathFromUtf8(settings.dipname))) {
+    if (!settings.dipname.empty() && !set.save_dipoles_dip(mne::path_from_utf8(settings.dipname))) {
         qCritical("Dipoles could not be saved to %s.", settings.dipname.c_str());
         return 1;
     }
-    if (!settings.bdipname.empty() && !set.save_dipoles_bdip(mne::pathFromUtf8(settings.bdipname))) {
+    if (!settings.bdipname.empty() && !set.save_dipoles_bdip(mne::path_from_utf8(settings.bdipname))) {
         qCritical("Dipoles could not be saved to %s.", settings.bdipname.c_str());
         return 1;
     }

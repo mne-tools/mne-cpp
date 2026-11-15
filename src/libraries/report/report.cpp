@@ -79,7 +79,7 @@ std::string_view mimeType(ImageFormat format)
 
 std::optional<ImageFormat> formatOfExtension(const std::filesystem::path& path)
 {
-    const std::string extension = toLower(utf8FromPath(path.extension()));
+    const std::string extension = to_lower(utf8_from_path(path.extension()));
     if (extension == ".png") {
         return ImageFormat::Png;
     }
@@ -244,12 +244,12 @@ bool Report::add_image_file(std::string_view title, const std::filesystem::path&
 {
     const std::optional<ImageFormat> format = formatOfExtension(path);
     if (!format) {
-        Log::warning("[Report::add_image_file] Unsupported image format: {}", utf8FromPath(path));
+        Log::warning("[Report::add_image_file] Unsupported image format: {}", utf8_from_path(path));
         return false;
     }
     std::ifstream file(path, std::ios::binary);
     if (!file) {
-        Log::warning("[Report::add_image_file] Cannot open: {}", utf8FromPath(path));
+        Log::warning("[Report::add_image_file] Cannot open: {}", utf8_from_path(path));
         return false;
     }
     const std::string data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -308,7 +308,7 @@ bool Report::save(const std::filesystem::path& path) const
 {
     std::ofstream file(path, std::ios::binary | std::ios::trunc);
     if (!file) {
-        Log::warning("[Report::save] Cannot open: {}", utf8FromPath(path));
+        Log::warning("[Report::save] Cannot open: {}", utf8_from_path(path));
         return false;
     }
     file << to_html();

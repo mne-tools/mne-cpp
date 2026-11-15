@@ -123,9 +123,9 @@ bool FsLabel::read(const std::filesystem::path& p_sFileName, FsLabel& p_Label)
 {
     p_Label.clear();
 
-    const std::string fileName = mne::utf8FromPath(p_sFileName.filename());
+    const std::string fileName = mne::utf8_from_path(p_sFileName.filename());
     if (!fileName.ends_with(".label")) {
-        mne::Log::warning("Given file ({}) is not a .label file!\n", mne::utf8FromPath(p_sFileName));
+        mne::Log::warning("Given file ({}) is not a .label file!\n", mne::utf8_from_path(p_sFileName));
         return false;
     }
 
@@ -140,7 +140,7 @@ bool FsLabel::read(const std::filesystem::path& p_sFileName, FsLabel& p_Label)
     std::string line;
     std::getline(file, comment);
     std::getline(file, line);
-    const int nv = mne::toInt(line).value_or(0);
+    const int nv = mne::to_int(line).value_or(0);
 
     // One row per vertex: vertex number, x, y, z (mm) and value
     MatrixXd data = MatrixXd::Zero(nv, 5);

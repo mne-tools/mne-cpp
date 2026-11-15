@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (!fwdSolution->write(mne::pathFromUtf8(settings->solname))) {
+    if (!fwdSolution->write(mne::path_from_utf8(settings->solname))) {
         qCritical("The forward solution could not be written to %s.", settings->solname.c_str());
         return 1;
     }

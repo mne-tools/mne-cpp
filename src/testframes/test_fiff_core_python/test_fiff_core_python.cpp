@@ -579,7 +579,7 @@ void TestFiffCorePython::computeFromRaw_matchesPython()
 
         // Bad channels must not take part in the projection.
         for (const std::string& bad : m_raw->info.bads) {
-            QCOMPARE(v(mne::indexOf(m_raw->info.ch_names, bad)), 0.0);
+            QCOMPARE(v(mne::index_of(m_raw->info.ch_names, bad)), 0.0);
         }
     }
 
@@ -652,10 +652,10 @@ void TestFiffCorePython::computeFromEvoked_matchesPython()
         const double peak = v.cwiseAbs().maxCoeff(&peakIdx);
         QCOMPARE(evoked.info.ch_names.at(static_cast<int>(peakIdx)), QString(expected[i].peakName));
         QVERIFY2(relClose(peak, expected[i].peak, 1e-6), qPrintable(mismatch(p.desc + " peak", peak, expected[i].peak)));
-        const double first = std::fabs(v(mne::indexOf(evoked.info.ch_names, expected[i].firstName)));
+        const double first = std::fabs(v(mne::index_of(evoked.info.ch_names, expected[i].firstName)));
         QVERIFY2(relClose(first, expected[i].first, 1e-6), qPrintable(mismatch(p.desc + " first", first, expected[i].first)));
         for (const std::string& bad : evoked.info.bads) {
-            QCOMPARE(v(mne::indexOf(evoked.info.ch_names, bad)), 0.0);
+            QCOMPARE(v(mne::index_of(evoked.info.ch_names, bad)), 0.0);
         }
     }
 }

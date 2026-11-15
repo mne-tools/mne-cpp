@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
 
     //set columns of matrix to zero depending on bad channels indexes
     for (qint32 j = 0; j < static_cast<int>(infoTemp.bads.size()); ++j) {
-        matProjectors.col(mne::indexOf(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
+        matProjectors.col(mne::index_of(infoTemp.ch_names, infoTemp.bads.at(j))).setZero();
     }
 
     // if debugging files are necessary set bDoDebug = true;

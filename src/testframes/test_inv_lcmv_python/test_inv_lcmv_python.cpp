@@ -126,7 +126,7 @@ void TestInvLcmvPython::initTestCase()
     FiffEvoked sampleEvoked((base + "/MEG/sample/sample_audvis-ave.fif").toStdU16String(), 0, {}, false);
     StringList good;
     for (const std::string& name : sampleEvoked.info.ch_names) {
-        if (name.starts_with("MEG") && !mne::contains(sampleEvoked.info.bads, name))
+        if (name.starts_with("MEG") && !std::ranges::contains(sampleEvoked.info.bads, name))
             good.push_back(name);
     }
     QCOMPARE(good.size(), 305);

@@ -124,7 +124,7 @@ void TestEDF2FIFFRWR::convertMatchesPython()
         {QStringLiteral("Status"), FIFFV_STIM_CH, {4352.0, 0.0, 0.0, 57624.0}},
     };
     for (const auto& [name, kind, values] : expected) {
-        const int k = mne::indexOf(raw.info.ch_names, name.toStdString());
+        const int k = mne::index_of(raw.info.ch_names, name.toStdString());
         QVERIFY2(k >= 0, qPrintable(name));
         QCOMPARE(raw.info.chs[k].kind, kind);
         const double tol = 1e-6 * std::abs(values[3]);
@@ -136,7 +136,7 @@ void TestEDF2FIFFRWR::convertMatchesPython()
 
     // Every channel equals what EDFReader reads (float samples, float FIFF buffers)
     EDFReader reader;
-    QVERIFY(reader.open(mne::pathFromUtf8(m_sEdf.toStdString())));
+    QVERIFY(reader.open(mne::path_from_utf8(m_sEdf.toStdString())));
     QVERIFY(data.isApprox(reader.read_raw_segment(0, 3072).cast<double>()));
 
     // Without --fileOut the output goes next to the input

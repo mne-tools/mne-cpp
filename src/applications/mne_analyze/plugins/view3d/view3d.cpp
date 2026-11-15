@@ -364,5 +364,5 @@ void View3D::onModelRemoved(QSharedPointer<mne::analyze::AbstractModel> pRemoved
 
 QString View3D::getBuildInfo()
 {
-    return QString(mne::dateTimeNow());
+    return QString(mne::compile_date_time());
 }

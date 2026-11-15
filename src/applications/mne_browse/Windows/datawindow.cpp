@@ -223,7 +223,7 @@ void DataWindow::computeAutoScale()
     QMap<qint32, TypeStats> typeStats;
 
     for (int ch = 0; ch < fiffInfo->nchan && ch < block.rows(); ++ch) {
-        if (mne::contains(fiffInfo->bads, fiffInfo->ch_names[ch]))
+        if (std::ranges::contains(fiffInfo->bads, fiffInfo->ch_names[ch]))
             continue;
 
         const auto& chInfo = fiffInfo->chs[ch];

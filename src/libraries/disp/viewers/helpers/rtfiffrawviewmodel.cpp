@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include "rtfiffrawviewmodel.h"
 #include <memory>
 
@@ -190,7 +191,7 @@ QVariant RtFiffRawViewModel::data(const QModelIndex& index, int role) const
 
         //******** third column (bad channel) ********
         if (index.column() == 2 && role == Qt::DisplayRole) {
-            return QVariant(mne::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[row]));
+            return QVariant(std::ranges::contains(m_pFiffInfo->bads, m_pFiffInfo->ch_names[row]));
         } // end column check
 
     } // end index.valid() check
@@ -797,11 +798,11 @@ void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
     const std::vector<FiffChInfo>& chInfolist = m_pFiffInfo->chs;
 
     if (status) {
-        if (!mne::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name))
+        if (!std::ranges::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name))
             m_pFiffInfo->bads.push_back(chInfolist[ch.row()].ch_name);
         qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as bad.";
-    } else if (mne::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name)) {
-        int index = mne::indexOf(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name);
+    } else if (std::ranges::contains(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name)) {
+        int index = mne::index_of(m_pFiffInfo->bads, chInfolist[ch.row()].ch_name);
         m_pFiffInfo->bads.erase(m_pFiffInfo->bads.begin() + index);
         qDebug() << "RawModel:" << chInfolist[ch.row()].ch_name << "marked as good.";
     }
@@ -866,11 +867,11 @@ void RtFiffRawViewModel::markChBad(QModelIndexList chlist, bool status)
 
     for (int i = 0; i < chlist.size(); ++i) {
         if (status) {
-            if (!mne::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name))
+            if (!std::ranges::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name))
                 m_pFiffInfo->bads.push_back(chInfolist[chlist[i].row()].ch_name);
         } else {
-            if (mne::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name)) {
-                int index = mne::indexOf(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name);
+            if (std::ranges::contains(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name)) {
+                int index = mne::index_of(m_pFiffInfo->bads, chInfolist[chlist[i].row()].ch_name);
                 m_pFiffInfo->bads.erase(m_pFiffInfo->bads.begin() + index);
             }
         }

@@ -53,8 +53,8 @@ SettingsControllerCl::SettingsControllerCl()
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
 , m_sAppName(APPLICATION_NAME)
 , m_sAppVer(APPLICATION_VERSION)
-, m_sBuildDate(QString(mne::dateTimeNow()))
-, m_sBuildHash(QString(mne::gitHash()))
+, m_sBuildDate(QString(mne::compile_date_time()))
+, m_sBuildHash(QString(mne::git_hash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -73,8 +73,8 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
 , m_sAppName(APPLICATION_NAME)
 , m_sAppVer(APPLICATION_VERSION)
-, m_sBuildDate(QString(mne::dateTimeNow()))
-, m_sBuildHash(QString(mne::gitHash()))
+, m_sBuildDate(QString(mne::compile_date_time()))
+, m_sBuildHash(QString(mne::git_hash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -488,8 +488,8 @@ void SettingsControllerCl::printHeaderIfVerbose()
     printIfVerbose("Build Date: " + m_sBuildDate);
     printIfVerbose("Build Hash: " + m_sBuildHash);
     printIfVerbose(" ");
-    printIfVerbose(QString("Fiff Lib Build Date: ") + mne::buildDateTime());
-    printIfVerbose(QString("Fiff Lib Build Hash: ") + mne::buildHash());
+    printIfVerbose(QString("Fiff Lib Build Date: ") + mne::build_date_time());
+    printIfVerbose(QString("Fiff Lib Build Hash: ") + mne::build_hash());
     printIfVerbose(" ");
 }
 

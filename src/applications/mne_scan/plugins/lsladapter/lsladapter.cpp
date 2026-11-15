@@ -17,6 +17,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <algorithm>
 #include "lsladapter.h"
 #include <memory>
 #include "lsladapterproducer.h"
@@ -59,7 +60,7 @@ LSLAdapter::LSLAdapter()
 , m_pProducer(new LSLAdapterProducer(m_pRTMSA, m_iOutputBlockSize))
 {
     // would be better to do this on a single occasion
-    qRegisterMetaType<mne::stream_info>("mne::stream_info");
+    qRegisterMetaType<mne::stream_info>();
     qRegisterMetaType<QVector<mne::stream_info>>("QVector<mne::stream_info>");
 }
 
@@ -222,7 +223,7 @@ void LSLAdapter::onLSLStreamScanReady()
     } else {
         // check whether we had a valid stream, and if its still amongst the available ones
         if (m_bHasValidStream) {
-            if (contains(m_vAvailableStreams, m_currentStream) == false) {
+            if (!std::ranges::contains(m_vAvailableStreams, m_currentStream.uid(), &mne::stream_info::uid)) {
                 qDebug() << "[LSLAdapter] Old stream no longer available, switching to first available stream";
                 m_currentStream = m_vAvailableStreams[0];
                 m_bHasValidStream = true;

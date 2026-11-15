@@ -77,7 +77,7 @@ QString covarianceSummary(const mne::FiffCov& covariance,
 
     if (fiffInfo) {
         for (const std::string& channelName : covariance.names) {
-            const int channelIndex = mne::indexOf(fiffInfo->ch_names, channelName);
+            const int channelIndex = mne::index_of(fiffInfo->ch_names, channelName);
             if (channelIndex < 0 || channelIndex >= std::ssize(fiffInfo->chs)) {
                 ++otherCount;
                 continue;

@@ -648,7 +648,7 @@ void MainWindow::about()
         m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse | Qt::TextBrowserInteraction | Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
 
         QLabel* pLabel = new QLabel();
-        pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(mne::dateTimeNow()) + " - " + QString(mne::gitHash()));
+        pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(mne::compile_date_time()) + " - " + QString(mne::git_hash()));
 
         gridLayout->addWidget(pLabel, 1, 0, 1, 1);
 

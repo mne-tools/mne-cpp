@@ -151,7 +151,7 @@ void ComputeFwd::initFwd()
 
     // Read the source locations
     mne::Log::info("Reading {}...", m_pSettings->srcname);
-    if (MNESourceSpace::read_source_spaces(mne::pathFromUtf8(m_pSettings->srcname), m_spaces) != OK) {
+    if (MNESourceSpace::read_source_spaces(mne::path_from_utf8(m_pSettings->srcname), m_spaces) != OK) {
         return;
     }
     for (k = 0, m_iNSource = 0; k < static_cast<int>(m_spaces.size()); k++) {
@@ -171,20 +171,20 @@ void ComputeFwd::initFwd()
 
     // Read the MRI -> head coordinate transformation
     if (!m_pSettings->mriname.empty()) {
-        const auto mriHead = FiffCoordTrans::read(mne::pathFromUtf8(m_pSettings->mriname), FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
+        const auto mriHead = FiffCoordTrans::read(mne::path_from_utf8(m_pSettings->mriname), FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
         if (!mriHead) {
             mne::Log::critical("{}", mriHead.error().what());
             return;
         }
         m_mri_head_t = *mriHead;
-        auto mriStream = FiffStream::open(mne::pathFromUtf8(m_pSettings->mriname));
+        auto mriStream = FiffStream::open(mne::path_from_utf8(m_pSettings->mriname));
         m_mri_id = mriStream ? mriStream->id() : FiffId();
         if (m_mri_id.empty()) {
             mne::Log::critical("Couldn't read MRI file id (How come?)");
             return;
         }
     } else if (!m_pSettings->transname.empty()) {
-        const auto headMri = FiffCoordTrans::read_ascii(mne::pathFromUtf8(m_pSettings->transname), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
+        const auto headMri = FiffCoordTrans::read_ascii(mne::path_from_utf8(m_pSettings->transname), FIFFV_COORD_HEAD, FIFFV_COORD_MRI);
         if (!headMri) {
             mne::Log::critical("{}", headMri.error().what());
             return;
@@ -198,7 +198,7 @@ void ComputeFwd::initFwd()
     // Read the channel information and the MEG device -> head coordinate transformation
 
     if (!m_pSettings->pFiffInfo) {
-        auto pStream = FiffStream::open(mne::pathFromUtf8(m_pSettings->measname));
+        auto pStream = FiffStream::open(mne::path_from_utf8(m_pSettings->measname));
         if (!pStream) {
             mne::Log::critical("{}", pStream.error().what());
             return;
@@ -274,7 +274,7 @@ void ComputeFwd::initFwd()
 
         // Compensation data
 
-        m_compData = MNECTFCompDataSet::read(mne::pathFromUtf8(m_pSettings->measname));
+        m_compData = MNECTFCompDataSet::read(mne::path_from_utf8(m_pSettings->measname));
         if (!m_compData) {
             return;
         }
@@ -353,7 +353,7 @@ void ComputeFwd::initFwd()
     // Prepare the BEM model if necessary
 
     if (!m_pSettings->bemname.empty()) {
-        m_pSettings->bemname = mne::utf8FromPath(FwdBemModel::fwd_bem_make_bem_sol_name(mne::pathFromUtf8(m_pSettings->bemname)));
+        m_pSettings->bemname = mne::utf8_from_path(FwdBemModel::fwd_bem_make_bem_sol_name(mne::path_from_utf8(m_pSettings->bemname)));
 
         mne::Log::info("Setting up the BEM model using {}...", m_pSettings->bemname);
         mne::Log::info("Loading surfaces...");
@@ -392,7 +392,7 @@ void ComputeFwd::initFwd()
 
     if (m_pSettings->filter_spaces) {
         if (!m_pSettings->mindistoutname.empty()) {
-            filteredFile.open(mne::pathFromUtf8(m_pSettings->mindistoutname));
+            filteredFile.open(mne::path_from_utf8(m_pSettings->mindistoutname));
             if (!filteredFile) {
                 mne::Log::critical("{}", m_pSettings->mindistoutname);
                 return;
@@ -400,7 +400,7 @@ void ComputeFwd::initFwd()
             mne::Log::info("Omitted source space points will be output to : {}", m_pSettings->mindistoutname);
         }
         MNESourceSpace::filter_source_spaces(m_pSettings->mindist,
-                                             mne::pathFromUtf8(m_pSettings->bemname),
+                                             mne::path_from_utf8(m_pSettings->bemname),
                                              m_mri_head_t,
                                              m_spaces,
                                              filteredFile.is_open() ? &filteredFile : nullptr, m_pSettings->use_threads);
@@ -475,7 +475,7 @@ void ComputeFwd::populateMetadata(MNEForwardSolution& fwd)
 
     // Bad channels
     if (!m_pSettings->measname.empty()) {
-        if (auto badStream = FiffStream::open(mne::pathFromUtf8(m_pSettings->measname)))
+        if (auto badStream = FiffStream::open(mne::path_from_utf8(m_pSettings->measname)))
             fwd.info.bads = badStream->read_bad_channels(badStream->dirtree());
     }
 }

@@ -87,7 +87,7 @@ PythonRunnerResult PythonTestHelper::eval(std::string_view code, std::chrono::mi
 std::optional<double> PythonTestHelper::eval_double(std::string_view code, std::chrono::milliseconds timeout) const
 {
     const PythonRunnerResult result = eval(code, timeout);
-    return result.success ? toDouble(trimmed(result.std_out)) : std::nullopt;
+    return result.success ? to_double(trimmed(result.std_out)) : std::nullopt;
 }
 
 //=============================================================================================================
@@ -162,5 +162,5 @@ std::filesystem::path PythonTestHelper::test_data_path()
 bool PythonTestHelper::is_python_required()
 {
     const char* value = std::getenv("MNE_REQUIRE_PYTHON"); // NOLINT(concurrency-mt-unsafe): read-only, no setenv here
-    return value != nullptr && (equalsIgnoreCase(value, "true") || std::string_view(value) == "1");
+    return value != nullptr && (iequals(value, "true") || std::string_view(value) == "1");
 }

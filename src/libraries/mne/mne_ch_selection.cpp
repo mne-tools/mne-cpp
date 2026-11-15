@@ -60,7 +60,7 @@ int MNEChSelection::assign_channels(std::span<const FiffChInfo> chs, const MNEDe
     ch_kind.setConstant(nchan, -1);
 
     const auto matches = [this](int c, std::string_view ch_name) {
-        return mne::equalsIgnoreCase(chspick[c], ch_name) || mne::equalsIgnoreCase(chspick_nospace[c], ch_name);
+        return mne::iequals(chspick[c], ch_name) || mne::iequals(chspick_nospace[c], ch_name);
     };
     const auto assign = [this, &chs](int c, std::size_t rc) {
         pick[c] = static_cast<int>(rc);
@@ -84,7 +84,7 @@ int MNEChSelection::assign_channels(std::span<const FiffChInfo> chs, const MNEDe
             if (pick[c] != -1)
                 continue;
             for (std::size_t d = 0; d < deriv_names.size(); d++) {
-                if (mne::equalsIgnoreCase(chspick[c], deriv_names[d]) && d < static_cast<std::size_t>(deriv->valid.size()) && deriv->valid[static_cast<Eigen::Index>(d)]) {
+                if (mne::iequals(chspick[c], deriv_names[d]) && d < static_cast<std::size_t>(deriv->valid.size()) && deriv->valid[static_cast<Eigen::Index>(d)]) {
                     pick_deriv[c] = static_cast<int>(d);
                     ch_kind[c] = deriv->chs[d].kind;
                     break;

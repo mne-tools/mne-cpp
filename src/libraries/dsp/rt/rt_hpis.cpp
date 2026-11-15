@@ -75,7 +75,7 @@ RtHpi::RtHpi(const InvSensorSet sensorSet, QObject* parent)
 : QObject(parent)
 , m_sensorSet(sensorSet)
 {
-    qRegisterMetaType<mne::HpiFitResult>("mne::HpiFitResult");
+    qRegisterMetaType<mne::HpiFitResult>();
     qRegisterMetaType<QVector<int>>("QVector<int>");
     qRegisterMetaType<std::shared_ptr<mne::FiffInfo>>();
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");

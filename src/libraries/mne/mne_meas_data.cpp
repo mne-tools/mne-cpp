@@ -287,7 +287,7 @@ bool MNEMeasData::read_evoked_set(const std::filesystem::path& name,
         if (op) {         /* Attach the projection operator and CTF compensation info to the data, too */
             target.proj = MNEProjOp::read(name);
             if (target.proj && !target.proj->items.empty()) {
-                mne::Log::info("\tLoaded projection from {}:\n", mne::utf8FromPath(name));
+                mne::Log::info("\tLoaded projection from {}:\n", mne::utf8_from_path(name));
                 std::ostringstream report;
                 target.proj->report(report, "\t\t");
                 mne::Log::info("{}", report.str());
@@ -295,7 +295,7 @@ bool MNEMeasData::read_evoked_set(const std::filesystem::path& name,
         } else {
             target.proj = MNEProjOp::read(name);
             if (target.proj && !target.proj->items.empty()) {
-                mne::Log::info("\tLoaded projection from {}:\n", mne::utf8FromPath(name));
+                mne::Log::info("\tLoaded projection from {}:\n", mne::utf8_from_path(name));
                 std::ostringstream report;
                 target.proj->report(report, "\t\t");
                 mne::Log::info("{}", report.str());
@@ -305,7 +305,7 @@ bool MNEMeasData::read_evoked_set(const std::filesystem::path& name,
                 return false;
             }
             if (target.comp->ncomp > 0)
-                mne::Log::info("\tRead {} compensation data sets from {}\n", target.comp->ncomp, mne::utf8FromPath(name));
+                mne::Log::info("\tRead {} compensation data sets from {}\n", target.comp->ncomp, mne::utf8_from_path(name));
         }
         /*
          * Bad channels — already read by FiffEvoked via FiffStream::read_meas_info()
@@ -316,13 +316,13 @@ bool MNEMeasData::read_evoked_set(const std::filesystem::path& name,
 
             for (const auto& bad_name : target.badlist) {
                 for (k = 0; k < target.nchan; k++) {
-                    if (mne::equalsIgnoreCase(target.chs[k].ch_name, bad_name)) {
+                    if (mne::iequals(target.chs[k].ch_name, bad_name)) {
                         target.bad[k] = 1;
                         break;
                     }
                 }
             }
-            mne::Log::info("\t{} bad channels read from {}{}{}", target.badlist.size(), mne::utf8FromPath(name),
+            mne::Log::info("\t{} bad channels read from {}{}{}", target.badlist.size(), mne::utf8_from_path(name),
                            target.badlist.empty() ? "" : ": ", mne::join(target.badlist, " "));
         }
     }
@@ -362,7 +362,7 @@ bool MNEMeasData::read_evoked_set(const std::filesystem::path& name,
     target.nset++;
     if (fresh)
         target.current = target.sets.front().get();
-    mne::Log::info("\t{} dataset {} from {}", fresh ? "Loaded" : "Added", comment, mne::utf8FromPath(name));
+    mne::Log::info("\t{} dataset {} from {}", fresh ? "Loaded" : "Added", comment, mne::utf8_from_path(name));
     return true;
 }
 

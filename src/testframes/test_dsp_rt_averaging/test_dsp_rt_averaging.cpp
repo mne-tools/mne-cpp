@@ -257,7 +257,7 @@ private slots:
             QSKIP("No test data");
         FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
         std::shared_ptr<FiffInfo> info = std::make_shared<FiffInfo>(raw.info);
-        const int stiIdx = mne::indexOf(info->ch_names, "STI 014");
+        const int stiIdx = mne::index_of(info->ch_names, "STI 014");
         QVERIFY(stiIdx >= 0);
         MatrixXd data, times;
         QVERIFY(raw.read_raw_segment(data, times));
@@ -787,7 +787,7 @@ private slots:
         FiffRawData raw((m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
         MatrixXd data, times;
         QVERIFY(raw.read_raw_segment(data, times));
-        const int stiIdx = mne::indexOf(raw.info.ch_names, "STI 014");
+        const int stiIdx = mne::index_of(raw.info.ch_names, "STI 014");
         QVERIFY(stiIdx >= 0);
 
         // Rising stim onsets with their codes, as read from the stim channel directly

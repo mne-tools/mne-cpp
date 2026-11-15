@@ -94,7 +94,7 @@ public:
     }
 
     /** @return Whether the stream has not been closed. */
-    virtual bool isOpen() const
+    virtual bool is_open() const
     {
         return true;
     }
@@ -102,11 +102,11 @@ public:
     /** Opens a closed stream again at position 0, keeping its contents. @return Whether the stream is open. */
     virtual bool reopen()
     {
-        return isOpen();
+        return is_open();
     }
 
     /** @return Whether the position is at or past the end. */
-    bool atEnd() const
+    bool at_end() const
     {
         return pos() >= size();
     }
@@ -121,13 +121,13 @@ public:
      * @return Whether all values were read.
      */
     template<Swappable T>
-    bool readBigEndian(T* values, std::size_t count)
+    bool read_big_endian(T* values, std::size_t count)
     {
         if (read(values, count * sizeof(T)) != count * sizeof(T)) {
             return false;
         }
         if constexpr (std::endian::native != std::endian::big) {
-            byteSwapInPlace(values, count);
+            byte_swap_in_place(values, count);
         }
         return true;
     }
@@ -138,9 +138,9 @@ public:
      * @return Whether the value was read.
      */
     template<Swappable T>
-    bool readBigEndian(T& value)
+    bool read_big_endian(T& value)
     {
-        return readBigEndian(&value, 1);
+        return read_big_endian(&value, 1);
     }
 
     //=========================================================================================================
@@ -153,7 +153,7 @@ public:
      * @return Whether all values were written.
      */
     template<Swappable T>
-    bool writeBigEndian(const T* values, std::size_t count)
+    bool write_big_endian(const T* values, std::size_t count)
     {
         if constexpr (std::endian::native == std::endian::big) {
             return write(values, count * sizeof(T)) == count * sizeof(T);
@@ -163,7 +163,7 @@ public:
             for (std::size_t done = 0; done < count;) {
                 const std::size_t n = count - done < kChunk ? count - done : kChunk;
                 for (std::size_t i = 0; i < n; ++i) {
-                    swapped[i] = byteSwap(values[done + i]);
+                    swapped[i] = byte_swap(values[done + i]);
                 }
                 if (write(swapped, n * sizeof(T)) != n * sizeof(T)) {
                     return false;
@@ -180,9 +180,9 @@ public:
      * @return Whether the value was written.
      */
     template<Swappable T>
-    bool writeBigEndian(T value)
+    bool write_big_endian(T value)
     {
-        return writeBigEndian(&value, 1);
+        return write_big_endian(&value, 1);
     }
 };
 
@@ -251,7 +251,7 @@ public:
     std::uint64_t pos() const override;
     std::uint64_t size() const override;
     void close() override;
-    bool isOpen() const override;
+    bool is_open() const override;
     bool reopen() override;
     /** @return Whether everything written has reached the operating system. */
     bool flush();
@@ -270,7 +270,7 @@ private:
     FileByteStream(std::FILE* file, Mode mode, std::filesystem::path path);
 
     /** C streams need a seek between a write and a following read, and vice versa. */
-    void switchDirection(bool writing);
+    void switch_direction(bool writing);
 
     std::FILE* m_file = nullptr;
     Mode m_mode = Mode::Read;

@@ -167,7 +167,7 @@ public:
      * @param[in] name  Contact name.
      * @return Index of the contact, or -1.
      */
-    int indexOf(const std::string& name) const;
+    int index_of(const std::string& name) const;
 
     /** @return Contact positions, one row per contact, in metres. */
     Eigen::MatrixX3f positions() const;

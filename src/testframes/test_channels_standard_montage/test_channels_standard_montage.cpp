@@ -42,14 +42,14 @@ private slots:
         const StringList names = StandardMontage::electrode_names(StandardMontage::System::Standard_1020);
         QCOMPARE(names.size(), std::size_t(21));
         for (const char* name : {"Cz", "Fp1", "O2", "A1"})
-            QVERIFY(contains(names, name));
+            QVERIFY(std::ranges::contains(names, name));
     }
 
     void testElectrodeNames1010()
     {
         const StringList names = StandardMontage::electrode_names(StandardMontage::System::Standard_1010);
         for (const char* name : {"FCz", "CPz", "AF7", "PO8"})
-            QVERIFY(contains(names, name));
+            QVERIFY(std::ranges::contains(names, name));
     }
 
     void testFindElectrode()
