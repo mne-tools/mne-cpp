@@ -143,6 +143,21 @@ BASESHARED_EXPORT bool is_utf8(std::string_view text);
  */
 BASESHARED_EXPORT std::string to_hex(std::span<const std::byte> data);
 
+/**
+ * @param[in] data   Any bytes.
+ * @param[in] url    Whether to use the URL-safe alphabet without padding (RFC 4648 section 5).
+ *
+ * @return @p data in base64, like QByteArray::toBase64().
+ */
+BASESHARED_EXPORT std::string to_base64(std::span<const std::byte> data, bool url = false);
+
+/**
+ * @param[in] text   Base64 in the standard or the URL-safe alphabet, padded or not; whitespace is skipped.
+ *
+ * @return The bytes, or nothing if @p text holds another character or is cut short.
+ */
+BASESHARED_EXPORT std::optional<std::vector<std::byte>> from_base64(std::string_view text);
+
 /** A UTC time point with millisecond resolution, e.g. a file's creation time. */
 using UtcTime = std::chrono::sys_time<std::chrono::milliseconds>;
 

@@ -68,6 +68,7 @@ private slots:
     void utf8PathsRoundTrip();
     void latin1AndUtf8MatchQString();
     void toHexMatchesQByteArray();
+    void base64MatchesQByteArray();
     void iso8601MatchesQDateTime_data();
     void iso8601MatchesQDateTime();
     void iso8601RejectsMalformedText();
@@ -283,6 +284,28 @@ void TestUtilsStringUtils::toHexMatchesQByteArray()
     const QByteArray qt(reinterpret_cast<const char*>(every.data()), qsizetype(every.size()));
     QCOMPARE(to_hex(every), qt.toHex().toStdString());
     QCOMPARE(to_hex({}), std::string());
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::base64MatchesQByteArray()
+{
+    std::vector<std::byte> data;
+    data.reserve(300);
+    for (std::size_t n = 0; n <= 300; ++n) {
+        const QByteArray qt(reinterpret_cast<const char*>(data.data()), qsizetype(data.size()));
+        const std::string standard = to_base64(data);
+        const std::string url = to_base64(data, true);
+        QCOMPARE(standard, qt.toBase64().toStdString());
+        QCOMPARE(url, qt.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals).toStdString());
+        QCOMPARE(from_base64(standard), std::optional(data));
+        QCOMPARE(from_base64(url), std::optional(data));
+        data.push_back(static_cast<std::byte>((n * 151) + (n >> 2)));
+    }
+    QCOMPARE(from_base64("QU JD\nRA=="), std::optional(std::vector<std::byte>{std::byte{'A'}, std::byte{'B'}, std::byte{'C'}, std::byte{'D'}}));
+    QVERIFY(!from_base64("QUJD*"));
+    QVERIFY(!from_base64("QUJDR"));
+    QVERIFY(!from_base64("QQ==QQ=="));
 }
 
 //=============================================================================================================

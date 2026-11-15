@@ -42,44 +42,6 @@ namespace
 
 constexpr int kMaxNesting = 1024;
 
-/** @return @p data in base64 (RFC 4648), the URL-safe alphabet without padding if @p url. */
-std::string toBase64(const CborByteArray& data, bool url)
-{
-    const char* alphabet = url ? "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
-                               : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    std::string text;
-    text.reserve((data.size() + 2) / 3 * 4);
-    std::size_t i = 0;
-    for (; i + 2 < data.size(); i += 3) {
-        const auto bits = (std::to_integer<unsigned>(data[i]) << 16) | (std::to_integer<unsigned>(data[i + 1]) << 8) | std::to_integer<unsigned>(data[i + 2]);
-        text += {alphabet[(bits >> 18) & 63], alphabet[(bits >> 12) & 63], alphabet[(bits >> 6) & 63], alphabet[bits & 63]};
-    }
-    if (i < data.size()) {
-        const bool two = i + 1 < data.size();
-        const auto bits = (std::to_integer<unsigned>(data[i]) << 16) | (two ? std::to_integer<unsigned>(data[i + 1]) << 8 : 0U);
-        text += {alphabet[(bits >> 18) & 63], alphabet[(bits >> 12) & 63]};
-        if (two) {
-            text += alphabet[(bits >> 6) & 63];
-        }
-        if (!url) {
-            text.append(two ? 1 : 2, '=');
-        }
-    }
-    return text;
-}
-
-/** @return @p data as lower-case hex digits. */
-std::string toHex(const CborByteArray& data)
-{
-    constexpr std::string_view digits = "0123456789abcdef";
-    std::string text;
-    text.reserve(data.size() * 2);
-    for (const std::byte b : data) {
-        text += {digits[std::to_integer<unsigned>(b) >> 4], digits[std::to_integer<unsigned>(b) & 15]};
-    }
-    return text;
-}
-
 /** Appends CBOR to a byte buffer. */
 class Encoder
 {
@@ -901,7 +863,7 @@ JsonValue CborValue::to_json_value() const
         case Integer:
             return to_integer();
         case ByteArray:
-            return toBase64(to_byte_array(), true);
+            return to_base64(to_byte_array(), true);
         case String:
             return to_string();
         case Array:
@@ -911,7 +873,7 @@ JsonValue CborValue::to_json_value() const
         case Tag: {
             const CborValue& content = tagged_value();
             if (content.is_byte_array() && (tag() == 22 || tag() == 23)) {
-                return tag() == 22 ? toBase64(content.to_byte_array(), false) : toHex(content.to_byte_array());
+                return tag() == 22 ? to_base64(content.to_byte_array()) : to_hex(content.to_byte_array());
             }
             return content.to_json_value();
         }

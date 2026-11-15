@@ -358,6 +358,88 @@ std::filesystem::path mne::resource_path(std::string_view relative)
 
 //=============================================================================================================
 
+std::string mne::to_base64(std::span<const std::byte> data, bool url)
+{
+    const std::string_view alphabet = url ? "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+                                          : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    const auto at = [&](unsigned bits) {
+        return alphabet[bits & 63U];
+    };
+    std::string text;
+    text.reserve((data.size() + 2) / 3 * 4);
+    std::size_t i = 0;
+    for (; i + 2 < data.size(); i += 3) {
+        const unsigned bits = (std::to_integer<unsigned>(data[i]) << 16) | (std::to_integer<unsigned>(data[i + 1]) << 8) | std::to_integer<unsigned>(data[i + 2]);
+        text += {at(bits >> 18), at(bits >> 12), at(bits >> 6), at(bits)};
+    }
+    if (i < data.size()) {
+        const bool two = i + 1 < data.size();
+        const unsigned bits = (std::to_integer<unsigned>(data[i]) << 16) | (two ? std::to_integer<unsigned>(data[i + 1]) << 8 : 0U);
+        text += {at(bits >> 18), at(bits >> 12)};
+        if (two) {
+            text += at(bits >> 6);
+        }
+        if (!url) {
+            text.append(two ? 1 : 2, '=');
+        }
+    }
+    return text;
+}
+
+//=============================================================================================================
+
+std::optional<std::vector<std::byte>> mne::from_base64(std::string_view text)
+{
+    const auto sextet = [](char c) -> int {
+        if (c >= 'A' && c <= 'Z')
+            return c - 'A';
+        if (c >= 'a' && c <= 'z')
+            return c - 'a' + 26;
+        if (c >= '0' && c <= '9')
+            return c - '0' + 52;
+        if (c == '+' || c == '-')
+            return 62;
+        if (c == '/' || c == '_')
+            return 63;
+        return -1;
+    };
+    std::vector<std::byte> data;
+    data.reserve(text.size() / 4 * 3);
+    unsigned bits = 0;
+    int count = 0;
+    bool padding = false;
+    for (const char c : text) {
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+            continue;
+        }
+        if (c == '=') {
+            padding = true;
+            continue;
+        }
+        const int value = sextet(c);
+        if (value < 0 || padding) {
+            return std::nullopt;
+        }
+        bits = (bits << 6) | static_cast<unsigned>(value);
+        if (++count == 4) {
+            data.insert(data.end(), {std::byte(bits >> 16), std::byte(bits >> 8), std::byte(bits)});
+            bits = 0;
+            count = 0;
+        }
+    }
+    if (count == 1) {
+        return std::nullopt;
+    }
+    if (count == 2) {
+        data.push_back(std::byte(bits >> 4));
+    } else if (count == 3) {
+        data.insert(data.end(), {std::byte(bits >> 10), std::byte(bits >> 2)});
+    }
+    return data;
+}
+
+//=============================================================================================================
+
 std::string mne::format_iso8601(UtcTime time, bool milliseconds)
 {
     using namespace std::chrono;
