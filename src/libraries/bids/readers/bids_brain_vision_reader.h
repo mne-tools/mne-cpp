@@ -45,10 +45,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDateTime>
 #include <QVector>
 #include <QFile>
 #include <QMap>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <chrono>
+#include <optional>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -65,12 +71,12 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BrainVisionMarker
 {
-    QString type;        /**< Marker type (e.g., "New Segment", "Stimulus", "Response"). */
-    QString description; /**< Description (e.g., "S253", "R255"). */
-    long position{0};    /**< 0-based sample position. */
-    long duration{0};    /**< Duration in samples (0 = point marker). */
-    int channel{0};      /**< Channel number (0 = all channels). */
-    QDateTime date;      /**< Optional date/time (for New Segment markers). */
+    QString type;                                                         /**< Marker type (e.g., "New Segment", "Stimulus", "Response"). */
+    QString description;                                                  /**< Description (e.g., "S253", "R255"). */
+    long position{0};                                                     /**< 0-based sample position. */
+    long duration{0};                                                     /**< Duration in samples (0 = point marker). */
+    int channel{0};                                                       /**< Channel number (0 = all channels). */
+    std::optional<std::chrono::sys_time<std::chrono::microseconds>> date; /**< Optional UTC date/time (for New Segment markers). */
 };
 
 //=============================================================================================================
@@ -184,6 +190,7 @@ private:
 
     QVector<BrainVisionChannelInfo> m_vChannels;
     QVector<BrainVisionMarker> m_vMarkers;
+    std::optional<std::chrono::sys_time<std::chrono::microseconds>> m_measDate; /**< Date of the first dated New Segment marker. */
 
     mutable QFile m_dataFile;
     bool m_bIsOpen{false};

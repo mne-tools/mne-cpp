@@ -16,6 +16,7 @@
 
 #include "bids_edf_reader.h"
 #include <base/log.h>
+#include <base/string_utils.h>
 
 #include <fiff/fiff_constants.h>
 
@@ -27,12 +28,102 @@
 #include <QIODevice>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+#include <array>
+#include <string>
+#include <vector>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace BIDSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE LOCAL FUNCTIONS
+//=============================================================================================================
+
+namespace
+{
+
+/** Splits "a.b.c" (dots or dashes) into three fields; empty when the text has another shape. */
+std::optional<std::array<std::string, 3>> splitTriple(std::string_view text, char separator)
+{
+    std::array<std::string, 3> fields;
+    std::size_t start = 0;
+    for (std::size_t k = 0; k < 3; ++k) {
+        const std::size_t end = k < 2 ? text.find(separator, start) : text.size();
+        if (end == std::string_view::npos) {
+            return std::nullopt;
+        }
+        fields[k] = std::string(BASELIB::trimmed(text.substr(start, end - start)));
+        start = end + 1;
+    }
+    return fields;
+}
+
+/** A calendar date from day, month and year, or empty when it does not exist. */
+std::optional<std::chrono::sys_days> civilDate(std::optional<int> day, std::optional<int> month, std::optional<int> year)
+{
+    if (!day || !month || !year) {
+        return std::nullopt;
+    }
+    const std::chrono::year_month_day date{std::chrono::year{*year}, std::chrono::month(static_cast<unsigned>(*month)),
+                                           std::chrono::day(static_cast<unsigned>(*day))};
+    return date.ok() ? std::optional(std::chrono::sys_days{date}) : std::nullopt;
+}
+
+} // namespace
+
+//=============================================================================================================
+
+std::optional<std::chrono::sys_time<std::chrono::microseconds>> EDFReader::parseStartDate(std::string_view recordingId,
+                                                                                          std::string_view startDate,
+                                                                                          std::string_view startTime)
+{
+    using namespace std::chrono;
+    // EDF+ "Startdate dd-MMM-yyyy ..." carries all four digits of the year and wins over the header date
+    std::optional<sys_days> date;
+    const std::vector<std::string> recording = BASELIB::split(BASELIB::trimmed(recordingId), ' ');
+    if (recording.size() == 5) {
+        if (const auto fields = splitTriple(recording[1], '-')) {
+            static constexpr std::array<std::string_view, 12> months{"JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+                                                                     "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+            const auto month = std::ranges::find_if(months, [&](std::string_view name) { return BASELIB::equalsIgnoreCase(name, (*fields)[1]); });
+            if (month != months.end()) {
+                date = civilDate(BASELIB::toInt((*fields)[0]), static_cast<int>(month - months.begin()) + 1, BASELIB::toInt((*fields)[2]));
+            }
+        }
+    }
+    // Otherwise the two-digit header year: 85-99 is 1985-1999, 00-84 is 2000-2084
+    if (!date) {
+        if (const auto fields = splitTriple(startDate, '.')) {
+            std::optional<int> year = BASELIB::toInt((*fields)[2]);
+            if (year) {
+                *year += *year < 85 ? 2000 : 1900;
+            }
+            date = civilDate(BASELIB::toInt((*fields)[0]), BASELIB::toInt((*fields)[1]), year);
+        }
+    }
+    if (!date) {
+        return std::nullopt;
+    }
+    sys_time<microseconds> time = *date;
+    if (const auto fields = splitTriple(startTime, '.')) {
+        const auto hour = BASELIB::toInt((*fields)[0]);
+        const auto minute = BASELIB::toInt((*fields)[1]);
+        const auto second = BASELIB::toInt((*fields)[2]);
+        if (hour && minute && second) {
+            time += hours(*hour) + minutes(*minute) + seconds(*second);
+        }
+    }
+    return time;
+}
 
 //=============================================================================================================
 // EDFChannelInfo
@@ -156,9 +247,9 @@ void EDFReader::parseHeader(QIODevice* pDev)
     m_sVersionNo = QString::fromLatin1(pDev->read(EDF_VERSION)).trimmed();
     m_sPatientId = QString::fromLatin1(pDev->read(LOCAL_PATIENT_INFO)).trimmed();
     m_sRecordingId = QString::fromLatin1(pDev->read(LOCAL_RECORD_INFO)).trimmed();
-    m_startDateTime.setDate(QDate::fromString(QString::fromLatin1(pDev->read(STARTDATE)), "dd.MM.yy"));
-    m_startDateTime = m_startDateTime.addYears(100);
-    m_startDateTime.setTime(QTime::fromString(QString::fromLatin1(pDev->read(STARTTIME)), "hh.mm.ss"));
+    const std::string startDate = pDev->read(STARTDATE).toStdString();
+    const std::string startTime = pDev->read(STARTTIME).toStdString();
+    m_measDate = parseStartDate(m_sRecordingId.toStdString(), startDate, startTime);
     m_iNumBytesInHeader = QString::fromLatin1(pDev->read(NUM_BYTES_HEADER)).trimmed().toInt();
     pDev->read(HEADER_RESERVED);
     m_iNumDataRecords = QString::fromLatin1(pDev->read(NUM_DATA_RECORDS)).trimmed().toInt();
@@ -255,6 +346,9 @@ FiffInfo EDFReader::getInfo() const
     }
 
     info.sfreq = getFrequency();
+    if (m_measDate) {
+        info.set_meas_date(*m_measDate);
+    }
     return info;
 }
 

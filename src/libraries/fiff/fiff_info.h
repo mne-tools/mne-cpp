@@ -53,9 +53,10 @@
 #include "fiff_proj.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
+#include <chrono>
 #include <memory>
 #include <cstdint>
 
@@ -122,6 +123,19 @@ public:
      * @param[in] p_FiffInfo  FIFF measurement information which should be copied.
      */
     FiffInfo(const FiffInfo& p_FiffInfo);
+
+    //=========================================================================================================
+    /**
+     * Sets @c meas_date to a UTC time point, as seconds and microseconds since the Unix epoch.
+     *
+     * @param[in] time   Measurement start in UTC.
+     */
+    void set_meas_date(std::chrono::sys_time<std::chrono::microseconds> time)
+    {
+        const auto seconds = std::chrono::floor<std::chrono::seconds>(time);
+        meas_date[0] = static_cast<fiff_int_t>(seconds.time_since_epoch().count());
+        meas_date[1] = static_cast<fiff_int_t>((time - seconds).count());
+    }
 
     //=========================================================================================================
     /**

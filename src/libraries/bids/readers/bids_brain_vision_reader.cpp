@@ -16,6 +16,7 @@
 
 #include "bids_brain_vision_reader.h"
 #include <base/log.h>
+#include <base/string_utils.h>
 
 #include <fiff/fiff_constants.h>
 
@@ -30,12 +31,44 @@
 #include <QtEndian>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <algorithm>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace BIDSLIB;
 using namespace FIFFLIB;
 using namespace Eigen;
+
+//=============================================================================================================
+// DEFINE LOCAL FUNCTIONS
+//=============================================================================================================
+
+namespace
+{
+
+/** A marker date "YYYYMMDDhhmmssffffff" in UTC; empty for the all-zero placeholder or an invalid date. */
+std::optional<std::chrono::sys_time<std::chrono::microseconds>> parseMarkerDate(std::string_view digits)
+{
+    using namespace std::chrono;
+    const auto field = [digits](std::size_t pos, std::size_t count) {
+        return BASELIB::toInt(digits.substr(pos, count)).value_or(-1);
+    };
+    const year_month_day date{year{field(0, 4)}, month(static_cast<unsigned>(field(4, 2))), day(static_cast<unsigned>(field(6, 2)))};
+    const int hour = field(8, 2);
+    const int minute = field(10, 2);
+    const int second = field(12, 2);
+    if (!date.ok() || hour > 23 || minute > 59 || second > 59) {
+        return std::nullopt;
+    }
+    return sys_days{date} + hours(hour) + minutes(minute) + seconds(second) + microseconds(field(14, 6));
+}
+
+} // namespace
 
 //=============================================================================================================
 // BrainVisionChannelInfo
@@ -305,6 +338,8 @@ bool BrainVisionReader::parseMarkers(const QString& sVmrkPath)
 
     QString currentSection;
     m_vMarkers.clear();
+    m_measDate.reset();
+    bool measDateFound = false;
 
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
@@ -334,13 +369,13 @@ bool BrainVisionReader::parseMarkers(const QString& sVmrkPath)
             marker.duration = parts[3].toLong();
             marker.channel = parts[4].toInt();
 
-            if (parts.size() >= 6 && !parts[5].isEmpty()) {
-                // Date format: YYYYMMDDHHMMSSffffff (20 chars)
-                QString dateStr = parts[5];
-                if (dateStr.size() >= 14) {
-                    marker.date = QDateTime(
-                        QDate(dateStr.mid(0, 4).toInt(), dateStr.mid(4, 2).toInt(), dateStr.mid(6, 2).toInt()),
-                        QTime(dateStr.mid(8, 2).toInt(), dateStr.mid(10, 2).toInt(), dateStr.mid(12, 2).toInt()));
+            // Like mne, the recording start is the date of the first New Segment marker that has one
+            const bool hasDate = parts.size() == 6 && parts[5].size() == 20 && std::ranges::all_of(parts[5], [](QChar c) { return c >= '0' && c <= '9'; });
+            if (hasDate) {
+                marker.date = parseMarkerDate(parts[5].toStdString());
+                if (marker.type == QStringLiteral("New Segment") && !measDateFound) {
+                    measDateFound = true;
+                    m_measDate = marker.date;
                 }
             }
 
@@ -411,6 +446,9 @@ FIFFLIB::FiffInfo BrainVisionReader::getInfo() const
         FiffChInfo fiffCh = ch.toFiffChInfo();
         info.chs.push_back(fiffCh);
         info.ch_names.push_back(fiffCh.ch_name);
+    }
+    if (m_measDate) {
+        info.set_meas_date(*m_measDate);
     }
 
     return info;

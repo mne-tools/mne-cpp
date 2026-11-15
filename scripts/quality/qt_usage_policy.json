@@ -65,8 +65,8 @@
       ]
     },
     "bids": {
-      "tokens": 218,
-      "public_header_includes": 8,
+      "tokens": 210,
+      "public_header_includes": 6,
       "modules": [
         "Core"
       ]

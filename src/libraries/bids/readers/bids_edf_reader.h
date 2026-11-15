@@ -44,9 +44,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDateTime>
 #include <QVector>
 #include <QFile>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <chrono>
+#include <optional>
+#include <string_view>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -159,13 +166,22 @@ private:
 
     void parseHeader(QIODevice* pDev);
 
+    /**
+     * The recording start in UTC, as MNE-Python reads it: the EDF+ "Startdate dd-MMM-yyyy" recording field
+     * when present, else the "dd.mm.yy" header date with years 85-99 in 1985-1999 and 00-84 in 2000-2084,
+     * plus the "hh.mm.ss" header time. Empty when no valid date is found.
+     */
+    static std::optional<std::chrono::sys_time<std::chrono::microseconds>> parseStartDate(std::string_view recordingId,
+                                                                                          std::string_view startDate,
+                                                                                          std::string_view startTime);
+
     QString m_sFilePath;
 
     // Header data
     QString m_sVersionNo;
     QString m_sPatientId;
     QString m_sRecordingId;
-    QDateTime m_startDateTime;
+    std::optional<std::chrono::sys_time<std::chrono::microseconds>> m_measDate;
     int m_iNumBytesInHeader{0};
     int m_iNumDataRecords{0};
     float m_fDataRecordsDuration{0.0f};

@@ -38,6 +38,7 @@
 #include <QTemporaryDir>
 
 #include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <string>
 #include <tuple>
@@ -456,6 +457,10 @@ void TestBids::testReadBrainVision()
     QVERIFY(BASELIB::contains(data.raw.info.bads, "P4"));
     QCOMPARE(data.raw.info.bads.size(), 1);
 
+    // mne.io.read_raw_brainvision: meas_date 2013-11-13 16:14:03.794232 UTC from the New Segment marker
+    QCOMPARE(data.raw.info.meas_date[0], 1384359243);
+    QCOMPARE(data.raw.info.meas_date[1], 794232);
+
     // Reference values produced by mne_bids.read_raw_bids(BIDSPath(...)) (mne-bids 0.17, mne 1.11): 32 channels,
     // 1000 Hz, bads ['P4'], annotations stimulus, response, stimulus, feedback.
     QCOMPARE(data.events.size(), std::size_t{4});
@@ -520,8 +525,11 @@ void TestBids::testReadEdf()
     QVERIFY(data.reader != nullptr);
 
     // Reference values produced by mne.io.read_raw_edf(...).get_data() (mne 1.11); mne.io.read_raw dispatches
-    // to the same reader and returns identical samples, as BidsRawData::createReader does by extension.
+    // to the same reader and returns identical samples, as BidsRawData::create_reader does by extension.
     QCOMPARE(data.reader->getSampleCount(), 1228L);
+    // mne.io.read_raw_edf: meas_date 2015-06-02 10:41:57 UTC
+    QCOMPARE(data.raw.info.meas_date[0], 1433241717);
+    QCOMPARE(data.raw.info.meas_date[1], 0);
     QCOMPARE(data.raw.first_samp, 0);
     QCOMPARE(data.raw.last_samp, 1227); // mne raw.last_samp is inclusive
     const Eigen::MatrixXd samples = data.reader->readRawSegment(0, 1228).cast<double>();
@@ -581,6 +589,25 @@ void TestBids::testReadEdf()
     QCOMPARE(reducedInfo.chs[a10].unit, FIFF_UNIT_V);
     QCOMPARE(reducedInfo.chs[status].kind, FIFFV_STIM_CH);
     QCOMPARE(reducedInfo.chs[status].unit, FIFF_UNIT_NONE);
+    // mne.io.read_raw_edf: meas_date 2014-04-29 22:19:44 UTC
+    QCOMPARE(reducedInfo.meas_date[0], 1398809984);
+
+    // Like mne read_raw_edf: the EDF+ "Startdate dd-MMM-yyyy" recording field wins over the two-digit header
+    // date, which otherwise maps years 85-99 to 1985-1999 and 00-84 to 2000-2084
+    QCOMPARE(mixedReader.getInfo().meas_date[0], 1767268800); // 2026-01-01 12:00:00 UTC
+    for (const auto& [date, seconds] : {std::pair<QByteArray, int>{"31.12.99", 946684799}, {"01.01.26", 1767268800}}) {
+        QByteArray plain = edfBytes;
+        plain.replace(88, 80, field(QStringLiteral("X"), 80));
+        plain.replace(168, 16, date + (seconds == 946684799 ? "23.59.59" : "12.00.00"));
+        QFile plainFile(dir.filePath(QStringLiteral("plain.edf")));
+        QVERIFY(plainFile.open(QIODevice::WriteOnly));
+        plainFile.write(plain);
+        plainFile.close();
+        EDFReader plainReader;
+        QVERIFY(plainReader.open(plainFile.fileName()));
+        QCOMPARE(plainReader.getInfo().meas_date[0], seconds);
+        QCOMPARE(plainReader.getInfo().meas_date[1], 0);
+    }
     const Eigen::MatrixXf reducedData = reduced.readRawSegment(0, 2);
     QCOMPARE(reducedData(status, 0), 4352.0f);
     QCOMPARE(reducedData(status, 1), 0.0f);
@@ -767,7 +794,7 @@ void TestBids::testBrainVisionReaderMatchesPython()
         QFile vmrk(dir.filePath(base + ".vmrk"));
         QVERIFY(vmrk.open(QIODevice::WriteOnly | QIODevice::Text));
         vmrk.write("Brain Vision Data Exchange Marker File, Version 1.0\n[Marker Infos]\n"
-                   "Mk1=New Segment,,1,1,0,20260101120000000000\nMk2=Stimulus,S\\1 7,3,2,0\n");
+                   "Mk1=New Segment,,1,1,0,20260101120000123456\nMk2=Stimulus,S\\1 7,3,2,0\n");
         vmrk.close();
     };
     write(QStringLiteral("mux16"), QStringLiteral("INT_16"), QStringLiteral("MULTIPLEXED"));
@@ -807,7 +834,12 @@ void TestBids::testBrainVisionReaderMatchesPython()
         QCOMPARE(markers[1].description, std::string("S, 7"));
         QCOMPARE(markers[1].position, 2L);
         QCOMPARE(markers[1].duration, 2L);
-        QCOMPARE(markers[0].date, QDateTime(QDate(2026, 1, 1), QTime(12, 0)));
+        using namespace std::chrono;
+        QVERIFY(markers[0].date == sys_days{2026y / January / 1} + 12h + 123456us);
+        QVERIFY(!markers[1].date);
+        // mne.io.read_raw_brainvision: meas_date from the first New Segment marker with a date
+        QCOMPARE(info.meas_date[0], 1767268800);
+        QCOMPARE(info.meas_date[1], 123456);
     }
 
     // ASCII data is refused rather than misread as INT_16 binary
@@ -882,6 +914,22 @@ void TestBids::testBrainVisionReaderVariants()
         QVERIFY(reader.readRawSegment(2, 2).size() == 0);
         QVERIFY(reader.readRawSegment(0, 4).size() == 0);
         QVERIFY(reader.readRawSegment(-1, 1).size() == 0);
+        QCOMPARE(reader.getInfo().meas_date[0], -1); // no marker file, no date
+    }
+    // As mne read_raw_brainvision: the first dated New Segment marker decides; the all-zero placeholder means unknown
+    {
+        QFile vmrk(dir.filePath(QStringLiteral("zero.vmrk")));
+        QVERIFY(vmrk.open(QIODevice::WriteOnly | QIODevice::Text));
+        vmrk.write("Brain Vision Data Exchange Marker File, Version 1.0\n[Marker Infos]\n"
+                   "Mk1=New Segment,,1,1,0,00000000000000000000\nMk2=New Segment,,2,1,0,20260101120000000000\n");
+        vmrk.close();
+        const QString header = "Brain Vision Data Exchange Header File Version 1.0\n[Common Infos]\nDataFile=zero.eeg\n"
+                               "MarkerFile=zero.vmrk\nNumberOfChannels=2\n[Binary Infos]\nBinaryFormat=INT_32\n";
+        BrainVisionReader reader;
+        QVERIFY(reader.open(write(QStringLiteral("zero"), header, int32)));
+        QCOMPARE(reader.getMarkers().size(), std::size_t{2});
+        QVERIFY(!reader.getMarkers()[0].date && reader.getMarkers()[1].date);
+        QCOMPARE(reader.getInfo().meas_date[0], -1);
     }
     BrainVisionReader probe;
     QVERIFY(probe.supportsExtension(".VHDR") && probe.supportsExtension(".ahdr") && !probe.supportsExtension(".edf"));

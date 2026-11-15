@@ -549,6 +549,15 @@ aliases; replace the old spelling as below.
     and `QStringList`.
   The format readers (`EDFReader`, `BrainVisionReader`) keep their Qt-based
   API for now.
+- `EDFReader` and `BrainVisionReader` set `FiffInfo::meas_date` like
+  MNE-Python; it was left unset. EDF takes the EDF+ "Startdate" field, else
+  the two-digit header year (85-99 is 1985-1999, 00-84 is 2000-2084; the old
+  parser put every year in 2000-2099 and never used it). BrainVision takes the
+  first dated "New Segment" marker, to the microsecond.
+  `BrainVisionMarker::date` is a
+  `std::optional<std::chrono::sys_time<std::chrono::microseconds>>` instead of
+  a `QDateTime`, empty for the all-zero placeholder. New
+  `FiffInfo::set_meas_date(time)` sets the date from a UTC time point.
 - FIFF annotation channel names and extras, and `FiffAnnotations::read_json`/
   `write_json`, use `BASELIB::JsonDocument` instead of Qt's JSON classes; the
   files are unchanged. The helpers in `fiff/fiff_annotations_json.h` are now
