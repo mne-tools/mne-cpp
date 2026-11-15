@@ -493,6 +493,30 @@ bool JsonArray::operator==(const JsonArray& other) const
 
 //=============================================================================================================
 
+JsonArray JsonArray::from_string_list(std::span<const std::string> list)
+{
+    JsonArray array;
+    array.reserve(list.size());
+    for (const std::string& item : list) {
+        array.append(item);
+    }
+    return array;
+}
+
+//=============================================================================================================
+
+std::vector<std::string> JsonArray::to_string_list() const
+{
+    std::vector<std::string> list;
+    list.reserve(size());
+    for (const JsonValue& value : *this) {
+        list.emplace_back(value.to_string());
+    }
+    return list;
+}
+
+//=============================================================================================================
+
 JsonObject::JsonObject(std::initializer_list<std::pair<std::string_view, JsonValue>> members)
 {
     m_members.reserve(members.size());
@@ -558,6 +582,20 @@ JsonValue JsonObject::take(std::string_view key)
     JsonValue value = std::move(it->m_value);
     m_members.erase(it);
     return value;
+}
+
+//=============================================================================================================
+
+JsonObject JsonObject::without(std::initializer_list<std::string_view> keys) const
+{
+    JsonObject result;
+    result.m_members.reserve(m_members.size());
+    for (const Member& member : m_members) {
+        if (std::ranges::find(keys, std::string_view(member.key())) == keys.end()) {
+            result.m_members.push_back(member); // already sorted
+        }
+    }
+    return result;
 }
 
 //=============================================================================================================

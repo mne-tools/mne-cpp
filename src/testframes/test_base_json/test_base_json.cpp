@@ -134,6 +134,7 @@ private slots:
     void missing_data_is_undefined();
     void objects_stay_sorted_and_unique();
     void arrays_edit_safely();
+    void string_lists_and_key_filters_match_qt();
     void stream_yields_the_same_at_every_split();
     void stream_takes_one_byte_at_a_time();
     void handler_gets_tokens_without_copies();
@@ -382,6 +383,23 @@ void TestBaseJson::arrays_edit_safely()
         count += value.is_null() || value.is_object();
     }
     QCOMPARE(count, 2);
+}
+
+//=============================================================================================================
+
+void TestBaseJson::string_lists_and_key_filters_match_qt()
+{
+    const std::vector<std::string> list{"MEG 0113", "", "\xC2\xB5V"};
+    const QStringList qtList{"MEG 0113", "", QString::fromUtf8("\xC2\xB5V")};
+    const JsonArray array = JsonArray::from_string_list(list);
+    QCOMPARE(JsonDocument(array).to_json(JsonDocument::Compact), QJsonDocument(QJsonArray::fromStringList(qtList)).toJson(QJsonDocument::Compact).toStdString());
+    QCOMPARE(array.to_string_list(), list);
+    QCOMPARE((JsonArray{"a", 1, nullptr}.to_string_list()), (std::vector<std::string>{"a", "", ""}));
+
+    const JsonObject object{{"a", 1}, {"b", 2}, {"c", JsonArray{3}}};
+    QCOMPARE(JsonDocument(object.without({"b", "missing"})).to_json(JsonDocument::Compact), std::string(R"({"a":1,"c":[3]})"));
+    QCOMPARE(object.without({}), object);
+    QVERIFY(object.without({"a", "b", "c"}).empty());
 }
 
 //=============================================================================================================

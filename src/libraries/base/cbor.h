@@ -150,6 +150,9 @@ public:
     /** @return The elements as JSON, converted as CborValue::to_json_value() does. */
     JsonArray to_json_array() const;
 
+    /** @param[in] list   Strings. @return An array of those strings, like QCborArray::fromStringList(). */
+    static CborArray from_string_list(std::span<const std::string> list);
+
 private:
     std::vector<CborValue> m_values; /**< The elements. */
 };
@@ -228,8 +231,13 @@ public:
     /** @param[in] object   A JSON object. @return The same members as CBOR, like QCborMap::fromJsonObject(). */
     static CborMap from_json_object(const JsonObject& object);
 
-    /** @return The members as JSON, converted as CborValue::to_json_value() does; later duplicate keys win. */
-    JsonObject to_json_object() const;
+    //=========================================================================================================
+    /**
+     * @param[in] except   Keys to leave out, e.g. large byte strings that would otherwise become base64 text.
+     *
+     * @return The members as JSON, converted as CborValue::to_json_value() does; later duplicate keys win.
+     */
+    JsonObject to_json_object(std::initializer_list<std::string_view> except = {}) const;
 
 private:
     std::vector<value_type> m_members; /**< The members in insertion order. */

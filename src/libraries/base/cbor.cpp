@@ -520,6 +520,16 @@ CborArray CborArray::from_json_array(const JsonArray& array)
     return result;
 }
 
+CborArray CborArray::from_string_list(std::span<const std::string> list)
+{
+    CborArray result;
+    result.reserve(list.size());
+    for (const std::string& item : list) {
+        result.append(item);
+    }
+    return result;
+}
+
 JsonArray CborArray::to_json_array() const
 {
     JsonArray result;
@@ -639,12 +649,14 @@ CborMap CborMap::from_json_object(const JsonObject& object)
     return result;
 }
 
-JsonObject CborMap::to_json_object() const
+JsonObject CborMap::to_json_object(std::initializer_list<std::string_view> except) const
 {
     JsonObject result;
     result.reserve(m_members.size());
     for (const auto& [key, value] : m_members) {
-        result.insert(key, value.to_json_value());
+        if (std::ranges::find(except, std::string_view(key)) == except.end()) {
+            result.insert(key, value.to_json_value());
+        }
     }
     return result;
 }

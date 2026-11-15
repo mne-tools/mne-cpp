@@ -604,6 +604,11 @@ aliases; replace the old spelling as below.
   (`base/string_utils.h`): SHA-256 digests in one call or incrementally,
   the counterpart of `QCryptographicHash::Sha256` and `QByteArray::toHex()`.
   The MNA graph executor fingerprints node inputs with it.
+- New `JsonArray::from_string_list()` / `to_string_list()`,
+  `CborArray::from_string_list()` and `JsonObject::without(keys)`, the
+  counterparts of `QJsonArray::fromStringList()` and
+  `QCborArray::fromStringList()`; `CborMap::to_json_object()` takes keys to
+  leave out, so large byte strings need not become base64 text.
 - New `mne::to_base64()` and `mne::from_base64()` (`base/string_utils.h`):
   base64 in the standard or URL-safe alphabet, the counterpart of
   `QByteArray::toBase64()` / `fromBase64()`; decoding rejects invalid text

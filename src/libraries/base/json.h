@@ -44,6 +44,7 @@
 #include <cstdint>
 #include <initializer_list>
 #include <limits>
+#include <span>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -229,6 +230,12 @@ public:
     /** @param[in] other   Another array. @return Whether both hold equal elements in the same order. */
     bool operator==(const JsonArray& other) const;
 
+    /** @param[in] list   Strings. @return An array of those strings, like QJsonArray::fromStringList(). */
+    static JsonArray from_string_list(std::span<const std::string> list);
+
+    /** @return The elements as strings; elements that are not strings become empty text. */
+    std::vector<std::string> to_string_list() const;
+
 private:
     std::vector<JsonValue> m_values; /**< The elements. */
 };
@@ -337,6 +344,9 @@ public:
 
     /** Removes all members. */
     void clear() noexcept;
+
+    /** @param[in] keys   Keys to leave out. @return A copy of this object without the members called @p keys. */
+    JsonObject without(std::initializer_list<std::string_view> keys) const;
 
     iterator begin() noexcept;
     iterator end() noexcept;

@@ -129,6 +129,7 @@ private slots:
     void decodingAcceptsEveryEncodingForm();
     void jsonConversionMatchesQt();
     void mapsKeepInsertionOrderAndLookUpKeys();
+    void stringListsAndKeyFiltersMatchQt();
     void malformedInputIsRejected();
 };
 
@@ -223,6 +224,21 @@ void TestBaseCbor::mapsKeepInsertionOrderAndLookUpKeys()
     QCOMPARE(date.tagged_value().to_string(), std::string_view("2026-01-01T00:00:00Z"));
     QCOMPARE(CborValue(2).to_double(), 2.0);
     QVERIFY(CborValue("x").to_array().empty());
+}
+
+//=============================================================================================================
+
+void TestBaseCbor::stringListsAndKeyFiltersMatchQt()
+{
+    const std::vector<std::string> list{"-u", "", "\xC2\xB5V"};
+    const QStringList qtList{"-u", "", QString::fromUtf8("\xC2\xB5V")};
+    QCOMPARE(CborValue(CborArray::from_string_list(list)).to_cbor(), bytes(QCborValue(QCborArray::fromStringList(qtList)).toCbor()));
+
+    CborMap map{{"id", "run-01"}, {"data", CborByteArray{std::byte{1}, std::byte{2}}}, {"n", 3}};
+    const JsonObject json = map.to_json_object({"data"});
+    QCOMPARE(json.keys(), (std::vector<std::string>{"id", "n"}));
+    QCOMPARE(map.to_json_object(), CborMap(map).to_json_object({}));
+    QCOMPARE(map.to_json_object()["data"].to_string(), std::string_view("AQI")); // base64url, like Qt
 }
 
 //=============================================================================================================
