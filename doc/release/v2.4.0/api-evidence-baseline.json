@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 480,
+    "exported_classes": 484,
     "exported_free_functions": 199,
-    "registered_classes": 572,
+    "registered_classes": 576,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
     "registered_header_only": 80,
     "registered_stale": 0,
-    "registered_with_test": 238,
+    "registered_with_test": 242,
     "registered_test_unresolved": 0,
-    "registered_with_example": 421,
+    "registered_with_example": 425,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 97,
     "registered_without_api_page": 0,
-    "with_snippet": 455,
-    "public_api_units": 574,
-    "example_eligible": 421,
+    "with_snippet": 459,
+    "public_api_units": 578,
+    "example_eligible": 425,
     "example_exempt": 153,
-    "eligible_backed_by_registry_example": 419,
-    "eligible_used_by_some_example": 363,
+    "eligible_backed_by_registry_example": 423,
+    "eligible_used_by_some_example": 367,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -36,13 +36,13 @@
       "with_snippet": 49
     },
     "base": {
-      "public": 16,
-      "registered": 16,
-      "with_test": 16,
-      "eligible": 16,
-      "eligible_with_registry_example": 16,
-      "eligible_used_by_example": 14,
-      "with_snippet": 16
+      "public": 20,
+      "registered": 20,
+      "with_test": 20,
+      "eligible": 20,
+      "eligible_with_registry_example": 20,
+      "eligible_used_by_example": 18,
+      "with_snippet": 20
     },
     "bids": {
       "public": 14,
@@ -2605,6 +2605,110 @@
         "ex_base/main.cpp#byte_stream_usage"
       ],
       "api_page": "doc/website/docs/api/base/memory-byte-stream.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "CborArray",
+      "header": "base/cbor.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_cbor",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/cbor-array.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "CborMap",
+      "header": "base/cbor.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_cbor",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/cbor-map.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "CborParseError",
+      "header": "base/cbor.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_cbor",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/cbor-parse-error.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "CborValue",
+      "header": "base/cbor.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_cbor",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage",
+        "ex_base/main.cpp#cbor_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/cbor-value.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

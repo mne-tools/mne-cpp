@@ -1,0 +1,174 @@
+---
+id: cbor-array
+title: "BASELIB::CborArray"
+sidebar_label: CborArray
+sidebar_position: 83
+---
+
+# CborArray
+
+**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/cbor.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/cbor.h)
+
+`#include <base/cbor.h>`
+
+```cpp
+class BASELIB::CborArray
+```
+
+An ordered list of CBOR values, like QCborArray.
+
+Indexing out of range is safe: the const accessors return an undefined value.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QCborMap header;
+//       header["sfreq"] = 600;
+//       header["payload"] = QByteArray(raw, 3);
+//       QByteArray encoded = QCborValue(header).toCbor();
+//       QCborValue decoded = QCborValue::fromCbor(encoded, &error);
+CborMap header{{"sfreq", 600}, {"device", "neuromag"}};
+header["payload"] = CborByteArray{std::byte{1}, std::byte{2}, std::byte{3}}; // binary stays binary
+const CborByteArray encoded = CborValue(header).to_cbor();                   // same bytes as QCborValue::toCbor()
+CborParseError cborError;
+const CborValue decoded = CborValue::from_cbor(encoded, &cborError);
+const std::int64_t sfreq = decoded["sfreq"].to_integer();
+const JsonValue asJson = decoded.to_json_value(); // byte strings become base64url text
+```
+
+---
+
+## Public Methods
+
+### CborArray()
+
+---
+
+### CborArray(values)
+
+**Parameters:**
+
+- **values** : *std::initializer_list&lt; [CborValue](/docs/api/base/cbor-value) &gt;*
+  The elements, e.g. [`CborArray`](/docs/api/base/cbor-array)\{1, "two", `CborByteArray`\{\}\}.
+
+---
+
+### size()
+
+**Returns:**
+
+- *std::size_t* — The number of elements.
+
+---
+
+### empty()
+
+**Returns:**
+
+- *bool* — Whether there are no elements.
+
+---
+
+### at(i)
+
+**Parameters:**
+
+- **i** : *std::size_t*
+  An index.
+
+**Returns:**
+
+- *const [CborValue](/docs/api/base/cbor-value) &* — The element at `i`, or an undefined value if out of range.
+
+---
+
+### operator\[\](i)
+
+**Parameters:**
+
+- **i** : *std::size_t*
+  An index.
+
+**Returns:**
+
+- *const [CborValue](/docs/api/base/cbor-value) &* — The element at `i`, or an undefined value if out of range.
+
+---
+
+### append(value)
+
+**Parameters:**
+
+- **value** : *[CborValue](/docs/api/base/cbor-value)*
+  Appended at the end.
+
+---
+
+### reserve(capacity)
+
+**Parameters:**
+
+- **capacity** : *std::size_t*
+  Number of elements to make room for.
+
+---
+
+### begin()
+
+---
+
+### end()
+
+---
+
+### begin()
+
+---
+
+### end()
+
+---
+
+### operator==(other)
+
+**Parameters:**
+
+- **other** : *const CborArray &*
+  Another array.
+
+**Returns:**
+
+- *bool* — Whether both hold equal elements in the same order.
+
+---
+
+### to_json_array()
+
+**Returns:**
+
+- *[JsonArray](/docs/api/base/json-array)* — The elements as JSON, converted as `CborValue::to_json_value()` does.
+
+---
+
+## Static Methods
+
+### from_json_array(array)
+
+**Parameters:**
+
+- **array** : *const [JsonArray](/docs/api/base/json-array) &*
+  A JSON array.
+
+**Returns:**
+
+- *CborArray* — The same elements as CBOR, like QCborArray::fromJsonArray().
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

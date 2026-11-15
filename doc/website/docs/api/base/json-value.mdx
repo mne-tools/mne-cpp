@@ -407,6 +407,21 @@ Pointers other than text would silently become booleans.
 - Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
 - Build target: `ex_base` (runs under CTest)
 
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 158"
+CborParseError cborError;
+const CborValue decoded = CborValue::from_cbor(encoded, &cborError);
+const std::int64_t sfreq = decoded["sfreq"].to_integer();
+const JsonValue asJson = decoded.to_json_value(); // byte strings become base64url text
+ok &= expect(cborError.error == CborParseError::NoError && sfreq == 600 && decoded["payload"].to_byte_array().size() == 3 && asJson["payload"].to_string() == "AQID",
+             "CborValue encoded and decoded a header with a byte string");
+````
+
 ## Authors of this file
 
 - Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

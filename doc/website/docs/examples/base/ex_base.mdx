@@ -33,16 +33,20 @@ The documented classes this example uses most:
 |---|---|
 | [`Log`](../../api/base/log.mdx) | Base |
 | [`JsonDocument`](../../api/base/json-document.mdx) | Base |
+| [`CborValue`](../../api/base/cbor-value.mdx) | Base |
 | [`FileByteStream`](../../api/base/file-byte-stream.mdx) | Base |
 | [`ThreadPool`](../../api/base/thread-pool.mdx) | Base |
+| [`CborParseError`](../../api/base/cbor-parse-error.mdx) | Base |
 | [`CircularBuffer`](../../api/base/circular-buffer.mdx) | Base |
 | [`JsonParseError`](../../api/base/json-parse-error.mdx) | Base |
-| [`JsonStreamParser`](../../api/base/json-stream-parser.mdx) | Base |
-| [`LogCapture`](../../api/base/log-capture.mdx) | Base |
 
 ## Used in the API reference
 
 - [ByteStream](../../api/base/byte-stream.mdx)
+- [CborArray](../../api/base/cbor-array.mdx)
+- [CborMap](../../api/base/cbor-map.mdx)
+- [CborParseError](../../api/base/cbor-parse-error.mdx)
+- [CborValue](../../api/base/cbor-value.mdx)
 - [CircularBuffer](../../api/base/circular-buffer.mdx)
 - [FileByteStream](../../api/base/file-byte-stream.mdx)
 - [JsonArray](../../api/base/json-array.mdx)
@@ -82,6 +86,7 @@ The documented classes this example uses most:
 //=============================================================================================================
 
 #include <base/byte_stream.h>
+#include <base/cbor.h>
 #include <base/circular_buffer.h>
 #include <base/json.h>
 #include <base/json_stream_parser.h>
@@ -208,6 +213,23 @@ int main()
     //! [json_usage]
     ok &= expect(parseError.error == JsonParseError::NoError && rate == 600 && !hasGain && out == R"({"channels":["MEG 0113","EEG 001"],"device":"neuromag","sfreq":600})",
                  "JsonDocument parsed, edited and wrote the configuration");
+
+    //! [cbor_usage]
+    // Qt:   QCborMap header;
+    //       header["sfreq"] = 600;
+    //       header["payload"] = QByteArray(raw, 3);
+    //       QByteArray encoded = QCborValue(header).toCbor();
+    //       QCborValue decoded = QCborValue::fromCbor(encoded, &error);
+    CborMap header{{"sfreq", 600}, {"device", "neuromag"}};
+    header["payload"] = CborByteArray{std::byte{1}, std::byte{2}, std::byte{3}}; // binary stays binary
+    const CborByteArray encoded = CborValue(header).to_cbor();                   // same bytes as QCborValue::toCbor()
+    CborParseError cborError;
+    const CborValue decoded = CborValue::from_cbor(encoded, &cborError);
+    const std::int64_t sfreq = decoded["sfreq"].to_integer();
+    const JsonValue asJson = decoded.to_json_value(); // byte strings become base64url text
+    //! [cbor_usage]
+    ok &= expect(cborError.error == CborParseError::NoError && sfreq == 600 && decoded["payload"].to_byte_array().size() == 3 && asJson["payload"].to_string() == "AQID",
+                 "CborValue encoded and decoded a header with a byte string");
 
     //! [json_stream_parser_usage]
     JsonStreamParser stream; // NDJSON from a socket, split anywhere

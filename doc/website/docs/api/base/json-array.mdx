@@ -325,7 +325,7 @@ Removes all elements.
 
 Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 139"
+````cpp title="src/examples/ex_base/main.cpp, line 140"
 JsonObject cfg = JsonDocument::from_json(R"({"sfreq": 600, "device": "neuromag"})", &parseError).object();
 const int rate = cfg.value("sfreq").to_int(1000);       // safe fallback on a missing key or wrong type
 const bool hasGain = !cfg.value("gain").is_undefined(); // missing keys are undefined; non-const [] inserts, as in Qt

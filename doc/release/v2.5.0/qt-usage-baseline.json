@@ -103,7 +103,7 @@
       },
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 18,
+      "files": 20,
       "modules": [
         "Core",
         "ZlibPrivate"

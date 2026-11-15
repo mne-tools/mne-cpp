@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6542 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6633 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -177,6 +177,8 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **annotationsVisibleToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **anode** `[var]` in [IeegBipolarPair](/docs/api/ieeg/ieeg-bipolar-pair) — Contact index of the anode.
 - **append** `[fn]` in [AcquiredPoints](/docs/api/acq/acquired-points) — Append a new point and emit `ACQLIB::AcquiredPoints::pointsChanged` "pointsChanged".
+- **append** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **append** `[fn]` in [CborMap](/docs/api/base/cbor-map) — Appends a member without looking for one with the same key, which makes building a map of distinct keys linear instead of quadratic.
 - **append** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **append** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **append** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
@@ -256,6 +258,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **assignedOperatorsChanged** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model) — Updates the fiff info.
 - **associatedImagePath** `[var]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — Relative path to associated T1w image (OPTIONAL).
 - **at** `[fn]` in [AcqPart](/docs/api/acq/acq-part)
+- **at** `[fn]` in [CborArray](/docs/api/base/cbor-array)
 - **at** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **at** `[fn]` in [JsonArray](/docs/api/base/json-array)
 - **at** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces) — Access the underlying shared_ptr at the given index.
@@ -332,6 +335,10 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **bDebias** `[var]` in [InvTfMxneParams](/docs/api/inv/inv-tf-mxne-params) — Whether to debias the final solution.
 - **bdipname** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Output file in bdip format.
 - **bEegOnly** `[var]` in [LofBadChannelParams](/docs/api/dsp/lof-bad-channel-params) — If true, only check EEG channels.
+- **begin** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **begin** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **begin** `[fn]` in [CborMap](/docs/api/base/cbor-map)
+- **begin** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **begin** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations)
 - **begin** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations)
 - **begin** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set)
@@ -528,6 +535,22 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **cathode** `[var]` in [IeegBipolarPair](/docs/api/ieeg/ieeg-bipolar-pair) — Contact index of the cathode.
 - **cbegin** `[fn]` in [JsonArray](/docs/api/base/json-array)
 - **cbegin** `[fn]` in [JsonObject](/docs/api/base/json-object)
+- **CborArray** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **CborArray** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **CborMap** `[fn]` in [CborMap](/docs/api/base/cbor-map)
+- **CborMap** `[fn]` in [CborMap](/docs/api/base/cbor-map)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value) — Constructs undefined.
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value) — Constructs null.
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **CborValue** `[fn]` in [CborValue](/docs/api/base/cbor-value) — Pointers other than text would silently become booleans.
 - **cend** `[fn]` in [JsonArray](/docs/api/base/json-array)
 - **cend** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **cent** `[var]` in [MNETriangle](/docs/api/mne/mne-triangle) — Centroid position.
@@ -787,6 +810,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **code** `[var]` in [AcqEvent](/docs/api/acq/acq-event) — Event code (trigger value, marker id, output line mask).
 - **code** `[var]` in [Error](/docs/api/base/error) — The kind of failure.
 - **code** `[var]` in [MnaScript](/docs/api/mna/mna-script) — The inline source code (resolved at save-time if sourceUri is set).
+- **Code** `[enum]` in [CborParseError](/docs/api/base/cbor-parse-error) — The reasons decoding can fail, with the names and values of QCborError::Code.
 - **codeSha256** `[var]` in [MnaScript](/docs/api/mna/mna-script) — SHA-256 of ``code`` for integrity verification.
 - **coding** `[var]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — FIFF coding type (FIFFTS_MC_RCS or FIFFTS_MC_CCS).
 - **coefficients** `[fn]` in [EogRegression](/docs/api/dsp/eog-regression) — Returns the fitted regression coefficients.
@@ -982,6 +1006,8 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **const_begin** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **const_end** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **const_find** `[fn]` in [JsonObject](/docs/api/base/json-object)
+- **const_iterator** `[type]` in [CborArray](/docs/api/base/cbor-array)
+- **const_iterator** `[type]` in [CborMap](/docs/api/base/cbor-map)
 - **const_iterator** `[type]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Constant iterator.
 - **const_iterator** `[type]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Constant iterator.
 - **const_iterator** `[type]` in [JsonArray](/docs/api/base/json-array)
@@ -995,6 +1021,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **contacts** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
 - **contacts** `[var]` in [IeegLead](/docs/api/ieeg/ieeg-lead) — Contact indices in order along the lead, contact 1 first.
 - **contactStreams** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
+- **contains** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **contains** `[fn]` in [JsonArray](/docs/api/base/json-array)
 - **contains** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **contains** `[fn]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Returns whether `channel` (any spelling) is one of the port's channels.
@@ -1497,6 +1524,8 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **emitChanged** `[fn]` in [AcquiredPoints](/docs/api/acq/acquired-points)
 - **empty** `[fn]` in [AcqBlockView](/docs/api/acq/acq-block-view)
 - **empty** `[fn]` in [AcqSpanPair](/docs/api/acq/acq-span-pair)
+- **empty** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **empty** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **empty** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **empty** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations)
 - **empty** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Returns true if coordinate transform contains no data.
@@ -1533,6 +1562,10 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **enabled** `[fn]` in [Log](/docs/api/base/log)
 - **enabled** `[var]` in [SubView](/docs/api/disp3-d/sub-view)
 - **end** `[var]` in [AcqSampleRange](/docs/api/acq/acq-sample-range) — One past the last sample; equals first for an empty range.
+- **end** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **end** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **end** `[fn]` in [CborMap](/docs/api/base/cbor-map)
+- **end** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **end** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations)
 - **end** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations)
 - **end** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set)
@@ -1578,11 +1611,13 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **erase** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Removes a range of annotations.
 - **erase** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **error** `[fn]` in [AcqExpected](/docs/api/acq/acq-expected)
+- **error** `[var]` in [CborParseError](/docs/api/base/cbor-parse-error) — What went wrong.
 - **error** `[var]` in [DipFitError](/docs/api/inv/dip-fit-error)
 - **error** `[var]` in [JsonParseError](/docs/api/base/json-parse-error) — What went wrong.
 - **error** `[fn]` in [JsonStreamParser](/docs/api/base/json-stream-parser)
 - **error** `[signal]` in [StcLoadingWorker](/docs/api/disp3-d/stc-loading-worker) — Emitted when an error occurs.
 - **Error** `[fn]` in [Error](/docs/api/base/error)
+- **error_string** `[fn]` in [CborParseError](/docs/api/base/cbor-parse-error)
 - **error_string** `[fn]` in [JsonParseError](/docs/api/base/json-parse-error)
 - **errorDistances** `[var]` in [HpiFitResult](/docs/api/inv/hpi-fit-result)
 - **ErrTest** `[fn]` in [ParksMcClellan](/docs/api/dsp/parks-mc-clellan) — This was added by IowaHills and is used in Remez() in 6 places.
@@ -1976,7 +2011,11 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **from** `[var]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Source coordinate system.
 - **from** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Trigger value before the transition.
 - **from_cardinal_points** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Constructs a coordinate transformation from cardinal points (LPA, Nasion, RPA).
+- **from_cbor** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **from_json** `[fn]` in [JsonDocument](/docs/api/base/json-document) — Parses a whole document like QJsonDocument::fromJson(): the root must be an object or an array and only whitespace may follow it.
+- **from_json_array** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **from_json_object** `[fn]` in [CborMap](/docs/api/base/cbor-map)
+- **from_json_value** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **from_matrix** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Builds a list from rows of sample, value before and value after.
 - **from_subj** `[var]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Source subject.
 - **from_tag** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Reads a coordinate transform from a FIFF tag.
@@ -2637,6 +2676,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **inputs** `[var]` in `GusbampSetup` — Inputs 1..16 of every unit, ascending.
 - **inputs** `[var]` in [MnaNode](/docs/api/mna/mna-node) — Input ports.
 - **inputWeights** `[var]` in [DerivationRule](/docs/api/dsp/derivation-rule) — Map of input channel name → weight.
+- **insert** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **insert** `[fn]` in [FsAnnotationSet](/docs/api/fs/fs-annotation-set) — Insert an annotation.
 - **insert** `[fn]` in [FsSurfaceSet](/docs/api/fs/fs-surface-set) — Insert a surface.
 - **insert** `[fn]` in [JsonArray](/docs/api/base/json-array)
@@ -2736,13 +2776,17 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **iRangeLow** `[var]` in [SpectogramInputData](/docs/api/dsp/spectogram-input-data)
 - **iRefIdx** `[var]` in [MaxwellMoveCompParams](/docs/api/dsp/maxwell-move-comp-params) — Index of reference head position in headPos list.
 - **iRow** `[var]` in [FilterObject](/docs/api/dsp/filter-object)
+- **is_array** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **is_array** `[fn]` in [JsonDocument](/docs/api/base/json-document)
 - **is_array** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **is_available** `[fn]` in [PythonTestHelper](/docs/api/pybridge/python-test-helper)
 - **is_axial_coil** `[fn]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Checks if this is an axial coil.
 - **is_axial_coil_type** `[fn]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Checks if a set of templates contains an axial coil of a specified type.
+- **is_bool** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **is_bool** `[fn]` in [JsonValue](/docs/api/base/json-value)
+- **is_byte_array** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **is_diag** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Check whether this covariance matrix is stored in diagonal form.
+- **is_double** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **is_double** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **is_eeg_electrode** `[fn]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Checks if this is an EEG electrode.
 - **is_eeg_electrode_type** `[fn]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Checks if a set of templates contains an EEG electrode of a specified type.
@@ -2750,13 +2794,16 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **is_empty** `[fn]` in [JsonDocument](/docs/api/base/json-document)
 - **is_empty** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **is_idle** `[fn]` in [JsonStreamParser](/docs/api/base/json-stream-parser)
+- **is_integer** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **is_integer** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **is_left_hemi** `[fn]` in [MNESourceSpace](/docs/api/mne/mne-source-space) — Determine whether this source space is on the left hemisphere based on the average x-coordinate of all vertices.
 - **is_little_endian** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream)
 - **is_loaded** `[fn]` in [FsAtlasLookup](/docs/api/fs/fs-atlas-lookup) — Check whether a parcellation volume has been loaded.
 - **is_magnetometer_coil** `[fn]` in [FwdCoil](/docs/api/fwd/fwd-coil) — Checks if this is an magnetometer.
 - **is_magnetometer_coil_type** `[fn]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Checks if a set of templates contains a magnetometer of a specified type.
+- **is_map** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **is_matrix** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — Provides information if tag contains a matrix.
+- **is_null** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **is_null** `[fn]` in [JsonDocument](/docs/api/base/json-document)
 - **is_null** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **is_number** `[fn]` in [JsonValue](/docs/api/base/json-value)
@@ -2772,7 +2819,10 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **is_python_required** `[fn]` in [PythonTestHelper](/docs/api/pybridge/python-test-helper)
 - **is_raw** `[var]` in [InvDipoleFitSettings](/docs/api/inv/inv-dipole-fit-settings) — Is this a raw data file.
 - **is_skip** `[var]` in [MNERawBufDef](/docs/api/mne/mne-raw-buf-def) — True if this buffer represents a data skip.
+- **is_string** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **is_string** `[fn]` in [JsonValue](/docs/api/base/json-value)
+- **is_tag** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **is_undefined** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **is_undefined** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **is_valid** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Returns true if the data was loaded successfully.
 - **is_valid_entity_value** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Validates entity values: BIDS labels are alphanumeric ASCII.
@@ -2858,6 +2908,8 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **ItemType** `[enum]` in [AbstractTreeItem](/docs/api/disp3-d/abstract-tree-item)
 - **itemTypeId** `[fn]` in [AbstractTreeItem](/docs/api/disp3-d/abstract-tree-item)
 - **iterate_alignment_once** `[fn]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Perform one iteration of ICP-like alignment.
+- **iterator** `[type]` in [CborArray](/docs/api/base/cbor-array)
+- **iterator** `[type]` in [CborMap](/docs/api/base/cbor-map)
 - **iterator** `[type]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Iterator.
 - **iterator** `[type]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Iterator.
 - **iterator** `[type]` in [JsonArray](/docs/api/base/json-array)
@@ -2901,6 +2953,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **kDepthContactRadius** `[var]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **keepTempFile** `[var]` in [MnaScript](/docs/api/mna/mna-script) — true → preserve temp script file after execution (debug aid)
 - **key** `[fn]` in `Member`
+- **keys** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **keys** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **khi2** `[var]` in [InvEcd](/docs/api/inv/inv-ecd) — khi^2 value.
 - **khi2** `[var]` in [InvFocalDipole](/docs/api/inv/inv-focal-dipole) — Chi-squared value of the fit.
@@ -3784,6 +3837,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **objectVisibleForTarget** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Check object visibility for a given target view.
 - **off** `[var]` in [FwdThreadArg](/docs/api/fwd/fwd-thread-arg) — Offset within the result to the first source space vertex solution.
 - **offset** `[var]` in [AcqChannelInfo](/docs/api/acq/acq-channel-info) — See scale.
+- **offset** `[var]` in [CborParseError](/docs/api/base/cbor-parse-error) — Byte offset in the input at which the error was found.
 - **offset** `[var]` in [FiffDataRef](/docs/api/fiff/fiff-data-ref) — Offset to the data in the external file.
 - **offset** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Vector offset.
 - **offset** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Vector offset.
@@ -3931,6 +3985,9 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **operator=** `[fn]` in [UdpSocket](/docs/api/com/udp-socket)
 - **operator=** `[fn]` in [UdpSocket](/docs/api/com/udp-socket)
 - **operator==** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
+- **operator==** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **operator==** `[fn]` in [CborMap](/docs/api/base/cbor-map)
+- **operator==** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **operator==** `[fn]` in [ChannelSelection](/docs/api/channels/channel-selection)
 - **operator==** `[fn]` in `EegoChannel`
 - **operator==** `[fn]` in [FiffAnnotation](/docs/api/fiff/fiff-annotation)
@@ -3942,8 +3999,15 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **operator==** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **operator==** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **operator==** `[fn]` in `Member`
+- **operator==** `[fn]` in `Tagged`
+- **operator==** `[fn]` in `UndefinedTag`
 - **operator==** `[fn]` in `UndefinedTag`
 - **operator[]** `[fn]` in [AcqSpanPair](/docs/api/acq/acq-span-pair)
+- **operator[]** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **operator[]** `[fn]` in [CborMap](/docs/api/base/cbor-map)
+- **operator[]** `[fn]` in [CborMap](/docs/api/base/cbor-map)
+- **operator[]** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **operator[]** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **operator[]** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations)
 - **operator[]** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations)
 - **operator[]** `[fn]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set)
@@ -4591,6 +4655,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **release** `[fn]` in [AcqViewLease](/docs/api/acq/acq-view-lease) — Returns the view now.
 - **release_session** `[var]` in `BrainFlowLibrary`
 - **Remez2** `[fn]` in [ParksMcClellan](/docs/api/dsp/parks-mc-clellan)
+- **remove** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **remove** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **remove_at** `[fn]` in [JsonArray](/docs/api/base/json-array)
 - **remove_first** `[fn]` in [JsonArray](/docs/api/base/json-array) — Removes the first element, if any.
@@ -4639,6 +4704,8 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **resample** `[fn]` in [Resample](/docs/api/dsp/resample) — [`Resample`](/docs/api/dsp/resample) a single-channel row vector from `dOldSFreq` to `dNewSFreq`.
 - **resampleMatrix** `[fn]` in [Resample](/docs/api/dsp/resample) — [`Resample`](/docs/api/dsp/resample) every row of a data matrix.
 - **rescale** `[fn]` in [Numerics](/docs/api/math/numerics) — Rescale (baseline correct) data.
+- **reserve** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **reserve** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **reserve** `[fn]` in [JsonArray](/docs/api/base/json-array)
 - **reserve** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **reserve** `[fn]` in [Network](/docs/api/connectivity/network) — Reserves storage for the expected number of nodes and edges.
@@ -5596,6 +5663,8 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **size** `[fn]` in [AcqSpanPair](/docs/api/acq/acq-span-pair)
 - **size** `[var]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Electrode size in mm or "n/a" (RECOMMENDED for iEEG).
 - **size** `[fn]` in [ByteStream](/docs/api/base/byte-stream)
+- **size** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **size** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **size** `[fn]` in [CircularBuffer](/docs/api/base/circular-buffer)
 - **size** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **size** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations)
@@ -5881,8 +5950,12 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 
 - **t** `[var]` in `VelocitySample`
 - **table** `[var]` in [FsColortable](/docs/api/fs/fs-colortable) — labels and corresponing colorcode.
+- **tag** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **tag** `[fn]` in [FiffExplain](/docs/api/fiff/fiff-explain) — Name of a tag kind (FIFF_*), e.g.
 - **tag** `[var]` in [MNEMghTag](/docs/api/mne/mne-mgh-tag) — Tag identifier code.
+- **tag** `[var]` in `Tagged`
+- **tagged** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **tagged_value** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **tags** `[var]` in [MNEMghTagGroup](/docs/api/mne/mne-mgh-tag-group) — The tags in file order.
 - **take** `[fn]` in [JsonObject](/docs/api/base/json-object)
 - **take_at** `[fn]` in [JsonArray](/docs/api/base/json-array)
@@ -5984,15 +6057,20 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **tmin** `[fn]` in [SourceEstimateOverlay](/docs/api/disp3-d/source-estimate-overlay) — Get the minimum time value.
 - **to** `[var]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Destination coordinate system.
 - **to** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Trigger value after the transition.
+- **to_array** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **to_array** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **to_array** `[fn]` in [JsonValue](/docs/api/base/json-value)
+- **to_bool** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **to_bool** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **to_byte** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Byte Fast access; Data are deleted if tag gets deleted, and vice versa
+- **to_byte_array** `[fn]` in [CborValue](/docs/api/base/cbor-value)
+- **to_cbor** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **to_ch_info** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff CH INFO
 - **to_coord_trans** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff COORD TRANS
 - **to_dau_pack16** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to DauPack16 Fast access; Data are deleted if tag gets deleted, and vice versa
 - **to_dig_point** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff DIG POINT
 - **to_dir_entry** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff DIR ENTRY
+- **to_double** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **to_double** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Double Fast access; Data are deleted if tag gets deleted, and vice versa
 - **to_double** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **to_fiff_ch_info** `[fn]` in [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info)
@@ -6008,9 +6086,14 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **to_int** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Int Fast access; Data are deleted if tag gets deleted, and vice versa
 - **to_int** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **to_int_matrix** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff FIFFT INT MATRIX
+- **to_integer** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **to_integer** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **to_json** `[fn]` in [JsonDocument](/docs/api/base/json-document)
+- **to_json_array** `[fn]` in [CborArray](/docs/api/base/cbor-array)
+- **to_json_object** `[fn]` in [CborMap](/docs/api/base/cbor-map)
+- **to_json_value** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **to_julian** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Julian Fast access; Data are deleted if tag gets deleted, and vice versa
+- **to_map** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **to_matrix** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Returns the events as rows of sample, value before and value after, the layout of `FIFFLIB::FiffEvents::events` and of `mne.read_events`.
 - **to_object** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **to_object** `[fn]` in [JsonValue](/docs/api/base/json-value)
@@ -6018,6 +6101,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **to_si** `[fn]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - **to_sparse_float_matrix** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to sparse fiff FIFFT FLOAT MATRIX
 - **to_std_string** `[fn]` in [JsonValue](/docs/api/base/json-value)
+- **to_string** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **to_string** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Returns a human-readable string representation of this ID.
 - **to_string** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to String
 - **to_string** `[fn]` in [JsonValue](/docs/api/base/json-value)
@@ -6153,12 +6237,14 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **tstep** `[fn]` in [SourceEstimateManager](/docs/api/disp3-d/source-estimate-manager)
 - **tstep** `[fn]` in [SourceEstimateOverlay](/docs/api/disp3-d/source-estimate-overlay) — Get the time step between samples.
 - **twinFiducial** `[fn]` in [AcquiredPoints](/docs/api/acq/acquired-points)
+- **Type** `[enum]` in [CborValue](/docs/api/base/cbor-value) — The CBOR type, with the names and values of QCborValue::Type.
 - **Type** `[enum]` in [JsonValue](/docs/api/base/json-value) — The JSON type, with the names and values of QJsonValue::Type; integers report Double, as in Qt 6.
 - **type** `[fn]` in [AbstractTreeItem](/docs/api/disp3-d/abstract-tree-item)
 - **type** `[var]` in [AcqParameterInfo](/docs/api/acq/acq-parameter-info) — "int", "double", "bool", "string", "enum:a\|b\|c".
 - **type** `[var]` in [BidsChannel](/docs/api/bids/bids-channel) — BIDS channel type: EEG, ECOG, SEEG, DBS, TRIG, etc.
 - **type** `[var]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Electrode type: "depth", "strip", "grid" (OPTIONAL).
 - **type** `[var]` in [BrainVisionMarker](/docs/api/bids/brain-vision-marker) — Marker type (e.g., "New Segment", "Stimulus", "Response").
+- **type** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **type** `[var]` in `EegoChannel`
 - **type** `[var]` in `EventMarker` — Numeric event type (stimulus code).
 - **type** `[var]` in [FiffDataRef](/docs/api/fiff/fiff-data-ref) — Type of the data.
@@ -6186,6 +6272,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **UnbiasedSquaredPhaseLagIndex** `[fn]` in [UnbiasedSquaredPhaseLagIndex](/docs/api/connectivity/unbiased-squared-phase-lag-index) — Constructs a [`UnbiasedSquaredPhaseLagIndex`](/docs/api/connectivity/unbiased-squared-phase-lag-index) object.
 - **unbuffered** `[var]` in [PythonRunnerConfig](/docs/api/pybridge/python-runner-config) — Pass -u so output streams in real time.
 - **uncertaintyNs** `[var]` in [AcqClockModel](/docs/api/acq/acq-clock-model) — One-sigma uncertainty of `physicalNs()`.
+- **undefined_value** `[fn]` in [CborValue](/docs/api/base/cbor-value)
 - **undefined_value** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **underrun** `[var]` in [AcqStreamStats](/docs/api/acq/acq-stream-stats) — Output: samples emitted as underrun fill.
 - **underrun** `[fn]` in [AcqWriteView](/docs/api/acq/acq-write-view)
@@ -6309,6 +6396,7 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **value** `[fn]` in [AcqInt24](/docs/api/acq/acq-int24)
 - **value** `[var]` in [BidsEvent](/docs/api/bids/bids-event) — Numeric event value / trigger code.
 - **value** `[fn]` in [BidsTsv](/docs/api/bids/bids-tsv)
+- **value** `[fn]` in [CborMap](/docs/api/base/cbor-map)
 - **value** `[fn]` in [Expected](/docs/api/base/expected)
 - **value** `[fn]` in [Expected](/docs/api/base/expected)
 - **value** `[fn]` in [Expected](/docs/api/base/expected)
@@ -6318,6 +6406,9 @@ Index of 6542 public class members (functions, variables, typedefs, enums) acros
 - **value** `[fn]` in `Member`
 - **value** `[var]` in [PickResult](/docs/api/disp3-d/pick-result) — Optional scalar overlay value at the picked element (uV, dSPM, MRI intensity).
 - **value** `[fn]` in [ScaleControl](/docs/api/disp/scale-control) — Return the value of the control.
+- **value** `[var]` in `Tagged`
+- **value_type** `[type]` in [CborArray](/docs/api/base/cbor-array)
+- **value_type** `[type]` in [CborMap](/docs/api/base/cbor-map)
 - **value_type** `[type]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Element type.
 - **value_type** `[type]` in [FiffDigPointSet](/docs/api/fiff/fiff-dig-point-set) — Element type.
 - **value_type** `[type]` in [JsonArray](/docs/api/base/json-array)

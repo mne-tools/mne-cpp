@@ -495,7 +495,11 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/base/json-array',
         'api/base/json-object',
         'api/base/json-parse-error',
-        'api/base/json-handler'
+        'api/base/json-handler',
+        'api/base/cbor-value',
+        'api/base/cbor-array',
+        'api/base/cbor-map',
+        'api/base/cbor-parse-error'
       ],
     },
     {

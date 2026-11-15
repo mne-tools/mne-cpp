@@ -1,0 +1,255 @@
+---
+id: cbor-map
+title: "BASELIB::CborMap"
+sidebar_label: CborMap
+sidebar_position: 84
+---
+
+# CborMap
+
+**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/cbor.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/cbor.h)
+
+`#include <base/cbor.h>`
+
+```cpp
+class BASELIB::CborMap
+```
+
+A CBOR map from text keys to values, like QCborMap; keys keep their insertion order.
+
+Looking up a missing key with a const accessor returns an undefined value.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QCborMap header;
+//       header["sfreq"] = 600;
+//       header["payload"] = QByteArray(raw, 3);
+//       QByteArray encoded = QCborValue(header).toCbor();
+//       QCborValue decoded = QCborValue::fromCbor(encoded, &error);
+CborMap header{{"sfreq", 600}, {"device", "neuromag"}};
+header["payload"] = CborByteArray{std::byte{1}, std::byte{2}, std::byte{3}}; // binary stays binary
+const CborByteArray encoded = CborValue(header).to_cbor();                   // same bytes as QCborValue::toCbor()
+CborParseError cborError;
+const CborValue decoded = CborValue::from_cbor(encoded, &cborError);
+const std::int64_t sfreq = decoded["sfreq"].to_integer();
+const JsonValue asJson = decoded.to_json_value(); // byte strings become base64url text
+```
+
+---
+
+## Public Methods
+
+### CborMap()
+
+---
+
+### CborMap(members)
+
+**Parameters:**
+
+- **members** : *std::initializer_list&lt; value_type &gt;*
+  The members in order, e.g. [`CborMap`](/docs/api/base/cbor-map)\{\{"name", "x"\}, \{"size", 3\}\}.
+
+---
+
+### size()
+
+**Returns:**
+
+- *std::size_t* — The number of members.
+
+---
+
+### empty()
+
+**Returns:**
+
+- *bool* — Whether there are no members.
+
+---
+
+### contains(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *bool* — Whether a member has that key.
+
+---
+
+### value(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *const [CborValue](/docs/api/base/cbor-value) &* — The value of the first member with that key, or an undefined value.
+
+---
+
+### operator\[\](key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *const [CborValue](/docs/api/base/cbor-value) &* — The value of the first member with that key, or an undefined value.
+
+---
+
+### operator\[\](key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *[CborValue](/docs/api/base/cbor-value) &* — The value of the member with that key, appended as undefined if missing.
+
+---
+
+### insert(key, value)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+- **value** : *[CborValue](/docs/api/base/cbor-value)*
+  Replaces the value of the member with that key, or is appended with it.
+
+---
+
+### append(key, value)
+
+Appends a member without looking for one with the same key, which makes building a map of distinct keys linear instead of quadratic.
+
+**Parameters:**
+
+- **key** : *std::string*
+  A key not yet in the map.
+
+- **value** : *[CborValue](/docs/api/base/cbor-value)*
+  Its value.
+
+---
+
+### remove(key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  Every member with that key is removed.
+
+---
+
+### keys()
+
+**Returns:**
+
+- *std::vector&lt; std::string &gt;* — The keys in order.
+
+---
+
+### reserve(capacity)
+
+**Parameters:**
+
+- **capacity** : *std::size_t*
+  Number of members to make room for.
+
+---
+
+### begin()
+
+---
+
+### end()
+
+---
+
+### begin()
+
+---
+
+### end()
+
+---
+
+### operator==(other)
+
+**Parameters:**
+
+- **other** : *const CborMap &*
+  Another map.
+
+**Returns:**
+
+- *bool* — Whether both hold equal members in the same order.
+
+---
+
+### to_json_object()
+
+**Returns:**
+
+- *[JsonObject](/docs/api/base/json-object)* — The members as JSON, converted as `CborValue::to_json_value()` does; later duplicate keys win.
+
+---
+
+## Static Methods
+
+### from_json_object(object)
+
+**Parameters:**
+
+- **object** : *const [JsonObject](/docs/api/base/json-object) &*
+  A JSON object.
+
+**Returns:**
+
+- *CborMap* — The same members as CBOR, like QCborMap::fromJsonObject().
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 152"
+//       header["payload"] = QByteArray(raw, 3);
+//       QByteArray encoded = QCborValue(header).toCbor();
+//       QCborValue decoded = QCborValue::fromCbor(encoded, &error);
+CborMap header{{"sfreq", 600}, {"device", "neuromag"}};
+header["payload"] = CborByteArray{std::byte{1}, std::byte{2}, std::byte{3}}; // binary stays binary
+const CborByteArray encoded = CborValue(header).to_cbor();                   // same bytes as QCborValue::toCbor()
+CborParseError cborError;
+const CborValue decoded = CborValue::from_cbor(encoded, &cborError);
+const std::int64_t sfreq = decoded["sfreq"].to_integer();
+const JsonValue asJson = decoded.to_json_value(); // byte strings become base64url text
+ok &= expect(cborError.error == CborParseError::NoError && sfreq == 600 && decoded["payload"].to_byte_array().size() == 3 && asJson["payload"].to_string() == "AQID",
+             "CborValue encoded and decoded a header with a byte string");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

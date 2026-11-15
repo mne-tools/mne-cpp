@@ -1,0 +1,460 @@
+---
+id: cbor-value
+title: "BASELIB::CborValue"
+sidebar_label: CborValue
+sidebar_position: 82
+---
+
+# CborValue
+
+**Namespace:** `BASELIB` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/cbor.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/cbor.h)
+
+`#include <base/cbor.h>`
+
+```cpp
+class BASELIB::CborValue
+```
+
+A CBOR value: an integer, a byte string, text, an array, a map, a tagged value, a boolean, null, undefined or a double, like QCborValue.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QCborMap header;
+//       header["sfreq"] = 600;
+//       header["payload"] = QByteArray(raw, 3);
+//       QByteArray encoded = QCborValue(header).toCbor();
+//       QCborValue decoded = QCborValue::fromCbor(encoded, &error);
+CborMap header{{"sfreq", 600}, {"device", "neuromag"}};
+header["payload"] = CborByteArray{std::byte{1}, std::byte{2}, std::byte{3}}; // binary stays binary
+const CborByteArray encoded = CborValue(header).to_cbor();                   // same bytes as QCborValue::toCbor()
+CborParseError cborError;
+const CborValue decoded = CborValue::from_cbor(encoded, &cborError);
+const std::int64_t sfreq = decoded["sfreq"].to_integer();
+const JsonValue asJson = decoded.to_json_value(); // byte strings become base64url text
+```
+
+---
+
+## Public Methods
+
+### CborValue()
+
+Constructs undefined.
+
+---
+
+### CborValue()
+
+Constructs null.
+
+---
+
+### CborValue(value)
+
+**Parameters:**
+
+- **value** : *bool*
+  A boolean.
+
+---
+
+### CborValue(value)
+
+**Parameters:**
+
+- **value** : *T*
+  An integer; unsigned values beyond std::int64_t become doubles.
+
+---
+
+### CborValue(value)
+
+**Parameters:**
+
+- **value** : *T*
+  A floating-point number.
+
+---
+
+### CborValue(value)
+
+**Parameters:**
+
+- **value** : *const char **
+  Null-terminated UTF-8 text.
+
+---
+
+### CborValue(value)
+
+**Parameters:**
+
+- **value** : *std::string_view*
+  UTF-8 text.
+
+---
+
+### CborValue(value)
+
+**Parameters:**
+
+- **value** : *std::string*
+  UTF-8 text, moved in.
+
+---
+
+### CborValue(value)
+
+**Parameters:**
+
+- **value** : *CborByteArray*
+  A byte string, moved in.
+
+---
+
+### CborValue(value)
+
+**Parameters:**
+
+- **value** : *[CborArray](/docs/api/base/cbor-array)*
+  An array, moved in.
+
+---
+
+### CborValue(value)
+
+**Parameters:**
+
+- **value** : *[CborMap](/docs/api/base/cbor-map)*
+  A map, moved in.
+
+---
+
+### CborValue()
+
+Pointers other than text would silently become booleans.
+
+---
+
+### type()
+
+**Returns:**
+
+- *Type* — The type.
+
+---
+
+### is_integer()
+
+**Returns:**
+
+- *bool* — Whether the value is an integer.
+
+---
+
+### is_byte_array()
+
+**Returns:**
+
+- *bool* — Whether the value is a byte string.
+
+---
+
+### is_string()
+
+**Returns:**
+
+- *bool* — Whether the value is text.
+
+---
+
+### is_array()
+
+**Returns:**
+
+- *bool* — Whether the value is an array.
+
+---
+
+### is_map()
+
+**Returns:**
+
+- *bool* — Whether the value is a map.
+
+---
+
+### is_tag()
+
+**Returns:**
+
+- *bool* — Whether the value is tagged.
+
+---
+
+### is_bool()
+
+**Returns:**
+
+- *bool* — Whether the value is false or true.
+
+---
+
+### is_null()
+
+**Returns:**
+
+- *bool* — Whether the value is null.
+
+---
+
+### is_undefined()
+
+**Returns:**
+
+- *bool* — Whether the value is undefined.
+
+---
+
+### is_double()
+
+**Returns:**
+
+- *bool* — Whether the value is a double.
+
+---
+
+### to_bool(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *bool*
+  Fallback.
+
+**Returns:**
+
+- *bool* — The boolean, or `defaultValue` if the value is not one.
+
+---
+
+### to_integer(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *std::int64_t*
+  Fallback.
+
+**Returns:**
+
+- *std::int64_t* — The integer, or `defaultValue` if the value is not one.
+
+---
+
+### to_double(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *double*
+  Fallback.
+
+**Returns:**
+
+- *double* — The number as double, or `defaultValue` if it is not a number.
+
+---
+
+### to_string(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *std::string_view*
+  Fallback.
+
+**Returns:**
+
+- *std::string_view* — A view of the text, or `defaultValue` if the value is not text.
+
+---
+
+### to_byte_array()
+
+**Returns:**
+
+- *const CborByteArray &* — The byte string, or an empty one if the value is not a byte string.
+
+---
+
+### to_array()
+
+**Returns:**
+
+- *const [CborArray](/docs/api/base/cbor-array) &* — The array, or an empty array if the value is not one.
+
+---
+
+### to_map()
+
+**Returns:**
+
+- *const [CborMap](/docs/api/base/cbor-map) &* — The map, or an empty map if the value is not one.
+
+---
+
+### tag(defaultValue)
+
+**Parameters:**
+
+- **defaultValue** : *std::uint64_t*
+  Fallback.
+
+**Returns:**
+
+- *std::uint64_t* — The tag number, or `defaultValue` if the value is not tagged.
+
+---
+
+### tagged_value()
+
+**Returns:**
+
+- *const [CborValue](/docs/api/base/cbor-value) &* — The tagged value, or an undefined value if the value is not tagged.
+
+---
+
+### operator\[\](key)
+
+**Parameters:**
+
+- **key** : *std::string_view*
+  A key.
+
+**Returns:**
+
+- *const [CborValue](/docs/api/base/cbor-value) &* — The member called `key` if the value is a map with one, else undefined.
+
+---
+
+### operator\[\](i)
+
+**Parameters:**
+
+- **i** : *std::size_t*
+  An index.
+
+**Returns:**
+
+- *const [CborValue](/docs/api/base/cbor-value) &* — The element at `i` if the value is an array that long, else undefined.
+
+---
+
+### operator==(other)
+
+**Parameters:**
+
+- **other** : *const [CborValue](/docs/api/base/cbor-value) &*
+  Another value.
+
+**Returns:**
+
+- *bool* — Whether both have the same type and content.
+
+---
+
+### to_json_value()
+
+**Returns:**
+
+- *[JsonValue](/docs/api/base/json-value)* — The value as JSON, like QCborValue::toJsonValue(): byte strings become base64url text without padding (base64 for tag 22, hex for tag 23), other tagged values the value they tag, undefined and non-finite doubles null.
+
+---
+
+### to_cbor()
+
+**Returns:**
+
+- *CborByteArray* — The value encoded as CBOR, with the same bytes as QCborValue::toCbor().
+
+---
+
+## Static Methods
+
+### tagged(tag, value)
+
+**Parameters:**
+
+- **tag** : *std::uint64_t*
+  The tag number, e.g. 0 for a date-time string.
+
+- **value** : *[CborValue](/docs/api/base/cbor-value)*
+  The tagged value.
+
+**Returns:**
+
+- *[CborValue](/docs/api/base/cbor-value)* — The tagged value, like QCborValue(QCborTag, QCborValue).
+
+---
+
+### from_json_value(value)
+
+**Parameters:**
+
+- **value** : *const [JsonValue](/docs/api/base/json-value) &*
+  A JSON value.
+
+**Returns:**
+
+- *[CborValue](/docs/api/base/cbor-value)* — The same value as CBOR, like QCborValue::fromJsonValue(): JSON integers become integers, other numbers doubles, and an undefined JSON value becomes undefined.
+
+---
+
+### from_cbor(data, error)
+
+**Parameters:**
+
+- **data** : *std::span&lt; const std::byte &gt;*
+  Exactly one encoded value.
+
+- **error** : *[CborParseError](/docs/api/base/cbor-parse-error) **
+  Receives the outcome if not null.
+
+**Returns:**
+
+- *[CborValue](/docs/api/base/cbor-value)* — The decoded value, or undefined on error.
+
+---
+
+### undefined_value()
+
+**Returns:**
+
+- *const [CborValue](/docs/api/base/cbor-value) &* — The shared undefined value that lookups return when nothing is found.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 154"
+//       QCborValue decoded = QCborValue::fromCbor(encoded, &error);
+CborMap header{{"sfreq", 600}, {"device", "neuromag"}};
+header["payload"] = CborByteArray{std::byte{1}, std::byte{2}, std::byte{3}}; // binary stays binary
+const CborByteArray encoded = CborValue(header).to_cbor();                   // same bytes as QCborValue::toCbor()
+CborParseError cborError;
+const CborValue decoded = CborValue::from_cbor(encoded, &cborError);
+const std::int64_t sfreq = decoded["sfreq"].to_integer();
+const JsonValue asJson = decoded.to_json_value(); // byte strings become base64url text
+ok &= expect(cborError.error == CborParseError::NoError && sfreq == 600 && decoded["payload"].to_byte_array().size() == 3 && asJson["payload"].to_string() == "AQID",
+             "CborValue encoded and decoded a header with a byte string");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

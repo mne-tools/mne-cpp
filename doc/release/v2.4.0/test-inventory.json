@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 282,
+    "directories": 283,
     "registration": {
-      "unconditional": 270,
+      "unconditional": 271,
       "conditional": 9,
       "unregistered": 3
     },
@@ -44,6 +44,7 @@
           "test_acq_thread",
           "test_acq_timebase",
           "test_base_byte_stream",
+          "test_base_cbor",
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
@@ -133,6 +134,7 @@
           "test_acq_thread",
           "test_acq_timebase",
           "test_base_byte_stream",
+          "test_base_cbor",
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
@@ -222,6 +224,7 @@
           "test_acq_thread",
           "test_acq_timebase",
           "test_base_byte_stream",
+          "test_base_cbor",
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
@@ -311,6 +314,7 @@
           "test_acq_thread",
           "test_acq_timebase",
           "test_base_byte_stream",
+          "test_base_cbor",
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
@@ -400,6 +404,7 @@
           "test_acq_thread",
           "test_acq_timebase",
           "test_base_byte_stream",
+          "test_base_cbor",
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
@@ -489,6 +494,7 @@
           "test_acq_thread",
           "test_acq_timebase",
           "test_base_byte_stream",
+          "test_base_cbor",
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
@@ -1411,6 +1417,43 @@
         "ByteStream",
         "FileByteStream",
         "MemoryByteStream"
+      ]
+    },
+    {
+      "name": "test_base_cbor",
+      "cmake": "src/testframes/test_base_cbor/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_base_cbor"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 0,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "CborArray",
+        "CborMap",
+        "CborParseError",
+        "CborValue"
       ]
     },
     {
