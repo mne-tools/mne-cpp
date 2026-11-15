@@ -225,7 +225,7 @@ Appends a member without looking for one with the same key, which makes building
 
 ## Example
 
-- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 - Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
 - Build target: `ex_base` (runs under CTest)
 
@@ -233,9 +233,9 @@ Appends a member without looking for one with the same key, which makes building
 
 ### [ex_base](../../examples/base/ex_base.mdx)
 
-Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 153"
+````cpp title="src/examples/ex_base/main.cpp, line 155"
 //       header["payload"] = QByteArray(raw, 3);
 //       QByteArray encoded = QCborValue(header).toCbor();
 //       QCborValue decoded = QCborValue::fromCbor(encoded, &error);

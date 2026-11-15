@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 485,
-    "exported_free_functions": 136,
-    "registered_classes": 577,
+    "exported_classes": 487,
+    "exported_free_functions": 140,
+    "registered_classes": 579,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
     "registered_header_only": 80,
     "registered_stale": 0,
-    "registered_with_test": 243,
+    "registered_with_test": 245,
     "registered_test_unresolved": 0,
-    "registered_with_example": 426,
+    "registered_with_example": 428,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 97,
     "registered_without_api_page": 0,
-    "with_snippet": 460,
-    "public_api_units": 579,
-    "example_eligible": 426,
+    "with_snippet": 462,
+    "public_api_units": 581,
+    "example_eligible": 428,
     "example_exempt": 153,
-    "eligible_backed_by_registry_example": 424,
-    "eligible_used_by_some_example": 368,
+    "eligible_backed_by_registry_example": 426,
+    "eligible_used_by_some_example": 370,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -36,13 +36,13 @@
       "with_snippet": 49
     },
     "base": {
-      "public": 21,
-      "registered": 21,
-      "with_test": 21,
-      "eligible": 21,
-      "eligible_with_registry_example": 21,
-      "eligible_used_by_example": 19,
-      "with_snippet": 21
+      "public": 23,
+      "registered": 23,
+      "with_test": 23,
+      "eligible": 23,
+      "eligible_with_registry_example": 23,
+      "eligible_used_by_example": 21,
+      "with_snippet": 23
     },
     "bids": {
       "public": 14,
@@ -482,6 +482,26 @@
     {
       "name": "write_text_file",
       "header": "base/byte_stream.h",
+      "library": "base"
+    },
+    {
+      "name": "run_process",
+      "header": "base/process.h",
+      "library": "base"
+    },
+    {
+      "name": "host_name",
+      "header": "base/process.h",
+      "library": "base"
+    },
+    {
+      "name": "os_pretty_name",
+      "header": "base/process.h",
+      "library": "base"
+    },
+    {
+      "name": "cpu_architecture",
+      "header": "base/process.h",
       "library": "base"
     },
     {
@@ -2764,6 +2784,54 @@
         "ex_base/main.cpp#log_capture_usage"
       ],
       "api_page": "doc/website/docs/api/base/log-capture.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ProcessOptions",
+      "header": "base/process.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_process",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#process_usage",
+        "ex_base/main.cpp#process_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/process-options.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "ProcessResult",
+      "header": "base/process.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_process",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#process_usage",
+        "ex_base/main.cpp#process_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/process-result.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

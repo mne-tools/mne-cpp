@@ -500,7 +500,9 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/base/cbor-array',
         'api/base/cbor-map',
         'api/base/cbor-parse-error',
-        'api/base/sha256'
+        'api/base/sha256',
+        'api/base/process-options',
+        'api/base/process-result'
       ],
     },
     {

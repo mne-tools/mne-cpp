@@ -1,0 +1,54 @@
+---
+id: process-options
+title: "mne::ProcessOptions"
+sidebar_label: ProcessOptions
+sidebar_position: 87
+---
+
+# ProcessOptions
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/process.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/process.h)
+
+`#include <base/process.h>`
+
+```cpp
+struct mne::ProcessOptions
+```
+
+How `run_process()` starts a program and what it does with its output.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QProcess p; p.start("python3", {"--version"}); p.waitForFinished(5000); p.readAllStandardOutput();
+ProcessOptions options;
+options.timeout = std::chrono::seconds(5); // killed if it takes longer
+const ProcessResult python = run_process("python3", std::vector<std::string>{"--version"}, options);
+Log::info("{} on {} ({}): {}", host_name(), os_pretty_name(), cpu_architecture(), python.ok() ? python.std_out : python.error);
+```
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 192"
+// Qt:   QProcess p; p.start("python3", {"--version"}); p.waitForFinished(5000); p.readAllStandardOutput();
+ProcessOptions options;
+options.timeout = std::chrono::seconds(5); // killed if it takes longer
+const ProcessResult python = run_process("python3", std::vector<std::string>{"--version"}, options);
+Log::info("{} on {} ({}): {}", host_name(), os_pretty_name(), cpu_architecture(), python.ok() ? python.std_out : python.error);
+ok &= expect(!host_name().empty() && !os_pretty_name().empty() && (python.started || !python.error.empty()),
+             "run_process ran a program and the host was described");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

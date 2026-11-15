@@ -187,7 +187,7 @@ Cuts the file to, or extends it with zeros to, `size` bytes; the position moves 
 
 ## Example
 
-- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 - Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
 - Build target: `ex_base` (runs under CTest)
 
@@ -195,9 +195,9 @@ Cuts the file to, or extends it with zeros to, `size` bytes; the position moves 
 
 ### [ex_base](../../examples/base/ex_base.mdx)
 
-Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 101"
+````cpp title="src/examples/ex_base/main.cpp, line 103"
     auto out = FileByteStream::open(dir / "data.bin", FileByteStream::Mode::Write);
     out->write_big_endian(std::int32_t(samples.size())); // FIFF byte order
     out->write_big_endian(samples.data(), samples.size());

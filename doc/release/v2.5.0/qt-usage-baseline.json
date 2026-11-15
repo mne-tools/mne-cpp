@@ -35,7 +35,7 @@
       "ml",
       "report"
     ],
-    "tokens": 11648,
+    "tokens": 11604,
     "gui_outside_design": []
   },
   "libraries": {
@@ -103,7 +103,7 @@
       },
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 22,
+      "files": 24,
       "modules": [
         "Core",
         "ZlibPrivate"
@@ -327,16 +327,15 @@
       "modules": []
     },
     "mna": {
-      "tokens": 1635,
+      "tokens": 1623,
       "by_category": {
         "containers": 65,
-        "files": 28,
+        "files": 26,
         "global": 31,
         "json": 335,
-        "objects_signals": 80,
-        "other": 3,
+        "objects_signals": 79,
         "regex": 19,
-        "strings": 1052,
+        "strings": 1046,
         "time": 22
       },
       "public_header_includes": 84,
@@ -373,20 +372,14 @@
       ]
     },
     "pybridge": {
-      "tokens": 34,
+      "tokens": 2,
       "by_category": {
-        "files": 9,
-        "global": 2,
-        "other": 2,
-        "strings": 20,
-        "time": 1
+        "other": 2
       },
       "public_header_includes": 0,
       "q_object": 0,
       "files": 5,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "report": {
       "tokens": 0,

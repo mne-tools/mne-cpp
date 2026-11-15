@@ -6,9 +6,9 @@
     "commit": "0800c9a1bf606c2df8c44e35fbb42ea13029b549"
   },
   "summary": {
-    "directories": 284,
+    "directories": 285,
     "registration": {
-      "unconditional": 272,
+      "unconditional": 273,
       "conditional": 9,
       "unregistered": 3
     },
@@ -23,7 +23,7 @@
       "test-data": 122
     },
     "gui": 46,
-    "with_qskip": 98,
+    "with_qskip": 99,
     "ci_excluded": {},
     "retry_paths": [],
     "ci": {
@@ -48,6 +48,7 @@
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
+          "test_base_process",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -139,6 +140,7 @@
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
+          "test_base_process",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -230,6 +232,7 @@
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
+          "test_base_process",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -321,6 +324,7 @@
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
+          "test_base_process",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -412,6 +416,7 @@
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
+          "test_base_process",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -503,6 +508,7 @@
           "test_base_circular_buffer",
           "test_base_json",
           "test_base_logger",
+          "test_base_process",
           "test_base_sha256",
           "test_base_string_utils",
           "test_base_thread_pool",
@@ -1569,6 +1575,41 @@
       "registry_classes": [
         "Log",
         "LogCapture"
+      ]
+    },
+    {
+      "name": "test_base_process",
+      "cmake": "src/testframes/test_base_process/CMakeLists.txt",
+      "registration": {
+        "state": "unconditional",
+        "via": "src/testframes/CMakeLists.txt",
+        "conditions": [],
+        "early_return_guard": null,
+        "unregistered_reason": null
+      },
+      "add_test_names": [
+        "test_base_process"
+      ],
+      "labels": [
+        "unit"
+      ],
+      "timeout": 60,
+      "requirements": [],
+      "gui": false,
+      "qskip_sites": 1,
+      "spawns_processes": false,
+      "ci_excluded_on": [],
+      "ci": {
+        "macos-26": "absent",
+        "macos-26-qt-min": "absent",
+        "ubuntu-24.04": "absent",
+        "ubuntu-24.04-qt-min": "absent",
+        "windows-2025-vs2026": "absent",
+        "windows-2025-vs2026-qt-min": "absent"
+      },
+      "registry_classes": [
+        "ProcessOptions",
+        "ProcessResult"
       ]
     },
     {
