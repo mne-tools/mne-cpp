@@ -34,7 +34,7 @@
       "ml",
       "report"
     ],
-    "tokens": 11868,
+    "tokens": 11860,
     "gui_outside_design": []
   },
   "libraries": {
@@ -109,16 +109,15 @@
       ]
     },
     "bids": {
-      "tokens": 218,
+      "tokens": 210,
       "by_category": {
         "containers": 26,
         "files": 18,
         "global": 30,
         "regex": 2,
-        "strings": 135,
-        "time": 7
+        "strings": 134
       },
-      "public_header_includes": 8,
+      "public_header_includes": 6,
       "q_object": 0,
       "files": 24,
       "modules": [
