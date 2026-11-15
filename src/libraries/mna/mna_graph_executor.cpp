@@ -38,6 +38,7 @@
 
 #include "mna_graph_executor.h"
 #include <base/log.h>
+#include <base/process.h>
 #include <base/sha256.h>
 #include <base/string_utils.h>
 #include "mna_graph.h"
@@ -45,13 +46,9 @@
 
 #include <QDir>
 #include <QElapsedTimer>
-#include <QSysInfo>
 #include <QTemporaryFile>
 
 #include <algorithm>
-#ifndef WASMBUILD
-#include <QProcess>
-#endif
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -64,6 +61,33 @@ using namespace mne;
 //=============================================================================================================
 
 MnaGraphExecutor::ProgressCallback MnaGraphExecutor::s_progressCallback;
+
+//=============================================================================================================
+// DEFINE STATICS AND LOCAL METHODS
+//=============================================================================================================
+
+namespace
+{
+
+/** Runs @p program and returns stdout, stderr and the exit code (-1 if it did not run to completion). */
+QVariantMap runProgram(const QString& program, const QStringList& args, const QString& workDir = {})
+{
+    std::vector<std::string> arguments;
+    arguments.reserve(static_cast<std::size_t>(args.size()));
+    for (const QString& arg : args)
+        arguments.push_back(arg.toStdString());
+    ProcessOptions options;
+    options.working_dir = path_from_utf8(workDir.toStdString());
+    const ProcessResult process = run_process(path_from_utf8(program.toStdString()), arguments, options);
+
+    QVariantMap outputs;
+    outputs.insert(QStringLiteral("stdout"), QString::fromStdString(process.std_out));
+    outputs.insert(QStringLiteral("stderr"), QString::fromStdString(process.started ? process.std_err : process.error));
+    outputs.insert(QStringLiteral("exit_code"), process.exit_code);
+    return outputs;
+}
+
+} // namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -183,8 +207,8 @@ bool MnaGraphExecutor::runNode(MnaGraph& graph, MnaNode& node, Context& ctx)
     provenance = MnaProvenance();
     provenance.mneCppVersion = QStringLiteral(MNE_CPP_VERSION);
     provenance.qtVersion = QString::fromLatin1(qVersion());
-    provenance.osInfo = QSysInfo::prettyProductName() + QLatin1Char(' ') + QSysInfo::currentCpuArchitecture();
-    provenance.hostName = QSysInfo::machineHostName();
+    provenance.osInfo = QString::fromStdString(os_pretty_name() + ' ' + std::string(cpu_architecture()));
+    provenance.hostName = QString::fromStdString(host_name());
     provenance.resolvedAttributes = node.attributes;
     for (auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
         provenance.inputHashes.insert(it.key(), QString::fromStdString(to_hex(Sha256::hash(it.value().toString().toStdString()))));
@@ -265,12 +289,6 @@ QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
 {
     // Script execution — inline code via interpreter
     if (node.execMode == MnaNodeExecMode::Script) {
-#ifdef WASMBUILD
-        QVariantMap outputs;
-        outputs.insert(QStringLiteral("stderr"), QStringLiteral("Script execution not supported in WebAssembly build (QProcess unavailable)"));
-        outputs.insert(QStringLiteral("exit_code"), -1);
-        return outputs;
-#else
         const MnaScript& script = node.script;
 
         // Determine file extension from language
@@ -331,32 +349,11 @@ QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
         QStringList args = script.interpreterArgs;
         args.append(tempFile.fileName());
 
-        QProcess process;
-        process.start(interpreter, args);
-        process.waitForFinished(-1);
-
-        QVariantMap outputs;
-        outputs.insert(QStringLiteral("stdout"), QString::fromUtf8(process.readAllStandardOutput()));
-        outputs.insert(QStringLiteral("stderr"), QString::fromUtf8(process.readAllStandardError()));
-        outputs.insert(QStringLiteral("exit_code"), process.exitCode());
-
-        return outputs;
-#endif
+        return runProgram(interpreter, args);
     }
 
     // IPC execution
     if (node.execMode == MnaNodeExecMode::Ipc) {
-#ifdef WASMBUILD
-        QVariantMap outputs;
-        outputs.insert(QStringLiteral("stderr"), QStringLiteral("IPC execution not supported in WebAssembly build (QProcess unavailable)"));
-        outputs.insert(QStringLiteral("exit_code"), -1);
-        return outputs;
-#else
-        QProcess process;
-        if (!node.ipcWorkDir.isEmpty()) {
-            process.setWorkingDirectory(node.ipcWorkDir);
-        }
-
         // Substitute {{placeholder}} tokens in arguments
         QStringList resolvedArgs;
         for (const QString& arg : node.ipcArgs) {
@@ -373,13 +370,7 @@ QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
             resolvedArgs.append(resolved);
         }
 
-        process.start(node.ipcCommand, resolvedArgs);
-        process.waitForFinished(-1);
-
-        QVariantMap outputs;
-        outputs.insert(QStringLiteral("stdout"), QString::fromUtf8(process.readAllStandardOutput()));
-        outputs.insert(QStringLiteral("stderr"), QString::fromUtf8(process.readAllStandardError()));
-        outputs.insert(QStringLiteral("exit_code"), process.exitCode());
+        QVariantMap outputs = runProgram(node.ipcCommand, resolvedArgs, node.ipcWorkDir);
 
         // Populate outputs from cached results if specified
         for (const MnaPort& p : node.outputs) {
@@ -389,7 +380,6 @@ QVariantMap MnaGraphExecutor::executeNode(const MnaNode& node,
         }
 
         return outputs;
-#endif
     }
 
     // Look up registered op function

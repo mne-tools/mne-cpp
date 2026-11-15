@@ -175,7 +175,7 @@
       "modules": []
     },
     "mna": {
-      "tokens": 1635,
+      "tokens": 1623,
       "public_header_includes": 84,
       "modules": [
         "Core"
@@ -197,11 +197,9 @@
       ]
     },
     "pybridge": {
-      "tokens": 34,
+      "tokens": 2,
       "public_header_includes": 0,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "report": {
       "tokens": 0,

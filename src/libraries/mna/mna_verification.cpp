@@ -27,7 +27,6 @@
 
 #include <QJsonArray>
 #include <QCborArray>
-#include <QSysInfo>
 
 //=============================================================================================================
 // USED NAMESPACES

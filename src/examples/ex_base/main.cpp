@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
+ * @brief    Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, processes, the thread pool and the circular buffer.
  *
  * Every step checks its result and the example exits non-zero on a mismatch.
  * All files are written to a temporary directory.
@@ -23,6 +23,7 @@
 #include <base/json.h>
 #include <base/json_stream_parser.h>
 #include <base/log.h>
+#include <base/process.h>
 #include <base/sha256.h>
 #include <base/string_utils.h>
 #include <base/thread_pool.h>
@@ -32,6 +33,7 @@
 //=============================================================================================================
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <cstdlib>
 #include <filesystem>
@@ -185,6 +187,16 @@ int main()
     //! [sha256_usage]
     ok &= expect(fingerprint == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" && incremental.digest() == Sha256::hash("abc"),
                  "Sha256 hashed a message in one call and incrementally");
+
+    //! [process_usage]
+    // Qt:   QProcess p; p.start("python3", {"--version"}); p.waitForFinished(5000); p.readAllStandardOutput();
+    ProcessOptions options;
+    options.timeout = std::chrono::seconds(5); // killed if it takes longer
+    const ProcessResult python = run_process("python3", std::vector<std::string>{"--version"}, options);
+    Log::info("{} on {} ({}): {}", host_name(), os_pretty_name(), cpu_architecture(), python.ok() ? python.std_out : python.error);
+    //! [process_usage]
+    ok &= expect(!host_name().empty() && !os_pretty_name().empty() && (python.started || !python.error.empty()),
+                 "run_process ran a program and the host was described");
 
     //! [circular_buffer_usage]
     CircularBuffer<double> buffer(4); // one thread pushes, another pops

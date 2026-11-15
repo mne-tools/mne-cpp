@@ -21,15 +21,7 @@
 #include "python_runner.h"
 
 #include <base/log.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QElapsedTimer>
-#include <QProcess>
-#include <QProcessEnvironment>
-#include <QStringList>
+#include <base/process.h>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -55,80 +47,50 @@ using namespace mne;
 namespace
 {
 
-constexpr int kStartTimeoutMs = 10000;
-constexpr int kQueryTimeoutMs = 10000;
-constexpr int kVenvTimeoutMs = 120000;
-constexpr int kPipTimeoutMs = 1800000; // pip install can take a while (torch alone is ~2 GB)
-constexpr int kPollMs = 100;
+using std::chrono::milliseconds;
 
-QString toQString(std::string_view text)
-{
-    return QString::fromUtf8(text.data(), static_cast<qsizetype>(text.size()));
-}
-
-QString pathToQString(const std::filesystem::path& path)
-{
-    return toQString(std::string_view(utf8_from_path(path)));
-}
-
-QStringList toQStringList(const StringList& list)
-{
-    QStringList result;
-    result.reserve(static_cast<qsizetype>(list.size()));
-    for (const std::string& item : list) {
-        result << toQString(item);
-    }
-    return result;
-}
-
-std::string fromBytes(const QByteArray& bytes)
-{
-    return {bytes.constData(), static_cast<std::size_t>(bytes.size())};
-}
+constexpr milliseconds kQueryTimeout{10000};
+constexpr milliseconds kVenvTimeout{120000};
+constexpr milliseconds kPipTimeout{1800000}; // pip install can take a while (torch alone is ~2 GB)
 
 //=============================================================================================================
 
 /** Runs a short-lived helper command; on success returns its stdout, otherwise nothing. */
-std::optional<std::string> query(const std::string& program, const QStringList& args, int timeoutMs = kQueryTimeoutMs)
+std::optional<std::string> query(const std::string& program, const StringList& args, milliseconds timeout = kQueryTimeout)
 {
-    QProcess process;
-    process.start(toQString(program), args);
-    if (!process.waitForFinished(timeoutMs)) {
-        process.kill();
-        process.waitForFinished(1000);
+    ProcessOptions options;
+    options.timeout = timeout;
+    ProcessResult process = run_process(program, args, options);
+    if (!process.ok()) {
         return std::nullopt;
     }
-    if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
-        return std::nullopt;
-    }
-    return fromBytes(process.readAllStandardOutput());
+    return std::move(process.std_out);
 }
 
 //=============================================================================================================
 
 /** Runs a setup step (venv creation, pip install) and fills @p result on failure; returns true on success. */
-bool runSetupStep(const std::string& program, const QStringList& args, int timeoutMs, std::string_view what, PythonRunnerResult& result)
+bool runSetupStep(const std::string& program, const StringList& args, milliseconds timeout, std::string_view what, PythonRunnerResult& result)
 {
-    QProcess process;
-    process.start(toQString(program), args);
-    if (!process.waitForStarted(kStartTimeoutMs)) {
-        result.std_err = std::format("Failed to start {}: {}", what, process.errorString().toStdString());
+    ProcessOptions options;
+    options.timeout = timeout;
+    ProcessResult process = run_process(program, args, options);
+    if (!process.started) {
+        result.std_err = std::format("Failed to start {}: {}", what, process.error);
         Log::warning("[PythonRunner] {}", result.std_err);
         return false;
     }
-    if (!process.waitForFinished(timeoutMs)) {
+    if (process.timed_out) {
         result.std_err = std::format("{} timed out.", what);
         result.timed_out = true;
-        process.kill();
-        process.waitForFinished(5000);
         Log::warning("[PythonRunner] {}", result.std_err);
         return false;
     }
-    result.std_out = fromBytes(process.readAllStandardOutput());
-    result.std_err = fromBytes(process.readAllStandardError());
-    result.exit_code = process.exitCode();
-    if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
-        Log::warning("[PythonRunner] {} failed with code {}: {}", what, process.exitCode(), result.std_err);
+    result.std_out = std::move(process.std_out);
+    result.std_err = std::move(process.std_err);
+    result.exit_code = process.exit_code;
+    if (!process.ok()) {
+        Log::warning("[PythonRunner] {} failed with code {}: {}", what, process.exit_code, result.std_err);
         return false;
     }
     return true;
@@ -246,14 +208,14 @@ PythonRunnerResult PythonRunner::run_code(std::string_view code, const StringLis
 
 bool PythonRunner::is_python_available() const
 {
-    return query(m_config.python_exe, {QStringLiteral("--version")}, 5000).has_value();
+    return query(m_config.python_exe, {"--version"}, milliseconds(5000)).has_value();
 }
 
 //=============================================================================================================
 
 std::string PythonRunner::python_version() const
 {
-    const std::optional<std::string> out = query(m_config.python_exe, {QStringLiteral("--version")}, 5000);
+    const std::optional<std::string> out = query(m_config.python_exe, {"--version"}, milliseconds(5000));
     if (!out) {
         return {};
     }
@@ -277,8 +239,8 @@ bool PythonRunner::is_package_available(std::string_view package) const
     }
     // find_spec locates the package without executing it; a full import of e.g. sklearn can exceed the timeout
     // on a loaded machine and read as "not installed"
-    const QString code = toQString(std::format("import importlib.util, sys; sys.exit(0 if importlib.util.find_spec('{}') else 1)", package));
-    return query(m_config.python_exe, {QStringLiteral("-c"), code}).has_value();
+    const std::string code = std::format("import importlib.util, sys; sys.exit(0 if importlib.util.find_spec('{}') else 1)", package);
+    return query(m_config.python_exe, {"-c", code}).has_value();
 }
 
 //=============================================================================================================
@@ -310,8 +272,7 @@ PythonRunnerResult PythonRunner::ensure_venv()
     std::error_code ec;
     if (!std::filesystem::exists(venvPython, ec)) {
         Log::debug("[PythonRunner] Creating virtual environment at: {}", utf8_from_path(m_config.venv_dir));
-        if (!runSetupStep(m_config.python_exe, {QStringLiteral("-m"), QStringLiteral("venv"), pathToQString(m_config.venv_dir)},
-                          kVenvTimeoutMs, "venv creation", result)) {
+        if (!runSetupStep(m_config.python_exe, {"-m", "venv", utf8_from_path(m_config.venv_dir)}, kVenvTimeout, "venv creation", result)) {
             return result;
         }
     } else {
@@ -319,29 +280,27 @@ PythonRunnerResult PythonRunner::ensure_venv()
     }
 
     // Prefer pyproject.toml (package_dir) over requirements.txt
-    QStringList pipArgs;
+    StringList pipArgs;
     if (!m_config.package_dir.empty()) {
         const std::filesystem::path toml = m_config.package_dir / "pyproject.toml";
         if (std::filesystem::exists(toml, ec)) {
-            pipArgs << QStringLiteral("install") << pathToQString(m_config.package_dir);
+            pipArgs = {"-m", "pip", "install", utf8_from_path(m_config.package_dir)};
             Log::debug("[PythonRunner] Installing from pyproject.toml in: {}", utf8_from_path(m_config.package_dir));
         } else {
             Log::warning("[PythonRunner] package_dir set but no pyproject.toml found at: {}", utf8_from_path(toml));
         }
     }
-    if (pipArgs.isEmpty() && !m_config.requirements_file.empty()) {
+    if (pipArgs.empty() && !m_config.requirements_file.empty()) {
         if (std::filesystem::exists(m_config.requirements_file, ec)) {
-            pipArgs << QStringLiteral("install") << QStringLiteral("-r") << pathToQString(m_config.requirements_file);
+            pipArgs = {"-m", "pip", "install", "-r", utf8_from_path(m_config.requirements_file)};
             Log::debug("[PythonRunner] Installing from requirements.txt: {}", utf8_from_path(m_config.requirements_file));
         } else {
             Log::warning("[PythonRunner] requirements_file not found: {}", utf8_from_path(m_config.requirements_file));
         }
     }
-    if (!pipArgs.isEmpty()) {
-        // "python -m pip" works whether or not the venv puts a pip launcher next to the interpreter
-        pipArgs.prepend(QStringLiteral("pip"));
-        pipArgs.prepend(QStringLiteral("-m"));
-        if (!runSetupStep(utf8_from_path(venvPython), pipArgs, kPipTimeoutMs, "pip install", result)) {
+    // "python -m pip" works whether or not the venv puts a pip launcher next to the interpreter
+    if (!pipArgs.empty()) {
+        if (!runSetupStep(utf8_from_path(venvPython), pipArgs, kPipTimeout, "pip install", result)) {
             return result;
         }
         Log::debug("[PythonRunner] Dependencies installed successfully.");
@@ -370,27 +329,10 @@ PythonRunnerResult PythonRunner::run_in_venv(const std::filesystem::path& script
 PythonRunnerResult PythonRunner::execute(const StringList& args) const
 {
     PythonRunnerResult result;
-
-    QProcess process;
-    process.setProcessChannelMode(QProcess::SeparateChannels);
-    if (!m_config.working_dir.empty()) {
-        process.setWorkingDirectory(pathToQString(m_config.working_dir));
-    }
-    if (!m_config.extra_env.empty()) {
-        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        for (const auto& [key, value] : m_config.extra_env) {
-            env.insert(toQString(key), toQString(value));
-        }
-        process.setProcessEnvironment(env);
-    }
-
-    Log::debug("[PythonRunner] Launching: {} {}", m_config.python_exe, join(args, " "));
-    process.start(toQString(m_config.python_exe), toQStringList(args));
-    if (!process.waitForStarted(kStartTimeoutMs)) {
-        result.std_err = "Failed to start Python process: " + process.errorString().toStdString();
-        Log::warning("[PythonRunner] {}", result.std_err);
-        return result;
-    }
+    ProcessOptions options;
+    options.working_dir = m_config.working_dir;
+    options.environment.assign(m_config.extra_env.begin(), m_config.extra_env.end());
+    options.timeout = m_config.timeout;
 
     std::array<std::string, 2> pending;
     std::array<std::string, 2> collected;
@@ -415,45 +357,46 @@ PythonRunnerResult PythonRunner::execute(const StringList& args) const
             Log::warning("[Python stderr] {}", line);
         }
     };
-    const auto drain = [&](bool flush) {
-        pending[0] += fromBytes(process.readAllStandardOutput());
-        pending[1] += fromBytes(process.readAllStandardError());
-        for (std::size_t i = 0; i < 2; ++i) {
-            const PythonChannel channel = i == 0 ? PythonChannel::StdOut : PythonChannel::StdErr;
-            std::size_t start = 0;
-            for (std::size_t end = pending.at(i).find('\n'); end != std::string::npos; end = pending.at(i).find('\n', start)) {
-                dispatch(channel, std::string_view(pending.at(i)).substr(start, end - start));
-                start = end + 1;
-            }
-            pending.at(i).erase(0, start);
-            if (flush && !pending.at(i).empty()) {
-                dispatch(channel, pending.at(i)); // trailing output without a newline
-                pending.at(i).clear();
-            }
+    const auto split = [&](std::size_t i, bool flush) {
+        const PythonChannel channel = i == 0 ? PythonChannel::StdOut : PythonChannel::StdErr;
+        std::size_t start = 0;
+        for (std::size_t end = pending.at(i).find('\n'); end != std::string::npos; end = pending.at(i).find('\n', start)) {
+            dispatch(channel, std::string_view(pending.at(i)).substr(start, end - start));
+            start = end + 1;
+        }
+        pending.at(i).erase(0, start);
+        if (flush && !pending.at(i).empty()) {
+            dispatch(channel, pending.at(i)); // trailing output without a newline
+            pending.at(i).clear();
         }
     };
+    options.on_output = [&](ProcessChannel channel, std::string_view data) {
+        const std::size_t i = channel == ProcessChannel::StdOut ? 0 : 1;
+        pending.at(i) += data;
+        split(i, false);
+    };
 
-    QElapsedTimer elapsed;
-    elapsed.start();
-    while (!process.waitForFinished(kPollMs)) {
-        drain(false);
-        if (m_config.timeout && elapsed.elapsed() >= m_config.timeout->count()) {
-            result.timed_out = true;
-            process.kill();
-            process.waitForFinished(5000);
-            Log::warning("[PythonRunner] Process timed out after {} ms.", m_config.timeout->count());
-            break;
-        }
+    Log::debug("[PythonRunner] Launching: {} {}", m_config.python_exe, join(args, " "));
+    const ProcessResult process = run_process(m_config.python_exe, args, options);
+    if (!process.started) {
+        result.std_err = "Failed to start Python process: " + process.error;
+        Log::warning("[PythonRunner] {}", result.std_err);
+        return result;
     }
-    drain(true);
+    split(0, true);
+    split(1, true);
+    result.timed_out = process.timed_out;
+    if (result.timed_out) {
+        Log::warning("[PythonRunner] Process timed out after {} ms.", m_config.timeout->count());
+    }
 
     result.std_out = std::move(collected[0]);
     result.std_err = std::move(collected[1]);
     if (result.timed_out) {
         result.std_err += std::format("{}Process timed out after {} ms.", result.std_err.empty() ? "" : "\n", m_config.timeout->count());
     }
-    result.exit_code = process.exitCode();
-    result.success = !result.timed_out && process.exitStatus() == QProcess::NormalExit && result.exit_code == 0;
+    result.exit_code = process.exit_code;
+    result.success = process.ok();
 
     if (result.success) {
         Log::debug("[PythonRunner] Script finished successfully.");

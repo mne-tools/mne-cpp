@@ -37,6 +37,7 @@ set(SOURCES
   json.cpp
   json_stream_parser.cpp
   log.cpp
+  process.cpp
   sha256.cpp
   string_utils.cpp
   thread_pool.cpp
@@ -53,6 +54,7 @@ set(HEADERS
   json.h
   json_stream_parser.h
   log.h
+  process.h
   sha256.h
   string_utils.h
   thread_pool.h

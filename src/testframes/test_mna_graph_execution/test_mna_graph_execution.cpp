@@ -647,6 +647,16 @@ void TestMnaGraphExecution::testScriptAndIpcNodes()
     QCOMPARE(ctx.results.value("ipc::stdout").toString(), QStringLiteral("3 ") + ipc.ipcWorkDir + QStringLiteral("\n"));
     QCOMPARE(ctx.results.value("ipc::exit_code").toInt(), 0);
     QCOMPARE(ctx.results.value("ipc::out").toString(), QStringLiteral("result.fif"));
+
+    // A command that cannot start is a failure, not exit code 0
+    MnaGraph missingGraph;
+    MnaNode missing = makeNode("missing", "external");
+    missing.execMode = MnaNodeExecMode::Ipc;
+    missing.ipcCommand = QStringLiteral("mne-cpp-no-such-program");
+    missingGraph.addNode(missing);
+    MnaGraphExecutor::Context missingCtx = MnaGraphExecutor::execute(missingGraph, {});
+    QCOMPARE(missingCtx.results.value("missing::exit_code").toInt(), -1);
+    QVERIFY(!missingCtx.results.value("missing::stderr").toString().isEmpty());
 #endif
 }
 

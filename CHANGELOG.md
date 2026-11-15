@@ -604,6 +604,14 @@ aliases; replace the old spelling as below.
   (`base/string_utils.h`): SHA-256 digests in one call or incrementally,
   the counterpart of `QCryptographicHash::Sha256` and `QByteArray::toHex()`.
   The MNA graph executor fingerprints node inputs with it.
+- New `mne::run_process()` with `ProcessOptions` and `ProcessResult`
+  (`base/process.h`): runs a program without a shell, with working
+  directory, extra environment, timeout and a live output callback, the
+  counterpart of `QProcess`; `host_name()`, `os_pretty_name()` and
+  `cpu_architecture()` replace `QSysInfo`. `PythonRunner` and the MNA graph
+  executor use them, so `mne_pybridge` no longer links Qt.
+- MNA script and IPC nodes whose program cannot be started report exit code
+  -1 and the reason in `stderr`; they reported a made-up exit code before.
 - `BrainVisionReader` decodes `.vhdr` and `.vmrk` files like MNE-Python:
   UTF-8, Windows-1252 for `Codepage=ANSI`, and Latin-1 when the bytes are
   not valid in that encoding. Latin-1 headers from older recorders kept raw
