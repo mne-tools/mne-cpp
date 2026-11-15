@@ -25,7 +25,7 @@ axial.fill(128);
 Matrix4d voxelToWorld = Matrix4d::Identity(); // 1 mm voxels, origin at the volume centre
 voxelToWorld.block<3, 1>(0, 3) = Vector3d(-128.0, -128.0, -128.0);
 SliceObject slice;
-slice.setSlice(axial, SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
+slice.setSlice(axial, MRILIB::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
 slice.setWindowLevel(100.0f, 200.0f);
 QVector<float> quad; // 4 corners x (x, y, z, u, v)
 slice.generateQuadVertices(quad);
@@ -48,7 +48,7 @@ Set the slice image data and orientation.
 - **image** : *const QImage &*
   Greyscale slice image (QImage::Format_Grayscale8 or 16).
 
-- **orientation** : *SliceOrientation*
+- **orientation** : *MRILIB::SliceOrientation*
   Axial, Sagittal, or Coronal.
 
 - **sliceIndex** : *int*
@@ -68,7 +68,7 @@ Set the slice image data with an explicit image-to-world transform.
 - **image** : *const QImage &*
   Greyscale slice image (QImage::Format_Grayscale8 or 16).
 
-- **orientation** : *SliceOrientation*
+- **orientation** : *MRILIB::SliceOrientation*
   Anatomical orientation of the slice.
 
 - **sliceIndex** : *int*
@@ -83,7 +83,7 @@ Set the slice image data with an explicit image-to-world transform.
 
 **Returns:**
 
-- *SliceOrientation* — Current slice orientation.
+- *MRILIB::SliceOrientation* — Current slice orientation.
 
 ---
 
@@ -199,7 +199,7 @@ axial.fill(128);
 Matrix4d voxelToWorld = Matrix4d::Identity(); // 1 mm voxels, origin at the volume centre
 voxelToWorld.block<3, 1>(0, 3) = Vector3d(-128.0, -128.0, -128.0);
 SliceObject slice;
-slice.setSlice(axial, SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
+slice.setSlice(axial, MRILIB::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
 slice.setWindowLevel(100.0f, 200.0f);
 QVector<float> quad; // 4 corners x (x, y, z, u, v)
 slice.generateQuadVertices(quad);
