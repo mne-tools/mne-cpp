@@ -20,9 +20,8 @@
  * canonical entity order (@c sub, @c ses, @c task, @c acq, @c run, …)
  * consumed by @ref BIDSLIB::BIDSPath when it serialises a filename.
  *
- * Header-only and inline so the maps are constant-folded at the call
- * sites and to avoid a hidden ODR surface for translation units that
- * only need one or two entries.
+ * Header-only and constexpr, so the tables live in read-only data and
+ * lookups need no allocation.
  */
 
 #ifndef BIDS_CONST_H
@@ -34,9 +33,11 @@
 
 #include <fiff/fiff_constants.h>
 
-#include <QMap>
-#include <QString>
-#include <QStringList>
+#include <algorithm>
+#include <array>
+#include <optional>
+#include <string_view>
+#include <utility>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -50,210 +51,128 @@ namespace BIDSLIB
 //=============================================================================================================
 
 /** BIDS datatype strings used in directory and filename construction. */
-const QString BIDS_DATATYPE_MEG = QStringLiteral("meg");
-const QString BIDS_DATATYPE_EEG = QStringLiteral("eeg");
-const QString BIDS_DATATYPE_IEEG = QStringLiteral("ieeg");
-const QString BIDS_DATATYPE_ANAT = QStringLiteral("anat");
-const QString BIDS_DATATYPE_FUNC = QStringLiteral("func");
-const QString BIDS_DATATYPE_DWI = QStringLiteral("dwi");
-const QString BIDS_DATATYPE_PERF = QStringLiteral("perf");
-const QString BIDS_DATATYPE_BEH = QStringLiteral("beh");
+inline constexpr std::string_view BIDS_DATATYPE_MEG = "meg";
+inline constexpr std::string_view BIDS_DATATYPE_EEG = "eeg";
+inline constexpr std::string_view BIDS_DATATYPE_IEEG = "ieeg";
+inline constexpr std::string_view BIDS_DATATYPE_ANAT = "anat";
+inline constexpr std::string_view BIDS_DATATYPE_FUNC = "func";
+inline constexpr std::string_view BIDS_DATATYPE_DWI = "dwi";
+inline constexpr std::string_view BIDS_DATATYPE_PERF = "perf";
+inline constexpr std::string_view BIDS_DATATYPE_BEH = "beh";
 
-/**
- * All allowed BIDS electrophysiology datatypes.
- *
- * @return List containing the "meg", "eeg", and "ieeg" datatype strings.
- */
-inline QStringList allowedElectrophysiologyDatatypes()
-{
-    return {BIDS_DATATYPE_MEG, BIDS_DATATYPE_EEG, BIDS_DATATYPE_IEEG};
-}
+/** All allowed BIDS electrophysiology datatypes: "meg", "eeg" and "ieeg". */
+inline constexpr std::array<std::string_view, 3> BIDS_ELECTROPHYSIOLOGY_DATATYPES{BIDS_DATATYPE_MEG, BIDS_DATATYPE_EEG, BIDS_DATATYPE_IEEG};
 
-/**
- * All allowed BIDS datatypes.
- *
- * @return List of all supported BIDS datatype strings (electrophysiology, imaging, and behavioral).
- */
-inline QStringList allowedDatatypes()
-{
-    return {BIDS_DATATYPE_MEG, BIDS_DATATYPE_EEG, BIDS_DATATYPE_IEEG,
-            BIDS_DATATYPE_ANAT, BIDS_DATATYPE_FUNC, BIDS_DATATYPE_DWI,
-            BIDS_DATATYPE_PERF, BIDS_DATATYPE_BEH};
-}
+/** All allowed BIDS datatypes (electrophysiology, imaging and behavioral). */
+inline constexpr std::array<std::string_view, 8> BIDS_DATATYPES{BIDS_DATATYPE_MEG, BIDS_DATATYPE_EEG, BIDS_DATATYPE_IEEG,
+                                                                BIDS_DATATYPE_ANAT, BIDS_DATATYPE_FUNC, BIDS_DATATYPE_DWI,
+                                                                BIDS_DATATYPE_PERF, BIDS_DATATYPE_BEH};
+
+/** Supported raw data file extensions for iEEG in BIDS, lowercase with the leading dot. */
+inline constexpr std::array<std::string_view, 5> BIDS_IEEG_EXTENSIONS{".vhdr", // BrainVision header
+                                                                      ".edf",  // European Data Format
+                                                                      ".set",  // EEGLAB
+                                                                      ".mef",  // MEF3
+                                                                      ".nwb"}; // NWB
+
+/** Supported raw data file extensions for EEG in BIDS, lowercase with the leading dot. */
+inline constexpr std::array<std::string_view, 5> BIDS_EEG_EXTENSIONS{".vhdr", ".edf", ".bdf", ".set", ".fif"};
 
 //=============================================================================================================
-// BIDS file extensions for iEEG raw data
+// Channel type mapping (FIFF kind <-> BIDS type), BIDS specification Appendix VII
 //=============================================================================================================
 
+/** BIDS channel type of each FIFF channel kind written to channels.tsv. */
+inline constexpr std::array<std::pair<int, std::string_view>, 12> FIFF_KIND_TO_BIDS_TYPE{{
+    {FIFFV_MEG_CH, "MEGMAG"},
+    {FIFFV_EEG_CH, "EEG"},
+    {FIFFV_STIM_CH, "TRIG"},
+    {FIFFV_EOG_CH, "EOG"},
+    {FIFFV_ECG_CH, "ECG"},
+    {FIFFV_EMG_CH, "EMG"},
+    {FIFFV_MISC_CH, "MISC"},
+    {FIFFV_RESP_CH, "RESP"},
+    {FIFFV_REF_MEG_CH, "MEGREF"},
+    {FIFFV_ECOG_CH, "ECOG"},
+    {FIFFV_SEEG_CH, "SEEG"},
+    {FIFFV_DBS_CH, "DBS"},
+}};
+
+/** FIFF channel kind of each BIDS channel type read from channels.tsv. */
+inline constexpr std::array<std::pair<std::string_view, int>, 13> BIDS_TYPE_TO_FIFF_KIND{{
+    {"MEGMAG", FIFFV_MEG_CH},
+    {"MEGGRAD", FIFFV_MEG_CH},
+    {"MEGREF", FIFFV_REF_MEG_CH},
+    {"EEG", FIFFV_EEG_CH},
+    {"ECOG", FIFFV_ECOG_CH},
+    {"SEEG", FIFFV_SEEG_CH},
+    {"DBS", FIFFV_DBS_CH},
+    {"EOG", FIFFV_EOG_CH},
+    {"ECG", FIFFV_ECG_CH},
+    {"EMG", FIFFV_EMG_CH},
+    {"TRIG", FIFFV_STIM_CH},
+    {"MISC", FIFFV_MISC_CH},
+    {"RESP", FIFFV_RESP_CH},
+}};
+
+//=============================================================================================================
+// Coordinate system mapping
+//=============================================================================================================
+
+/** FIFF coordinate frame of each BIDS coordinate system name read from electrodes.tsv / coordsystem.json. */
+inline constexpr std::array<std::pair<std::string_view, int>, 8> BIDS_COORD_TO_FIFF_FRAME{{
+    {"CTF", FIFFV_COORD_HEAD},
+    {"ElektaNeuromag", FIFFV_COORD_HEAD},
+    {"CapTrak", FIFFV_COORD_HEAD},
+    {"ACPC", FIFFV_COORD_MRI},
+    {"fsaverage", FIFFV_MNE_COORD_MNI_TAL},
+    {"MNI305", FIFFV_MNE_COORD_MNI_TAL},
+    {"fsaverageSymm", FIFFV_MNE_COORD_MNI_TAL},
+    {"Other", FIFFV_COORD_UNKNOWN},
+}};
+
+/** BIDS coordinate system name written for each FIFF coordinate frame. */
+inline constexpr std::array<std::pair<int, std::string_view>, 4> FIFF_FRAME_TO_BIDS_COORD{{
+    {FIFFV_COORD_HEAD, "CapTrak"},
+    {FIFFV_COORD_MRI, "ACPC"},
+    {FIFFV_MNE_COORD_MNI_TAL, "MNI305"},
+    {FIFFV_COORD_UNKNOWN, "Other"},
+}};
+
+/** Allowed coordinate systems for iEEG electrodes (BIDS-iEEG spec). */
+inline constexpr std::array<std::string_view, 14> BIDS_IEEG_COORD_SYSTEMS{"ACPC",
+                                                                          "Talairach",
+                                                                          "Other",
+                                                                          "fsaverage",
+                                                                          "fsaverageSymm",
+                                                                          "MNI305",
+                                                                          "MNI152Lin",
+                                                                          "MNI152NLin2009aSym",
+                                                                          "MNI152NLin2009bSym",
+                                                                          "MNI152NLin2009cSym",
+                                                                          "MNI152NLin2009aAsym",
+                                                                          "MNI152NLin2009bAsym",
+                                                                          "MNI152NLin2009cAsym",
+                                                                          "individual"};
+
+/** Entity keys in the order they must appear in a BIDS filename (per specification). */
+inline constexpr std::array<std::string_view, 11> BIDS_ENTITY_ORDER{"sub", "ses", "task", "tracksys", "acq", "run",
+                                                                    "proc", "space", "recording", "split", "desc"};
+
+//=============================================================================================================
 /**
- * Supported raw data file extensions for iEEG in BIDS.
+ * Looks a key up in one of the mapping tables above.
  *
- * @return List of lowercase extensions including the leading dot (e.g. ".vhdr", ".edf").
- */
-inline QStringList ieegAllowedExtensions()
-{
-    return {QStringLiteral(".vhdr"), // BrainVision header
-            QStringLiteral(".edf"),  // European Data Format
-            QStringLiteral(".set"),  // EEGLAB
-            QStringLiteral(".mef"),  // MEF3
-            QStringLiteral(".nwb")}; // NWB
-}
-
-/**
- * Supported raw data file extensions for EEG in BIDS.
+ * @param[in] table   A table of key-value pairs.
+ * @param[in] key     The key.
  *
- * @return List of lowercase extensions including the leading dot (e.g. ".vhdr", ".bdf").
+ * @return The value of @p key, or nothing if the table does not have it.
  */
-inline QStringList eegAllowedExtensions()
+template<typename Table, typename Key>
+constexpr auto bids_lookup(const Table& table, const Key& key) -> std::optional<typename Table::value_type::second_type>
 {
-    return {QStringLiteral(".vhdr"),
-            QStringLiteral(".edf"),
-            QStringLiteral(".bdf"),
-            QStringLiteral(".set"),
-            QStringLiteral(".fif")};
-}
-
-//=============================================================================================================
-// Channel type mapping: MNE FIFF kind → BIDS string
-//=============================================================================================================
-
-/**
- * Maps FIFF channel kind constants to BIDS channel type strings.
- * Reference: BIDS specification Appendix VII.
- *
- * @return Map from FIFF channel kind (e.g. FIFFV_EEG_CH) to BIDS channel type (e.g. "EEG").
- */
-inline QMap<int, QString> fiffKindToBidsType()
-{
-    return {
-        {FIFFV_MEG_CH, QStringLiteral("MEGMAG")},
-        {FIFFV_EEG_CH, QStringLiteral("EEG")},
-        {FIFFV_STIM_CH, QStringLiteral("TRIG")},
-        {FIFFV_EOG_CH, QStringLiteral("EOG")},
-        {FIFFV_ECG_CH, QStringLiteral("ECG")},
-        {FIFFV_EMG_CH, QStringLiteral("EMG")},
-        {FIFFV_MISC_CH, QStringLiteral("MISC")},
-        {FIFFV_RESP_CH, QStringLiteral("RESP")},
-        {FIFFV_REF_MEG_CH, QStringLiteral("MEGREF")},
-        {FIFFV_ECOG_CH, QStringLiteral("ECOG")},
-        {FIFFV_SEEG_CH, QStringLiteral("SEEG")},
-        {FIFFV_DBS_CH, QStringLiteral("DBS")},
-    };
-}
-
-/**
- * Maps BIDS channel type strings back to FIFF channel kind constants.
- * Reference: BIDS specification Appendix VII.
- *
- * @return Map from BIDS channel type (e.g. "SEEG") to FIFF channel kind (e.g. FIFFV_SEEG_CH).
- */
-inline QMap<QString, int> bidsTypeToFiffKind()
-{
-    return {
-        {QStringLiteral("MEGMAG"), FIFFV_MEG_CH},
-        {QStringLiteral("MEGGRAD"), FIFFV_MEG_CH},
-        {QStringLiteral("MEGREF"), FIFFV_REF_MEG_CH},
-        {QStringLiteral("EEG"), FIFFV_EEG_CH},
-        {QStringLiteral("ECOG"), FIFFV_ECOG_CH},
-        {QStringLiteral("SEEG"), FIFFV_SEEG_CH},
-        {QStringLiteral("DBS"), FIFFV_DBS_CH},
-        {QStringLiteral("EOG"), FIFFV_EOG_CH},
-        {QStringLiteral("ECG"), FIFFV_ECG_CH},
-        {QStringLiteral("EMG"), FIFFV_EMG_CH},
-        {QStringLiteral("TRIG"), FIFFV_STIM_CH},
-        {QStringLiteral("MISC"), FIFFV_MISC_CH},
-        {QStringLiteral("RESP"), FIFFV_RESP_CH},
-    };
-}
-
-//=============================================================================================================
-// Coordinate system mappings: BIDS string ↔ FIFF coordinate frame
-//=============================================================================================================
-
-/**
- * Maps BIDS coordinate system names to FIFF coordinate frame constants.
- * Used for electrodes.tsv / coordsystem.json handling.
- *
- * @return Map from BIDS coordinate system name to FIFF coordinate frame; unknown systems map to FIFFV_COORD_UNKNOWN.
- */
-inline QMap<QString, int> bidsCoordToFiffFrame()
-{
-    return {
-        {QStringLiteral("CTF"), FIFFV_COORD_HEAD},
-        {QStringLiteral("ElektaNeuromag"), FIFFV_COORD_HEAD},
-        {QStringLiteral("CapTrak"), FIFFV_COORD_HEAD},
-        {QStringLiteral("ACPC"), FIFFV_COORD_MRI},
-        {QStringLiteral("fsaverage"), FIFFV_MNE_COORD_MNI_TAL},
-        {QStringLiteral("MNI305"), FIFFV_MNE_COORD_MNI_TAL},
-        {QStringLiteral("fsaverageSymm"), FIFFV_MNE_COORD_MNI_TAL},
-        {QStringLiteral("Other"), FIFFV_COORD_UNKNOWN},
-    };
-}
-
-/**
- * Maps FIFF coordinate frame constants to BIDS coordinate system names.
- *
- * @return Map from FIFF coordinate frame to the BIDS coordinate system name written for it.
- */
-inline QMap<int, QString> fiffFrameToBidsCoord()
-{
-    return {
-        {FIFFV_COORD_HEAD, QStringLiteral("CapTrak")},
-        {FIFFV_COORD_MRI, QStringLiteral("ACPC")},
-        {FIFFV_MNE_COORD_MNI_TAL, QStringLiteral("MNI305")},
-        {FIFFV_COORD_UNKNOWN, QStringLiteral("Other")},
-    };
-}
-
-//=============================================================================================================
-// Allowed coordinate systems for iEEG
-//=============================================================================================================
-
-/**
- * Allowed coordinate systems for iEEG electrodes (BIDS-iEEG spec).
- *
- * @return List of coordinate system names accepted in an iEEG coordsystem.json.
- */
-inline QStringList ieegAllowedCoordSystems()
-{
-    return {QStringLiteral("ACPC"),
-            QStringLiteral("Talairach"),
-            QStringLiteral("Other"),
-            QStringLiteral("fsaverage"),
-            QStringLiteral("fsaverageSymm"),
-            QStringLiteral("MNI305"),
-            QStringLiteral("MNI152Lin"),
-            QStringLiteral("MNI152NLin2009aSym"),
-            QStringLiteral("MNI152NLin2009bSym"),
-            QStringLiteral("MNI152NLin2009cSym"),
-            QStringLiteral("MNI152NLin2009aAsym"),
-            QStringLiteral("MNI152NLin2009bAsym"),
-            QStringLiteral("MNI152NLin2009cAsym"),
-            QStringLiteral("individual")};
-}
-
-//=============================================================================================================
-// BIDS entity ordering (for filename construction)
-//=============================================================================================================
-
-/**
- * Entity key ordering for BIDS filenames (per specification).
- *
- * @return Entity keys (e.g. "sub", "ses", "task") in the order they must appear in a filename.
- */
-inline QStringList bidsEntityOrder()
-{
-    return {QStringLiteral("sub"),
-            QStringLiteral("ses"),
-            QStringLiteral("task"),
-            QStringLiteral("tracksys"),
-            QStringLiteral("acq"),
-            QStringLiteral("run"),
-            QStringLiteral("proc"),
-            QStringLiteral("space"),
-            QStringLiteral("recording"),
-            QStringLiteral("split"),
-            QStringLiteral("desc")};
+    const auto it = std::ranges::find(table, key, &Table::value_type::first);
+    return it == table.end() ? std::nullopt : std::optional(it->second);
 }
 
 } // namespace BIDSLIB

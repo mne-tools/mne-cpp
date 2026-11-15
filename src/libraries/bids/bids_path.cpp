@@ -17,15 +17,16 @@
 #include "bids_path.h"
 #include "bids_const.h"
 
+#include <base/string_utils.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
 #include <algorithm>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFileInfo>
-#include <QDirIterator>
-#include <QRegularExpression>
+#include <array>
+#include <format>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -37,52 +38,20 @@ using namespace BIDSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BIDSPath::BIDSPath()
-{
-}
-
-//=============================================================================================================
-
-BIDSPath::BIDSPath(const QString& sRoot,
-                   const QString& sSubject,
-                   const QString& sSession,
-                   const QString& sTask,
-                   const QString& sDatatype,
-                   const QString& sSuffix,
-                   const QString& sExtension)
-: m_sRoot(sRoot)
-, m_sSubject(sSubject)
-, m_sSession(sSession)
-, m_sTask(sTask)
-, m_sDatatype(sDatatype)
-, m_sSuffix(sSuffix)
-, m_sExtension(sExtension)
-{
-}
-
-//=============================================================================================================
-
-BIDSPath::BIDSPath(const BIDSPath& other)
-: m_sRoot(other.m_sRoot)
-, m_sSubject(other.m_sSubject)
-, m_sSession(other.m_sSession)
-, m_sTask(other.m_sTask)
-, m_sAcquisition(other.m_sAcquisition)
-, m_sRun(other.m_sRun)
-, m_sProcessing(other.m_sProcessing)
-, m_sSpace(other.m_sSpace)
-, m_sRecording(other.m_sRecording)
-, m_sSplit(other.m_sSplit)
-, m_sDescription(other.m_sDescription)
-, m_sDatatype(other.m_sDatatype)
-, m_sSuffix(other.m_sSuffix)
-, m_sExtension(other.m_sExtension)
-{
-}
-
-//=============================================================================================================
-
-BIDSPath::~BIDSPath()
+BIDSPath::BIDSPath(std::filesystem::path sRoot,
+                   std::string sSubject,
+                   std::string sSession,
+                   std::string sTask,
+                   std::string sDatatype,
+                   std::string sSuffix,
+                   std::string sExtension)
+: m_sRoot(std::move(sRoot))
+, m_sSubject(std::move(sSubject))
+, m_sSession(std::move(sSession))
+, m_sTask(std::move(sTask))
+, m_sDatatype(std::move(sDatatype))
+, m_sSuffix(std::move(sSuffix))
+, m_sExtension(std::move(sExtension))
 {
 }
 
@@ -90,120 +59,120 @@ BIDSPath::~BIDSPath()
 // Setters
 //=============================================================================================================
 
-void BIDSPath::setRoot(const QString& sRoot)
+void BIDSPath::set_root(std::filesystem::path sRoot)
 {
-    m_sRoot = sRoot;
+    m_sRoot = std::move(sRoot);
 }
-void BIDSPath::setSubject(const QString& sSubject)
+void BIDSPath::set_subject(std::string sSubject)
 {
-    m_sSubject = sSubject;
+    m_sSubject = std::move(sSubject);
 }
-void BIDSPath::setSession(const QString& sSession)
+void BIDSPath::set_session(std::string sSession)
 {
-    m_sSession = sSession;
+    m_sSession = std::move(sSession);
 }
-void BIDSPath::setTask(const QString& sTask)
+void BIDSPath::set_task(std::string sTask)
 {
-    m_sTask = sTask;
+    m_sTask = std::move(sTask);
 }
-void BIDSPath::setAcquisition(const QString& sAcq)
+void BIDSPath::set_acquisition(std::string sAcquisition)
 {
-    m_sAcquisition = sAcq;
+    m_sAcquisition = std::move(sAcquisition);
 }
-void BIDSPath::setRun(const QString& sRun)
+void BIDSPath::set_run(std::string sRun)
 {
-    m_sRun = zeroPad(sRun);
+    m_sRun = zero_pad(std::move(sRun));
 }
-void BIDSPath::setProcessing(const QString& sProc)
+void BIDSPath::set_processing(std::string sProcessing)
 {
-    m_sProcessing = sProc;
+    m_sProcessing = std::move(sProcessing);
 }
-void BIDSPath::setSpace(const QString& sSpace)
+void BIDSPath::set_space(std::string sSpace)
 {
-    m_sSpace = sSpace;
+    m_sSpace = std::move(sSpace);
 }
-void BIDSPath::setRecording(const QString& sRec)
+void BIDSPath::set_recording(std::string sRecording)
 {
-    m_sRecording = sRec;
+    m_sRecording = std::move(sRecording);
 }
-void BIDSPath::setSplit(const QString& sSplit)
+void BIDSPath::set_split(std::string sSplit)
 {
-    m_sSplit = zeroPad(sSplit);
+    m_sSplit = zero_pad(std::move(sSplit));
 }
-void BIDSPath::setDescription(const QString& sDesc)
+void BIDSPath::set_description(std::string sDescription)
 {
-    m_sDescription = sDesc;
+    m_sDescription = std::move(sDescription);
 }
-void BIDSPath::setDatatype(const QString& sDatatype)
+void BIDSPath::set_datatype(std::string sDatatype)
 {
-    m_sDatatype = sDatatype;
+    m_sDatatype = std::move(sDatatype);
 }
-void BIDSPath::setSuffix(const QString& sSuffix)
+void BIDSPath::set_suffix(std::string sSuffix)
 {
-    m_sSuffix = sSuffix;
+    m_sSuffix = std::move(sSuffix);
 }
-void BIDSPath::setExtension(const QString& sExtension)
+void BIDSPath::set_extension(std::string sExtension)
 {
-    m_sExtension = sExtension;
+    m_sExtension = std::move(sExtension);
 }
 
 //=============================================================================================================
 // Getters
 //=============================================================================================================
 
-QString BIDSPath::root() const
+const std::filesystem::path& BIDSPath::root() const
 {
     return m_sRoot;
 }
-QString BIDSPath::subject() const
+const std::string& BIDSPath::subject() const
 {
     return m_sSubject;
 }
-QString BIDSPath::session() const
+const std::string& BIDSPath::session() const
 {
     return m_sSession;
 }
-QString BIDSPath::task() const
+const std::string& BIDSPath::task() const
 {
     return m_sTask;
 }
-QString BIDSPath::acquisition() const
+const std::string& BIDSPath::acquisition() const
 {
     return m_sAcquisition;
 }
-QString BIDSPath::run() const
+const std::string& BIDSPath::run() const
 {
     return m_sRun;
 }
-QString BIDSPath::processing() const
+const std::string& BIDSPath::processing() const
 {
     return m_sProcessing;
 }
-QString BIDSPath::space() const
+const std::string& BIDSPath::space() const
 {
     return m_sSpace;
 }
-QString BIDSPath::recording() const
+const std::string& BIDSPath::recording() const
 {
     return m_sRecording;
 }
-QString BIDSPath::split() const
+const std::string& BIDSPath::split() const
 {
     return m_sSplit;
 }
-QString BIDSPath::description() const
+const std::string& BIDSPath::description() const
 {
     return m_sDescription;
 }
-QString BIDSPath::datatype() const
+const std::string& BIDSPath::datatype() const
 {
     return m_sDatatype;
 }
-QString BIDSPath::suffix() const
+const std::string& BIDSPath::suffix() const
 {
     return m_sSuffix;
 }
-QString BIDSPath::extension() const
+const std::string& BIDSPath::extension() const
 {
     return m_sExtension;
 }
@@ -212,214 +181,224 @@ QString BIDSPath::extension() const
 // Path construction
 //=============================================================================================================
 
-QString BIDSPath::basename() const
+std::string BIDSPath::basename() const
 {
-    QStringList parts;
+    const std::array<std::pair<std::string_view, const std::string*>, 10> entities{{
+        {"sub-", &m_sSubject},
+        {"ses-", &m_sSession},
+        {"task-", &m_sTask},
+        {"acq-", &m_sAcquisition},
+        {"run-", &m_sRun},
+        {"proc-", &m_sProcessing},
+        {"space-", &m_sSpace},
+        {"recording-", &m_sRecording},
+        {"split-", &m_sSplit},
+        {"desc-", &m_sDescription},
+    }};
 
-    // Build ordered entity key-value pairs
-    if (!m_sSubject.isEmpty())
-        parts << QStringLiteral("sub-") + m_sSubject;
-    if (!m_sSession.isEmpty())
-        parts << QStringLiteral("ses-") + m_sSession;
-    if (!m_sTask.isEmpty())
-        parts << QStringLiteral("task-") + m_sTask;
-    if (!m_sAcquisition.isEmpty())
-        parts << QStringLiteral("acq-") + m_sAcquisition;
-    if (!m_sRun.isEmpty())
-        parts << QStringLiteral("run-") + m_sRun;
-    if (!m_sProcessing.isEmpty())
-        parts << QStringLiteral("proc-") + m_sProcessing;
-    if (!m_sSpace.isEmpty())
-        parts << QStringLiteral("space-") + m_sSpace;
-    if (!m_sRecording.isEmpty())
-        parts << QStringLiteral("recording-") + m_sRecording;
-    if (!m_sSplit.isEmpty())
-        parts << QStringLiteral("split-") + m_sSplit;
-    if (!m_sDescription.isEmpty())
-        parts << QStringLiteral("desc-") + m_sDescription;
+    std::string name;
+    const auto append = [&name](std::string_view part) {
+        if (!name.empty())
+            name += '_';
+        name += part;
+    };
+    for (const auto& [key, value] : entities) {
+        if (!value->empty())
+            append(std::string(key) + *value);
+    }
+    if (!m_sSuffix.empty())
+        append(m_sSuffix);
 
-    // Append suffix
-    if (!m_sSuffix.isEmpty())
-        parts << m_sSuffix;
-
-    QString name = parts.join(QStringLiteral("_"));
-
-    // Append extension
-    if (!m_sExtension.isEmpty())
-        name += m_sExtension;
-
-    return name;
+    return name + m_sExtension;
 }
 
 //=============================================================================================================
 
-QString BIDSPath::directory() const
+std::filesystem::path BIDSPath::directory() const
 {
-    QDir dir(m_sRoot);
+    std::filesystem::path dir = m_sRoot;
 
-    if (!m_sSubject.isEmpty())
-        dir = QDir(dir.filePath(QStringLiteral("sub-") + m_sSubject));
+    if (!m_sSubject.empty())
+        dir /= BASELIB::pathFromUtf8("sub-" + m_sSubject);
 
-    if (!m_sSession.isEmpty())
-        dir = QDir(dir.filePath(QStringLiteral("ses-") + m_sSession));
+    if (!m_sSession.empty())
+        dir /= BASELIB::pathFromUtf8("ses-" + m_sSession);
 
-    if (!m_sDatatype.isEmpty())
-        dir = QDir(dir.filePath(m_sDatatype));
+    if (!m_sDatatype.empty())
+        dir /= BASELIB::pathFromUtf8(m_sDatatype);
 
-    return dir.path() + QDir::separator();
+    return dir;
 }
 
 //=============================================================================================================
 
-QString BIDSPath::filePath() const
+std::filesystem::path BIDSPath::file_path() const
 {
-    return QDir(directory()).filePath(basename());
+    return directory() / BASELIB::pathFromUtf8(basename());
 }
 
 //=============================================================================================================
 // Convenience methods
 //=============================================================================================================
 
-BIDSPath BIDSPath::withSuffix(const QString& sSuffix, const QString& sExtension) const
+BIDSPath BIDSPath::with_suffix(std::string sSuffix, std::string sExtension) const
 {
     BIDSPath result(*this);
-    result.m_sSuffix = sSuffix;
-    result.m_sExtension = sExtension;
+    result.m_sSuffix = std::move(sSuffix);
+    result.m_sExtension = std::move(sExtension);
     return result;
 }
 
 //=============================================================================================================
 
-BIDSPath BIDSPath::channelsTsvPath() const
+BIDSPath BIDSPath::channels_tsv_path() const
 {
-    return withSuffix(QStringLiteral("channels"), QStringLiteral(".tsv"));
+    return with_suffix("channels", ".tsv");
 }
 
 //=============================================================================================================
 
-BIDSPath BIDSPath::electrodesTsvPath() const
+BIDSPath BIDSPath::electrodes_tsv_path() const
 {
     // Electrodes file typically doesn't include task entity
-    BIDSPath result(*this);
+    BIDSPath result = with_suffix("electrodes", ".tsv");
     result.m_sTask.clear();
     result.m_sRun.clear();
-    result.m_sSuffix = QStringLiteral("electrodes");
-    result.m_sExtension = QStringLiteral(".tsv");
     return result;
 }
 
 //=============================================================================================================
 
-BIDSPath BIDSPath::coordsystemJsonPath() const
+BIDSPath BIDSPath::coordsystem_json_path() const
 {
     // Coordsystem file typically doesn't include task entity
-    BIDSPath result(*this);
+    BIDSPath result = with_suffix("coordsystem", ".json");
     result.m_sTask.clear();
     result.m_sRun.clear();
-    result.m_sSuffix = QStringLiteral("coordsystem");
-    result.m_sExtension = QStringLiteral(".json");
     return result;
 }
 
 //=============================================================================================================
 
-BIDSPath BIDSPath::eventsTsvPath() const
+BIDSPath BIDSPath::events_tsv_path() const
 {
-    return withSuffix(QStringLiteral("events"), QStringLiteral(".tsv"));
+    return with_suffix("events", ".tsv");
 }
 
 //=============================================================================================================
 
-BIDSPath BIDSPath::sidecarJsonPath() const
+BIDSPath BIDSPath::sidecar_json_path() const
 {
-    return withSuffix(m_sSuffix.isEmpty() ? m_sDatatype : m_sSuffix,
-                      QStringLiteral(".json"));
+    return with_suffix(m_sSuffix.empty() ? m_sDatatype : m_sSuffix, ".json");
 }
 
 //=============================================================================================================
 
 bool BIDSPath::exists() const
 {
-    return QFileInfo::exists(filePath());
+    std::error_code error;
+    return std::filesystem::exists(file_path(), error);
 }
 
 //=============================================================================================================
 
 bool BIDSPath::mkdirs() const
 {
-    QDir dir(directory());
-    if (dir.exists())
-        return true;
-    return dir.mkpath(QStringLiteral("."));
+    std::error_code error;
+    const std::filesystem::path dir = directory();
+    std::filesystem::create_directories(dir, error);
+    return std::filesystem::is_directory(dir, error);
 }
 
 //=============================================================================================================
 
-QList<BIDSPath> BIDSPath::match() const
+std::vector<BIDSPath> BIDSPath::match() const
 {
     // Like mne_bids.BIDSPath.match: every set entity must equal the file's, unset ones match anything
-    QList<BIDSPath> results;
-    if (m_sRoot.isEmpty() || !QDir(m_sRoot).exists())
+    std::vector<BIDSPath> results;
+    std::error_code error;
+    if (m_sRoot.empty() || !std::filesystem::is_directory(m_sRoot, error))
         return results;
 
-    QDirIterator it(m_sRoot, QDir::Files, QDirIterator::Subdirectories);
-    while (it.hasNext()) {
-        const QFileInfo file(it.next());
-        const QString name = file.fileName();
-        const int dot = name.indexOf(QLatin1Char('.'));
-        if (dot <= 0)
+    for (auto it = std::filesystem::recursive_directory_iterator(m_sRoot, error);
+         it != std::filesystem::recursive_directory_iterator();
+         it.increment(error)) {
+        const std::string name = BASELIB::utf8FromPath(it->path().filename());
+        if (name.starts_with('.')) {
+            if (it->is_directory(error))
+                it.disable_recursion_pending();
+            continue;
+        }
+        if (!it->is_regular_file(error))
+            continue;
+        const std::size_t dot = name.find('.');
+        if (dot == std::string::npos)
             continue;
 
         BIDSPath p;
-        p.setRoot(m_sRoot);
-        p.setExtension(name.mid(dot));
-        const QString dirName = file.dir().dirName();
-        if (!dirName.startsWith(QStringLiteral("sub-")) && !dirName.startsWith(QStringLiteral("ses-")))
-            p.setDatatype(dirName);
+        p.m_sRoot = m_sRoot;
+        p.m_sExtension = name.substr(dot);
+        const std::string dirName = BASELIB::utf8FromPath(it->path().parent_path().filename());
+        if (!dirName.starts_with("sub-") && !dirName.starts_with("ses-"))
+            p.m_sDatatype = dirName;
 
         bool valid = true;
-        const QStringList parts = name.left(dot).split(QLatin1Char('_'));
-        for (int i = 0; i < parts.size() && valid; ++i) {
-            const int dash = parts[i].indexOf(QLatin1Char('-'));
-            if (dash < 0) {
+        const BASELIB::StringList parts = BASELIB::split(std::string_view(name).substr(0, dot), '_');
+        for (std::size_t i = 0; i < parts.size() && valid; ++i) {
+            const std::size_t dash = parts[i].find('-');
+            if (dash == std::string::npos) {
                 // Only the last part may be the suffix
                 valid = (i == parts.size() - 1);
-                p.setSuffix(parts[i]);
+                p.m_sSuffix = parts[i];
                 continue;
             }
-            const QString key = parts[i].left(dash);
-            const QString val = parts[i].mid(dash + 1);
-            if (key == QStringLiteral("sub"))
-                p.setSubject(val);
-            else if (key == QStringLiteral("ses"))
-                p.setSession(val);
-            else if (key == QStringLiteral("task"))
-                p.setTask(val);
-            else if (key == QStringLiteral("acq"))
-                p.setAcquisition(val);
-            else if (key == QStringLiteral("run"))
-                p.m_sRun = val; // as on disk, so the path names the file found (the setter pads)
-            else if (key == QStringLiteral("proc"))
-                p.setProcessing(val);
-            else if (key == QStringLiteral("space"))
-                p.setSpace(val);
-            else if (key == QStringLiteral("recording"))
-                p.setRecording(val);
-            else if (key == QStringLiteral("split"))
-                p.m_sSplit = val;
-            else if (key == QStringLiteral("desc"))
-                p.setDescription(val);
+            const std::string_view key = std::string_view(parts[i]).substr(0, dash);
+            std::string val = parts[i].substr(dash + 1);
+            // Labels are kept as on disk (the run and split setters would pad), so the path names the file found
+            if (key == "sub")
+                p.m_sSubject = std::move(val);
+            else if (key == "ses")
+                p.m_sSession = std::move(val);
+            else if (key == "task")
+                p.m_sTask = std::move(val);
+            else if (key == "acq")
+                p.m_sAcquisition = std::move(val);
+            else if (key == "run")
+                p.m_sRun = std::move(val);
+            else if (key == "proc")
+                p.m_sProcessing = std::move(val);
+            else if (key == "space")
+                p.m_sSpace = std::move(val);
+            else if (key == "recording")
+                p.m_sRecording = std::move(val);
+            else if (key == "split")
+                p.m_sSplit = std::move(val);
+            else if (key == "desc")
+                p.m_sDescription = std::move(val);
         }
-        if (!valid || p.subject().isEmpty())
+        if (!valid || p.m_sSubject.empty())
             continue;
 
-        const QList<std::pair<QString, QString>> wanted{
-            {m_sSubject, p.subject()}, {m_sSession, p.session()}, {m_sTask, p.task()}, {m_sAcquisition, p.acquisition()}, {m_sRun, p.run()}, {m_sProcessing, p.processing()}, {m_sSpace, p.space()}, {m_sRecording, p.recording()}, {m_sSplit, p.split()}, {m_sDescription, p.description()}, {m_sDatatype, p.datatype()}, {m_sSuffix, p.suffix()}, {m_sExtension, p.extension()}};
-        if (std::all_of(wanted.cbegin(), wanted.cend(), [](const auto& w) { return w.first.isEmpty() || w.first == w.second; }))
-            results.append(p);
+        const std::array<std::pair<const std::string*, const std::string*>, 13> wanted{{
+            {&m_sSubject, &p.m_sSubject},
+            {&m_sSession, &p.m_sSession},
+            {&m_sTask, &p.m_sTask},
+            {&m_sAcquisition, &p.m_sAcquisition},
+            {&m_sRun, &p.m_sRun},
+            {&m_sProcessing, &p.m_sProcessing},
+            {&m_sSpace, &p.m_sSpace},
+            {&m_sRecording, &p.m_sRecording},
+            {&m_sSplit, &p.m_sSplit},
+            {&m_sDescription, &p.m_sDescription},
+            {&m_sDatatype, &p.m_sDatatype},
+            {&m_sSuffix, &p.m_sSuffix},
+            {&m_sExtension, &p.m_sExtension},
+        }};
+        if (std::ranges::all_of(wanted, [](const auto& w) { return w.first->empty() || *w.first == *w.second; }))
+            results.push_back(std::move(p));
     }
 
-    std::sort(results.begin(), results.end(), [](const BIDSPath& a, const BIDSPath& b) { return a.filePath() < b.filePath(); });
+    std::ranges::sort(results, {}, &BIDSPath::file_path);
     return results;
 }
 
@@ -427,53 +406,21 @@ QList<BIDSPath> BIDSPath::match() const
 // Validation
 //=============================================================================================================
 
-bool BIDSPath::isValidEntityValue(const QString& sValue)
+bool BIDSPath::is_valid_entity_value(std::string_view sValue)
 {
-    if (sValue.isEmpty())
-        return true;
     // BIDS labels are alphanumeric ASCII
-    static const QRegularExpression label(QStringLiteral("^[A-Za-z0-9]+$"));
-    return label.match(sValue).hasMatch();
-}
-
-//=============================================================================================================
-// Operators
-//=============================================================================================================
-
-BIDSPath& BIDSPath::operator=(const BIDSPath& other)
-{
-    if (this != &other) {
-        m_sRoot = other.m_sRoot;
-        m_sSubject = other.m_sSubject;
-        m_sSession = other.m_sSession;
-        m_sTask = other.m_sTask;
-        m_sAcquisition = other.m_sAcquisition;
-        m_sRun = other.m_sRun;
-        m_sProcessing = other.m_sProcessing;
-        m_sSpace = other.m_sSpace;
-        m_sRecording = other.m_sRecording;
-        m_sSplit = other.m_sSplit;
-        m_sDescription = other.m_sDescription;
-        m_sDatatype = other.m_sDatatype;
-        m_sSuffix = other.m_sSuffix;
-        m_sExtension = other.m_sExtension;
-    }
-    return *this;
+    return std::ranges::all_of(sValue, [](char c) {
+        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9');
+    });
 }
 
 //=============================================================================================================
 // Static helpers
 //=============================================================================================================
 
-QString BIDSPath::zeroPad(const QString& sValue)
+std::string BIDSPath::zero_pad(std::string sValue)
 {
-    if (sValue.isEmpty())
-        return sValue;
-
-    bool ok = false;
-    int num = sValue.toInt(&ok);
-    if (ok) {
-        return QStringLiteral("%1").arg(num, 2, 10, QLatin1Char('0'));
-    }
+    if (const std::optional<int> num = BASELIB::toInt(sValue))
+        return std::format("{:02}", *num);
     return sValue;
 }

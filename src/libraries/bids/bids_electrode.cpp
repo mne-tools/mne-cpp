@@ -19,6 +19,8 @@
 
 #include <Eigen/Core>
 
+#include <base/string_utils.h>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -31,39 +33,39 @@ using namespace BIDSLIB;
 
 namespace
 {
-static const QString NA = QStringLiteral("n/a");
 
-QString naToEmpty(const QString& s)
+std::string naToEmpty(std::string_view s)
 {
-    return (s == NA) ? QString() : s;
+    return s == "n/a" ? std::string() : std::string(s);
 }
+
 } // anonymous namespace
 
 //=============================================================================================================
 // STATIC METHODS
 //=============================================================================================================
 
-QList<BidsElectrode> BidsElectrode::readTsv(const QString& sFilePath)
+std::vector<BidsElectrode> BidsElectrode::read_tsv(const std::filesystem::path& path)
 {
-    QStringList headers;
-    QList<BidsTsvRow> rawRows = BidsTsv::readTsv(sFilePath, headers);
+    std::vector<std::string> headers;
+    const std::vector<BidsTsvRow> rawRows = BidsTsv::read_tsv(path, headers);
 
-    QList<BidsElectrode> electrodes;
+    std::vector<BidsElectrode> electrodes;
     electrodes.reserve(rawRows.size());
 
-    for (const auto& row : rawRows) {
+    for (const BidsTsvRow& row : rawRows) {
         BidsElectrode elec;
-        elec.name = row.value(QStringLiteral("name"));
-        elec.x = row.value(QStringLiteral("x"), NA);
-        elec.y = row.value(QStringLiteral("y"), NA);
-        elec.z = row.value(QStringLiteral("z"), NA);
-        elec.size = naToEmpty(row.value(QStringLiteral("size")));
-        elec.type = naToEmpty(row.value(QStringLiteral("type")));
-        elec.material = naToEmpty(row.value(QStringLiteral("material")));
-        elec.impedance = naToEmpty(row.value(QStringLiteral("impedance")));
-        elec.group = naToEmpty(row.value(QStringLiteral("group")));
-        elec.dimension = naToEmpty(row.value(QStringLiteral("dimension")));
-        electrodes.append(elec);
+        elec.name = BidsTsv::value(row, "name");
+        elec.x = BidsTsv::value(row, "x", "n/a");
+        elec.y = BidsTsv::value(row, "y", "n/a");
+        elec.z = BidsTsv::value(row, "z", "n/a");
+        elec.size = naToEmpty(BidsTsv::value(row, "size"));
+        elec.type = naToEmpty(BidsTsv::value(row, "type"));
+        elec.material = naToEmpty(BidsTsv::value(row, "material"));
+        elec.impedance = naToEmpty(BidsTsv::value(row, "impedance"));
+        elec.group = naToEmpty(BidsTsv::value(row, "group"));
+        elec.dimension = naToEmpty(BidsTsv::value(row, "dimension"));
+        electrodes.push_back(std::move(elec));
     }
 
     return electrodes;
@@ -71,47 +73,35 @@ QList<BidsElectrode> BidsElectrode::readTsv(const QString& sFilePath)
 
 //=============================================================================================================
 
-bool BidsElectrode::writeTsv(const QString& sFilePath,
-                             const QList<BidsElectrode>& electrodes)
+bool BidsElectrode::write_tsv(const std::filesystem::path& path,
+                              std::span<const BidsElectrode> electrodes)
 {
-    QStringList headers = {
-        QStringLiteral("name"),
-        QStringLiteral("x"),
-        QStringLiteral("y"),
-        QStringLiteral("z"),
-        QStringLiteral("size"),
-        QStringLiteral("type"),
-        QStringLiteral("material"),
-        QStringLiteral("impedance"),
-        QStringLiteral("group"),
-        QStringLiteral("dimension"),
-    };
+    const std::vector<std::string> headers{"name", "x", "y", "z", "size",
+                                           "type", "material", "impedance", "group", "dimension"};
 
-    QList<BidsTsvRow> rows;
+    std::vector<BidsTsvRow> rows;
     rows.reserve(electrodes.size());
 
-    for (const auto& elec : electrodes) {
-        BidsTsvRow row;
-        row[QStringLiteral("name")] = elec.name;
-        row[QStringLiteral("x")] = elec.x;
-        row[QStringLiteral("y")] = elec.y;
-        row[QStringLiteral("z")] = elec.z;
-        row[QStringLiteral("size")] = elec.size;
-        row[QStringLiteral("type")] = elec.type;
-        row[QStringLiteral("material")] = elec.material;
-        row[QStringLiteral("impedance")] = elec.impedance;
-        row[QStringLiteral("group")] = elec.group;
-        row[QStringLiteral("dimension")] = elec.dimension;
-        rows.append(row);
+    for (const BidsElectrode& elec : electrodes) {
+        rows.push_back({{"name", elec.name},
+                        {"x", elec.x},
+                        {"y", elec.y},
+                        {"z", elec.z},
+                        {"size", elec.size},
+                        {"type", elec.type},
+                        {"material", elec.material},
+                        {"impedance", elec.impedance},
+                        {"group", elec.group},
+                        {"dimension", elec.dimension}});
     }
 
-    return BidsTsv::writeTsv(sFilePath, headers, rows);
+    return BidsTsv::write_tsv(path, headers, rows);
 }
 
 //=============================================================================================================
 
-FIFFLIB::FiffDigPointSet BidsElectrode::toFiffDigPoints(
-    const QList<BidsElectrode>& electrodes,
+FIFFLIB::FiffDigPointSet BidsElectrode::to_fiff_dig_points(
+    std::span<const BidsElectrode> electrodes,
     const FIFFLIB::FiffCoordTrans& trans)
 {
     using namespace FIFFLIB;
@@ -123,12 +113,10 @@ FIFFLIB::FiffDigPointSet BidsElectrode::toFiffDigPoints(
 
     for (const BidsElectrode& elec : electrodes) {
         // Skip electrodes with "n/a" coordinates
-        bool xOk = false, yOk = false, zOk = false;
-        float xVal = elec.x.toFloat(&xOk);
-        float yVal = elec.y.toFloat(&yOk);
-        float zVal = elec.z.toFloat(&zOk);
-
-        if (!xOk || !yOk || !zOk) {
+        const std::optional<double> x = BASELIB::toDouble(elec.x);
+        const std::optional<double> y = BASELIB::toDouble(elec.y);
+        const std::optional<double> z = BASELIB::toDouble(elec.z);
+        if (!x || !y || !z) {
             continue;
         }
 
@@ -136,9 +124,9 @@ FIFFLIB::FiffDigPointSet BidsElectrode::toFiffDigPoints(
         point.kind = FIFFV_POINT_EEG;
         point.ident = ident++;
         point.coord_frame = hasTransform ? trans.to : FIFFV_COORD_UNKNOWN;
-        point.r[0] = xVal;
-        point.r[1] = yVal;
-        point.r[2] = zVal;
+        point.r[0] = static_cast<float>(*x);
+        point.r[1] = static_cast<float>(*y);
+        point.r[2] = static_cast<float>(*z);
 
         // Apply coordinate transform if provided
         if (hasTransform) {

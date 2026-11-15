@@ -17,6 +17,14 @@
 #include "bids_event.h"
 #include "bids_tsv.h"
 
+#include <base/string_utils.h>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <format>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -27,46 +35,43 @@ using namespace BIDSLIB;
 // STATIC METHODS
 //=============================================================================================================
 
-QList<BidsEvent> BidsEvent::readTsv(const QString& sFilePath)
+std::vector<BidsEvent> BidsEvent::read_tsv(const std::filesystem::path& path)
 {
-    QStringList headers;
-    QList<BidsTsvRow> rawRows = BidsTsv::readTsv(sFilePath, headers);
+    std::vector<std::string> headers;
+    const std::vector<BidsTsvRow> rawRows = BidsTsv::read_tsv(path, headers);
 
-    bool hasOnset = headers.contains(QStringLiteral("onset"));
-    bool hasDuration = headers.contains(QStringLiteral("duration"));
-    bool hasSample = headers.contains(QStringLiteral("sample"));
-    bool hasValue = headers.contains(QStringLiteral("value"));
-    bool hasTrialType = headers.contains(QStringLiteral("trial_type"));
+    const bool hasOnset = BASELIB::contains(headers, "onset");
+    const bool hasDuration = BASELIB::contains(headers, "duration");
+    const bool hasSample = BASELIB::contains(headers, "sample");
+    const bool hasValue = BASELIB::contains(headers, "value");
+    const bool hasTrialType = BASELIB::contains(headers, "trial_type");
 
-    QList<BidsEvent> events;
+    std::vector<BidsEvent> events;
     events.reserve(rawRows.size());
 
-    for (const auto& row : rawRows) {
+    for (const BidsTsvRow& row : rawRows) {
         BidsEvent ev;
 
+        // "n/a" and other non-numbers read as 0
         if (hasOnset)
-            ev.onset = row.value(QStringLiteral("onset"), QStringLiteral("0")).toFloat();
+            ev.onset = static_cast<float>(BASELIB::toDouble(BidsTsv::value(row, "onset", "0")).value_or(0.0));
 
-        if (hasDuration) {
-            QString dur = row.value(QStringLiteral("duration"), QStringLiteral("0"));
-            ev.duration = (dur == QStringLiteral("n/a")) ? 0.0f : dur.toFloat();
-        }
+        if (hasDuration)
+            ev.duration = static_cast<float>(BASELIB::toDouble(BidsTsv::value(row, "duration", "0")).value_or(0.0));
 
         if (hasSample)
-            ev.sample = row.value(QStringLiteral("sample"), QStringLiteral("0")).toInt();
+            ev.sample = BASELIB::toInt(BidsTsv::value(row, "sample", "0")).value_or(0);
 
-        if (hasValue) {
-            QString val = row.value(QStringLiteral("value"), QStringLiteral("0"));
-            ev.value = (val == QStringLiteral("n/a")) ? 0 : val.toInt();
-        }
+        if (hasValue)
+            ev.value = BASELIB::toInt(BidsTsv::value(row, "value", "0")).value_or(0);
 
         if (hasTrialType) {
-            ev.trialType = row.value(QStringLiteral("trial_type"));
-            if (ev.trialType == QStringLiteral("n/a"))
-                ev.trialType.clear();
+            const std::string_view trialType = BidsTsv::value(row, "trial_type");
+            if (trialType != "n/a")
+                ev.trialType = trialType;
         }
 
-        events.append(ev);
+        events.push_back(std::move(ev));
     }
 
     return events;
@@ -74,29 +79,21 @@ QList<BidsEvent> BidsEvent::readTsv(const QString& sFilePath)
 
 //=============================================================================================================
 
-bool BidsEvent::writeTsv(const QString& sFilePath,
-                         const QList<BidsEvent>& events)
+bool BidsEvent::write_tsv(const std::filesystem::path& path,
+                          std::span<const BidsEvent> events)
 {
-    QStringList headers = {
-        QStringLiteral("onset"),
-        QStringLiteral("duration"),
-        QStringLiteral("trial_type"),
-        QStringLiteral("value"),
-        QStringLiteral("sample"),
-    };
+    const std::vector<std::string> headers{"onset", "duration", "trial_type", "value", "sample"};
 
-    QList<BidsTsvRow> rows;
+    std::vector<BidsTsvRow> rows;
     rows.reserve(events.size());
 
-    for (const auto& ev : events) {
-        BidsTsvRow row;
-        row[QStringLiteral("onset")] = QString::number(static_cast<double>(ev.onset), 'f', 6);
-        row[QStringLiteral("duration")] = QString::number(static_cast<double>(ev.duration), 'f', 6);
-        row[QStringLiteral("trial_type")] = ev.trialType.isEmpty() ? QStringLiteral("n/a") : ev.trialType;
-        row[QStringLiteral("value")] = QString::number(ev.value);
-        row[QStringLiteral("sample")] = QString::number(ev.sample);
-        rows.append(row);
+    for (const BidsEvent& ev : events) {
+        rows.push_back({{"onset", std::format("{:.6f}", static_cast<double>(ev.onset))},
+                        {"duration", std::format("{:.6f}", static_cast<double>(ev.duration))},
+                        {"trial_type", ev.trialType.empty() ? std::string("n/a") : ev.trialType},
+                        {"value", std::to_string(ev.value)},
+                        {"sample", std::to_string(ev.sample)}});
     }
 
-    return BidsTsv::writeTsv(sFilePath, headers, rows);
+    return BidsTsv::write_tsv(path, headers, rows);
 }

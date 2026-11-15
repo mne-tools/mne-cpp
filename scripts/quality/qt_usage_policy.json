@@ -43,7 +43,7 @@
       ]
     },
     "acq/fiff": {
-      "tokens": 43,
+      "tokens": 19,
       "public_header_includes": 0,
       "modules": [
         "Core"
@@ -65,8 +65,8 @@
       ]
     },
     "bids": {
-      "tokens": 1027,
-      "public_header_includes": 32,
+      "tokens": 218,
+      "public_header_includes": 8,
       "modules": [
         "Core"
       ]
@@ -147,7 +147,7 @@
       ]
     },
     "ieeg": {
-      "tokens": 3,
+      "tokens": 0,
       "public_header_includes": 0,
       "modules": [
         "Core"

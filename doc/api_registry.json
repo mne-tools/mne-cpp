@@ -14124,7 +14124,7 @@
       {
         "python": "mne.io.read_raw",
         "status": "partial",
-        "mne_cpp": "BidsRawData::createReader",
+        "mne_cpp": "BidsRawData::create_reader",
         "note": "dispatch for BrainVision/EDF/BDF only",
         "test": "test_bids"
       },

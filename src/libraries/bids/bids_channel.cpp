@@ -29,38 +29,38 @@ using namespace BIDSLIB;
 
 namespace
 {
-static const QString NA = QStringLiteral("n/a");
 
-QString naToEmpty(const QString& s)
+std::string naToEmpty(std::string_view s)
 {
-    return (s == NA) ? QString() : s;
+    return s == "n/a" ? std::string() : std::string(s);
 }
+
 } // anonymous namespace
 
 //=============================================================================================================
 // STATIC METHODS
 //=============================================================================================================
 
-QList<BidsChannel> BidsChannel::readTsv(const QString& sFilePath)
+std::vector<BidsChannel> BidsChannel::read_tsv(const std::filesystem::path& path)
 {
-    QStringList headers;
-    QList<BidsTsvRow> rawRows = BidsTsv::readTsv(sFilePath, headers);
+    std::vector<std::string> headers;
+    const std::vector<BidsTsvRow> rawRows = BidsTsv::read_tsv(path, headers);
 
-    QList<BidsChannel> channels;
+    std::vector<BidsChannel> channels;
     channels.reserve(rawRows.size());
 
-    for (const auto& row : rawRows) {
+    for (const BidsTsvRow& row : rawRows) {
         BidsChannel ch;
-        ch.name = row.value(QStringLiteral("name"));
-        ch.type = row.value(QStringLiteral("type"));
-        ch.units = row.value(QStringLiteral("units"));
-        ch.samplingFreq = naToEmpty(row.value(QStringLiteral("sampling_frequency")));
-        ch.lowCutoff = naToEmpty(row.value(QStringLiteral("low_cutoff")));
-        ch.highCutoff = naToEmpty(row.value(QStringLiteral("high_cutoff")));
-        ch.notch = naToEmpty(row.value(QStringLiteral("notch")));
-        ch.status = naToEmpty(row.value(QStringLiteral("status")));
-        ch.description = naToEmpty(row.value(QStringLiteral("description")));
-        channels.append(ch);
+        ch.name = BidsTsv::value(row, "name");
+        ch.type = BidsTsv::value(row, "type");
+        ch.units = BidsTsv::value(row, "units");
+        ch.samplingFreq = naToEmpty(BidsTsv::value(row, "sampling_frequency"));
+        ch.lowCutoff = naToEmpty(BidsTsv::value(row, "low_cutoff"));
+        ch.highCutoff = naToEmpty(BidsTsv::value(row, "high_cutoff"));
+        ch.notch = naToEmpty(BidsTsv::value(row, "notch"));
+        ch.status = naToEmpty(BidsTsv::value(row, "status"));
+        ch.description = naToEmpty(BidsTsv::value(row, "description"));
+        channels.push_back(std::move(ch));
     }
 
     return channels;
@@ -68,37 +68,26 @@ QList<BidsChannel> BidsChannel::readTsv(const QString& sFilePath)
 
 //=============================================================================================================
 
-bool BidsChannel::writeTsv(const QString& sFilePath,
-                           const QList<BidsChannel>& channels)
+bool BidsChannel::write_tsv(const std::filesystem::path& path,
+                            std::span<const BidsChannel> channels)
 {
-    QStringList headers = {
-        QStringLiteral("name"),
-        QStringLiteral("type"),
-        QStringLiteral("units"),
-        QStringLiteral("sampling_frequency"),
-        QStringLiteral("low_cutoff"),
-        QStringLiteral("high_cutoff"),
-        QStringLiteral("notch"),
-        QStringLiteral("status"),
-        QStringLiteral("description"),
-    };
+    const std::vector<std::string> headers{"name", "type", "units", "sampling_frequency", "low_cutoff",
+                                           "high_cutoff", "notch", "status", "description"};
 
-    QList<BidsTsvRow> rows;
+    std::vector<BidsTsvRow> rows;
     rows.reserve(channels.size());
 
-    for (const auto& ch : channels) {
-        BidsTsvRow row;
-        row[QStringLiteral("name")] = ch.name;
-        row[QStringLiteral("type")] = ch.type;
-        row[QStringLiteral("units")] = ch.units;
-        row[QStringLiteral("sampling_frequency")] = ch.samplingFreq;
-        row[QStringLiteral("low_cutoff")] = ch.lowCutoff;
-        row[QStringLiteral("high_cutoff")] = ch.highCutoff;
-        row[QStringLiteral("notch")] = ch.notch;
-        row[QStringLiteral("status")] = ch.status;
-        row[QStringLiteral("description")] = ch.description;
-        rows.append(row);
+    for (const BidsChannel& ch : channels) {
+        rows.push_back({{"name", ch.name},
+                        {"type", ch.type},
+                        {"units", ch.units},
+                        {"sampling_frequency", ch.samplingFreq},
+                        {"low_cutoff", ch.lowCutoff},
+                        {"high_cutoff", ch.highCutoff},
+                        {"notch", ch.notch},
+                        {"status", ch.status},
+                        {"description", ch.description}});
     }
 
-    return BidsTsv::writeTsv(sFilePath, headers, rows);
+    return BidsTsv::write_tsv(path, headers, rows);
 }

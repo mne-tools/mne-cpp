@@ -15,8 +15,10 @@
 //=============================================================================================================
 
 #include "bids_raw_data.h"
-#include <memory>
+#include <base/byte_stream.h>
+#include <base/json.h>
 #include <base/log.h>
+#include <base/string_utils.h>
 #include "bids_channel.h"
 #include "bids_dataset_description.h"
 #include "bids_const.h"
@@ -29,14 +31,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QFileInfo>
-#include <QDir>
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <QString>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
 #include <algorithm>
-#include <map>
 #include <cmath>
+#include <format>
+#include <map>
+#include <memory>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -57,34 +62,34 @@ namespace
 /** channels.tsv units and their FIFF unit and multiplier (mne-bids UNITS_BIDS_TO_FIFF_MAP and UNITS_FIFF_TO_BIDS_MAP). */
 struct BidsUnit
 {
-    const char16_t* bids;
+    std::string_view bids;
     int unit;
     int mul;
 };
-const BidsUnit bidsUnits[] = {
-    {u"V", FIFF_UNIT_V, FIFF_UNITM_NONE},
-    {u"\u00B5V", FIFF_UNIT_V, FIFF_UNITM_MU},
-    {u"uV", FIFF_UNIT_V, FIFF_UNITM_MU},
-    {u"mV", FIFF_UNIT_V, FIFF_UNITM_M},
-    {u"nV", FIFF_UNIT_V, FIFF_UNITM_N},
-    {u"T", FIFF_UNIT_T, FIFF_UNITM_NONE},
-    {u"fT", FIFF_UNIT_T, FIFF_UNITM_F},
-    {u"pT", FIFF_UNIT_T, FIFF_UNITM_P},
-    {u"T/m", FIFF_UNIT_T_M, FIFF_UNITM_NONE},
-    {u"rad", FIFF_UNIT_RAD, FIFF_UNITM_NONE},
-    {u"S", FIFF_UNIT_MHO, FIFF_UNITM_NONE},
-    {u"oC", FIFF_UNIT_CEL, FIFF_UNITM_NONE},
-    {u"M", FIFF_UNIT_MOL, FIFF_UNITM_NONE},
-    {u"arbitrary", FIFF_UNIT_NONE, FIFF_UNITM_NONE},
+constexpr BidsUnit bidsUnits[] = {
+    {"V", FIFF_UNIT_V, FIFF_UNITM_NONE},
+    {"\xC2\xB5V", FIFF_UNIT_V, FIFF_UNITM_MU}, // UTF-8 micro sign
+    {"uV", FIFF_UNIT_V, FIFF_UNITM_MU},
+    {"mV", FIFF_UNIT_V, FIFF_UNITM_M},
+    {"nV", FIFF_UNIT_V, FIFF_UNITM_N},
+    {"T", FIFF_UNIT_T, FIFF_UNITM_NONE},
+    {"fT", FIFF_UNIT_T, FIFF_UNITM_F},
+    {"pT", FIFF_UNIT_T, FIFF_UNITM_P},
+    {"T/m", FIFF_UNIT_T_M, FIFF_UNITM_NONE},
+    {"rad", FIFF_UNIT_RAD, FIFF_UNITM_NONE},
+    {"S", FIFF_UNIT_MHO, FIFF_UNITM_NONE},
+    {"oC", FIFF_UNIT_CEL, FIFF_UNITM_NONE},
+    {"M", FIFF_UNIT_MOL, FIFF_UNITM_NONE},
+    {"arbitrary", FIFF_UNIT_NONE, FIFF_UNITM_NONE},
 };
 
 //=========================================================================================================
 /** FIFF unit of a channels.tsv unit as mne-bids UNITS_BIDS_TO_FIFF_MAP (unknown units are left alone); the multiplier keeps the stored unit for writing. */
-void bidsUnitToFiff(const QString& sUnit, int& unit, int& unitMul)
+void bidsUnitToFiff(std::string_view sUnit, int& unit, int& unitMul)
 {
-    const QString u = sUnit.trimmed();
+    const std::string_view u = BASELIB::trimmed(sUnit);
     for (const BidsUnit& e : bidsUnits) {
-        if (u == QStringView(e.bids)) {
+        if (u == e.bids) {
             unit = e.unit;
             unitMul = e.mul;
             return;
@@ -93,60 +98,60 @@ void bidsUnitToFiff(const QString& sUnit, int& unit, int& unitMul)
 }
 
 //=========================================================================================================
-void applyChannelsTsv(FiffInfo& info, const QList<BidsChannel>& channels)
+std::string toUpper(std::string_view text)
 {
-    if (channels.isEmpty())
+    std::string upper(text);
+    std::ranges::transform(upper, upper.begin(), [](unsigned char c) { return static_cast<char>(c >= 'a' && c <= 'z' ? c - 'a' + 'A' : c); });
+    return upper;
+}
+
+//=========================================================================================================
+void applyChannelsTsv(FiffInfo& info, const std::vector<BidsChannel>& channels)
+{
+    if (channels.empty())
         return;
 
-    QMap<QString, int> bidsToFiff = bidsTypeToFiffKind();
-
-    std::map<std::string, const BidsChannel*> channelMap;
-    for (const auto& ch : channels)
-        channelMap[ch.name.toStdString()] = &ch;
+    std::map<std::string, const BidsChannel*, std::less<>> channelMap;
+    for (const BidsChannel& ch : channels)
+        channelMap[ch.name] = &ch;
 
     info.bads.clear();
 
-    for (int i = 0; i < std::ssize(info.chs); ++i) {
-        FiffChInfo& fiffCh = info.chs[i];
+    for (FiffChInfo& fiffCh : info.chs) {
         auto it = channelMap.find(fiffCh.ch_name);
         if (it == channelMap.end())
             continue;
         const BidsChannel* rec = it->second;
 
-        QString typeUpper = rec->type.toUpper();
-        if (bidsToFiff.contains(typeUpper))
-            fiffCh.kind = bidsToFiff[typeUpper];
+        if (const std::optional<int> kind = bids_lookup(BIDS_TYPE_TO_FIFF_KIND, toUpper(rec->type)))
+            fiffCh.kind = *kind;
 
         bidsUnitToFiff(rec->units, fiffCh.unit, fiffCh.unit_mul);
 
-        if (rec->status.toLower() == "bad")
+        if (BASELIB::equalsIgnoreCase(rec->status, "bad"))
             info.bads.push_back(fiffCh.ch_name);
     }
 }
 
 //=========================================================================================================
 void applyElectrodePositions(FiffInfo& info,
-                             const QList<BidsElectrode>& electrodes,
-                             const QString& coordSystemName,
-                             const QString& coordUnits)
+                             const std::vector<BidsElectrode>& electrodes,
+                             std::string_view coordSystemName,
+                             std::string_view coordUnits)
 {
-    if (electrodes.isEmpty())
+    if (electrodes.empty())
         return;
 
-    QMap<QString, int> coordMap = bidsCoordToFiffFrame();
-    int coordFrame = FIFFV_COORD_UNKNOWN;
-    if (coordMap.contains(coordSystemName))
-        coordFrame = coordMap[coordSystemName];
+    const int coordFrame = bids_lookup(BIDS_COORD_TO_FIFF_FRAME, coordSystemName).value_or(FIFFV_COORD_UNKNOWN);
 
     float scaleFactor = 1.0f;
-    QString units = coordUnits.toLower();
-    if (units == "mm")
+    if (BASELIB::equalsIgnoreCase(coordUnits, "mm"))
         scaleFactor = 0.001f;
-    else if (units == "cm")
+    else if (BASELIB::equalsIgnoreCase(coordUnits, "cm"))
         scaleFactor = 0.01f;
 
     // Ident = 1-based ordinal among electrode channels, the order buildElectrodeRecords() reads them back in
-    std::map<std::string, int> chOrdinal;
+    std::map<std::string, int, std::less<>> chOrdinal;
     for (const auto& ch : info.chs) {
         if (ch.kind == FIFFV_EEG_CH || ch.kind == FIFFV_ECOG_CH || ch.kind == FIFFV_SEEG_CH || ch.kind == FIFFV_DBS_CH)
             chOrdinal.emplace(ch.ch_name, static_cast<int>(chOrdinal.size()) + 1);
@@ -154,17 +159,17 @@ void applyElectrodePositions(FiffInfo& info,
 
     info.dig.clear();
     int extraIdent = static_cast<int>(chOrdinal.size()) + 1;
-    for (const auto& elec : electrodes) {
+    for (const BidsElectrode& elec : electrodes) {
         if (elec.x == "n/a" || elec.y == "n/a" || elec.z == "n/a")
             continue;
 
         FiffDigPoint dp;
-        const auto ordinal = chOrdinal.find(elec.name.toStdString());
+        const auto ordinal = chOrdinal.find(elec.name);
         dp.kind = ordinal != chOrdinal.end() ? FIFFV_POINT_EEG : FIFFV_POINT_EXTRA;
         dp.ident = ordinal != chOrdinal.end() ? ordinal->second : extraIdent++;
-        dp.r[0] = elec.x.toFloat() * scaleFactor;
-        dp.r[1] = elec.y.toFloat() * scaleFactor;
-        dp.r[2] = elec.z.toFloat() * scaleFactor;
+        dp.r[0] = static_cast<float>(BASELIB::toDouble(elec.x).value_or(0.0)) * scaleFactor;
+        dp.r[1] = static_cast<float>(BASELIB::toDouble(elec.y).value_or(0.0)) * scaleFactor;
+        dp.r[2] = static_cast<float>(BASELIB::toDouble(elec.z).value_or(0.0)) * scaleFactor;
         dp.coord_frame = coordFrame;
 
         info.dig.push_back(dp);
@@ -172,55 +177,38 @@ void applyElectrodePositions(FiffInfo& info,
 }
 
 //=========================================================================================================
-QJsonObject readJsonFile(const QString& sFilePath)
+BASELIB::JsonDocument readJsonFile(const std::filesystem::path& path)
 {
-    QFile file(sFilePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return {};
-    QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
-    file.close();
-    if (error.error != QJsonParseError::NoError)
-        return {};
-    return doc.object();
+    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(path);
+    return text ? BASELIB::JsonDocument::from_json(*text) : BASELIB::JsonDocument();
 }
 
 //=========================================================================================================
-bool writeJsonFile(const QString& sFilePath, const QJsonObject& json)
-{
-    QFile file(sFilePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-        return false;
-    file.write(QJsonDocument(json).toJson(QJsonDocument::Indented));
-    file.close();
-    return true;
-}
-
-//=========================================================================================================
-void readSidecarJson(const QString& sFilePath,
+void readSidecarJson(const std::filesystem::path& path,
                      FiffInfo& info,
                      BidsRawData& data)
 {
-    QJsonObject json = readJsonFile(sFilePath);
-    if (json.isEmpty())
+    const BASELIB::JsonDocument doc = readJsonFile(path);
+    const BASELIB::JsonObject& json = doc.object();
+    if (json.empty())
         return;
 
     // Apply to FiffInfo
-    double plf = json.value(QStringLiteral("PowerLineFrequency")).toDouble();
+    const double plf = json.value("PowerLineFrequency").to_double();
     if (plf > 0.0)
         info.linefreq = static_cast<float>(plf);
 
-    double sf = json.value(QStringLiteral("SamplingFrequency")).toDouble();
+    const double sf = json.value("SamplingFrequency").to_double();
     if (sf > 0.0 && std::abs(info.sfreq - static_cast<float>(sf)) > 0.5f)
         BASELIB::Log::warning("[BidsRawData::read] Sampling frequency mismatch: raw = {} sidecar = {}", info.sfreq, sf);
 
     // Store independent metadata fields on BidsRawData
-    data.ieegReference = json.value(QStringLiteral("iEEGReference")).toString();
-    data.taskDescription = json.value(QStringLiteral("TaskDescription")).toString();
-    data.manufacturer = json.value(QStringLiteral("Manufacturer")).toString();
-    data.manufacturerModelName = json.value(QStringLiteral("ManufacturerModelName")).toString();
-    data.softwareVersions = json.value(QStringLiteral("SoftwareVersions")).toString();
-    data.recordingType = json.value(QStringLiteral("RecordingType")).toString();
+    data.ieegReference = json.value("iEEGReference").to_string();
+    data.taskDescription = json.value("TaskDescription").to_string();
+    data.manufacturer = json.value("Manufacturer").to_string();
+    data.manufacturerModelName = json.value("ManufacturerModelName").to_string();
+    data.softwareVersions = json.value("SoftwareVersions").to_string();
+    data.recordingType = json.value("RecordingType").to_string();
 }
 
 //=============================================================================================================
@@ -228,115 +216,107 @@ void readSidecarJson(const QString& sFilePath,
 //=============================================================================================================
 
 //=========================================================================================================
-QString fiffUnitToBidsString(int unit, int unitMul)
+std::string fiffUnitToBidsString(int unit, int unitMul)
 {
     for (const BidsUnit& e : bidsUnits) {
         if (e.unit == unit && e.mul == unitMul && e.unit != FIFF_UNIT_NONE)
-            return QString::fromUtf16(e.bids);
+            return std::string(e.bids);
     }
     // A multiplier BIDS has no name for: the SI unit
     for (const BidsUnit& e : bidsUnits) {
         if (e.unit == unit && e.mul == FIFF_UNITM_NONE && e.unit != FIFF_UNIT_NONE)
-            return QString::fromUtf16(e.bids);
+            return std::string(e.bids);
     }
-    return QStringLiteral("n/a");
+    return "n/a";
 }
 
 //=========================================================================================================
-QString channelTypeDescription(int kind)
+std::string_view channelTypeDescription(int kind)
 {
     switch (kind) {
         case FIFFV_EEG_CH:
-            return QStringLiteral("ElectroEncephaloGram");
+            return "ElectroEncephaloGram";
         case FIFFV_ECOG_CH:
-            return QStringLiteral("Electrocorticography");
+            return "Electrocorticography";
         case FIFFV_SEEG_CH:
-            return QStringLiteral("StereoElectroEncephaloGram");
+            return "StereoElectroEncephaloGram";
         case FIFFV_DBS_CH:
-            return QStringLiteral("DeepBrainStimulation");
+            return "DeepBrainStimulation";
         case FIFFV_MEG_CH:
-            return QStringLiteral("MagnetoEncephaloGram");
+            return "MagnetoEncephaloGram";
         case FIFFV_STIM_CH:
-            return QStringLiteral("Trigger");
+            return "Trigger";
         case FIFFV_EOG_CH:
-            return QStringLiteral("ElectroOculoGram");
+            return "ElectroOculoGram";
         case FIFFV_ECG_CH:
-            return QStringLiteral("ElectroCardioGram");
+            return "ElectroCardioGram";
         case FIFFV_EMG_CH:
-            return QStringLiteral("ElectroMyoGram");
+            return "ElectroMyoGram";
         case FIFFV_MISC_CH:
-            return QStringLiteral("Miscellaneous");
+            return "Miscellaneous";
         case FIFFV_RESP_CH:
-            return QStringLiteral("Respiration");
+            return "Respiration";
         default:
-            return QStringLiteral("n/a");
+            return "n/a";
     }
 }
 
 //=========================================================================================================
-QList<BidsChannel> buildChannelRecords(const FiffInfo& info)
+std::vector<BidsChannel> buildChannelRecords(const FiffInfo& info)
 {
-    QList<BidsChannel> records;
-    QMap<int, QString> kindMap = fiffKindToBidsType();
+    std::vector<BidsChannel> records;
+    records.reserve(info.chs.size());
 
-
-    for (int i = 0; i < std::ssize(info.chs); ++i) {
-        const FiffChInfo& ch = info.chs[i];
-
+    for (const FiffChInfo& ch : info.chs) {
         BidsChannel rec;
-        rec.name = QString::fromStdString(ch.ch_name);
-        rec.type = kindMap.contains(ch.kind) ? kindMap[ch.kind] : QStringLiteral("MISC");
+        rec.name = ch.ch_name;
+        rec.type = bids_lookup(FIFF_KIND_TO_BIDS_TYPE, ch.kind).value_or("MISC");
         rec.units = fiffUnitToBidsString(ch.unit, ch.unit_mul);
-        rec.samplingFreq = QString::number(static_cast<double>(info.sfreq), 'g', 10);
-        rec.lowCutoff = (info.highpass > 0.0f)
-            ? QString::number(static_cast<double>(info.highpass), 'g', 10)
-            : QStringLiteral("n/a");
-        rec.highCutoff = (info.lowpass > 0.0f)
-            ? QString::number(static_cast<double>(info.lowpass), 'g', 10)
-            : QStringLiteral("n/a");
-        rec.notch = QStringLiteral("n/a");
-        rec.status = info.isBad(ch.ch_name) ? QStringLiteral("bad") : QStringLiteral("good");
+        rec.samplingFreq = std::format("{:.10g}", static_cast<double>(info.sfreq));
+        rec.lowCutoff = info.highpass > 0.0f ? std::format("{:.10g}", static_cast<double>(info.highpass)) : "n/a";
+        rec.highCutoff = info.lowpass > 0.0f ? std::format("{:.10g}", static_cast<double>(info.lowpass)) : "n/a";
+        rec.notch = "n/a";
+        rec.status = info.isBad(ch.ch_name) ? "bad" : "good";
         rec.description = channelTypeDescription(ch.kind);
 
-        records.append(rec);
+        records.push_back(std::move(rec));
     }
     return records;
 }
 
 //=========================================================================================================
-QList<BidsElectrode> buildElectrodeRecords(const FiffInfo& info)
+std::vector<BidsElectrode> buildElectrodeRecords(const FiffInfo& info)
 {
-    QList<BidsElectrode> records;
+    std::vector<BidsElectrode> records;
 
-    QMap<int, const FiffDigPoint*> digByIdent;
+    std::map<int, const FiffDigPoint*> digByIdent;
     for (const auto& dp : info.dig) {
         if (dp.kind == FIFFV_POINT_EEG || dp.kind == FIFFV_POINT_EXTRA)
             digByIdent[dp.ident] = &dp;
     }
 
+    const auto coordinate = [](float value) {
+        return std::format("{:.8g}", static_cast<double>(value));
+    };
     int digIdx = 0;
 
-    for (int i = 0; i < std::ssize(info.chs); ++i) {
-        const FiffChInfo& ch = info.chs[i];
-
-        if (ch.kind == FIFFV_STIM_CH)
-            continue;
+    for (const FiffChInfo& ch : info.chs) {
         if (ch.kind != FIFFV_EEG_CH && ch.kind != FIFFV_ECOG_CH &&
             ch.kind != FIFFV_SEEG_CH && ch.kind != FIFFV_DBS_CH)
             continue;
 
         BidsElectrode rec;
-        rec.name = QString::fromStdString(ch.ch_name);
+        rec.name = ch.ch_name;
 
         ++digIdx;
         bool hasPosition = false;
 
-        if (digByIdent.contains(digIdx)) {
-            const FiffDigPoint* dp = digByIdent[digIdx];
+        if (const auto it = digByIdent.find(digIdx); it != digByIdent.end()) {
+            const FiffDigPoint* dp = it->second;
             if (std::isfinite(dp->r[0]) && std::isfinite(dp->r[1]) && std::isfinite(dp->r[2])) {
-                rec.x = QString::number(static_cast<double>(dp->r[0]), 'g', 8);
-                rec.y = QString::number(static_cast<double>(dp->r[1]), 'g', 8);
-                rec.z = QString::number(static_cast<double>(dp->r[2]), 'g', 8);
+                rec.x = coordinate(dp->r[0]);
+                rec.y = coordinate(dp->r[1]);
+                rec.z = coordinate(dp->r[2]);
                 hasPosition = true;
             }
         }
@@ -344,53 +324,53 @@ QList<BidsElectrode> buildElectrodeRecords(const FiffInfo& info)
         if (!hasPosition) {
             const Eigen::Vector3f& r0 = ch.chpos.r0;
             if (r0.squaredNorm() > 0.0f && std::isfinite(r0[0])) {
-                rec.x = QString::number(static_cast<double>(r0[0]), 'g', 8);
-                rec.y = QString::number(static_cast<double>(r0[1]), 'g', 8);
-                rec.z = QString::number(static_cast<double>(r0[2]), 'g', 8);
+                rec.x = coordinate(r0[0]);
+                rec.y = coordinate(r0[1]);
+                rec.z = coordinate(r0[2]);
             } else {
-                rec.x = QStringLiteral("n/a");
-                rec.y = QStringLiteral("n/a");
-                rec.z = QStringLiteral("n/a");
+                rec.x = "n/a";
+                rec.y = "n/a";
+                rec.z = "n/a";
             }
         }
 
-        rec.size = QStringLiteral("n/a");
-        rec.type = QStringLiteral("n/a");
-        rec.material = QStringLiteral("n/a");
-        rec.impedance = QStringLiteral("n/a");
+        rec.size = "n/a";
+        rec.type = "n/a";
+        rec.material = "n/a";
+        rec.impedance = "n/a";
 
-        records.append(rec);
+        records.push_back(std::move(rec));
     }
     return records;
 }
 
 //=========================================================================================================
-QJsonObject buildSidecarJson(const BidsRawData& data,
-                             const BIDSPath& bidsPath)
+BASELIB::JsonObject buildSidecarJson(const BidsRawData& data,
+                                     const BIDSPath& bidsPath)
 {
-    QJsonObject json;
+    BASELIB::JsonObject json;
     const FiffInfo& info = data.raw.info;
-    const QString datatype = bidsPath.datatype();
+    const std::string& datatype = bidsPath.datatype();
 
     // Required for every electrophysiology datatype
-    json[QStringLiteral("TaskName")] = bidsPath.task();
-    json[QStringLiteral("SamplingFrequency")] = static_cast<double>(info.sfreq);
+    json.insert("TaskName", bidsPath.task());
+    json.insert("SamplingFrequency", static_cast<double>(info.sfreq));
     if (info.linefreq > 0.0f)
-        json[QStringLiteral("PowerLineFrequency")] = static_cast<double>(info.linefreq);
+        json.insert("PowerLineFrequency", static_cast<double>(info.linefreq));
     else
-        json[QStringLiteral("PowerLineFrequency")] = QStringLiteral("n/a");
-    json[QStringLiteral("SoftwareFilters")] = QStringLiteral("n/a");
+        json.insert("PowerLineFrequency", "n/a");
+    json.insert("SoftwareFilters", "n/a");
 
     // Required per datatype
-    const QString reference = data.ieegReference.isEmpty() ? QStringLiteral("n/a") : data.ieegReference;
-    if (datatype == QLatin1String("meg")) {
-        json[QStringLiteral("DewarPosition")] = QStringLiteral("n/a");
-        json[QStringLiteral("DigitizedLandmarks")] = false;
-        json[QStringLiteral("DigitizedHeadPoints")] = !info.dig.empty();
-    } else if (datatype == QLatin1String("eeg")) {
-        json[QStringLiteral("EEGReference")] = reference;
+    const std::string reference = data.ieegReference.empty() ? std::string("n/a") : data.ieegReference;
+    if (datatype == "meg") {
+        json.insert("DewarPosition", "n/a");
+        json.insert("DigitizedLandmarks", false);
+        json.insert("DigitizedHeadPoints", !info.dig.empty());
+    } else if (datatype == "eeg") {
+        json.insert("EEGReference", reference);
     } else {
-        json[QStringLiteral("iEEGReference")] = reference;
+        json.insert("iEEGReference", reference);
     }
 
     // Channel counts — computed from FiffInfo
@@ -434,163 +414,156 @@ QJsonObject buildSidecarJson(const BidsRawData& data,
                 break;
         }
     }
-    if (datatype == QLatin1String("meg")) {
-        json[QStringLiteral("MEGChannelCount")] = meg;
-        json[QStringLiteral("MEGREFChannelCount")] = megRef;
+    if (datatype == "meg") {
+        json.insert("MEGChannelCount", meg);
+        json.insert("MEGREFChannelCount", megRef);
     }
-    if (datatype == QLatin1String("ieeg")) {
-        json[QStringLiteral("ECOGChannelCount")] = ecog;
-        json[QStringLiteral("SEEGChannelCount")] = seeg;
+    if (datatype == "ieeg") {
+        json.insert("ECOGChannelCount", ecog);
+        json.insert("SEEGChannelCount", seeg);
         if (dbs > 0)
-            json[QStringLiteral("DBSChannelCount")] = dbs;
+            json.insert("DBSChannelCount", dbs);
     }
-    if (eeg > 0 || datatype == QLatin1String("eeg"))
-        json[QStringLiteral("EEGChannelCount")] = eeg;
+    if (eeg > 0 || datatype == "eeg")
+        json.insert("EEGChannelCount", eeg);
     if (eog > 0)
-        json[QStringLiteral("EOGChannelCount")] = eog;
+        json.insert("EOGChannelCount", eog);
     if (ecg > 0)
-        json[QStringLiteral("ECGChannelCount")] = ecg;
+        json.insert("ECGChannelCount", ecg);
     if (emg > 0)
-        json[QStringLiteral("EMGChannelCount")] = emg;
+        json.insert("EMGChannelCount", emg);
     if (misc > 0)
-        json[QStringLiteral("MiscChannelCount")] = misc;
+        json.insert("MiscChannelCount", misc);
     if (trig > 0)
-        json[QStringLiteral("TriggerChannelCount")] = trig;
+        json.insert("TriggerChannelCount", trig);
 
     // Recording metadata
-    if (!data.recordingType.isEmpty())
-        json[QStringLiteral("RecordingType")] = data.recordingType;
-    else
-        json[QStringLiteral("RecordingType")] = QStringLiteral("continuous");
+    json.insert("RecordingType", data.recordingType.empty() ? std::string("continuous") : data.recordingType);
 
     // mne-bids writes raw.times[-1]
     if (info.sfreq > 0.0f && data.raw.last_samp >= data.raw.first_samp) {
-        double dur = static_cast<double>(data.raw.last_samp - data.raw.first_samp) / static_cast<double>(info.sfreq);
-        json[QStringLiteral("RecordingDuration")] = dur;
+        const double dur = static_cast<double>(data.raw.last_samp - data.raw.first_samp) / static_cast<double>(info.sfreq);
+        json.insert("RecordingDuration", dur);
     }
 
     // Optional strings from BidsRawData
-    if (!data.taskDescription.isEmpty())
-        json[QStringLiteral("TaskDescription")] = data.taskDescription;
-    if (!data.manufacturer.isEmpty())
-        json[QStringLiteral("Manufacturer")] = data.manufacturer;
-    if (!data.manufacturerModelName.isEmpty())
-        json[QStringLiteral("ManufacturerModelName")] = data.manufacturerModelName;
-    if (!data.softwareVersions.isEmpty())
-        json[QStringLiteral("SoftwareVersions")] = data.softwareVersions;
+    if (!data.taskDescription.empty())
+        json.insert("TaskDescription", data.taskDescription);
+    if (!data.manufacturer.empty())
+        json.insert("Manufacturer", data.manufacturer);
+    if (!data.manufacturerModelName.empty())
+        json.insert("ManufacturerModelName", data.manufacturerModelName);
+    if (!data.softwareVersions.empty())
+        json.insert("SoftwareVersions", data.softwareVersions);
 
     return json;
 }
 
 //=========================================================================================================
-bool copyFile(const QString& src, const QString& dst, bool overwrite)
+bool fileExists(const std::filesystem::path& path)
 {
-    if (!QFileInfo::exists(src)) {
-        BASELIB::Log::warning("[BidsRawData::write] Source file does not exist: {}", src.toStdString());
-        return false;
-    }
-    if (QFileInfo::exists(dst)) {
-        if (!overwrite) {
-            BASELIB::Log::warning("[BidsRawData::write] Target file already exists: {}", dst.toStdString());
-            return false;
-        }
-        QFile::remove(dst);
-    }
-    return QFile::copy(src, dst);
+    std::error_code error;
+    return std::filesystem::exists(path, error);
 }
 
 //=========================================================================================================
-bool copyBrainVisionFiles(const QString& srcVhdr, const BIDSPath& bidsPath, bool overwrite)
+bool copyFile(const std::filesystem::path& src, const std::filesystem::path& dst, bool overwrite)
 {
-    QFileInfo srcInfo(srcVhdr);
-    QString srcDir = srcInfo.absolutePath();
+    if (!fileExists(src)) {
+        BASELIB::Log::warning("[BidsRawData::write] Source file does not exist: {}", BASELIB::utf8FromPath(src));
+        return false;
+    }
+    if (fileExists(dst) && !overwrite) {
+        BASELIB::Log::warning("[BidsRawData::write] Target file already exists: {}", BASELIB::utf8FromPath(dst));
+        return false;
+    }
+    std::error_code error;
+    return std::filesystem::copy_file(src, dst, std::filesystem::copy_options::overwrite_existing, error);
+}
 
-    QFile vhdrFile(srcVhdr);
-    if (!vhdrFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BidsRawData::write] Cannot open .vhdr file: {}", srcVhdr.toStdString());
+//=========================================================================================================
+/** Replaces every occurrence of @p from in @p text by @p to. */
+void replaceAll(std::string& text, std::string_view from, std::string_view to)
+{
+    if (from.empty())
+        return;
+    for (std::size_t at = text.find(from); at != std::string::npos; at = text.find(from, at + to.size()))
+        text.replace(at, from.size(), to);
+}
+
+//=========================================================================================================
+/** The value after "key=" if @p line (trimmed) starts with it, compared case-insensitively. */
+std::optional<std::string_view> headerValue(std::string_view line, std::string_view key)
+{
+    line = BASELIB::trimmed(line);
+    if (line.size() < key.size() || !BASELIB::equalsIgnoreCase(line.substr(0, key.size()), key))
+        return std::nullopt;
+    return BASELIB::trimmed(line.substr(key.size()));
+}
+
+//=========================================================================================================
+bool copyBrainVisionFiles(const std::filesystem::path& srcVhdr, const BIDSPath& bidsPath, bool overwrite)
+{
+    const BASELIB::Expected<std::string> vhdrContent = BASELIB::read_text_file(srcVhdr);
+    if (!vhdrContent) {
+        BASELIB::Log::warning("[BidsRawData::write] Cannot open .vhdr file: {}", BASELIB::utf8FromPath(srcVhdr));
         return false;
     }
 
-    QString dataFileName;
-    QString markerFileName;
-    QByteArray vhdrContent = vhdrFile.readAll();
-    vhdrFile.close();
-
-    for (const auto& line : vhdrContent.split('\n')) {
-        QString sLine = QString::fromUtf8(line).trimmed();
-        if (sLine.startsWith("DataFile=", Qt::CaseInsensitive))
-            dataFileName = sLine.mid(9).trimmed();
-        else if (sLine.startsWith("MarkerFile=", Qt::CaseInsensitive))
-            markerFileName = sLine.mid(11).trimmed();
+    std::string dataFileName;
+    std::string markerFileName;
+    for (const std::string& line : BASELIB::split(*vhdrContent, '\n')) {
+        if (const auto value = headerValue(line, "DataFile="))
+            dataFileName = *value;
+        else if (const auto value = headerValue(line, "MarkerFile="))
+            markerFileName = *value;
     }
 
-    QString dstDir = bidsPath.directory();
-    QString dstBase = bidsPath.basename();
-    dstBase = dstBase.left(dstBase.lastIndexOf('.'));
+    const std::filesystem::path srcDir = std::filesystem::absolute(srcVhdr).parent_path();
+    const std::filesystem::path dstDir = bidsPath.directory();
+    std::string dstBase = bidsPath.basename();
+    dstBase = dstBase.substr(0, dstBase.rfind('.'));
 
-    QString dstVhdr = bidsPath.filePath();
-    QString newDataFile = dstBase + QStringLiteral(".eeg");
-    QString newMarkerFile = dstBase + QStringLiteral(".vmrk");
+    const std::filesystem::path dstVhdr = bidsPath.file_path();
+    const std::string newDataFile = dstBase + ".eeg";
+    const std::string newMarkerFile = dstBase + ".vmrk";
 
-    QString vhdrStr = QString::fromUtf8(vhdrContent);
-    if (!dataFileName.isEmpty())
-        vhdrStr.replace("DataFile=" + dataFileName,
-                        "DataFile=" + QFileInfo(newDataFile).fileName());
-    if (!markerFileName.isEmpty())
-        vhdrStr.replace("MarkerFile=" + markerFileName,
-                        "MarkerFile=" + QFileInfo(newMarkerFile).fileName());
+    std::string vhdr = *vhdrContent;
+    if (!dataFileName.empty())
+        replaceAll(vhdr, "DataFile=" + dataFileName, "DataFile=" + newDataFile);
+    if (!markerFileName.empty())
+        replaceAll(vhdr, "MarkerFile=" + markerFileName, "MarkerFile=" + newMarkerFile);
 
-    if (QFileInfo::exists(dstVhdr) && !overwrite) {
-        BASELIB::Log::warning("[BidsRawData::write] Target file already exists: {}", dstVhdr.toStdString());
+    if (fileExists(dstVhdr) && !overwrite) {
+        BASELIB::Log::warning("[BidsRawData::write] Target file already exists: {}", BASELIB::utf8FromPath(dstVhdr));
         return false;
     }
-    if (QFileInfo::exists(dstVhdr))
-        QFile::remove(dstVhdr);
-
-    QFile dstVhdrFile(dstVhdr);
-    if (!dstVhdrFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BidsRawData::write] Cannot write .vhdr file: {}", dstVhdr.toStdString());
+    if (!BASELIB::write_text_file(dstVhdr, vhdr)) {
+        BASELIB::Log::warning("[BidsRawData::write] Cannot write .vhdr file: {}", BASELIB::utf8FromPath(dstVhdr));
         return false;
     }
-    dstVhdrFile.write(vhdrStr.toUtf8());
-    dstVhdrFile.close();
 
-    if (!dataFileName.isEmpty()) {
-        QString srcData = QDir(srcDir).absoluteFilePath(dataFileName);
-        QString dstData = dstDir + QFileInfo(newDataFile).fileName();
-        if (!copyFile(srcData, dstData, overwrite)) {
-            BASELIB::Log::warning("[BidsRawData::write] Failed to copy data file: {}", srcData.toStdString());
+    if (!dataFileName.empty()) {
+        const std::filesystem::path srcData = srcDir / BASELIB::pathFromUtf8(dataFileName);
+        if (!copyFile(srcData, dstDir / BASELIB::pathFromUtf8(newDataFile), overwrite)) {
+            BASELIB::Log::warning("[BidsRawData::write] Failed to copy data file: {}", BASELIB::utf8FromPath(srcData));
             return false;
         }
     }
 
-    if (!markerFileName.isEmpty()) {
-        QString srcMarker = QDir(srcDir).absoluteFilePath(markerFileName);
-        QString dstMarker = dstDir + QFileInfo(newMarkerFile).fileName();
+    if (!markerFileName.empty()) {
+        const std::filesystem::path srcMarker = srcDir / BASELIB::pathFromUtf8(markerFileName);
+        const std::filesystem::path dstMarker = dstDir / BASELIB::pathFromUtf8(newMarkerFile);
 
-        if (QFileInfo::exists(srcMarker)) {
-            QFile markerFile(srcMarker);
-            if (markerFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                QString markerContent = QString::fromUtf8(markerFile.readAll());
-                markerFile.close();
+        if (BASELIB::Expected<std::string> marker = BASELIB::read_text_file(srcMarker)) {
+            replaceAll(*marker, "DataFile=" + dataFileName, "DataFile=" + newDataFile);
 
-                markerContent.replace("DataFile=" + dataFileName,
-                                      "DataFile=" + QFileInfo(newDataFile).fileName());
-
-                if (QFileInfo::exists(dstMarker)) {
-                    if (!overwrite) {
-                        BASELIB::Log::warning("[BidsRawData::write] Target marker file already exists: {}", dstMarker.toStdString());
-                        return false;
-                    }
-                    QFile::remove(dstMarker);
-                }
-
-                QFile dstMarkerFile(dstMarker);
-                if (dstMarkerFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-                    dstMarkerFile.write(markerContent.toUtf8());
-                    dstMarkerFile.close();
-                }
+            if (fileExists(dstMarker) && !overwrite) {
+                BASELIB::Log::warning("[BidsRawData::write] Target marker file already exists: {}", BASELIB::utf8FromPath(dstMarker));
+                return false;
             }
+            if (!BASELIB::write_text_file(dstMarker, *marker))
+                BASELIB::Log::warning("[BidsRawData::write] Cannot write marker file: {}", BASELIB::utf8FromPath(dstMarker));
         }
     }
 
@@ -598,16 +571,16 @@ bool copyBrainVisionFiles(const QString& srcVhdr, const BIDSPath& bidsPath, bool
 }
 
 //=========================================================================================================
-bool copyRawDataFile(const QString& sourcePath, const BIDSPath& bidsPath, bool overwrite)
+bool copyRawDataFile(const std::filesystem::path& sourcePath, const BIDSPath& bidsPath, bool overwrite)
 {
-    if (sourcePath.isEmpty())
+    if (sourcePath.empty())
         return true;
 
-    QString ext = bidsPath.extension().toLower();
+    const std::string ext = BASELIB::toLower(bidsPath.extension());
     if (ext == ".vhdr" || ext == ".ahdr")
         return copyBrainVisionFiles(sourcePath, bidsPath, overwrite);
 
-    return copyFile(sourcePath, bidsPath.filePath(), overwrite);
+    return copyFile(sourcePath, bidsPath.file_path(), overwrite);
 }
 
 } // anonymous namespace
@@ -681,9 +654,9 @@ void BidsRawData::clear()
 
 //=============================================================================================================
 
-std::unique_ptr<AbstractFormatReader> BidsRawData::createReader(const QString& sExtension)
+std::unique_ptr<AbstractFormatReader> BidsRawData::create_reader(std::string_view sExtension)
 {
-    QString ext = sExtension.toLower();
+    const std::string ext = BASELIB::toLower(sExtension);
     if (ext == ".vhdr" || ext == ".ahdr")
         return std::make_unique<BrainVisionReader>();
     if (ext == ".edf" || ext == ".bdf")
@@ -702,15 +675,15 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     //=========================================================================================================
     // Step 1 — Validate BIDSPath
     //=========================================================================================================
-    if (bidsPath.root().isEmpty()) {
+    if (bidsPath.root().empty()) {
         BASELIB::Log::warning("[BidsRawData::read] BIDSPath root is not set");
         return result;
     }
-    if (bidsPath.subject().isEmpty()) {
+    if (bidsPath.subject().empty()) {
         BASELIB::Log::warning("[BidsRawData::read] BIDSPath subject is not set");
         return result;
     }
-    if (bidsPath.extension().isEmpty()) {
+    if (bidsPath.extension().empty()) {
         BASELIB::Log::warning("[BidsRawData::read] BIDSPath extension is not set");
         return result;
     }
@@ -718,34 +691,31 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     //=========================================================================================================
     // Step 2 — Resolve raw file path
     //=========================================================================================================
-    QString rawFilePath = bidsPath.filePath();
+    std::filesystem::path rawFilePath = bidsPath.file_path();
 
-    if (!QFileInfo::exists(rawFilePath)) {
-        QString ext = bidsPath.extension();
-        if (ext.toLower() == ".edf") {
-            BIDSPath altPath(bidsPath);
-            altPath.setExtension(".EDF");
-            if (QFileInfo::exists(altPath.filePath()))
-                rawFilePath = altPath.filePath();
-        }
+    if (!fileExists(rawFilePath) && BASELIB::toLower(bidsPath.extension()) == ".edf") {
+        BIDSPath altPath(bidsPath);
+        altPath.set_extension(".EDF");
+        if (fileExists(altPath.file_path()))
+            rawFilePath = altPath.file_path();
     }
 
-    if (!QFileInfo::exists(rawFilePath)) {
-        BASELIB::Log::warning("[BidsRawData::read] Raw data file not found: {}", rawFilePath.toStdString());
+    if (!fileExists(rawFilePath)) {
+        BASELIB::Log::warning("[BidsRawData::read] Raw data file not found: {}", BASELIB::utf8FromPath(rawFilePath));
         return result;
     }
 
     //=========================================================================================================
     // Step 3 — Create and open the format reader
     //=========================================================================================================
-    result.reader = createReader(bidsPath.extension());
+    result.reader = create_reader(bidsPath.extension());
     if (!result.reader) {
-        BASELIB::Log::warning("[BidsRawData::read] Unsupported file extension: {}", bidsPath.extension().toStdString());
+        BASELIB::Log::warning("[BidsRawData::read] Unsupported file extension: {}", bidsPath.extension());
         return result;
     }
 
-    if (!result.reader->open(rawFilePath)) {
-        BASELIB::Log::warning("[BidsRawData::read] Failed to open raw file: {}", rawFilePath.toStdString());
+    if (!result.reader->open(QString::fromStdString(BASELIB::utf8FromPath(rawFilePath)))) {
+        BASELIB::Log::warning("[BidsRawData::read] Failed to open raw file: {}", BASELIB::utf8FromPath(rawFilePath));
         return result;
     }
 
@@ -757,25 +727,20 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     //=========================================================================================================
     // Step 5 — Read and apply *_channels.tsv
     //=========================================================================================================
-    BIDSPath channelsPath = bidsPath.channelsTsvPath();
-    if (QFileInfo::exists(channelsPath.filePath())) {
-        QList<BidsChannel> channels = BidsChannel::readTsv(channelsPath.filePath());
-        applyChannelsTsv(result.raw.info, channels);
-    }
+    if (const std::filesystem::path channelsPath = bidsPath.channels_tsv_path().file_path(); fileExists(channelsPath))
+        applyChannelsTsv(result.raw.info, BidsChannel::read_tsv(channelsPath));
 
     //=========================================================================================================
     // Step 6 — Read *_coordsystem.json (before electrodes, for scale/frame info)
     //=========================================================================================================
-    BIDSPath coordsysPath = bidsPath.coordsystemJsonPath();
-    if (QFileInfo::exists(coordsysPath.filePath()))
-        result.coordinateSystem = BidsCoordinateSystem::readJson(coordsysPath.filePath());
+    if (const std::filesystem::path coordsysPath = bidsPath.coordsystem_json_path().file_path(); fileExists(coordsysPath))
+        result.coordinateSystem = BidsCoordinateSystem::read_json(coordsysPath);
 
     //=========================================================================================================
     // Step 7 — Read and apply *_electrodes.tsv
     //=========================================================================================================
-    BIDSPath electrodesPath = bidsPath.electrodesTsvPath();
-    if (QFileInfo::exists(electrodesPath.filePath())) {
-        result.electrodes = BidsElectrode::readTsv(electrodesPath.filePath());
+    if (const std::filesystem::path electrodesPath = bidsPath.electrodes_tsv_path().file_path(); fileExists(electrodesPath)) {
+        result.electrodes = BidsElectrode::read_tsv(electrodesPath);
         applyElectrodePositions(result.raw.info, result.electrodes,
                                 result.coordinateSystem.system, result.coordinateSystem.units);
     }
@@ -783,30 +748,28 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     //=========================================================================================================
     // Step 8 — Read *_events.tsv
     //=========================================================================================================
-    BIDSPath eventsPath = bidsPath.eventsTsvPath();
-    if (QFileInfo::exists(eventsPath.filePath())) {
-        result.events = BidsEvent::readTsv(eventsPath.filePath());
+    if (const std::filesystem::path eventsPath = bidsPath.events_tsv_path().file_path(); fileExists(eventsPath)) {
+        result.events = BidsEvent::read_tsv(eventsPath);
 
         // Compute sample from onset*sfreq if sample column was absent
-        float sfreq = result.raw.info.sfreq;
-        for (auto& ev : result.events) {
+        const float sfreq = result.raw.info.sfreq;
+        for (BidsEvent& ev : result.events) {
             if (ev.sample == 0 && ev.onset > 0.0f && sfreq > 0)
                 ev.sample = static_cast<int>(ev.onset * sfreq);
         }
 
         // Build eventIdMap from trial_type → value
-        for (const auto& ev : result.events) {
-            if (!ev.trialType.isEmpty() && ev.trialType != "n/a")
-                result.eventIdMap.insert(ev.trialType, ev.value);
+        for (const BidsEvent& ev : result.events) {
+            if (!ev.trialType.empty() && ev.trialType != "n/a")
+                result.eventIdMap.insert_or_assign(ev.trialType, ev.value);
         }
     }
 
     //=========================================================================================================
     // Step 9 — Read sidecar *_{datatype}.json
     //=========================================================================================================
-    BIDSPath sidecarPath = bidsPath.sidecarJsonPath();
-    if (QFileInfo::exists(sidecarPath.filePath()))
-        readSidecarJson(sidecarPath.filePath(), result.raw.info, result);
+    if (const std::filesystem::path sidecarPath = bidsPath.sidecar_json_path().file_path(); fileExists(sidecarPath))
+        readSidecarJson(sidecarPath, result.raw.info, result);
 
     //=========================================================================================================
     // Done
@@ -820,7 +783,7 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
 //=============================================================================================================
 
 BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
-                            const QString& sourcePath,
+                            const std::filesystem::path& sourcePath,
                             const WriteOptions& options) const
 {
     BIDSPath result;
@@ -828,19 +791,19 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     //=========================================================================================================
     // Step 1 — Validate
     //=========================================================================================================
-    if (bidsPath.root().isEmpty()) {
+    if (bidsPath.root().empty()) {
         BASELIB::Log::warning("[BidsRawData::write] BIDSPath root is not set");
         return result;
     }
-    if (bidsPath.subject().isEmpty()) {
+    if (bidsPath.subject().empty()) {
         BASELIB::Log::warning("[BidsRawData::write] BIDSPath subject is not set");
         return result;
     }
-    if (bidsPath.task().isEmpty()) {
+    if (bidsPath.task().empty()) {
         BASELIB::Log::warning("[BidsRawData::write] BIDSPath task is not set");
         return result;
     }
-    if (bidsPath.datatype().isEmpty()) {
+    if (bidsPath.datatype().empty()) {
         BASELIB::Log::warning("[BidsRawData::write] BIDSPath datatype is not set");
         return result;
     }
@@ -853,14 +816,14 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     // Step 2 — Create directory structure
     //=========================================================================================================
     if (!bidsPath.mkdirs()) {
-        BASELIB::Log::warning("[BidsRawData::write] Failed to create directory: {}", bidsPath.directory().toStdString());
+        BASELIB::Log::warning("[BidsRawData::write] Failed to create directory: {}", BASELIB::utf8FromPath(bidsPath.directory()));
         return result;
     }
 
     //=========================================================================================================
     // Step 3 — Copy raw data file
     //=========================================================================================================
-    if (options.copyData && !sourcePath.isEmpty()) {
+    if (options.copyData && !sourcePath.empty()) {
         if (!copyRawDataFile(sourcePath, bidsPath, options.overwrite)) {
             BASELIB::Log::warning("[BidsRawData::write] Failed to copy raw data file");
             return result;
@@ -871,14 +834,13 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     // Step 4 — Write *_channels.tsv
     //=========================================================================================================
     {
-        BIDSPath channelsPath = bidsPath.channelsTsvPath();
-        if (!options.overwrite && QFileInfo::exists(channelsPath.filePath())) {
-            BASELIB::Log::warning("[BidsRawData::write] channels.tsv already exists: {}", channelsPath.filePath().toStdString());
+        const std::filesystem::path channelsPath = bidsPath.channels_tsv_path().file_path();
+        if (!options.overwrite && fileExists(channelsPath)) {
+            BASELIB::Log::warning("[BidsRawData::write] channels.tsv already exists: {}", BASELIB::utf8FromPath(channelsPath));
             return result;
         }
 
-        QList<BidsChannel> channelRecords = buildChannelRecords(raw.info);
-        if (!BidsChannel::writeTsv(channelsPath.filePath(), channelRecords)) {
+        if (!BidsChannel::write_tsv(channelsPath, buildChannelRecords(raw.info))) {
             BASELIB::Log::warning("[BidsRawData::write] Failed to write channels.tsv");
             return result;
         }
@@ -888,52 +850,45 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     // Step 5 — Write *_electrodes.tsv + *_coordsystem.json
     //=========================================================================================================
     {
-        QList<BidsElectrode> electrodeRecords = buildElectrodeRecords(raw.info);
+        std::vector<BidsElectrode> electrodeRecords = buildElectrodeRecords(raw.info);
         // Electrodes without any position say nothing a channels.tsv does not.
-        const bool anyPosition = std::any_of(electrodeRecords.cbegin(), electrodeRecords.cend(),
-                                             [](const BidsElectrode& e) { return e.x != QLatin1String("n/a"); });
-        if (!anyPosition)
+        if (std::ranges::none_of(electrodeRecords, [](const BidsElectrode& e) { return e.x != "n/a"; }))
             electrodeRecords.clear();
 
-        if (!electrodeRecords.isEmpty()) {
-            BIDSPath electrodesPath = bidsPath.electrodesTsvPath();
-            if (options.overwrite || !QFileInfo::exists(electrodesPath.filePath())) {
-                if (!BidsElectrode::writeTsv(electrodesPath.filePath(), electrodeRecords))
+        if (!electrodeRecords.empty()) {
+            const std::filesystem::path electrodesPath = bidsPath.electrodes_tsv_path().file_path();
+            if (options.overwrite || !fileExists(electrodesPath)) {
+                if (!BidsElectrode::write_tsv(electrodesPath, electrodeRecords))
                     BASELIB::Log::warning("[BidsRawData::write] Failed to write electrodes.tsv");
             }
         }
 
         // MEG always states its coordinate system (sensor positions live in the data file).
-        const QString datatype = bidsPath.datatype();
-        const bool isMeg = datatype == QLatin1String("meg");
-        BIDSPath coordsysPath = bidsPath.coordsystemJsonPath();
-        if ((isMeg || !electrodeRecords.isEmpty()) && (options.overwrite || !QFileInfo::exists(coordsysPath.filePath()))) {
+        const std::string& datatype = bidsPath.datatype();
+        const bool isMeg = datatype == "meg";
+        const std::filesystem::path coordsysPath = bidsPath.coordsystem_json_path().file_path();
+        if ((isMeg || !electrodeRecords.empty()) && (options.overwrite || !fileExists(coordsysPath))) {
             // Build coordinate system, deriving defaults from FiffInfo if needed
             BidsCoordinateSystem cs = coordinateSystem;
-            if (cs.system.isEmpty()) {
+            if (cs.system.empty()) {
                 if (raw.info.dig.empty()) {
-                    cs.system = QStringLiteral("Other");
-                    cs.units = isMeg ? QStringLiteral("m") : QStringLiteral("n/a");
+                    cs.system = "Other";
+                    cs.units = isMeg ? "m" : "n/a";
                 } else {
-                    int coordFrame = raw.info.dig.front().coord_frame;
-                    QMap<int, QString> frameMap = fiffFrameToBidsCoord();
-                    cs.system = frameMap.contains(coordFrame)
-                        ? frameMap[coordFrame]
-                        : QStringLiteral("Other");
-                    cs.units = QStringLiteral("m");
+                    cs.system = bids_lookup(FIFF_FRAME_TO_BIDS_COORD, raw.info.dig.front().coord_frame).value_or("Other");
+                    cs.units = "m";
                 }
             }
-            if (cs.description.isEmpty() && !raw.info.dig.empty())
-                cs.description = QStringLiteral("Coordinate system derived from recording data");
+            if (cs.description.empty() && !raw.info.dig.empty())
+                cs.description = "Coordinate system derived from recording data";
             // REQUIRED by BIDS for "Other".
-            if (cs.description.isEmpty() && cs.system == QLatin1String("Other"))
-                cs.description = isMeg ? QStringLiteral("Device coordinates of the acquisition system")
-                                       : QStringLiteral("Coordinate system of the electrode positions");
+            if (cs.description.empty() && cs.system == "Other")
+                cs.description = isMeg ? "Device coordinates of the acquisition system"
+                                       : "Coordinate system of the electrode positions";
 
-            const QString modality = isMeg         ? QStringLiteral("MEG")
-                : datatype == QLatin1String("eeg") ? QStringLiteral("EEG")
-                                                   : QStringLiteral("iEEG");
-            if (!BidsCoordinateSystem::writeJson(coordsysPath.filePath(), cs, modality))
+            const std::string_view modality = isMeg ? "MEG" : datatype == "eeg" ? "EEG"
+                                                                                : "iEEG";
+            if (!BidsCoordinateSystem::write_json(coordsysPath, cs, modality))
                 BASELIB::Log::warning("[BidsRawData::write] Failed to write coordsystem.json");
         }
     }
@@ -941,25 +896,27 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     //=========================================================================================================
     // Step 6 — Write *_events.tsv
     //=========================================================================================================
-    if (!events.isEmpty()) {
-        BIDSPath eventsPath = bidsPath.eventsTsvPath();
-        if (!options.overwrite && QFileInfo::exists(eventsPath.filePath())) {
-            BASELIB::Log::warning("[BidsRawData::write] events.tsv already exists: {}", eventsPath.filePath().toStdString());
+    if (!events.empty()) {
+        const std::filesystem::path eventsPath = bidsPath.events_tsv_path().file_path();
+        if (!options.overwrite && fileExists(eventsPath)) {
+            BASELIB::Log::warning("[BidsRawData::write] events.tsv already exists: {}", BASELIB::utf8FromPath(eventsPath));
             return result;
         }
 
-        QList<BidsEvent> eventsToWrite = events;
+        std::vector<BidsEvent> eventsToWrite = events;
 
         // Apply trial_type fallback from eventIdMap
-        QMap<int, QString> valueToType;
-        for (auto it = eventIdMap.constBegin(); it != eventIdMap.constEnd(); ++it)
-            valueToType[it.value()] = it.key();
-        for (auto& ev : eventsToWrite) {
-            if (ev.trialType.isEmpty() || ev.trialType == "n/a")
-                ev.trialType = valueToType.value(ev.value, QStringLiteral("n/a"));
+        std::map<int, std::string> valueToType;
+        for (const auto& [type, value] : eventIdMap)
+            valueToType[value] = type;
+        for (BidsEvent& ev : eventsToWrite) {
+            if (ev.trialType.empty() || ev.trialType == "n/a") {
+                const auto it = valueToType.find(ev.value);
+                ev.trialType = it != valueToType.end() ? it->second : "n/a";
+            }
         }
 
-        if (!BidsEvent::writeTsv(eventsPath.filePath(), eventsToWrite))
+        if (!BidsEvent::write_tsv(eventsPath, eventsToWrite))
             BASELIB::Log::warning("[BidsRawData::write] Failed to write events.tsv");
     }
 
@@ -967,14 +924,13 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     // Step 7 — Write *_{datatype}.json sidecar
     //=========================================================================================================
     {
-        BIDSPath sidecarPath = bidsPath.sidecarJsonPath();
-        if (!options.overwrite && QFileInfo::exists(sidecarPath.filePath())) {
-            BASELIB::Log::warning("[BidsRawData::write] Sidecar JSON already exists: {}", sidecarPath.filePath().toStdString());
+        const std::filesystem::path sidecarPath = bidsPath.sidecar_json_path().file_path();
+        if (!options.overwrite && fileExists(sidecarPath)) {
+            BASELIB::Log::warning("[BidsRawData::write] Sidecar JSON already exists: {}", BASELIB::utf8FromPath(sidecarPath));
             return result;
         }
 
-        QJsonObject sidecarJson = buildSidecarJson(*this, bidsPath);
-        if (!writeJsonFile(sidecarPath.filePath(), sidecarJson)) {
+        if (!BASELIB::write_text_file(sidecarPath, BASELIB::JsonDocument(buildSidecarJson(*this, bidsPath)).to_json())) {
             BASELIB::Log::warning("[BidsRawData::write] Failed to write sidecar JSON");
             return result;
         }
@@ -984,15 +940,13 @@ BIDSPath BidsRawData::write(const BIDSPath& bidsPath,
     // Step 8 — Write dataset_description.json (never overwrite)
     //=========================================================================================================
     {
-        QString descPath = bidsPath.root() + QDir::separator() + QStringLiteral("dataset_description.json");
+        const std::filesystem::path descPath = bidsPath.root() / "dataset_description.json";
 
-        if (!QFileInfo::exists(descPath)) {
+        if (!fileExists(descPath)) {
             BidsDatasetDescription desc;
-            desc.name = options.datasetName.isEmpty()
-                ? QStringLiteral("[Unspecified]")
-                : options.datasetName;
-            desc.bidsVersion = QStringLiteral("1.9.0");
-            desc.datasetType = QStringLiteral("raw");
+            desc.name = options.datasetName.empty() ? std::string("[Unspecified]") : options.datasetName;
+            desc.bidsVersion = "1.9.0";
+            desc.datasetType = "raw";
 
             if (!BidsDatasetDescription::write(descPath, desc))
                 BASELIB::Log::warning("[BidsRawData::write] Failed to write dataset_description.json");

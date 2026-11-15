@@ -15,6 +15,8 @@
 //=============================================================================================================
 
 #include <bids/bids_path.h>
+#include <base/byte_stream.h>
+#include <base/json.h>
 #include <base/string_utils.h>
 #include <bids/bids_channel.h>
 #include <bids/bids_electrode.h>
@@ -36,13 +38,37 @@
 #include <QTemporaryDir>
 
 #include <algorithm>
+#include <filesystem>
+#include <string>
 #include <tuple>
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace BIDSLIB;
+
+namespace
+{
+
+QString qpath(const std::filesystem::path& path)
+{
+    return QString::fromStdString(BASELIB::utf8FromPath(path));
+}
+
+std::filesystem::path stdpath(const QString& path)
+{
+    return BASELIB::pathFromUtf8(path.toStdString());
+}
+
+BASELIB::JsonObject readJsonObject(const std::filesystem::path& path)
+{
+    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(path);
+    return text ? BASELIB::JsonDocument::from_json(*text).object() : BASELIB::JsonObject();
+}
+
+} // namespace
 
 //=============================================================================================================
 /**
@@ -62,8 +88,8 @@ public:
     TestBids() = default;
 
 private:
-    QString bidsRoot() const; /**< Path to BIDS test fixtures. */
-    QString dataPath() const; /**< Base path for mne-cpp-test-data. */
+    std::filesystem::path bidsRoot() const; /**< Path to BIDS test fixtures. */
+    std::filesystem::path dataPath() const; /**< Base path for mne-cpp-test-data. */
 
 private slots:
     void initTestCase();
@@ -120,14 +146,14 @@ private slots:
 // HELPERS
 //=============================================================================================================
 
-QString TestBids::dataPath() const
+std::filesystem::path TestBids::dataPath() const
 {
-    return QCoreApplication::applicationDirPath() + QStringLiteral("/../resources/data/mne-cpp-test-data/");
+    return BASELIB::executable_dir().parent_path() / "resources" / "data" / "mne-cpp-test-data";
 }
 
-QString TestBids::bidsRoot() const
+std::filesystem::path TestBids::bidsRoot() const
 {
-    return dataPath() + QStringLiteral("BIDS");
+    return dataPath() / "BIDS";
 }
 
 //=============================================================================================================
@@ -137,9 +163,9 @@ QString TestBids::bidsRoot() const
 void TestBids::initTestCase()
 {
     // Verify fixture data exists
-    QVERIFY2(QDir(bidsRoot()).exists(),
-             qPrintable("BIDS test fixture directory not found: " + bidsRoot()));
-    QVERIFY(QFileInfo::exists(bidsRoot() + "/dataset_description.json"));
+    QVERIFY2(std::filesystem::is_directory(bidsRoot()),
+             qPrintable(QString::fromStdString("BIDS test fixture directory not found: " + BASELIB::utf8FromPath(bidsRoot()))));
+    QVERIFY(std::filesystem::exists(bidsRoot() / "dataset_description.json"));
 }
 
 //=============================================================================================================
@@ -151,44 +177,44 @@ void TestBids::testPathConstruction()
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
 
     QCOMPARE(path.root(), bidsRoot());
-    QCOMPARE(path.subject(), QStringLiteral("01"));
-    QCOMPARE(path.session(), QStringLiteral("01"));
-    QCOMPARE(path.task(), QStringLiteral("rest"));
-    QCOMPARE(path.datatype(), QStringLiteral("ieeg"));
-    QCOMPARE(path.suffix(), QStringLiteral("ieeg"));
-    QCOMPARE(path.extension(), QStringLiteral(".vhdr"));
+    QCOMPARE(path.subject(), std::string("01"));
+    QCOMPARE(path.session(), std::string("01"));
+    QCOMPARE(path.task(), std::string("rest"));
+    QCOMPARE(path.datatype(), std::string("ieeg"));
+    QCOMPARE(path.suffix(), std::string("ieeg"));
+    QCOMPARE(path.extension(), std::string(".vhdr"));
 
     // basename: sub-01_ses-01_task-rest_ieeg.vhdr
-    QCOMPARE(path.basename(), QStringLiteral("sub-01_ses-01_task-rest_ieeg.vhdr"));
+    QCOMPARE(path.basename(), std::string("sub-01_ses-01_task-rest_ieeg.vhdr"));
 
     // filePath should exist on disk
-    QVERIFY2(QFileInfo::exists(path.filePath()),
-             qPrintable("Expected file not found: " + path.filePath()));
+    QVERIFY2(path.exists(),
+             qPrintable(QString::fromStdString("Expected file not found: " + BASELIB::utf8FromPath(path.file_path()))));
 }
 
 void TestBids::testPathSidecarDerivation()
 {
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
 
-    BIDSPath chPath = path.channelsTsvPath();
-    QVERIFY(chPath.basename().endsWith("_channels.tsv"));
-    QVERIFY(QFileInfo::exists(chPath.filePath()));
+    BIDSPath chPath = path.channels_tsv_path();
+    QVERIFY(chPath.basename().ends_with("_channels.tsv"));
+    QVERIFY(chPath.exists());
 
-    BIDSPath elPath = path.electrodesTsvPath();
-    QVERIFY(elPath.basename().endsWith("_electrodes.tsv"));
-    QVERIFY(QFileInfo::exists(elPath.filePath()));
+    BIDSPath elPath = path.electrodes_tsv_path();
+    QVERIFY(elPath.basename().ends_with("_electrodes.tsv"));
+    QVERIFY(elPath.exists());
 
-    BIDSPath evPath = path.eventsTsvPath();
-    QVERIFY(evPath.basename().endsWith("_events.tsv"));
-    QVERIFY(QFileInfo::exists(evPath.filePath()));
+    BIDSPath evPath = path.events_tsv_path();
+    QVERIFY(evPath.basename().ends_with("_events.tsv"));
+    QVERIFY(evPath.exists());
 
-    BIDSPath csPath = path.coordsystemJsonPath();
-    QVERIFY(csPath.basename().endsWith("_coordsystem.json"));
-    QVERIFY(QFileInfo::exists(csPath.filePath()));
+    BIDSPath csPath = path.coordsystem_json_path();
+    QVERIFY(csPath.basename().ends_with("_coordsystem.json"));
+    QVERIFY(csPath.exists());
 
-    BIDSPath sjPath = path.sidecarJsonPath();
-    QVERIFY(sjPath.basename().endsWith("_ieeg.json"));
-    QVERIFY(QFileInfo::exists(sjPath.filePath()));
+    BIDSPath sjPath = path.sidecar_json_path();
+    QVERIFY(sjPath.basename().ends_with("_ieeg.json"));
+    QVERIFY(sjPath.exists());
 }
 
 //=============================================================================================================
@@ -198,44 +224,44 @@ void TestBids::testPathSidecarDerivation()
 void TestBids::testChannelsReadTsv()
 {
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
-    QList<BidsChannel> channels = BidsChannel::readTsv(path.channelsTsvPath().filePath());
+    std::vector<BidsChannel> channels = BidsChannel::read_tsv(path.channels_tsv_path().file_path());
 
     // BrainVision test.vhdr has 32 channels
-    QCOMPARE(channels.size(), 32);
+    QCOMPARE(channels.size(), std::size_t{32});
 
     // First channel
-    QCOMPARE(channels[0].name, QStringLiteral("FP1"));
-    QCOMPARE(channels[0].type, QStringLiteral("EEG"));
-    QCOMPARE(channels[0].status, QStringLiteral("good"));
+    QCOMPARE(channels[0].name, std::string("FP1"));
+    QCOMPARE(channels[0].type, std::string("EEG"));
+    QCOMPARE(channels[0].status, std::string("good"));
 
     // P4 (index 7) is marked bad in the fixture
-    QCOMPARE(channels[7].name, QStringLiteral("P4"));
-    QCOMPARE(channels[7].status, QStringLiteral("bad"));
+    QCOMPARE(channels[7].name, std::string("P4"));
+    QCOMPARE(channels[7].status, std::string("bad"));
 
     // Last channel
-    QCOMPARE(channels[31].name, QStringLiteral("ReRef"));
+    QCOMPARE(channels[31].name, std::string("ReRef"));
 
     // Sampling frequency
-    QCOMPARE(channels[0].samplingFreq, QStringLiteral("1000"));
+    QCOMPARE(channels[0].samplingFreq, std::string("1000"));
 }
 
 void TestBids::testChannelsWriteRoundTrip()
 {
     // Read original
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
-    QList<BidsChannel> original = BidsChannel::readTsv(path.channelsTsvPath().filePath());
+    std::vector<BidsChannel> original = BidsChannel::read_tsv(path.channels_tsv_path().file_path());
 
     // Write to temp
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
-    QString tmpPath = tmpDir.path() + "/channels.tsv";
-    QVERIFY(BidsChannel::writeTsv(tmpPath, original));
+    const std::filesystem::path tmpPath = stdpath(tmpDir.path()) / "channels.tsv";
+    QVERIFY(BidsChannel::write_tsv(tmpPath, original));
 
     // Read back
-    QList<BidsChannel> roundTripped = BidsChannel::readTsv(tmpPath);
+    std::vector<BidsChannel> roundTripped = BidsChannel::read_tsv(tmpPath);
     QCOMPARE(roundTripped.size(), original.size());
 
-    for (int i = 0; i < original.size(); ++i) {
+    for (std::size_t i = 0; i < original.size(); ++i) {
         QCOMPARE(roundTripped[i].name, original[i].name);
         QCOMPARE(roundTripped[i].type, original[i].type);
         QCOMPARE(roundTripped[i].units, original[i].units);
@@ -250,24 +276,24 @@ void TestBids::testChannelsWriteRoundTrip()
 void TestBids::testElectrodesReadTsv()
 {
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
-    QList<BidsElectrode> electrodes = BidsElectrode::readTsv(path.electrodesTsvPath().filePath());
+    std::vector<BidsElectrode> electrodes = BidsElectrode::read_tsv(path.electrodes_tsv_path().file_path());
 
-    QCOMPARE(electrodes.size(), 10);
+    QCOMPARE(electrodes.size(), std::size_t{10});
 
     // First electrode
-    QCOMPARE(electrodes[0].name, QStringLiteral("FP1"));
-    QVERIFY(!electrodes[0].x.isEmpty());
+    QCOMPARE(electrodes[0].name, std::string("FP1"));
+    QVERIFY(!electrodes[0].x.empty());
     QVERIFY(electrodes[0].x != "n/a");
 
     // Check a known position
-    float x = electrodes[0].x.toFloat();
+    float x = static_cast<float>(*BASELIB::toDouble(electrodes[0].x));
     QVERIFY(std::abs(x - (-0.0254f)) < 0.001f);
 
     // As digitizer points: n/a positions are skipped; without a transform the frame is unknown,
     // with one the points are moved into its target frame
-    electrodes[1].y = QStringLiteral("n/a");
-    const FIFFLIB::FiffDigPointSet plain = BidsElectrode::toFiffDigPoints(electrodes);
-    QCOMPARE(plain.size(), 9);
+    electrodes[1].y = "n/a";
+    const FIFFLIB::FiffDigPointSet plain = BidsElectrode::to_fiff_dig_points(electrodes);
+    QCOMPARE(plain.size(), std::size_t{9});
     QCOMPARE(plain[1].ident, 2);
     QCOMPARE(plain[0].kind, FIFFV_POINT_EEG);
     QCOMPARE(plain[0].coord_frame, FIFFV_COORD_UNKNOWN);
@@ -276,7 +302,7 @@ void TestBids::testElectrodesReadTsv()
     shift.from = FIFFV_COORD_MRI;
     shift.to = FIFFV_COORD_HEAD;
     shift.trans(0, 3) = 0.5f;
-    const FIFFLIB::FiffDigPointSet moved = BidsElectrode::toFiffDigPoints(electrodes, shift);
+    const FIFFLIB::FiffDigPointSet moved = BidsElectrode::to_fiff_dig_points(electrodes, shift);
     QCOMPARE(moved[0].coord_frame, FIFFV_COORD_HEAD);
     QCOMPARE(moved[0].r[0], x + 0.5f);
 }
@@ -284,20 +310,20 @@ void TestBids::testElectrodesReadTsv()
 void TestBids::testElectrodesWriteRoundTrip()
 {
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
-    QList<BidsElectrode> original = BidsElectrode::readTsv(path.electrodesTsvPath().filePath());
-    QVERIFY(original.size() > 1 && original[0].group.isEmpty());
-    original[0].group = QStringLiteral("GridA");
-    original[0].dimension = QStringLiteral("[4x8]");
+    std::vector<BidsElectrode> original = BidsElectrode::read_tsv(path.electrodes_tsv_path().file_path());
+    QVERIFY(original.size() > 1 && original[0].group.empty());
+    original[0].group = "GridA";
+    original[0].dimension = "[4x8]";
 
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
-    QString tmpPath = tmpDir.path() + "/electrodes.tsv";
-    QVERIFY(BidsElectrode::writeTsv(tmpPath, original));
+    const std::filesystem::path tmpPath = stdpath(tmpDir.path()) / "electrodes.tsv";
+    QVERIFY(BidsElectrode::write_tsv(tmpPath, original));
 
-    QList<BidsElectrode> roundTripped = BidsElectrode::readTsv(tmpPath);
+    std::vector<BidsElectrode> roundTripped = BidsElectrode::read_tsv(tmpPath);
     QCOMPARE(roundTripped.size(), original.size());
 
-    for (int i = 0; i < original.size(); ++i) {
+    for (std::size_t i = 0; i < original.size(); ++i) {
         QCOMPARE(roundTripped[i].name, original[i].name);
         QCOMPARE(roundTripped[i].x, original[i].x);
         QCOMPARE(roundTripped[i].y, original[i].y);
@@ -314,36 +340,36 @@ void TestBids::testElectrodesWriteRoundTrip()
 void TestBids::testEventsReadTsv()
 {
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
-    QList<BidsEvent> events = BidsEvent::readTsv(path.eventsTsvPath().filePath());
+    std::vector<BidsEvent> events = BidsEvent::read_tsv(path.events_tsv_path().file_path());
 
-    QCOMPARE(events.size(), 4);
+    QCOMPARE(events.size(), std::size_t{4});
 
     // First event
     QCOMPARE(events[0].onset, 0.0f);
     QCOMPARE(events[0].sample, 0);
     QCOMPARE(events[0].value, 1);
-    QCOMPARE(events[0].trialType, QStringLiteral("stimulus"));
+    QCOMPARE(events[0].trialType, std::string("stimulus"));
 
     // Second event at 1.5 s
     QVERIFY(std::abs(events[1].onset - 1.5f) < 0.001f);
     QCOMPARE(events[1].sample, 1500);
-    QCOMPARE(events[1].trialType, QStringLiteral("response"));
+    QCOMPARE(events[1].trialType, std::string("response"));
 }
 
 void TestBids::testEventsWriteRoundTrip()
 {
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
-    QList<BidsEvent> original = BidsEvent::readTsv(path.eventsTsvPath().filePath());
+    std::vector<BidsEvent> original = BidsEvent::read_tsv(path.events_tsv_path().file_path());
 
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
-    QString tmpPath = tmpDir.path() + "/events.tsv";
-    QVERIFY(BidsEvent::writeTsv(tmpPath, original));
+    const std::filesystem::path tmpPath = stdpath(tmpDir.path()) / "events.tsv";
+    QVERIFY(BidsEvent::write_tsv(tmpPath, original));
 
-    QList<BidsEvent> roundTripped = BidsEvent::readTsv(tmpPath);
+    std::vector<BidsEvent> roundTripped = BidsEvent::read_tsv(tmpPath);
     QCOMPARE(roundTripped.size(), original.size());
 
-    for (int i = 0; i < original.size(); ++i) {
+    for (std::size_t i = 0; i < original.size(); ++i) {
         QVERIFY(std::abs(roundTripped[i].onset - original[i].onset) < 0.001f);
         QCOMPARE(roundTripped[i].sample, original[i].sample);
         QCOMPARE(roundTripped[i].value, original[i].value);
@@ -358,23 +384,23 @@ void TestBids::testEventsWriteRoundTrip()
 void TestBids::testCoordinateSystemReadJson()
 {
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
-    BidsCoordinateSystem cs = BidsCoordinateSystem::readJson(path.coordsystemJsonPath().filePath());
+    BidsCoordinateSystem cs = BidsCoordinateSystem::read_json(path.coordsystem_json_path().file_path());
 
-    QCOMPARE(cs.system, QStringLiteral("ACPC"));
-    QCOMPARE(cs.units, QStringLiteral("m"));
+    QCOMPARE(cs.system, std::string("ACPC"));
+    QCOMPARE(cs.units, std::string("m"));
 }
 
 void TestBids::testCoordinateSystemWriteRoundTrip()
 {
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
-    BidsCoordinateSystem original = BidsCoordinateSystem::readJson(path.coordsystemJsonPath().filePath());
+    BidsCoordinateSystem original = BidsCoordinateSystem::read_json(path.coordsystem_json_path().file_path());
 
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
-    QString tmpPath = tmpDir.path() + "/coordsystem.json";
-    QVERIFY(BidsCoordinateSystem::writeJson(tmpPath, original));
+    const std::filesystem::path tmpPath = stdpath(tmpDir.path()) / "coordsystem.json";
+    QVERIFY(BidsCoordinateSystem::write_json(tmpPath, original));
 
-    BidsCoordinateSystem roundTripped = BidsCoordinateSystem::readJson(tmpPath);
+    BidsCoordinateSystem roundTripped = BidsCoordinateSystem::read_json(tmpPath);
     QCOMPARE(roundTripped.system, original.system);
     QCOMPARE(roundTripped.units, original.units);
 }
@@ -385,21 +411,21 @@ void TestBids::testCoordinateSystemWriteRoundTrip()
 
 void TestBids::testDatasetDescriptionRead()
 {
-    BidsDatasetDescription desc = BidsDatasetDescription::read(bidsRoot() + "/dataset_description.json");
+    BidsDatasetDescription desc = BidsDatasetDescription::read(bidsRoot() / "dataset_description.json");
 
-    QCOMPARE(desc.name, QStringLiteral("MNE-CPP Test Dataset"));
-    QCOMPARE(desc.bidsVersion, QStringLiteral("1.9.0"));
-    QCOMPARE(desc.datasetType, QStringLiteral("raw"));
-    QCOMPARE(desc.license, QStringLiteral("CC0"));
+    QCOMPARE(desc.name, std::string("MNE-CPP Test Dataset"));
+    QCOMPARE(desc.bidsVersion, std::string("1.9.0"));
+    QCOMPARE(desc.datasetType, std::string("raw"));
+    QCOMPARE(desc.license, std::string("CC0"));
 }
 
 void TestBids::testDatasetDescriptionWriteRoundTrip()
 {
-    BidsDatasetDescription original = BidsDatasetDescription::read(bidsRoot() + "/dataset_description.json");
+    BidsDatasetDescription original = BidsDatasetDescription::read(bidsRoot() / "dataset_description.json");
 
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
-    QString tmpPath = tmpDir.path() + "/dataset_description.json";
+    const std::filesystem::path tmpPath = stdpath(tmpDir.path()) / "dataset_description.json";
     QVERIFY(BidsDatasetDescription::write(tmpPath, original));
 
     BidsDatasetDescription roundTripped = BidsDatasetDescription::read(tmpPath);
@@ -418,7 +444,7 @@ void TestBids::testReadBrainVision()
     BIDSPath path(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
     BidsRawData data = BidsRawData::read(path);
 
-    QVERIFY2(data.isValid(), "BidsRawData::read failed for BrainVision file");
+    QVERIFY2(data.is_valid(), "BidsRawData::read failed for BrainVision file");
 
     // Channel count: 32 channels from BrainVision test.vhdr
     QCOMPARE(data.raw.info.nchan, 32);
@@ -432,31 +458,31 @@ void TestBids::testReadBrainVision()
 
     // Reference values produced by mne_bids.read_raw_bids(BIDSPath(...)) (mne-bids 0.17, mne 1.11): 32 channels,
     // 1000 Hz, bads ['P4'], annotations stimulus, response, stimulus, feedback.
-    QCOMPARE(data.events.size(), 4);
+    QCOMPARE(data.events.size(), std::size_t{4});
     const QStringList trialTypes{"stimulus", "response", "stimulus", "feedback"};
     for (int k = 0; k < 4; ++k) {
         QCOMPARE(data.events[k].trialType, trialTypes[k]);
     }
 
     // Event ID map
-    QVERIFY(data.eventIdMap.contains(QStringLiteral("stimulus")));
-    QVERIFY(data.eventIdMap.contains(QStringLiteral("response")));
+    QVERIFY(data.eventIdMap.contains("stimulus"));
+    QVERIFY(data.eventIdMap.contains("response"));
 
     // Electrodes
-    QCOMPARE(data.electrodes.size(), 10);
-    QCOMPARE(data.electrodes[0].name, QStringLiteral("FP1"));
+    QCOMPARE(data.electrodes.size(), std::size_t{10});
+    QCOMPARE(data.electrodes[0].name, std::string("FP1"));
 
     // Coordinate system
-    QCOMPARE(data.coordinateSystem.system, QStringLiteral("ACPC"));
-    QCOMPARE(data.coordinateSystem.units, QStringLiteral("m"));
+    QCOMPARE(data.coordinateSystem.system, std::string("ACPC"));
+    QCOMPARE(data.coordinateSystem.units, std::string("m"));
 
     // Digitization points loaded
     QVERIFY(data.raw.info.dig.size() >= 10);
 
     // Sidecar metadata
-    QCOMPARE(data.ieegReference, QStringLiteral("Cz"));
-    QCOMPARE(data.manufacturer, QStringLiteral("BrainProducts"));
-    QCOMPARE(data.recordingType, QStringLiteral("continuous"));
+    QCOMPARE(data.ieegReference, std::string("Cz"));
+    QCOMPARE(data.manufacturer, std::string("BrainProducts"));
+    QCOMPARE(data.recordingType, std::string("continuous"));
 
     // Line frequency from sidecar
     QVERIFY(std::abs(data.raw.info.linefreq - 50.0f) < 0.1f);
@@ -474,7 +500,7 @@ void TestBids::testReadEdf()
     BIDSPath path(bidsRoot(), "02", "01", "rest", "eeg", "eeg", ".edf");
     BidsRawData data = BidsRawData::read(path);
 
-    QVERIFY2(data.isValid(), "BidsRawData::read failed for EDF file");
+    QVERIFY2(data.is_valid(), "BidsRawData::read failed for EDF file");
 
     // Channel count: 25 channels in the EDF
     QCOMPARE(data.raw.info.nchan, 25);
@@ -486,9 +512,9 @@ void TestBids::testReadEdf()
     QVERIFY(BASELIB::contains(data.raw.info.bads, "EEG O1"));
 
     // As mne_bids.read_raw_bids: 25 channels, 128 Hz, bads ['EEG O1'], annotations start, stimulus, response
-    QCOMPARE(data.events.size(), 3);
-    QCOMPARE(data.events[0].trialType, QStringLiteral("start"));
-    QCOMPARE(data.events[1].trialType, QStringLiteral("stimulus"));
+    QCOMPARE(data.events.size(), std::size_t{3});
+    QCOMPARE(data.events[0].trialType, std::string("start"));
+    QCOMPARE(data.events[1].trialType, std::string("stimulus"));
 
     // Reader should be alive
     QVERIFY(data.reader != nullptr);
@@ -545,7 +571,7 @@ void TestBids::testReadEdf()
 
     // Like mne read_raw_edf: unrecognised labels are EEG; "Status" is an unscaled stim channel
     EDFReader reduced;
-    QVERIFY(reduced.open(dataPath() + QStringLiteral("EEG/test_reduced.edf")));
+    QVERIFY(reduced.open(QString::fromStdString(BASELIB::utf8FromPath(dataPath() / "EEG/test_reduced.edf"))));
     const FIFFLIB::FiffInfo reducedInfo = reduced.getInfo();
     const int a4 = BASELIB::indexOf(reducedInfo.ch_names, "A4");
     const int status = BASELIB::indexOf(reducedInfo.ch_names, "Status");
@@ -593,32 +619,32 @@ void TestBids::testWriteRoundTrip()
     // Read original BrainVision dataset
     BIDSPath srcPath(bidsRoot(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
     BidsRawData original = BidsRawData::read(srcPath);
-    QVERIFY(original.isValid());
+    QVERIFY(original.is_valid());
 
     // Write to a temporary BIDS directory
     QTemporaryDir tmpDir;
     QVERIFY(tmpDir.isValid());
 
-    BIDSPath dstPath(tmpDir.path(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
+    BIDSPath dstPath(stdpath(tmpDir.path()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr");
 
     BidsRawData::WriteOptions opts;
     opts.overwrite = true;
     opts.copyData = true;
     opts.datasetName = "TestRoundTrip";
 
-    BIDSPath written = original.write(dstPath, srcPath.filePath(), opts);
+    BIDSPath written = original.write(dstPath, srcPath.file_path(), opts);
     // A failed write returns BIDSPath(), whose filePath() is "." and therefore never empty
     QVERIFY(written == dstPath);
-    QVERIFY(QFileInfo::exists(written.filePath()));
+    QVERIFY(written.exists());
 
     // Verify sidecar files were created
-    QVERIFY(QFileInfo::exists(dstPath.channelsTsvPath().filePath()));
-    QVERIFY(QFileInfo::exists(dstPath.eventsTsvPath().filePath()));
-    QVERIFY(QFileInfo::exists(dstPath.sidecarJsonPath().filePath()));
+    QVERIFY(dstPath.channels_tsv_path().exists());
+    QVERIFY(dstPath.events_tsv_path().exists());
+    QVERIFY(dstPath.sidecar_json_path().exists());
 
     // Read back from the written location
     BidsRawData readBack = BidsRawData::read(dstPath);
-    QVERIFY2(readBack.isValid(), "Failed to read back written BIDS dataset");
+    QVERIFY2(readBack.is_valid(), "Failed to read back written BIDS dataset");
 
     // Verify round-trip fidelity
     QCOMPARE(readBack.raw.info.nchan, original.raw.info.nchan);
@@ -630,52 +656,50 @@ void TestBids::testWriteRoundTrip()
     for (const BidsElectrode& before : original.electrodes) {
         auto after = std::find_if(readBack.electrodes.cbegin(), readBack.electrodes.cend(),
                                   [&](const BidsElectrode& e) { return e.name == before.name; });
-        QVERIFY2(after != readBack.electrodes.cend() && std::abs(after->z.toDouble() - before.z.toDouble()) < 1e-6, qPrintable(before.name));
+        QVERIFY2(after != readBack.electrodes.cend() && std::abs(*BASELIB::toDouble(after->z) - *BASELIB::toDouble(before.z)) < 1e-6, before.name.c_str());
     }
 
     // Without overwrite, existing sidecars are left alone and the write is refused
     BidsRawData::WriteOptions keep;
     keep.copyData = false;
-    QVERIFY(original.write(dstPath, QString(), keep) == BIDSPath());
+    QVERIFY(original.write(dstPath, {}, keep) == BIDSPath());
 
     // Incomplete paths and an empty recording are refused before anything is written
     QTemporaryDir refusedDir;
     BidsRawData empty;
-    QVERIFY(empty.write(BIDSPath(refusedDir.path(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
-    QVERIFY(original.write(BIDSPath(QString(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
-    QVERIFY(original.write(BIDSPath(refusedDir.path(), QString(), "01", "rest", "ieeg", "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
-    QVERIFY(original.write(BIDSPath(refusedDir.path(), "01", "01", QString(), "ieeg", "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
-    QVERIFY(original.write(BIDSPath(refusedDir.path(), "01", "01", "rest", QString(), "ieeg", ".vhdr"), QString(), opts) == BIDSPath());
+    QVERIFY(empty.write(BIDSPath(stdpath(refusedDir.path()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), {}, opts) == BIDSPath());
+    QVERIFY(original.write(BIDSPath({}, "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), {}, opts) == BIDSPath());
+    QVERIFY(original.write(BIDSPath(stdpath(refusedDir.path()), {}, "01", "rest", "ieeg", "ieeg", ".vhdr"), {}, opts) == BIDSPath());
+    QVERIFY(original.write(BIDSPath(stdpath(refusedDir.path()), "01", "01", {}, "ieeg", "ieeg", ".vhdr"), {}, opts) == BIDSPath());
+    QVERIFY(original.write(BIDSPath(stdpath(refusedDir.path()), "01", "01", "rest", {}, "ieeg", ".vhdr"), {}, opts) == BIDSPath());
     QVERIFY(QDir(refusedDir.path()).isEmpty());
 
     // EDF: copied as a single file; events without a trial type get theirs from the event id map
     BIDSPath edfSrc(bidsRoot(), "02", "01", "rest", "eeg", "eeg", ".edf");
     BidsRawData edf = BidsRawData::read(edfSrc);
-    QVERIFY(edf.isValid());
+    QVERIFY(edf.is_valid());
     edf.events[1].trialType.clear();
-    edf.eventIdMap.insert(QStringLiteral("visual"), edf.events[1].value);
-    BIDSPath edfDst(tmpDir.path(), "02", "01", "rest", "eeg", "eeg", ".edf");
-    QVERIFY(edf.write(edfDst, edfSrc.filePath(), opts) == edfDst);
-    QCOMPARE(QFileInfo(edfDst.filePath()).size(), QFileInfo(edfSrc.filePath()).size());
-    QFile sidecar(edfDst.sidecarJsonPath().filePath());
-    QVERIFY(sidecar.open(QIODevice::ReadOnly));
+    edf.eventIdMap.insert_or_assign("visual", edf.events[1].value);
+    BIDSPath edfDst(stdpath(tmpDir.path()), "02", "01", "rest", "eeg", "eeg", ".edf");
+    QVERIFY(edf.write(edfDst, edfSrc.file_path(), opts) == edfDst);
+    QCOMPARE(std::filesystem::file_size(edfDst.file_path()), std::filesystem::file_size(edfSrc.file_path()));
     // mne-bids writes raw.times[-1]: 1227 / 128 Hz
-    QCOMPARE(QJsonDocument::fromJson(sidecar.readAll()).object().value(QStringLiteral("RecordingDuration")).toDouble(), 9.5859375);
+    QCOMPARE(readJsonObject(edfDst.sidecar_json_path().file_path()).value("RecordingDuration").to_double(), 9.5859375);
     BidsRawData edfBack = BidsRawData::read(edfDst);
-    QVERIFY(edfBack.isValid());
+    QVERIFY(edfBack.is_valid());
     QCOMPARE(edfBack.raw.info.nchan, 25);
-    QCOMPARE(edfBack.events.size(), 3);
-    QCOMPARE(edfBack.events[1].trialType, QStringLiteral("visual"));
-    QCOMPARE(edfBack.events[2].trialType, QStringLiteral("response"));
+    QCOMPARE(edfBack.events.size(), std::size_t{3});
+    QCOMPARE(edfBack.events[1].trialType, std::string("visual"));
+    QCOMPARE(edfBack.events[2].trialType, std::string("response"));
     QVERIFY(BASELIB::contains(edfBack.raw.info.bads, "EEG O1"));
 
     // channels.tsv units other than volts, as mne_bids.read_raw_bids: known ones set the unit, unknown ones keep it
-    QFile channelsTsv(edfDst.channelsTsvPath().filePath());
+    QFile channelsTsv(qpath(edfDst.channels_tsv_path().file_path()));
     QVERIFY(channelsTsv.open(QIODevice::ReadOnly));
     QStringList rows = QString::fromUtf8(channelsTsv.readAll()).split('\n');
     channelsTsv.close();
     const QStringList newUnits{"oC", "S", "foo"};
-    for (int i = 0; i < newUnits.size(); ++i) {
+    for (qsizetype i = 0; i < newUnits.size(); ++i) {
         QStringList cols = rows[i + 1].split('\t');
         cols[2] = newUnits[i];
         rows[i + 1] = cols.join('\t');
@@ -684,15 +708,15 @@ void TestBids::testWriteRoundTrip()
     channelsTsv.write(rows.join('\n').toUtf8());
     channelsTsv.close();
     BidsRawData units = BidsRawData::read(edfDst);
-    QVERIFY(units.isValid());
+    QVERIFY(units.is_valid());
     QCOMPARE(units.raw.info.chs[0].unit, FIFF_UNIT_CEL);
     QCOMPARE(units.raw.info.chs[1].unit, FIFF_UNIT_MHO);
     QCOMPARE(units.raw.info.chs[2].unit, FIFF_UNIT_V);
 
     // ... and are written back under their BIDS names
-    BIDSPath unitsDst(tmpDir.path(), "03", "01", "rest", "eeg", "eeg", ".edf");
-    QVERIFY(units.write(unitsDst, edfDst.filePath(), opts) == unitsDst);
-    QFile unitsTsv(unitsDst.channelsTsvPath().filePath());
+    BIDSPath unitsDst(stdpath(tmpDir.path()), "03", "01", "rest", "eeg", "eeg", ".edf");
+    QVERIFY(units.write(unitsDst, edfDst.file_path(), opts) == unitsDst);
+    QFile unitsTsv(qpath(unitsDst.channels_tsv_path().file_path()));
     QVERIFY(unitsTsv.open(QIODevice::ReadOnly));
     const QStringList writtenRows = QString::fromUtf8(unitsTsv.readAll()).split('\n');
     QCOMPARE(writtenRows[1].split('\t')[2], QStringLiteral("oC"));
@@ -718,7 +742,7 @@ void TestBids::testBrainVisionReaderMatchesPython()
             << "DataFile=" << base << ".eeg\nMarkerFile=" << base << ".vmrk\nDataFormat=BINARY\n"
             << "DataOrientation=" << orientation << "\nNumberOfChannels=6\nSamplingInterval=2000\n"
             << "[Binary Infos]\nBinaryFormat=" << format << "\n[Channel Infos]\n";
-        for (int k = 0; k < channels.size(); ++k) {
+        for (qsizetype k = 0; k < channels.size(); ++k) {
             out << "Ch" << (k + 1) << "=" << channels[k] << "\n";
         }
         vhdr.close();
@@ -766,7 +790,7 @@ void TestBids::testBrainVisionReaderMatchesPython()
         QCOMPARE(reader.getSampleCount(), 4L);
         QCOMPARE(reader.toFiffRawData().last_samp, 3);
         const FIFFLIB::FiffInfo info = reader.getInfo();
-        QCOMPARE(info.ch_names.back(), QStringLiteral("A,B"));
+        QCOMPARE(info.ch_names.back(), std::string("A,B"));
         for (int k = 0; k < 6; ++k) {
             QVERIFY2(info.chs[k].kind == kinds[k], info.ch_names[k].c_str());
         }
@@ -779,8 +803,8 @@ void TestBids::testBrainVisionReaderMatchesPython()
         }
         // Markers: 1-based positions in the file, \1 decodes to a comma
         const QVector<BrainVisionMarker> markers = reader.getMarkers();
-        QCOMPARE(markers.size(), 2);
-        QCOMPARE(markers[1].description, QStringLiteral("S, 7"));
+        QCOMPARE(markers.size(), std::size_t{2});
+        QCOMPARE(markers[1].description, std::string("S, 7"));
         QCOMPARE(markers[1].position, 2L);
         QCOMPARE(markers[1].duration, 2L);
         QCOMPARE(markers[0].date, QDateTime(QDate(2026, 1, 1), QTime(12, 0)));
@@ -846,7 +870,7 @@ void TestBids::testBrainVisionReaderVariants()
         QCOMPARE(reader.getSampleCount(), 3L);
         QCOMPARE(reader.getFrequency(), 0.0f);
         QCOMPARE(reader.getChannelCount(), 2);
-        QCOMPARE(reader.getChannelInfos()[1].name, QStringLiteral("Ch2"));
+        QCOMPARE(reader.getChannelInfos()[1].name, std::string("Ch2"));
         QVERIFY(reader.getMarkers().isEmpty());
         const Eigen::MatrixXf data = reader.readRawSegment(1, 3);
         Eigen::MatrixXf expected(2, 2);
@@ -861,7 +885,7 @@ void TestBids::testBrainVisionReaderVariants()
     }
     BrainVisionReader probe;
     QVERIFY(probe.supportsExtension(".VHDR") && probe.supportsExtension(".ahdr") && !probe.supportsExtension(".edf"));
-    QCOMPARE(probe.formatName(), QStringLiteral("BrainVision"));
+    QCOMPARE(probe.formatName(), std::string("BrainVision"));
     QVERIFY(probe.readRawSegment(0, 1).size() == 0);
 
     // Headers that cannot describe a recording are refused
@@ -912,49 +936,48 @@ void TestBids::testWriteSidecarsPerDatatype()
     BidsRawData::WriteOptions opts;
     opts.copyData = false;
     const auto sidecar = [](const BIDSPath& path) {
-        QFile file(path.filePath());
-        return file.open(QIODevice::ReadOnly) ? QJsonDocument::fromJson(file.readAll()).object() : QJsonObject();
+        return readJsonObject(path.file_path());
     };
 
-    const BIDSPath meg(dir.path(), "01", QString(), "rest", "meg", "meg", ".fif");
-    QVERIFY(data.write(meg, QString(), opts) == meg);
-    const QJsonObject megJson = sidecar(meg.sidecarJsonPath());
+    const BIDSPath meg(stdpath(dir.path()), "01", {}, "rest", "meg", "meg", ".fif");
+    QVERIFY(data.write(meg, {}, opts) == meg);
+    const BASELIB::JsonObject megJson = sidecar(meg.sidecar_json_path());
     for (const char* key : {"TaskName", "SamplingFrequency", "PowerLineFrequency", "DewarPosition", "SoftwareFilters",
                             "DigitizedLandmarks", "DigitizedHeadPoints"}) {
-        QVERIFY2(megJson.contains(QLatin1String(key)), key);
+        QVERIFY2(megJson.contains(key), key);
     }
-    QCOMPARE(megJson.value(QStringLiteral("PowerLineFrequency")).toString(), QStringLiteral("n/a"));
-    QCOMPARE(megJson.value(QStringLiteral("MEGChannelCount")).toInt(), 1);
-    QCOMPARE(megJson.value(QStringLiteral("EEGChannelCount")).toInt(), 1);
-    QCOMPARE(megJson.value(QStringLiteral("TriggerChannelCount")).toInt(), 1);
-    QVERIFY(!megJson.contains(QStringLiteral("iEEGReference")));
-    QVERIFY(!megJson.contains(QStringLiteral("ECOGChannelCount")));
+    QCOMPARE(megJson.value("PowerLineFrequency").to_std_string(), std::string("n/a"));
+    QCOMPARE(megJson.value("MEGChannelCount").to_int(), 1);
+    QCOMPARE(megJson.value("EEGChannelCount").to_int(), 1);
+    QCOMPARE(megJson.value("TriggerChannelCount").to_int(), 1);
+    QVERIFY(!megJson.contains("iEEGReference"));
+    QVERIFY(!megJson.contains("ECOGChannelCount"));
     // An EEG channel without a position gives no electrodes.tsv; MEG always has its coordinate system.
-    QVERIFY(!QFileInfo::exists(meg.electrodesTsvPath().filePath()));
-    const QJsonObject megCoords = sidecar(meg.coordsystemJsonPath());
-    QCOMPARE(megCoords.value(QStringLiteral("MEGCoordinateSystem")).toString(), QStringLiteral("Other"));
-    QCOMPARE(megCoords.value(QStringLiteral("MEGCoordinateUnits")).toString(), QStringLiteral("m"));
-    QVERIFY(megCoords.contains(QStringLiteral("MEGCoordinateSystemDescription")));
+    QVERIFY(!meg.electrodes_tsv_path().exists());
+    const BASELIB::JsonObject megCoords = sidecar(meg.coordsystem_json_path());
+    QCOMPARE(megCoords.value("MEGCoordinateSystem").to_std_string(), std::string("Other"));
+    QCOMPARE(megCoords.value("MEGCoordinateUnits").to_std_string(), std::string("m"));
+    QVERIFY(megCoords.contains("MEGCoordinateSystemDescription"));
 
-    const BIDSPath eeg(dir.path(), "02", QString(), "rest", "eeg", "eeg", ".edf");
+    const BIDSPath eeg(stdpath(dir.path()), "02", {}, "rest", "eeg", "eeg", ".edf");
     info.chs[1].chpos.r0 = Eigen::Vector3f(0.01f, 0.02f, 0.03f);
-    QVERIFY(data.write(eeg, QString(), opts) == eeg);
-    const QJsonObject eegJson = sidecar(eeg.sidecarJsonPath());
+    QVERIFY(data.write(eeg, {}, opts) == eeg);
+    const BASELIB::JsonObject eegJson = sidecar(eeg.sidecar_json_path());
     for (const char* key : {"TaskName", "SamplingFrequency", "PowerLineFrequency", "SoftwareFilters", "EEGReference"}) {
-        QVERIFY2(eegJson.contains(QLatin1String(key)), key);
+        QVERIFY2(eegJson.contains(key), key);
     }
-    QVERIFY(!eegJson.contains(QStringLiteral("iEEGReference")));
-    QVERIFY(!eegJson.contains(QStringLiteral("DewarPosition")));
-    QVERIFY(QFileInfo::exists(eeg.electrodesTsvPath().filePath()));
-    QVERIFY(sidecar(eeg.coordsystemJsonPath()).contains(QStringLiteral("EEGCoordinateSystem")));
+    QVERIFY(!eegJson.contains("iEEGReference"));
+    QVERIFY(!eegJson.contains("DewarPosition"));
+    QVERIFY(eeg.electrodes_tsv_path().exists());
+    QVERIFY(sidecar(eeg.coordsystem_json_path()).contains("EEGCoordinateSystem"));
 
-    const BIDSPath ieeg(dir.path(), "03", QString(), "rest", "ieeg", "ieeg", ".edf");
-    QVERIFY(data.write(ieeg, QString(), opts) == ieeg);
-    const QJsonObject ieegJson = sidecar(ieeg.sidecarJsonPath());
+    const BIDSPath ieeg(stdpath(dir.path()), "03", {}, "rest", "ieeg", "ieeg", ".edf");
+    QVERIFY(data.write(ieeg, {}, opts) == ieeg);
+    const BASELIB::JsonObject ieegJson = sidecar(ieeg.sidecar_json_path());
     for (const char* key : {"TaskName", "SamplingFrequency", "PowerLineFrequency", "SoftwareFilters", "iEEGReference"}) {
-        QVERIFY2(ieegJson.contains(QLatin1String(key)), key);
+        QVERIFY2(ieegJson.contains(key), key);
     }
-    QVERIFY(sidecar(ieeg.coordsystemJsonPath()).contains(QStringLiteral("iEEGCoordinateSystem")));
+    QVERIFY(sidecar(ieeg.coordsystem_json_path()).contains("iEEGCoordinateSystem"));
 }
 
 //=============================================================================================================
@@ -992,66 +1015,64 @@ void TestBids::testWriteFromInfoAndReadRejects()
     }
     data.raw.first_samp = 0;
     data.raw.last_samp = 511;
-    data.recordingType = QStringLiteral("epoched");
-    data.taskDescription = QStringLiteral("rest");
-    data.manufacturer = QStringLiteral("Acme");
-    data.manufacturerModelName = QStringLiteral("A1");
-    data.softwareVersions = QStringLiteral("1.0");
+    data.recordingType = "epoched";
+    data.taskDescription = "rest";
+    data.manufacturer = "Acme";
+    data.manufacturerModelName = "A1";
+    data.softwareVersions = "1.0";
 
     QTemporaryDir dir;
-    const BIDSPath path(dir.path(), "05", "01", "rest", "ieeg", "ieeg", ".vhdr");
+    const BIDSPath path(stdpath(dir.path()), "05", "01", "rest", "ieeg", "ieeg", ".vhdr");
     BidsRawData::WriteOptions opts;
     opts.copyData = false;
-    QVERIFY(data.write(path, QString(), opts) == path);
+    QVERIFY(data.write(path, {}, opts) == path);
 
-    const QList<BidsChannel> channels = BidsChannel::readTsv(path.channelsTsvPath().filePath());
+    const std::vector<BidsChannel> channels = BidsChannel::read_tsv(path.channels_tsv_path().file_path());
     QCOMPARE(channels.size(), chans.size());
     const QStringList types{"EEG", "ECOG", "SEEG", "DBS", "EOG", "ECG", "EMG", "MISC", "RESP", "TRIG", "MEGMAG", "MISC"};
-    for (int i = 0; i < channels.size(); ++i)
-        QCOMPARE(channels[i].type, types[i]);
-    QCOMPARE(channels[0].lowCutoff, QStringLiteral("0.5"));
-    QCOMPARE(channels[0].highCutoff, QStringLiteral("100"));
-    QCOMPARE(channels[4].status, QStringLiteral("bad"));
+    for (std::size_t i = 0; i < channels.size(); ++i)
+        QCOMPARE(channels[i].type, types[static_cast<qsizetype>(i)].toStdString());
+    QCOMPARE(channels[0].lowCutoff, std::string("0.5"));
+    QCOMPARE(channels[0].highCutoff, std::string("100"));
+    QCOMPARE(channels[4].status, std::string("bad"));
 
-    const QList<BidsElectrode> electrodes = BidsElectrode::readTsv(path.electrodesTsvPath().filePath());
-    QCOMPARE(electrodes.size(), 4);
-    QCOMPARE(electrodes[0].x, QStringLiteral("0.1"));
-    QCOMPARE(electrodes[1].z, QStringLiteral("0.125"));
-    QCOMPARE(electrodes[2].x, QStringLiteral("n/a"));
-    QCOMPARE(BidsCoordinateSystem::readJson(path.coordsystemJsonPath().filePath()).system, QStringLiteral("CapTrak"));
+    const std::vector<BidsElectrode> electrodes = BidsElectrode::read_tsv(path.electrodes_tsv_path().file_path());
+    QCOMPARE(electrodes.size(), std::size_t{4});
+    QCOMPARE(electrodes[0].x, std::string("0.1"));
+    QCOMPARE(electrodes[1].z, std::string("0.125"));
+    QCOMPARE(electrodes[2].x, std::string("n/a"));
+    QCOMPARE(BidsCoordinateSystem::read_json(path.coordsystem_json_path().file_path()).system, std::string("CapTrak"));
 
-    QFile sidecar(path.sidecarJsonPath().filePath());
-    QVERIFY(sidecar.open(QIODevice::ReadOnly));
-    const QJsonObject json = QJsonDocument::fromJson(sidecar.readAll()).object();
+    const BASELIB::JsonObject json = readJsonObject(path.sidecar_json_path().file_path());
     for (const char* key : {"ECOGChannelCount", "SEEGChannelCount", "DBSChannelCount", "EEGChannelCount", "EOGChannelCount",
                             "ECGChannelCount", "EMGChannelCount", "MiscChannelCount", "TriggerChannelCount"})
-        QVERIFY2(json.value(key).toInt() == 1, key);
-    QCOMPARE(json.value("RecordingDuration").toDouble(), 511.0 / 256.0);
-    QCOMPARE(json.value("RecordingType").toString(), QStringLiteral("epoched"));
-    QCOMPARE(json.value("ManufacturerModelName").toString(), QStringLiteral("A1"));
-    QCOMPARE(json.value("SoftwareVersions").toString(), QStringLiteral("1.0"));
-    QCOMPARE(json.value("PowerLineFrequency").toDouble(), 60.0);
+        QVERIFY2(json.value(key).to_int() == 1, key);
+    QCOMPARE(json.value("RecordingDuration").to_double(), 511.0 / 256.0);
+    QCOMPARE(json.value("RecordingType").to_std_string(), std::string("epoched"));
+    QCOMPARE(json.value("ManufacturerModelName").to_std_string(), std::string("A1"));
+    QCOMPARE(json.value("SoftwareVersions").to_std_string(), std::string("1.0"));
+    QCOMPARE(json.value("PowerLineFrequency").to_double(), 60.0);
 
     // Reading needs a complete path, an existing raw file of a known format that opens
-    QVERIFY(!BidsRawData::read(BIDSPath(QString(), "05", "01", "rest", "ieeg", "ieeg", ".vhdr")).isValid());
-    QVERIFY(!BidsRawData::read(BIDSPath(dir.path(), QString(), "01", "rest", "ieeg", "ieeg", ".vhdr")).isValid());
-    QVERIFY(!BidsRawData::read(BIDSPath(dir.path(), "05", "01", "rest", "ieeg", "ieeg", QString())).isValid());
-    QVERIFY(!BidsRawData::read(path).isValid());
-    const BIDSPath odd(dir.path(), "05", "01", "rest", "ieeg", "ieeg", ".xyz");
-    QVERIFY(QFile(odd.filePath()).open(QIODevice::WriteOnly));
-    QVERIFY(!BidsRawData::read(odd).isValid());
-    QVERIFY(QFile(path.filePath()).open(QIODevice::WriteOnly));
-    QVERIFY(!BidsRawData::read(path).isValid());
+    QVERIFY(!BidsRawData::read(BIDSPath({}, "05", "01", "rest", "ieeg", "ieeg", ".vhdr")).is_valid());
+    QVERIFY(!BidsRawData::read(BIDSPath(stdpath(dir.path()), {}, "01", "rest", "ieeg", "ieeg", ".vhdr")).is_valid());
+    QVERIFY(!BidsRawData::read(BIDSPath(stdpath(dir.path()), "05", "01", "rest", "ieeg", "ieeg", {})).is_valid());
+    QVERIFY(!BidsRawData::read(path).is_valid());
+    const BIDSPath odd(stdpath(dir.path()), "05", "01", "rest", "ieeg", "ieeg", ".xyz");
+    QVERIFY(BASELIB::write_text_file(odd.file_path(), {}).has_value());
+    QVERIFY(!BidsRawData::read(odd).is_valid());
+    QVERIFY(BASELIB::write_text_file(path.file_path(), {}).has_value());
+    QVERIFY(!BidsRawData::read(path).is_valid());
 
     // An EDF stored with an upper-case extension is found from the lower-case path
     const BIDSPath edfSrc(bidsRoot(), "02", "01", "rest", "eeg", "eeg", ".edf");
-    BIDSPath upper(dir.path(), "06", "01", "rest", "eeg", "eeg", ".EDF");
+    BIDSPath upper(stdpath(dir.path()), "06", "01", "rest", "eeg", "eeg", ".EDF");
     QVERIFY(upper.mkdirs());
-    QVERIFY(QFile::copy(edfSrc.filePath(), upper.filePath()));
+    QVERIFY(QFile::copy(edfSrc.file_path(), upper.file_path()));
     BIDSPath lower = upper;
-    lower.setExtension(".edf");
+    lower.set_extension(".edf");
     const BidsRawData found = BidsRawData::read(lower);
-    QVERIFY(found.isValid());
+    QVERIFY(found.is_valid());
     QCOMPARE(found.raw.info.nchan, 25);
 }
 
@@ -1066,40 +1087,40 @@ void TestBids::cleanupTestCase()
 void TestBids::testPathSettersGetters()
 {
     BIDSPath path;
-    path.setRoot("/tmp/bids");
-    path.setSubject("02");
-    path.setSession("03");
-    path.setTask("motor");
-    path.setAcquisition("acq01");
-    path.setRun("01");
-    path.setProcessing("sss");
-    path.setSpace("MNI");
-    path.setRecording("ecog");
-    path.setSplit("01");
-    path.setDescription("filtered");
-    path.setDatatype("meg");
-    path.setSuffix("meg");
-    path.setExtension(".fif");
+    path.set_root("/tmp/bids");
+    path.set_subject("02");
+    path.set_session("03");
+    path.set_task("motor");
+    path.set_acquisition("acq01");
+    path.set_run("01");
+    path.set_processing("sss");
+    path.set_space("MNI");
+    path.set_recording("ecog");
+    path.set_split("01");
+    path.set_description("filtered");
+    path.set_datatype("meg");
+    path.set_suffix("meg");
+    path.set_extension(".fif");
 
-    QCOMPARE(path.root(), QStringLiteral("/tmp/bids"));
-    QCOMPARE(path.subject(), QStringLiteral("02"));
-    QCOMPARE(path.session(), QStringLiteral("03"));
-    QCOMPARE(path.task(), QStringLiteral("motor"));
-    QCOMPARE(path.acquisition(), QStringLiteral("acq01"));
-    QCOMPARE(path.run(), QStringLiteral("01"));
-    QCOMPARE(path.processing(), QStringLiteral("sss"));
-    QCOMPARE(path.space(), QStringLiteral("MNI"));
-    QCOMPARE(path.recording(), QStringLiteral("ecog"));
-    QCOMPARE(path.split(), QStringLiteral("01"));
-    QCOMPARE(path.description(), QStringLiteral("filtered"));
-    QCOMPARE(path.datatype(), QStringLiteral("meg"));
-    QCOMPARE(path.suffix(), QStringLiteral("meg"));
-    QCOMPARE(path.extension(), QStringLiteral(".fif"));
+    QCOMPARE(path.root(), std::string("/tmp/bids"));
+    QCOMPARE(path.subject(), std::string("02"));
+    QCOMPARE(path.session(), std::string("03"));
+    QCOMPARE(path.task(), std::string("motor"));
+    QCOMPARE(path.acquisition(), std::string("acq01"));
+    QCOMPARE(path.run(), std::string("01"));
+    QCOMPARE(path.processing(), std::string("sss"));
+    QCOMPARE(path.space(), std::string("MNI"));
+    QCOMPARE(path.recording(), std::string("ecog"));
+    QCOMPARE(path.split(), std::string("01"));
+    QCOMPARE(path.description(), std::string("filtered"));
+    QCOMPARE(path.datatype(), std::string("meg"));
+    QCOMPARE(path.suffix(), std::string("meg"));
+    QCOMPARE(path.extension(), std::string(".fif"));
 
     // Reference values produced by mne_bids.BIDSPath(...).basename (mne-bids 0.17) with the same entities
     // (space CTF, check=False)
-    path.setSpace("CTF");
-    QCOMPARE(path.basename(), QStringLiteral("sub-02_ses-03_task-motor_acq-acq01_run-01_proc-sss_space-CTF_recording-ecog_split-01_desc-filtered_meg.fif"));
+    path.set_space("CTF");
+    QCOMPARE(path.basename(), std::string("sub-02_ses-03_task-motor_acq-acq01_run-01_proc-sss_space-CTF_recording-ecog_split-01_desc-filtered_meg.fif"));
 
     // match(): every set entity filters, unset ones match anything, files are found below the root
     QTemporaryDir dir;
@@ -1111,24 +1132,25 @@ void TestBids::testPathSettersGetters()
         QFile f(dir.filePath(file));
         QVERIFY(f.open(QIODevice::WriteOnly));
     }
-    const auto describe = [](const QList<BIDSPath>& paths) {
-        QStringList out;
+    const auto describe = [](const std::vector<BIDSPath>& paths) {
+        std::vector<std::string> out;
+        out.reserve(paths.size());
         for (const BIDSPath& p : paths) {
-            out << QStringList{p.subject(), p.session(), p.task(), p.run(), p.datatype(), p.suffix(), p.extension()}.join(u'|');
+            out.push_back(BASELIB::join({p.subject(), p.session(), p.task(), p.run(), p.datatype(), p.suffix(), p.extension()}, "|"));
         }
         return out;
     };
     // Expected: mne_bids.BIDSPath(root=..., **entities).match()
-    QCOMPARE(describe(BIDSPath(dir.path(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr").match()),
-             QStringList{"01|01|rest|01|ieeg|ieeg|.vhdr"});
-    QCOMPARE(describe(BIDSPath(dir.path(), "01", "01", QString(), "ieeg", "ieeg", ".vhdr").match()),
-             (QStringList{"01|01|motor||ieeg|ieeg|.vhdr", "01|01|rest|01|ieeg|ieeg|.vhdr"}));
-    QCOMPARE(describe(BIDSPath(dir.path(), QString(), QString(), "rest", "ieeg", "ieeg", ".vhdr").match()),
-             (QStringList{"01|01|rest|01|ieeg|ieeg|.vhdr", "02|01|rest||ieeg|ieeg|.vhdr"}));
+    QCOMPARE(describe(BIDSPath(stdpath(dir.path()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr").match()),
+             std::vector<std::string>{"01|01|rest|01|ieeg|ieeg|.vhdr"});
+    QCOMPARE(describe(BIDSPath(stdpath(dir.path()), "01", "01", {}, "ieeg", "ieeg", ".vhdr").match()),
+             (std::vector<std::string>{"01|01|motor||ieeg|ieeg|.vhdr", "01|01|rest|01|ieeg|ieeg|.vhdr"}));
+    QCOMPARE(describe(BIDSPath(stdpath(dir.path()), {}, {}, "rest", "ieeg", "ieeg", ".vhdr").match()),
+             (std::vector<std::string>{"01|01|rest|01|ieeg|ieeg|.vhdr", "02|01|rest||ieeg|ieeg|.vhdr"}));
 
     // Every entity is parsed back; names without a subject, with a suffix before the last part or
     // without an extension are no BIDS files, and a missing root has none
-    const QString entities = QStringLiteral("sub-03/meg/sub-03_task-x_acq-a_run-2_proc-sss_space-CTF_recording-r_split-01_desc-d_meg.fif");
+    const QString entities = "sub-03/meg/sub-03_task-x_acq-a_run-2_proc-sss_space-CTF_recording-r_split-01_desc-d_meg.fif";
     for (const QString& file : {entities, QStringLiteral("sub-03/meg/task-x_meg.fif"), QStringLiteral("sub-03/meg/sub-03_meg_task-x.fif"),
                                 QStringLiteral("sub-03/meg/README"), QStringLiteral("sub-03/meg/.hidden")}) {
         QVERIFY(QDir(dir.path()).mkpath(QFileInfo(file).path()));
@@ -1136,31 +1158,31 @@ void TestBids::testPathSettersGetters()
         QVERIFY(f.open(QIODevice::WriteOnly));
     }
     BIDSPath third;
-    third.setRoot(dir.path());
-    third.setSubject("03");
-    const QList<BIDSPath> found = third.match();
-    QCOMPARE(found.size(), 1);
-    QCOMPARE(found[0].filePath(), QDir(dir.path()).filePath(entities));
-    third.setRoot(dir.filePath("missing"));
-    QVERIFY(third.match().isEmpty());
-    QCOMPARE(BIDSPath().basename(), QString());
+    third.set_root(stdpath(dir.path()));
+    third.set_subject("03");
+    const std::vector<BIDSPath> found = third.match();
+    QCOMPARE(found.size(), std::size_t{1});
+    QCOMPARE(found[0].file_path(), stdpath(QDir(dir.path()).filePath(entities)));
+    third.set_root(stdpath(dir.filePath("missing")));
+    QVERIFY(third.match().empty());
+    QCOMPARE(BIDSPath().basename(), {});
 }
 
 //=============================================================================================================
 
 void TestBids::testPathValidation()
 {
-    QVERIFY(BIDSPath::isValidEntityValue("abc"));
-    QVERIFY(BIDSPath::isValidEntityValue("abc123"));
-    QVERIFY(BIDSPath::isValidEntityValue("")); // empty is valid per implementation
-    QVERIFY(!BIDSPath::isValidEntityValue("abc-def"));
-    QVERIFY(!BIDSPath::isValidEntityValue("abc_def"));
-    QVERIFY(!BIDSPath::isValidEntityValue("abc/def"));
+    QVERIFY(BIDSPath::is_valid_entity_value("abc"));
+    QVERIFY(BIDSPath::is_valid_entity_value("abc123"));
+    QVERIFY(BIDSPath::is_valid_entity_value("")); // empty is valid per implementation
+    QVERIFY(!BIDSPath::is_valid_entity_value("abc-def"));
+    QVERIFY(!BIDSPath::is_valid_entity_value("abc_def"));
+    QVERIFY(!BIDSPath::is_valid_entity_value("abc/def"));
     // BIDS labels are alphanumeric: anything else breaks the file name or the validator.
-    QVERIFY(!BIDSPath::isValidEntityValue("a b"));
-    QVERIFY(!BIDSPath::isValidEntityValue("a.b"));
-    QVERIFY(!BIDSPath::isValidEntityValue("a+b"));
-    QVERIFY(!BIDSPath::isValidEntityValue(QStringLiteral("\u00e4")));
+    QVERIFY(!BIDSPath::is_valid_entity_value("a b"));
+    QVERIFY(!BIDSPath::is_valid_entity_value("a.b"));
+    QVERIFY(!BIDSPath::is_valid_entity_value("a+b"));
+    QVERIFY(!BIDSPath::is_valid_entity_value("\xC3\xA4")); // UTF-8 a-umlaut
 }
 
 //=============================================================================================================

@@ -17,13 +17,9 @@
 #include "bids_dataset_description.h"
 #include <base/log.h>
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <base/byte_stream.h>
+#include <base/json.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -35,56 +31,46 @@ using namespace BIDSLIB;
 // STATIC METHODS
 //=============================================================================================================
 
-BidsDatasetDescription BidsDatasetDescription::read(const QString& sFilePath)
+BidsDatasetDescription BidsDatasetDescription::read(const std::filesystem::path& path)
 {
     BidsDatasetDescription desc;
 
-    QFile file(sFilePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BidsDatasetDescription::read] Cannot open {}", sFilePath.toStdString());
+    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(path);
+    if (!text) {
+        BASELIB::Log::warning("[BidsDatasetDescription::read] Cannot open {}", BASELIB::utf8FromPath(path));
         return desc;
     }
 
-    QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
-    file.close();
-
-    if (error.error != QJsonParseError::NoError) {
-        BASELIB::Log::warning("[BidsDatasetDescription::read] Parse error in {} : {}", sFilePath.toStdString(), error.errorString().toStdString());
+    BASELIB::JsonParseError error;
+    const BASELIB::JsonDocument doc = BASELIB::JsonDocument::from_json(*text, &error);
+    if (error.error != BASELIB::JsonParseError::NoError) {
+        BASELIB::Log::warning("[BidsDatasetDescription::read] Parse error in {} : {}", BASELIB::utf8FromPath(path), error.error_string());
         return desc;
     }
 
-    QJsonObject json = doc.object();
-    desc.name = json.value(QStringLiteral("Name")).toString();
-    desc.bidsVersion = json.value(QStringLiteral("BIDSVersion")).toString();
-    desc.datasetType = json.value(QStringLiteral("DatasetType")).toString();
-    desc.license = json.value(QStringLiteral("License")).toString();
+    const BASELIB::JsonObject& json = doc.object();
+    desc.name = json.value("Name").to_string();
+    desc.bidsVersion = json.value("BIDSVersion").to_string();
+    desc.datasetType = json.value("DatasetType").to_string();
+    desc.license = json.value("License").to_string();
 
     return desc;
 }
 
 //=============================================================================================================
 
-bool BidsDatasetDescription::write(const QString& sFilePath,
+bool BidsDatasetDescription::write(const std::filesystem::path& path,
                                    const BidsDatasetDescription& desc)
 {
-    QJsonObject json;
+    BASELIB::JsonObject json{{"Name", desc.name}, {"BIDSVersion", desc.bidsVersion}};
+    if (!desc.datasetType.empty())
+        json.insert("DatasetType", desc.datasetType);
+    if (!desc.license.empty())
+        json.insert("License", desc.license);
 
-    json[QStringLiteral("Name")] = desc.name;
-    json[QStringLiteral("BIDSVersion")] = desc.bidsVersion;
-
-    if (!desc.datasetType.isEmpty())
-        json[QStringLiteral("DatasetType")] = desc.datasetType;
-    if (!desc.license.isEmpty())
-        json[QStringLiteral("License")] = desc.license;
-
-    QFile file(sFilePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BidsDatasetDescription::write] Cannot open {} for writing", sFilePath.toStdString());
+    if (!BASELIB::write_text_file(path, BASELIB::JsonDocument(std::move(json)).to_json())) {
+        BASELIB::Log::warning("[BidsDatasetDescription::write] Cannot open {} for writing", BASELIB::utf8FromPath(path));
         return false;
     }
-
-    file.write(QJsonDocument(json).toJson(QJsonDocument::Indented));
-    file.close();
     return true;
 }

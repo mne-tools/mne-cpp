@@ -13,8 +13,8 @@
  * ship a sibling @c _channels.tsv with one row per channel describing
  * @c name, @c type and @c units (REQUIRED) plus optional sampling /
  * filter / status / description columns. @ref BIDSLIB::BidsChannel is the in-memory
- * row record and the static @ref BIDSLIB::BidsChannel::readTsv "BidsChannel::readTsv" /
- * @ref BIDSLIB::BidsChannel::writeTsv "BidsChannel::writeTsv" functions perform the TSV round-trip via
+ * row record and the static @ref BIDSLIB::BidsChannel::read_tsv "BidsChannel::read_tsv" /
+ * @ref BIDSLIB::BidsChannel::write_tsv "BidsChannel::write_tsv" functions perform the TSV round-trip via
  * @ref BIDSLIB::BidsTsv. The BIDS channel-type vocabulary (@c MEGMAG, @c EEG,
  * @c ECOG, @c SEEG, @c DBS, @c TRIG, …) maps to FIFF channel kinds
  * through the tables in @ref bids_const.h, so a channel record read
@@ -34,11 +34,13 @@
 #include "bids_global.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QList>
+#include <filesystem>
+#include <span>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -55,31 +57,31 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsChannel
 {
-    QString name;         /**< Channel name (REQUIRED). */
-    QString type;         /**< BIDS channel type: EEG, ECOG, SEEG, DBS, TRIG, etc. (REQUIRED). */
-    QString units;        /**< Unit of measurement: V, uV, mV (REQUIRED). */
-    QString samplingFreq; /**< Sampling frequency in Hz (OPTIONAL). */
-    QString lowCutoff;    /**< High-pass cutoff frequency in Hz (OPTIONAL). */
-    QString highCutoff;   /**< Low-pass cutoff frequency in Hz (OPTIONAL). */
-    QString notch;        /**< Notch filter frequency in Hz (OPTIONAL). */
-    QString status;       /**< "good" or "bad" (OPTIONAL). */
-    QString description;  /**< Free-text description (OPTIONAL). */
+    std::string name;         /**< Channel name (REQUIRED). */
+    std::string type;         /**< BIDS channel type: EEG, ECOG, SEEG, DBS, TRIG, etc. (REQUIRED). */
+    std::string units;        /**< Unit of measurement: V, uV, mV (REQUIRED). */
+    std::string samplingFreq; /**< Sampling frequency in Hz (OPTIONAL). */
+    std::string lowCutoff;    /**< High-pass cutoff frequency in Hz (OPTIONAL). */
+    std::string highCutoff;   /**< Low-pass cutoff frequency in Hz (OPTIONAL). */
+    std::string notch;        /**< Notch filter frequency in Hz (OPTIONAL). */
+    std::string status;       /**< "good" or "bad" (OPTIONAL). */
+    std::string description;  /**< Free-text description (OPTIONAL). */
 
     /**
      * @brief Read a BIDS *_channels.tsv file.
-     * @param[in] sFilePath  Path to the channels.tsv file.
+     * @param[in] path       Path to the channels.tsv file.
      * @return List of channel records.
      */
-    static QList<BidsChannel> readTsv(const QString& sFilePath);
+    static std::vector<BidsChannel> read_tsv(const std::filesystem::path& path);
 
     /**
      * @brief Write a BIDS *_channels.tsv file.
-     * @param[in] sFilePath  Output path.
+     * @param[in] path       Output path.
      * @param[in] channels   List of channel records.
      * @return true on success.
      */
-    static bool writeTsv(const QString& sFilePath,
-                         const QList<BidsChannel>& channels);
+    static bool write_tsv(const std::filesystem::path& path,
+                          std::span<const BidsChannel> channels);
 };
 
 } // namespace BIDSLIB

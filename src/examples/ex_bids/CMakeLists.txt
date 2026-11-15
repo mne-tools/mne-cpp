@@ -17,6 +17,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::Core
+  mne_base
   mne_bids
   Eigen3::Eigen
 )

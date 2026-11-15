@@ -14,7 +14,7 @@
  * by single literal tabs, missing values are encoded as the three-byte
  * string @c n/a, and the file MUST be UTF-8 encoded with LF (no CR)
  * line terminators. @ref BIDSLIB::BidsTsv implements that dialect once via
- * @ref BIDSLIB::BidsTsv::readTsv "BidsTsv::readTsv" / @ref BIDSLIB::BidsTsv::writeTsv "BidsTsv::writeTsv" so the domain-specific
+ * @ref BIDSLIB::BidsTsv::read_tsv "BidsTsv::read_tsv" / @ref BIDSLIB::BidsTsv::write_tsv "BidsTsv::write_tsv" so the domain-specific
  * wrappers @ref BIDSLIB::BidsChannel, @ref BIDSLIB::BidsElectrode and @ref BIDSLIB::BidsEvent do
  * not each re-derive it. Rows are returned as ordered
  * column-name → value maps (@ref BIDSLIB::BidsTsvRow "BidsTsvRow"), preserving the header
@@ -31,14 +31,16 @@
 #include "bids_global.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QString>
-#include <QStringList>
-#include <QList>
-#include <QMap>
+#include <filesystem>
+#include <functional>
+#include <map>
+#include <span>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -51,7 +53,7 @@ namespace BIDSLIB
 /**
  * Represents a single row of a BIDS TSV file as a column-name → value map.
  */
-using BidsTsvRow = QMap<QString, QString>;
+using BidsTsvRow = std::map<std::string, std::string, std::less<>>;
 
 //=============================================================================================================
 /**
@@ -72,30 +74,35 @@ using BidsTsvRow = QMap<QString, QString>;
 class BIDSSHARED_EXPORT BidsTsv
 {
 public:
-    BidsTsv();
-    ~BidsTsv();
-
     /**
      * Reads a TSV file into an ordered list of row maps.
      *
-     * @param[in] sFilePath  Path to the TSV file.
-     * @param[out] headers   Column names from the header row.
-     * @return List of rows, each row a map of column-name → value.
+     * @param[in] path      Path to the TSV file.
+     * @param[out] headers  Column names from the header row.
+     * @return List of rows, each row a map of column-name → value; empty if the file cannot be read.
      */
-    static QList<BidsTsvRow> readTsv(const QString& sFilePath,
-                                     QStringList& headers);
+    static std::vector<BidsTsvRow> read_tsv(const std::filesystem::path& path,
+                                            std::vector<std::string>& headers);
 
     /**
-     * Writes rows to a TSV file.
+     * Writes rows to a TSV file, writing "n/a" for empty and missing values.
      *
-     * @param[in] sFilePath  Output file path.
-     * @param[in] headers    Column names (determines column order).
-     * @param[in] rows       Data rows.
+     * @param[in] path     Output file path.
+     * @param[in] headers  Column names (determines column order).
+     * @param[in] rows     Data rows.
      * @return true on success, false on I/O error.
      */
-    static bool writeTsv(const QString& sFilePath,
-                         const QStringList& headers,
-                         const QList<BidsTsvRow>& rows);
+    static bool write_tsv(const std::filesystem::path& path,
+                          std::span<const std::string> headers,
+                          std::span<const BidsTsvRow> rows);
+
+    /**
+     * @param[in] row        A row.
+     * @param[in] column     Column name.
+     * @param[in] fallback   Value if the row has no such column.
+     * @return The value of @p column, valid while @p row is unchanged.
+     */
+    static std::string_view value(const BidsTsvRow& row, std::string_view column, std::string_view fallback = {});
 };
 
 } // namespace BIDSLIB

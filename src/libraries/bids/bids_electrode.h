@@ -16,7 +16,7 @@
  * @c _coordsystem.json (see @ref BIDSLIB::BidsCoordinateSystem) using the unit
  * declared there.
  *
- * @ref BIDSLIB::BidsElectrode::toFiffDigPoints "BidsElectrode::toFiffDigPoints" converts a list of records into a
+ * @ref BIDSLIB::BidsElectrode::to_fiff_dig_points "BidsElectrode::to_fiff_dig_points" converts a list of records into a
  * @c FIFFLIB::FiffDigPointSet of EEG digitizer points so the rest of
  * MNE-CPP — channel registration, forward modelling, 3-D rendering —
  * can consume BIDS electrodes through the same interface it uses for
@@ -46,11 +46,13 @@
 #include <fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QList>
+#include <filesystem>
+#include <span>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -67,32 +69,32 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsElectrode
 {
-    QString name;      /**< Electrode name (REQUIRED). */
-    QString x;         /**< X coordinate or "n/a" (REQUIRED). */
-    QString y;         /**< Y coordinate or "n/a" (REQUIRED). */
-    QString z;         /**< Z coordinate or "n/a" (REQUIRED). */
-    QString size;      /**< Electrode size in mm or "n/a" (RECOMMENDED for iEEG). */
-    QString type;      /**< Electrode type: "depth", "strip", "grid" (OPTIONAL). */
-    QString material;  /**< Electrode material (OPTIONAL). */
-    QString impedance; /**< Impedance value or "n/a" (OPTIONAL). */
-    QString group;     /**< iEEG: lead (shaft, strip or grid) the contact belongs to (OPTIONAL). */
-    QString dimension; /**< iEEG: shape of that group, e.g. "[1x8]" (OPTIONAL). */
+    std::string name;      /**< Electrode name (REQUIRED). */
+    std::string x;         /**< X coordinate or "n/a" (REQUIRED). */
+    std::string y;         /**< Y coordinate or "n/a" (REQUIRED). */
+    std::string z;         /**< Z coordinate or "n/a" (REQUIRED). */
+    std::string size;      /**< Electrode size in mm or "n/a" (RECOMMENDED for iEEG). */
+    std::string type;      /**< Electrode type: "depth", "strip", "grid" (OPTIONAL). */
+    std::string material;  /**< Electrode material (OPTIONAL). */
+    std::string impedance; /**< Impedance value or "n/a" (OPTIONAL). */
+    std::string group;     /**< iEEG: lead (shaft, strip or grid) the contact belongs to (OPTIONAL). */
+    std::string dimension; /**< iEEG: shape of that group, e.g. "[1x8]" (OPTIONAL). */
 
     /**
      * @brief Read a BIDS *_electrodes.tsv file.
-     * @param[in] sFilePath  Path to the electrodes.tsv file.
+     * @param[in] path       Path to the electrodes.tsv file.
      * @return List of electrode records.
      */
-    static QList<BidsElectrode> readTsv(const QString& sFilePath);
+    static std::vector<BidsElectrode> read_tsv(const std::filesystem::path& path);
 
     /**
      * @brief Write a BIDS *_electrodes.tsv file.
-     * @param[in] sFilePath    Output path.
+     * @param[in] path         Output path.
      * @param[in] electrodes   List of electrode records.
      * @return true on success.
      */
-    static bool writeTsv(const QString& sFilePath,
-                         const QList<BidsElectrode>& electrodes);
+    static bool write_tsv(const std::filesystem::path& path,
+                          std::span<const BidsElectrode> electrodes);
 
     /**
      * @brief Convert a list of BIDS electrodes to a FIFF digitizer point set.
@@ -110,8 +112,8 @@ struct BIDSSHARED_EXPORT BidsElectrode
      *                          Pass a default-constructed FiffCoordTrans to skip.
      * @return FiffDigPointSet with one point per valid electrode.
      */
-    static FIFFLIB::FiffDigPointSet toFiffDigPoints(
-        const QList<BidsElectrode>& electrodes,
+    static FIFFLIB::FiffDigPointSet to_fiff_dig_points(
+        std::span<const BidsElectrode> electrodes,
         const FIFFLIB::FiffCoordTrans& trans = FIFFLIB::FiffCoordTrans());
 };
 

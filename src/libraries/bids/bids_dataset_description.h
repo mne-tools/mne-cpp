@@ -18,7 +18,7 @@
  * @c License); additional recommended/optional fields can be added
  * without breaking the JSON-pass-through wire format.
  *
- * I/O goes through Qt's JSON facilities; missing required fields fall
+ * I/O goes through BASELIB::JsonDocument; missing required fields fall
  * back to safe defaults (BIDS version pinned to the spec version this
  * library was tested against) so a partially-populated dataset still
  * round-trips.
@@ -36,10 +36,11 @@
 #include "bids_global.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include <filesystem>
+#include <string>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -59,25 +60,25 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsDatasetDescription
 {
-    QString name;        /**< Human-readable dataset name (REQUIRED). */
-    QString bidsVersion; /**< BIDS specification version, e.g. "1.9.0" (REQUIRED). */
-    QString datasetType; /**< "raw" or "derivative" (RECOMMENDED). */
-    QString license;     /**< License identifier (RECOMMENDED). */
+    std::string name;        /**< Human-readable dataset name (REQUIRED). */
+    std::string bidsVersion; /**< BIDS specification version, e.g. "1.9.0" (REQUIRED). */
+    std::string datasetType; /**< "raw" or "derivative" (RECOMMENDED). */
+    std::string license;     /**< License identifier (RECOMMENDED). */
 
     /**
      * @brief Read a dataset_description.json file.
-     * @param[in] sFilePath  Path to dataset_description.json.
+     * @param[in] path       Path to dataset_description.json.
      * @return Populated description, or default if file cannot be read.
      */
-    static BidsDatasetDescription read(const QString& sFilePath);
+    static BidsDatasetDescription read(const std::filesystem::path& path);
 
     /**
      * @brief Write a dataset_description.json file.
-     * @param[in] sFilePath  Output path.
+     * @param[in] path       Output path.
      * @param[in] desc       Dataset description to write.
      * @return true on success.
      */
-    static bool write(const QString& sFilePath,
+    static bool write(const std::filesystem::path& path,
                       const BidsDatasetDescription& desc);
 };
 

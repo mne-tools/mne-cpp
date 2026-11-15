@@ -15,14 +15,14 @@
  * @c proc, @c space, @c rec, @c split, @c desc, then a `_<suffix>`
  * and a `.<ext>`). @ref BIDSLIB::BIDSPath is the value object that encodes
  * those entities and emits canonical paths via @ref BIDSLIB::BIDSPath::basename "BIDSPath::basename",
- * @ref BIDSLIB::BIDSPath::directory "BIDSPath::directory" and @ref BIDSLIB::BIDSPath::filePath "BIDSPath::filePath", mirroring the
+ * @ref BIDSLIB::BIDSPath::directory "BIDSPath::directory" and @ref BIDSLIB::BIDSPath::file_path "BIDSPath::file_path", mirroring the
  * API of @c mne_bids.BIDSPath in mne-python so call sites can be
  * ported with minimal cognitive overhead.
  *
  * Beyond serialisation, @ref BIDSLIB::BIDSPath provides three orthogonal
- * conveniences: @ref BIDSLIB::BIDSPath::withSuffix "BIDSPath::withSuffix" and the dedicated
- * @c channelsTsvPath / @c electrodesTsvPath / @c coordsystemJsonPath /
- * @c eventsTsvPath / @c sidecarJsonPath helpers so a single
+ * conveniences: @ref BIDSLIB::BIDSPath::with_suffix "BIDSPath::with_suffix" and the dedicated
+ * @c channels_tsv_path / @c electrodes_tsv_path / @c coordsystem_json_path /
+ * @c events_tsv_path / @c sidecar_json_path helpers so a single
  * @ref BIDSLIB::BIDSPath instance can spawn every sidecar derived from a raw-data
  * BIDSPath; @ref BIDSLIB::BIDSPath::mkdirs "BIDSPath::mkdirs" to materialise the directory
  * hierarchy lazily on write; and @ref BIDSLIB::BIDSPath::match "BIDSPath::match" to enumerate
@@ -43,13 +43,13 @@
 #include "bids_global.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QString>
-#include <QMap>
-#include <QDir>
+#include <filesystem>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -77,7 +77,7 @@ public:
     /**
      * Constructs an empty BIDSPath.
      */
-    BIDSPath();
+    BIDSPath() = default;
 
     //=========================================================================================================
     /**
@@ -91,27 +91,13 @@ public:
      * @param[in] sSuffix     Filename suffix (e.g. "ieeg", "channels", "electrodes").
      * @param[in] sExtension  File extension including dot (e.g. ".vhdr", ".tsv", ".json").
      */
-    BIDSPath(const QString& sRoot,
-             const QString& sSubject,
-             const QString& sSession = QString(),
-             const QString& sTask = QString(),
-             const QString& sDatatype = QString(),
-             const QString& sSuffix = QString(),
-             const QString& sExtension = QString());
-
-    //=========================================================================================================
-    /**
-     * Copy constructor.
-     *
-     * @param[in] other BIDSPath to copy.
-     */
-    BIDSPath(const BIDSPath& other);
-
-    //=========================================================================================================
-    /**
-     * Destructor.
-     */
-    ~BIDSPath();
+    BIDSPath(std::filesystem::path sRoot,
+             std::string sSubject,
+             std::string sSession = {},
+             std::string sTask = {},
+             std::string sDatatype = {},
+             std::string sSuffix = {},
+             std::string sExtension = {});
 
     //=========================================================================================================
     // Entity setters
@@ -122,131 +108,131 @@ public:
      *
      * @param[in] sRoot Root directory of the BIDS dataset.
      */
-    void setRoot(const QString& sRoot);
+    void set_root(std::filesystem::path sRoot);
 
     /**
      * Set the subject label (without "sub-" prefix).
      *
      * @param[in] sSubject Subject label without the "sub-" prefix.
      */
-    void setSubject(const QString& sSubject);
+    void set_subject(std::string sSubject);
 
     /**
      * Set the session label (without "ses-" prefix).
      *
      * @param[in] sSession Session label without the "ses-" prefix; empty to omit the entity.
      */
-    void setSession(const QString& sSession);
+    void set_session(std::string sSession);
 
     /**
      * Set the task label.
      *
      * @param[in] sTask Task label; empty to omit the entity.
      */
-    void setTask(const QString& sTask);
+    void set_task(std::string sTask);
 
     /**
      * Set the acquisition label.
      *
      * @param[in] sAcquisition Acquisition label; empty to omit the entity.
      */
-    void setAcquisition(const QString& sAcquisition);
+    void set_acquisition(std::string sAcquisition);
 
     /**
      * Set the run index (will be zero-padded to 2 digits).
      *
      * @param[in] sRun Run index as a numeric string (e.g. "1" becomes "01"); empty to omit the entity.
      */
-    void setRun(const QString& sRun);
+    void set_run(std::string sRun);
 
     /**
      * Set the processing label.
      *
      * @param[in] sProcessing Processing label; empty to omit the entity.
      */
-    void setProcessing(const QString& sProcessing);
+    void set_processing(std::string sProcessing);
 
     /**
      * Set the space label.
      *
      * @param[in] sSpace Space label (e.g. a coordinate system name); empty to omit the entity.
      */
-    void setSpace(const QString& sSpace);
+    void set_space(std::string sSpace);
 
     /**
      * Set the recording label.
      *
      * @param[in] sRecording Recording label; empty to omit the entity.
      */
-    void setRecording(const QString& sRecording);
+    void set_recording(std::string sRecording);
 
     /**
      * Set the split index.
      *
      * @param[in] sSplit Split index as a numeric string, zero-padded to 2 digits; empty to omit the entity.
      */
-    void setSplit(const QString& sSplit);
+    void set_split(std::string sSplit);
 
     /**
      * Set the description label.
      *
      * @param[in] sDescription Description label; empty to omit the entity.
      */
-    void setDescription(const QString& sDescription);
+    void set_description(std::string sDescription);
 
     /**
      * Set the BIDS datatype (e.g. "ieeg", "eeg", "meg", "anat").
      *
      * @param[in] sDatatype BIDS datatype, used as the innermost directory name.
      */
-    void setDatatype(const QString& sDatatype);
+    void set_datatype(std::string sDatatype);
 
     /**
      * Set the filename suffix (e.g. "ieeg", "channels", "electrodes", "coordsystem").
      *
      * @param[in] sSuffix Filename suffix appended after the entities.
      */
-    void setSuffix(const QString& sSuffix);
+    void set_suffix(std::string sSuffix);
 
     /**
      * Set the file extension including dot (e.g. ".vhdr", ".tsv", ".json").
      *
      * @param[in] sExtension File extension including the leading dot.
      */
-    void setExtension(const QString& sExtension);
+    void set_extension(std::string sExtension);
 
     //=========================================================================================================
     // Entity getters
     //=========================================================================================================
 
-    /** @return Root directory of the BIDS dataset, or an empty string if unset. */
-    QString root() const; /**< BIDS dataset root path. */
+    /** @return Root directory of the BIDS dataset, or an empty path if unset. */
+    const std::filesystem::path& root() const;
     /** @return Subject label without the "sub-" prefix, or an empty string if unset. */
-    QString subject() const; /**< Subject label (without "sub-"). */
+    const std::string& subject() const;
     /** @return Session label without the "ses-" prefix, or an empty string if unset. */
-    QString session() const; /**< Session label (without "ses-"). */
+    const std::string& session() const;
     /** @return Task label, or an empty string if unset. */
-    QString task() const; /**< Task label. */
+    const std::string& task() const;
     /** @return Acquisition label, or an empty string if unset. */
-    QString acquisition() const; /**< Acquisition label. */
+    const std::string& acquisition() const;
     /** @return Zero-padded run index, or an empty string if unset. */
-    QString run() const; /**< Run index. */
+    const std::string& run() const;
     /** @return Processing label, or an empty string if unset. */
-    QString processing() const; /**< Processing label. */
+    const std::string& processing() const;
     /** @return Space label, or an empty string if unset. */
-    QString space() const; /**< Space label. */
+    const std::string& space() const;
     /** @return Recording label, or an empty string if unset. */
-    QString recording() const; /**< Recording label. */
+    const std::string& recording() const;
     /** @return Zero-padded split index, or an empty string if unset. */
-    QString split() const; /**< Split index. */
+    const std::string& split() const;
     /** @return Description label, or an empty string if unset. */
-    QString description() const; /**< Description label. */
+    const std::string& description() const;
     /** @return BIDS datatype (e.g. "ieeg"), or an empty string if unset. */
-    QString datatype() const; /**< BIDS datatype string. */
+    const std::string& datatype() const;
     /** @return Filename suffix, or an empty string if unset. */
-    QString suffix() const; /**< Filename suffix. */
+    const std::string& suffix() const;
     /** @return File extension including the leading dot, or an empty string if unset. */
-    QString extension() const; /**< File extension. */
+    const std::string& extension() const;
 
     //=========================================================================================================
     // Path construction
@@ -261,23 +247,23 @@ public:
      *
      * @return The BIDS filename.
      */
-    QString basename() const;
+    std::string basename() const;
 
     /**
      * Constructs the directory path for this entity combination.
      *
      * Format: `<root>/sub-<label>[/ses-<label>]/<datatype>/`
      *
-     * @return The BIDS directory path (with trailing separator).
+     * @return The BIDS directory path.
      */
-    QString directory() const;
+    std::filesystem::path directory() const;
 
     /**
-     * Constructs the full file path: directory() + basename().
+     * Constructs the full file path: directory() / basename().
      *
      * @return The complete file path.
      */
-    QString filePath() const;
+    std::filesystem::path file_path() const;
 
     //=========================================================================================================
     // Convenience methods
@@ -291,41 +277,41 @@ public:
      * @param[in] sExtension  New extension (e.g. ".tsv", ".json").
      * @return A new BIDSPath with the updated suffix and extension.
      */
-    BIDSPath withSuffix(const QString& sSuffix, const QString& sExtension) const;
+    BIDSPath with_suffix(std::string sSuffix, std::string sExtension) const;
 
     /**
      * Returns the path for the channels.tsv sidecar.
      * @return BIDSPath pointing to the *_channels.tsv file.
      */
-    BIDSPath channelsTsvPath() const;
+    BIDSPath channels_tsv_path() const;
 
     /**
      * Returns the path for the electrodes.tsv sidecar.
      * @return BIDSPath pointing to the *_electrodes.tsv file.
      */
-    BIDSPath electrodesTsvPath() const;
+    BIDSPath electrodes_tsv_path() const;
 
     /**
      * Returns the path for the coordsystem.json sidecar.
      * @return BIDSPath pointing to the *_coordsystem.json file.
      */
-    BIDSPath coordsystemJsonPath() const;
+    BIDSPath coordsystem_json_path() const;
 
     /**
      * Returns the path for the events.tsv sidecar.
      * @return BIDSPath pointing to the *_events.tsv file.
      */
-    BIDSPath eventsTsvPath() const;
+    BIDSPath events_tsv_path() const;
 
     /**
      * Returns the path for the sidecar JSON metadata file
      * (e.g. *_ieeg.json, *_eeg.json).
      * @return BIDSPath pointing to the sidecar JSON file.
      */
-    BIDSPath sidecarJsonPath() const;
+    BIDSPath sidecar_json_path() const;
 
     /**
-     * Checks whether the file at filePath() exists on disk.
+     * Checks whether the file at file_path() exists on disk.
      * @return true if the file exists.
      */
     bool exists() const;
@@ -342,7 +328,7 @@ public:
      *
      * @return Matching paths, sorted by file path.
      */
-    QList<BIDSPath> match() const;
+    std::vector<BIDSPath> match() const;
 
     //=========================================================================================================
     // Validation
@@ -353,56 +339,42 @@ public:
      * @param[in] sValue Entity value to validate.
      * @return true if the value is valid.
      */
-    static bool isValidEntityValue(const QString& sValue);
+    static bool is_valid_entity_value(std::string_view sValue);
 
     //=========================================================================================================
     // Operators
     //=========================================================================================================
 
-    BIDSPath& operator=(const BIDSPath& other);
-    friend bool operator==(const BIDSPath& a, const BIDSPath& b);
+    /**
+     * @param[in] other   Another path.
+     * @return Whether both paths have the same root, entities, datatype, suffix and extension.
+     */
+    bool operator==(const BIDSPath& other) const = default;
 
 private:
-    QString m_sRoot;        /**< BIDS dataset root directory. */
-    QString m_sSubject;     /**< Subject label. */
-    QString m_sSession;     /**< Session label. */
-    QString m_sTask;        /**< Task label. */
-    QString m_sAcquisition; /**< Acquisition label. */
-    QString m_sRun;         /**< Run index. */
-    QString m_sProcessing;  /**< Processing label. */
-    QString m_sSpace;       /**< Space label. */
-    QString m_sRecording;   /**< Recording label. */
-    QString m_sSplit;       /**< Split index. */
-    QString m_sDescription; /**< Description label. */
-    QString m_sDatatype;    /**< BIDS datatype (ieeg, eeg, meg, anat, ...). */
-    QString m_sSuffix;      /**< Filename suffix. */
-    QString m_sExtension;   /**< File extension (with dot). */
+    std::filesystem::path m_sRoot; /**< BIDS dataset root directory. */
+    std::string m_sSubject;        /**< Subject label. */
+    std::string m_sSession;        /**< Session label. */
+    std::string m_sTask;           /**< Task label. */
+    std::string m_sAcquisition;    /**< Acquisition label. */
+    std::string m_sRun;            /**< Run index. */
+    std::string m_sProcessing;     /**< Processing label. */
+    std::string m_sSpace;          /**< Space label. */
+    std::string m_sRecording;      /**< Recording label. */
+    std::string m_sSplit;          /**< Split index. */
+    std::string m_sDescription;    /**< Description label. */
+    std::string m_sDatatype;       /**< BIDS datatype (ieeg, eeg, meg, anat, ...). */
+    std::string m_sSuffix;         /**< Filename suffix. */
+    std::string m_sExtension;      /**< File extension (with dot). */
 
     /**
      * Zero-pads a numeric string to at least 2 characters.
+     *
+     * @param[in] sValue   A label.
+     * @return @p sValue, padded with leading zeros if it is a number.
      */
-    static QString zeroPad(const QString& sValue);
+    static std::string zero_pad(std::string sValue);
 };
-
-//=============================================================================================================
-
-inline bool operator==(const BIDSPath& a, const BIDSPath& b)
-{
-    return a.root() == b.root() &&
-        a.subject() == b.subject() &&
-        a.session() == b.session() &&
-        a.task() == b.task() &&
-        a.acquisition() == b.acquisition() &&
-        a.run() == b.run() &&
-        a.processing() == b.processing() &&
-        a.space() == b.space() &&
-        a.recording() == b.recording() &&
-        a.split() == b.split() &&
-        a.description() == b.description() &&
-        a.datatype() == b.datatype() &&
-        a.suffix() == b.suffix() &&
-        a.extension() == b.extension();
-}
 
 } // namespace BIDSLIB
 

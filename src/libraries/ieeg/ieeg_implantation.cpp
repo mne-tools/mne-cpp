@@ -21,12 +21,6 @@
 #include <base/string_utils.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QString>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
@@ -118,9 +112,9 @@ std::optional<std::pair<int, int>> parseDimension(std::string_view text)
     return std::make_pair(*rows, *cols);
 }
 
-std::optional<float> toCoordinate(const QString& text)
+std::optional<float> toCoordinate(std::string_view text)
 {
-    const std::optional<double> value = BASELIB::toDouble(BASELIB::trimmed(text.toStdString()));
+    const std::optional<double> value = BASELIB::toDouble(BASELIB::trimmed(text));
     if (!value || !std::isfinite(static_cast<float>(*value)))
         return std::nullopt;
     return static_cast<float>(*value);
@@ -207,8 +201,8 @@ IeegImplantation IeegImplantation::readBids(const std::string& electrodesTsv, st
         setError(error, "no *_coordsystem.json next to " + electrodesTsv + ", so the units are unknown");
         return {};
     }
-    const BIDSLIB::BidsCoordinateSystem coordSystem = BIDSLIB::BidsCoordinateSystem::readJson(QString::fromStdString(coordPath));
-    const std::string units = coordSystem.units.toStdString();
+    const BIDSLIB::BidsCoordinateSystem coordSystem = BIDSLIB::BidsCoordinateSystem::read_json(BASELIB::pathFromUtf8(coordPath));
+    const std::string& units = coordSystem.units;
     const float scale = units == "m" ? 1.0f
         : units == "cm"              ? 0.01f
         : units == "mm"              ? 0.001f
@@ -221,22 +215,22 @@ IeegImplantation IeegImplantation::readBids(const std::string& electrodesTsv, st
     std::vector<IeegContact> contacts;
     std::unordered_map<std::string, std::string> declaredTypes;
     std::unordered_map<std::string, std::string> declaredDimensions;
-    for (const BIDSLIB::BidsElectrode& e : BIDSLIB::BidsElectrode::readTsv(QString::fromStdString(electrodesTsv))) {
+    for (const BIDSLIB::BidsElectrode& e : BIDSLIB::BidsElectrode::read_tsv(BASELIB::pathFromUtf8(electrodesTsv))) {
         const std::optional<float> x = toCoordinate(e.x);
         const std::optional<float> y = toCoordinate(e.y);
         const std::optional<float> z = toCoordinate(e.z);
         if (!x || !y || !z)
             continue;
         IeegContact contact;
-        contact.name = e.name.toStdString();
+        contact.name = e.name;
         contact.position = Eigen::Vector3f(*x, *y, *z) * scale;
-        contact.lead = e.group.toStdString();
+        contact.lead = e.group;
         // Declarations are per lead; contacts without a group take their lead from the name later
         const std::string key = contact.lead.empty() ? contact.name : contact.lead;
-        if (!e.type.isEmpty())
-            declaredTypes.insert_or_assign(key, BASELIB::toLower(e.type.toStdString()));
-        if (!e.dimension.isEmpty())
-            declaredDimensions.insert_or_assign(key, e.dimension.toStdString());
+        if (!e.type.empty())
+            declaredTypes.insert_or_assign(key, BASELIB::toLower(e.type));
+        if (!e.dimension.empty())
+            declaredDimensions.insert_or_assign(key, e.dimension);
         contacts.push_back(std::move(contact));
     }
     if (contacts.empty()) {
@@ -248,7 +242,7 @@ IeegImplantation IeegImplantation::readBids(const std::string& electrodesTsv, st
         const auto it = map.find(key);
         return it == map.end() ? std::string() : it->second;
     };
-    IeegImplantation implantation(contacts, coordSystem.system.toStdString());
+    IeegImplantation implantation(contacts, coordSystem.system);
     for (std::size_t l = 0; l < implantation.m_leads.size(); ++l) {
         const IeegLead lead = implantation.m_leads[l];
         // A declaration on any contact of the lead applies to the lead

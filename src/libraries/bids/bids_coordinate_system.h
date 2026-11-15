@@ -19,7 +19,7 @@
  * plus the recommended free-text description / processing-description /
  * @c IntendedFor pointer.
  *
- * @ref BIDSLIB::BidsCoordinateSystem::toFiffCoordTrans "BidsCoordinateSystem::toFiffCoordTrans" bridges the parsed affine
+ * @ref BIDSLIB::BidsCoordinateSystem::to_fiff_coord_trans "BidsCoordinateSystem::to_fiff_coord_trans" bridges the parsed affine
  * into a @c FIFFLIB::FiffCoordTrans so downstream MNE-CPP code (forward
  * solution, source localisation, visualisation) can treat a BIDS
  * dataset's coordinate metadata exactly like a FIFF MRI↔head transform.
@@ -47,10 +47,12 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
+#include <filesystem>
+#include <string>
+#include <string_view>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -69,30 +71,30 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsCoordinateSystem
 {
-    QString system;                /**< e.g. "ACPC", "MNI305", "Other" (REQUIRED for iEEG). */
-    QString units;                 /**< "m", "mm", or "cm" (REQUIRED for iEEG). */
-    QString description;           /**< Description of the coordinate system (RECOMMENDED). */
-    QString processingDescription; /**< How coordinates were obtained (RECOMMENDED). */
-    QString associatedImagePath;   /**< Relative path to associated T1w image (OPTIONAL). */
-    Eigen::Matrix4d transform;     /**< 4x4 affine transform (identity if not provided). */
+    std::string system;                /**< e.g. "ACPC", "MNI305", "Other" (REQUIRED for iEEG). */
+    std::string units;                 /**< "m", "mm", or "cm" (REQUIRED for iEEG). */
+    std::string description;           /**< Description of the coordinate system (RECOMMENDED). */
+    std::string processingDescription; /**< How coordinates were obtained (RECOMMENDED). */
+    std::string associatedImagePath;   /**< Relative path to associated T1w image (OPTIONAL). */
+    Eigen::Matrix4d transform;         /**< 4x4 affine transform (identity if not provided). */
 
     /**
      * @brief Read a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Path to the coordsystem.json file.
+     * @param[in] path       Path to the coordsystem.json file.
      * @return Populated coordinate system, or default if file cannot be read.
      */
-    static BidsCoordinateSystem readJson(const QString& sFilePath);
+    static BidsCoordinateSystem read_json(const std::filesystem::path& path);
 
     /**
      * @brief Write a BIDS *_coordsystem.json file.
-     * @param[in] sFilePath  Output path.
+     * @param[in] path       Output path.
      * @param[in] cs         Coordinate system metadata.
      * @param[in] sModality  Key prefix of the datatype: "iEEG", "EEG" or "MEG".
      * @return true on success.
      */
-    static bool writeJson(const QString& sFilePath,
-                          const BidsCoordinateSystem& cs,
-                          const QString& sModality = QStringLiteral("iEEG"));
+    static bool write_json(const std::filesystem::path& path,
+                           const BidsCoordinateSystem& cs,
+                           std::string_view sModality = "iEEG");
 
     /**
      * @brief Convert parsed transform to a FiffCoordTrans.
@@ -100,8 +102,8 @@ struct BIDSSHARED_EXPORT BidsCoordinateSystem
      * @param[in] toFrame    Destination coordinate frame (default FIFFV_COORD_HEAD = 4).
      * @return FiffCoordTrans populated with the parsed 4x4 matrix.
      */
-    FIFFLIB::FiffCoordTrans toFiffCoordTrans(int fromFrame = FIFFV_COORD_MRI,
-                                             int toFrame = FIFFV_COORD_HEAD) const;
+    FIFFLIB::FiffCoordTrans to_fiff_coord_trans(int fromFrame = FIFFV_COORD_MRI,
+                                                int toFrame = FIFFV_COORD_HEAD) const;
 };
 
 } // namespace BIDSLIB

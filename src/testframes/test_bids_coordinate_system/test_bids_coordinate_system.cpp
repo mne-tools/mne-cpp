@@ -82,11 +82,11 @@ void TestBidsCoordinateSystem::initTestCase()
 void TestBidsCoordinateSystem::testReadJsonValid()
 {
     QString path = writeSampleCoordSystemJson(m_tempDir.path());
-    BidsCoordinateSystem cs = BidsCoordinateSystem::readJson(path);
+    BidsCoordinateSystem cs = BidsCoordinateSystem::read_json(path.toStdString());
 
-    QCOMPARE(cs.system, QString("Other"));
-    QCOMPARE(cs.units, QString("mm"));
-    QVERIFY(!cs.description.isEmpty());
+    QCOMPARE(cs.system, std::string("Other"));
+    QCOMPARE(cs.units, std::string("mm"));
+    QVERIFY(!cs.description.empty());
 }
 
 //=============================================================================================================
@@ -102,19 +102,18 @@ void TestBidsCoordinateSystem::testWriteJsonRoundTrip()
     cs.transform(0, 3) = 10.0;
     cs.transform(1, 3) = 20.0;
     cs.transform(2, 3) = 30.0;
+    cs.transform(0, 0) = 0.1; // not exact in binary: must still come back bit for bit
 
-    QString outPath = m_tempDir.filePath("test_coordsystem.json");
-    QVERIFY(BidsCoordinateSystem::writeJson(outPath, cs));
+    const std::filesystem::path outPath = m_tempDir.filePath("test_coordsystem.json").toStdString();
+    QVERIFY(BidsCoordinateSystem::write_json(outPath, cs));
 
-    BidsCoordinateSystem csRead = BidsCoordinateSystem::readJson(outPath);
+    BidsCoordinateSystem csRead = BidsCoordinateSystem::read_json(outPath);
     QCOMPARE(csRead.system, cs.system);
     QCOMPARE(csRead.units, cs.units);
     QCOMPARE(csRead.description, cs.description);
 
-    // The 4x4 transform should round-trip
-    double maxDiff = (csRead.transform - cs.transform).cwiseAbs().maxCoeff();
-    QVERIFY2(maxDiff < 1e-5,
-             qPrintable(QString("Transform round-trip maxDiff=%1").arg(maxDiff)));
+    // The 4x4 transform round-trips exactly
+    QVERIFY(csRead.transform == cs.transform);
 }
 
 //=============================================================================================================
@@ -129,7 +128,7 @@ void TestBidsCoordinateSystem::testToFiffCoordTrans()
     cs.transform(1, 3) = 10.0;
     cs.transform(2, 3) = 15.0;
 
-    FiffCoordTrans trans = cs.toFiffCoordTrans(FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
+    FiffCoordTrans trans = cs.to_fiff_coord_trans(FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
 
     QCOMPARE(trans.from, (int)FIFFV_COORD_MRI);
     QCOMPARE(trans.to, (int)FIFFV_COORD_HEAD);
@@ -158,7 +157,7 @@ void TestBidsCoordinateSystem::testTransformValues()
     cs.transform(1, 3) = 200.0;
     cs.transform(2, 3) = 300.0;
 
-    FiffCoordTrans trans = cs.toFiffCoordTrans(FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
+    FiffCoordTrans trans = cs.to_fiff_coord_trans(FIFFV_COORD_MRI, FIFFV_COORD_HEAD);
 
     // Check translation component (may be in meters depending on units conversion)
     // The FiffCoordTrans stores data in its trans member
@@ -175,7 +174,7 @@ void TestBidsCoordinateSystem::testIdentityTransform()
     cs.units = "m";
     cs.transform = Matrix4d::Identity();
 
-    FiffCoordTrans trans = cs.toFiffCoordTrans(FIFFV_COORD_HEAD, FIFFV_COORD_HEAD);
+    FiffCoordTrans trans = cs.to_fiff_coord_trans(FIFFV_COORD_HEAD, FIFFV_COORD_HEAD);
     QCOMPARE(trans.from, (int)FIFFV_COORD_HEAD);
     QCOMPARE(trans.to, (int)FIFFV_COORD_HEAD);
 }
@@ -185,9 +184,9 @@ void TestBidsCoordinateSystem::testIdentityTransform()
 void TestBidsCoordinateSystem::testReadNonexistentFile()
 {
     // Reading a nonexistent file should not crash — return default/empty struct
-    BidsCoordinateSystem cs = BidsCoordinateSystem::readJson("/nonexistent/path/coordsystem.json");
+    BidsCoordinateSystem cs = BidsCoordinateSystem::read_json("/nonexistent/path/coordsystem.json");
     // Should have empty/default values, not crash
-    QVERIFY(cs.system.isEmpty() || cs.system == "Unknown");
+    QVERIFY(cs.system.empty());
 }
 
 //=============================================================================================================

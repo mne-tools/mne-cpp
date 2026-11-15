@@ -17,14 +17,15 @@
 #include "bids_coordinate_system.h"
 #include <base/log.h>
 
+#include <base/byte_stream.h>
+#include <base/json.h>
+#include <base/string_utils.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
+#include <string>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -36,62 +37,57 @@ using namespace BIDSLIB;
 // STATIC METHODS
 //=============================================================================================================
 
-BidsCoordinateSystem BidsCoordinateSystem::readJson(const QString& sFilePath)
+BidsCoordinateSystem BidsCoordinateSystem::read_json(const std::filesystem::path& path)
 {
     BidsCoordinateSystem cs;
     cs.transform = Eigen::Matrix4d::Identity();
 
-    QFile file(sFilePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BidsCoordinateSystem::readJson] Cannot open {}", sFilePath.toStdString());
+    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(path);
+    if (!text) {
+        BASELIB::Log::warning("[BidsCoordinateSystem::read_json] Cannot open {}", BASELIB::utf8FromPath(path));
         return cs;
     }
 
-    QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
-    file.close();
-
-    if (error.error != QJsonParseError::NoError) {
-        BASELIB::Log::warning("[BidsCoordinateSystem::readJson] Parse error in {} : {}", sFilePath.toStdString(), error.errorString().toStdString());
+    BASELIB::JsonParseError error;
+    const BASELIB::JsonDocument doc = BASELIB::JsonDocument::from_json(*text, &error);
+    if (error.error != BASELIB::JsonParseError::NoError) {
+        BASELIB::Log::warning("[BidsCoordinateSystem::read_json] Parse error in {} : {}", BASELIB::utf8FromPath(path), error.error_string());
         return cs;
     }
 
-    QJsonObject json = doc.object();
+    const BASELIB::JsonObject& json = doc.object();
 
     // iEEG fields first, then EEG, then MEG
-    const auto field = [&json](const QString& name) {
+    const auto field = [&json](std::string_view name) {
         for (const char* prefix : {"iEEG", "EEG", "MEG"}) {
-            const QString value = json.value(QLatin1String(prefix) + name).toString();
-            if (!value.isEmpty())
-                return value;
+            const std::string_view value = json.value(std::string(prefix).append(name)).to_string();
+            if (!value.empty())
+                return std::string(value);
         }
-        return QString();
+        return std::string();
     };
-    cs.system = field(QStringLiteral("CoordinateSystem"));
-    cs.units = field(QStringLiteral("CoordinateUnits"));
-    cs.description = field(QStringLiteral("CoordinateSystemDescription"));
+    cs.system = field("CoordinateSystem");
+    cs.units = field("CoordinateUnits");
+    cs.description = field("CoordinateSystemDescription");
 
-    cs.processingDescription = json.value(QStringLiteral("iEEGCoordinateProcessingDescription")).toString();
-    if (cs.processingDescription.isEmpty())
-        cs.processingDescription = json.value(QStringLiteral("EEGCoordinateProcessingDescription")).toString();
+    cs.processingDescription = json.value("iEEGCoordinateProcessingDescription").to_string();
+    if (cs.processingDescription.empty())
+        cs.processingDescription = json.value("EEGCoordinateProcessingDescription").to_string();
 
-    cs.associatedImagePath = json.value(QStringLiteral("IntendedFor")).toString();
+    cs.associatedImagePath = json.value("IntendedFor").to_string();
 
     // Parse 4x4 transform if provided as "iEEGCoordinateProcessingTransform" or "Transform"
-    QString transformKey;
-    if (json.contains(QStringLiteral("iEEGCoordinateProcessingTransform")))
-        transformKey = QStringLiteral("iEEGCoordinateProcessingTransform");
-    else if (json.contains(QStringLiteral("Transform")))
-        transformKey = QStringLiteral("Transform");
-
-    if (!transformKey.isEmpty()) {
-        QJsonArray rows = json.value(transformKey).toArray();
+    const std::string_view transformKey = json.contains("iEEGCoordinateProcessingTransform") ? "iEEGCoordinateProcessingTransform"
+        : json.contains("Transform")                                                         ? "Transform"
+                                                                                             : "";
+    if (!transformKey.empty()) {
+        const BASELIB::JsonArray& rows = json.value(transformKey).to_array();
         if (rows.size() == 4) {
             for (int r = 0; r < 4; ++r) {
-                QJsonArray cols = rows[r].toArray();
+                const BASELIB::JsonArray& cols = rows[static_cast<std::size_t>(r)].to_array();
                 if (cols.size() == 4) {
                     for (int c = 0; c < 4; ++c)
-                        cs.transform(r, c) = cols[c].toDouble();
+                        cs.transform(r, c) = cols[static_cast<std::size_t>(c)].to_double();
                 }
             }
         }
@@ -102,48 +98,45 @@ BidsCoordinateSystem BidsCoordinateSystem::readJson(const QString& sFilePath)
 
 //=============================================================================================================
 
-bool BidsCoordinateSystem::writeJson(const QString& sFilePath,
-                                     const BidsCoordinateSystem& cs,
-                                     const QString& sModality)
+bool BidsCoordinateSystem::write_json(const std::filesystem::path& path,
+                                      const BidsCoordinateSystem& cs,
+                                      std::string_view sModality)
 {
-    QJsonObject json;
+    const std::string modality(sModality);
+    BASELIB::JsonObject json{{modality + "CoordinateSystem", cs.system},
+                             {modality + "CoordinateUnits", cs.units}};
 
-    json[sModality + QStringLiteral("CoordinateSystem")] = cs.system;
-    json[sModality + QStringLiteral("CoordinateUnits")] = cs.units;
-
-    if (!cs.description.isEmpty())
-        json[sModality + QStringLiteral("CoordinateSystemDescription")] = cs.description;
-    if (!cs.processingDescription.isEmpty() && sModality == QLatin1String("iEEG"))
-        json[QStringLiteral("iEEGCoordinateProcessingDescription")] = cs.processingDescription;
-    if (!cs.associatedImagePath.isEmpty())
-        json[QStringLiteral("IntendedFor")] = cs.associatedImagePath;
+    if (!cs.description.empty())
+        json.insert(modality + "CoordinateSystemDescription", cs.description);
+    if (!cs.processingDescription.empty() && sModality == "iEEG")
+        json.insert("iEEGCoordinateProcessingDescription", cs.processingDescription);
+    if (!cs.associatedImagePath.empty())
+        json.insert("IntendedFor", cs.associatedImagePath);
 
     // Serialize the 4x4 transform matrix
-    if (!cs.transform.isIdentity(1e-15) && sModality == QLatin1String("iEEG")) {
-        QJsonArray rows;
+    if (!cs.transform.isIdentity(1e-15) && sModality == "iEEG") {
+        BASELIB::JsonArray rows;
+        rows.reserve(4);
         for (int r = 0; r < 4; ++r) {
-            QJsonArray cols;
+            BASELIB::JsonArray cols;
+            cols.reserve(4);
             for (int c = 0; c < 4; ++c)
-                cols.append(cs.transform(r, c));
-            rows.append(cols);
+                cols.push_back(cs.transform(r, c));
+            rows.push_back(std::move(cols));
         }
-        json[QStringLiteral("iEEGCoordinateProcessingTransform")] = rows;
+        json.insert("iEEGCoordinateProcessingTransform", std::move(rows));
     }
 
-    QFile file(sFilePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BidsCoordinateSystem::writeJson] Cannot open {} for writing", sFilePath.toStdString());
+    if (!BASELIB::write_text_file(path, BASELIB::JsonDocument(std::move(json)).to_json())) {
+        BASELIB::Log::warning("[BidsCoordinateSystem::write_json] Cannot open {} for writing", BASELIB::utf8FromPath(path));
         return false;
     }
-
-    file.write(QJsonDocument(json).toJson(QJsonDocument::Indented));
-    file.close();
     return true;
 }
 
 //=============================================================================================================
 
-FIFFLIB::FiffCoordTrans BidsCoordinateSystem::toFiffCoordTrans(int fromFrame, int toFrame) const
+FIFFLIB::FiffCoordTrans BidsCoordinateSystem::to_fiff_coord_trans(int fromFrame, int toFrame) const
 {
     Eigen::Matrix4f matTrans = transform.cast<float>();
     return FIFFLIB::FiffCoordTrans(fromFrame, toFrame, matTrans);

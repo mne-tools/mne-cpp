@@ -21,7 +21,7 @@
  * recording into a @c FIFFLIB::FiffRawData ready to hand to MNE-CPP's
  * filtering / source-localisation stack. @ref BIDSLIB::AbstractFormatReader::formatName "formatName" and
  * @ref BIDSLIB::AbstractFormatReader::supportsExtension "supportsExtension" power the dispatch implemented by @ref
- * BIDSLIB::BidsRawData::createReader.
+ * BIDSLIB::BidsRawData::create_reader.
  *
  * Readers are owned through @c std::unique_ptr because the concrete
  * readers keep the underlying file open for lazy segment reads.

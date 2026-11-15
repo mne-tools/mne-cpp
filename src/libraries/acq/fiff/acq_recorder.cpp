@@ -27,6 +27,7 @@
 #include "../acq_reader.h"
 #include "../acq_timebase.h"
 
+#include <base/string_utils.h>
 #include <bids/bids_channel.h>
 #include <bids/bids_event.h>
 #include <bids/bids_path.h>
@@ -328,7 +329,7 @@ std::string clockSourceName(AcqClockSource source)
 
 bool isLabel(const std::string& value)
 {
-    return !value.empty() && BIDSLIB::BIDSPath::isValidEntityValue(QString::fromStdString(value));
+    return !value.empty() && BIDSLIB::BIDSPath::is_valid_entity_value(value);
 }
 
 /** One unit of work for the writer thread: whole pages ending in a NOP that terminates the file. */
@@ -972,8 +973,8 @@ struct AcqRecorder::Impl
         data.raw.info = fiffInfo;
         data.raw.first_samp = static_cast<fiff_int_t>(firstSample - origin);
         data.raw.last_samp = static_cast<fiff_int_t>(firstSample - origin + statSamples.load() - 1);
-        data.recordingType = QStringLiteral("continuous");
-        data.manufacturerModelName = QString::fromStdString(options.device.device);
+        data.recordingType = "continuous";
+        data.manufacturerModelName = options.device.device;
         for (const RecordedEvent& e : events) {
             BIDSLIB::BidsEvent event;
             event.sample = static_cast<int>(e.sample - firstSample);
@@ -982,19 +983,17 @@ struct AcqRecorder::Impl
             event.value = e.code;
             const auto code = static_cast<std::size_t>(e.code);
             event.trialType = e.code >= 0 && code < info->eventLabels.size() && !info->eventLabels[code].empty()
-                ? QString::fromStdString(info->eventLabels[code])
-                : QStringLiteral("n/a");
-            data.events.append(event);
+                ? info->eventLabels[code]
+                : std::string("n/a");
+            data.events.push_back(std::move(event));
         }
-        BIDSLIB::BIDSPath path(QString::fromStdString(bids->root), QString::fromStdString(bids->subject),
-                               QString::fromStdString(bids->session), QString::fromStdString(bids->task),
-                               QStringLiteral("meg"), QStringLiteral("meg"), QStringLiteral(".fif"));
-        path.setRun(QString::fromStdString(bids->run));
+        BIDSLIB::BIDSPath path(BASELIB::pathFromUtf8(bids->root), bids->subject, bids->session, bids->task, "meg", "meg", ".fif");
+        path.set_run(bids->run);
         BIDSLIB::BidsRawData::WriteOptions write;
         write.overwrite = true;
         write.copyData = false;
-        write.datasetName = QString::fromStdString(bids->datasetName);
-        if (data.write(path, QString(), write).root().isEmpty()) {
+        write.datasetName = bids->datasetName;
+        if (data.write(path, {}, write).root().empty()) {
             return AcqError(AcqErrorCode::DeviceIo, "cannot write the BIDS sidecars of " + firstPath);
         }
         return {};
@@ -1040,7 +1039,7 @@ struct AcqRecorder::Impl
                                [](const AcqChannelInfo& c) { return c.kind == AcqChannelKind::Stim; });
         if (addStim) {
             FiffChInfo stim;
-            stim.ch_name = QString::fromLatin1(kStimName).toStdString();
+            stim.ch_name = kStimName;
             stim.kind = FIFFV_STIM_CH;
             stim.unit = FIFF_UNIT_NONE;
             stim.unit_mul = FIFF_UNITM_NONE;
@@ -1191,14 +1190,12 @@ AcqExpected<AcqRecorder> AcqRecorder::start(const AcqStream& stream, const AcqBi
         !optionalLabel(bids.run)) {
         return AcqError(AcqErrorCode::InvalidParameter, "BIDS needs a root, and alphanumeric subject and task labels");
     }
-    BIDSLIB::BIDSPath path(QString::fromStdString(bids.root), QString::fromStdString(bids.subject),
-                           QString::fromStdString(bids.session), QString::fromStdString(bids.task),
-                           QStringLiteral("meg"), QStringLiteral("meg"), QStringLiteral(".fif"));
-    path.setRun(QString::fromStdString(bids.run));
+    BIDSLIB::BIDSPath path(BASELIB::pathFromUtf8(bids.root), bids.subject, bids.session, bids.task, "meg", "meg", ".fif");
+    path.set_run(bids.run);
     auto impl = std::make_unique<Impl>();
     impl->options = options;
     impl->bids = bids;
-    if (AcqError e = impl->begin(stream, path.filePath().toStdString()); !e.ok()) {
+    if (AcqError e = impl->begin(stream, BASELIB::utf8FromPath(path.file_path())); !e.ok()) {
         return e;
     }
     return AcqRecorder(std::move(impl));

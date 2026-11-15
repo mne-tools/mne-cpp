@@ -15,8 +15,8 @@
  * mne-cpp additionally tracks the original 0-based @c sample index and
  * the numeric trigger @c value so the record can round-trip back into
  * FIFF @c stim-channel land without re-deriving them. @ref BIDSLIB::BidsEvent is
- * the per-row value object and the static @ref BIDSLIB::BidsEvent::readTsv "BidsEvent::readTsv" /
- * @ref BIDSLIB::BidsEvent::writeTsv "BidsEvent::writeTsv" functions perform the TSV round-trip via
+ * the per-row value object and the static @ref BIDSLIB::BidsEvent::read_tsv "BidsEvent::read_tsv" /
+ * @ref BIDSLIB::BidsEvent::write_tsv "BidsEvent::write_tsv" functions perform the TSV round-trip via
  * @ref BIDSLIB::BidsTsv. Missing / @c n/a fields default to zero / empty so
  * partially-populated event files still round-trip.
  *
@@ -33,11 +33,13 @@
 #include "bids_global.h"
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <QList>
+#include <filesystem>
+#include <span>
+#include <string>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -57,11 +59,11 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BidsEvent
 {
-    float onset{0.0f};    /**< Onset in seconds from the start of the recording. */
-    float duration{0.0f}; /**< Duration of the event in seconds. */
-    int sample{0};        /**< Sample index (0-based) corresponding to onset. */
-    int value{0};         /**< Numeric event value / trigger code. */
-    QString trialType;    /**< Trial type or condition label (e.g. "stimulus", "response"). */
+    float onset{0.0f};     /**< Onset in seconds from the start of the recording. */
+    float duration{0.0f};  /**< Duration of the event in seconds. */
+    int sample{0};         /**< Sample index (0-based) corresponding to onset. */
+    int value{0};          /**< Numeric event value / trigger code. */
+    std::string trialType; /**< Trial type or condition label (e.g. "stimulus", "response"). */
 
     /**
      * @brief Read a BIDS *_events.tsv file.
@@ -69,20 +71,20 @@ struct BIDSSHARED_EXPORT BidsEvent
      * Parses onset, duration, sample, value, and trial_type columns.
      * Missing or "n/a" fields default to zero / empty.
      *
-     * @param[in] sFilePath  Path to the events.tsv file.
+     * @param[in] path       Path to the events.tsv file.
      * @return List of events.
      */
-    static QList<BidsEvent> readTsv(const QString& sFilePath);
+    static std::vector<BidsEvent> read_tsv(const std::filesystem::path& path);
 
     /**
      * @brief Write a BIDS *_events.tsv file.
      *
-     * @param[in] sFilePath  Output path.
+     * @param[in] path       Output path.
      * @param[in] events     List of events.
      * @return true on success.
      */
-    static bool writeTsv(const QString& sFilePath,
-                         const QList<BidsEvent>& events);
+    static bool write_tsv(const std::filesystem::path& path,
+                          std::span<const BidsEvent> events);
 };
 
 } // namespace BIDSLIB

@@ -11,7 +11,7 @@
  *
  * @ref BIDSLIB::BidsRawData is the top-level object exposed by BIDSLIB: a single
  * @ref BIDSLIB::BidsRawData::read "BidsRawData::read" call walks a @ref BIDSLIB::BIDSPath, picks the right
- * format reader via @ref BIDSLIB::BidsRawData::createReader "BidsRawData::createReader", parses the raw data
+ * format reader via @ref BIDSLIB::BidsRawData::create_reader "BidsRawData::create_reader", parses the raw data
  * into a fully-populated @c FIFFLIB::FiffRawData, and then merges every
  * sidecar BIDS defines for an electrophysiology recording —
  * @c _channels.tsv (channel types, units, bad-channel marking),
@@ -50,13 +50,14 @@
 #include <fiff/fiff_raw_data.h>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QString>
-#include <QList>
-#include <QMap>
+#include <filesystem>
+#include <map>
+#include <string>
+#include <string_view>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -94,10 +95,10 @@ public:
      */
     struct WriteOptions
     {
-        bool overwrite{false}; /**< Overwrite existing files if true. */
-        bool copyData{true};   /**< Copy the raw data file into the BIDS directory.
+        bool overwrite{false};   /**< Overwrite existing files if true. */
+        bool copyData{true};     /**< Copy the raw data file into the BIDS directory.
                                          If false, only sidecars are written. */
-        QString datasetName;   /**< Name for dataset_description.json (defaults to "[Unspecified]"). */
+        std::string datasetName; /**< Name for dataset_description.json (defaults to "[Unspecified]"). */
     };
 
     //=========================================================================================================
@@ -136,7 +137,7 @@ public:
      *
      * @param[in] bidsPath  Fully specified BIDSPath pointing to the raw data file.
      *
-     * @return Populated BidsRawData.  Check isValid() to determine success.
+     * @return Populated BidsRawData.  Check is_valid() to determine success.
      */
     static BidsRawData read(const BIDSPath& bidsPath);
 
@@ -164,7 +165,7 @@ public:
      * @return BIDSPath of the written data file, or empty BIDSPath on failure.
      */
     BIDSPath write(const BIDSPath& bidsPath,
-                   const QString& sourcePath,
+                   const std::filesystem::path& sourcePath,
                    const WriteOptions& options) const;
 
     /**
@@ -176,7 +177,7 @@ public:
      * @return BIDSPath of the written data file, or empty BIDSPath on failure.
      */
     inline BIDSPath write(const BIDSPath& bidsPath,
-                          const QString& sourcePath = QString()) const
+                          const std::filesystem::path& sourcePath = {}) const
     {
         return write(bidsPath, sourcePath, WriteOptions());
     }
@@ -190,7 +191,7 @@ public:
      *
      * @return True if the data is valid, false otherwise.
      */
-    bool isValid() const
+    bool is_valid() const
     {
         return m_bIsValid;
     }
@@ -200,7 +201,7 @@ public:
      *
      * @param[in] bValid True to mark the data as valid, false to mark it invalid.
      */
-    void setValid(bool bValid)
+    void set_valid(bool bValid)
     {
         m_bIsValid = bValid;
     }
@@ -221,16 +222,16 @@ public:
      *
      * @return Shared pointer to the reader, or nullptr if unsupported.
      */
-    static std::unique_ptr<AbstractFormatReader> createReader(const QString& sExtension);
+    static std::unique_ptr<AbstractFormatReader> create_reader(std::string_view sExtension);
 
     //=========================================================================================================
     // Core data members (public, following mne-cpp convention)
     //=========================================================================================================
 
     FIFFLIB::FiffRawData raw;                     /**< Raw data with fully populated FiffInfo. */
-    QList<BidsEvent> events;                      /**< Events from *_events.tsv. */
-    QMap<QString, int> eventIdMap;                /**< trial_type string → numeric value mapping. */
-    QList<BidsElectrode> electrodes;              /**< Electrode positions from *_electrodes.tsv. */
+    std::vector<BidsEvent> events;                /**< Events from *_events.tsv. */
+    std::map<std::string, int> eventIdMap;        /**< trial_type string → numeric value mapping. */
+    std::vector<BidsElectrode> electrodes;        /**< Electrode positions from *_electrodes.tsv. */
     BidsCoordinateSystem coordinateSystem;        /**< Coordinate system from *_coordsystem.json. */
     std::unique_ptr<AbstractFormatReader> reader; /**< The underlying format reader (keeps file open). */
 
@@ -240,12 +241,12 @@ public:
     // they are computed on write and applied on read.
     //=========================================================================================================
 
-    QString ieegReference;         /**< Reference electrode name (RECOMMENDED). */
-    QString taskDescription;       /**< Task description (OPTIONAL). */
-    QString manufacturer;          /**< Amplifier manufacturer (RECOMMENDED). */
-    QString manufacturerModelName; /**< Amplifier model (RECOMMENDED). */
-    QString softwareVersions;      /**< Recording software versions (RECOMMENDED). */
-    QString recordingType;         /**< "continuous", "epoched", or "discontinuous" (RECOMMENDED). */
+    std::string ieegReference;         /**< Reference electrode name (RECOMMENDED). */
+    std::string taskDescription;       /**< Task description (OPTIONAL). */
+    std::string manufacturer;          /**< Amplifier manufacturer (RECOMMENDED). */
+    std::string manufacturerModelName; /**< Amplifier model (RECOMMENDED). */
+    std::string softwareVersions;      /**< Recording software versions (RECOMMENDED). */
+    std::string recordingType;         /**< "continuous", "epoched", or "discontinuous" (RECOMMENDED). */
 
 private:
     bool m_bIsValid{false}; /**< True if the data was loaded successfully. */

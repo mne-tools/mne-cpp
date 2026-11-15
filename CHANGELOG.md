@@ -522,6 +522,33 @@ aliases; replace the old spelling as below.
 - New `BASELIB::read_text_file(path)` and `write_text_file(path, text)` read
   and replace a whole file byte for byte (no line-ending or encoding
   conversion) and report failures as `BASELIB::Expected`.
+- The BIDS library's sidecar API uses std types instead of Qt, and its JSON
+  goes through `BASELIB::JsonDocument`. Migration:
+  - `BIDSPath` takes and returns `std::string` labels and a
+    `std::filesystem::path` root; `file_path()` and `directory()` return
+    `std::filesystem::path`; methods are snake_case (`set_subject`,
+    `file_path`, `with_suffix`, `channels_tsv_path`, `electrodes_tsv_path`,
+    `events_tsv_path`, `coordsystem_json_path`, `sidecar_json_path`,
+    `is_valid_entity_value`); `match()` returns `std::vector<BIDSPath>`.
+  - `BidsChannel`, `BidsElectrode`, `BidsEvent`, `BidsDatasetDescription`
+    and `BidsCoordinateSystem` hold `std::string` fields; their
+    `read_tsv`/`write_tsv`, `read`/`write` and `read_json`/`write_json`
+    take `std::filesystem::path` and `std::vector`/`std::span`;
+    `to_fiff_dig_points` and `to_fiff_coord_trans` replace the camelCase
+    names.
+  - `BidsTsv::read_tsv`/`write_tsv` work on `std::vector<BidsTsvRow>` with
+    `BidsTsvRow = std::map<std::string, std::string>`; `BidsTsv::value(row,
+    column, fallback)` looks a cell up.
+  - `BidsRawData` events and electrodes are `std::vector`, `eventIdMap` is a
+    `std::map<std::string, int>`, the metadata fields are `std::string`,
+    `write` takes the source as `std::filesystem::path`, and `isValid`,
+    `setValid`, `createReader` are `is_valid`, `set_valid`, `create_reader`.
+  - `bids_const.h` holds `constexpr` tables (`BIDS_DATATYPES`,
+    `FIFF_KIND_TO_BIDS_TYPE`, `BIDS_COORD_TO_FIFF_FRAME`, ...) looked up
+    with `bids_lookup(table, key)` instead of functions returning `QMap`
+    and `QStringList`.
+  The format readers (`EDFReader`, `BrainVisionReader`) keep their Qt-based
+  API for now.
 - FIFF annotation channel names and extras, and `FiffAnnotations::read_json`/
   `write_json`, use `BASELIB::JsonDocument` instead of Qt's JSON classes; the
   files are unchanged. The helpers in `fiff/fiff_annotations_json.h` are now

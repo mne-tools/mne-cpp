@@ -17,12 +17,13 @@
 #include "bids_tsv.h"
 #include <base/log.h>
 
+#include <base/string_utils.h>
+
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QFile>
-#include <QTextStream>
+#include <fstream>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -31,98 +32,78 @@
 using namespace BIDSLIB;
 
 //=============================================================================================================
-// STATIC HELPERS
-//=============================================================================================================
-
-static const QString NA = QStringLiteral("n/a");
-
-static QString valOrNA(const QString& s)
-{
-    return s.isEmpty() ? NA : s;
-}
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BidsTsv::BidsTsv()
+std::vector<BidsTsvRow> BidsTsv::read_tsv(const std::filesystem::path& path,
+                                          std::vector<std::string>& headers)
 {
-}
-
-//=============================================================================================================
-
-BidsTsv::~BidsTsv()
-{
-}
-
-//=============================================================================================================
-
-QList<BidsTsvRow> BidsTsv::readTsv(const QString& sFilePath,
-                                   QStringList& headers)
-{
-    QList<BidsTsvRow> rows;
+    std::vector<BidsTsvRow> rows;
     headers.clear();
 
-    QFile file(sFilePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BidsTsv::readTsv] Cannot open {}", sFilePath.toStdString());
+    std::ifstream file(path, std::ios::binary);
+    if (!file) {
+        BASELIB::Log::warning("[BidsTsv::read_tsv] Cannot open {}", BASELIB::utf8FromPath(path));
         return rows;
     }
 
-    QTextStream in(&file);
     bool firstLine = true;
-
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty())
+    std::string line;
+    while (std::getline(file, line)) {
+        const std::string_view text = BASELIB::trimmed(line);
+        if (text.empty())
             continue;
 
-        QStringList fields = line.split(QLatin1Char('\t'));
+        BASELIB::StringList fields = BASELIB::split(text, '\t');
 
         if (firstLine) {
-            headers = fields;
+            headers = std::move(fields);
             firstLine = false;
             continue;
         }
 
         BidsTsvRow row;
-        for (int i = 0; i < headers.size() && i < fields.size(); ++i) {
-            row[headers[i]] = fields[i];
+        for (std::size_t i = 0; i < headers.size() && i < fields.size(); ++i) {
+            row[headers[i]] = std::move(fields[i]);
         }
-        rows.append(row);
+        rows.push_back(std::move(row));
     }
 
-    file.close();
     return rows;
 }
 
 //=============================================================================================================
 
-bool BidsTsv::writeTsv(const QString& sFilePath,
-                       const QStringList& headers,
-                       const QList<BidsTsvRow>& rows)
+bool BidsTsv::write_tsv(const std::filesystem::path& path,
+                        std::span<const std::string> headers,
+                        std::span<const BidsTsvRow> rows)
 {
-    QFile file(sFilePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BidsTsv::writeTsv] Cannot open {} for writing", sFilePath.toStdString());
+    std::ofstream out(path, std::ios::binary);
+    if (!out) {
+        BASELIB::Log::warning("[BidsTsv::write_tsv] Cannot open {} for writing", BASELIB::utf8FromPath(path));
         return false;
     }
 
-    QTextStream out(&file);
+    for (std::size_t i = 0; i < headers.size(); ++i) {
+        out << (i > 0 ? "\t" : "") << headers[i];
+    }
+    out << '\n';
 
-    // Header row
-    out << headers.join(QLatin1Char('\t')) << QLatin1Char('\n');
-
-    // Data rows
-    for (const auto& row : rows) {
-        QStringList fields;
-        fields.reserve(headers.size());
-        for (const auto& header : headers) {
-            fields << valOrNA(row.value(header));
+    for (const BidsTsvRow& row : rows) {
+        for (std::size_t i = 0; i < headers.size(); ++i) {
+            const std::string_view field = value(row, headers[i]);
+            out << (i > 0 ? "\t" : "") << (field.empty() ? std::string_view("n/a") : field);
         }
-        out << fields.join(QLatin1Char('\t')) << QLatin1Char('\n');
+        out << '\n';
     }
 
-    file.close();
-    return true;
+    return static_cast<bool>(out);
+}
+
+//=============================================================================================================
+
+std::string_view BidsTsv::value(const BidsTsvRow& row, std::string_view column, std::string_view fallback)
+{
+    const auto it = row.find(column);
+    return it == row.end() ? fallback : std::string_view(it->second);
 }
