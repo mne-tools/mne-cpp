@@ -21,9 +21,9 @@ EDF stores data as 16-bit (BDF: 24-bit) little-endian integers in fixed-duration
 
 ```cpp title="src/examples/ex_bids/main.cpp"
 std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
-const bool edfOpen = edf->open(QString::fromStdString(BASELIB::utf8FromPath(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path())));
-const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
-const MatrixXf edfHead = edf->readRawSegment(0, 201);
+const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path());
+const FIFFLIB::FiffInfo edfInfo = edf->info();
+const MatrixXf edfHead = edf->read_raw_segment(0, 201);
 ```
 
 ### Inheritance
@@ -40,15 +40,13 @@ classDiagram
 
 ### EDFReader()
 
-[`EDFReader`](/docs/api/bids/edf-reader) Default constructor.
-
 ---
 
 ### ~EDFReader()
 
 ---
 
-### open(sFilePath)
+### open(path)
 
 Open and parse the file header.
 
@@ -56,8 +54,8 @@ Must be called before reading data.
 
 **Parameters:**
 
-- **sFilePath** : *const QString &*
-  Absolute path to the primary data file.
+- **path** : *const std::filesystem::path &*
+  Path to the primary data file.
 
 **Returns:**
 
@@ -65,37 +63,33 @@ Must be called before reading data.
 
 ---
 
-### getInfo()
-
-Return measurement metadata as [FiffInfo](/docs/api/fiff/fiff-info).
+### info()
 
 **Returns:**
 
-- *[FiffInfo](/docs/api/fiff/fiff-info)* — FiffInfo populated from the native format header.
+- *[FiffInfo](/docs/api/fiff/fiff-info)* — Measurement metadata populated from the native format header.
 
 ---
 
-### readRawSegment(iStartSampleIdx, iEndSampleIdx)
+### read_raw_segment(first, last)
 
 Read a segment of raw data.
 
 **Parameters:**
 
-- **iStartSampleIdx** : *int*
+- **first** : *long*
   First sample index (0-based, inclusive).
 
-- **iEndSampleIdx** : *int*
+- **last** : *long*
   Last sample index (0-based, exclusive).
 
 **Returns:**
 
-- *Eigen::MatrixXf* — Matrix of shape (n_channels x n_samples) with calibrated physical values.
+- *Eigen::MatrixXf* — Matrix of shape (n_channels x n_samples) in SI units; empty for an invalid range.
 
 ---
 
-### getSampleCount()
-
-Return total number of samples across the recording.
+### sample_count()
 
 **Returns:**
 
@@ -103,9 +97,7 @@ Return total number of samples across the recording.
 
 ---
 
-### getFrequency()
-
-Return the sampling frequency in Hz.
+### sfreq()
 
 **Returns:**
 
@@ -113,46 +105,28 @@ Return the sampling frequency in Hz.
 
 ---
 
-### getChannelCount()
-
-Return the number of measurement channels.
+### channel_count()
 
 **Returns:**
 
-- *int* — Number of measurement channels (rows returned by readRawSegment).
+- *int* — Number of measurement channels (rows returned by read_raw_segment).
 
 ---
 
-### toFiffRawData()
-
-Convert the entire dataset to a [FiffRawData](/docs/api/fiff/fiff-raw-data) structure.
+### format_name()
 
 **Returns:**
 
-- *[FiffRawData](/docs/api/fiff/fiff-raw-data)* — FiffRawData populated with info, calibrations, and sample bounds.
+- *std::string_view* — Human-readable format name (e.g. "EDF", "BrainVision").
 
 ---
 
-### formatName()
-
-Return a descriptive name for the format (e.g.
-
-"EDF", "BrainVision").
-
-**Returns:**
-
-- *QString* — Human-readable format name.
-
----
-
-### supportsExtension(sExtension)
-
-Check whether this reader can handle the given file extension.
+### supports_extension(extension)
 
 **Parameters:**
 
-- **sExtension** : *const QString &*
-  File extension including dot (e.g. ".edf", ".vhdr").
+- **extension** : *std::string_view*
+  File extension including the dot (e.g. ".edf", ".vhdr"), in any letter case.
 
 **Returns:**
 
@@ -160,23 +134,19 @@ Check whether this reader can handle the given file extension.
 
 ---
 
-### getAllChannelInfos()
-
-Return all channel infos (measurement + extra).
+### all_channel_infos()
 
 **Returns:**
 
-- *QVector&lt; [EDFChannelInfo](/docs/api/bids/edf-channel-info) &gt;* — Infos for every signal in the EDF header, including annotation/extra channels.
+- *const std::vector&lt; [EDFChannelInfo](/docs/api/bids/edf-channel-info) &gt; &* — Infos for every signal in the EDF header, including annotation/extra channels.
 
 ---
 
-### getMeasurementChannelInfos()
-
-Return measurement channel infos only.
+### measurement_channel_infos()
 
 **Returns:**
 
-- *QVector&lt; [EDFChannelInfo](/docs/api/bids/edf-channel-info) &gt;* — Infos for the measurement channels only, in channel order.
+- *const std::vector&lt; [EDFChannelInfo](/docs/api/bids/edf-channel-info) &gt; &* — Infos for the measurement channels only, in channel order.
 
 ---
 
@@ -195,12 +165,12 @@ BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round 
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 138"
 std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
-const bool edfOpen = edf->open(QString::fromStdString(BASELIB::utf8FromPath(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path())));
-const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
-const MatrixXf edfHead = edf->readRawSegment(0, 201);
+const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path());
+const FIFFLIB::FiffInfo edfInfo = edf->info();
+const MatrixXf edfHead = edf->read_raw_segment(0, 201);
 // mne.io.read_raw_edf: 25 channels at 128 Hz, 1228 samples, first channel "EEG Fp1"; data[3, 200] = 0.1757724
-ok &= expect(edfOpen && dynamic_cast<EDFReader*>(edf.get()) != nullptr && edf->formatName() == "EDF" && edfInfo.nchan == 25 && edfInfo.ch_names.front() == "EEG Fp1" && edf->getSampleCount() == 1228 && near(edfHead(0, 0), 0.17594066, 1e-5) && near(edfHead(3, 200), 0.17577240650034331, 1e-5),
-             std::format("EDF: {} channels, {} samples, (3,200) = {:.8g} match mne", edfInfo.nchan, edf->getSampleCount(), edfHead(3, 200)));
+ok &= expect(edfOpen && dynamic_cast<EDFReader*>(edf.get()) != nullptr && edf->format_name() == "EDF" && edfInfo.nchan == 25 && edfInfo.ch_names.front() == "EEG Fp1" && edf->sample_count() == 1228 && near(edfHead(0, 0), 0.17594066, 1e-5) && near(edfHead(3, 200), 0.17577240650034331, 1e-5),
+             std::format("EDF: {} channels, {} samples, (3,200) = {:.8g} match mne", edfInfo.nchan, edf->sample_count(), edfHead(3, 200)));
 ````
 
 ## Authors of this file

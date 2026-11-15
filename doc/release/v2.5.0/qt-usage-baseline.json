@@ -25,6 +25,7 @@
     "qt_free": [
       "acq",
       "acq/devices",
+      "bids",
       "channels",
       "com",
       "decoding",
@@ -34,7 +35,7 @@
       "ml",
       "report"
     ],
-    "tokens": 11860,
+    "tokens": 11650,
     "gui_outside_design": []
   },
   "libraries": {
@@ -109,20 +110,12 @@
       ]
     },
     "bids": {
-      "tokens": 210,
-      "by_category": {
-        "containers": 26,
-        "files": 18,
-        "global": 30,
-        "regex": 2,
-        "strings": 134
-      },
-      "public_header_includes": 6,
+      "tokens": 0,
+      "by_category": {},
+      "public_header_includes": 0,
       "q_object": 0,
       "files": 24,
-      "modules": [
-        "Core"
-      ]
+      "modules": []
     },
     "channels": {
       "tokens": 0,

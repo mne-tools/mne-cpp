@@ -18,15 +18,19 @@ struct BIDSLIB::BrainVisionChannelInfo
 Channel info from the .vhdr header.
 
 ```cpp title="src/examples/ex_bids/main.cpp"
-const QVector<BrainVisionChannelInfo> bvChannels = brainVision.getChannelInfos(); // name, resolution, unit per Ch<n>= line
-const QVector<BrainVisionMarker> markers = brainVision.getMarkers();              // Mk<n>= lines: type, description, 0-based position
+const std::vector<BrainVisionChannelInfo>& bvChannels = brainVision.channel_infos(); // name, resolution, unit per Ch<n>= line
+const std::vector<BrainVisionMarker>& markers = brainVision.markers();               // Mk<n>= lines: type, description, 0-based position
 ```
 
 ---
 
 ## Public Methods
 
-### toFiffChInfo()
+### to_fiff_ch_info()
+
+**Returns:**
+
+- *[FiffChInfo](/docs/api/fiff/fiff-ch-info)* — The FIFF channel description: kind from the name and unit, calibration from the resolution.
 
 ---
 
@@ -43,11 +47,11 @@ const QVector<BrainVisionMarker> markers = brainVision.getMarkers();            
 BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 130"
-const QVector<BrainVisionChannelInfo> bvChannels = brainVision.getChannelInfos(); // name, resolution, unit per Ch<n>= line
-const QVector<BrainVisionMarker> markers = brainVision.getMarkers();              // Mk<n>= lines: type, description, 0-based position
+const std::vector<BrainVisionChannelInfo>& bvChannels = brainVision.channel_infos(); // name, resolution, unit per Ch<n>= line
+const std::vector<BrainVisionMarker>& markers = brainVision.markers();               // Mk<n>= lines: type, description, 0-based position
 // mne.io.read_raw_brainvision annotations: 13 after the "New Segment", first "Stimulus/S253" at 0.486 s
 ok &= expect(bvChannels.size() == 32 && bvChannels[0].name == "FP1" && bvChannels[0].resolution == 0.5f && markers.size() == 14 && markers[1].type == "Stimulus" && markers[1].description == "S253" && markers[1].position == 486,
-             std::format("BrainVision metadata: {} channels, {} markers, S253 at sample {} (mne 0.486 s)", bvChannels.size(), markers.size(), markers.value(1).position));
+             std::format("BrainVision metadata: {} channels, {} markers, S253 at sample {} (mne 0.486 s)", bvChannels.size(), markers.size(), markers[1].position));
 ````
 
 ## Authors of this file

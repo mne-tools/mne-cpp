@@ -4,7 +4,7 @@
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 480,
-    "exported_free_functions": 197,
+    "exported_free_functions": 199,
     "registered_classes": 572,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
@@ -536,6 +536,16 @@
     },
     {
       "name": "utf8FromPath",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "latin1_to_utf8",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "is_utf8",
       "header": "base/string_utils.h",
       "library": "base"
     },

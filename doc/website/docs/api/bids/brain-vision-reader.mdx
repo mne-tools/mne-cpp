@@ -21,8 +21,8 @@ BrainVision is the most common format for iEEG (sEEG/ECoG) recordings in BIDS da
 
 ```cpp title="src/examples/ex_bids/main.cpp"
 BrainVisionReader brainVision;
-const bool bvOpen = brainVision.open(QString::fromStdString(BASELIB::utf8FromPath(vhdr)));
-const MatrixXf bvHead = brainVision.readRawSegment(0, 200); // calibrated, volts
+const bool bvOpen = brainVision.open(vhdr);
+const MatrixXf bvHead = brainVision.read_raw_segment(0, 200); // calibrated, volts
 ```
 
 ### Inheritance
@@ -39,15 +39,13 @@ classDiagram
 
 ### BrainVisionReader()
 
-Default constructor.
-
 ---
 
 ### ~BrainVisionReader()
 
 ---
 
-### open(sFilePath)
+### open(path)
 
 Open and parse the file header.
 
@@ -55,8 +53,8 @@ Must be called before reading data.
 
 **Parameters:**
 
-- **sFilePath** : *const QString &*
-  Absolute path to the primary data file.
+- **path** : *const std::filesystem::path &*
+  Path to the primary data file.
 
 **Returns:**
 
@@ -64,37 +62,33 @@ Must be called before reading data.
 
 ---
 
-### getInfo()
-
-Return measurement metadata as [FiffInfo](/docs/api/fiff/fiff-info).
+### info()
 
 **Returns:**
 
-- *[FiffInfo](/docs/api/fiff/fiff-info)* — FiffInfo populated from the native format header.
+- *[FiffInfo](/docs/api/fiff/fiff-info)* — Measurement metadata populated from the native format header.
 
 ---
 
-### readRawSegment(iStartSampleIdx, iEndSampleIdx)
+### read_raw_segment(first, last)
 
 Read a segment of raw data.
 
 **Parameters:**
 
-- **iStartSampleIdx** : *int*
+- **first** : *long*
   First sample index (0-based, inclusive).
 
-- **iEndSampleIdx** : *int*
+- **last** : *long*
   Last sample index (0-based, exclusive).
 
 **Returns:**
 
-- *Eigen::MatrixXf* — Matrix of shape (n_channels x n_samples) with calibrated physical values.
+- *Eigen::MatrixXf* — Matrix of shape (n_channels x n_samples) in SI units; empty for an invalid range.
 
 ---
 
-### getSampleCount()
-
-Return total number of samples across the recording.
+### sample_count()
 
 **Returns:**
 
@@ -102,9 +96,7 @@ Return total number of samples across the recording.
 
 ---
 
-### getFrequency()
-
-Return the sampling frequency in Hz.
+### sfreq()
 
 **Returns:**
 
@@ -112,46 +104,28 @@ Return the sampling frequency in Hz.
 
 ---
 
-### getChannelCount()
-
-Return the number of measurement channels.
+### channel_count()
 
 **Returns:**
 
-- *int* — Number of measurement channels (rows returned by readRawSegment).
+- *int* — Number of measurement channels (rows returned by read_raw_segment).
 
 ---
 
-### toFiffRawData()
-
-Convert the entire dataset to a [FiffRawData](/docs/api/fiff/fiff-raw-data) structure.
+### format_name()
 
 **Returns:**
 
-- *[FiffRawData](/docs/api/fiff/fiff-raw-data)* — FiffRawData populated with info, calibrations, and sample bounds.
+- *std::string_view* — Human-readable format name (e.g. "EDF", "BrainVision").
 
 ---
 
-### formatName()
-
-Return a descriptive name for the format (e.g.
-
-"EDF", "BrainVision").
-
-**Returns:**
-
-- *QString* — Human-readable format name.
-
----
-
-### supportsExtension(sExtension)
-
-Check whether this reader can handle the given file extension.
+### supports_extension(extension)
 
 **Parameters:**
 
-- **sExtension** : *const QString &*
-  File extension including dot (e.g. ".edf", ".vhdr").
+- **extension** : *std::string_view*
+  File extension including the dot (e.g. ".edf", ".vhdr"), in any letter case.
 
 **Returns:**
 
@@ -159,33 +133,47 @@ Check whether this reader can handle the given file extension.
 
 ---
 
-### getMarkers()
-
-Return all parsed markers from the .vmrk file.
+### markers()
 
 **Returns:**
 
-- *QVector&lt; [BrainVisionMarker](/docs/api/bids/brain-vision-marker) &gt;* — Markers in file order; empty if no marker file was parsed.
+- *const std::vector&lt; [BrainVisionMarker](/docs/api/bids/brain-vision-marker) &gt; &* — Markers in file order; empty if no marker file was parsed.
 
 ---
 
-### getChannelInfos()
-
-Return all channel infos.
+### channel_infos()
 
 **Returns:**
 
-- *QVector&lt; [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info) &gt;* — Channel infos parsed from the .vhdr header, in channel order.
+- *const std::vector&lt; [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info) &gt; &* — Channel infos parsed from the .vhdr header, in channel order.
 
 ---
 
 ## Static Methods
 
-### unitScale(sUnit)
+### unit_scale(unit)
+
+**Parameters:**
+
+- **unit** : *std::string_view*
+  Unit from the header in UTF-8, e.g. "µV".
+
+**Returns:**
+
+- *float* — Factor from the unit into SI (V for voltages, S for siemens); unknown units scale by 1, like mne.
 
 ---
 
-### isVoltageUnit(sUnit)
+### is_voltage_unit(unit)
+
+**Parameters:**
+
+- **unit** : *std::string_view*
+  Unit from the header in UTF-8.
+
+**Returns:**
+
+- *bool* — Whether the unit is a voltage (V, mV, µV, uV, nV); other channels are typed misc, like mne.
 
 ---
 
@@ -204,11 +192,11 @@ BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round 
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 121"
 BrainVisionReader brainVision;
-const bool bvOpen = brainVision.open(QString::fromStdString(BASELIB::utf8FromPath(vhdr)));
-const MatrixXf bvHead = brainVision.readRawSegment(0, 200); // calibrated, volts
+const bool bvOpen = brainVision.open(vhdr);
+const MatrixXf bvHead = brainVision.read_raw_segment(0, 200); // calibrated, volts
 // mne.io.read_raw_brainvision: 32 channels at 1000 Hz, 7900 samples; data[0, 0] = -23.5 uV, data[5, 100] = 38.5 uV
-ok &= expect(bvOpen && brainVision.getChannelCount() == 32 && brainVision.getSampleCount() == 7900 && brainVision.getFrequency() == 1000.0f && near(bvHead(0, 0), -2.35e-5, 1e-4) && near(bvHead(5, 100), 3.85e-5, 1e-4),
-             std::format("BrainVision: {} x {} samples, (0,0) = {:g} V match mne", brainVision.getChannelCount(), brainVision.getSampleCount(), bvHead(0, 0)));
+ok &= expect(bvOpen && brainVision.channel_count() == 32 && brainVision.sample_count() == 7900 && brainVision.sfreq() == 1000.0f && near(bvHead(0, 0), -2.35e-5, 1e-4) && near(bvHead(5, 100), 3.85e-5, 1e-4),
+             std::format("BrainVision: {} x {} samples, (0,0) = {:g} V match mne", brainVision.channel_count(), brainVision.sample_count(), bvHead(0, 0)));
 ````
 
 ## Authors of this file

@@ -225,12 +225,12 @@ BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round 
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 138"
 std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
-const bool edfOpen = edf->open(QString::fromStdString(BASELIB::utf8FromPath(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path())));
-const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
-const MatrixXf edfHead = edf->readRawSegment(0, 201);
+const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path());
+const FIFFLIB::FiffInfo edfInfo = edf->info();
+const MatrixXf edfHead = edf->read_raw_segment(0, 201);
 // mne.io.read_raw_edf: 25 channels at 128 Hz, 1228 samples, first channel "EEG Fp1"; data[3, 200] = 0.1757724
-ok &= expect(edfOpen && dynamic_cast<EDFReader*>(edf.get()) != nullptr && edf->formatName() == "EDF" && edfInfo.nchan == 25 && edfInfo.ch_names.front() == "EEG Fp1" && edf->getSampleCount() == 1228 && near(edfHead(0, 0), 0.17594066, 1e-5) && near(edfHead(3, 200), 0.17577240650034331, 1e-5),
-             std::format("EDF: {} channels, {} samples, (3,200) = {:.8g} match mne", edfInfo.nchan, edf->getSampleCount(), edfHead(3, 200)));
+ok &= expect(edfOpen && dynamic_cast<EDFReader*>(edf.get()) != nullptr && edf->format_name() == "EDF" && edfInfo.nchan == 25 && edfInfo.ch_names.front() == "EEG Fp1" && edf->sample_count() == 1228 && near(edfHead(0, 0), 0.17594066, 1e-5) && near(edfHead(3, 200), 0.17577240650034331, 1e-5),
+             std::format("EDF: {} channels, {} samples, (3,200) = {:.8g} match mne", edfInfo.nchan, edf->sample_count(), edfHead(3, 200)));
 ````
 
 ## Authors of this file

@@ -18,18 +18,22 @@ struct BIDSLIB::EDFChannelInfo
 Channel-level metadata from the EDF header.
 
 ```cpp title="src/examples/ex_bids/main.cpp"
-const QVector<EDFChannelInfo> edfChannels = static_cast<EDFReader*>(edf.get())->getMeasurementChannelInfos(); // header fields per signal
+const std::vector<EDFChannelInfo>& edfChannels = static_cast<EDFReader*>(edf.get())->measurement_channel_infos(); // header fields per signal
 ```
 
 ---
 
 ## Public Methods
 
-### toFiffChInfo()
+### to_fiff_ch_info()
+
+**Returns:**
+
+- *[FiffChInfo](/docs/api/fiff/fiff-ch-info)* — The FIFF channel description: kind from the label, volts for voltage dimensions.
 
 ---
 
-### toSi()
+### to_si()
 
 **Returns:**
 
@@ -50,10 +54,10 @@ const QVector<EDFChannelInfo> edfChannels = static_cast<EDFReader*>(edf.get())->
 BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 148"
-const QVector<EDFChannelInfo> edfChannels = static_cast<EDFReader*>(edf.get())->getMeasurementChannelInfos(); // header fields per signal
+const std::vector<EDFChannelInfo>& edfChannels = static_cast<EDFReader*>(edf.get())->measurement_channel_infos(); // header fields per signal
 // mne.io.read_raw_edf: physical_max of the first two signals 175946, -217624
 ok &= expect(edfChannels.size() == 25 && edfChannels[0].label == "EEG Fp1" && edfChannels[0].physicalMax == 175946.0f && edfChannels[1].physicalMax == -217624.0f && edfChannels[0].frequency == 128.0f,
-             std::format("EDF header: {} signals, {} physical max {:g}", edfChannels.size(), edfChannels.value(0).label.toStdString(), edfChannels.value(0).physicalMax));
+             std::format("EDF header: {} signals, {} physical max {:g}", edfChannels.size(), edfChannels[0].label, edfChannels[0].physicalMax));
 ````
 
 ## Authors of this file

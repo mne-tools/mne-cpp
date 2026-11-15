@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6544 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6542 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -150,6 +150,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **affect_chs** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Count how many active projection vectors affect the given channels.
 - **align_fiducials** `[fn]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Align MEG and MRI coordinate systems using fiducial points and ICP.
 - **alignment** `[var]` in [AcqStreamOptions](/docs/api/acq/acq-stream-options) — Ring start alignment, power of two &gt;= 64 (e.g.
+- **all_channel_infos** `[fn]` in [EDFReader](/docs/api/bids/edf-reader)
 - **all_coord_trans** `[var]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — All coordinate transformations stored in the file, in file order.
 - **allowedMeanErrorDistChanged** `[signal]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Emit this signal whenever the allowed error changed.
 - **allowedMovementChanged** `[signal]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Emit this signal whenever the allowed head movement threshold changed.
@@ -413,7 +414,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **BrainSurface** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface) — Default Constructor.
 - **BrainTreeModel** `[fn]` in [BrainTreeModel](/docs/api/disp3-d/brain-tree-model)
 - **BrainView** `[fn]` in [BrainView](/docs/api/disp3-d/brain-view) — Constructor.
-- **BrainVisionReader** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Default constructor.
+- **BrainVisionReader** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
 - **bReject** `[var]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — Whether this epoch is to be rejected.
 - **bRejected** `[var]` in [ArtifactRejectionData](/docs/api/mne/artifact-rejection-data) — Set when the channel's peak-to-peak range exceeds dThreshold.
 - **buf_size** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Buffer size in samples.
@@ -562,7 +563,11 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **channel** `[var]` in [AcqBitField](/docs/api/acq/acq-bit-field) — Channel whose sample word carries the field.
 - **channel** `[var]` in [AcqImpedance](/docs/api/acq/acq-impedance) — Channel index within the stream.
 - **channel** `[var]` in [BrainVisionMarker](/docs/api/bids/brain-vision-marker) — Channel number (0 = all channels).
+- **channel_count** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader)
+- **channel_count** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
+- **channel_count** `[fn]` in [EDFReader](/docs/api/bids/edf-reader)
 - **channel_indices_by_type** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Channel indices of each channel type, like mne.channel_indices_by_type.
+- **channel_infos** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
 - **channel_type** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Get channel type.
 - **channelBadToggled** `[signal]` in [ChannelLabelPanel](/docs/api/disp/channel-label-panel)
 - **channelCount** `[fn]` in [AcqReader](/docs/api/acq/acq-reader)
@@ -1438,7 +1443,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **ecgFlat** `[var]` in [RejectionParams](/docs/api/fiff/rejection-params) — ECG flatness (V).
 - **EcgParams** `[type]` in [ArtifactDetect](/docs/api/dsp/artifact-detect) — Convenience alias so callers can still write `ArtifactDetect::EcgParams`.
 - **ecgReject** `[var]` in [RejectionParams](/docs/api/fiff/rejection-params) — ECG rejection (V).
-- **EDFReader** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — [`EDFReader`](/docs/api/bids/edf-reader) Default constructor.
+- **EDFReader** `[fn]` in [EDFReader](/docs/api/bids/edf-reader)
 - **edge_color** `[var]` in [VisualizationInfo](/docs/api/connectivity/visualization-info) — RGBA edge colour used by `Coloring::fixed`.
 - **edge_count** `[fn]` in [Network](/docs/api/connectivity/network)
 - **edgeInstanceCount** `[fn]` in [NetworkObject](/docs/api/disp3-d/network-object)
@@ -1944,9 +1949,9 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **format** `[var]` in [AcqStreamInfo](/docs/api/acq/acq-stream-info) — Native sample format stored in the ring.
 - **format** `[fn]` in [AcqViewBase](/docs/api/acq/acq-view-base)
 - **format** `[var]` in [MnaFileRef](/docs/api/mna/mna-file-ref) — File format: "fiff", "mgh", "stc", etc.
-- **formatName** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Return a descriptive name for the format (e.g.
-- **formatName** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return a descriptive name for the format (e.g.
-- **formatName** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Return a descriptive name for the format (e.g.
+- **format_name** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader)
+- **format_name** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
+- **format_name** `[fn]` in [EDFReader](/docs/api/bids/edf-reader)
 - **fov** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Field of view (extent of the surface).
 - **fov** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Field of view (extent of the surface).
 - **FoV** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Field of view (unreliable per FreeSurfer docs).
@@ -2166,7 +2171,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **get_meas_info** `[fn]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — This is an overloaded member function, provided for convenience. It differs from the above function only in what argument(s) it accepts. Overload that does not return the measurement start time.
 - **get_vertno** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces) — Returns the Zero based (different to MATLAB) indices of the used vertices of both hemispheres.
 - **get_whitener** `[fn]` in [Linalg](/docs/api/math/linalg) — Returns the whitener of a given matrix.
-- **getAllChannelInfos** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Return all channel infos (measurement + extra).
 - **getAllowedMeanErrorDistChanged** `[fn]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Get the allowed mean error distance.
 - **getAllowedMovementChanged** `[fn]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Get the allowed head movement.
 - **getAllowedRotationChanged** `[fn]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Get the allowed head rotation.
@@ -2193,10 +2197,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **getBaselineInfo** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Returns the current baseline information.
 - **getBaselineToSeconds** `[fn]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
 - **getCenterFrequency** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
-- **getChannelCount** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Return the number of measurement channels.
-- **getChannelCount** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return the number of measurement channels.
-- **getChannelCount** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Return the number of measurement channels.
-- **getChannelInfos** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return all channel infos.
 - **getChannels** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater) — inline get functions for private member variables.
 - **getChannelType** `[fn]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Returns the current channel type which is to be filtered.
 - **getClusteringStatusChanged** `[fn]` in [FwdSettingsView](/docs/api/disp/fwd-settings-view) — Get status of clustering check box.
@@ -2253,9 +2253,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **getFittingWindowSize** `[fn]` in [HpiSettingsView](/docs/api/disp/hpi-settings-view) — Get number of fits per second to do when performing continuous hpi.
 - **getFreqScale** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns the frequency scale of the x axis.
 - **getFreqScaleBound** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns the frequency scale scaled to boundaries of the x axis.
-- **getFrequency** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Return the sampling frequency in Hz.
-- **getFrequency** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return the sampling frequency in Hz.
-- **getFrequency** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Return the sampling frequency in Hz.
 - **getFrom** `[fn]` in [FilterDesignView](/docs/api/disp/filter-design-view) — Get filter 'From' value.
 - **getHighpassFreq** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
 - **getHpiDigitizer** `[fn]` in [InvHpiDataUpdater](/docs/api/inv/inv-hpi-data-updater)
@@ -2264,9 +2261,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **getIdxSelMap** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Returns a map which conatins the channel idx and its corresponding selection status.
 - **getIndexFromMappedChName** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model) — Returns the model index for the given input channel fro mthe mapped channel list.
 - **getIndexFromOrigChName** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model) — Returns the model index for the given input channel fro mthe original channel list.
-- **getInfo** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Return measurement metadata as FiffInfo.
-- **getInfo** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return measurement metadata as FiffInfo.
-- **getInfo** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Return measurement metadata as FiffInfo.
 - **getInfo** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns the fiff info.
 - **getIntermediateSumData** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **getIsChannelBad** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Returns true or fals whether the provided channel is bad.
@@ -2289,11 +2283,9 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **getLowerFrqBound** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Returns the lower frequency boundary.
 - **getLowpassFreq** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
 - **getMappedChannelsList** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model) — Updates the layout map.
-- **getMarkers** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return all parsed markers from the .vmrk file.
 - **getMaxIter** `[fn]` in [CoregSettingsView](/docs/api/disp/coreg-settings-view) — Get the maximum number of icp iterations.
 - **getMaxSamples** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Returns the maximal number of samples of the downsampled data to display.
 - **getMaxValueFromRawViewModel** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Get maximum range of respective channel type.
-- **getMeasurementChannelInfos** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Return measurement channel infos only.
 - **getModalityMap** `[fn]` in [ButterflyView](/docs/api/disp/butterfly-view) — Get the activation of the already created modality check boxes.
 - **getModalityMap** `[fn]` in [ModalitySelectionView](/docs/api/disp/modality-selection-view) — Get the activation of the already created modality check boxes.
 - **getModelCheckpoint** `[fn]` in [MinimumNormSettingsView](/docs/api/disp/minimum-norm-settings-view) — Returns the current model checkpoint path.
@@ -2326,9 +2318,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **getRecomputationStatusChanged** `[fn]` in [FwdSettingsView](/docs/api/disp/fwd-settings-view) — Get status of recomputation check box.
 - **getRGBAs** `[fn]` in [FsColortable](/docs/api/fs/fs-colortable) — RGBAs encoded in the colortable.
 - **getSampleAtColumn** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Maps a displayed buffer column to the sample it shows.
-- **getSampleCount** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Return total number of samples across the recording.
-- **getSampleCount** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Return total number of samples across the recording.
-- **getSampleCount** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Return total number of samples across the recording.
 - **getSamplingFreq** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Getter fcn for Sampling Frequency member.
 - **getSamplingFrequency** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
 - **getSamplingFrequency** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Returns the current sampling frequency.
@@ -2604,9 +2593,12 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **indices_by_label** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate)
 - **iNeighbours** `[var]` in [BadChannelDetectParams](/docs/api/dsp/bad-channel-detect-params) — Number of channels on each side to use as neighbours.
 - **iNfft** `[var]` in [TaperedSpectraInputData](/docs/api/math/tapered-spectra-input-data)
+- **info** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader)
 - **info** `[fn]` in [AcqError](/docs/api/acq/acq-error)
 - **info** `[fn]` in [AcqStream](/docs/api/acq/acq-stream)
 - **info** `[fn]` in `BabyMegTransport`
+- **info** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
+- **info** `[fn]` in [EDFReader](/docs/api/bids/edf-reader)
 - **info** `[var]` in [FiffEvoked](/docs/api/fiff/fiff-evoked) — Measurement info.
 - **info** `[var]` in `FiffEvokedFile` — The measurement info shared by all data sets.
 - **info** `[var]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — FIFF measurement information.
@@ -2784,6 +2776,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **is_undefined** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **is_valid** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Returns true if the data was loaded successfully.
 - **is_valid_entity_value** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Validates entity values: BIDS labels are alphanumeric ASCII.
+- **is_voltage_unit** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
 - **iSampleFreq** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - **isBad** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base)
 - **isBrainSurfaceKey** `[fn]` in [SubView](/docs/api/disp3-d/sub-view) — True when `key` identifies a brain-tissue surface (lh_/rh_) as opposed to BEM, sensor, digitizer, or source-space geometry.
@@ -2858,7 +2851,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **isVisible** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns whether a port lies completely inside the visible area.
 - **isVisible** `[fn]` in [NetworkObject](/docs/api/disp3-d/network-object)
 - **isVisible** `[fn]` in [PolylineObject](/docs/api/disp3-d/polyline-object)
-- **isVoltageUnit** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
 - **iTargetEvent** `[var]` in [XdawnResult](/docs/api/dsp/xdawn-result) — Event code used as the target class.
 - **item** `[var]` in [RayHit](/docs/api/disp3-d/ray-hit) — Tree item that was hit (nullable).
 - **ItemRole** `[enum]` in [AbstractTreeItem](/docs/api/disp3-d/abstract-tree-item)
@@ -2954,7 +2946,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **label** `[var]` in [AcqDiscoveredDevice](/docs/api/acq/acq-discovered-device) — Human-readable name.
 - **label** `[var]` in `AnnotationSpan` — Annotation label shown near the top edge.
 - **label** `[var]` in [DigitizedPoint](/docs/api/acq/digitized-point) — Human label ("NAS", "Cz", "HSP-42", …).
-- **label** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
+- **label** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info) — Signal label, Latin-1 bytes as stored.
 - **label** `[var]` in `EventMarker` — Short text label (shown at the bottom strip); defaults to type number.
 - **label** `[var]` in [IcaLabelResult](/docs/api/decoding/ica-label-result) — Assigned label.
 - **label** `[var]` in [MNELayoutPort](/docs/api/mne/mne-layout-port) — Channel names as written in the file (e.g.
@@ -3235,6 +3227,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **marker_values** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Per-vertex marker values (shown in shades of marker color).
 - **markerMoved** `[signal]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — position is emitted whenever user moves the mouse inside of the table view viewport
 - **markerMoved** `[fn]` in [RtFiffRawViewDelegate](/docs/api/disp/rt-fiff-raw-view-delegate) — markerMoved is called whenever user moves the mouse inside of the table view viewport
+- **markers** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
 - **match** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Searches the BIDS root (all subject, session and datatype folders) for files whose entities, datatype, suffix and extension equal the ones set here; unset ones match anything, as in mne_bids.BIDSPath.match.
 - **match** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Keeps the derivations whose inputs are all among `chNames` and merges them into one derivation whose columns are exactly `chNames` (MNE-C `mne_match_merge_deriv`).
 - **match_event** `[fn]` in [FiffEvents](/docs/api/fiff/fiff-events) — Checks whether an event matches an averaging category, as MNE-C's mne_process_raw does.
@@ -3316,6 +3309,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **measure** `[var]` in [InvConnectivity](/docs/api/inv/inv-connectivity) — Metric name, e.g.
 - **measureImpedances** `[fn]` in [AcqBackend](/docs/api/acq/acq-backend) — Measures electrode impedances.
 - **measureImpedances** `[fn]` in [AcqDevice](/docs/api/acq/acq-device) — Measures the electrode impedances (control path, allocates).
+- **measurement_channel_infos** `[fn]` in [EDFReader](/docs/api/bids/edf-reader)
 - **meg** `[var]` in `BabyMegSimulation` — Inner layer magnetometers.
 - **meg** `[var]` in `FtBufferSimulation` — Magnetometers of the relayed Neuromag system.
 - **meg** `[var]` in `NeuromagSimulation` — Magnetometer channels.
@@ -4107,7 +4101,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **phi_y** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
 - **phi_z** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
 - **phi_z** `[fn]` in [InvDipole](/docs/api/inv/inv-dipole)
-- **physicalDimension** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
+- **physicalDimension** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info) — Physical dimension (e.g.
 - **physicalMax** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - **physicalMin** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - **physicalNs** `[fn]` in [AcqClockModel](/docs/api/acq/acq-clock-model)
@@ -4223,7 +4217,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **predict** `[fn]` in [MlOnnxModel](/docs/api/ml/ml-onnx-model) — Run inference on the given input tensor.
 - **predicted** `[var]` in [MNEMneData](/docs/api/mne/mne-mne-data) — The predicted data, channels x times.
 - **prefault** `[var]` in [AcqStreamOptions](/docs/api/acq/acq-stream-options) — Touch every page at creation, so start() never page-faults.
-- **prefiltering** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
+- **prefiltering** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info) — Prefiltering description.
 - **prepare_forward** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Prepare forward for assembling the inverse operator.
 - **prepare_inverse_operator** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Prepare the inverse operator for source estimation.
 - **prepare_noise_cov** `[fn]` in [FiffCov](/docs/api/fiff/fiff-cov) — Prepare noise covariance matrix.
@@ -4505,6 +4499,9 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **read_polhemus_fastscan** `[fn]` in [FiffDigMontage](/docs/api/fiff/fiff-dig-montage) — Reads the points of a Polhemus FastSCAN .txt file, as mne.channels.read_polhemus_fastscan does.
 - **read_polhemus_isotrak** `[fn]` in [FiffDigMontage](/docs/api/fiff/fiff-dig-montage) — Reads a Polhemus Isotrak file, as mne.channels.read_dig_polhemus_isotrak does.
 - **read_proj** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Read the SSP data under a given directory node.
+- **read_raw_segment** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Read a segment of raw data.
+- **read_raw_segment** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Read a segment of raw data.
+- **read_raw_segment** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Read a segment of raw data.
 - **read_raw_segment** `[fn]` in [FiffRawData](/docs/api/fiff/fiff-raw-data) — Read a specific raw data segment.
 - **read_raw_segment** `[fn]` in [FiffRawData](/docs/api/fiff/fiff-raw-data) — Read a specific raw data segment.
 - **read_raw_segment_times** `[fn]` in [FiffRawData](/docs/api/fiff/fiff-raw-data) — Read a specific raw data segment.
@@ -4532,9 +4529,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **readMegEegChannels** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Read MEG and EEG channel information from a FIFF file, excluding bad channels.
 - **readMniTransform** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI .xfm file (MNE-C read_mni_coord_transform_file).
 - **ReadMode** `[enum]` in [AcqReader](/docs/api/acq/acq-reader) — Consumption mode.
-- **readRawSegment** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Read a segment of raw data.
-- **readRawSegment** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Read a segment of raw data.
-- **readRawSegment** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Read a segment of raw data.
 - **readsLm** `[fn]` in [Warp](/docs/api/math/warp) — Read electrode positions from MRI Database.
 - **readText** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Reads MNE-C's text syntax (`mne_make_derivations` in).
 - **realtime** `[var]` in `BabyMegSimulation`
@@ -4786,6 +4780,9 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **sample** `[var]` in [MNEEvent](/docs/api/mne/mne-event) — Sample number.
 - **sample** `[var]` in [TimeRulerEventMark](/docs/api/disp/time-ruler-event-mark) — Absolute sample index.
 - **sample** `[var]` in [TimeRulerReferenceMark](/docs/api/disp/time-ruler-reference-mark) — Absolute sample index.
+- **sample_count** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader)
+- **sample_count** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
+- **sample_count** `[fn]` in [EDFReader](/docs/api/bids/edf-reader)
 - **sampleAlignment** `[var]` in [AcqTimebase](/docs/api/acq/acq-timebase) — Step in samples on which this stream can schedule.
 - **sampleAt** `[fn]` in [AcqClockModel](/docs/api/acq/acq-clock-model)
 - **sampleClicked** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Emitted when the user clicks on a sample position.
@@ -5546,9 +5543,12 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setZScoreMode** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **severity** `[var]` in [MnaVerificationCheck](/docs/api/mna/mna-verification-check) — "error" (abort), "warning" (log + continue), "info" (always continue)
 - **severity** `[var]` in [MnaVerificationResult](/docs/api/mna/mna-verification-result) — Echoed from the check definition.
+- **sfreq** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader)
 - **sfreq** `[var]` in [AcqClockModel](/docs/api/acq/acq-clock-model) — Nominal sampling frequency in Hz.
 - **sfreq** `[var]` in [AcqStreamInfo](/docs/api/acq/acq-stream-info) — Nominal rate in Hz; 0 for irregular streams.
+- **sfreq** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
 - **sfreq** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model)
+- **sfreq** `[fn]` in [EDFReader](/docs/api/bids/edf-reader)
 - **sfreq** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — Sample frequency.
 - **sfreq** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — Sampling frequency (Hz).
 - **sfreq** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Sampling frequency.
@@ -5848,9 +5848,9 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **sum_solids** `[fn]` in [MNESurface](/docs/api/mne/mne-surface) — Sum the solid angles of all triangles as seen from a given point.
 - **sumd** `[var]` in [RegionDataOut](/docs/api/mne/region-data-out) — Sums of the distances to the centroid.
 - **sumd** `[var]` in [RegionMTOut](/docs/api/mne/region-mt-out) — Sum of distances to the assigned centroid.
-- **supportsExtension** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Check whether this reader can handle the given file extension.
-- **supportsExtension** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Check whether this reader can handle the given file extension.
-- **supportsExtension** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Check whether this reader can handle the given file extension.
+- **supports_extension** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader)
+- **supports_extension** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
+- **supports_extension** `[fn]` in [EDFReader](/docs/api/bids/edf-reader)
 - **surf** `[var]` in [FilterThreadArg](/docs/api/mne/filter-thread-arg) — Non-owning reference to the inner skull BEM surface (owned by the caller).
 - **surf** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Loaded surface (eg.
 - **surf** `[fn]` in [FsSurfaceSet](/docs/api/fs/fs-surface-set) — The kind of Surfaces which are held by the [`FsSurfaceSet`](/docs/api/fs/fs-surface-set) (eg.
@@ -5995,9 +5995,12 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **to_dir_entry** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff DIR ENTRY
 - **to_double** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Double Fast access; Data are deleted if tag gets deleted, and vice versa
 - **to_double** `[fn]` in [JsonValue](/docs/api/base/json-value)
+- **to_fiff_ch_info** `[fn]` in [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info)
+- **to_fiff_ch_info** `[fn]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - **to_fiff_coord_trans** `[fn]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — Convert parsed transform to a FiffCoordTrans.
 - **to_fiff_dig_points** `[fn]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Convert a list of BIDS electrodes to a FIFF digitizer point set.
 - **to_fiff_id** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff ID
+- **to_fiff_raw_data** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader)
 - **to_fixed_ori** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Helper to convert the forward solution to fixed ori from free.
 - **to_float** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Float Fast access; Data are deleted if tag gets deleted, and vice versa
 - **to_float_matrix** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff FIFFT FLOAT MATRIX
@@ -6012,6 +6015,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **to_object** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **to_object** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **to_short** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Short Fast access; Data are deleted if tag gets deleted, and vice versa
+- **to_si** `[fn]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - **to_sparse_float_matrix** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to sparse fiff FIFFT FLOAT MATRIX
 - **to_std_string** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **to_string** `[fn]` in [FiffId](/docs/api/fiff/fiff-id) — Returns a human-readable string representation of this ID.
@@ -6037,11 +6041,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **toCbor** `[fn]` in [MnaVerificationResult](/docs/api/mna/mna-verification-result)
 - **toEigen** `[fn]` in [MNEMorphMap](/docs/api/mne/mne-morph-map) — Returns the map as a matrix that takes source vertex values to destination vertices.
 - **toEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Convert to Eigen::SparseMatrix&lt;double&gt; (cast from float).
-- **toFiffChInfo** `[fn]` in [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info)
-- **toFiffChInfo** `[fn]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
-- **toFiffRawData** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Convert the entire dataset to a FiffRawData structure.
-- **toFiffRawData** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Convert the entire dataset to a FiffRawData structure.
-- **toFiffRawData** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Convert the entire dataset to a FiffRawData structure.
 - **toggleFreeze** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Toggle freeze for all channels when a channel is double clicked.
 - **toggleFreeze** `[fn]` in [FrequencySpectrumModel](/docs/api/disp/frequency-spectrum-model) — Toggle freeze for all channels when a channel is double clicked.
 - **toggleFreeze** `[fn]` in [RtFiffRawViewModel](/docs/api/disp/rt-fiff-raw-view-model) — Toggle freeze for all channels when a channel is double clicked.
@@ -6073,7 +6072,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **toMatrixXf** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
 - **toolVersion** `[var]` in [MnaNode](/docs/api/mna/mna-node) — Version of tool that last executed this node.
 - **topologicalSort** `[fn]` in [MnaGraph](/docs/api/mna/mna-graph)
-- **toSi** `[fn]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
 - **toString** `[fn]` in [AcqUri](/docs/api/acq/acq-uri)
 - **tot_area** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Total area of the surface, computed from the triangles (m^2).
 - **total_degree** `[fn]` in [Network](/docs/api/connectivity/network) — Returns the sum of all node degrees, i.e.
@@ -6096,7 +6094,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **trans** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Extra 4x4 transformation matrix for this surface.
 - **trans** `[var]` in [MNERawInfo](/docs/api/mne/mne-raw-info) — Coordinate transformation FIFF_COORD_HEAD &lt;-&gt; FIFF_COORD_DEVICE.
 - **trans** `[var]` in [MriSlice](/docs/api/mri/mri-slice) — Coordinate transform: slice -&gt; MRI (surface RAS).
-- **transducerType** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
+- **transducerType** `[var]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info) — Transducer type.
 - **transfer_bytes** `[fn]` in `GusbampSetup`
 - **transferFunction** `[fn]` in [MvarModel](/docs/api/connectivity/mvar-model) — Computes the transfer function H(f) at the given normalized frequencies.
 - **transform** `[fn]` in [AbstractTreeItem](/docs/api/disp3-d/abstract-tree-item)
@@ -6197,7 +6195,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **undoLast** `[fn]` in [AcquiredPoints](/docs/api/acq/acquired-points) — Remove the most recently captured point matching `kind`, if any.
 - **unit** `[var]` in [AcqChannelInfo](/docs/api/acq/acq-channel-info) — SI unit of the physical value.
 - **unit** `[var]` in `AcqFiffChannel` — FIFF_UNIT_*.
-- **unit** `[var]` in [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info) — Physical unit string (e.g.
+- **unit** `[var]` in [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info) — Physical unit in UTF-8 (e.g.
 - **unit** `[var]` in [ElectrodeLayout](/docs/api/channels/electrode-layout) — Unit of the positions, e.g.
 - **unit** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Unit of measurement.
 - **unit** `[fn]` in [FiffExplain](/docs/api/fiff/fiff-explain) — SI symbol of a unit (FIFF_UNIT_*), e.g.
@@ -6205,6 +6203,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **unit** `[var]` in `TmsiChannel`
 - **unit_mul** `[var]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Unit multiplier exponent.
 - **unit_mul** `[var]` in `NeuromagChannel`
+- **unit_scale** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
 - **unitExponent** `[var]` in [AcqChannelInfo](/docs/api/acq/acq-channel-info) — Power of ten of the unit (e.g.
 - **unitMul** `[var]` in `AcqFiffChannel` — FIFF_UNITM_*.
 - **unitMultiplier** `[fn]` in [FiffExplain](/docs/api/fiff/fiff-explain) — SI prefix of a unit multiplier (FIFF_UNITM_*), e.g.
@@ -6212,7 +6211,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **units** `[var]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — "m", "mm", or "cm" (REQUIRED for iEEG).
 - **units** `[var]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Unit of the source estimates, FIFF_UNIT_AM, FIFF_UNIT_AM_M2 or FIFF_UNIT_AM_M3.
 - **units** `[var]` in `PolhemusSimulation` — Unit of the simulated records.
-- **unitScale** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader)
 - **unproject** `[fn]` in [RayPicker](/docs/api/disp3-d/ray-picker) — Unproject a screen position to a world-space ray.
 - **up** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Up vector for 3D viewing.
 - **up** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Up vector for viewing.
