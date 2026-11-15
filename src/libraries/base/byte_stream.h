@@ -30,6 +30,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -320,6 +321,17 @@ BASESHARED_EXPORT Expected<std::string> read_text_file(const std::filesystem::pa
  * @return Nothing; an Io error if the file cannot be written.
  */
 BASESHARED_EXPORT Expected<void> write_text_file(const std::filesystem::path& path, std::string_view text);
+
+//=============================================================================================================
+/**
+ * Replaces a file with the given bytes.
+ *
+ * @param[in] path   The file.
+ * @param[in] data   The content.
+ *
+ * @return Nothing; an Io error if the file cannot be written.
+ */
+BASESHARED_EXPORT Expected<void> write_file_bytes(const std::filesystem::path& path, std::span<const std::byte> data);
 
 } // namespace mne
 

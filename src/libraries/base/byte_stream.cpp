@@ -364,8 +364,15 @@ Expected<std::string> mne::read_text_file(const std::filesystem::path& path)
 
 Expected<void> mne::write_text_file(const std::filesystem::path& path, std::string_view text)
 {
+    return write_file_bytes(path, std::as_bytes(std::span(text)));
+}
+
+//=============================================================================================================
+
+Expected<void> mne::write_file_bytes(const std::filesystem::path& path, std::span<const std::byte> data)
+{
     std::ofstream file(path, std::ios::binary | std::ios::trunc);
-    if (!file || !file.write(text.data(), static_cast<std::streamsize>(text.size())) || !file.flush()) {
+    if (!file || !file.write(reinterpret_cast<const char*>(data.data()), static_cast<std::streamsize>(data.size())) || !file.flush()) {
         return std::unexpected(Error(ErrorCode::Io, std::format("cannot write {}", utf8_from_path(path))));
     }
     return {};

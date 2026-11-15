@@ -382,6 +382,16 @@ void TestUtilsByteStream::textFilesRoundTripExactly()
     QVERIFY(!missing && missing.error().code == ErrorCode::Io);
     const auto unwritable = write_text_file(path.parent_path() / "no" / "dir.txt", text);
     QVERIFY(!unwritable && unwritable.error().code == ErrorCode::Io);
+    std::vector<std::byte> bytes;
+    for (int i = 0; i < 256; ++i) {
+        bytes.push_back(static_cast<std::byte>(i));
+    }
+    QVERIFY(write_file_bytes(path, bytes).has_value());
+    QCOMPARE(read_file_bytes(path).value(), bytes);
+    QVERIFY(write_file_bytes(path, std::span(bytes).first(3)).has_value());
+    QCOMPARE(read_file_bytes(path).value().size(), std::size_t(3));
+    const auto unwritableBytes = write_file_bytes(path.parent_path() / "no" / "dir.bin", bytes);
+    QVERIFY(!unwritableBytes && unwritableBytes.error().code == ErrorCode::Io);
 }
 
 //=============================================================================================================
