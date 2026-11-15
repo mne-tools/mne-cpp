@@ -10,25 +10,10 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     February 2013
- * @brief    Library export/import macros and namespace marker for the disp3D library.
+ * @brief    Export macro of mne_disp3D — 3-D brain visualisation using the Qt RHI rendering backend.
  *
- * disp3D is the Qt-RHI-based 3-D visualisation layer of MNE-CPP. It
- * renders cortical surfaces, BEM heads, source-space points, fitted
- * dipoles, MEG / EEG sensor arrays, digitizer fiducials, connectivity
- * networks and MRI slice planes into a single interactive scene that
- * is shared by every clinical / research GUI in the suite.
- *
- * All renderables go through a uniform pipeline of <em>CPU mesh build</em>
- * &rarr; <em>QRhi vertex / index / instance buffer upload</em> &rarr;
- * <em>shader draw</em>. Per-vertex colour is computed either from
- * FreeSurfer curvature, FsAnnotation parcellation, an iso-contour
- * field map, or a smoothed source-time-course produced by the
- * @ref mne::disp::Interpolation helpers, then packed ABGR and uploaded
- * alongside the geometry so a single draw covers the whole surface.
- *
- * The header itself only carries the import / export macro plumbing;
- * consumers should include @ref mne::disp::BrainView (top-level QWidget) or the
- * scene controllers in scene/ and workers/ for high-level integration.
+ * @c DISP3DSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef DISP3DLIB_DISP3D_GLOBAL_H
@@ -39,7 +24,6 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
-#include <base/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -52,33 +36,5 @@
 #else
 #define DISP3DSHARED_EXPORT Q_DECL_IMPORT /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
-
-namespace mne::disp
-{
-
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Static C string with the build timestamp.
- */
-const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Static C string with the short git commit hash.
- */
-const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Static C string with the full git commit hash.
- */
-const char* buildHashLong();
-}
 
 #endif // DISP3DLIB_DISP3D_GLOBAL_H

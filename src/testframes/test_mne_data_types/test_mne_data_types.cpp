@@ -13,6 +13,7 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
+#include <base/base_global.h>
 #include <base/log.h>
 #include <math/linalg.h>
 #include <mne/mne_source_spaces.h>

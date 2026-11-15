@@ -7,24 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    Export/import macros and namespace declaration for the DSP library.
+ * @brief    Export macro of mne_dsp — Digital signal processing (filtering, spectrograms, real-time averaging, HPI, noise reduction).
  *
- * The DSP library bundles every digital-signal-processing component shipped
- * with mne-cpp: FIR / IIR / cosine-tapered / Parks–McClellan filter design
- * and application, FFT-based overlap-add convolution, polyphase rational
- * resampling, Morlet wavelet and multitaper time-frequency representations,
- * Welch and multitaper power spectral density estimators, surface Laplacian
- * (CSD) and SPHARA spatial filters, ExtendedInfomax and PICARD ICA, Maxwell
- * filtering (SSS, movement compensation, fine calibration), cHPI line-noise
- * removal, bridged-electrode and LOF bad-channel detection, EOG regression
- * and assorted real-time wrappers (averaging, covariance, noise PSD, inverse
- * operator update).
- *
- * @c DSPSHARED_EXPORT exports the symbols inside the DSP target
- * itself and imports them for every downstream consumer; it collapses
- * to an empty token in static builds. This macro must annotate every symbol
- * that crosses the shared-library boundary on Windows so the import library
- * is generated correctly.
+ * @c DSPSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef DSP_GLOBAL_H
@@ -34,7 +20,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/buildinfo.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -69,29 +54,6 @@ namespace mne
 
 using mne::StringList;
 
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Static C string with the compile date and time, e.g. "Sep 30 2026 14:05:12".
- */
-DSPSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Static C string with the short git commit hash, or a "not defined" notice if unavailable at build time.
- */
-DSPSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Static C string with the full git commit hash, or a "not defined" notice if unavailable at build time.
- */
-DSPSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // DSP_GLOBAL_H

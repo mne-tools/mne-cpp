@@ -7,7 +7,6 @@ cmake_minimum_required(VERSION 3.21)
 project(mne_com LANGUAGES CXX)
 
 set(SOURCES
-    com_global.cpp
     serial_port.cpp
     tcp_socket.cpp
     udp_socket.cpp
@@ -23,12 +22,6 @@ set(HEADERS
     tcp_socket.h
     udp_socket.h
 )
-
-set(FILE_TO_UPDATE com_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${PRIVATE_HEADERS} ${HEADERS})
 

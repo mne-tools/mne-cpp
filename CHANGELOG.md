@@ -25,6 +25,8 @@ table.
 | `EVENTSINTERNAL` | `mne::analyze::events::detail` |
 | `SCSHAREDLIB`, `SCMEASLIB`, `SCDISPLIB` (MNE Scan) | `mne::scan` |
 | `using namespace FIFFLIB; using namespace MNELIB; ...` | `using namespace mne;` |
+| `FIFFLIB::buildDateTime()`, `buildHash()`, `buildHashLong()` and the same three in every other library | `mne::buildDateTime()`, `buildHash()`, `buildHashLong()` from `base/base_global.h` only; all libraries are built from one commit |
+| `ACQLIB::buildDateTime()`, `buildHash()`, `buildHashLong()` | `mne::acq_build_date_time()`, `acq_build_hash()`, `acq_build_hash_long()`; `mne_acq` builds without `mne_base` |
 
 The library interfaces use the C++ standard library instead of Qt for strings,
 paths, containers, smart pointers and logging. There are no compatibility

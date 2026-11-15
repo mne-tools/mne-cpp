@@ -8,7 +8,6 @@ project(mne_bids
 )
 
 set(SOURCES
-  bids_global.cpp
   bids_path.cpp
   bids_tsv.cpp
   bids_channel.cpp
@@ -36,12 +35,6 @@ set(HEADERS
   readers/bids_edf_reader.h
   readers/bids_brain_vision_reader.h
 )
-
-set(FILE_TO_UPDATE bids_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 

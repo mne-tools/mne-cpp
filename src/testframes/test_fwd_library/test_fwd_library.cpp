@@ -14,6 +14,7 @@
 #include <QCoreApplication>
 #include <Eigen/Dense>
 
+#include <base/base_global.h>
 #include <base/log.h>
 
 #include <fiff/fiff.h>

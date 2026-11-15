@@ -21,6 +21,7 @@
 
 #include "settingscontrollercl.h"
 #include "fiffanonymizer.h"
+#include <base/base_global.h>
 #include <base/buildinfo.h>
 #include "fiff/fiff_global.h"
 

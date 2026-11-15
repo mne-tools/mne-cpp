@@ -9,9 +9,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-
 set(SOURCES
-  decoding_global.cpp
   decoding_csp.cpp
   decoding_spoc.cpp
   decoding_ssd.cpp
@@ -25,11 +23,6 @@ set(HEADERS
   decoding_ssd.h
   decoding_ica_label.h
 )
-
-set(FILE_TO_UPDATE decoding_global.cpp)
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 include(${CMAKE_CURRENT_LIST_DIR}/../../../cmake/MneWarnings.cmake)

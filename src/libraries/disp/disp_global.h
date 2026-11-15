@@ -10,14 +10,10 @@
  *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     August 2012
- * @brief    Export macros and build-info hooks for the mne_disp shared library.
+ * @brief    Export macro of mne_disp — 2-D display widgets and visualisation helpers (charts, topography, colour maps).
  *
- * Defines @c DISPSHARED_EXPORT / @c DISPSHARED_IMPORT for Windows DLL
- * visibility and exposes a single @c mne::disp::buildDateTime() entry
- * point so any of the disp viewers / plots / models can stamp the same
- * MNE-CPP build date into status bars or log files. Every public class
- * in this library declares itself with @c DISPSHARED_EXPORT to be
- * usable from downstream applications and plugins.
+ * @c DISPSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef DISP_GLOBAL_H
@@ -28,7 +24,6 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
-#include <base/buildinfo.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -53,29 +48,6 @@ namespace mne::disp
 
 using mne::StringList;
 
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Null-terminated build date/time string with static storage duration.
- */
-DISPSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Null-terminated abbreviated git hash string with static storage duration.
- */
-DISPSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Null-terminated full git hash string with static storage duration.
- */
-DISPSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // DISP_GLOBAL_H

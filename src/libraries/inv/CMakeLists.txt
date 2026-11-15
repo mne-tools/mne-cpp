@@ -6,7 +6,6 @@ cmake_minimum_required(VERSION 3.14)
 project(mne_inv LANGUAGES CXX)
 
 set(SOURCES
-    inv_global.cpp
     minimum_norm/inv_minimum_norm.cpp
     rap_music/inv_rap_music.cpp
     rap_music/inv_pwl_rap_music.cpp
@@ -91,12 +90,6 @@ set(HEADERS
     inv_vector_source_estimate.h
     inv_volume_source_estimate.h
 )
-
-set(FILE_TO_UPDATE inv_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 

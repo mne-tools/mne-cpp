@@ -10,20 +10,23 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     December 2012
- * @brief    Export/import macros and build-info accessors for the mne_fs FreeSurfer I/O library.
+ * @brief    Export macro of mne_fs — FreeSurfer surface, annotation and parcellation I/O for mne-cpp.
  *
- * Defines the @c FSSHARED_EXPORT visibility macro used by every public
- * class in mne_fs so the library can be built either as a shared
- * library (default) or as a static archive under @c STATICBUILD without
- * source changes. Also exposes the small set of build-info accessors
- * (date/time, abbreviated git hash, full git hash) that downstream
- * tools surface in their About dialogs and log headers.
+ * Houses the readers and in-memory containers for the on-surface side of
+ * a FreeSurfer @c recon-all output tree: triangular cortical surfaces
+ * (@c lh.pial, @c rh.white, @c lh.inflated, …), per-vertex annotation
+ * files (@c lh.aparc.annot, …), the FreeSurferColorLUT-style colour
+ * lookup tables they embed, surface labels (@c .label) and the
+ * companion lookup against volumetric parcellations
+ * (@c aparc+aseg.mgz). The volumetric MRI side lives in MRILIB.
+ *
+ * @c FSSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef FS_GLOBAL_H
 #define FS_GLOBAL_H
 
-#include <base/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -46,33 +49,5 @@
 #if defined(_MSC_VER)
 #pragma warning(disable : 4251 4275)
 #endif
-
-namespace mne
-{
-
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Null-terminated build date/time string with static storage duration.
- */
-FSSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Null-terminated abbreviated git hash string with static storage duration.
- */
-FSSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Null-terminated full git hash string with static storage duration.
- */
-FSSHARED_EXPORT const char* buildHashLong();
-}
 
 #endif // FS_GLOBAL_H

@@ -29,7 +29,6 @@ set(MNE_DISP_HAS_RHIWIDGET TRUE)
 message(STATUS "mne_disp: QRhi GPU rendering enabled as the only supported raw-browser renderer")
 
 set(SOURCES
-    disp_global.cpp
     plots/imagesc.cpp
     plots/plot.cpp
     plots/graph.cpp
@@ -195,12 +194,6 @@ set(UI
 )
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/viewers/formfiles")
-
-set(FILE_TO_UPDATE disp_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI})
 

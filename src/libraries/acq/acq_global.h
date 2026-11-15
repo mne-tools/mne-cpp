@@ -7,10 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Export macro, build-info accessors and the mne_acq namespace anchor of the acquisition library.
+ * @brief    Export macro of mne_acq — Headless acquisition: sources, streams, zero-copy readers and native sample formats.
  *
- * mne_acq is the headless acquisition library of MNE-CPP. It depends only on the C++20 standard
- * library, so the export macro is defined here without Qt and the library builds for embedded targets.
+ * @c ACQSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef ACQ_GLOBAL_H
@@ -47,29 +47,16 @@
 namespace mne
 {
 
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Null-terminated string with the compile date and time of the library.
- */
-ACQSHARED_EXPORT const char* buildDateTime();
+// mne_acq builds without mne_base, so it reports its own build instead of mne::buildDateTime() and friends.
 
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Null-terminated string with the short git commit hash the library was built from.
- */
-ACQSHARED_EXPORT const char* buildHash();
+/** @return Null-terminated compile date and time of mne_acq. */
+ACQSHARED_EXPORT const char* acq_build_date_time();
 
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Null-terminated string with the full git commit hash the library was built from.
- */
-ACQSHARED_EXPORT const char* buildHashLong();
+/** @return Null-terminated short git commit hash mne_acq was built from, or "unknown" in a standalone build. */
+ACQSHARED_EXPORT const char* acq_build_hash();
+
+/** @return Null-terminated full git commit hash mne_acq was built from, or "unknown" in a standalone build. */
+ACQSHARED_EXPORT const char* acq_build_hash_long();
 
 } // namespace mne
 

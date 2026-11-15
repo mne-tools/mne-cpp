@@ -29,21 +29,21 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* mne::buildDateTime()
+const char* mne::acq_build_date_time()
 {
     return __DATE__ " " __TIME__;
 }
 
 //=============================================================================================================
 
-const char* mne::buildHash()
+const char* mne::acq_build_hash()
 {
     return MNE_GIT_HASH_SHORT;
 }
 
 //=============================================================================================================
 
-const char* mne::buildHashLong()
+const char* mne::acq_build_hash_long()
 {
     return MNE_GIT_HASH_LONG;
 }

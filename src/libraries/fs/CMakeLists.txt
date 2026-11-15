@@ -10,7 +10,6 @@ set(SOURCES
     fs_annotation.cpp
     fs_atlas_lookup.cpp
     fs_colortable.cpp
-    fs_global.cpp
     fs_label.cpp
     fs_label_utils.cpp
     fs_surface.cpp
@@ -29,12 +28,6 @@ set(HEADERS
     fs_annotationset.h
     fs_surfaceset.h
 )
-
-set(FILE_TO_UPDATE fs_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 

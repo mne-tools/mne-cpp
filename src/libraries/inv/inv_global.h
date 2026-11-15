@@ -7,17 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     March 2026
- * @brief    mne_inv library export/import macros, build-info accessors, and namespace docstring for the inverse-solver library.
+ * @brief    Export macro of mne_inv — Inverse source estimation (MNE, dSPM, sLORETA, dipole fitting).
  *
- * The mne_inv library bundles every inverse-method, beamformer and HPI-fit
- * class used by mne-cpp: minimum-norm / dSPM / sLORETA / eLORETA, LCMV and
- * DICS beamformers, RAP-MUSIC, TRAP-MUSIC, MxNE / TF-MxNE / Gamma-MAP,
- * contextual MNE (CMNE), ECD dipole fitting and continuous head-position
- * estimation. This header defines the @c INVSHARED_EXPORT macro that
- * controls symbol visibility for the shared/static build variants, declares
- * the @c mne_inv namespace, and exposes @ref mne::buildDateTime "buildDateTime" and
- * @ref mne::buildHash "buildHash" so applications can stamp the linked mne_inv version into
- * log files and reports.
+ * @c INVSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef INV_GLOBAL_H
@@ -27,7 +20,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/buildinfo.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -57,29 +49,6 @@ namespace mne
 
 using mne::StringList;
 
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Static C string with the compile date and time, e.g. "Sep 30 2026 14:05:12".
- */
-INVSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Static C string with the short git commit hash, or a "not defined" notice if unavailable at build time.
- */
-INVSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Static C string with the full git commit hash, or a "not defined" notice if unavailable at build time.
- */
-INVSHARED_EXPORT const char* buildHashLong();
 
 }
 

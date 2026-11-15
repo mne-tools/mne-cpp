@@ -7,11 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.4.0
  * @date     October 2026
- * @brief    mne_ieeg shared-library export macro and build-info accessors for the intracranial EEG library.
+ * @brief    Export macro of mne_ieeg — Intracranial EEG (sEEG, ECoG): implantation, bipolar referencing, cortical mapping.
  *
- * mne_ieeg holds what is specific to intracranial recordings, sEEG depth leads and ECoG strips and
- * grids: the implantation (contacts grouped into leads), bipolar re-referencing along the leads,
- * and the mapping of contact values onto the cortical surface.
+ * @c IEEGSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef IEEG_GLOBAL_H
@@ -21,7 +20,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -44,34 +42,5 @@
 #if defined(_MSC_VER)
 #pragma warning(disable : 4251 4275)
 #endif
-
-namespace mne
-{
-
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Static C string with the build timestamp.
- */
-IEEGSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Static C string with the short git commit hash.
- */
-IEEGSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Static C string with the full git commit hash.
- */
-IEEGSHARED_EXPORT const char* buildHashLong();
-
-} // namespace mne
 
 #endif // IEEG_GLOBAL_H

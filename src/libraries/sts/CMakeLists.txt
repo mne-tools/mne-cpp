@@ -15,7 +15,6 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    sts_global.cpp
     sts_ttest.cpp
     sts_ftest.cpp
     sts_correction.cpp
@@ -36,12 +35,6 @@ set(HEADERS
     sts_source_metrics.h
     sts_cov_estimators.h
 )
-
-set(FILE_TO_UPDATE sts_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 include(${CMAKE_CURRENT_LIST_DIR}/../../../cmake/MneWarnings.cmake)

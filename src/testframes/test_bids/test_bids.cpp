@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/base_global.h>
 #include <bids/bids_path.h>
 #include <base/byte_stream.h>
 #include <base/json.h>

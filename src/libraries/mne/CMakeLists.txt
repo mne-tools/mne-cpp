@@ -14,7 +14,6 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    mne_global.cpp
     mne_source_spaces.cpp
     mne_hemisphere.cpp
     mne_epoch_data.cpp
@@ -128,12 +127,6 @@ set(HEADERS
     mne_meas_data.h
     mne_meas_data_set.h
 )
-
-set(FILE_TO_UPDATE mne_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 

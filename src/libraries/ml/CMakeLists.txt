@@ -10,7 +10,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(SOURCES
-  ml_global.cpp
   ml_tensor.cpp
   ml_onnx_model.cpp
   ml_trainer.cpp
@@ -24,11 +23,6 @@ set(HEADERS
   ml_onnx_model.h
   ml_trainer.h
 )
-
-set(FILE_TO_UPDATE ml_global.cpp)
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 include(${CMAKE_CURRENT_LIST_DIR}/../../../cmake/MneWarnings.cmake)

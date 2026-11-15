@@ -17,7 +17,6 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-  lsl_global.cpp
   lsl_stream_info.cpp
   lsl_stream_inlet.cpp
   lsl_stream_outlet.cpp
@@ -33,12 +32,6 @@ set(HEADERS
   lsl_stream_outlet.h
   lsl_stream_discovery.h
 )
-
-set(FILE_TO_UPDATE lsl_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} lsl_protocol.h)
 

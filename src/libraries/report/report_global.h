@@ -7,16 +7,15 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Export macro and build-info accessors of mne_report.
+ * @brief    Export macro of mne_report — HTML reports of analysis results.
  *
- * mne_report builds self-contained HTML reports of analysis results, the counterpart of
- * mne.Report.
+ * @c REPORTSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef REPORT_GLOBAL_H
 #define REPORT_GLOBAL_H
 
-#include <base/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -39,33 +38,5 @@
 #if defined(_MSC_VER)
 #pragma warning(disable : 4251 4275)
 #endif
-
-namespace mne
-{
-
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Null-terminated string with the library build date and time.
- */
-REPORTSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Null-terminated string with the short git commit hash of the build.
- */
-REPORTSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Null-terminated string with the full git commit hash of the build.
- */
-REPORTSHARED_EXPORT const char* buildHashLong();
-}
 
 #endif // MNEREPORT_GLOBAL_H

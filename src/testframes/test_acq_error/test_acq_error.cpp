@@ -167,7 +167,7 @@ void TestAcqError::testSampleFormatNamesAndBuildInfo()
     QVERIFY(isComplex(AcqSampleFormat::ComplexInt16) && !isComplex(AcqSampleFormat::Float64));
     AcqInt24 negative{{0xFF, 0xFF, 0xFF}};
     QCOMPARE(negative.value(), -1);
-    QVERIFY(std::strlen(buildDateTime()) > 0 && std::strlen(buildHash()) > 0 && std::strlen(buildHashLong()) > 0);
+    QVERIFY(std::strlen(acq_build_date_time()) > 0 && std::strlen(acq_build_hash()) > 0 && std::strlen(acq_build_hash_long()) > 0);
 }
 
 //=============================================================================================================

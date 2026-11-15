@@ -14,9 +14,7 @@ set(QT_REQUIRED_COMPONENTS Core)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-
 set(SOURCES
-    mri_global.cpp
     mri_vol_data.cpp
     mri_mgh_io.cpp
     mri_nifti_io.cpp
@@ -38,12 +36,6 @@ set(HEADERS
     mri_cor_fif_io.h
     mri_slicer.h
 )
-
-set(FILE_TO_UPDATE mri_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${PRIVATE_HEADERS})
 include(${CMAKE_CURRENT_LIST_DIR}/../../../cmake/MneWarnings.cmake)

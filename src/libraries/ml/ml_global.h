@@ -7,22 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.2.0
  * @date     April 2026
- * @brief    Export/import macros, build-stamp accessors and namespace anchor for the mne_ml machine-learning library.
+ * @brief    Export macro of mne_ml — Tensors, model abstraction, ONNX Runtime inference and Python training drivers used across mne-cpp.
  *
- * mne_ml is the thin C++ surface mne-cpp puts around third-party ML
- * runtimes (currently ONNX Runtime) and Python-side training drivers.
- * The library deliberately stays small: an N-dimensional tensor type,
- * an abstract model interface, an ONNX inference backend and a
- * @c QProcess-based trainer wrapper. Anything heavier (graph
- * optimisation, autodiff, GPU kernels) is delegated to the underlying
- * runtime to keep the mne-cpp build tractable on every supported
- * platform, including WebAssembly where the trainer compiles out.
- *
- * This header exposes only the symbol-visibility macro
- * @c MLSHARED_EXPORT and the three build-stamp accessors used by the
- * application about-boxes; pull it from every public declaration so the
- * library can be linked as shared (Qt default), static
- * (@c STATICBUILD) or imported by clients without code changes.
+ * @c MLSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef ML_GLOBAL_H
@@ -32,7 +20,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -55,33 +42,5 @@
 #if defined(_MSC_VER)
 #pragma warning(disable : 4251 4275)
 #endif
-
-namespace mne
-{
-
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Static C string with the build timestamp.
- */
-MLSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Static C string with the short git commit hash.
- */
-MLSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Static C string with the full git commit hash.
- */
-MLSHARED_EXPORT const char* buildHashLong();
-}
 
 #endif // ML_GLOBAL_H

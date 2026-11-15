@@ -10,20 +10,19 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     August 2012
- * @brief    Export/import macros and build-info accessors for the mne_fiff shared library.
+ * @brief    Export macro of mne_fiff — FIFF file I/O, in-memory data structures and high-level readers/writers.
  *
- * This header is included first by every public mne_fiff symbol and is the
- * only place where the export / import visibility decoration
- * is chosen. STATICBUILD strips the decoration entirely so the same
- * sources can be linked into a monolithic static archive (used for the
- * WebAssembly build and for the all-in-one fat library on Windows).
+ * Houses every class that round-trips an Elekta/Neuromag FIFF file:
+ * the stream layer (mne::FiffStream, mne::FiffTag, mne::FiffDirNode,
+ * mne::FiffDirEntry), the measurement metadata (mne::FiffInfo,
+ * mne::FiffChInfo, mne::FiffCoordTrans, mne::FiffId, mne::FiffDigPoint),
+ * the data containers (mne::FiffRawData, mne::FiffEvoked,
+ * mne::FiffEvokedSet, mne::FiffCov, mne::FiffProj, mne::FiffCtfComp,
+ * mne::FiffNamedMatrix, mne::FiffSparseMatrix) and the convenience facade
+ * @c FIFF. Surface-level parity with @c mne.io.fiff in MNE-Python.
  *
- * The library also re-exports three string accessors backed by
- * ``utils/buildinfo.h`` so that downstream tools can stamp the FIFF
- * build identity (timestamp, short hash, long hash) into the FIFF
- * @c FIFF_MNE_CREATOR and @c FIFF_PROC_HISTORY tags when writing files,
- * keeping provenance with parity to MNE-Python's @c mne.__version__ field
- * that lands in the same tags.
+ * @c FIFFSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef FIFF_GLOBAL_H
@@ -33,7 +32,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/buildinfo.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -63,29 +61,6 @@ namespace mne
 
 using mne::StringList;
 
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Null-terminated string with the compile date and time of the library.
- */
-FIFFSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Null-terminated string with the short git commit hash the library was built from.
- */
-FIFFSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Null-terminated string with the full git commit hash the library was built from.
- */
-FIFFSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FIFF_GLOBAL_H

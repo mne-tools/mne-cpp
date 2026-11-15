@@ -7,17 +7,10 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.1.0
  * @date     March 2026
- * @brief    MNE-CPP BIDS library entry point: symbol-visibility macro and the @c mne_bids namespace documentation.
+ * @brief    Export macro of mne_bids — BIDS dataset reading, writing, path construction, and sidecar metadata handling for iEEG/EEG/MEG.
  *
- * Every public symbol in the BIDS library is annotated with
- * @c BIDSSHARED_EXPORT, which exports the symbols when the
- * shared library itself is being built, imports them for a
- * downstream consumer, and to nothing when the project is configured
- * with @c STATICBUILD. Including this header also pulls in
- * @c utils/buildinfo.h so the @ref mne::buildDateTime, @ref
- * mne::buildHash and @ref mne::buildHashLong free functions
- * are available to clients that need to log which build of the BIDS
- * library they linked against.
+ * @c BIDSSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef BIDS_GLOBAL_H
@@ -27,7 +20,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/buildinfo.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -55,33 +47,5 @@
 #if defined(_MSC_VER)
 #pragma warning(disable : 4251 4275)
 #endif
-
-namespace mne
-{
-
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Null-terminated string with the library build date and time.
- */
-BIDSSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Null-terminated string with the short git commit hash of the build.
- */
-BIDSSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Null-terminated string with the full git commit hash of the build.
- */
-BIDSSHARED_EXPORT const char* buildHashLong();
-}
 
 #endif // BIDS_GLOBAL_H

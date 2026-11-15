@@ -10,16 +10,10 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     August 2012
- * @brief    mne_mne shared-library export/import macros and library build metadata.
+ * @brief    Export macro of mne_mne — Core MNE data structures (source spaces, source estimates, hemispheres).
  *
- * mne_mne is the central mne-cpp data library: it ties the on-disk FIFF
- * containers exposed by mne_fiff to the higher-level neuroscience objects
- * (source spaces, hemispheres, BEM surfaces, forward solutions, inverse
- * operators, covariance matrices, raw/epoch/evoked aggregates and the
- * MSH display surfaces consumed by DISP3D). This translation unit only
- * declares the @c MNESHARED_EXPORT visibility macro and the
- * @ref mne::buildDateTime helper so every other compilation unit can
- * resolve symbol visibility identically across static and shared builds.
+ * @c MNESHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef MNE_GLOBAL_H
@@ -29,7 +23,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/buildinfo.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -59,29 +52,6 @@ namespace mne
 
 using mne::StringList;
 
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Static C string with the compile date and time, e.g. "Sep 30 2026 14:05:12".
- */
-MNESHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Static C string with the short git commit hash, or a "not defined" notice if unavailable at build time.
- */
-MNESHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Static C string with the full git commit hash, or a "not defined" notice if unavailable at build time.
- */
-MNESHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // MNE_GLOBAL_H

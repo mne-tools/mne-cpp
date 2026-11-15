@@ -14,6 +14,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <base/base_global.h>
 #include <lsl/lsl.h>
 #include <lsl/lsl_protocol.h>
 

@@ -709,7 +709,7 @@ bool writeJson(const QString& path, const std::vector<Metric>& metrics, const Se
     }
     const QJsonObject report{{"tool", "mne_acq_bench"},
                              {"version", MNE_CPP_VERSION},
-                             {"build", buildHash()},
+                             {"build", acq_build_hash()},
                              {"quick", s.quick},
                              {"repeats", s.repeats},
                              {"paced_seconds", s.pacedSeconds},
@@ -769,7 +769,7 @@ int main(int argc, char* argv[])
     }
 
     QTextStream out(stdout);
-    out << "mne_acq_bench " << MNE_CPP_VERSION << " (mne_acq " << buildHash() << "), "
+    out << "mne_acq_bench " << MNE_CPP_VERSION << " (mne_acq " << acq_build_hash() << "), "
         << std::thread::hardware_concurrency() << " hardware threads\n";
     out.flush();
     const std::vector<Metric> metrics = run(settings);

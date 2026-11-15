@@ -10,20 +10,10 @@
  *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     December 2012
- * @brief    Symbol-visibility macro and build-info entry points for the mne_fwd (MEG/EEG forward-modelling) library.
+ * @brief    Export macro of mne_fwd — Forward modelling — BEM solver, spherical models, sensor/coil definitions and the lead-field assembly that links current dipoles to MEG/EEG sensor readings.
  *
- * mne_fwd implements the forward problem of bioelectromagnetism: given a
- * current dipole at a known source location, compute the magnetic field
- * sampled by each MEG coil and the electric potential sampled by each
- * EEG electrode. Because Maxwell's equations are evaluated in the
- * quasi-static regime (head-scale frequencies ≪ c/L), the lead-field
- * matrix G that maps dipole moments to sensor readings is purely real,
- * time-invariant for a fixed head and sensor array, and re-usable across
- * every subsequent inverse-solution / source-localisation step.
- *
- * This translation unit only defines the FWDSHARED_EXPORT visibility
- * macro and exposes the build-stamp helpers consumed by the library
- * banner; the actual solver primitives live in the sibling headers.
+ * @c FWDSHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef FWD_GLOBAL_H
@@ -33,7 +23,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/buildinfo.h>
 #include <base/string_utils.h>
 
 //=============================================================================================================
@@ -63,29 +52,6 @@ namespace mne
 
 using mne::StringList;
 
-//=============================================================================================================
-/**
- * Returns build date and time.
- *
- * @return Static C string with the compile date and time, e.g. "Sep 30 2026 14:05:12".
- */
-FWDSHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- *
- * @return Static C string with the short git commit hash, or a "not defined" notice if unavailable at build time.
- */
-FWDSHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns full build git hash.
- *
- * @return Static C string with the full git commit hash, or a "not defined" notice if unavailable at build time.
- */
-FWDSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FWD_GLOBAL_H

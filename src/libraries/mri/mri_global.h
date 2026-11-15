@@ -7,18 +7,16 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February 2026
- * @brief    Export/import macros and build-info accessors for mne_mri.
+ * @brief    Export macro of mne_mri — Volume I/O, voxel geometry and slice resampling for structural MRI data inside mne-cpp.
  *
- * Provides the @c MRISHARED_EXPORT decorator used by every public
- * symbol in the MRI library so that the same headers can be
- * consumed by a shared-library build (export when compiling
- * MNE_MRI_LIBRARY, import when linking against it) and a
- * static build (empty decorator). Also exposes @c buildDateTime()
- * and @c buildHash() for runtime provenance reporting --- e.g.
- * when @c mne_analyze prints the linked-library version table
- * in its About dialog or when the registry validator in
- * @c scripts/validate_api_registry.py needs to confirm which MRI
- * library snapshot is wired into a deployed binary.
+ * Hosts every public type that participates in loading a 3D MRI volume
+ * (MGH/MGZ, NIfTI-1, FreeSurfer COR), describing it in memory
+ * (mne::MriVolData, mne::MriSlice), resampling it onto an orthogonal viewing
+ * plane (mne::MriSlicer, mne::MriSliceImage) and re-serialising it through
+ * the FIFF MRI block hierarchy (mne::MriCorFifIO).
+ *
+ * @c MRISHARED_EXPORT marks the public symbols: exported when building the shared library, imported by
+ * its clients, and empty in a static build (@c STATICBUILD).
  */
 
 #ifndef MRI_GLOBAL_H
@@ -28,7 +26,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <base/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -51,34 +48,5 @@
 #if defined(_MSC_VER)
 #pragma warning(disable : 4251 4275)
 #endif
-
-namespace mne
-{
-
-//=============================================================================================================
-/**
- * Returns the build date and time.
- *
- * @return Static C string with the build timestamp.
- */
-MRISHARED_EXPORT const char* buildDateTime();
-
-//=============================================================================================================
-/**
- * Returns the short git hash.
- *
- * @return Static C string with the short git commit hash.
- */
-MRISHARED_EXPORT const char* buildHash();
-
-//=============================================================================================================
-/**
- * Returns the long git hash.
- *
- * @return Static C string with the full git commit hash.
- */
-MRISHARED_EXPORT const char* buildHashLong();
-
-} // namespace mne
 
 #endif // MRI_GLOBAL_H

@@ -8,7 +8,6 @@ project(mne_report
 )
 
 set(SOURCES
-  report_global.cpp
   report.cpp
 )
 
@@ -16,12 +15,6 @@ set(HEADERS
   report_global.h
   report.h
 )
-
-set(FILE_TO_UPDATE report_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 

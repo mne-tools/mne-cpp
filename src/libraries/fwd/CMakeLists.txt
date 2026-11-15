@@ -27,7 +27,6 @@ set(SOURCES
     fwd_eeg_sphere_model.cpp
     fwd_eeg_sphere_model_set.cpp
     fwd_field_map.cpp
-    fwd_global.cpp
     fwd_thread_arg.cpp
 )
 
@@ -48,12 +47,6 @@ set(HEADERS
     fwd_thread_arg.h
     fwd_types.h
 )
-
-set(FILE_TO_UPDATE fwd_global.cpp)
-
-set(SOURCE_PATHS ${SOURCES})
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 

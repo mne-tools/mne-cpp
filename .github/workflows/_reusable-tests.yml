@@ -252,6 +252,11 @@ jobs:
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DMNE_WARNINGS_AS_ERRORS=ON
         cmake --build build -j "$(sysctl -n hw.logicalcpu)"
 
+    # All libraries share the namespace mne, so two of them can define the same function.
+    - name: Check that no mne:: symbol is defined by two libraries
+      if: runner.os != 'Windows'
+      run: python3 scripts/quality/check_duplicate_symbols.py out/Release/lib
+
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2025-vs2026'
       shell: pwsh
