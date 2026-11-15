@@ -250,7 +250,7 @@ int main(int argc, char* argv[])
     //! [bad_channels_maxwell_usage]
     int worst = 0;
     bads.zScores.maxCoeff(&worst);
-    ok &= expect(worst == 40 && std::ranges::contains(bads.badIndices, meg[40]) && mne::contains(bads.badChannels, info.ch_names[meg[40]]),
+    ok &= expect(worst == 40 && std::ranges::contains(bads.badIndices, meg[40]) && std::ranges::contains(bads.badChannels, info.ch_names[meg[40]]),
                  std::format("findBadChannelsMaxwell ranks {} worst (z = {:.0f}), flagged: {}", info.ch_names[meg[worst]], bads.zScores(worst), mne::join(bads.badChannels, ", ")));
 
     //! [maxwell_movement_comp_usage]

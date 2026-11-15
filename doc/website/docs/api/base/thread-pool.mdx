@@ -17,11 +17,11 @@ class mne::ThreadPool
 
 Runs tasks on a fixed set of worker threads.
 
-`parallelFor()` and `parallelMap()` block until done, and the calling thread works through the range too, so they may be nested or called from a task of the same pool without deadlocking.
+`parallel_for()` and `parallel_map()` block until done, and the calling thread works through the range too, so they may be nested or called from a task of the same pool without deadlocking.
 
 ```cpp title="src/examples/ex_base/main.cpp"
 const std::vector<int> channels = {0, 1, 2, 3};
-const std::vector<double> power = ThreadPool::global().parallelMap(channels, [](int ch) { return 0.5 * ch; }); // in order
+const std::vector<double> power = ThreadPool::global().parallel_map(channels, [](int ch) { return 0.5 * ch; }); // in order
 auto background = ThreadPool::global().submit([] { return 42; });
 ```
 
@@ -54,7 +54,7 @@ Runs the tasks still queued, then joins the workers.
 
 ---
 
-### threadCount()
+### thread_count()
 
 **Returns:**
 
@@ -77,7 +77,7 @@ Queues `task`.
 
 ---
 
-### parallelFor(begin, end, body)
+### parallel_for(begin, end, body)
 
 Calls `body(i)` for every i in [`begin`, `end`) and returns when all calls have finished.
 
@@ -94,7 +94,7 @@ Calls `body(i)` for every i in [`begin`, `end`) and returns when all calls have 
 
 ---
 
-### parallelMap(input, f)
+### parallel_map(input, f)
 
 **Parameters:**
 
@@ -134,7 +134,7 @@ Base library: logging, byte streams, string and path helpers, JSON, the thread p
 
 ````cpp title="src/examples/ex_base/main.cpp, line 120"
 const std::vector<int> channels = {0, 1, 2, 3};
-const std::vector<double> power = ThreadPool::global().parallelMap(channels, [](int ch) { return 0.5 * ch; }); // in order
+const std::vector<double> power = ThreadPool::global().parallel_map(channels, [](int ch) { return 0.5 * ch; }); // in order
 auto background = ThreadPool::global().submit([] { return 42; });
 ok &= expect(power == std::vector<double>({0.0, 0.5, 1.0, 1.5}) && background.get() == 42, "ThreadPool mapped the channels in order");
 ````

@@ -231,7 +231,7 @@ ok &= expect(pca.desc == "PCA-v1" && !pca.active && pca.data.nrow == 1 && pca.da
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 429"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 430"
 const std::filesystem::path eveName = tmp.filePath("audvis-eve.fif").toStdU16String();
 const bool eventsWritten = events.write_fif(eveName).has_value();
 const MatrixXi eventsBack = FiffEvents::read(eveName).value().events;
@@ -248,7 +248,7 @@ ok &= expect(eventsWritten && eventsBack.rows() == 25 && eventsBack(0, 0) == 139
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 280"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 281"
 ok &= hpiRaw.read_raw_segment(hpiData, hpiTimes, hpiRaw.first_samp, hpiRaw.first_samp + 399);
 MatrixXd projectors = MatrixXd::Identity(hpiInfo->nchan, hpiInfo->nchan);
 FiffInfo projInfo = *hpiInfo;

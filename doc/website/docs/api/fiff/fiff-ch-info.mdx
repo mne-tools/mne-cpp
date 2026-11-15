@@ -127,7 +127,7 @@ Formerly mne_check_chinfo (MNE C).
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 93"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 94"
 QFile rawFile(data + "/MEG/sample/sample_audvis_trunc_raw.fif");
 const FiffRawData raw((data + "/MEG/sample/sample_audvis_trunc_raw.fif").toStdString());
 std::vector<FiffChInfo> meg;
@@ -136,7 +136,7 @@ std::vector<FiffChInfo> eeg;
 for (const FiffChInfo& ch : raw.info.chs) {
     if (ch.kind == FIFFV_MEG_CH) {
         meg.push_back(ch);
-        if (!mne::contains(raw.info.bads, ch.ch_name)) {
+        if (!std::ranges::contains(raw.info.bads, ch.ch_name)) {
             goodMeg.push_back(ch);
         }
     } else if (ch.kind == FIFFV_EEG_CH) {

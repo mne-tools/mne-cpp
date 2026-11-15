@@ -245,7 +245,7 @@ Reset the data processing in the real-time worker.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 160"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 161"
     averager.doWork(block); // runs synchronously; RtAveraging moves this worker to a thread
 }
 // Average of k = 1..4 is 2.5 after the trigger and 0 before it; MEG0121 stays at -2

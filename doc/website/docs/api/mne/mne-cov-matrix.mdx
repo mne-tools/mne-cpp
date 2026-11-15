@@ -25,7 +25,7 @@ QFile aveFile(data + "/MEG/sample/sample_audvis-ave.fif");
 FiffEvoked ave((data + "/MEG/sample/sample_audvis-ave.fif").toStdU16String(), 0, {}, false);
 StringList megNames; // the 305 good MEG channels
 for (const std::string& name : ave.info.ch_names) {
-    if (name.starts_with("MEG") && !mne::contains(ave.info.bads, name)) {
+    if (name.starts_with("MEG") && !std::ranges::contains(ave.info.bads, name)) {
         megNames.push_back(name);
     }
 }
@@ -385,7 +385,7 @@ Compute the linear index into a symmetric lower-triangular packed storage array 
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 322"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 323"
 auto noise = MNECovMatrix::read((data + "/MEG/sample/sample_audvis-cov.fif").toStdU16String(), FIFFV_MNE_NOISE_COV);
 const int ncovFile = noise->ncov;
 auto noiseMeg = noise->pick_chs_omit(megNames, false, ave.info.chs);

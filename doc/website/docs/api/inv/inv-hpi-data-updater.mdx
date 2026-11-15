@@ -132,7 +132,7 @@ const Vector3d reference = maxfilter.block<1, 3>(0, 4).transpose();
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 289"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 290"
 InvHpiDataUpdater updater(hpiInfo); // MEG picks, sensor geometry and digitised coil positions
 updater.prepareDataAndProjectors(hpiData, projectors);
 const InvHpiModelParameters model(std::vector<int>({166, 154, 161, 158}), hpiInfo->sfreq, hpiInfo->linefreq, false);

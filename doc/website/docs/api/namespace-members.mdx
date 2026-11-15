@@ -7,7 +7,7 @@ sidebar_position: 6
 
 # Namespace Members
 
-Index of 359 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
+Index of 358 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
 
 - **Accuracy** `[enum]` in [mne](/docs/api/fiff/)
 - **acq_build_date_time** `[fn]` in [mne](/docs/api/fiff/)
@@ -68,17 +68,20 @@ Index of 359 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **BIDS_TYPE_TO_FIFF_KIND** `[var]` in [mne](/docs/api/fiff/) — FIFF channel kind of each BIDS channel type read from channels.tsv.
 - **BidsTsvRow** `[type]` in [mne](/docs/api/fiff/) — Represents a single row of a BIDS TSV file as a column-name → value map.
 - **BIG_TIME** `[var]` in [mne](/docs/api/fiff/)
-- **buildDateTime** `[fn]` in [mne](/docs/api/fiff/) — Returns build date and time.
-- **buildHash** `[fn]` in [mne](/docs/api/fiff/) — Returns abbreviated build git hash.
-- **buildHashLong** `[fn]` in [mne](/docs/api/fiff/) — Returns full build git hash.
+- **build_date_time** `[fn]` in [mne](/docs/api/fiff/) — Returns build date and time.
+- **build_hash** `[fn]` in [mne](/docs/api/fiff/) — Returns abbreviated build git hash.
+- **build_hash_long** `[fn]` in [mne](/docs/api/fiff/) — Returns full build git hash.
 - **BVBinaryFormat** `[enum]` in [mne](/docs/api/fiff/) — Binary format enumeration for BrainVision data files.
 - **BVOrientation** `[enum]` in [mne](/docs/api/fiff/) — Data orientation enumeration.
+- **byte_swap** `[fn]` in [mne](/docs/api/fiff/)
+- **byte_swap_in_place** `[fn]` in [mne](/docs/api/fiff/) — Reverses the bytes of every element of `data`.
 - **bytesPerSample** `[fn]` in [mne](/docs/api/fiff/)
-- **byteSwap** `[fn]` in [mne](/docs/api/fiff/)
-- **byteSwapInPlace** `[fn]` in [mne](/docs/api/fiff/) — Reverses the bytes of every element of `data`.
 - **CborByteArray** `[type]` in [mne](/docs/api/fiff/) — A CBOR byte string.
 - **channel_index** `[fn]` in [mne](/docs/api/fiff/)
 - **ChannelFormat** `[enum]` in [mne](/docs/api/fiff/) — Data format of a channel (mirroring the values used in the original LSL protocol).
+- **compile_date** `[fn]` in [mne](/docs/api/fiff/) — Returns build date (time preprocessor was run).
+- **compile_date_time** `[fn]` in [mne](/docs/api/fiff/) — Returns build date and time (time preprocessor was run).
+- **compile_time** `[fn]` in [mne](/docs/api/fiff/) — Returns build time (time preprocessor was run).
 - **Compression** `[enum]` in [mne](/docs/api/fiff/) — How the bytes of a file are stored.
 - **compute_connectivity** `[fn]` in [mne](/docs/api/fiff/) — Computes every connectivity method the settings ask for, as mne_connectivity.spectral_connectivity_epochs does for its spectral methods.
 - **compute_source_band_power** `[fn]` in [mne](/docs/api/fiff/) — Compute band power for source estimate.
@@ -88,15 +91,12 @@ Index of 359 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **computeElectricalDistance** `[fn]` in [mne](/docs/api/fiff/) — Compute electrical distance matrix between EEG channels.
 - **computeFilteredAverage** `[fn]` in [mne](/docs/api/fiff/) — Computes the filtered average for given fiff raw data.
 - **computeLofScores** `[fn]` in [mne](/docs/api/fiff/) — Compute LOF scores for a feature matrix.
-- **contains** `[fn]` in [mne](/docs/api/fiff/)
 - **COR_HEIGHT** `[var]` in [mne](/docs/api/fiff/) — Height of each COR slice in pixels.
 - **COR_NSLICE** `[var]` in [mne](/docs/api/fiff/) — Number of COR slices.
 - **COR_PIXEL_SIZE** `[var]` in [mne](/docs/api/fiff/) — Pixel size for COR slices (1mm in meters).
 - **COR_WIDTH** `[var]` in [mne](/docs/api/fiff/) — Width of each COR slice in pixels.
 - **count_annotations** `[fn]` in [mne](/docs/api/fiff/) — Counts annotations by description, like `mne.count_annotations`.
 - **DATA_TYPE** `[var]` in [mne](/docs/api/fiff/) — DATA_TYPE encoding 0000ffff.
-- **dateTimeNow** `[fn]` in [mne](/docs/api/fiff/) — Returns build date and time (time preprocessor was run).
-- **dateToday** `[fn]` in [mne](/docs/api/fiff/) — Returns build date (time preprocessor was run).
 - **decode** `[fn]` in [mne](/docs/api/fiff/) — Decodes all samples of `view` into `out`.
 - **decode** `[fn]` in [mne](/docs/api/fiff/) — Decodes all samples of `view` into `out`.
 - **decode** `[fn]` in [mne](/docs/api/fiff/) — Decodes all samples of `view` into `out`.    Real formats yield a zero imaginary part.
@@ -123,7 +123,6 @@ Index of 359 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **encode** `[fn]` in [mne](/docs/api/fiff/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).
 - **encode** `[fn]` in [mne](/docs/api/fiff/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).    For real formats the imaginary part must be 0, otherwise the element counts as clipped.
 - **encodeBits** `[fn]` in [mne](/docs/api/fiff/) — Writes bit fields into the reserved samples of `view`, leaving the analog bits untouched; call before or after `encode()` of the same view.
-- **equalsIgnoreCase** `[fn]` in [mne](/docs/api/fiff/)
 - **ErrorCode** `[enum]` in [mne](/docs/api/fiff/) — What went wrong, so callers can react without parsing the message.
 - **estimate_snr** `[fn]` in [mne](/docs/api/fiff/) — Estimate the SNR of evoked data as a function of time.
 - **events_from_annotations** `[fn]` in [mne](/docs/api/fiff/) — Converts annotations to events, like `mne.events_from_annotations`.
@@ -162,7 +161,7 @@ Index of 359 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **fitMatchedPoints** `[fn]` in [mne](/docs/api/fiff/) — Corresponding point set registration using quaternions.
 - **fitUser** `[type]` in [mne](/docs/api/fiff/)
 - **fixStimArtifact** `[fn]` in [mne](/docs/api/fiff/) — Repair stimulus artifacts by interpolating or zeroing data around events.
-- **fromBigEndian** `[fn]` in [mne](/docs/api/fiff/)
+- **from_big_endian** `[fn]` in [mne](/docs/api/fiff/)
 - **fromFiffInfo** `[fn]` in [mne](/docs/api/fiff/) — Describes a FIFF measurement as a stream.
 - **fromTokens** `[fn]` in [mne](/docs/api/fiff/) — Reconstruct an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) from a token sequence.
 - **FWD_BEM_CONSTANT_COLL** `[var]` in [mne](/docs/api/fiff/)
@@ -183,15 +182,16 @@ Index of 359 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **FWD_COILC_PLANAR_GRAD** `[var]` in [mne](/docs/api/fiff/)
 - **FWD_COILC_UNKNOWN** `[var]` in [mne](/docs/api/fiff/)
 - **FWD_IS_MEG_COIL** `[fn]` in [mne](/docs/api/fiff/)
-- **gitHash** `[fn]` in [mne](/docs/api/fiff/) — Returns short version of the hash of the current git commit.
-- **gitHashLong** `[fn]` in [mne](/docs/api/fiff/) — Returns entire hash of the current git commit.
+- **git_hash** `[fn]` in [mne](/docs/api/fiff/) — Returns short version of the hash of the current git commit.
+- **git_hash_long** `[fn]` in [mne](/docs/api/fiff/) — Returns entire hash of the current git commit.
 - **has_channel** `[fn]` in [mne](/docs/api/fiff/)
 - **html_escape** `[fn]` in [mne](/docs/api/fiff/) — Escapes the characters that are special in HTML text and attribute values: & &lt; &gt; " '.
 - **IcaComponentLabel** `[enum]` in [mne](/docs/api/fiff/) — Categorical label assigned to a single [`ICA`](/docs/api/dsp/ica) component.
 - **IeegLeadType** `[enum]` in [mne](/docs/api/fiff/) — Kind of lead a contact sits on.
 - **IeegSurfaceMapMode** `[enum]` in [mne](/docs/api/fiff/) — How the weights of contacts near one vertex combine; the modes of MNE-Python's stc_near_sensors.
+- **iequals** `[fn]` in [mne](/docs/api/fiff/)
 - **ImageFormat** `[enum]` in [mne](/docs/api/fiff/) — Encoding of an embedded figure.
-- **indexOf** `[fn]` in [mne](/docs/api/fiff/)
+- **index_of** `[fn]` in [mne](/docs/api/fiff/)
 - **InvEstimateMethod** `[enum]` in [mne](/docs/api/fiff/) — Enumerates the inverse estimation method that produced a source estimate.
 - **InvOrientationType** `[enum]` in [mne](/docs/api/fiff/) — Enumerates the orientation constraint used during source estimation.
 - **InvSourceSpaceType** `[enum]` in [mne](/docs/api/fiff/) — Enumerates the source space type underlying a source estimate.
@@ -287,7 +287,7 @@ Index of 359 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **operator==** `[fn]` in [mne](/docs/api/fiff/)
 - **operator==** `[fn]` in [mne](/docs/api/fiff/)
 - **parse_progress_line** `[fn]` in [mne](/docs/api/fiff/) — Parses a progress line of the form `"[progress] 42.5%"` or `"[progress] 42.5% message"` (case-insensitive tag, surrounding whitespace ignored).
-- **pathFromUtf8** `[fn]` in [mne](/docs/api/fiff/)
+- **path_from_utf8** `[fn]` in [mne](/docs/api/fiff/)
 - **peakFinder** `[fn]` in [mne](/docs/api/fiff/) — Find peaks in a 1D signal.
 - **peakFinderMne** `[fn]` in [mne](/docs/api/fiff/) — Noise-tolerant extrema search of `mne.preprocessing.peak_finder`.
 - **peakProminences** `[fn]` in [mne](/docs/api/fiff/) — Compute prominence of each peak.
@@ -350,19 +350,18 @@ Index of 359 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **swap_long** `[fn]` in [mne](/docs/api/fiff/) — Swap a 64-bit long.
 - **swap_longp** `[fn]` in [mne](/docs/api/fiff/) — Swap a 64-bit long in place.
 - **swap_short** `[fn]` in [mne](/docs/api/fiff/) — Swap a 16-bit short.
-- **timeNowNow** `[fn]` in [mne](/docs/api/fiff/) — Returns build time (time preprocessor was run).
-- **toBigEndian** `[fn]` in [mne](/docs/api/fiff/)
+- **to_big_endian** `[fn]` in [mne](/docs/api/fiff/)
+- **to_double** `[fn]` in [mne](/docs/api/fiff/)
+- **to_int** `[fn]` in [mne](/docs/api/fiff/)
+- **to_lower** `[fn]` in [mne](/docs/api/fiff/)
 - **toDLPack** `[fn]` in [mne](/docs/api/fiff/) — Exports one part of `view` as a read-only DLPack tensor of shape channels x samples, without a copy.
-- **toDouble** `[fn]` in [mne](/docs/api/fiff/)
 - **toEventMatrix** `[fn]` in [mne](/docs/api/fiff/) — Transforms QMap with stored information about events per stim channel to a list of event matrices.
 - **toFiffInfo** `[fn]` in [mne](/docs/api/fiff/) — Builds FIFF measurement info for a stream, e.g.
-- **toInt** `[fn]` in [mne](/docs/api/fiff/)
 - **tokenIds** `[fn]` in [mne](/docs/api/fiff/) — Extract just the integer token IDs from a token sequence (discarding continuous values).
 - **tokenize** `[fn]` in [mne](/docs/api/fiff/) — Serialise an [`InvSourceEstimate`](/docs/api/inv/inv-source-estimate) into a flat token sequence.
 - **tokenValues** `[fn]` in [mne](/docs/api/fiff/) — Extract just the continuous values from a token sequence (discarding IDs).
-- **toLower** `[fn]` in [mne](/docs/api/fiff/)
 - **trimmed** `[fn]` in [mne](/docs/api/fiff/)
-- **utf8FromPath** `[fn]` in [mne](/docs/api/fiff/)
+- **utf8_from_path** `[fn]` in [mne](/docs/api/fiff/)
 - **vecDefaultWeights** `[var]` in [mne](/docs/api/fiff/)
 - **verify** `[fn]` in [mne](/docs/api/fiff/) — Determines the origin of `target` from loop-back markers against `reference` and verifies the declared clock relation: every marker must imply the same origin within `toleranceTicks`, so drift (a missing or wrong clock connection) is detected instead of producing wrong samples.
 - **write** `[fn]` in [mne](/docs/api/fiff/) — Writes all columns of an Eigen matrix to an output stream: reserves, encodes, commits.

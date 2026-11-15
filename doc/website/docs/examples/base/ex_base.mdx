@@ -144,7 +144,7 @@ int main()
     //! [log_file_usage]
     Log::install_qt_message_handler();  // console output
     Log::set_file(dir / "example.log"); // and a plain-text copy
-    Log::info("logging to {}", utf8FromPath(Log::file()));
+    Log::info("logging to {}", utf8_from_path(Log::file()));
     //! [log_file_usage]
     Log::set_file({});
     std::ifstream logFile(dir / "example.log");
@@ -166,35 +166,35 @@ int main()
     const std::vector<float> samples = {1.5f, -0.25f};
     {
         auto out = FileByteStream::open(dir / "data.bin", FileByteStream::Mode::Write);
-        out->writeBigEndian(std::int32_t(samples.size())); // FIFF byte order
-        out->writeBigEndian(samples.data(), samples.size());
+        out->write_big_endian(std::int32_t(samples.size())); // FIFF byte order
+        out->write_big_endian(samples.data(), samples.size());
     }
     auto in = FileByteStream::open(dir / "data.bin", FileByteStream::Mode::Read);
     std::int32_t count = 0;
-    in->readBigEndian(count);
+    in->read_big_endian(count);
     std::vector<float> back(static_cast<std::size_t>(count));
-    in->readBigEndian(back.data(), back.size());
+    in->read_big_endian(back.data(), back.size());
     //! [byte_stream_usage]
-    ok &= expect(back == samples && in->atEnd(), "FileByteStream read back the big-endian samples");
+    ok &= expect(back == samples && in->at_end(), "FileByteStream read back the big-endian samples");
 
     //! [memory_byte_stream_usage]
     MemoryByteStream memory;
-    memory.writeBigEndian(std::int16_t{0x0102});
+    memory.write_big_endian(std::int16_t{0x0102});
     const bool bigEndian = memory.data()[0] == std::byte{0x01}; // most significant byte first
     //! [memory_byte_stream_usage]
     ok &= expect(bigEndian && memory.size() == 2, "MemoryByteStream stores values most significant byte first");
 
     //! [thread_pool_usage]
     const std::vector<int> channels = {0, 1, 2, 3};
-    const std::vector<double> power = ThreadPool::global().parallelMap(channels, [](int ch) { return 0.5 * ch; }); // in order
+    const std::vector<double> power = ThreadPool::global().parallel_map(channels, [](int ch) { return 0.5 * ch; }); // in order
     auto background = ThreadPool::global().submit([] { return 42; });
     //! [thread_pool_usage]
     ok &= expect(power == std::vector<double>({0.0, 0.5, 1.0, 1.5}) && background.get() == 42, "ThreadPool mapped the channels in order");
 
     //! [string_utils_usage]
     const StringList fields = split(trimmed(" MEG 0113, 1.5e-13 \n"), ','); // a line of a text file
-    const std::optional<double> scale = toDouble(fields[1]);                // locale independent
-    const bool isGz = equalsIgnoreCase(utf8FromPath(pathFromUtf8("T1.NII.GZ").extension()), ".gz");
+    const std::optional<double> scale = to_double(fields[1]);               // locale independent
+    const bool isGz = iequals(utf8_from_path(path_from_utf8("T1.NII.GZ").extension()), ".gz");
     //! [string_utils_usage]
     ok &= expect(fields[0] == "MEG 0113" && scale == 1.5e-13 && isGz, "string helpers parsed the line");
 

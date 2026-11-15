@@ -4,7 +4,7 @@
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 484,
-    "exported_free_functions": 136,
+    "exported_free_functions": 135,
     "registered_classes": 576,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
@@ -455,17 +455,17 @@
       "library": "acq"
     },
     {
-      "name": "buildDateTime",
+      "name": "build_date_time",
       "header": "base/base_global.h",
       "library": "base"
     },
     {
-      "name": "buildHash",
+      "name": "build_hash",
       "header": "base/base_global.h",
       "library": "base"
     },
     {
-      "name": "buildHashLong",
+      "name": "build_hash_long",
       "header": "base/base_global.h",
       "library": "base"
     },
@@ -495,12 +495,7 @@
       "library": "base"
     },
     {
-      "name": "indexOf",
-      "header": "base/string_utils.h",
-      "library": "base"
-    },
-    {
-      "name": "contains",
+      "name": "index_of",
       "header": "base/string_utils.h",
       "library": "base"
     },
@@ -510,32 +505,32 @@
       "library": "base"
     },
     {
-      "name": "toLower",
+      "name": "to_lower",
       "header": "base/string_utils.h",
       "library": "base"
     },
     {
-      "name": "equalsIgnoreCase",
+      "name": "iequals",
       "header": "base/string_utils.h",
       "library": "base"
     },
     {
-      "name": "toDouble",
+      "name": "to_double",
       "header": "base/string_utils.h",
       "library": "base"
     },
     {
-      "name": "toInt",
+      "name": "to_int",
       "header": "base/string_utils.h",
       "library": "base"
     },
     {
-      "name": "pathFromUtf8",
+      "name": "path_from_utf8",
       "header": "base/string_utils.h",
       "library": "base"
     },
     {
-      "name": "utf8FromPath",
+      "name": "utf8_from_path",
       "header": "base/string_utils.h",
       "library": "base"
     },

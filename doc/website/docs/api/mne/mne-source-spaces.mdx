@@ -398,7 +398,7 @@ Reads the source spaces from an open FIFF stream.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 198"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 199"
 const QString srcPath = data + "/subjects/sample/bem/sample-oct-6-src.fif";
 const MNESourceSpaces src(srcPath.toStdU16String()); // with normals, triangle data and patches
 const auto& lh = dynamic_cast<const MNEHemisphere&>(src[0]);

@@ -78,7 +78,7 @@ Process one data block, accumulate, and emit the spectrum when enough blocks are
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 217"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 218"
 RtNoiseWorker noiseWorker(64, info200, 10); // 64-point FFT over 10 accumulated blocks
 MatrixXd spectrum;
 QObject::connect(&noiseWorker, &RtNoiseWorker::resultReady, [&](const MatrixXd& psd) { spectrum = psd; });

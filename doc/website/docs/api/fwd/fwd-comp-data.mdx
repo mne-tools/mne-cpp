@@ -205,7 +205,7 @@ settings->solname = tmp.filePath("V1-fwd.fif").toStdString();
 settings->pFiffInfo = std::make_shared<FiffInfo>(raw.info);
 settings->checkIntegrity();
 auto fwd = std::make_shared<ComputeFwd>(settings)->calculateFwd();
-const std::filesystem::path solPath = mne::pathFromUtf8(settings->solname);
+const std::filesystem::path solPath = mne::path_from_utf8(settings->solname);
 const bool written = fwd->write(solPath).has_value();
 ````
 

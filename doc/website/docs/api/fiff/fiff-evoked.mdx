@@ -275,7 +275,7 @@ Merges evoked data with a predefined weighting strategy (weights="nave" or "equa
 
 Read an evoked data set from FIFF and print its measurement info and coordinate transforms.
 
-````cpp title="src/examples/ex_read_evoked/main.cpp, line 53"
+````cpp title="src/examples/ex_read_evoked/main.cpp, line 54"
 /** Writes a butterfly plot of the channels of @p evoked of @p kind measured in @p unit, scaled by @p scale. */
 void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, const QString& name, const QString& yLabel, const QColor& color)
 {
@@ -288,7 +288,7 @@ void saveButterfly(const FiffEvoked& evoked, int kind, int unit, double scale, c
     plot.setXLabel("Time [ms]");
     plot.setYLabel(yLabel);
     for (int c = 0; c < evoked.data.rows(); ++c) {
-        if (evoked.info.chs[c].kind != kind || evoked.info.chs[c].unit != unit || mne::contains(evoked.info.bads, evoked.info.ch_names[c])) {
+        if (evoked.info.chs[c].kind != kind || evoked.info.chs[c].unit != unit || std::ranges::contains(evoked.info.bads, evoked.info.ch_names[c])) {
             continue;
 ````
 

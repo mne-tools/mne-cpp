@@ -175,7 +175,7 @@ Compute EEG electrode-to-surface mapping matrix with SSP projection and average 
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 151"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 152"
 MatrixX3f surfRr(3, 3);
 surfRr << 0.0f, 0.0f, 0.12f, 0.08f, 0.0f, 0.08f, 0.0f, -0.09f, 0.07f;
 const MatrixX3f surfNn = (surfRr.rowwise() - origin.transpose()).rowwise().normalized();

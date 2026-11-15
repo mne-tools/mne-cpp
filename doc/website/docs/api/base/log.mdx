@@ -24,7 +24,7 @@ Log::warning("channel {} is flat", "MEG 0113"); // formatted as by std::format
 ```cpp title="src/examples/ex_base/main.cpp"
 Log::install_qt_message_handler();  // console output
 Log::set_file(dir / "example.log"); // and a plain-text copy
-Log::info("logging to {}", utf8FromPath(Log::file()));
+Log::info("logging to {}", utf8_from_path(Log::file()));
 ```
 
 ---
@@ -202,7 +202,7 @@ Base library: logging, byte streams, string and path helpers, JSON, the thread p
 ````cpp title="src/examples/ex_base/main.cpp, line 77"
 Log::install_qt_message_handler();  // console output
 Log::set_file(dir / "example.log"); // and a plain-text copy
-Log::info("logging to {}", utf8FromPath(Log::file()));
+Log::info("logging to {}", utf8_from_path(Log::file()));
 Log::set_file({});
 std::ifstream logFile(dir / "example.log");
 const std::string logText{std::istreambuf_iterator<char>(logFile), {}};
@@ -213,7 +213,7 @@ ok &= expect(logText.find("logging to") != std::string::npos, "Log wrote the mes
 
 Average stimulus-locked epochs of a raw FIFF recording into an evoked response, with event selection and EOG rejection.
 
-````cpp title="src/examples/ex_averaging/main.cpp, line 69"
+````cpp title="src/examples/ex_averaging/main.cpp, line 70"
 mne::Log::install_qt_message_handler();
 QApplication a(argc, argv);
 ````

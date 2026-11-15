@@ -19,7 +19,7 @@ A byte stream over a growable buffer in memory.
 
 ```cpp title="src/examples/ex_base/main.cpp"
 MemoryByteStream memory;
-memory.writeBigEndian(std::int16_t{0x0102});
+memory.write_big_endian(std::int16_t{0x0102});
 const bool bigEndian = memory.data()[0] == std::byte{0x01}; // most significant byte first
 ```
 
@@ -131,7 +131,7 @@ Base library: logging, byte streams, string and path helpers, JSON, the thread p
 
 ````cpp title="src/examples/ex_base/main.cpp, line 113"
 MemoryByteStream memory;
-memory.writeBigEndian(std::int16_t{0x0102});
+memory.write_big_endian(std::int16_t{0x0102});
 const bool bigEndian = memory.data()[0] == std::byte{0x01}; // most significant byte first
 ok &= expect(bigEndian && memory.size() == 2, "MemoryByteStream stores values most significant byte first");
 ````

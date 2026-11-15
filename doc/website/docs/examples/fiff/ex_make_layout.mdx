@@ -135,14 +135,14 @@ int main(int argc, char* argv[])
         option->second = argv[++i];
     }
 
-    const std::filesystem::path input = pathFromUtf8(options["--fileIn"]);
-    const std::string extension = toLower(input.extension().string());
+    const std::filesystem::path input = path_from_utf8(options["--fileIn"]);
+    const std::string extension = to_lower(input.extension().string());
     std::vector<Vector3d> positions;
     StringList names;
 
     if (extension == ".fif") {
         const FiffRawData raw(input);
-        const int coilType = toInt(options["--coilType"]).value_or(3012);
+        const int coilType = to_int(options["--coilType"]).value_or(3012);
         for (std::size_t i = 0; i < raw.info.ch_names.size(); ++i) {
             const auto& position = raw.info.chs[i].chpos;
             if (position.coil_type == coilType) {
@@ -168,7 +168,7 @@ int main(int argc, char* argv[])
                                       .mirror_x = options["--mirrorX"] == "1",
                                       .mirror_y = options["--mirrorY"] == "1"};
     const auto corners = LayoutMaker::make_layout(positions, layoutOptions);
-    if (!corners || !LayoutMaker::write_lout(pathFromUtf8(options["--fileOut"]), *corners, names, layoutOptions)) {
+    if (!corners || !LayoutMaker::write_lout(path_from_utf8(options["--fileOut"]), *corners, names, layoutOptions)) {
         std::println(stderr, "Could not make the layout");
         return EXIT_FAILURE;
     }

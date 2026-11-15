@@ -85,7 +85,7 @@ Perform one single HPI fit.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 293"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 294"
 RtHpiWorker hpiWorker(updater.getSensors());
 HpiFitResult workerFit;
 QObject::connect(&hpiWorker, &RtHpiWorker::resultReady, [&](const HpiFitResult& fit) { workerFit = fit; });

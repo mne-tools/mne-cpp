@@ -113,7 +113,7 @@ Stops the thread by interrupting its computation queue, quitting and waiting.
 
 DSP real-time workers: averaging, covariance, noise spectrum, connectivity, HPI fitting and inverse operators.
 
-````cpp title="src/examples/ex_dsp_rt/main.cpp, line 315"
+````cpp title="src/examples/ex_dsp_rt/main.cpp, line 316"
 RtInvOp rtInvOp(rawInfo, fwd); // MEG-only operator, loose 0.2, depth 0.8
 MNEInverseOperator inverse;
 bool inverseDone = false;
@@ -124,7 +124,7 @@ QObject::connect(&rtInvOp, &RtInvOp::invOperatorCalculated, [&](const MNEInverse
 rtInvOp.append(noiseCov); // e.g. each new RtCov estimate
 const bool inverseArrived = waitFor(inverseDone, 60000);
 // 306 MEG channels in the forward solution, minus the bad MEG2443
-ok &= expect(inverseArrived && inverse.nsource == fwd->nsource && inverse.nchan == 305 && mne::contains(rawInfo->bads, "MEG 2443"),
+ok &= expect(inverseArrived && inverse.nsource == fwd->nsource && inverse.nchan == 305 && std::ranges::contains(rawInfo->bads, "MEG 2443"),
              std::format("RtInvOp builds a {}-channel operator for {} sources", inverse.nchan, inverse.nsource));
 rtInvOp.stop();
 ````

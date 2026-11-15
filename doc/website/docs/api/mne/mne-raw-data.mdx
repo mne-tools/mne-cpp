@@ -36,7 +36,7 @@ sel.chspick = sel.chspick_nospace = {"MEG 0113", "EEG 001", "EOG 061"};
 sel.pick_deriv = VectorXi::Constant(sel.nchan(), -1);
 sel.pick.resize(sel.nchan());
 for (int c = 0; c < sel.nchan(); ++c) {
-    sel.pick[c] = static_cast<int>(mne::indexOf(mneRaw->ch_names, sel.chspick[c]));
+    sel.pick[c] = static_cast<int>(mne::index_of(mneRaw->ch_names, sel.chspick[c]));
 }
 
 const int ns = 25;
@@ -302,7 +302,7 @@ Convenience wrapper for `open_file_comp()` with comp_set = -1.
 
 MNE library: BEM surfaces, surface projection, ICP, source spaces and epochs.
 
-````cpp title="src/examples/ex_mne_api/main.cpp, line 265"
+````cpp title="src/examples/ex_mne_api/main.cpp, line 266"
 filter.taper_size = 2048;
 filter.lowpass = filter.eog_lowpass = 40.0f;
 filter.lowpass_width = filter.eog_lowpass_width = 5.0f;

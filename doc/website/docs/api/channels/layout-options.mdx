@@ -52,7 +52,7 @@ if (layout)
     LayoutMaker::write_lout(dir / "1020.lout", *layout, names, options);
 if (layout) {
     const auto box = [&](std::string_view name) {
-        return (*layout)[static_cast<std::size_t>(indexOf(names, name))];
+        return (*layout)[static_cast<std::size_t>(index_of(names, name))];
     };
     // Box corners: the box of an electrode at (x, y) starts at (x - w/2, y - h/2)
     const Vector2d czCentre = box("Cz") + Vector2d(2.5, 2.0);
@@ -72,7 +72,7 @@ Project the 3D sensor positions of a FIFF file onto a 2D channel layout.
                                       .mirror_x = options["--mirrorX"] == "1",
                                       .mirror_y = options["--mirrorY"] == "1"};
     const auto corners = LayoutMaker::make_layout(positions, layoutOptions);
-    if (!corners || !LayoutMaker::write_lout(pathFromUtf8(options["--fileOut"]), *corners, names, layoutOptions)) {
+    if (!corners || !LayoutMaker::write_lout(path_from_utf8(options["--fileOut"]), *corners, names, layoutOptions)) {
         std::println(stderr, "Could not make the layout");
         return EXIT_FAILURE;
     }

@@ -160,7 +160,7 @@ int main()
     //! [layout_maker_usage]
     if (layout) {
         const auto box = [&](std::string_view name) {
-            return (*layout)[static_cast<std::size_t>(indexOf(names, name))];
+            return (*layout)[static_cast<std::size_t>(index_of(names, name))];
         };
         // Box corners: the box of an electrode at (x, y) starts at (x - w/2, y - h/2)
         const Vector2d czCentre = box("Cz") + Vector2d(2.5, 2.0);

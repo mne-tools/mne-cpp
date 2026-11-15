@@ -60,7 +60,7 @@ std::shared_ptr<ComputeFwdSettings> pSettings = std::make_shared<ComputeFwdSetti
 
 Forward library: coil definitions, BEM and sphere models, field maps and forward solutions.
 
-````cpp title="src/examples/ex_fwd_api/main.cpp, line 161"
+````cpp title="src/examples/ex_fwd_api/main.cpp, line 162"
 // mne_forward_solution --meg --eeg --accurate --label V1-lh.label with sphere models instead of a BEM
 const QString label = tmp.filePath("V1-lh.label"); // the hemisphere is taken from the "-lh.label" suffix
 QFile::copy(data + "/subjects/sample/label/lh.V1.label", label);

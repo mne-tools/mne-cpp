@@ -36,7 +36,7 @@ BidsRawData data = BidsRawData::read(ieeg); // raw data plus channels, events, e
 QTemporaryDir out;
 BidsRawData::WriteOptions options;
 options.datasetName = "ex_bids";
-const BIDSPath written = data.write(BIDSPath(mne::pathFromUtf8(out.path().toStdString()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
+const BIDSPath written = data.write(BIDSPath(mne::path_from_utf8(out.path().toStdString()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
 const BidsRawData readBack = BidsRawData::read(written);
 ```
 

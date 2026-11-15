@@ -21,14 +21,14 @@ A buffered byte stream over a file, with 64-bit positions.
 const std::vector<float> samples = {1.5f, -0.25f};
 {
     auto out = FileByteStream::open(dir / "data.bin", FileByteStream::Mode::Write);
-    out->writeBigEndian(std::int32_t(samples.size())); // FIFF byte order
-    out->writeBigEndian(samples.data(), samples.size());
+    out->write_big_endian(std::int32_t(samples.size())); // FIFF byte order
+    out->write_big_endian(samples.data(), samples.size());
 }
 auto in = FileByteStream::open(dir / "data.bin", FileByteStream::Mode::Read);
 std::int32_t count = 0;
-in->readBigEndian(count);
+in->read_big_endian(count);
 std::vector<float> back(static_cast<std::size_t>(count));
-in->readBigEndian(back.data(), back.size());
+in->read_big_endian(back.data(), back.size());
 ```
 
 ### Inheritance
@@ -126,7 +126,7 @@ Releases the underlying resource; later reads, writes and seeks fail.
 
 ---
 
-### isOpen()
+### is_open()
 
 **Returns:**
 
@@ -199,15 +199,15 @@ Base library: logging, byte streams, string and path helpers, JSON, the thread p
 
 ````cpp title="src/examples/ex_base/main.cpp, line 100"
     auto out = FileByteStream::open(dir / "data.bin", FileByteStream::Mode::Write);
-    out->writeBigEndian(std::int32_t(samples.size())); // FIFF byte order
-    out->writeBigEndian(samples.data(), samples.size());
+    out->write_big_endian(std::int32_t(samples.size())); // FIFF byte order
+    out->write_big_endian(samples.data(), samples.size());
 }
 auto in = FileByteStream::open(dir / "data.bin", FileByteStream::Mode::Read);
 std::int32_t count = 0;
-in->readBigEndian(count);
+in->read_big_endian(count);
 std::vector<float> back(static_cast<std::size_t>(count));
-in->readBigEndian(back.data(), back.size());
-ok &= expect(back == samples && in->atEnd(), "FileByteStream read back the big-endian samples");
+in->read_big_endian(back.data(), back.size());
+ok &= expect(back == samples && in->at_end(), "FileByteStream read back the big-endian samples");
 ````
 
 ## Authors of this file
