@@ -24,7 +24,9 @@
 #include <charconv>
 #include <cmath>
 #include <clocale>
+#include <cstdint>
 #include <cstdlib>
+#include <format>
 #include <limits>
 
 #ifdef __APPLE__
@@ -352,4 +354,106 @@ std::filesystem::path mne::resource_path(std::string_view relative)
         return installed;
     }
     return std::filesystem::path("..") / "resources" / name;
+}
+
+//=============================================================================================================
+
+std::string mne::format_iso8601(UtcTime time, bool milliseconds)
+{
+    using namespace std::chrono;
+    const sys_seconds seconds = floor<std::chrono::seconds>(time);
+    if (!milliseconds) {
+        return std::format("{:%FT%T}Z", seconds);
+    }
+    return std::format("{:%FT%T}.{:03}Z", seconds, (time - seconds).count());
+}
+
+//=============================================================================================================
+
+std::optional<mne::UtcTime> mne::parse_iso8601(std::string_view text)
+{
+    using namespace std::chrono;
+    std::size_t pos = 0;
+    const auto number = [&](std::size_t digits, int& value) {
+        if (pos + digits > text.size()) {
+            return false;
+        }
+        const char* first = text.data() + pos;
+        const auto [end, ec] = std::from_chars(first, first + digits, value);
+        if (ec != std::errc{} || end != first + digits || *first == '-' || *first == '+') {
+            return false;
+        }
+        pos += digits;
+        return true;
+    };
+    const auto expect = [&](char c) {
+        if (pos >= text.size() || text[pos] != c) {
+            return false;
+        }
+        ++pos;
+        return true;
+    };
+
+    int y = 0;
+    int mo = 0;
+    int d = 0;
+    if (!number(4, y) || !expect('-') || !number(2, mo) || !expect('-') || !number(2, d)) {
+        return std::nullopt;
+    }
+    const year_month_day date{year{y}, month{static_cast<unsigned>(mo)}, day{static_cast<unsigned>(d)}};
+    if (!date.ok()) {
+        return std::nullopt;
+    }
+    UtcTime time = sys_days(date);
+    if (pos == text.size()) {
+        return time;
+    }
+    if (text[pos] != 'T' && text[pos] != ' ') {
+        return std::nullopt;
+    }
+    ++pos;
+
+    int h = 0;
+    int mi = 0;
+    int s = 0;
+    if (!number(2, h) || !expect(':') || !number(2, mi) || h > 23 || mi > 59) {
+        return std::nullopt;
+    }
+    if (expect(':')) {
+        if (!number(2, s) || s > 59) {
+            return std::nullopt;
+        }
+        if (expect('.')) {
+            std::int64_t nanos = 0;
+            std::int64_t scale = 100'000'000;
+            const std::size_t first = pos;
+            for (; pos < text.size() && text[pos] >= '0' && text[pos] <= '9'; ++pos, scale /= 10) {
+                nanos += (text[pos] - '0') * scale;
+            }
+            if (pos == first) {
+                return std::nullopt;
+            }
+            time += std::chrono::milliseconds((nanos + 500'000) / 1'000'000); // rounded, as Qt does
+        }
+    }
+    time += hours(h) + minutes(mi) + seconds(s);
+
+    if (pos == text.size() || (text[pos] == 'Z' && pos + 1 == text.size())) {
+        return time;
+    }
+    if (text[pos] != '+' && text[pos] != '-') {
+        return std::nullopt;
+    }
+    const bool east = text[pos++] == '+';
+    int oh = 0;
+    int om = 0;
+    if (!number(2, oh) || oh > 23) {
+        return std::nullopt;
+    }
+    expect(':');
+    if (!number(2, om) || om > 59 || pos != text.size()) {
+        return std::nullopt;
+    }
+    const minutes offset = hours(oh) + minutes(om);
+    return east ? time - offset : time + offset;
 }

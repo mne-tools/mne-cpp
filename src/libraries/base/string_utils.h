@@ -26,6 +26,7 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <chrono>
 #include <cstddef>
 #include <filesystem>
 #include <optional>
@@ -141,6 +142,26 @@ BASESHARED_EXPORT bool is_utf8(std::string_view text);
  * @return @p data as lowercase hex digits, two per byte, like QByteArray::toHex().
  */
 BASESHARED_EXPORT std::string to_hex(std::span<const std::byte> data);
+
+/** A UTC time point with millisecond resolution, e.g. a file's creation time. */
+using UtcTime = std::chrono::sys_time<std::chrono::milliseconds>;
+
+/**
+ * @param[in] time           A UTC time.
+ * @param[in] milliseconds   Whether to append the milliseconds.
+ *
+ * @return @p time as ISO 8601 text, "2026-11-15T09:30:00Z" or "2026-11-15T09:30:00.250Z", like
+ *         QDateTime::toString(Qt::ISODate) and Qt::ISODateWithMs.
+ */
+BASESHARED_EXPORT std::string format_iso8601(UtcTime time, bool milliseconds = false);
+
+/**
+ * @param[in] text   ISO 8601 date YYYY-MM-DD, optionally followed by 'T' or ' ' and hh:mm[:ss[.fraction]] and 'Z',
+ *                   an offset like +02:00, or nothing for UTC.
+ *
+ * @return The UTC time, or nothing if @p text is not such a date and time.
+ */
+BASESHARED_EXPORT std::optional<UtcTime> parse_iso8601(std::string_view text);
 
 /**
  * @return The directory of the running executable with symbolic links resolved, like

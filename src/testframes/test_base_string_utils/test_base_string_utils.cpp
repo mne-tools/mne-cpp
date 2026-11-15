@@ -24,6 +24,7 @@
 #include <QDir>
 #include <QFile>
 #include <QTemporaryDir>
+#include <QTimeZone>
 #include <QtTest>
 
 //=============================================================================================================
@@ -67,6 +68,9 @@ private slots:
     void utf8PathsRoundTrip();
     void latin1AndUtf8MatchQString();
     void toHexMatchesQByteArray();
+    void iso8601MatchesQDateTime_data();
+    void iso8601MatchesQDateTime();
+    void iso8601RejectsMalformedText();
     void executableDirIsTheApplicationDir();
     void resourcePathPrefersTheInstalledResources();
 };
@@ -279,6 +283,53 @@ void TestUtilsStringUtils::toHexMatchesQByteArray()
     const QByteArray qt(reinterpret_cast<const char*>(every.data()), qsizetype(every.size()));
     QCOMPARE(to_hex(every), qt.toHex().toStdString());
     QCOMPARE(to_hex({}), std::string());
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::iso8601MatchesQDateTime_data()
+{
+    QTest::addColumn<QString>("text");
+    QTest::newRow("utc") << "2026-11-15T09:30:05Z";
+    QTest::newRow("milliseconds") << "2026-11-15T09:30:05.250Z";
+    QTest::newRow("microseconds") << "2026-11-15T09:30:05.250999Z";
+    QTest::newRow("offset") << "2026-11-15T09:30:05+02:00";
+    QTest::newRow("negative offset") << "1999-12-31T23:59:59.5-05:30";
+    QTest::newRow("compact offset") << "2026-03-01T00:00:00+0100";
+    QTest::newRow("no seconds") << "2026-11-15T09:30Z";
+    QTest::newRow("leap day") << "2024-02-29T12:00:00Z";
+    QTest::newRow("epoch") << "1970-01-01T00:00:00Z";
+    QTest::newRow("date only") << "2026-11-15";
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::iso8601MatchesQDateTime()
+{
+    QFETCH(QString, text);
+    QDateTime qt = QDateTime::fromString(text, Qt::ISODateWithMs);
+    QVERIFY(qt.isValid());
+    if (qt.timeSpec() == Qt::LocalTime) {
+        qt.setTimeZone(QTimeZone::UTC); // text without an offset is UTC here, local time in Qt
+    }
+    const std::optional<UtcTime> ours = parse_iso8601(text.toStdString());
+    QVERIFY(ours);
+    QCOMPARE(ours->time_since_epoch().count(), qt.toMSecsSinceEpoch());
+    QCOMPARE(format_iso8601(*ours), qt.toUTC().toString(Qt::ISODate).toStdString());
+    QCOMPARE(format_iso8601(*ours, true), qt.toUTC().toString(Qt::ISODateWithMs).toStdString());
+    QCOMPARE(parse_iso8601(format_iso8601(*ours, true)), ours);
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::iso8601RejectsMalformedText()
+{
+    for (const std::string_view text : {"", "2026-11", "2026-13-01T00:00:00Z", "2026-02-30T00:00:00Z", "2026-11-15T24:00:00Z",
+                                        "2026-11-15T09:60:00Z", "2026-11-15T09:30:00X", "2026-11-15T09:30:00Z trailing", "26-11-15T09:30Z",
+                                        "2026-11-15T09:30:00+25:00", "2026-11-15T09:30:00."}) {
+        QVERIFY2(!parse_iso8601(text), std::string(text).c_str());
+    }
+    QCOMPARE(parse_iso8601("2026-11-15 09:30:00"), parse_iso8601("2026-11-15T09:30:00Z"));
 }
 
 //=============================================================================================================

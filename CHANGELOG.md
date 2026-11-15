@@ -604,6 +604,11 @@ aliases; replace the old spelling as below.
   (`base/string_utils.h`): SHA-256 digests in one call or incrementally,
   the counterpart of `QCryptographicHash::Sha256` and `QByteArray::toHex()`.
   The MNA graph executor fingerprints node inputs with it.
+- New `mne::format_iso8601()` and `mne::parse_iso8601()` with `mne::UtcTime`
+  (`base/string_utils.h`): ISO 8601 text for UTC times with millisecond
+  resolution, the counterpart of `QDateTime::toString(Qt::ISODate)` /
+  `Qt::ISODateWithMs` and `QDateTime::fromString()`. Text without an offset
+  is read as UTC.
 - New `mne::run_process()` with `ProcessOptions` and `ProcessResult`
   (`base/process.h`): runs a program without a shell, with working
   directory, extra environment, timeout and a live output callback, the
