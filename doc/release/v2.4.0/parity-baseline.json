@@ -1049,7 +1049,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNELIB::MNEEpochDataList",
+      "mne_cpp": "mne::MNEEpochDataList",
       "python": "mne.BaseEpochs",
       "claimed": "partial",
       "equivalence": null,
@@ -1058,7 +1058,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "ECD (INVERSELIB)",
+      "mne_cpp": "ECD (mne)",
       "python": "mne.Dipole",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1068,7 +1068,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNELIB::MNEEpochData, FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
+      "mne_cpp": "mne::MNEEpochData, mne::FiffEpochs::makeFixedLengthEpochs",
       "python": "mne.EpochsArray",
       "claimed": "partial",
       "equivalence": null,
@@ -1086,7 +1086,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "Label (FSLIB)",
+      "mne_cpp": "Label (mne)",
       "python": "mne.Label",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1096,7 +1096,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::InvVolumeSourceEstimate",
+      "mne_cpp": "mne::InvVolumeSourceEstimate",
       "python": "mne.VolSourceEstimate",
       "claimed": "partial",
       "equivalence": null,
@@ -1106,7 +1106,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::addReferenceChannels",
+      "mne_cpp": "mne::addReferenceChannels",
       "python": "mne.add_reference_channels",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1116,7 +1116,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::annotations_from_events",
+      "mne_cpp": "mne::annotations_from_events",
       "python": "mne.annotations_from_events",
       "claimed": "implemented",
       "equivalence": null,
@@ -1125,7 +1125,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::apply_forward",
+      "mne_cpp": "mne::apply_forward",
       "python": "mne.apply_forward",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1135,7 +1135,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::apply_forward",
+      "mne_cpp": "mne::apply_forward",
       "python": "mne.apply_forward_raw",
       "claimed": "partial",
       "equivalence": null,
@@ -1153,7 +1153,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::InvBeamformer",
+      "mne_cpp": "mne::InvBeamformer",
       "python": "mne.beamformer.Beamformer",
       "claimed": "partial",
       "equivalence": null,
@@ -1249,7 +1249,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::InvLCMV::makeLCMVResolutionMatrix",
+      "mne_cpp": "mne::InvLCMV::makeLCMVResolutionMatrix",
       "python": "mne.beamformer.make_lcmv_resolution_matrix",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1279,7 +1279,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffDigPointSet",
+      "mne_cpp": "mne::FiffDigPointSet",
       "python": "mne.channels.DigMontage",
       "claimed": "partial",
       "equivalence": null,
@@ -1288,7 +1288,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNELIB::MNELayout",
+      "mne_cpp": "mne::MNELayout",
       "python": "mne.channels.Layout",
       "claimed": "implemented",
       "equivalence": null,
@@ -1297,7 +1297,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::ChannelDerivation::apply",
+      "mne_cpp": "mne::ChannelDerivation::apply",
       "python": "mne.channels.combine_channels",
       "claimed": "partial",
       "equivalence": null,
@@ -1306,7 +1306,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNELIB::fitMatchedPoints",
+      "mne_cpp": "mne::fitMatchedPoints",
       "python": "mne.channels.compute_dev_head_t",
       "claimed": "partial",
       "equivalence": null,
@@ -1315,7 +1315,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "STSLIB::StatsAdjacency::fromChannelPositions",
+      "mne_cpp": "mne::StatsAdjacency::fromChannelPositions",
       "python": "mne.channels.find_ch_adjacency",
       "claimed": "partial",
       "equivalence": null,
@@ -1333,7 +1333,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "CHANNELSLIB::LayoutMaker::make_layout",
+      "mne_cpp": "mne::LayoutMaker::make_layout",
       "python": "mne.channels.generate_2d_layout",
       "claimed": "partial",
       "equivalence": null,
@@ -1360,7 +1360,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "CHANNELSLIB::StandardMontage::montage",
+      "mne_cpp": "mne::StandardMontage::montage",
       "python": "mne.channels.make_standard_montage",
       "claimed": "partial",
       "equivalence": null,
@@ -1370,7 +1370,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "CHANNELSLIB::LayoutLoader::read_elc",
+      "mne_cpp": "mne::LayoutLoader::read_elc",
       "python": "mne.channels.read_custom_montage",
       "claimed": "partial",
       "equivalence": null,
@@ -1379,7 +1379,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffDigMontage::read_captrak",
+      "mne_cpp": "mne::FiffDigMontage::read_captrak",
       "python": "mne.channels.read_dig_captrak",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1389,7 +1389,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffDigMontage::read_neuroscan_dat",
+      "mne_cpp": "mne::FiffDigMontage::read_neuroscan_dat",
       "python": "mne.channels.read_dig_dat",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1399,7 +1399,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffDigMontage::read_egi",
+      "mne_cpp": "mne::FiffDigMontage::read_egi",
       "python": "mne.channels.read_dig_egi",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1409,7 +1409,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB dig I/O",
+      "mne_cpp": "mne dig I/O",
       "python": "mne.channels.read_dig_fif",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1428,7 +1428,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffDigMontage::read_localite",
+      "mne_cpp": "mne::FiffDigMontage::read_localite",
       "python": "mne.channels.read_dig_localite",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1438,7 +1438,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffDigMontage::read_polhemus_isotrak",
+      "mne_cpp": "mne::FiffDigMontage::read_polhemus_isotrak",
       "python": "mne.channels.read_dig_polhemus_isotrak",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1448,7 +1448,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DISPLIB layout I/O",
+      "mne_cpp": "mne::disp layout I/O",
       "python": "mne.channels.read_layout",
       "claimed": "implemented",
       "equivalence": null,
@@ -1457,7 +1457,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffDigMontage::read_polhemus_fastscan",
+      "mne_cpp": "mne::FiffDigMontage::read_polhemus_fastscan",
       "python": "mne.channels.read_polhemus_fastscan",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1467,7 +1467,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "CHANNELSLIB::SelectionIO::read_sel",
+      "mne_cpp": "mne::SelectionIO::read_sel",
       "python": "mne.channels.read_vectorview_selection",
       "claimed": "partial",
       "equivalence": null,
@@ -1534,7 +1534,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffProj::compute_from_raw",
+      "mne_cpp": "mne::FiffProj::compute_from_raw",
       "python": "mne.compute_proj_raw",
       "claimed": "partial",
       "equivalence": null,
@@ -1543,7 +1543,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MATHLIB::Linalg::rank",
+      "mne_cpp": "mne::Linalg::rank",
       "python": "mne.compute_rank",
       "claimed": "partial",
       "equivalence": null,
@@ -1561,7 +1561,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::SourceMorph::compute, MNEMorphMap::compute",
+      "mne_cpp": "mne::SourceMorph::compute, MNEMorphMap::compute",
       "python": "mne.compute_source_morph",
       "claimed": "partial",
       "equivalence": null,
@@ -1570,7 +1570,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffEpochs::concatenateEpochs",
+      "mne_cpp": "mne::FiffEpochs::concatenateEpochs",
       "python": "mne.concatenate_epochs",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1609,7 +1609,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::count_annotations",
+      "mne_cpp": "mne::count_annotations",
       "python": "mne.count_annotations",
       "claimed": "implemented",
       "equivalence": null,
@@ -1709,7 +1709,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::Xdawn::fit/apply",
+      "mne_cpp": "mne::Xdawn::fit/apply",
       "python": "mne.decoding.XdawnTransformer",
       "claimed": "implemented",
       "equivalence": null,
@@ -1718,7 +1718,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::events_from_annotations",
+      "mne_cpp": "mne::events_from_annotations",
       "python": "mne.events_from_annotations",
       "claimed": "implemented",
       "equivalence": null,
@@ -1747,7 +1747,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::apply_forward",
+      "mne_cpp": "mne::apply_forward",
       "python": "mne.forward.apply_forward",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1757,7 +1757,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::apply_forward",
+      "mne_cpp": "mne::apply_forward",
       "python": "mne.forward.apply_forward_raw",
       "claimed": "partial",
       "equivalence": null,
@@ -1815,7 +1815,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
+      "mne_cpp": "mne::FwdFieldMap::computeMegMapping/computeEegMapping",
       "python": "mne.forward.make_field_map",
       "claimed": "partial",
       "equivalence": null,
@@ -1882,7 +1882,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FWDLIB helmet surface",
+      "mne_cpp": "mne helmet surface",
       "python": "mne.get_meg_helmet_surf",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -1892,7 +1892,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FSLIB::FsAtlasLookup::load",
+      "mne_cpp": "mne::FsAtlasLookup::load",
       "python": "mne.get_volume_labels_from_aseg",
       "claimed": "partial",
       "equivalence": null,
@@ -1940,7 +1940,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FSLIB (partial)",
+      "mne_cpp": "mne (partial)",
       "python": "mne.head_to_mni",
       "claimed": "partial",
       "equivalence": null,
@@ -1980,7 +1980,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::InvTfMxne::compute",
+      "mne_cpp": "mne::InvTfMxne::compute",
       "python": "mne.inverse_sparse.tf_mixed_norm",
       "claimed": "partial",
       "equivalence": null,
@@ -2064,7 +2064,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
+      "mne_cpp": "mne::EDFReader / mne_edf2fiff (CLI)",
       "python": "mne.io.read_raw_bdf",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2074,7 +2074,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "BIDSLIB::BrainVisionReader / mne_brain_vision2fiff (CLI)",
+      "mne_cpp": "mne::BrainVisionReader / mne_brain_vision2fiff (CLI)",
       "python": "mne.io.read_raw_brainvision",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2093,7 +2093,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "BIDSLIB::EDFReader / mne_edf2fiff (CLI)",
+      "mne_cpp": "mne::EDFReader / mne_edf2fiff (CLI)",
       "python": "mne.io.read_raw_edf",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2205,7 +2205,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FWDLIB::FwdFieldMap::computeMegMapping/computeEegMapping",
+      "mne_cpp": "mne::FwdFieldMap::computeMegMapping/computeEegMapping",
       "python": "mne.make_field_map",
       "claimed": "partial",
       "equivalence": null,
@@ -2215,7 +2215,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FIFFLIB::FiffEpochs::makeFixedLengthEpochs",
+      "mne_cpp": "mne::FiffEpochs::makeFixedLengthEpochs",
       "python": "mne.make_fixed_length_epochs",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2284,7 +2284,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::apply_inverse_epochs",
+      "mne_cpp": "mne::apply_inverse_epochs",
       "python": "mne.minimum_norm.apply_inverse_epochs",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2313,7 +2313,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::compute_source_psd",
+      "mne_cpp": "mne::compute_source_psd",
       "python": "mne.minimum_norm.compute_source_psd",
       "claimed": "partial",
       "equivalence": null,
@@ -2322,7 +2322,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::estimate_snr",
+      "mne_cpp": "mne::estimate_snr",
       "python": "mne.minimum_norm.estimate_snr",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2332,7 +2332,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::InvResolutionMatrix::getCtf/getCtfs",
+      "mne_cpp": "mne::InvResolutionMatrix::getCtf/getCtfs",
       "python": "mne.minimum_norm.get_cross_talk",
       "claimed": "partial",
       "equivalence": null,
@@ -2341,7 +2341,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::InvResolutionMatrix::getPsf/getPsfs",
+      "mne_cpp": "mne::InvResolutionMatrix::getPsf/getPsfs",
       "python": "mne.minimum_norm.get_point_spread",
       "claimed": "partial",
       "equivalence": null,
@@ -2379,7 +2379,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::InvResolutionMatrix::peakLocalisationError/spatialSpread",
+      "mne_cpp": "mne::InvResolutionMatrix::peakLocalisationError/spatialSpread",
       "python": "mne.minimum_norm.resolution_metrics",
       "claimed": "partial",
       "equivalence": null,
@@ -2487,7 +2487,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::EogRegression",
+      "mne_cpp": "mne::EogRegression",
       "python": "mne.preprocessing.EOGRegression",
       "claimed": "partial",
       "equivalence": null,
@@ -2497,7 +2497,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::ICA::run/excludeComponents, ExtendedInfomax",
+      "mne_cpp": "mne::ICA::run/excludeComponents, ExtendedInfomax",
       "python": "mne.preprocessing.ICA",
       "claimed": "partial",
       "equivalence": null,
@@ -2506,7 +2506,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::annotateAmplitude",
+      "mne_cpp": "mne::annotateAmplitude",
       "python": "mne.preprocessing.annotate_amplitude",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2516,7 +2516,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::annotateMusclZscore",
+      "mne_cpp": "mne::annotateMusclZscore",
       "python": "mne.preprocessing.annotate_muscle_zscore",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2526,7 +2526,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::SurfaceLaplacian::compute",
+      "mne_cpp": "mne::SurfaceLaplacian::compute",
       "python": "mne.preprocessing.compute_current_source_density",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2536,7 +2536,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "SSS basis (DSPLIB)",
+      "mne_cpp": "SSS basis (mne)",
       "python": "mne.preprocessing.compute_maxwell_basis",
       "claimed": "implemented",
       "equivalence": null,
@@ -2594,7 +2594,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::findBadChannelsMaxwell",
+      "mne_cpp": "mne::findBadChannelsMaxwell",
       "python": "mne.preprocessing.find_bad_channels_maxwell",
       "claimed": "partial",
       "equivalence": null,
@@ -2643,7 +2643,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "Infomax ICA (DSPLIB)",
+      "mne_cpp": "Infomax ICA (mne)",
       "python": "mne.preprocessing.infomax",
       "claimed": "implemented",
       "equivalence": null,
@@ -2652,7 +2652,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "SSS/tSSS (DSPLIB)",
+      "mne_cpp": "SSS/tSSS (mne)",
       "python": "mne.preprocessing.maxwell_filter",
       "claimed": "partial",
       "equivalence": null,
@@ -2661,7 +2661,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::peakFinderMne",
+      "mne_cpp": "mne::peakFinderMne",
       "python": "mne.preprocessing.peak_finder",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2671,7 +2671,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::EogRegression::fitApply",
+      "mne_cpp": "mne::EogRegression::fitApply",
       "python": "mne.preprocessing.regress_artifact",
       "claimed": "partial",
       "equivalence": null,
@@ -2680,7 +2680,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::FineCalibration::write",
+      "mne_cpp": "mne::FineCalibration::write",
       "python": "mne.preprocessing.write_fine_calibration",
       "claimed": "implemented",
       "equivalence": null,
@@ -2698,7 +2698,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FWDLIB BEM",
+      "mne_cpp": "mne BEM",
       "python": "mne.read_bem_solution",
       "claimed": "implemented",
       "equivalence": null,
@@ -2707,7 +2707,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "mne_list_bem (CLI) / FWDLIB",
+      "mne_cpp": "mne_list_bem (CLI) / mne",
       "python": "mne.read_bem_surfaces",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2783,7 +2783,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "Label::read (FSLIB)",
+      "mne_cpp": "Label::read (mne)",
       "python": "mne.read_label",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2793,7 +2793,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "mne_annot2labels (CLI) / FSLIB",
+      "mne_cpp": "mne_annot2labels (CLI) / mne",
       "python": "mne.read_labels_from_annot",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2897,7 +2897,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::setBipolarReference",
+      "mne_cpp": "mne::setBipolarReference",
       "python": "mne.set_bipolar_reference",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2907,7 +2907,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::setEegReference",
+      "mne_cpp": "mne::setEegReference",
       "python": "mne.set_eeg_reference",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -2936,7 +2936,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::simulateEvoked",
+      "mne_cpp": "mne::simulateEvoked",
       "python": "mne.simulation.simulate_evoked",
       "claimed": "partial",
       "equivalence": null,
@@ -2946,7 +2946,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::simulateStc",
+      "mne_cpp": "mne::simulateStc",
       "python": "mne.simulation.simulate_sparse_stc",
       "claimed": "partial",
       "equivalence": null,
@@ -2955,7 +2955,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::simulateStcFromWaveforms",
+      "mne_cpp": "mne::simulateStcFromWaveforms",
       "python": "mne.simulation.simulate_stc",
       "claimed": "partial",
       "equivalence": null,
@@ -3042,7 +3042,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "FSLIB (partial)",
+      "mne_cpp": "mne (partial)",
       "python": "mne.split_label",
       "claimed": "partial",
       "equivalence": null,
@@ -3051,7 +3051,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "STSLIB::StatsMcCorrection::bonferroni",
+      "mne_cpp": "mne::StatsMcCorrection::bonferroni",
       "python": "mne.stats.bonferroni_correction",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -3061,7 +3061,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "STSLIB::StatsAdjacency::combine",
+      "mne_cpp": "mne::StatsAdjacency::combine",
       "python": "mne.stats.combine_adjacency",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -3081,7 +3081,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "STSLIB::StatsMcCorrection::fdr",
+      "mne_cpp": "mne::StatsMcCorrection::fdr",
       "python": "mne.stats.fdr_correction",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -3111,7 +3111,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "STSLIB::StatsTtest::permutation",
+      "mne_cpp": "mne::StatsTtest::permutation",
       "python": "mne.stats.permutation_t_test",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -3206,7 +3206,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::CsdResult",
+      "mne_cpp": "mne::CsdResult",
       "python": "mne.time_frequency.CrossSpectralDensity",
       "claimed": "partial",
       "equivalence": null,
@@ -3233,7 +3233,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::WelchPsdResult, MultitaperPsdResult",
+      "mne_cpp": "mne::WelchPsdResult, MultitaperPsdResult",
       "python": "mne.time_frequency.Spectrum",
       "claimed": "partial",
       "equivalence": null,
@@ -3242,7 +3242,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::WelchPsdResult, MultitaperPsdResult",
+      "mne_cpp": "mne::WelchPsdResult, MultitaperPsdResult",
       "python": "mne.time_frequency.SpectrumArray",
       "claimed": "partial",
       "equivalence": null,
@@ -3311,7 +3311,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::Dpss::compute",
+      "mne_cpp": "mne::Dpss::compute",
       "python": "mne.time_frequency.dpss_windows",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -3331,7 +3331,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::MultitaperPsd::compute",
+      "mne_cpp": "mne::MultitaperPsd::compute",
       "python": "mne.time_frequency.psd_array_multitaper",
       "claimed": "partial",
       "equivalence": null,
@@ -3341,7 +3341,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::WelchPsd::compute",
+      "mne_cpp": "mne::WelchPsd::compute",
       "python": "mne.time_frequency.psd_array_welch",
       "claimed": "partial",
       "equivalence": null,
@@ -3360,7 +3360,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MATHLIB::Spectral::calculateFFTFreqs",
+      "mne_cpp": "mne::Spectral::calculateFFTFreqs",
       "python": "mne.time_frequency.stftfreq",
       "claimed": "implemented",
       "equivalence": "equivalent",
@@ -3380,7 +3380,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::MultitaperTfr::computeArray",
+      "mne_cpp": "mne::MultitaperTfr::computeArray",
       "python": "mne.time_frequency.tfr_array_multitaper",
       "claimed": "partial",
       "equivalence": null,
@@ -3400,7 +3400,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "DSPLIB::MultitaperTfr::computeArray",
+      "mne_cpp": "mne::MultitaperTfr::computeArray",
       "python": "mne.time_frequency.tfr_multitaper",
       "claimed": "partial",
       "equivalence": null,
@@ -3410,7 +3410,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNELIB::MNEBem::transform",
+      "mne_cpp": "mne::MNEBem::transform",
       "python": "mne.transform_surface_to",
       "claimed": "implemented",
       "equivalence": null,
@@ -3437,7 +3437,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "INVLIB::compute_whitener",
+      "mne_cpp": "mne::compute_whitener",
       "python": "mne.whiten_evoked",
       "claimed": "partial",
       "equivalence": null,
@@ -3456,7 +3456,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "MNELIB::MNEBem::write",
+      "mne_cpp": "mne::MNEBem::write",
       "python": "mne.write_bem_surfaces",
       "claimed": "implemented",
       "equivalence": null,

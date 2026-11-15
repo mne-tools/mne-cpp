@@ -58,15 +58,15 @@ Tolerance is the range of comparison thresholds the test asserts (`exact` when i
 | MNE-Python | MNE-CPP | Claim | Test | Tolerance |
 |---|---|---|---|---|
 | `mne.Covariance` | `FiffCov` | equivalent | `test_fiff_cov_python` | 1e-09 |
-| `mne.Dipole` | `ECD (INVERSELIB)` | equivalent | `test_inv_dipole_fit_python` | 1e-12 to 0.02 |
+| `mne.Dipole` | `ECD (mne)` | equivalent | `test_inv_dipole_fit_python` | 1e-12 to 0.02 |
 | `mne.Epochs` | `FiffEpochs` | equivalent | `test_epochs` | 1e-10 |
 | `mne.Evoked` | `FiffEvoked` | equivalent | `test_fiff_io_evoked_info` | 1e-06 to 0.01 |
 | `mne.Forward` | `MNEForwardSolution` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
-| `mne.Label` | `Label (FSLIB)` | equivalent | `test_fs_annotation_labels` | 1e-06 |
+| `mne.Label` | `Label (mne)` | equivalent | `test_fs_annotation_labels` | 1e-06 |
 | `mne.SourceEstimate.save / read` | `InvSourceEstimateIO` | equivalent | `test_source_estimate_io` | 1e-06 to 1e-05 |
 | `mne.VectorSourceEstimate` | `InvVectorSourceEstimate` | equivalent | `test_source_estimate_types` | 1e-15 to 1e-07 |
-| `mne.add_reference_channels` | `DSPLIB::addReferenceChannels` | equivalent | `test_dsp_eeg_reference` | exact |
-| `mne.apply_forward` | `INVLIB::apply_forward` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
+| `mne.add_reference_channels` | `mne::addReferenceChannels` | equivalent | `test_dsp_eeg_reference` | exact |
+| `mne.apply_forward` | `mne::apply_forward` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
 | `mne.beamformer.apply_dics` | `InvDICS::applyDICS` | equivalent | `test_inv_lcmv_python` | 1e-06 |
 | `mne.beamformer.apply_dics_csd` | `InvDICS::applyDICSCsd` | equivalent | `test_inv_lcmv_python` | 1e-06 |
 | `mne.beamformer.apply_lcmv` | `Lcmv` | equivalent | `test_inv_lcmv_python` | 1e-06 |
@@ -74,22 +74,22 @@ Tolerance is the range of comparison thresholds the test asserts (`exact` when i
 | `mne.beamformer.make_dics / apply_dics` | `InvDICS` | equivalent | `test_inv_lcmv_python` | 1e-06 |
 | `mne.beamformer.make_lcmv` | `Lcmv` | equivalent | `test_inv_lcmv_python` | 1e-06 |
 | `mne.beamformer.make_lcmv / apply_lcmv` | `InvLCMV` | equivalent | `test_inv_lcmv_python` | 1e-06 |
-| `mne.beamformer.make_lcmv_resolution_matrix` | `INVLIB::InvLCMV::makeLCMVResolutionMatrix` | equivalent | `test_inv_lcmv_python` | 1e-06 |
+| `mne.beamformer.make_lcmv_resolution_matrix` | `mne::InvLCMV::makeLCMVResolutionMatrix` | equivalent | `test_inv_lcmv_python` | 1e-06 |
 | `mne.channel_indices_by_type` | `FiffInfoBase::channel_indices_by_type` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
 | `mne.channel_type` | `FiffInfoBase::channel_type` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
 | `mne.channels.make_standard_montage` | `StandardMontage` | equivalent | `test_channels_standard_montage` | 1e-12 to 0.005 |
-| `mne.channels.read_dig_captrak` | `FIFFLIB::FiffDigMontage::read_captrak` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
-| `mne.channels.read_dig_dat` | `FIFFLIB::FiffDigMontage::read_neuroscan_dat` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
-| `mne.channels.read_dig_egi` | `FIFFLIB::FiffDigMontage::read_egi` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
-| `mne.channels.read_dig_fif` | `FIFFLIB dig I/O` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
-| `mne.channels.read_dig_localite` | `FIFFLIB::FiffDigMontage::read_localite` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
-| `mne.channels.read_dig_polhemus_isotrak` | `FIFFLIB::FiffDigMontage::read_polhemus_isotrak` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
-| `mne.channels.read_polhemus_fastscan` | `FIFFLIB::FiffDigMontage::read_polhemus_fastscan` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
+| `mne.channels.read_dig_captrak` | `mne::FiffDigMontage::read_captrak` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
+| `mne.channels.read_dig_dat` | `mne::FiffDigMontage::read_neuroscan_dat` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
+| `mne.channels.read_dig_egi` | `mne::FiffDigMontage::read_egi` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
+| `mne.channels.read_dig_fif` | `mne dig I/O` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
+| `mne.channels.read_dig_localite` | `mne::FiffDigMontage::read_localite` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
+| `mne.channels.read_dig_polhemus_isotrak` | `mne::FiffDigMontage::read_polhemus_isotrak` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
+| `mne.channels.read_polhemus_fastscan` | `mne::FiffDigMontage::read_polhemus_fastscan` | equivalent | `test_fiff_dig_point_python` | 1e-06 |
 | `mne.channels.transform_to_head` | `FiffDigPointSet::transform_to_head` | equivalent | `test_fiff_coord_trans` | 1e-07 to 1e-06 |
 | `mne.combine_evoked` | `FiffEvoked::combine` | equivalent | `test_fiff_io_evoked_info` | 1e-06 to 0.01 |
 | `mne.compute_proj_epochs` | `FiffProj::compute_from_raw` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
 | `mne.compute_proj_evoked` | `FiffProj::compute_from_evoked` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
-| `mne.concatenate_epochs` | `FIFFLIB::FiffEpochs::concatenateEpochs` | equivalent | `test_epochs` | 1e-10 |
+| `mne.concatenate_epochs` | `mne::FiffEpochs::concatenateEpochs` | equivalent | `test_epochs` | 1e-10 |
 | `mne.concatenate_events` | `FiffEvents::concatenate` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
 | `mne.convert_forward_solution` | `MNEForwardSolution` | equivalent | `test_fwd_python` | 1e-06 to 0.001 |
 | `mne.count_events` | `FiffEvents::count` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
@@ -97,27 +97,27 @@ Tolerance is the range of comparison thresholds the test asserts (`exact` when i
 | `mne.find_events` | `FiffEvents::find_events` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
 | `mne.find_stim_steps` | `FiffEvents::find_stim_steps` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
 | `mne.fit_dipole` | `InvDipoleFit` | equivalent | `test_inv_dipole_fit_python` | 1e-12 to 0.02 |
-| `mne.forward.apply_forward` | `INVLIB::apply_forward` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
+| `mne.forward.apply_forward` | `mne::apply_forward` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
 | `mne.forward.compute_depth_prior` | `MNEForwardSolution::compute_depth_prior` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
 | `mne.forward.compute_orient_prior` | `MNEForwardSolution::compute_orient_prior` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
 | `mne.forward.convert_forward_solution` | `MNEForwardSolution` | equivalent | `test_fwd_python` | 1e-06 to 0.001 |
 | `mne.forward.is_fixed_orient` | `MNEForwardSolution::isFixedOrient` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
 | `mne.forward.read_forward_solution` | `MNEForwardSolution::read` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
 | `mne.forward.write_forward_solution` | `MNEForwardSolution::write` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
-| `mne.get_meg_helmet_surf` | `FWDLIB helmet surface` | equivalent | `test_field_map` | 1e-20 to 0.05 |
+| `mne.get_meg_helmet_surf` | `mne helmet surface` | equivalent | `test_field_map` | 1e-20 to 0.05 |
 | `mne.grade_to_vertices` | `MNESourceSpace::gradeToVertices` | equivalent | `test_mne_source_space_ops_python` | 1e-06 to 1e-05 |
 | `mne.inverse_sparse.gamma_map` | `InvGammaMap` | equivalent | `test_inv_sparse` | exact |
 | `mne.inverse_sparse.mixed_norm` | `InvMxne` | equivalent | `test_inv_sparse` | exact |
 | `mne.io.Raw` | `FiffRawData` | equivalent | `test_fiff_raw_formats_python` | 1e-12 to 1e-06 |
 | `mne.io.fiff.FiffStream` | `FiffStream` | equivalent | `test_fiff_raw_io` | exact |
 | `mne.io.read_info` | `FiffInfo::read` | equivalent | `test_fiff_stream_python` | 1e-07 to 1e-05 |
-| `mne.io.read_raw_bdf` | `BIDSLIB::EDFReader / mne_edf2fiff (CLI)` | equivalent | `test_bids` | 1e-07 to 0.001 |
-| `mne.io.read_raw_brainvision` | `BIDSLIB::BrainVisionReader / mne_brain_vision2fiff (CLI)` | equivalent | `test_bids` | 1e-07 to 0.001 |
-| `mne.io.read_raw_edf` | `BIDSLIB::EDFReader / mne_edf2fiff (CLI)` | equivalent | `test_edf2fiff_rwr` | 1e-06 to 1e-05 |
+| `mne.io.read_raw_bdf` | `mne::EDFReader / mne_edf2fiff (CLI)` | equivalent | `test_bids` | 1e-07 to 0.001 |
+| `mne.io.read_raw_brainvision` | `mne::BrainVisionReader / mne_brain_vision2fiff (CLI)` | equivalent | `test_bids` | 1e-07 to 0.001 |
+| `mne.io.read_raw_edf` | `mne::EDFReader / mne_edf2fiff (CLI)` | equivalent | `test_edf2fiff_rwr` | 1e-06 to 1e-05 |
 | `mne.io.read_raw_eximia` | `mne_eximia2fiff (CLI)` | equivalent | `test_tool_data_pipeline` | 1e-07 to 1e-06 |
 | `mne.io.read_raw_fif` | `FiffRawData::read` | equivalent | `test_fiff_raw_formats_python` | 1e-12 to 1e-06 |
 | `mne.make_bem_solution` | `mne_setup_forward_model (CLI)` | equivalent | `test_fwd_bem_driver_python` | 1e-06 to 0.02 |
-| `mne.make_fixed_length_epochs` | `FIFFLIB::FiffEpochs::makeFixedLengthEpochs` | equivalent | `test_epochs` | 1e-10 |
+| `mne.make_fixed_length_epochs` | `mne::FiffEpochs::makeFixedLengthEpochs` | equivalent | `test_epochs` | 1e-10 |
 | `mne.make_fixed_length_events` | `FiffEvents::make_fixed_length` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
 | `mne.make_forward_solution` | `ComputeFwd` | equivalent | `test_fwd_python` | 1e-06 to 0.001 |
 | `mne.make_forward_solution` | `mne_forward_solution (CLI) / ComputeFwd` | equivalent | `test_fwd_python` | 1e-06 to 0.001 |
@@ -126,10 +126,10 @@ Tolerance is the range of comparison thresholds the test asserts (`exact` when i
 | `mne.merge_events` | `FiffEvents::merge` | equivalent | `test_fiff_core_python` | 1e-12 to 1e-09 |
 | `mne.minimum_norm.apply_inverse` | `InvMinimumNorm` | equivalent | `test_compute_raw_inverse` | exact |
 | `mne.minimum_norm.apply_inverse` | `MinimumNorm` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
-| `mne.minimum_norm.apply_inverse_epochs` | `INVLIB::apply_inverse_epochs` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
+| `mne.minimum_norm.apply_inverse_epochs` | `mne::apply_inverse_epochs` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
 | `mne.minimum_norm.apply_inverse_raw` | `mne_compute_raw_inverse (CLI)` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
 | `mne.minimum_norm.estimate_snr` | `MNEMneData` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
-| `mne.minimum_norm.estimate_snr` | `INVLIB::estimate_snr` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
+| `mne.minimum_norm.estimate_snr` | `mne::estimate_snr` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
 | `mne.minimum_norm.make_inverse_operator` | `MNEInverseOperator` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
 | `mne.minimum_norm.prepare_inverse_operator` | `MNEInverseOperator::prepare` | equivalent | `test_inv_eloreta_python` | 1e-12 to 0.0001 |
 | `mne.pick_channels` | `FiffInfoBase::pick_channels` | equivalent | `test_fiff_info` | 1e-10 |
@@ -140,30 +140,30 @@ Tolerance is the range of comparison thresholds the test asserts (`exact` when i
 | `mne.pick_info` | `FiffInfo::pick_info` | equivalent | `test_fiff_info` | 1e-10 |
 | `mne.pick_types_forward` | `MNEForwardSolution::pick_types` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
 | `mne.preprocessing.EOGRegression` | `EogRegression` | equivalent | `test_dsp_eog_regression` | 1e-15 to 0.3 |
-| `mne.preprocessing.annotate_amplitude` | `DSPLIB::annotateAmplitude` | equivalent | `test_dsp_annotate_artifact` | 1e-14 to 1e-06 |
-| `mne.preprocessing.annotate_muscle_zscore` | `DSPLIB::annotateMusclZscore` | equivalent | `test_dsp_annotate_artifact` | 1e-14 to 1e-06 |
+| `mne.preprocessing.annotate_amplitude` | `mne::annotateAmplitude` | equivalent | `test_dsp_annotate_artifact` | 1e-14 to 1e-06 |
+| `mne.preprocessing.annotate_muscle_zscore` | `mne::annotateMusclZscore` | equivalent | `test_dsp_annotate_artifact` | 1e-14 to 1e-06 |
 | `mne.preprocessing.annotate_muscle_zscore / annotate_amplitude` | `AnnotateArtifact` | equivalent | `test_dsp_annotate_artifact` | 1e-14 to 1e-06 |
 | `mne.preprocessing.compute_current_source_density` | `SurfaceLaplacian` | equivalent | `test_surface_laplacian` | 1e-06 |
-| `mne.preprocessing.compute_current_source_density` | `DSPLIB::SurfaceLaplacian::compute` | equivalent | `test_surface_laplacian` | 1e-06 |
+| `mne.preprocessing.compute_current_source_density` | `mne::SurfaceLaplacian::compute` | equivalent | `test_surface_laplacian` | 1e-06 |
 | `mne.preprocessing.compute_proj_ecg` | `ArtifactDetectProjParams` | equivalent | `test_dsp_artifact_detect` | 1e-05 |
 | `mne.preprocessing.compute_proj_ecg` | `ArtifactDetect::computeProjEcg` | equivalent | `test_dsp_artifact_detect` | 1e-05 |
 | `mne.preprocessing.compute_proj_eog` | `ArtifactDetect::computeProjEog` | equivalent | `test_dsp_artifact_detect` | 1e-05 |
 | `mne.preprocessing.find_ecg_events` | `ArtifactDetect::detectEcg` | equivalent | `test_dsp_artifact_detect` | 1e-05 |
 | `mne.preprocessing.find_eog_events` | `ArtifactDetect::detectEog` | equivalent | `test_dsp_artifact_detect` | 1e-05 |
-| `mne.preprocessing.peak_finder` | `DSPLIB::peakFinderMne` | equivalent | `test_dsp_artifact_detect` | 1e-05 |
-| `mne.read_bem_surfaces` | `mne_list_bem (CLI) / FWDLIB` | equivalent | `test_mne_source_space_ops_python` | 1e-06 to 1e-05 |
+| `mne.preprocessing.peak_finder` | `mne::peakFinderMne` | equivalent | `test_dsp_artifact_detect` | 1e-05 |
+| `mne.read_bem_surfaces` | `mne_list_bem (CLI) / mne` | equivalent | `test_mne_source_space_ops_python` | 1e-06 to 1e-05 |
 | `mne.read_cov` | `FiffCov::FiffCov(io)` | equivalent | `test_fiff_cov_python` | 1e-09 |
 | `mne.read_evokeds` | `FiffEvoked::read` | equivalent | `test_fiff_evoked_python` | 1e-12 to 1e-06 |
 | `mne.read_forward_solution` | `MNEForwardSolution::read` | equivalent | `test_mne_forward_ops` | 1e-12 to 0.001 |
-| `mne.read_label` | `Label::read (FSLIB)` | equivalent | `test_mne_label_python` | 1e-12 to 1e-05 |
-| `mne.read_labels_from_annot` | `mne_annot2labels (CLI) / FSLIB` | equivalent | `test_fs_annotation_labels` | 1e-06 |
+| `mne.read_label` | `Label::read (mne)` | equivalent | `test_mne_label_python` | 1e-12 to 1e-05 |
+| `mne.read_labels_from_annot` | `mne_annot2labels (CLI) / mne` | equivalent | `test_fs_annotation_labels` | 1e-06 |
 | `mne.read_morph_map` | `mne_make_morph_maps (CLI)` | equivalent | `test_mne_source_space_ops_python` | 1e-06 to 1e-05 |
 | `mne.read_proj` | `FiffProj::read` | equivalent | `test_fiff_stream_python` | 1e-07 to 1e-05 |
 | `mne.read_source_spaces` | `MNESourceSpace::read` | equivalent | `test_mne_source_space_python` | 0.001 |
 | `mne.read_trans` | `FiffCoordTrans::read` | equivalent | `test_fiff_fs_library` | 1e-10 to 0.5 |
-| `mne.set_bipolar_reference` | `DSPLIB::setBipolarReference` | equivalent | `test_dsp_eeg_reference` | exact |
+| `mne.set_bipolar_reference` | `mne::setBipolarReference` | equivalent | `test_dsp_eeg_reference` | exact |
 | `mne.set_eeg_reference` | `EegReference` | equivalent | `test_dsp_eeg_reference` | exact |
-| `mne.set_eeg_reference` | `DSPLIB::setEegReference` | equivalent | `test_dsp_eeg_reference` | exact |
+| `mne.set_eeg_reference` | `mne::setEegReference` | equivalent | `test_dsp_eeg_reference` | exact |
 | `mne.setup_volume_source_space` | `mne_volume_source_space (CLI)` | equivalent | `test_mne_source_space_ops_python` | 1e-06 to 1e-05 |
 | `mne.simulation.simulate_stc / simulate_evoked` | `Simulate` | equivalent | `test_dsp_simulate` | 1e-15 to 1e-10 |
 | `mne.source_space.read_source_spaces` | `MNESourceSpace::read` | equivalent | `test_mne_source_space_python` | 0.001 |
@@ -172,22 +172,22 @@ Tolerance is the range of comparison thresholds the test asserts (`exact` when i
 | `mne.spatial_tris_adjacency` | `StatsAdjacency` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.spatio_temporal_src_adjacency` | `StatsAdjacency::fromSourceSpaceTemporal` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.spatio_temporal_tris_adjacency` | `StatsAdjacency` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
-| `mne.stats.bonferroni_correction` | `STSLIB::StatsMcCorrection::bonferroni` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
+| `mne.stats.bonferroni_correction` | `mne::StatsMcCorrection::bonferroni` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.stats.combine_adjacency` | `StatsAdjacency` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
-| `mne.stats.combine_adjacency` | `STSLIB::StatsAdjacency::combine` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
+| `mne.stats.combine_adjacency` | `mne::StatsAdjacency::combine` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.stats.f_oneway` | `StatsCluster f-test` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
-| `mne.stats.fdr_correction` | `STSLIB::StatsMcCorrection::fdr` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
+| `mne.stats.fdr_correction` | `mne::StatsMcCorrection::fdr` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.stats.permutation_cluster_1samp_test` | `StatsCluster::oneSamplePermutationTest` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.stats.permutation_cluster_test` | `StatsCluster` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.stats.permutation_cluster_test` | `StatsCluster::fTestPermutationTest` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
-| `mne.stats.permutation_t_test` | `STSLIB::StatsTtest::permutation` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
+| `mne.stats.permutation_t_test` | `mne::StatsTtest::permutation` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.stats.spatio_temporal_cluster_1samp_test` | `StatsCluster` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.stats.spatio_temporal_cluster_test` | `StatsCluster` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.stats.ttest_1samp_no_p` | `StatsCluster` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
 | `mne.stats.ttest_ind_no_p` | `StatsCluster t-test` | equivalent | `test_sts_cluster` | 1e-10 to 0.05 |
-| `mne.time_frequency.dpss_windows` | `DSPLIB::Dpss::compute` | equivalent | `test_dsp_multitaper` | 1e-06 |
+| `mne.time_frequency.dpss_windows` | `mne::Dpss::compute` | equivalent | `test_dsp_multitaper` | 1e-06 |
 | `mne.time_frequency.psd_array_multitaper` | `MultitaperPsd` | equivalent | `test_dsp_multitaper` | 1e-06 |
-| `mne.time_frequency.stftfreq` | `MATHLIB::Spectral::calculateFFTFreqs` | equivalent | `test_math_spectral` | 1e-12 to 0.01 |
+| `mne.time_frequency.stftfreq` | `mne::Spectral::calculateFFTFreqs` | equivalent | `test_math_spectral` | 1e-12 to 0.01 |
 | `mne.time_frequency.tfr_morlet` | `MorletTfr` | equivalent | `test_dsp_morlet_tfr` | 1e-10 to 0.1 |
 | `mne.time_frequency.tfr_multitaper` | `MultitaperTfr` | equivalent | `test_dsp_multitaper` | 1e-06 |
 | `mne.write_bem_solution` | `FwdBemModel::fwd_bem_save_model` | equivalent | `test_fwd_bem_driver_python` | 1e-06 to 0.02 |

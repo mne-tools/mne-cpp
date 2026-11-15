@@ -20,7 +20,7 @@ Qt identifiers in code with comments, string literals and `#include` lines remov
 | `decoding` | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | `disp` | Concurrent Core GuiPrivate Svg Widgets | 6,034 | 111 | 60 | 477 | 108 | 1,257 | 924 | 5 | 49 | 0 | 545 | 1,504 | 0 | 4 | 0 | 1,127 | 23 | 11 |
 | `disp3D` | Concurrent Core Gui GuiPrivate ShaderTools Widgets | 2,895 | 142 | 12 | 261 | 45 | 302 | 962 | 0 | 105 | 0 | 142 | 228 | 3 | 0 | 69 | 687 | 74 | 17 |
-| `dsp` | Concurrent Core | 430 | 17 | 12 | 79 | 24 | 121 | 0 | 0 | 0 | 0 | 82 | 3 | 0 | 3 | 0 | 97 | 21 | 0 |
+| `dsp` | Concurrent Core | 430 | 19 | 12 | 79 | 24 | 121 | 0 | 0 | 0 | 0 | 82 | 3 | 0 | 3 | 0 | 97 | 21 | 0 |
 | `fiff` | Core Network | 50 | 1 | 0 | 1 | 8 | 15 | 0 | 0 | 0 | 5 | 0 | 3 | 0 | 2 | 0 | 15 | 0 | 1 |
 | `fs` | — | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | `fwd` | Concurrent Core | 9 | 2 | 0 | 0 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 2 | 4 | 0 |
