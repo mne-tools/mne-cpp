@@ -28,12 +28,6 @@
 #include <fiff/fiff_constants.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QString>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
@@ -656,11 +650,12 @@ void BidsRawData::clear()
 
 std::unique_ptr<AbstractFormatReader> BidsRawData::create_reader(std::string_view sExtension)
 {
-    const std::string ext = BASELIB::toLower(sExtension);
-    if (ext == ".vhdr" || ext == ".ahdr")
-        return std::make_unique<BrainVisionReader>();
-    if (ext == ".edf" || ext == ".bdf")
-        return std::make_unique<EDFReader>();
+    if (auto reader = std::make_unique<BrainVisionReader>(); reader->supports_extension(sExtension)) {
+        return reader;
+    }
+    if (auto reader = std::make_unique<EDFReader>(); reader->supports_extension(sExtension)) {
+        return reader;
+    }
     return nullptr;
 }
 
@@ -714,7 +709,7 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
         return result;
     }
 
-    if (!result.reader->open(QString::fromStdString(BASELIB::utf8FromPath(rawFilePath)))) {
+    if (!result.reader->open(rawFilePath)) {
         BASELIB::Log::warning("[BidsRawData::read] Failed to open raw file: {}", BASELIB::utf8FromPath(rawFilePath));
         return result;
     }
@@ -722,7 +717,7 @@ BidsRawData BidsRawData::read(const BIDSPath& bidsPath)
     //=========================================================================================================
     // Step 4 — Build FiffRawData from the reader
     //=========================================================================================================
-    result.raw = result.reader->toFiffRawData();
+    result.raw = result.reader->to_fiff_raw_data();
 
     //=========================================================================================================
     // Step 5 — Read and apply *_channels.tsv

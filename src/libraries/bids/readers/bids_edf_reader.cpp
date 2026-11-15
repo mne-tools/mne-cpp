@@ -15,17 +15,11 @@
 //=============================================================================================================
 
 #include "bids_edf_reader.h"
+#include <base/byte_stream.h>
 #include <base/log.h>
 #include <base/string_utils.h>
 
 #include <fiff/fiff_constants.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFileInfo>
-#include <QIODevice>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -33,6 +27,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -82,9 +77,9 @@ std::optional<std::chrono::sys_days> civilDate(std::optional<int> day, std::opti
 
 //=============================================================================================================
 
-std::optional<std::chrono::sys_time<std::chrono::microseconds>> EDFReader::parseStartDate(std::string_view recordingId,
-                                                                                          std::string_view startDate,
-                                                                                          std::string_view startTime)
+std::optional<std::chrono::sys_time<std::chrono::microseconds>> EDFReader::parse_start_date(std::string_view recordingId,
+                                                                                            std::string_view startDate,
+                                                                                            std::string_view startTime)
 {
     using namespace std::chrono;
     // EDF+ "Startdate dd-MMM-yyyy ..." carries all four digits of the year and wins over the header date
@@ -133,219 +128,208 @@ namespace
 {
 
 // mne read_raw_edf stim_channel="auto"
-bool isAutoStimLabel(const QString& label)
+bool isAutoStimLabel(std::string_view label)
 {
-    return label.compare(QLatin1String("status"), Qt::CaseInsensitive) == 0 || label.compare(QLatin1String("trigger"), Qt::CaseInsensitive) == 0;
+    return BASELIB::equalsIgnoreCase(label, "status") || BASELIB::equalsIgnoreCase(label, "trigger");
+}
+
+// EDF header fields are space-padded Latin-1
+std::string headerText(std::string_view field)
+{
+    return BASELIB::latin1_to_utf8(BASELIB::trimmed(field));
 }
 
 } // namespace
 
 //=============================================================================================================
 
-FiffChInfo EDFChannelInfo::toFiffChInfo() const
+FiffChInfo EDFChannelInfo::to_fiff_ch_info() const
 {
     FiffChInfo info;
 
     info.scanNo = channelNumber;
     info.logNo = channelNumber;
 
-    QString sLabelUpper = label.toUpper();
+    const std::string lower = BASELIB::toLower(label);
+    const auto has = [&lower](std::string_view part) {
+        return lower.find(part) != std::string::npos;
+    };
     if (!isMeasurement) {
-        info.kind = sLabelUpper.contains("STIM") ? FIFFV_STIM_CH : FIFFV_MISC_CH;
+        info.kind = has("stim") ? FIFFV_STIM_CH : FIFFV_MISC_CH;
     } else if (isAutoStimLabel(label)) {
         info.kind = FIFFV_STIM_CH;
+    } else if (has("ecog")) {
+        info.kind = FIFFV_ECOG_CH;
+    } else if (has("seeg")) {
+        info.kind = FIFFV_SEEG_CH;
+    } else if (has("eeg")) {
+        info.kind = FIFFV_EEG_CH;
+    } else if (has("meg")) {
+        info.kind = FIFFV_MEG_CH;
+    } else if (has("ecg")) {
+        info.kind = FIFFV_ECG_CH;
+    } else if (has("eog")) {
+        info.kind = FIFFV_EOG_CH;
+    } else if (has("emg")) {
+        info.kind = FIFFV_EMG_CH;
     } else {
-        if (sLabelUpper.contains("ECOG"))
-            info.kind = FIFFV_ECOG_CH;
-        else if (sLabelUpper.contains("SEEG"))
-            info.kind = FIFFV_SEEG_CH;
-        else if (sLabelUpper.contains("EEG"))
-            info.kind = FIFFV_EEG_CH;
-        else if (sLabelUpper.contains("MEG"))
-            info.kind = FIFFV_MEG_CH;
-        else if (sLabelUpper.contains("ECG"))
-            info.kind = FIFFV_ECG_CH;
-        else if (sLabelUpper.contains("EOG"))
-            info.kind = FIFFV_EOG_CH;
-        else if (sLabelUpper.contains("EMG"))
-            info.kind = FIFFV_EMG_CH;
-        else
-            info.kind = FIFFV_EEG_CH;
+        info.kind = FIFFV_EEG_CH;
     }
 
-    // Samples are converted to SI by toSi(), so voltages are stored in V
-    info.unit = (info.kind != FIFFV_STIM_CH && physicalDimension.endsWith(QLatin1Char('V'))) ? FIFF_UNIT_V : FIFF_UNIT_NONE;
+    // Samples are converted to SI by to_si(), so voltages are stored in V
+    info.unit = (info.kind != FIFFV_STIM_CH && physicalDimension.ends_with('V')) ? FIFF_UNIT_V : FIFF_UNIT_NONE;
     info.unit_mul = FIFF_UNITM_NONE;
 
     info.cal = 1.0f;
     info.range = 1.0f;
-    info.ch_name = label.toStdString();
+    info.ch_name = label;
 
     return info;
+}
+
+//=============================================================================================================
+
+float EDFChannelInfo::to_si() const
+{
+    // mne read_raw_edf: µV (micro sign, Greek mu, Shift-JIS mu) and uV are 1e-6, mV 1e-3, anything else 1
+    if (isAutoStimLabel(label)) {
+        return 1.0f;
+    }
+    const std::string_view d = physicalDimension;
+    if (d == "\xC2\xB5V" || d == "\xCE\xBCV" || d == "\xC2\x83\xC3\x8AV" || d == "uV") {
+        return 1.0e-6f;
+    }
+    if (d == "mV") {
+        return 1.0e-3f;
+    }
+    return 1.0f;
 }
 
 //=============================================================================================================
 // EDFReader
 //=============================================================================================================
 
-float EDFChannelInfo::toSi() const
-{
-    // mne read_raw_edf: µV (micro sign, Greek mu, Shift-JIS mu) and uV are 1e-6, mV 1e-3, anything else 1
-    if (isAutoStimLabel(label))
-        return 1.0f;
-    const QString& d = physicalDimension;
-    if (d == QStringLiteral("\u03BCV") || d == QStringLiteral("\u00B5V") || d == QLatin1String("\x83\xCAV") || d == QLatin1String("uV"))
-        return 1.0e-6f;
-    if (d == QLatin1String("mV"))
-        return 1.0e-3f;
-    return 1.0f;
-}
+EDFReader::EDFReader() = default;
+
+EDFReader::~EDFReader() = default;
 
 //=============================================================================================================
 
-EDFReader::EDFReader()
+bool EDFReader::open(const std::filesystem::path& path)
 {
-}
-
-//=============================================================================================================
-
-EDFReader::~EDFReader()
-{
-    if (m_file.isOpen()) {
-        m_file.close();
-    }
-}
-
-//=============================================================================================================
-
-bool EDFReader::open(const QString& sFilePath)
-{
-    m_sFilePath = sFilePath;
-    m_file.setFileName(sFilePath);
-
-    if (!m_file.open(QIODevice::ReadOnly)) {
-        BASELIB::Log::warning("[EDFReader::open] Could not open file: {}", sFilePath.toStdString());
+    m_file = BASELIB::FileByteStream::open(path, BASELIB::FileByteStream::Mode::Read);
+    if (!m_file) {
+        BASELIB::Log::warning("[EDFReader::open] Could not open file: {}", BASELIB::utf8FromPath(path));
         return false;
     }
 
     // Like mne, the extension decides between EDF (16 bit) and BDF (24 bit)
-    m_iBytesPerSample = QFileInfo(sFilePath).suffix().compare(QLatin1String("bdf"), Qt::CaseInsensitive) == 0 ? 3 : 2;
-    parseHeader(&m_file);
-    m_bIsOpen = true;
+    m_bytesPerSample = BASELIB::equalsIgnoreCase(BASELIB::utf8FromPath(path.extension()), ".bdf") ? 3 : 2;
+    if (!parse_header()) {
+        BASELIB::Log::warning("[EDFReader::open] Not an EDF/BDF header: {}", BASELIB::utf8FromPath(path));
+        m_file.reset();
+        return false;
+    }
     return true;
 }
 
 //=============================================================================================================
 
-void EDFReader::parseHeader(QIODevice* pDev)
+bool EDFReader::parse_header()
 {
-    if (pDev->pos() != 0) {
-        pDev->seek(0);
+    // Fixed part: version 8, patient 80, recording 80, start date 8, start time 8, header bytes 8, reserved 44,
+    // record count 8, record duration 8, signal count 4
+    constexpr std::size_t fixedBytes = 256;
+    constexpr std::size_t bytesPerSignal = 256;
+    std::string header(fixedBytes, '\0');
+    if (!m_file->seek(0) || m_file->read(header.data(), fixedBytes) != fixedBytes) {
+        return false;
+    }
+    std::size_t cursor = 0;
+    const auto field = [&header, &cursor](std::size_t width) {
+        const std::string_view value = std::string_view(header).substr(cursor, width);
+        cursor += width;
+        return value;
+    };
+
+    field(8);  // version
+    field(80); // patient
+    const std::string_view recordingId = field(80);
+    const std::string_view startDate = field(8);
+    const std::string_view startTime = field(8);
+    m_measDate = parse_start_date(recordingId, startDate, startTime);
+    m_numBytesInHeader = BASELIB::toInt(field(8)).value_or(0);
+    field(44); // reserved
+    m_numDataRecords = BASELIB::toInt(field(8)).value_or(0);
+    const auto recordDuration = static_cast<float>(BASELIB::toDouble(field(8)).value_or(0.0));
+    const int numChannels = BASELIB::toInt(field(4)).value_or(0);
+    if (numChannels <= 0 || static_cast<std::uint64_t>(numChannels) * bytesPerSignal + fixedBytes > m_file->size()) {
+        return false;
     }
 
-    // General header fields
-    m_sVersionNo = QString::fromLatin1(pDev->read(EDF_VERSION)).trimmed();
-    m_sPatientId = QString::fromLatin1(pDev->read(LOCAL_PATIENT_INFO)).trimmed();
-    m_sRecordingId = QString::fromLatin1(pDev->read(LOCAL_RECORD_INFO)).trimmed();
-    const std::string startDate = pDev->read(STARTDATE).toStdString();
-    const std::string startTime = pDev->read(STARTTIME).toStdString();
-    m_measDate = parseStartDate(m_sRecordingId.toStdString(), startDate, startTime);
-    m_iNumBytesInHeader = QString::fromLatin1(pDev->read(NUM_BYTES_HEADER)).trimmed().toInt();
-    pDev->read(HEADER_RESERVED);
-    m_iNumDataRecords = QString::fromLatin1(pDev->read(NUM_DATA_RECORDS)).trimmed().toInt();
-    m_fDataRecordsDuration = QString::fromLatin1(pDev->read(DURATION_DATA_RECS)).trimmed().toFloat();
-    m_iNumChannels = QString::fromLatin1(pDev->read(NUM_SIGNALS)).trimmed().toInt();
+    // Per-signal fields, each stored for all signals in turn: label 16, transducer 80, dimension 8, physical min 8,
+    // physical max 8, digital min 8, digital max 8, prefiltering 80, samples per record 8, reserved 32
+    const auto count = static_cast<std::size_t>(numChannels);
+    header.resize(count * bytesPerSignal);
+    if (m_file->read(header.data(), header.size()) != header.size()) {
+        return false;
+    }
+    cursor = 0;
+    m_allChannels.assign(count, EDFChannelInfo{});
+    const auto column = [&](std::size_t width, auto assign) {
+        for (EDFChannelInfo& ch : m_allChannels) {
+            assign(ch, field(width));
+        }
+    };
+    column(16, [](EDFChannelInfo& ch, std::string_view v) { ch.label = headerText(v); });
+    column(80, [](EDFChannelInfo& ch, std::string_view v) { ch.transducerType = headerText(v); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalDimension = headerText(v); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMin = static_cast<float>(BASELIB::toDouble(v).value_or(0.0)); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.physicalMax = static_cast<float>(BASELIB::toDouble(v).value_or(0.0)); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMin = BASELIB::toInt(v).value_or(0); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.digitalMax = BASELIB::toInt(v).value_or(0); });
+    column(80, [](EDFChannelInfo& ch, std::string_view v) { ch.prefiltering = headerText(v); });
+    column(8, [](EDFChannelInfo& ch, std::string_view v) { ch.samplesPerRecord = BASELIB::toInt(v).value_or(0); });
 
-    // Per-channel fields (read in EDF-specified order: all labels, then all transducers, etc.)
-    QVector<QString> vLabels, vTransducers, vPhysDims, vPrefilterings;
-    QVector<float> vPhysMins, vPhysMaxs;
-    QVector<long> vDigMins, vDigMaxs, vSamplesPerRecord;
-
-    for (int i = 0; i < m_iNumChannels; ++i)
-        vLabels.push_back(QString::fromLatin1(pDev->read(SIG_LABEL)).trimmed());
-    for (int i = 0; i < m_iNumChannels; ++i)
-        vTransducers.push_back(QString::fromLatin1(pDev->read(SIG_TRANSDUCER)).trimmed());
-    for (int i = 0; i < m_iNumChannels; ++i)
-        vPhysDims.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_DIM)).trimmed());
-    for (int i = 0; i < m_iNumChannels; ++i)
-        vPhysMins.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_MIN)).trimmed().toFloat());
-    for (int i = 0; i < m_iNumChannels; ++i)
-        vPhysMaxs.push_back(QString::fromLatin1(pDev->read(SIG_PHYS_MAX)).trimmed().toFloat());
-    for (int i = 0; i < m_iNumChannels; ++i)
-        vDigMins.push_back(QString::fromLatin1(pDev->read(SIG_DIG_MIN)).trimmed().toLong());
-    for (int i = 0; i < m_iNumChannels; ++i)
-        vDigMaxs.push_back(QString::fromLatin1(pDev->read(SIG_DIG_MAX)).trimmed().toLong());
-    for (int i = 0; i < m_iNumChannels; ++i)
-        vPrefilterings.push_back(QString::fromLatin1(pDev->read(SIG_PREFILTERING)).trimmed());
-    for (int i = 0; i < m_iNumChannels; ++i)
-        vSamplesPerRecord.push_back(QString::fromLatin1(pDev->read(SIG_NUM_SAMPLES)).trimmed().toLong());
-    for (int i = 0; i < m_iNumChannels; ++i)
-        pDev->read(SIG_RESERVED);
-
-    // Build channel info structs
-    m_vAllChannels.clear();
-    for (int i = 0; i < m_iNumChannels; ++i) {
-        EDFChannelInfo ch;
-        ch.channelNumber = i;
-        ch.label = vLabels[i];
-        ch.transducerType = vTransducers[i];
-        ch.physicalDimension = vPhysDims[i];
-        ch.prefiltering = vPrefilterings[i];
-        ch.physicalMin = vPhysMins[i];
-        ch.physicalMax = vPhysMaxs[i];
-        ch.digitalMin = vDigMins[i];
-        ch.digitalMax = vDigMaxs[i];
-        ch.samplesPerRecord = vSamplesPerRecord[i];
-        ch.sampleCount = vSamplesPerRecord[i] * m_iNumDataRecords;
-        ch.frequency = (m_fDataRecordsDuration > 0.0f)
-            ? vSamplesPerRecord[i] / m_fDataRecordsDuration
-            : 0.0f;
-        ch.isMeasurement = false;
-        m_vAllChannels.push_back(ch);
+    if (m_numBytesInHeader != static_cast<long>(fixedBytes + count * bytesPerSignal)) {
+        BASELIB::Log::warning("[EDFReader::parse_header] Header byte count mismatch: read {} expected {}", fixedBytes + count * bytesPerSignal, m_numBytesInHeader);
     }
 
-    // Verify header size consistency
-    if (pDev->pos() != m_iNumBytesInHeader) {
-        BASELIB::Log::warning("[EDFReader::parseHeader] Header byte count mismatch: read {} expected {}", pDev->pos(), m_iNumBytesInHeader);
+    m_numBytesPerDataRecord = 0;
+    long maxSamplesPerRecord = 0;
+    for (std::size_t i = 0; i < count; ++i) {
+        EDFChannelInfo& ch = m_allChannels[i];
+        ch.channelNumber = static_cast<int>(i);
+        ch.sampleCount = ch.samplesPerRecord * m_numDataRecords;
+        ch.frequency = recordDuration > 0.0f ? static_cast<float>(ch.samplesPerRecord) / recordDuration : 0.0f;
+        m_numBytesPerDataRecord += ch.samplesPerRecord * m_bytesPerSample;
+        maxSamplesPerRecord = std::max(maxSamplesPerRecord, ch.samplesPerRecord);
     }
 
-    // Calculate bytes per data record
-    m_iNumBytesPerDataRecord = 0;
-    for (const auto& ch : m_vAllChannels) {
-        m_iNumBytesPerDataRecord += ch.samplesPerRecord * m_iBytesPerSample;
-    }
-
-    // Identify measurement channels (those with the highest sample rate)
-    long iMaxSamplesPerRecord = -1;
-    for (const auto& ch : m_vAllChannels) {
-        if (ch.samplesPerRecord > iMaxSamplesPerRecord) {
-            iMaxSamplesPerRecord = ch.samplesPerRecord;
+    // Measurement channels are those with the highest sample rate
+    m_measChannels.clear();
+    for (EDFChannelInfo& ch : m_allChannels) {
+        ch.isMeasurement = ch.samplesPerRecord == maxSamplesPerRecord;
+        if (ch.isMeasurement) {
+            m_measChannels.push_back(ch);
         }
     }
-
-    m_vMeasChannels.clear();
-    for (int i = 0; i < m_vAllChannels.size(); ++i) {
-        if (m_vAllChannels[i].samplesPerRecord == iMaxSamplesPerRecord) {
-            m_vAllChannels[i].isMeasurement = true;
-            m_vMeasChannels.push_back(m_vAllChannels[i]);
-        }
-    }
+    return true;
 }
 
 //=============================================================================================================
 
-FiffInfo EDFReader::getInfo() const
+FiffInfo EDFReader::info() const
 {
     FiffInfo info;
-    info.nchan = m_vMeasChannels.size();
-
-    for (const auto& ch : m_vMeasChannels) {
-        FiffChInfo fiffCh = ch.toFiffChInfo();
-        info.chs.push_back(fiffCh);
-        info.ch_names.push_back(fiffCh.ch_name);
+    info.nchan = static_cast<int>(m_measChannels.size());
+    info.chs.reserve(m_measChannels.size());
+    info.ch_names.reserve(m_measChannels.size());
+    for (const EDFChannelInfo& ch : m_measChannels) {
+        info.chs.push_back(ch.to_fiff_ch_info());
+        info.ch_names.push_back(info.chs.back().ch_name);
     }
-
-    info.sfreq = getFrequency();
+    info.sfreq = sfreq();
     if (m_measDate) {
         info.set_meas_date(*m_measDate);
     }
@@ -354,172 +338,102 @@ FiffInfo EDFReader::getInfo() const
 
 //=============================================================================================================
 
-MatrixXf EDFReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
+MatrixXf EDFReader::read_raw_segment(long first, long last) const
 {
-    if (!m_bIsOpen) {
-        BASELIB::Log::warning("[EDFReader::readRawSegment] File not open");
+    if (!m_file) {
+        BASELIB::Log::warning("[EDFReader::read_raw_segment] File not open");
         return MatrixXf();
     }
 
-    long totalSamples = getSampleCount();
-    if (iStartSampleIdx < 0 || iStartSampleIdx >= totalSamples ||
-        iEndSampleIdx < 0 || iEndSampleIdx > totalSamples) {
-        BASELIB::Log::warning("[EDFReader::readRawSegment] Index out of bounds: {} - {}", iStartSampleIdx, iEndSampleIdx);
+    const long total = sample_count();
+    if (first < 0 || first >= total || last < 0 || last > total) {
+        BASELIB::Log::warning("[EDFReader::read_raw_segment] Index out of bounds: {} - {}", first, last);
+        return MatrixXf();
+    }
+    const long numSamples = last - first;
+    const long perRecord = m_measChannels.front().samplesPerRecord;
+    if (numSamples <= 0 || perRecord <= 0) {
         return MatrixXf();
     }
 
-    int iNumSamples = iEndSampleIdx - iStartSampleIdx;
-    if (iNumSamples <= 0) {
-        return MatrixXf();
+    // Read the data records that hold the segment in one go
+    const long firstRecord = first / perRecord;
+    const long offsetInRecord = first % perRecord;
+    const long numRecords = (offsetInRecord + numSamples + perRecord - 1) / perRecord;
+    const auto recordBytes = static_cast<std::size_t>(m_numBytesPerDataRecord);
+    std::vector<unsigned char> records(static_cast<std::size_t>(numRecords) * recordBytes);
+    m_file->seek(static_cast<std::uint64_t>(m_numBytesInHeader) + static_cast<std::uint64_t>(firstRecord) * recordBytes);
+    if (m_file->read(records.data(), records.size()) != records.size()) {
+        BASELIB::Log::warning("[EDFReader::read_raw_segment] File ends before sample {}", last);
     }
 
-    int iSamplesPerRecord = m_vMeasChannels.isEmpty() ? 0 : m_vMeasChannels[0].samplesPerRecord;
-    if (iSamplesPerRecord <= 0) {
-        return MatrixXf();
-    }
-
-    // Calculate which data records to read
-    int iFirstRecord = iStartSampleIdx / iSamplesPerRecord;
-    int iRelativeFirst = iStartSampleIdx % iSamplesPerRecord;
-    int iNumRecords = static_cast<int>(
-        std::ceil(static_cast<float>(iNumSamples + iRelativeFirst) / iSamplesPerRecord));
-
-    // Seek to first needed data record
-    m_file.seek(m_iNumBytesInHeader + static_cast<qint64>(iFirstRecord) * m_iNumBytesPerDataRecord);
-
-    // Read needed data records
-    QVector<QByteArray> vRecords;
-    vRecords.reserve(iNumRecords);
-    for (int i = 0; i < iNumRecords; ++i) {
-        vRecords.push_back(m_file.read(m_iNumBytesPerDataRecord));
-    }
-
-    // Demultiplex: channels are interleaved within each record
-    QVector<QVector<int>> vRawPatches(m_vAllChannels.size());
-    for (int iRec = 0; iRec < vRecords.size(); ++iRec) {
-        int iOffset = 0;
-        for (int iCh = 0; iCh < m_vAllChannels.size(); ++iCh) {
-            int nSamp = m_vAllChannels[iCh].samplesPerRecord;
-            QVector<int> patch(nSamp);
-            for (int s = 0; s < nSamp; ++s) {
+    // Channels are interleaved per record; demultiplex and scale the measurement channels
+    MatrixXf result(static_cast<Index>(m_measChannels.size()), numSamples);
+    Index row = 0;
+    long channelOffset = 0;
+    for (const EDFChannelInfo& ch : m_allChannels) {
+        if (ch.isMeasurement) {
+            const double digRange = static_cast<double>(ch.digitalMax - ch.digitalMin);
+            const double physRange = static_cast<double>(ch.physicalMax) - ch.physicalMin;
+            const double si = ch.to_si();
+            const bool stim = isAutoStimLabel(ch.label);
+            for (long s = 0; s < numSamples; ++s) {
+                const long sample = offsetInRecord + s;
+                const unsigned char* bytes = records.data() + static_cast<std::size_t>(sample / perRecord) * recordBytes + static_cast<std::size_t>((channelOffset + sample % perRecord) * m_bytesPerSample);
                 // Little-endian signed integers: 16 bit (EDF) or 24 bit (BDF)
-                const auto* bytes = reinterpret_cast<const unsigned char*>(vRecords[iRec].constData()) + (iOffset + s) * m_iBytesPerSample;
-                int value = bytes[0] | (bytes[1] << 8);
-                if (m_iBytesPerSample == 3) {
-                    value |= bytes[2] << 16;
-                    patch[s] = (value & 0x800000) ? value - 0x1000000 : value;
+                int raw = bytes[0] | (bytes[1] << 8);
+                if (m_bytesPerSample == 3) {
+                    raw |= bytes[2] << 16;
+                    raw = (raw & 0x800000) ? raw - 0x1000000 : raw;
                 } else {
-                    patch[s] = static_cast<int16_t>(value);
+                    raw = static_cast<std::int16_t>(raw);
+                }
+                const double physical = (raw - ch.digitalMin) / digRange * physRange + ch.physicalMin;
+                // mne read_raw_bdf keeps the raw stim value; both readers keep its low 17 bits
+                if (stim) {
+                    result(row, s) = static_cast<float>(static_cast<int>(m_bytesPerSample == 3 ? raw : physical) & 0x1FFFF);
+                } else {
+                    result(row, s) = static_cast<float>(physical * si);
                 }
             }
-            iOffset += nSamp;
-            vRawPatches[iCh] += patch;
+            ++row;
         }
+        channelOffset += ch.samplesPerRecord;
     }
-
-    // Filter to measurement channels only
-    QVector<QVector<int>> vMeasPatches;
-    vMeasPatches.reserve(m_vMeasChannels.size());
-    for (int iCh = 0; iCh < m_vAllChannels.size(); ++iCh) {
-        if (m_vAllChannels[iCh].isMeasurement) {
-            vMeasPatches.push_back(vRawPatches[iCh]);
-        }
-    }
-
-    // Scale and copy to result matrix
-    MatrixXf result(vMeasPatches.size(), iNumSamples);
-
-    for (int iCh = 0; iCh < vMeasPatches.size(); ++iCh) {
-        const EDFChannelInfo& ch = m_vMeasChannels[iCh];
-        const double digRange = static_cast<double>(ch.digitalMax - ch.digitalMin);
-        const double physRange = static_cast<double>(ch.physicalMax) - ch.physicalMin;
-        const bool stim = isAutoStimLabel(ch.label);
-
-        for (int s = 0; s < iNumSamples; ++s) {
-            const int raw = vMeasPatches[iCh][s + iRelativeFirst];
-            // mne read_raw_bdf keeps the raw stim value; both readers keep its low 17 bits
-            if (stim) {
-                const double value = (m_iBytesPerSample == 3) ? raw : (raw - ch.digitalMin) / digRange * physRange + ch.physicalMin;
-                result(iCh, s) = static_cast<float>(static_cast<int>(value) & 0x1FFFF);
-            } else {
-                result(iCh, s) = static_cast<float>(((raw - ch.digitalMin) / digRange * physRange + ch.physicalMin) * ch.toSi());
-            }
-        }
-    }
-
     return result;
 }
 
 //=============================================================================================================
 
-long EDFReader::getSampleCount() const
+long EDFReader::sample_count() const
 {
-    if (!m_vMeasChannels.isEmpty()) {
-        return m_vMeasChannels[0].sampleCount;
-    }
-    return 0;
+    return m_measChannels.empty() ? 0 : m_measChannels.front().sampleCount;
 }
 
 //=============================================================================================================
 
-float EDFReader::getFrequency() const
+float EDFReader::sfreq() const
 {
-    if (!m_vMeasChannels.isEmpty()) {
-        return m_vMeasChannels[0].frequency;
-    }
-    return 0.0f;
+    return m_measChannels.empty() ? 0.0f : m_measChannels.front().frequency;
 }
 
 //=============================================================================================================
 
-int EDFReader::getChannelCount() const
+int EDFReader::channel_count() const
 {
-    return m_vMeasChannels.size();
+    return static_cast<int>(m_measChannels.size());
 }
 
 //=============================================================================================================
 
-FiffRawData EDFReader::toFiffRawData() const
+std::string_view EDFReader::format_name() const
 {
-    FiffRawData raw;
-    raw.info = getInfo();
-    raw.first_samp = 0;
-    raw.last_samp = static_cast<int>(getSampleCount()) - 1;
-
-    RowVectorXd cals(raw.info.nchan);
-    for (int i = 0; i < std::ssize(raw.info.chs); ++i) {
-        cals[i] = static_cast<double>(raw.info.chs[i].cal);
-    }
-    raw.cals = cals;
-
-    return raw;
+    return "EDF";
 }
 
 //=============================================================================================================
 
-QString EDFReader::formatName() const
+bool EDFReader::supports_extension(std::string_view extension) const
 {
-    return QStringLiteral("EDF");
-}
-
-//=============================================================================================================
-
-bool EDFReader::supportsExtension(const QString& sExtension) const
-{
-    QString ext = sExtension.toLower();
-    return (ext == ".edf" || ext == ".bdf");
-}
-
-//=============================================================================================================
-
-QVector<EDFChannelInfo> EDFReader::getAllChannelInfos() const
-{
-    return m_vAllChannels;
-}
-
-//=============================================================================================================
-
-QVector<EDFChannelInfo> EDFReader::getMeasurementChannelInfos() const
-{
-    return m_vMeasChannels;
+    return BASELIB::equalsIgnoreCase(extension, ".edf") || BASELIB::equalsIgnoreCase(extension, ".bdf");
 }

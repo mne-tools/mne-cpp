@@ -137,8 +137,8 @@ void TestEDF2FIFFRWR::convertMatchesPython()
 
     // Every channel equals what EDFReader reads (float samples, float FIFF buffers)
     EDFReader reader;
-    QVERIFY(reader.open(m_sEdf));
-    QVERIFY(data.isApprox(reader.readRawSegment(0, 3072).cast<double>()));
+    QVERIFY(reader.open(BASELIB::pathFromUtf8(m_sEdf.toStdString())));
+    QVERIFY(data.isApprox(reader.read_raw_segment(0, 3072).cast<double>()));
 
     // Without --fileOut the output goes next to the input
     const QString copy = m_tempDir.filePath(QStringLiteral("copy.EDF"));

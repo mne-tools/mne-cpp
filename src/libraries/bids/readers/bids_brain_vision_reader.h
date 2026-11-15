@@ -42,19 +42,25 @@
 #include "bids_abstract_format_reader.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QVector>
-#include <QFile>
-#include <QMap>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <chrono>
+#include <filesystem>
+#include <memory>
 #include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace BASELIB
+{
+class FileByteStream;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -71,8 +77,8 @@ namespace BIDSLIB
  */
 struct BIDSSHARED_EXPORT BrainVisionMarker
 {
-    QString type;                                                         /**< Marker type (e.g., "New Segment", "Stimulus", "Response"). */
-    QString description;                                                  /**< Description (e.g., "S253", "R255"). */
+    std::string type;                                                     /**< Marker type (e.g., "New Segment", "Stimulus", "Response"). */
+    std::string description;                                              /**< Description (e.g., "S253", "R255"). */
     long position{0};                                                     /**< 0-based sample position. */
     long duration{0};                                                     /**< Duration in samples (0 = point marker). */
     int channel{0};                                                       /**< Channel number (0 = all channels). */
@@ -88,12 +94,13 @@ struct BIDSSHARED_EXPORT BrainVisionMarker
 struct BIDSSHARED_EXPORT BrainVisionChannelInfo
 {
     int channelNumber{0};
-    QString name;
-    QString reference;
+    std::string name;
+    std::string reference;
     float resolution{1.0f}; /**< Scaling factor (calibration value). */
-    QString unit;           /**< Physical unit string (e.g. "µV", "V"). */
+    std::string unit;       /**< Physical unit in UTF-8 (e.g. "µV", "V"). */
 
-    FIFFLIB::FiffChInfo toFiffChInfo() const;
+    /** @return The FIFF channel description: kind from the name and unit, calibration from the resolution. */
+    FIFFLIB::FiffChInfo to_fiff_ch_info() const;
 };
 
 //=============================================================================================================
@@ -131,69 +138,62 @@ enum class BVOrientation
 class BIDSSHARED_EXPORT BrainVisionReader : public AbstractFormatReader
 {
 public:
-    //=========================================================================================================
-    /**
-     * @brief Default constructor.
-     */
     BrainVisionReader();
-
     ~BrainVisionReader() override;
 
-    // AbstractFormatReader interface
-    bool open(const QString& sFilePath) override;
-    FIFFLIB::FiffInfo getInfo() const override;
-    Eigen::MatrixXf readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const override;
-    long getSampleCount() const override;
-    float getFrequency() const override;
-    int getChannelCount() const override;
-    FIFFLIB::FiffRawData toFiffRawData() const override;
-    QString formatName() const override;
-    bool supportsExtension(const QString& sExtension) const override;
+    bool open(const std::filesystem::path& path) override;
+    FIFFLIB::FiffInfo info() const override;
+    Eigen::MatrixXf read_raw_segment(long first, long last) const override;
+    long sample_count() const override;
+    float sfreq() const override;
+    int channel_count() const override;
+    std::string_view format_name() const override;
+    bool supports_extension(std::string_view extension) const override;
 
-    //=========================================================================================================
+    /** @return Markers in file order; empty if no marker file was parsed. */
+    const std::vector<BrainVisionMarker>& markers() const
+    {
+        return m_markers;
+    }
+
+    /** @return Channel infos parsed from the .vhdr header, in channel order. */
+    const std::vector<BrainVisionChannelInfo>& channel_infos() const
+    {
+        return m_channels;
+    }
+
     /**
-     * @brief Return all parsed markers from the .vmrk file.
+     * @param[in] unit   Unit from the header in UTF-8, e.g. "µV".
      *
-     * @return Markers in file order; empty if no marker file was parsed.
+     * @return Factor from the unit into SI (V for voltages, S for siemens); unknown units scale by 1, like mne.
      */
-    QVector<BrainVisionMarker> getMarkers() const;
+    static float unit_scale(std::string_view unit);
 
-    //=========================================================================================================
     /**
-     * @brief Return all channel infos.
+     * @param[in] unit   Unit from the header in UTF-8.
      *
-     * @return Channel infos parsed from the .vhdr header, in channel order.
+     * @return Whether the unit is a voltage (V, mV, µV, uV, nV); other channels are typed misc, like mne.
      */
-    QVector<BrainVisionChannelInfo> getChannelInfos() const;
-
-    // Unit to scaling factor into SI (V for voltages, S for siemens); unknown units scale by 1, like mne
-    static float unitScale(const QString& sUnit);
-
-    // Whether the unit is a voltage (V, mV, µV, uV, nV); other channels are typed misc, like mne
-    static bool isVoltageUnit(const QString& sUnit);
+    static bool is_voltage_unit(std::string_view unit);
 
 private:
-    bool parseHeader(const QString& sVhdrPath);
-    bool parseMarkers(const QString& sVmrkPath);
-    void computeSampleCount();
+    bool parse_header(const std::filesystem::path& vhdrPath);
+    bool parse_markers(const std::filesystem::path& vmrkPath);
 
-    QString m_sVhdrPath;
-    QString m_sDataPath;
-    QString m_sMarkerPath;
+    std::filesystem::path m_dataPath;
+    std::filesystem::path m_markerPath;
 
-    // Header fields
-    float m_fSFreq{0.0f};
-    int m_iNumChannels{0};
+    float m_sfreq{0.0f};
+    int m_numChannels{0};
     BVBinaryFormat m_binaryFormat{BVBinaryFormat::INT_16};
     BVOrientation m_orientation{BVOrientation::MULTIPLEXED};
-    long m_lSampleCount{0};
+    long m_sampleCount{0};
 
-    QVector<BrainVisionChannelInfo> m_vChannels;
-    QVector<BrainVisionMarker> m_vMarkers;
+    std::vector<BrainVisionChannelInfo> m_channels;
+    std::vector<BrainVisionMarker> m_markers;
     std::optional<std::chrono::sys_time<std::chrono::microseconds>> m_measDate; /**< Date of the first dated New Segment marker. */
 
-    mutable QFile m_dataFile;
-    bool m_bIsOpen{false};
+    std::unique_ptr<BASELIB::FileByteStream> m_dataFile;
 };
 
 } // namespace BIDSLIB

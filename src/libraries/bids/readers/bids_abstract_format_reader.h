@@ -15,12 +15,12 @@
  * BIDSLIB::AbstractFormatReader is the polymorphic interface every
  * concrete reader implements so @ref BIDSLIB::BidsRawData can drive
  * them uniformly: @ref BIDSLIB::AbstractFormatReader::open "open" parses the format-specific header,
- * @ref BIDSLIB::AbstractFormatReader::getInfo "getInfo" emits a populated @c FIFFLIB::FiffInfo, @ref
- * BIDSLIB::AbstractFormatReader::readRawSegment "readRawSegment" returns a calibrated @c (n_channels × n_samples)
- * matrix in physical units, and @ref BIDSLIB::AbstractFormatReader::toFiffRawData "toFiffRawData" assembles the whole
- * recording into a @c FIFFLIB::FiffRawData ready to hand to MNE-CPP's
- * filtering / source-localisation stack. @ref BIDSLIB::AbstractFormatReader::formatName "formatName" and
- * @ref BIDSLIB::AbstractFormatReader::supportsExtension "supportsExtension" power the dispatch implemented by @ref
+ * @ref BIDSLIB::AbstractFormatReader::info "info" emits a populated @c FIFFLIB::FiffInfo, @ref
+ * BIDSLIB::AbstractFormatReader::read_raw_segment "read_raw_segment" returns a calibrated @c (n_channels × n_samples)
+ * matrix in physical units, and @ref BIDSLIB::AbstractFormatReader::to_fiff_raw_data "to_fiff_raw_data" assembles the
+ * whole recording into a @c FIFFLIB::FiffRawData ready to hand to MNE-CPP's
+ * filtering / source-localisation stack. @ref BIDSLIB::AbstractFormatReader::format_name "format_name" and
+ * @ref BIDSLIB::AbstractFormatReader::supports_extension "supports_extension" power the dispatch implemented by @ref
  * BIDSLIB::BidsRawData::create_reader.
  *
  * Readers are owned through @c std::unique_ptr because the concrete
@@ -46,11 +46,11 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
-// QT INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
-#include <QString>
-#include <memory>
+#include <filesystem>
+#include <string_view>
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -71,90 +71,65 @@ namespace BIDSLIB
 class BIDSSHARED_EXPORT AbstractFormatReader
 {
 public:
-    //=========================================================================================================
-    /**
-     * @brief Virtual destructor.
-     */
     virtual ~AbstractFormatReader() = default;
 
     //=========================================================================================================
     /**
      * @brief Open and parse the file header. Must be called before reading data.
      *
-     * @param[in] sFilePath   Absolute path to the primary data file.
+     * @param[in] path   Path to the primary data file.
      *
      * @return True if the file was opened and parsed successfully.
      */
-    virtual bool open(const QString& sFilePath) = 0;
+    virtual bool open(const std::filesystem::path& path) = 0;
 
-    //=========================================================================================================
-    /**
-     * @brief Return measurement metadata as FiffInfo.
-     *
-     * @return FiffInfo populated from the native format header.
-     */
-    virtual FIFFLIB::FiffInfo getInfo() const = 0;
+    /** @return Measurement metadata populated from the native format header. */
+    virtual FIFFLIB::FiffInfo info() const = 0;
 
     //=========================================================================================================
     /**
      * @brief Read a segment of raw data.
      *
-     * @param[in] iStartSampleIdx   First sample index (0-based, inclusive).
-     * @param[in] iEndSampleIdx     Last sample index (0-based, exclusive).
+     * @param[in] first   First sample index (0-based, inclusive).
+     * @param[in] last    Last sample index (0-based, exclusive).
      *
-     * @return Matrix of shape (n_channels x n_samples) with calibrated physical values.
+     * @return Matrix of shape (n_channels x n_samples) in SI units; empty for an invalid range.
      */
-    virtual Eigen::MatrixXf readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const = 0;
+    virtual Eigen::MatrixXf read_raw_segment(long first, long last) const = 0;
+
+    /** @return Number of samples per channel in the whole recording. */
+    virtual long sample_count() const = 0;
+
+    /** @return Sampling frequency in Hz. */
+    virtual float sfreq() const = 0;
+
+    /** @return Number of measurement channels (rows returned by read_raw_segment). */
+    virtual int channel_count() const = 0;
+
+    /** @return Human-readable format name (e.g. "EDF", "BrainVision"). */
+    virtual std::string_view format_name() const = 0;
 
     //=========================================================================================================
     /**
-     * @brief Return total number of samples across the recording.
-     *
-     * @return Number of samples per channel in the whole recording.
-     */
-    virtual long getSampleCount() const = 0;
-
-    //=========================================================================================================
-    /**
-     * @brief Return the sampling frequency in Hz.
-     *
-     * @return Sampling frequency in Hz.
-     */
-    virtual float getFrequency() const = 0;
-
-    //=========================================================================================================
-    /**
-     * @brief Return the number of measurement channels.
-     *
-     * @return Number of measurement channels (rows returned by readRawSegment).
-     */
-    virtual int getChannelCount() const = 0;
-
-    //=========================================================================================================
-    /**
-     * @brief Convert the entire dataset to a FiffRawData structure.
-     *
-     * @return FiffRawData populated with info, calibrations, and sample bounds.
-     */
-    virtual FIFFLIB::FiffRawData toFiffRawData() const = 0;
-
-    //=========================================================================================================
-    /**
-     * @brief Return a descriptive name for the format (e.g. "EDF", "BrainVision").
-     *
-     * @return Human-readable format name.
-     */
-    virtual QString formatName() const = 0;
-
-    //=========================================================================================================
-    /**
-     * @brief Check whether this reader can handle the given file extension.
-     *
-     * @param[in] sExtension   File extension including dot (e.g. ".edf", ".vhdr").
+     * @param[in] extension   File extension including the dot (e.g. ".edf", ".vhdr"), in any letter case.
      *
      * @return True if this reader supports the extension.
      */
-    virtual bool supportsExtension(const QString& sExtension) const = 0;
+    virtual bool supports_extension(std::string_view extension) const = 0;
+
+    /** @return The whole recording as FiffRawData: info, calibrations and sample bounds. */
+    FIFFLIB::FiffRawData to_fiff_raw_data() const
+    {
+        FIFFLIB::FiffRawData raw;
+        raw.info = info();
+        raw.first_samp = 0;
+        raw.last_samp = static_cast<int>(sample_count()) - 1;
+        raw.cals.resize(static_cast<Eigen::Index>(raw.info.chs.size()));
+        for (Eigen::Index i = 0; i < raw.cals.size(); ++i) {
+            raw.cals[i] = raw.info.chs[static_cast<std::size_t>(i)].cal;
+        }
+        return raw;
+    }
 
 protected:
     AbstractFormatReader() = default;

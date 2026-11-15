@@ -16,6 +16,7 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <filesystem>
 
 #include <bids/readers/bids_edf_reader.h>
 
@@ -78,12 +79,13 @@ int main(int argc, char* argv[])
         parser.showHelp(1);
     }
 
+    const std::filesystem::path inputPath = BASELIB::pathFromUtf8(sInputFile.toStdString());
     EDFReader reader;
-    if (!reader.supportsExtension(sInputFile.mid(sInputFile.lastIndexOf('.')))) {
+    if (!reader.supports_extension(BASELIB::utf8FromPath(inputPath.extension()))) {
         qCritical() << "Not an EDF or BDF file:" << sInputFile;
         return 1;
     }
-    if (!reader.open(sInputFile) || reader.getSampleCount() <= 0) {
+    if (!reader.open(inputPath) || reader.sample_count() <= 0) {
         qCritical() << "Could not read" << sInputFile;
         return 1;
     }
@@ -91,7 +93,7 @@ int main(int argc, char* argv[])
         sOutputFile = sInputFile.left(sInputFile.lastIndexOf('.')) + ".fif";
     }
 
-    const FiffRawData fiffRaw = reader.toFiffRawData();
+    const FiffRawData fiffRaw = reader.to_fiff_raw_data();
     RowVectorXd cals;
     auto outfid = FiffStream::start_writing_raw(sOutputFile.toStdU16String(), fiffRaw.info, cals);
     if (!outfid) {
@@ -103,10 +105,10 @@ int main(int argc, char* argv[])
 
     // 10 s buffers
     const int iBufferSamples = static_cast<int>(std::ceil(10.0f * fiffRaw.info.sfreq));
-    const int iSampleCount = static_cast<int>(reader.getSampleCount());
+    const int iSampleCount = static_cast<int>(reader.sample_count());
     for (int iStart = 0; iStart < iSampleCount; iStart += iBufferSamples) {
         const int iEnd = std::min(iStart + iBufferSamples, iSampleCount);
-        outfid->write_raw_buffer(reader.readRawSegment(iStart, iEnd).cast<double>(), cals);
+        outfid->write_raw_buffer(reader.read_raw_segment(iStart, iEnd).cast<double>(), cals);
     }
     outfid->finish_writing_raw();
 

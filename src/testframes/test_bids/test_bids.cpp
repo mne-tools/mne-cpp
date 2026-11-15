@@ -526,13 +526,13 @@ void TestBids::testReadEdf()
 
     // Reference values produced by mne.io.read_raw_edf(...).get_data() (mne 1.11); mne.io.read_raw dispatches
     // to the same reader and returns identical samples, as BidsRawData::create_reader does by extension.
-    QCOMPARE(data.reader->getSampleCount(), 1228L);
+    QCOMPARE(data.reader->sample_count(), 1228L);
     // mne.io.read_raw_edf: meas_date 2015-06-02 10:41:57 UTC
     QCOMPARE(data.raw.info.meas_date[0], 1433241717);
     QCOMPARE(data.raw.info.meas_date[1], 0);
     QCOMPARE(data.raw.first_samp, 0);
     QCOMPARE(data.raw.last_samp, 1227); // mne raw.last_samp is inclusive
-    const Eigen::MatrixXd samples = data.reader->readRawSegment(0, 1228).cast<double>();
+    const Eigen::MatrixXd samples = data.reader->read_raw_segment(0, 1228).cast<double>();
     QCOMPARE(samples.rows(), Eigen::Index(25));
     QVERIFY(std::abs(samples(0, 0) - 0.175940656291) < 1e-7);
     QVERIFY(std::abs(samples(5, 101) - 0.175486234485) < 1e-7);
@@ -567,8 +567,8 @@ void TestBids::testReadEdf()
     mixed.write(edfBytes);
     mixed.close();
     EDFReader mixedReader;
-    QVERIFY(mixedReader.open(mixed.fileName()));
-    const Eigen::MatrixXd mixedData = mixedReader.readRawSegment(0, 4).cast<double>();
+    QVERIFY(mixedReader.open(stdpath(mixed.fileName())));
+    const Eigen::MatrixXd mixedData = mixedReader.read_raw_segment(0, 4).cast<double>();
     Eigen::MatrixXd expected(3, 4);
     expected << -5e-4, -1.525139238575e-05, 7.629510948334e-09, 5e-4,
         6.134126802472e-06, 1.223773556115e-05, -1.828030823224e-05, 2.444495307851e-05,
@@ -579,8 +579,8 @@ void TestBids::testReadEdf()
 
     // Like mne read_raw_edf: unrecognised labels are EEG; "Status" is an unscaled stim channel
     EDFReader reduced;
-    QVERIFY(reduced.open(QString::fromStdString(BASELIB::utf8FromPath(dataPath() / "EEG/test_reduced.edf"))));
-    const FIFFLIB::FiffInfo reducedInfo = reduced.getInfo();
+    QVERIFY(reduced.open(dataPath() / "EEG/test_reduced.edf"));
+    const FIFFLIB::FiffInfo reducedInfo = reduced.info();
     const int a4 = BASELIB::indexOf(reducedInfo.ch_names, "A4");
     const int status = BASELIB::indexOf(reducedInfo.ch_names, "Status");
     QVERIFY(a4 < 0 && status >= 0); // A4 is sampled below the highest rate
@@ -594,7 +594,7 @@ void TestBids::testReadEdf()
 
     // Like mne read_raw_edf: the EDF+ "Startdate dd-MMM-yyyy" recording field wins over the two-digit header
     // date, which otherwise maps years 85-99 to 1985-1999 and 00-84 to 2000-2084
-    QCOMPARE(mixedReader.getInfo().meas_date[0], 1767268800); // 2026-01-01 12:00:00 UTC
+    QCOMPARE(mixedReader.info().meas_date[0], 1767268800); // 2026-01-01 12:00:00 UTC
     for (const auto& [date, seconds] : {std::pair<QByteArray, int>{"31.12.99", 946684799}, {"01.01.26", 1767268800}}) {
         QByteArray plain = edfBytes;
         plain.replace(88, 80, field(QStringLiteral("X"), 80));
@@ -604,11 +604,11 @@ void TestBids::testReadEdf()
         plainFile.write(plain);
         plainFile.close();
         EDFReader plainReader;
-        QVERIFY(plainReader.open(plainFile.fileName()));
-        QCOMPARE(plainReader.getInfo().meas_date[0], seconds);
-        QCOMPARE(plainReader.getInfo().meas_date[1], 0);
+        QVERIFY(plainReader.open(stdpath(plainFile.fileName())));
+        QCOMPARE(plainReader.info().meas_date[0], seconds);
+        QCOMPARE(plainReader.info().meas_date[1], 0);
     }
-    const Eigen::MatrixXf reducedData = reduced.readRawSegment(0, 2);
+    const Eigen::MatrixXf reducedData = reduced.read_raw_segment(0, 2);
     QCOMPARE(reducedData(status, 0), 4352.0f);
     QCOMPARE(reducedData(status, 1), 0.0f);
 
@@ -624,10 +624,10 @@ void TestBids::testReadEdf()
     bdf.write(bdfBytes);
     bdf.close();
     EDFReader bdfReader;
-    QVERIFY(bdfReader.open(bdf.fileName()));
-    QCOMPARE(bdfReader.getSampleCount(), 4L);
-    QCOMPARE(bdfReader.getInfo().chs[2].kind, FIFFV_STIM_CH);
-    const Eigen::MatrixXd bdfData = bdfReader.readRawSegment(0, 4).cast<double>();
+    QVERIFY(bdfReader.open(stdpath(bdf.fileName())));
+    QCOMPARE(bdfReader.sample_count(), 4L);
+    QCOMPARE(bdfReader.info().chs[2].kind, FIFFV_STIM_CH);
+    const Eigen::MatrixXd bdfData = bdfReader.read_raw_segment(0, 4).cast<double>();
     Eigen::MatrixXd bdfExpected(3, 4);
     bdfExpected << -0.262144, -3.1734317286867926e-05, -4.843750288709998e-07, 0.262143,
         3.1388999902333236e-06, -6.2309507269447055e-06, 9.385467135018676e-06, -1.2477517871730058e-05,
@@ -812,16 +812,16 @@ void TestBids::testBrainVisionReaderMatchesPython()
     const QList<int> kinds{FIFFV_EEG_CH, FIFFV_EEG_CH, FIFFV_MISC_CH, FIFFV_MISC_CH, FIFFV_EEG_CH, FIFFV_EEG_CH};
     for (const auto& [base, factor] : {std::pair<QString, double>{QStringLiteral("mux16"), 1.0}, {QStringLiteral("vec32"), 1.5}}) {
         BrainVisionReader reader;
-        QVERIFY(reader.open(dir.filePath(base + ".vhdr")));
-        QCOMPARE(reader.getFrequency(), 500.0f);
-        QCOMPARE(reader.getSampleCount(), 4L);
-        QCOMPARE(reader.toFiffRawData().last_samp, 3);
-        const FIFFLIB::FiffInfo info = reader.getInfo();
+        QVERIFY(reader.open(stdpath(dir.filePath(base + ".vhdr"))));
+        QCOMPARE(reader.sfreq(), 500.0f);
+        QCOMPARE(reader.sample_count(), 4L);
+        QCOMPARE(reader.to_fiff_raw_data().last_samp, 3);
+        const FIFFLIB::FiffInfo info = reader.info();
         QCOMPARE(info.ch_names.back(), std::string("A,B"));
         for (int k = 0; k < 6; ++k) {
             QVERIFY2(info.chs[k].kind == kinds[k], info.ch_names[k].c_str());
         }
-        const Eigen::MatrixXd data = reader.readRawSegment(0, 4).cast<double>();
+        const Eigen::MatrixXd data = reader.read_raw_segment(0, 4).cast<double>();
         QVERIFY2((data - factor * expected).cwiseAbs().maxCoeff() <= 1e-6 * (factor * expected).cwiseAbs().maxCoeff(),
                  qPrintable(base));
         for (int k = 0; k < 6; ++k) {
@@ -829,7 +829,7 @@ void TestBids::testBrainVisionReaderMatchesPython()
                      qPrintable(base + " " + QString::fromStdString(info.ch_names[k])));
         }
         // Markers: 1-based positions in the file, \1 decodes to a comma
-        const QVector<BrainVisionMarker> markers = reader.getMarkers();
+        const std::vector<BrainVisionMarker>& markers = reader.markers();
         QCOMPARE(markers.size(), std::size_t{2});
         QCOMPARE(markers[1].description, std::string("S, 7"));
         QCOMPARE(markers[1].position, 2L);
@@ -853,7 +853,7 @@ void TestBids::testBrainVisionReaderMatchesPython()
     ascii.close();
     BrainVisionReader asciiReader;
     QTest::ignoreMessage(QtWarningMsg, QRegularExpression("Only BINARY data is supported"));
-    QVERIFY(!asciiReader.open(ascii.fileName()));
+    QVERIFY(!asciiReader.open(stdpath(ascii.fileName())));
 }
 
 //=============================================================================================================
@@ -865,14 +865,14 @@ void TestBids::testBrainVisionReaderVariants()
         {"ECoG1", "uV", FIFFV_ECOG_CH, FIFF_UNITM_MU}, {"SEEG2", "nV", FIFFV_SEEG_CH, FIFF_UNITM_N}, {"HEOGL", "mV", FIFFV_EOG_CH, FIFF_UNITM_M}, {"EKG", "V", FIFFV_ECG_CH, FIFF_UNITM_NONE}, {"EMG_chin", "uV", FIFFV_EMG_CH, FIFF_UNITM_MU}, {"STI 014", "uV", FIFFV_STIM_CH, FIFF_UNITM_MU}, {"Temp", "C", FIFFV_MISC_CH, FIFF_UNITM_NONE}};
     for (const auto& [name, unit, kind, mul] : types) {
         BrainVisionChannelInfo ch;
-        ch.name = name;
-        ch.unit = unit;
-        const FIFFLIB::FiffChInfo info = ch.toFiffChInfo();
+        ch.name = name.toStdString();
+        ch.unit = unit.toStdString();
+        const FIFFLIB::FiffChInfo info = ch.to_fiff_ch_info();
         QVERIFY2(info.kind == kind && info.unit_mul == mul, qPrintable(name));
         QCOMPARE(info.unit, unit == "C" ? FIFF_UNIT_NONE : FIFF_UNIT_V);
     }
-    QVERIFY(qFuzzyCompare(BrainVisionReader::unitScale("nV"), 1e-9f));
-    QVERIFY(qFuzzyCompare(BrainVisionReader::unitScale("uS"), 1e-6f));
+    QVERIFY(qFuzzyCompare(BrainVisionReader::unit_scale("nV"), 1e-9f));
+    QVERIFY(qFuzzyCompare(BrainVisionReader::unit_scale("uS"), 1e-6f));
 
     // INT_32, multiplexed and vectorized, with the NeurOne "Common infos" spelling, a missing channel table and a comment
     QTemporaryDir dir;
@@ -898,23 +898,23 @@ void TestBids::testBrainVisionReaderVariants()
             orientation + ".eeg\nDataOrientation=" + orientation + "\nNumberOfChannels=2\n"
                                                                    "[Binary Infos]\nBinaryFormat=INT_32\n[Comment]\nCh9=ignored\n";
         BrainVisionReader reader;
-        QVERIFY(reader.open(write(orientation, header, int32)));
-        QCOMPARE(reader.getSampleCount(), 3L);
-        QCOMPARE(reader.getFrequency(), 0.0f);
-        QCOMPARE(reader.getChannelCount(), 2);
-        QCOMPARE(reader.getChannelInfos()[1].name, std::string("Ch2"));
-        QVERIFY(reader.getMarkers().isEmpty());
-        const Eigen::MatrixXf data = reader.readRawSegment(1, 3);
+        QVERIFY(reader.open(stdpath(write(orientation, header, int32))));
+        QCOMPARE(reader.sample_count(), 3L);
+        QCOMPARE(reader.sfreq(), 0.0f);
+        QCOMPARE(reader.channel_count(), 2);
+        QCOMPARE(reader.channel_infos()[1].name, std::string("Ch2"));
+        QVERIFY(reader.markers().empty());
+        const Eigen::MatrixXf data = reader.read_raw_segment(1, 3);
         Eigen::MatrixXf expected(2, 2);
         if (orientation == "MULTIPLEXED")
             expected << 2, 4, 3, 5;
         else
             expected << 1, 2, 4, 5;
         QCOMPARE(data, Eigen::MatrixXf(expected * 1e-6f));
-        QVERIFY(reader.readRawSegment(2, 2).size() == 0);
-        QVERIFY(reader.readRawSegment(0, 4).size() == 0);
-        QVERIFY(reader.readRawSegment(-1, 1).size() == 0);
-        QCOMPARE(reader.getInfo().meas_date[0], -1); // no marker file, no date
+        QVERIFY(reader.read_raw_segment(2, 2).size() == 0);
+        QVERIFY(reader.read_raw_segment(0, 4).size() == 0);
+        QVERIFY(reader.read_raw_segment(-1, 1).size() == 0);
+        QCOMPARE(reader.info().meas_date[0], -1); // no marker file, no date
     }
     // As mne read_raw_brainvision: the first dated New Segment marker decides; the all-zero placeholder means unknown
     {
@@ -926,15 +926,15 @@ void TestBids::testBrainVisionReaderVariants()
         const QString header = "Brain Vision Data Exchange Header File Version 1.0\n[Common Infos]\nDataFile=zero.eeg\n"
                                "MarkerFile=zero.vmrk\nNumberOfChannels=2\n[Binary Infos]\nBinaryFormat=INT_32\n";
         BrainVisionReader reader;
-        QVERIFY(reader.open(write(QStringLiteral("zero"), header, int32)));
-        QCOMPARE(reader.getMarkers().size(), std::size_t{2});
-        QVERIFY(!reader.getMarkers()[0].date && reader.getMarkers()[1].date);
-        QCOMPARE(reader.getInfo().meas_date[0], -1);
+        QVERIFY(reader.open(stdpath(write(QStringLiteral("zero"), header, int32))));
+        QCOMPARE(reader.markers().size(), std::size_t{2});
+        QVERIFY(!reader.markers()[0].date && reader.markers()[1].date);
+        QCOMPARE(reader.info().meas_date[0], -1);
     }
     BrainVisionReader probe;
-    QVERIFY(probe.supportsExtension(".VHDR") && probe.supportsExtension(".ahdr") && !probe.supportsExtension(".edf"));
-    QCOMPARE(probe.formatName(), std::string("BrainVision"));
-    QVERIFY(probe.readRawSegment(0, 1).size() == 0);
+    QVERIFY(probe.supports_extension(".VHDR") && probe.supports_extension(".ahdr") && !probe.supports_extension(".edf"));
+    QCOMPARE(probe.format_name(), std::string("BrainVision"));
+    QVERIFY(probe.read_raw_segment(0, 1).size() == 0);
 
     // Headers that cannot describe a recording are refused
     const QString ok = "Brain Vision Data Exchange Header File Version 1.0\n[Common Infos]\n";
@@ -951,10 +951,10 @@ void TestBids::testBrainVisionReaderVariants()
         vhdr.write(header.toUtf8());
         vhdr.close();
         BrainVisionReader reader;
-        QVERIFY2(!reader.open(vhdr.fileName()), qPrintable(base));
+        QVERIFY2(!reader.open(stdpath(vhdr.fileName())), qPrintable(base));
     }
     BrainVisionReader missing;
-    QVERIFY(!missing.open(dir.filePath("none.vhdr")));
+    QVERIFY(!missing.open(stdpath(dir.filePath("none.vhdr"))));
 }
 
 //=============================================================================================================
@@ -970,7 +970,7 @@ void TestBids::testWriteSidecarsPerDatatype()
                                            std::tuple{"EEG 001", FIFFV_EEG_CH, FIFF_UNIT_V},
                                            std::tuple{"STI 101", FIFFV_STIM_CH, FIFF_UNIT_NONE}}) {
         FIFFLIB::FiffChInfo ch;
-        ch.ch_name = QString::fromLatin1(name).toStdString();
+        ch.ch_name = name;
         ch.kind = kind;
         ch.unit = unit;
         info.chs.push_back(ch);

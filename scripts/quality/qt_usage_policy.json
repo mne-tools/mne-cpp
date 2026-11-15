@@ -65,11 +65,9 @@
       ]
     },
     "bids": {
-      "tokens": 210,
-      "public_header_includes": 6,
-      "modules": [
-        "Core"
-      ]
+      "tokens": 0,
+      "public_header_includes": 0,
+      "modules": []
     },
     "channels": {
       "tokens": 0,

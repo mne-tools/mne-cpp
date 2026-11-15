@@ -547,8 +547,6 @@ aliases; replace the old spelling as below.
     `FIFF_KIND_TO_BIDS_TYPE`, `BIDS_COORD_TO_FIFF_FRAME`, ...) looked up
     with `bids_lookup(table, key)` instead of functions returning `QMap`
     and `QStringList`.
-  The format readers (`EDFReader`, `BrainVisionReader`) keep their Qt-based
-  API for now.
 - `EDFReader` and `BrainVisionReader` set `FiffInfo::meas_date` like
   MNE-Python; it was left unset. EDF takes the EDF+ "Startdate" field, else
   the two-digit header year (85-99 is 1985-1999, 00-84 is 2000-2084; the old
@@ -560,6 +558,24 @@ aliases; replace the old spelling as below.
   `FiffInfo::set_meas_date(time)` sets the date from a UTC time point.
 - New `BASELIB::latin1_to_utf8(text)` and `BASELIB::is_utf8(text)` for
   headers stored in Latin-1 (EDF) or of unknown encoding.
+- The BIDS format readers use std types, and `mne_bids` no longer links Qt
+  itself. Migration:
+  - `AbstractFormatReader`, `EDFReader`, `BrainVisionReader`: `open()` takes a
+    `std::filesystem::path`; `getInfo`, `readRawSegment`, `getSampleCount`,
+    `getFrequency`, `getChannelCount`, `toFiffRawData`, `formatName`,
+    `supportsExtension` are `info`, `read_raw_segment`, `sample_count`,
+    `sfreq`, `channel_count`, `to_fiff_raw_data`, `format_name` (returns
+    `std::string_view`) and `supports_extension` (takes
+    `std::string_view`). `read_raw_segment` takes `long` sample indices.
+  - `EDFReader::getAllChannelInfos`/`getMeasurementChannelInfos` and
+    `BrainVisionReader::getChannelInfos`/`getMarkers` are
+    `all_channel_infos`, `measurement_channel_infos`, `channel_infos` and
+    `markers`, returning `const std::vector<...>&` instead of a `QVector`
+    copy.
+  - `EDFChannelInfo`, `BrainVisionChannelInfo` and `BrainVisionMarker` hold
+    `std::string` fields in UTF-8; `toFiffChInfo`, `toSi`, `unitScale`,
+    `isVoltageUnit` are `to_fiff_ch_info`, `to_si`, `unit_scale`,
+    `is_voltage_unit`.
 - FIFF annotation channel names and extras, and `FiffAnnotations::read_json`/
   `write_json`, use `BASELIB::JsonDocument` instead of Qt's JSON classes; the
   files are unchanged. The helpers in `fiff/fiff_annotations_json.h` are now

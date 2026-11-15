@@ -15,26 +15,25 @@
 //=============================================================================================================
 
 #include "bids_brain_vision_reader.h"
+#include <base/byte_stream.h>
+#include <base/endian.h>
 #include <base/log.h>
 #include <base/string_utils.h>
 
 #include <fiff/fiff_constants.h>
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFileInfo>
-#include <QDir>
-#include <QTextStream>
-#include <QRegularExpression>
-#include <QtEndian>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <algorithm>
+#include <bit>
+#include <charconv>
+#include <cstdint>
+#include <cstring>
+#include <map>
+#include <regex>
+#include <utility>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -50,6 +49,8 @@ using namespace Eigen;
 
 namespace
 {
+
+constexpr std::string_view kMicroVolt = "\xC2\xB5V";
 
 /** A marker date "YYYYMMDDhhmmssffffff" in UTC; empty for the all-zero placeholder or an invalid date. */
 std::optional<std::chrono::sys_time<std::chrono::microseconds>> parseMarkerDate(std::string_view digits)
@@ -68,57 +69,139 @@ std::optional<std::chrono::sys_time<std::chrono::microseconds>> parseMarkerDate(
     return sys_days{date} + hours(hour) + minutes(minute) + seconds(second) + microseconds(field(14, 6));
 }
 
+/** @return @p text with the BrainVision comma escape "\1" decoded. */
+std::string decodeCommas(std::string_view text)
+{
+    std::string decoded;
+    decoded.reserve(text.size());
+    for (std::size_t i = 0; i < text.size(); ++i) {
+        if (text[i] == '\\' && i + 1 < text.size() && text[i + 1] == '1') {
+            decoded.push_back(',');
+            ++i;
+        } else {
+            decoded.push_back(text[i]);
+        }
+    }
+    return decoded;
+}
+
+/** @return The integer in @p text, or @p fallback if @p text is not one. */
+long toLong(std::string_view text, long fallback)
+{
+    text = BASELIB::trimmed(text);
+    long value = 0;
+    const auto [end, error] = std::from_chars(text.data(), text.data() + text.size(), value);
+    return error == std::errc() && end == text.data() + text.size() ? value : fallback;
+}
+
+/**
+ * Calls @p entry(section, key, value) for every "key=value" line of a BrainVision header or marker file, in file
+ * order, skipping the version line and comments and stopping at the free-form [Comment] section.
+ */
+template<typename Entry>
+void forEachEntry(std::string_view text, Entry entry)
+{
+    std::string_view section;
+    bool versionLine = true;
+    while (!text.empty()) {
+        const std::size_t newline = text.find('\n');
+        const std::string_view line = BASELIB::trimmed(text.substr(0, newline));
+        text = newline == std::string_view::npos ? std::string_view() : text.substr(newline + 1);
+        if (std::exchange(versionLine, false) || line.empty() || line.front() == ';') {
+            continue;
+        }
+        if (line.front() == '[' && line.back() == ']') {
+            section = line.substr(1, line.size() - 2);
+            if (BASELIB::equalsIgnoreCase(section, "comment")) {
+                return;
+            }
+            continue;
+        }
+        const std::size_t eq = line.find('=');
+        if (eq != std::string_view::npos && eq > 0 && !section.empty()) {
+            entry(section, BASELIB::trimmed(line.substr(0, eq)), BASELIB::trimmed(line.substr(eq + 1)));
+        }
+    }
+}
+
+/** INI sections of a BrainVision header: section name -> key -> value. */
+using Sections = std::map<std::string, std::map<std::string, std::string, std::less<>>, std::less<>>;
+
+/** @return The value of @p key in @p section, or @p fallback. */
+std::string_view value(const std::map<std::string, std::string, std::less<>>& section, std::string_view key, std::string_view fallback = {})
+{
+    const auto it = section.find(key);
+    return it == section.end() ? fallback : std::string_view(it->second);
+}
+
+/** @return The little-endian value at @p bytes in host byte order. */
+template<BASELIB::Swappable T>
+T fromLittleEndian(const unsigned char* bytes)
+{
+    T value;
+    std::memcpy(&value, bytes, sizeof(T));
+    if constexpr (std::endian::native == std::endian::big) {
+        value = BASELIB::byteSwap(value);
+    }
+    return value;
+}
+
+int bytesPerValue(BVBinaryFormat format)
+{
+    return format == BVBinaryFormat::INT_16 ? 2 : 4;
+}
+
 } // namespace
 
 //=============================================================================================================
 // BrainVisionChannelInfo
 //=============================================================================================================
 
-FiffChInfo BrainVisionChannelInfo::toFiffChInfo() const
+FiffChInfo BrainVisionChannelInfo::to_fiff_ch_info() const
 {
     FiffChInfo info;
     info.scanNo = channelNumber;
     info.logNo = channelNumber;
 
     // Detect channel type from name
-    QString nameUpper = name.toUpper();
-    if (nameUpper.contains("ECOG"))
+    const std::string lower = BASELIB::toLower(name);
+    const auto has = [&lower](std::string_view part) {
+        return lower.find(part) != std::string::npos;
+    };
+    if (has("ecog")) {
         info.kind = FIFFV_ECOG_CH;
-    else if (nameUpper.contains("SEEG"))
+    } else if (has("seeg")) {
         info.kind = FIFFV_SEEG_CH;
-    else if (nameUpper.contains("EOG") || nameUpper == "HEOGL" || nameUpper == "HEOGR" || nameUpper == "VEOGB")
+    } else if (has("eog") || lower == "heogl" || lower == "heogr" || lower == "veogb") {
         info.kind = FIFFV_EOG_CH;
-    else if (nameUpper.contains("ECG") || nameUpper.contains("EKG"))
+    } else if (has("ecg") || has("ekg")) {
         info.kind = FIFFV_ECG_CH;
-    else if (nameUpper.contains("EMG"))
+    } else if (has("emg")) {
         info.kind = FIFFV_EMG_CH;
-    else if (nameUpper == "STI 014" || nameUpper.contains("STIM"))
+    } else if (lower == "sti 014" || has("stim")) {
         info.kind = FIFFV_STIM_CH;
-    else {
+    } else {
         // Like mne read_raw_brainvision: voltage channels are EEG, anything else (ARU, µS, °C, ...) is misc
-        info.kind = BrainVisionReader::isVoltageUnit(unit) ? FIFFV_EEG_CH : FIFFV_MISC_CH;
+        info.kind = BrainVisionReader::is_voltage_unit(unit) ? FIFFV_EEG_CH : FIFFV_MISC_CH;
     }
 
-    // Map unit
-    if (BrainVisionReader::isVoltageUnit(unit)) {
+    info.unit = FIFF_UNIT_NONE;
+    info.unit_mul = FIFF_UNITM_NONE;
+    if (BrainVisionReader::is_voltage_unit(unit)) {
         info.unit = FIFF_UNIT_V;
-        if (unit == QLatin1String("nV"))
+        if (unit == "nV") {
             info.unit_mul = FIFF_UNITM_N;
-        else if (unit == QStringLiteral("\u00B5V") || unit == QLatin1String("uV"))
+        } else if (unit == kMicroVolt || unit == "uV") {
             info.unit_mul = FIFF_UNITM_MU;
-        else if (unit == QLatin1String("mV"))
+        } else if (unit == "mV") {
             info.unit_mul = FIFF_UNITM_M;
-        else
-            info.unit_mul = FIFF_UNITM_NONE;
-    } else {
-        info.unit = FIFF_UNIT_NONE;
-        info.unit_mul = FIFF_UNITM_NONE;
+        }
     }
 
     // Calibration: resolution is the scaling factor from raw → physical units
     info.cal = resolution;
     info.range = 1.0f;
-    info.ch_name = name.toStdString();
+    info.ch_name = name;
 
     return info;
 }
@@ -127,500 +210,314 @@ FiffChInfo BrainVisionChannelInfo::toFiffChInfo() const
 // BrainVisionReader
 //=============================================================================================================
 
-BrainVisionReader::BrainVisionReader()
-{
-}
+BrainVisionReader::BrainVisionReader() = default;
+
+BrainVisionReader::~BrainVisionReader() = default;
 
 //=============================================================================================================
 
-BrainVisionReader::~BrainVisionReader()
+bool BrainVisionReader::open(const std::filesystem::path& path)
 {
-    if (m_dataFile.isOpen()) {
-        m_dataFile.close();
-    }
-}
-
-//=============================================================================================================
-
-bool BrainVisionReader::open(const QString& sFilePath)
-{
-    m_sVhdrPath = sFilePath;
-
-    if (!parseHeader(sFilePath)) {
-        return false;
-    }
-
-    // Open the binary data file
-    m_dataFile.setFileName(m_sDataPath);
-    if (!m_dataFile.open(QIODevice::ReadOnly)) {
-        BASELIB::Log::warning("[BrainVisionReader::open] Could not open data file: {}", m_sDataPath.toStdString());
-        return false;
-    }
-
-    computeSampleCount();
-
-    // Parse markers if marker file exists
-    if (!m_sMarkerPath.isEmpty()) {
-        parseMarkers(m_sMarkerPath);
-    }
-
-    m_bIsOpen = true;
-    return true;
-}
-
-//=============================================================================================================
-
-bool BrainVisionReader::parseHeader(const QString& sVhdrPath)
-{
-    QFile hdrFile(sVhdrPath);
-    if (!hdrFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BrainVisionReader::parseHeader] Could not open header: {}", sVhdrPath.toStdString());
-        return false;
-    }
-
-    QFileInfo fi(sVhdrPath);
-    QString sDir = fi.absolutePath();
-
-    QTextStream in(&hdrFile);
-
-    // Validate version line
-    QString firstLine = in.readLine().trimmed();
-    QRegularExpression versionRe(
-        QStringLiteral("Brain ?Vision( Core| V-Amp)? Data( Exchange)? Header File,? Version [12]\\.0"),
-        QRegularExpression::CaseInsensitiveOption);
-    if (!versionRe.match(firstLine).hasMatch()) {
-        BASELIB::Log::warning("[BrainVisionReader::parseHeader] Unrecognized header version: {}", firstLine.toStdString());
-        return false;
-    }
-
-    // Simple INI-style parser (sections + key=value)
-    QString currentSection;
-    QMap<QString, QMap<QString, QString>> sections;
-
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith(';'))
-            continue;
-
-        if (line.startsWith('[') && line.endsWith(']')) {
-            currentSection = line.mid(1, line.size() - 2);
-            // Stop parsing at [Comment] section — it's free-form text
-            if (currentSection.toLower() == "comment")
-                break;
-            continue;
-        }
-
-        int eqPos = line.indexOf('=');
-        if (eqPos > 0 && !currentSection.isEmpty()) {
-            QString key = line.left(eqPos).trimmed();
-            QString value = line.mid(eqPos + 1).trimmed();
-            sections[currentSection][key] = value;
-        }
-    }
-
-    hdrFile.close();
-
-    // Extract Common Infos — handle both "Common Infos" and "Common infos" (NeurOne variant)
-    QMap<QString, QString> commonInfos;
-    if (sections.contains("Common Infos"))
-        commonInfos = sections["Common Infos"];
-    else if (sections.contains("Common infos"))
-        commonInfos = sections["Common infos"];
-
-    if (commonInfos.isEmpty()) {
-        BASELIB::Log::warning("[BrainVisionReader::parseHeader] Missing [Common Infos] section");
-        return false;
-    }
-
-    // Data file path (relative to .vhdr location)
-    QString dataFileName = commonInfos.value("DataFile");
-    if (dataFileName.isEmpty()) {
-        BASELIB::Log::warning("[BrainVisionReader::parseHeader] No DataFile specified");
-        return false;
-    }
-    m_sDataPath = QDir(sDir).absoluteFilePath(dataFileName);
-
-    // Marker file path
-    QString markerFileName = commonInfos.value("MarkerFile");
-    if (!markerFileName.isEmpty()) {
-        m_sMarkerPath = QDir(sDir).absoluteFilePath(markerFileName);
-    }
-
-    if (commonInfos.value("DataFormat", "BINARY").toUpper() != QLatin1String("BINARY")) {
-        BASELIB::Log::warning("[BrainVisionReader::parseHeader] Only BINARY data is supported, not {}", (commonInfos.value("DataFormat")).toStdString());
-        return false;
-    }
-
-    // Data orientation (default: MULTIPLEXED)
-    QString orientation = commonInfos.value("DataOrientation", "MULTIPLEXED").toUpper();
-    m_orientation = (orientation == "VECTORIZED") ? BVOrientation::VECTORIZED : BVOrientation::MULTIPLEXED;
-
-    // Number of channels
-    m_iNumChannels = commonInfos.value("NumberOfChannels", "0").toInt();
-    if (m_iNumChannels <= 0) {
-        BASELIB::Log::warning("[BrainVisionReader::parseHeader] Invalid channel count: {}", m_iNumChannels);
-        return false;
-    }
-
-    // Sampling interval in microseconds → frequency in Hz
-    float samplingInterval = commonInfos.value("SamplingInterval", "0").toFloat();
-    if (samplingInterval > 0.0f) {
-        m_fSFreq = 1.0e6f / samplingInterval;
-    }
-
-    // Binary format
-    QMap<QString, QString> binaryInfos;
-    if (sections.contains("Binary Infos"))
-        binaryInfos = sections["Binary Infos"];
-
-    QString binaryFormat = binaryInfos.value("BinaryFormat", "INT_16").toUpper();
-    if (binaryFormat == "INT_32")
-        m_binaryFormat = BVBinaryFormat::INT_32;
-    else if (binaryFormat == "IEEE_FLOAT_32")
-        m_binaryFormat = BVBinaryFormat::IEEE_FLOAT_32;
-    else
-        m_binaryFormat = BVBinaryFormat::INT_16;
-
-    // Channel Infos — Format: Ch<N>=<Name>,<Reference>,<Resolution>,<Unit>
-    QMap<QString, QString> channelInfos;
-    if (sections.contains("Channel Infos"))
-        channelInfos = sections["Channel Infos"];
-
-    m_vChannels.clear();
-    m_vChannels.reserve(m_iNumChannels);
-
-    for (int i = 1; i <= m_iNumChannels; ++i) {
-        QString key = QStringLiteral("Ch%1").arg(i);
-        QString value = channelInfos.value(key);
-
-        BrainVisionChannelInfo ch;
-        ch.channelNumber = i - 1; // 0-based internally
-
-        if (!value.isEmpty()) {
-            // Decode \1 back to comma for name parsing
-            QStringList parts = value.split(',');
-
-            if (parts.size() >= 1)
-                ch.name = parts[0].replace(QStringLiteral("\\1"), QStringLiteral(","));
-            if (parts.size() >= 2)
-                ch.reference = parts[1].replace(QStringLiteral("\\1"), QStringLiteral(","));
-            if (parts.size() >= 3 && !parts[2].isEmpty())
-                ch.resolution = parts[2].toFloat();
-            if (parts.size() >= 4 && !parts[3].isEmpty())
-                ch.unit = parts[3];
-            else
-                ch.unit = QStringLiteral("\u00B5V"); // Default: µV
-        } else {
-            ch.name = QStringLiteral("Ch%1").arg(i);
-            ch.unit = QStringLiteral("\u00B5V");
-        }
-
-        m_vChannels.push_back(ch);
-    }
-
-    return true;
-}
-
-//=============================================================================================================
-
-bool BrainVisionReader::parseMarkers(const QString& sVmrkPath)
-{
-    QFile mrkFile(sVmrkPath);
-    if (!mrkFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        BASELIB::Log::warning("[BrainVisionReader::parseMarkers] Could not open marker file: {}", sVmrkPath.toStdString());
-        return false;
-    }
-
-    QTextStream in(&mrkFile);
-
-    // Skip version line
-    in.readLine();
-
-    QString currentSection;
-    m_vMarkers.clear();
+    m_dataFile.reset();
+    m_markers.clear();
     m_measDate.reset();
-    bool measDateFound = false;
-
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith(';'))
-            continue;
-
-        if (line.startsWith('[') && line.endsWith(']')) {
-            currentSection = line.mid(1, line.size() - 2);
-            continue;
-        }
-
-        if (currentSection == "Marker Infos") {
-            // Format: Mk<N>=<Type>,<Description>,<Position>,<Duration>,<Channel>[,<Date>]
-            int eqPos = line.indexOf('=');
-            if (eqPos <= 0)
-                continue;
-
-            QString value = line.mid(eqPos + 1);
-            QStringList parts = value.split(',');
-            if (parts.size() < 5)
-                continue;
-
-            BrainVisionMarker marker;
-            marker.type = parts[0].replace(QStringLiteral("\\1"), QStringLiteral(","));
-            marker.description = parts[1].replace(QStringLiteral("\\1"), QStringLiteral(","));
-            marker.position = parts[2].toLong() - 1; // Convert 1-indexed to 0-indexed
-            marker.duration = parts[3].toLong();
-            marker.channel = parts[4].toInt();
-
-            // Like mne, the recording start is the date of the first New Segment marker that has one
-            const bool hasDate = parts.size() == 6 && parts[5].size() == 20 && std::ranges::all_of(parts[5], [](QChar c) { return c >= '0' && c <= '9'; });
-            if (hasDate) {
-                marker.date = parseMarkerDate(parts[5].toStdString());
-                if (marker.type == QStringLiteral("New Segment") && !measDateFound) {
-                    measDateFound = true;
-                    m_measDate = marker.date;
-                }
-            }
-
-            m_vMarkers.push_back(marker);
-        }
+    if (!parse_header(path)) {
+        return false;
     }
 
-    mrkFile.close();
+    m_dataFile = BASELIB::FileByteStream::open(m_dataPath, BASELIB::FileByteStream::Mode::Read);
+    if (!m_dataFile) {
+        BASELIB::Log::warning("[BrainVisionReader::open] Could not open data file: {}", BASELIB::utf8FromPath(m_dataPath));
+        return false;
+    }
+    m_sampleCount = static_cast<long>(m_dataFile->size() / (static_cast<std::uint64_t>(bytesPerValue(m_binaryFormat)) * static_cast<std::uint64_t>(m_numChannels)));
+
+    if (!m_markerPath.empty()) {
+        parse_markers(m_markerPath);
+    }
     return true;
 }
 
 //=============================================================================================================
 
-void BrainVisionReader::computeSampleCount()
+bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
 {
-    if (m_iNumChannels <= 0) {
-        m_lSampleCount = 0;
-        return;
+    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(vhdrPath);
+    if (!text) {
+        BASELIB::Log::warning("[BrainVisionReader::parse_header] Could not open header: {}", BASELIB::utf8FromPath(vhdrPath));
+        return false;
     }
 
-    qint64 fileSize = m_dataFile.size();
-    int bytesPerSample = 0;
-    switch (m_binaryFormat) {
-        case BVBinaryFormat::INT_16:
-            bytesPerSample = 2;
-            break;
-        case BVBinaryFormat::INT_32:
-            bytesPerSample = 4;
-            break;
-        case BVBinaryFormat::IEEE_FLOAT_32:
-            bytesPerSample = 4;
-            break;
+    const std::string_view firstLine = BASELIB::trimmed(std::string_view(*text).substr(0, text->find('\n')));
+    static const std::regex versionPattern("Brain ?Vision( Core| V-Amp)? Data( Exchange)? Header File,? Version [12]\\.0", std::regex::icase);
+    if (!std::regex_search(firstLine.begin(), firstLine.end(), versionPattern)) {
+        BASELIB::Log::warning("[BrainVisionReader::parse_header] Unrecognized header version: {}", firstLine);
+        return false;
     }
 
-    m_lSampleCount = fileSize / (static_cast<qint64>(bytesPerSample) * m_iNumChannels);
+    Sections sections;
+    forEachEntry(*text, [&sections](std::string_view section, std::string_view key, std::string_view entry) {
+        sections[std::string(section)].insert_or_assign(std::string(key), std::string(entry));
+    });
+
+    // "Common infos" is the NeurOne spelling
+    auto common = sections.find("Common Infos");
+    if (common == sections.end()) {
+        common = sections.find("Common infos");
+    }
+    if (common == sections.end() || common->second.empty()) {
+        BASELIB::Log::warning("[BrainVisionReader::parse_header] Missing [Common Infos] section");
+        return false;
+    }
+    const auto& commonInfos = common->second;
+
+    // Data and marker files are relative to the .vhdr
+    const std::string_view dataFile = value(commonInfos, "DataFile");
+    if (dataFile.empty()) {
+        BASELIB::Log::warning("[BrainVisionReader::parse_header] No DataFile specified");
+        return false;
+    }
+    const std::filesystem::path dir = std::filesystem::absolute(vhdrPath).parent_path();
+    m_dataPath = dir / BASELIB::pathFromUtf8(dataFile);
+    const std::string_view markerFile = value(commonInfos, "MarkerFile");
+    m_markerPath = markerFile.empty() ? std::filesystem::path() : dir / BASELIB::pathFromUtf8(markerFile);
+
+    const std::string_view dataFormat = value(commonInfos, "DataFormat", "BINARY");
+    if (!BASELIB::equalsIgnoreCase(dataFormat, "BINARY")) {
+        BASELIB::Log::warning("[BrainVisionReader::parse_header] Only BINARY data is supported, not {}", dataFormat);
+        return false;
+    }
+
+    m_orientation = BASELIB::equalsIgnoreCase(value(commonInfos, "DataOrientation", "MULTIPLEXED"), "VECTORIZED") ? BVOrientation::VECTORIZED : BVOrientation::MULTIPLEXED;
+
+    m_numChannels = BASELIB::toInt(value(commonInfos, "NumberOfChannels", "0")).value_or(0);
+    if (m_numChannels <= 0) {
+        BASELIB::Log::warning("[BrainVisionReader::parse_header] Invalid channel count: {}", m_numChannels);
+        return false;
+    }
+
+    // Sampling interval in microseconds
+    const double samplingInterval = BASELIB::toDouble(value(commonInfos, "SamplingInterval", "0")).value_or(0.0);
+    m_sfreq = samplingInterval > 0.0 ? static_cast<float>(1.0e6 / samplingInterval) : 0.0f;
+
+    static const std::map<std::string, std::string, std::less<>> none;
+    const auto section = [&sections](std::string_view name) -> const std::map<std::string, std::string, std::less<>>& {
+        const auto it = sections.find(name);
+        return it == sections.end() ? none : it->second;
+    };
+
+    const std::string_view binaryFormat = value(section("Binary Infos"), "BinaryFormat", "INT_16");
+    if (BASELIB::equalsIgnoreCase(binaryFormat, "INT_32")) {
+        m_binaryFormat = BVBinaryFormat::INT_32;
+    } else if (BASELIB::equalsIgnoreCase(binaryFormat, "IEEE_FLOAT_32")) {
+        m_binaryFormat = BVBinaryFormat::IEEE_FLOAT_32;
+    } else {
+        m_binaryFormat = BVBinaryFormat::INT_16;
+    }
+
+    // Ch<N>=<Name>,<Reference>,<Resolution>,<Unit>
+    const auto& channelInfos = section("Channel Infos");
+    m_channels.clear();
+    m_channels.reserve(static_cast<std::size_t>(m_numChannels));
+    for (int i = 1; i <= m_numChannels; ++i) {
+        BrainVisionChannelInfo ch;
+        ch.channelNumber = i - 1;
+        ch.unit = kMicroVolt;
+        const std::string_view entry = value(channelInfos, "Ch" + std::to_string(i));
+        if (entry.empty()) {
+            ch.name = "Ch" + std::to_string(i);
+        } else {
+            const std::vector<std::string> parts = BASELIB::split(entry, ',');
+            ch.name = decodeCommas(parts[0]);
+            if (parts.size() >= 2) {
+                ch.reference = decodeCommas(parts[1]);
+            }
+            if (parts.size() >= 3 && !parts[2].empty()) {
+                ch.resolution = static_cast<float>(BASELIB::toDouble(parts[2]).value_or(0.0));
+            }
+            if (parts.size() >= 4 && !parts[3].empty()) {
+                ch.unit = parts[3];
+            }
+        }
+        m_channels.push_back(std::move(ch));
+    }
+    return true;
 }
 
 //=============================================================================================================
 
-float BrainVisionReader::unitScale(const QString& sUnit)
+bool BrainVisionReader::parse_markers(const std::filesystem::path& vmrkPath)
+{
+    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(vmrkPath);
+    if (!text) {
+        BASELIB::Log::warning("[BrainVisionReader::parse_markers] Could not open marker file: {}", BASELIB::utf8FromPath(vmrkPath));
+        return false;
+    }
+
+    // Mk<N>=<Type>,<Description>,<Position>,<Duration>,<Channel>[,<Date>]
+    bool measDateFound = false;
+    forEachEntry(*text, [this, &measDateFound](std::string_view section, std::string_view, std::string_view entry) {
+        if (section != "Marker Infos") {
+            return;
+        }
+        const std::vector<std::string> parts = BASELIB::split(entry, ',');
+        if (parts.size() < 5) {
+            return;
+        }
+        BrainVisionMarker marker;
+        marker.type = decodeCommas(parts[0]);
+        marker.description = decodeCommas(parts[1]);
+        marker.position = toLong(parts[2], 0) - 1; // 1-based in the file
+        marker.duration = toLong(parts[3], 0);
+        marker.channel = static_cast<int>(toLong(parts[4], 0));
+
+        // Like mne, the recording start is the date of the first New Segment marker that has one
+        const bool hasDate = parts.size() == 6 && parts[5].size() == 20 && std::ranges::all_of(parts[5], [](char c) { return c >= '0' && c <= '9'; });
+        if (hasDate) {
+            marker.date = parseMarkerDate(parts[5]);
+            if (marker.type == "New Segment" && !std::exchange(measDateFound, true)) {
+                m_measDate = marker.date;
+            }
+        }
+        m_markers.push_back(std::move(marker));
+    });
+    return true;
+}
+
+//=============================================================================================================
+
+float BrainVisionReader::unit_scale(std::string_view unit)
 {
     // mne.io.brainvision _unit_dict; units it does not know are taken as-is (factor 1)
-    if (sUnit == QStringLiteral("\u00B5V") || sUnit == QLatin1String("uV") || sUnit == QStringLiteral("\u00B5S") || sUnit == QLatin1String("uS"))
+    if (unit == kMicroVolt || unit == "uV" || unit == "\xC2\xB5S" || unit == "uS") {
         return 1.0e-6f;
-    if (sUnit == QLatin1String("mV"))
+    }
+    if (unit == "mV") {
         return 1.0e-3f;
-    if (sUnit == QLatin1String("nV"))
+    }
+    if (unit == "nV") {
         return 1.0e-9f;
+    }
     return 1.0f;
 }
 
 //=============================================================================================================
 
-bool BrainVisionReader::isVoltageUnit(const QString& sUnit)
+bool BrainVisionReader::is_voltage_unit(std::string_view unit)
 {
-    return sUnit == QLatin1String("V") || sUnit == QLatin1String("mV") || sUnit == QStringLiteral("\u00B5V") || sUnit == QLatin1String("uV") || sUnit == QLatin1String("nV");
+    return unit == "V" || unit == "mV" || unit == kMicroVolt || unit == "uV" || unit == "nV";
 }
 
 //=============================================================================================================
 
-FIFFLIB::FiffInfo BrainVisionReader::getInfo() const
+FIFFLIB::FiffInfo BrainVisionReader::info() const
 {
     FiffInfo info;
-    info.nchan = m_vChannels.size();
-    info.sfreq = m_fSFreq;
-
-    for (const auto& ch : m_vChannels) {
-        FiffChInfo fiffCh = ch.toFiffChInfo();
-        info.chs.push_back(fiffCh);
-        info.ch_names.push_back(fiffCh.ch_name);
+    info.nchan = static_cast<int>(m_channels.size());
+    info.sfreq = m_sfreq;
+    info.chs.reserve(m_channels.size());
+    info.ch_names.reserve(m_channels.size());
+    for (const BrainVisionChannelInfo& ch : m_channels) {
+        info.chs.push_back(ch.to_fiff_ch_info());
+        info.ch_names.push_back(info.chs.back().ch_name);
     }
     if (m_measDate) {
         info.set_meas_date(*m_measDate);
     }
-
     return info;
 }
 
 //=============================================================================================================
 
-Eigen::MatrixXf BrainVisionReader::readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const
+Eigen::MatrixXf BrainVisionReader::read_raw_segment(long first, long last) const
 {
-    if (!m_bIsOpen) {
-        BASELIB::Log::warning("[BrainVisionReader::readRawSegment] File not open");
+    if (!m_dataFile) {
+        BASELIB::Log::warning("[BrainVisionReader::read_raw_segment] File not open");
+        return MatrixXf();
+    }
+    if (first < 0 || first >= m_sampleCount || last < 0 || last > m_sampleCount || last <= first) {
+        BASELIB::Log::warning("[BrainVisionReader::read_raw_segment] Invalid range: {} - {}", first, last);
         return MatrixXf();
     }
 
-    if (iStartSampleIdx < 0 || iStartSampleIdx >= m_lSampleCount ||
-        iEndSampleIdx < 0 || iEndSampleIdx > m_lSampleCount ||
-        iEndSampleIdx <= iStartSampleIdx) {
-        BASELIB::Log::warning("[BrainVisionReader::readRawSegment] Invalid range: {} - {}", iStartSampleIdx, iEndSampleIdx);
-        return MatrixXf();
+    const long numSamples = last - first;
+    const auto valueBytes = static_cast<std::size_t>(bytesPerValue(m_binaryFormat));
+    const auto channels = static_cast<std::size_t>(m_numChannels);
+    std::vector<float> scales(channels);
+    for (std::size_t ch = 0; ch < channels; ++ch) {
+        scales[ch] = m_channels[ch].resolution * unit_scale(m_channels[ch].unit);
     }
+    const auto decode = [this](const unsigned char* bytes) -> float {
+        switch (m_binaryFormat) {
+            case BVBinaryFormat::INT_16:
+                return static_cast<float>(fromLittleEndian<std::int16_t>(bytes));
+            case BVBinaryFormat::INT_32:
+                return static_cast<float>(fromLittleEndian<std::int32_t>(bytes));
+            case BVBinaryFormat::IEEE_FLOAT_32:
+                return fromLittleEndian<float>(bytes);
+        }
+        return 0.0f;
+    };
 
-    int iNumSamples = iEndSampleIdx - iStartSampleIdx;
-    int bytesPerValue = 0;
-    switch (m_binaryFormat) {
-        case BVBinaryFormat::INT_16:
-            bytesPerValue = 2;
-            break;
-        case BVBinaryFormat::INT_32:
-            bytesPerValue = 4;
-            break;
-        case BVBinaryFormat::IEEE_FLOAT_32:
-            bytesPerValue = 4;
-            break;
-    }
-
-    MatrixXf result(m_iNumChannels, iNumSamples);
-
+    MatrixXf result(m_numChannels, numSamples);
+    std::vector<unsigned char> buffer;
     if (m_orientation == BVOrientation::MULTIPLEXED) {
-        // Data layout: [ch1_t1, ch2_t1, ..., chN_t1, ch1_t2, ...]
-        qint64 startByte = static_cast<qint64>(iStartSampleIdx) * m_iNumChannels * bytesPerValue;
-        qint64 totalBytes = static_cast<qint64>(iNumSamples) * m_iNumChannels * bytesPerValue;
-        m_dataFile.seek(startByte);
-
-        QByteArray rawData = m_dataFile.read(totalBytes);
-        const char* pData = rawData.constData();
-
-        for (int s = 0; s < iNumSamples; ++s) {
-            for (int ch = 0; ch < m_iNumChannels; ++ch) {
-                qint64 offset = (static_cast<qint64>(s) * m_iNumChannels + ch) * bytesPerValue;
-                float rawValue = 0.0f;
-
-                switch (m_binaryFormat) {
-                    case BVBinaryFormat::INT_16:
-                        rawValue = static_cast<float>(qFromLittleEndian<qint16>(pData + offset));
-                        break;
-                    case BVBinaryFormat::INT_32:
-                        rawValue = static_cast<float>(qFromLittleEndian<qint32>(pData + offset));
-                        break;
-                    case BVBinaryFormat::IEEE_FLOAT_32:
-                        rawValue = qFromLittleEndian<float>(pData + offset);
-                        break;
-                }
-
-                // Apply channel resolution (cal) and unit scaling
-                float cal = m_vChannels[ch].resolution;
-                float scale = unitScale(m_vChannels[ch].unit);
-                result(ch, s) = rawValue * cal * scale;
+        // [ch1_t1, ch2_t1, ..., chN_t1, ch1_t2, ...]
+        buffer.resize(static_cast<std::size_t>(numSamples) * channels * valueBytes);
+        m_dataFile->seek(static_cast<std::uint64_t>(first) * channels * valueBytes);
+        m_dataFile->read(buffer.data(), buffer.size());
+        const unsigned char* bytes = buffer.data();
+        for (Index s = 0; s < numSamples; ++s) {
+            for (std::size_t ch = 0; ch < channels; ++ch, bytes += valueBytes) {
+                result(static_cast<Index>(ch), s) = decode(bytes) * scales[ch];
             }
         }
     } else {
-        // VECTORIZED: Each channel contiguous
-        // Layout: [ch1_t1, ch1_t2, ..., ch1_tM, ch2_t1, ...]
-        for (int ch = 0; ch < m_iNumChannels; ++ch) {
-            qint64 channelOffset = static_cast<qint64>(ch) * m_lSampleCount * bytesPerValue;
-            qint64 startByte = channelOffset + static_cast<qint64>(iStartSampleIdx) * bytesPerValue;
-            qint64 readBytes = static_cast<qint64>(iNumSamples) * bytesPerValue;
-
-            m_dataFile.seek(startByte);
-            QByteArray rawData = m_dataFile.read(readBytes);
-            const char* pData = rawData.constData();
-
-            float cal = m_vChannels[ch].resolution;
-            float scale = unitScale(m_vChannels[ch].unit);
-
-            for (int s = 0; s < iNumSamples; ++s) {
-                qint64 offset = static_cast<qint64>(s) * bytesPerValue;
-                float rawValue = 0.0f;
-
-                switch (m_binaryFormat) {
-                    case BVBinaryFormat::INT_16:
-                        rawValue = static_cast<float>(qFromLittleEndian<qint16>(pData + offset));
-                        break;
-                    case BVBinaryFormat::INT_32:
-                        rawValue = static_cast<float>(qFromLittleEndian<qint32>(pData + offset));
-                        break;
-                    case BVBinaryFormat::IEEE_FLOAT_32:
-                        rawValue = qFromLittleEndian<float>(pData + offset);
-                        break;
-                }
-
-                result(ch, s) = rawValue * cal * scale;
+        // [ch1_t1, ch1_t2, ..., ch1_tM, ch2_t1, ...]
+        buffer.resize(static_cast<std::size_t>(numSamples) * valueBytes);
+        for (std::size_t ch = 0; ch < channels; ++ch) {
+            m_dataFile->seek((static_cast<std::uint64_t>(ch) * static_cast<std::uint64_t>(m_sampleCount) + static_cast<std::uint64_t>(first)) * valueBytes);
+            m_dataFile->read(buffer.data(), buffer.size());
+            const unsigned char* bytes = buffer.data();
+            for (Index s = 0; s < numSamples; ++s, bytes += valueBytes) {
+                result(static_cast<Index>(ch), s) = decode(bytes) * scales[ch];
             }
         }
     }
-
     return result;
 }
 
 //=============================================================================================================
 
-long BrainVisionReader::getSampleCount() const
+long BrainVisionReader::sample_count() const
 {
-    return m_lSampleCount;
+    return m_sampleCount;
 }
 
 //=============================================================================================================
 
-float BrainVisionReader::getFrequency() const
+float BrainVisionReader::sfreq() const
 {
-    return m_fSFreq;
+    return m_sfreq;
 }
 
 //=============================================================================================================
 
-int BrainVisionReader::getChannelCount() const
+int BrainVisionReader::channel_count() const
 {
-    return m_iNumChannels;
+    return m_numChannels;
 }
 
 //=============================================================================================================
 
-FiffRawData BrainVisionReader::toFiffRawData() const
+std::string_view BrainVisionReader::format_name() const
 {
-    FiffRawData raw;
-    raw.info = getInfo();
-    raw.first_samp = 0;
-    raw.last_samp = static_cast<int>(m_lSampleCount) - 1;
-
-    RowVectorXd cals(raw.info.nchan);
-    for (int i = 0; i < std::ssize(raw.info.chs); ++i) {
-        cals[i] = static_cast<double>(raw.info.chs[i].cal);
-    }
-    raw.cals = cals;
-
-    return raw;
+    return "BrainVision";
 }
 
 //=============================================================================================================
 
-QString BrainVisionReader::formatName() const
+bool BrainVisionReader::supports_extension(std::string_view extension) const
 {
-    return QStringLiteral("BrainVision");
-}
-
-//=============================================================================================================
-
-bool BrainVisionReader::supportsExtension(const QString& sExtension) const
-{
-    QString ext = sExtension.toLower();
-    return (ext == ".vhdr" || ext == ".ahdr");
-}
-
-//=============================================================================================================
-
-QVector<BrainVisionMarker> BrainVisionReader::getMarkers() const
-{
-    return m_vMarkers;
-}
-
-//=============================================================================================================
-
-QVector<BrainVisionChannelInfo> BrainVisionReader::getChannelInfos() const
-{
-    return m_vChannels;
+    return BASELIB::equalsIgnoreCase(extension, ".vhdr") || BASELIB::equalsIgnoreCase(extension, ".ahdr");
 }

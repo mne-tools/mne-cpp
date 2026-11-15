@@ -41,19 +41,24 @@
 #include "bids_abstract_format_reader.h"
 
 //=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QVector>
-#include <QFile>
-
-//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
 #include <chrono>
+#include <memory>
 #include <optional>
+#include <string>
 #include <string_view>
+#include <vector>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace BASELIB
+{
+class FileByteStream;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE BIDSLIB
@@ -71,10 +76,10 @@ namespace BIDSLIB
 struct BIDSSHARED_EXPORT EDFChannelInfo
 {
     int channelNumber{-1};
-    QString label;
-    QString transducerType;
-    QString physicalDimension;
-    QString prefiltering;
+    std::string label;             /**< Signal label, Latin-1 bytes as stored. */
+    std::string transducerType;    /**< Transducer type. */
+    std::string physicalDimension; /**< Physical dimension (e.g. "uV"), Latin-1 bytes as stored. */
+    std::string prefiltering;      /**< Prefiltering description. */
     float physicalMin{0.0f};
     float physicalMax{0.0f};
     long digitalMin{0};
@@ -84,10 +89,11 @@ struct BIDSSHARED_EXPORT EDFChannelInfo
     float frequency{0.0f};
     bool isMeasurement{false};
 
-    FIFFLIB::FiffChInfo toFiffChInfo() const;
+    /** @return The FIFF channel description: kind from the label, volts for voltage dimensions. */
+    FIFFLIB::FiffChInfo to_fiff_ch_info() const;
 
     /** @return Factor from the physical dimension to SI (µV/uV 1e-6, mV 1e-3, otherwise 1; 1 for a "Status"/"Trigger" stim channel), as in mne read_raw_edf. */
-    float toSi() const;
+    float to_si() const;
 };
 
 //=============================================================================================================
@@ -103,97 +109,52 @@ struct BIDSSHARED_EXPORT EDFChannelInfo
 class BIDSSHARED_EXPORT EDFReader : public AbstractFormatReader
 {
 public:
-    //=========================================================================================================
-    /**
-     * @brief EDFReader Default constructor.
-     */
     EDFReader();
-
     ~EDFReader() override;
 
-    // AbstractFormatReader interface
-    bool open(const QString& sFilePath) override;
-    FIFFLIB::FiffInfo getInfo() const override;
-    Eigen::MatrixXf readRawSegment(int iStartSampleIdx, int iEndSampleIdx) const override;
-    long getSampleCount() const override;
-    float getFrequency() const override;
-    int getChannelCount() const override;
-    FIFFLIB::FiffRawData toFiffRawData() const override;
-    QString formatName() const override;
-    bool supportsExtension(const QString& sExtension) const override;
+    bool open(const std::filesystem::path& path) override;
+    FIFFLIB::FiffInfo info() const override;
+    Eigen::MatrixXf read_raw_segment(long first, long last) const override;
+    long sample_count() const override;
+    float sfreq() const override;
+    int channel_count() const override;
+    std::string_view format_name() const override;
+    bool supports_extension(std::string_view extension) const override;
 
-    //=========================================================================================================
-    /**
-     * @brief Return all channel infos (measurement + extra).
-     *
-     * @return Infos for every signal in the EDF header, including annotation/extra channels.
-     */
-    QVector<EDFChannelInfo> getAllChannelInfos() const;
+    /** @return Infos for every signal in the EDF header, including annotation/extra channels. */
+    const std::vector<EDFChannelInfo>& all_channel_infos() const
+    {
+        return m_allChannels;
+    }
 
-    //=========================================================================================================
-    /**
-     * @brief Return measurement channel infos only.
-     *
-     * @return Infos for the measurement channels only, in channel order.
-     */
-    QVector<EDFChannelInfo> getMeasurementChannelInfos() const;
+    /** @return Infos for the measurement channels only, in channel order. */
+    const std::vector<EDFChannelInfo>& measurement_channel_infos() const
+    {
+        return m_measChannels;
+    }
 
 private:
-    // EDF header field byte lengths
-    enum EDFHeaderFieldLengths
-    {
-        EDF_VERSION = 8,
-        LOCAL_PATIENT_INFO = 80,
-        LOCAL_RECORD_INFO = 80,
-        STARTDATE = 8,
-        STARTTIME = 8,
-        NUM_BYTES_HEADER = 8,
-        HEADER_RESERVED = 44,
-        NUM_DATA_RECORDS = 8,
-        DURATION_DATA_RECS = 8,
-        NUM_SIGNALS = 4,
-        SIG_LABEL = 16,
-        SIG_TRANSDUCER = 80,
-        SIG_PHYS_DIM = 8,
-        SIG_PHYS_MIN = 8,
-        SIG_PHYS_MAX = 8,
-        SIG_DIG_MIN = 8,
-        SIG_DIG_MAX = 8,
-        SIG_PREFILTERING = 80,
-        SIG_NUM_SAMPLES = 8,
-        SIG_RESERVED = 32,
-    };
-
-    void parseHeader(QIODevice* pDev);
+    bool parse_header();
 
     /**
      * The recording start in UTC, as MNE-Python reads it: the EDF+ "Startdate dd-MMM-yyyy" recording field
      * when present, else the "dd.mm.yy" header date with years 85-99 in 1985-1999 and 00-84 in 2000-2084,
      * plus the "hh.mm.ss" header time. Empty when no valid date is found.
      */
-    static std::optional<std::chrono::sys_time<std::chrono::microseconds>> parseStartDate(std::string_view recordingId,
-                                                                                          std::string_view startDate,
-                                                                                          std::string_view startTime);
+    static std::optional<std::chrono::sys_time<std::chrono::microseconds>> parse_start_date(std::string_view recordingId,
+                                                                                            std::string_view startDate,
+                                                                                            std::string_view startTime);
 
-    QString m_sFilePath;
-
-    // Header data
-    QString m_sVersionNo;
-    QString m_sPatientId;
-    QString m_sRecordingId;
     std::optional<std::chrono::sys_time<std::chrono::microseconds>> m_measDate;
-    int m_iNumBytesInHeader{0};
-    int m_iNumDataRecords{0};
-    float m_fDataRecordsDuration{0.0f};
-    int m_iNumChannels{0};
-    int m_iNumBytesPerDataRecord{0};
+    long m_numBytesInHeader{0};
+    long m_numDataRecords{0};
+    long m_numBytesPerDataRecord{0};
 
-    QVector<EDFChannelInfo> m_vAllChannels;
-    QVector<EDFChannelInfo> m_vMeasChannels;
+    std::vector<EDFChannelInfo> m_allChannels;
+    std::vector<EDFChannelInfo> m_measChannels;
 
-    mutable QFile m_file;
-    bool m_bIsOpen{false};
-    int m_iBytesPerSample{2}; // 3 for BDF
+    std::unique_ptr<BASELIB::FileByteStream> m_file;
+    int m_bytesPerSample{2}; // 3 for BDF
 };
 
 } // namespace BIDSLIB
