@@ -243,6 +243,67 @@ std::string BASELIB::utf8FromPath(const std::filesystem::path& path)
 
 //=============================================================================================================
 
+std::string BASELIB::latin1_to_utf8(std::string_view latin1)
+{
+    std::string utf8;
+    utf8.reserve(latin1.size() + static_cast<std::size_t>(std::ranges::count_if(latin1, [](char c) { return static_cast<unsigned char>(c) >= 0x80; })));
+    for (const char c : latin1) {
+        const auto byte = static_cast<unsigned char>(c);
+        if (byte < 0x80) {
+            utf8.push_back(c);
+        } else {
+            utf8.push_back(static_cast<char>(0xC0 | (byte >> 6)));
+            utf8.push_back(static_cast<char>(0x80 | (byte & 0x3F)));
+        }
+    }
+    return utf8;
+}
+
+//=============================================================================================================
+
+bool BASELIB::is_utf8(std::string_view text)
+{
+    const auto byte = [&](std::size_t i) {
+        return static_cast<unsigned char>(text[i]);
+    };
+    for (std::size_t i = 0; i < text.size();) {
+        const unsigned char lead = byte(i);
+        if (lead < 0x80) {
+            ++i;
+            continue;
+        }
+        // Second-byte range per lead byte (Unicode table 3-7), which rules out overlongs, surrogates and > U+10FFFF
+        std::size_t length = 0;
+        unsigned char low = 0x80;
+        unsigned char high = 0xBF;
+        if (lead >= 0xC2 && lead <= 0xDF) {
+            length = 2;
+        } else if (lead >= 0xE0 && lead <= 0xEF) {
+            length = 3;
+            low = lead == 0xE0 ? 0xA0 : 0x80;
+            high = lead == 0xED ? 0x9F : 0xBF;
+        } else if (lead >= 0xF0 && lead <= 0xF4) {
+            length = 4;
+            low = lead == 0xF0 ? 0x90 : 0x80;
+            high = lead == 0xF4 ? 0x8F : 0xBF;
+        } else {
+            return false;
+        }
+        if (i + length > text.size() || byte(i + 1) < low || byte(i + 1) > high) {
+            return false;
+        }
+        for (std::size_t k = 2; k < length; ++k) {
+            if ((byte(i + k) & 0xC0) != 0x80) {
+                return false;
+            }
+        }
+        i += length;
+    }
+    return true;
+}
+
+//=============================================================================================================
+
 std::filesystem::path BASELIB::executable_dir()
 {
     static const std::filesystem::path dir = [] {

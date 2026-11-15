@@ -64,6 +64,7 @@ private slots:
     void toIntMatchesQString();
     void toDoubleIgnoresTheLocale();
     void utf8PathsRoundTrip();
+    void latin1AndUtf8MatchQString();
     void executableDirIsTheApplicationDir();
     void resourcePathPrefersTheInstalledResources();
 };
@@ -241,6 +242,27 @@ void TestUtilsStringUtils::utf8PathsRoundTrip()
     QVERIFY(QFile::exists(QDir(dir.path()).filePath(name)));
     QCOMPARE(utf8FromPath(path.filename()), name.toStdString());
     QCOMPARE(utf8FromPath(path.extension()), std::string(".fif"));
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::latin1AndUtf8MatchQString()
+{
+    std::string every;
+    for (int byte = 0; byte < 256; ++byte) {
+        every.push_back(static_cast<char>(byte));
+    }
+    QCOMPARE(latin1_to_utf8(every), QString::fromLatin1(every.data(), qsizetype(every.size())).toStdString());
+    QCOMPARE(latin1_to_utf8("\xB5V"), std::string("\xC2\xB5V"));
+
+    QVERIFY(is_utf8(""));
+    QVERIFY(is_utf8("plain ASCII"));
+    QVERIFY(is_utf8("\xC2\xB5V \xE6\x97\xA5 \xF0\x9F\x98\x80"));
+    QVERIFY(!is_utf8("\xB5V"));            // Latin-1 micro sign
+    QVERIFY(!is_utf8("\xC2"));             // cut short
+    QVERIFY(!is_utf8("\xC0\xAF"));         // overlong
+    QVERIFY(!is_utf8("\xED\xA0\x80"));     // surrogate
+    QVERIFY(!is_utf8("\xF4\x90\x80\x80")); // above U+10FFFF
 }
 
 //=============================================================================================================

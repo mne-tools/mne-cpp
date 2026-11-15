@@ -558,6 +558,8 @@ aliases; replace the old spelling as below.
   `std::optional<std::chrono::sys_time<std::chrono::microseconds>>` instead of
   a `QDateTime`, empty for the all-zero placeholder. New
   `FiffInfo::set_meas_date(time)` sets the date from a UTC time point.
+- New `BASELIB::latin1_to_utf8(text)` and `BASELIB::is_utf8(text)` for
+  headers stored in Latin-1 (EDF) or of unknown encoding.
 - FIFF annotation channel names and extras, and `FiffAnnotations::read_json`/
   `write_json`, use `BASELIB::JsonDocument` instead of Qt's JSON classes; the
   files are unchanged. The helpers in `fiff/fiff_annotations_json.h` are now

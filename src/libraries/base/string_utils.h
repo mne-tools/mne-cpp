@@ -129,6 +129,20 @@ BASESHARED_EXPORT std::filesystem::path pathFromUtf8(std::string_view utf8);
 BASESHARED_EXPORT std::string utf8FromPath(const std::filesystem::path& path);
 
 /**
+ * @param[in] latin1   ISO 8859-1 text, one byte per character.
+ *
+ * @return The same characters in UTF-8.
+ */
+BASESHARED_EXPORT std::string latin1_to_utf8(std::string_view latin1);
+
+/**
+ * @param[in] text   Any bytes.
+ *
+ * @return Whether @p text is well-formed UTF-8 (no overlong forms, surrogates or code points above U+10FFFF).
+ */
+BASESHARED_EXPORT bool is_utf8(std::string_view text);
+
+/**
  * @return The directory of the running executable with symbolic links resolved, like
  *         QCoreApplication::applicationDirPath() but without an application object; empty if unknown.
  */
