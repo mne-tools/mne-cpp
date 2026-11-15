@@ -519,6 +519,9 @@ aliases; replace the old spelling as below.
   `coil_def.dat`, `icos.fif` and the test data with them instead of
   `QCoreApplication::applicationDirPath()`, so these lookups also work in
   programs without a Qt application object.
+- New `BASELIB::read_text_file(path)` and `write_text_file(path, text)` read
+  and replace a whole file byte for byte (no line-ending or encoding
+  conversion) and report failures as `BASELIB::Expected`.
 - FIFF annotation channel names and extras, and `FiffAnnotations::read_json`/
   `write_json`, use `BASELIB::JsonDocument` instead of Qt's JSON classes; the
   files are unchanged. The helpers in `fiff/fiff_annotations_json.h` are now

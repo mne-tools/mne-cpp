@@ -22,13 +22,13 @@
 #include "fiff_ch_name.h"
 #include "fiff_annotations_json.h"
 
+#include <base/byte_stream.h>
 #include <base/string_utils.h>
 
 
 #include <algorithm>
 #include <cmath>
 #include <format>
-#include <fstream>
 #include <iterator>
 #include <limits>
 #include <cstdint>
@@ -121,24 +121,6 @@ FiffAnnotation::Extras FIFFLIB::extras_from_json(const BASELIB::JsonObject& obje
 namespace
 {
 
-Expected<void> writeBytes(const std::filesystem::path& path, std::string_view bytes)
-{
-    std::ofstream file(path, std::ios::binary | std::ios::trunc);
-    if (!file || !file.write(bytes.data(), static_cast<std::streamsize>(bytes.size()))) {
-        return fail(ErrorCode::Io, "cannot write {}", BASELIB::utf8FromPath(path));
-    }
-    return {};
-}
-
-Expected<std::string> readBytes(const std::filesystem::path& path)
-{
-    std::ifstream file(path, std::ios::binary);
-    if (!file) {
-        return fail(ErrorCode::Io, "cannot read {}", BASELIB::utf8FromPath(path));
-    }
-    return std::string(std::istreambuf_iterator<char>(file), {});
-}
-
 std::string lowerExtension(const std::filesystem::path& path)
 {
     return BASELIB::toLower(BASELIB::utf8FromPath(path.extension()));
@@ -216,7 +198,7 @@ FiffAnnotations FiffAnnotations::crop(double tmin, double tmax) const
 
 Expected<FiffAnnotations> FiffAnnotations::read_json(const std::filesystem::path& path)
 {
-    const Expected<std::string> bytes = readBytes(path);
+    const Expected<std::string> bytes = BASELIB::read_text_file(path);
     if (!bytes) {
         return std::unexpected(bytes.error());
     }
@@ -253,14 +235,14 @@ Expected<void> FiffAnnotations::write_json(const std::filesystem::path& path) co
                                           {"comment", a.comment},
                                           {"extras", extras_to_json(a.extras)}});
     }
-    return writeBytes(path, BASELIB::JsonDocument(BASELIB::JsonObject{{"annotations", std::move(arr)}}).to_json());
+    return BASELIB::write_text_file(path, BASELIB::JsonDocument(BASELIB::JsonObject{{"annotations", std::move(arr)}}).to_json());
 }
 
 //=============================================================================================================
 
 Expected<FiffAnnotations> FiffAnnotations::read_csv(const std::filesystem::path& path)
 {
-    const Expected<std::string> bytes = readBytes(path);
+    const Expected<std::string> bytes = BASELIB::read_text_file(path);
     if (!bytes) {
         return std::unexpected(bytes.error());
     }
@@ -292,7 +274,7 @@ Expected<void> FiffAnnotations::write_csv(const std::filesystem::path& path) con
     for (const FiffAnnotation& a : m_annotations) {
         std::format_to(std::back_inserter(text), "{},{},{}\n", a.onset, a.duration, a.description);
     }
-    return writeBytes(path, text);
+    return BASELIB::write_text_file(path, text);
 }
 
 //=============================================================================================================

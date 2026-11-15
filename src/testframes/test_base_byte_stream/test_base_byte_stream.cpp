@@ -16,6 +16,7 @@
 
 #include <base/byte_stream.h>
 #include <base/endian.h>
+#include <base/string_utils.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -100,6 +101,7 @@ private slots:
     void fileStreamFailsOnMissingFile();
     void fileStreamCloseWritesAndEnds();
     void readFileBytesPlainAndGzip();
+    void textFilesRoundTripExactly();
     void benchmarkReadBigEndianFloats_data();
     void benchmarkReadBigEndianFloats();
 };
@@ -361,6 +363,25 @@ void TestUtilsByteStream::readFileBytesPlainAndGzip()
     QVERIFY(!notGzip && notGzip.error().code == ErrorCode::Format);
     const auto missing = read_file_bytes(dir.filePath(QStringLiteral("missing.bin")).toStdString());
     QVERIFY(!missing && missing.error().code == ErrorCode::Io);
+}
+
+//=============================================================================================================
+
+void TestUtilsByteStream::textFilesRoundTripExactly()
+{
+    QTemporaryDir dir;
+    const std::filesystem::path path = pathFromUtf8(dir.filePath(QStringLiteral("text.json")).toStdString());
+    // Bytes are written as given: no CR is added, and NUL and UTF-8 survive.
+    const std::string text("{\n  \"Name\": \"\xc3\xa4\"\n}\n\0end", 23);
+    QVERIFY(write_text_file(path, text).has_value());
+    QCOMPARE(read_text_file(path).value(), text);
+    QVERIFY(write_text_file(path, "short").has_value());
+    QCOMPARE(read_text_file(path).value(), std::string("short"));
+
+    const auto missing = read_text_file(path.parent_path() / "missing.txt");
+    QVERIFY(!missing && missing.error().code == ErrorCode::Io);
+    const auto unwritable = write_text_file(path.parent_path() / "no" / "dir.txt", text);
+    QVERIFY(!unwritable && unwritable.error().code == ErrorCode::Io);
 }
 
 //=============================================================================================================

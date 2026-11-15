@@ -30,6 +30,8 @@
 #include <cstdio>
 #include <filesystem>
 #include <memory>
+#include <string>
+#include <string_view>
 #include <vector>
 
 //=============================================================================================================
@@ -297,6 +299,27 @@ enum class Compression
  *         damaged or cut short.
  */
 BASESHARED_EXPORT Expected<std::vector<std::byte>> read_file_bytes(const std::filesystem::path& path, Compression compression = Compression::None);
+
+//=============================================================================================================
+/**
+ * Reads a whole file as text, byte for byte (no line-ending or encoding conversion).
+ *
+ * @param[in] path   The file.
+ *
+ * @return The content; an Io error if the file cannot be read.
+ */
+BASESHARED_EXPORT Expected<std::string> read_text_file(const std::filesystem::path& path);
+
+//=============================================================================================================
+/**
+ * Replaces a file with the given text, byte for byte, so "\n" stays LF on every platform.
+ *
+ * @param[in] path   The file.
+ * @param[in] text   The content.
+ *
+ * @return Nothing; an Io error if the file cannot be written.
+ */
+BASESHARED_EXPORT Expected<void> write_text_file(const std::filesystem::path& path, std::string_view text);
 
 } // namespace BASELIB
 

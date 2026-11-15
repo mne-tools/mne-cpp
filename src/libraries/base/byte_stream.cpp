@@ -27,6 +27,7 @@
 #include <cstring>
 #include <format>
 #include <fstream>
+#include <iterator>
 #include <system_error>
 #include <utility>
 
@@ -342,4 +343,30 @@ Expected<std::vector<std::byte>> BASELIB::read_file_bytes(const std::filesystem:
     inflateEnd(&strm);
     raw.resize(used);
     return raw;
+}
+
+//=============================================================================================================
+
+Expected<std::string> BASELIB::read_text_file(const std::filesystem::path& path)
+{
+    std::ifstream file(path, std::ios::binary);
+    if (!file) {
+        return std::unexpected(Error(ErrorCode::Io, std::format("cannot open {}", utf8FromPath(path))));
+    }
+    std::string text(std::istreambuf_iterator<char>(file), {});
+    if (file.bad()) {
+        return std::unexpected(Error(ErrorCode::Io, std::format("cannot read {}", utf8FromPath(path))));
+    }
+    return text;
+}
+
+//=============================================================================================================
+
+Expected<void> BASELIB::write_text_file(const std::filesystem::path& path, std::string_view text)
+{
+    std::ofstream file(path, std::ios::binary | std::ios::trunc);
+    if (!file || !file.write(text.data(), static_cast<std::streamsize>(text.size())) || !file.flush()) {
+        return std::unexpected(Error(ErrorCode::Io, std::format("cannot write {}", utf8FromPath(path))));
+    }
+    return {};
 }
