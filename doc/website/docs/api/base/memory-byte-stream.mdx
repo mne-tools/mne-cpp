@@ -119,7 +119,7 @@ Writes `bytes` bytes at the current position, overwriting or extending the strea
 
 ## Example
 
-- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
 - Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
 - Build target: `ex_base` (runs under CTest)
 
@@ -127,9 +127,9 @@ Writes `bytes` bytes at the current position, overwriting or extending the strea
 
 ### [ex_base](../../examples/base/ex_base.mdx)
 
-Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 113"
+````cpp title="src/examples/ex_base/main.cpp, line 114"
 MemoryByteStream memory;
 memory.write_big_endian(std::int16_t{0x0102});
 const bool bigEndian = memory.data()[0] == std::byte{0x01}; // most significant byte first

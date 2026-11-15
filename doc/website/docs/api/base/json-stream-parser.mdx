@@ -222,7 +222,7 @@ after a corrupt line of NDJSON; the options, handler, callback and the queue of 
 
 ## Example
 
-- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
 - Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
 - Build target: `ex_base` (runs under CTest)
 
@@ -230,9 +230,9 @@ after a corrupt line of NDJSON; the options, handler, callback and the queue of 
 
 ### [ex_base](../../examples/base/ex_base.mdx)
 
-Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 167"
+````cpp title="src/examples/ex_base/main.cpp, line 168"
 JsonStreamParser stream; // NDJSON from a socket, split anywhere
 std::vector<double> latencies;
 stream.set_document_callback([&](JsonDocument&& event) { latencies.push_back(event["latency"].to_double()); });

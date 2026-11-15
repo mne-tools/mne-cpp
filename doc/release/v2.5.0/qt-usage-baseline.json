@@ -35,7 +35,7 @@
       "ml",
       "report"
     ],
-    "tokens": 11650,
+    "tokens": 11648,
     "gui_outside_design": []
   },
   "libraries": {
@@ -103,7 +103,7 @@
       },
       "public_header_includes": 0,
       "q_object": 0,
-      "files": 20,
+      "files": 22,
       "modules": [
         "Core",
         "ZlibPrivate"
@@ -327,14 +327,14 @@
       "modules": []
     },
     "mna": {
-      "tokens": 1637,
+      "tokens": 1635,
       "by_category": {
         "containers": 65,
         "files": 28,
         "global": 31,
         "json": 335,
         "objects_signals": 80,
-        "other": 5,
+        "other": 3,
         "regex": 19,
         "strings": 1052,
         "time": 22

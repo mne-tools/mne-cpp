@@ -122,7 +122,7 @@ Calls `body(i)` for every i in [`begin`, `end`) and returns when all calls have 
 
 ## Example
 
-- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
 - Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
 - Build target: `ex_base` (runs under CTest)
 
@@ -130,9 +130,9 @@ Calls `body(i)` for every i in [`begin`, `end`) and returns when all calls have 
 
 ### [ex_base](../../examples/base/ex_base.mdx)
 
-Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 120"
+````cpp title="src/examples/ex_base/main.cpp, line 121"
 const std::vector<int> channels = {0, 1, 2, 3};
 const std::vector<double> power = ThreadPool::global().parallel_map(channels, [](int ch) { return 0.5 * ch; }); // in order
 auto background = ThreadPool::global().submit([] { return 42; });

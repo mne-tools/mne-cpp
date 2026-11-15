@@ -3,25 +3,25 @@
   "generated_by": "scripts/quality/audit_api_evidence.py",
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
-    "exported_classes": 484,
-    "exported_free_functions": 135,
-    "registered_classes": 576,
+    "exported_classes": 485,
+    "exported_free_functions": 136,
+    "registered_classes": 577,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
     "registered_header_only": 80,
     "registered_stale": 0,
-    "registered_with_test": 242,
+    "registered_with_test": 243,
     "registered_test_unresolved": 0,
-    "registered_with_example": 425,
+    "registered_with_example": 426,
     "registered_example_not_built": 0,
     "registered_with_python_equiv": 97,
     "registered_without_api_page": 0,
-    "with_snippet": 459,
-    "public_api_units": 578,
-    "example_eligible": 425,
+    "with_snippet": 460,
+    "public_api_units": 579,
+    "example_eligible": 426,
     "example_exempt": 153,
-    "eligible_backed_by_registry_example": 423,
-    "eligible_used_by_some_example": 367,
+    "eligible_backed_by_registry_example": 424,
+    "eligible_used_by_some_example": 368,
     "examples_on_disk": 80,
     "examples_built": 80
   },
@@ -36,13 +36,13 @@
       "with_snippet": 49
     },
     "base": {
-      "public": 20,
-      "registered": 20,
-      "with_test": 20,
-      "eligible": 20,
-      "eligible_with_registry_example": 20,
-      "eligible_used_by_example": 18,
-      "with_snippet": 20
+      "public": 21,
+      "registered": 21,
+      "with_test": 21,
+      "eligible": 21,
+      "eligible_with_registry_example": 21,
+      "eligible_used_by_example": 19,
+      "with_snippet": 21
     },
     "bids": {
       "public": 14,
@@ -541,6 +541,11 @@
     },
     {
       "name": "is_utf8",
+      "header": "base/string_utils.h",
+      "library": "base"
+    },
+    {
+      "name": "to_hex",
       "header": "base/string_utils.h",
       "library": "base"
     },
@@ -2759,6 +2764,29 @@
         "ex_base/main.cpp#log_capture_usage"
       ],
       "api_page": "doc/website/docs/api/base/log-capture.mdx",
+      "python_equiv": null,
+      "example_eligible": true,
+      "exempt_reason": null
+    },
+    {
+      "name": "Sha256",
+      "header": "base/sha256.h",
+      "library": "base",
+      "kind": "exported-class",
+      "exported": true,
+      "registered": true,
+      "registry_status": "documented",
+      "test": "test_base_sha256",
+      "test_resolves": true,
+      "example": "ex_base",
+      "example_state": "built",
+      "including_examples": [
+        "ex_base"
+      ],
+      "snippets": [
+        "ex_base/main.cpp#sha256_usage"
+      ],
+      "api_page": "doc/website/docs/api/base/sha256.mdx",
       "python_equiv": null,
       "example_eligible": true,
       "exempt_reason": null

@@ -499,7 +499,8 @@ const apiSidebar: SidebarsConfig['apiSidebar'] = [
         'api/base/cbor-value',
         'api/base/cbor-array',
         'api/base/cbor-map',
-        'api/base/cbor-parse-error'
+        'api/base/cbor-parse-error',
+        'api/base/sha256'
       ],
     },
     {

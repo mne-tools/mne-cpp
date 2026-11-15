@@ -1,0 +1,130 @@
+---
+id: sha256
+title: "mne::Sha256"
+sidebar_label: Sha256
+sidebar_position: 86
+---
+
+# Sha256
+
+**Namespace:** `mne` &nbsp;·&nbsp; **Library:** Base Library &nbsp;·&nbsp; **Source:** [`base/sha256.h`](https://github.com/mne-tools/mne-cpp/blob/staging/src/libraries/base/sha256.h)
+
+`#include <base/sha256.h>`
+
+```cpp
+class mne::Sha256
+```
+
+Computes SHA-256 digests in one call or incrementally, e.g.
+
+to fingerprint pipeline inputs.
+
+Use `to_hex()` from `string_utils.h` for the hex text QCryptographicHash::hash(...).toHex() gives.
+
+```cpp title="src/examples/ex_base/main.cpp"
+// Qt:   QCryptographicHash::hash(text.toUtf8(), QCryptographicHash::Sha256).toHex()
+const std::string fingerprint = to_hex(Sha256::hash("abc"));
+Sha256 incremental; // or feed a large file block by block
+incremental.update("a").update("bc");
+```
+
+---
+
+## Public Methods
+
+### update(data)
+
+Appends bytes to the hashed message.
+
+**Parameters:**
+
+- **data** : *std::span&lt; const std::byte &gt;*
+  The bytes to append.
+
+**Returns:**
+
+- *[Sha256](/docs/api/base/sha256) &* — This hash, to chain calls.
+
+---
+
+### update(text)
+
+Appends text, as its bytes, to the hashed message.
+
+**Parameters:**
+
+- **text** : *std::string_view*
+  The text to append.
+
+**Returns:**
+
+- *[Sha256](/docs/api/base/sha256) &* — This hash, to chain calls.
+
+---
+
+### digest()
+
+**Returns:**
+
+- *Digest* — The digest of everything appended so far; more data can still be appended.
+
+---
+
+### reset()
+
+Starts a new, empty message.
+
+---
+
+## Static Methods
+
+### hash(data)
+
+**Parameters:**
+
+- **data** : *std::span&lt; const std::byte &gt;*
+  The message.
+
+**Returns:**
+
+- *Digest* — The digest of `data`.
+
+---
+
+### hash(text)
+
+**Parameters:**
+
+- **text** : *std::string_view*
+  The message.
+
+**Returns:**
+
+- *Digest* — The digest of the bytes of `text`.
+
+---
+
+## Example
+
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
+- Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
+- Build target: `ex_base` (runs under CTest)
+
+## Used in examples
+
+### [ex_base](../../examples/base/ex_base.mdx)
+
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
+
+````cpp title="src/examples/ex_base/main.cpp, line 181"
+// Qt:   QCryptographicHash::hash(text.toUtf8(), QCryptographicHash::Sha256).toHex()
+const std::string fingerprint = to_hex(Sha256::hash("abc"));
+Sha256 incremental; // or feed a large file block by block
+incremental.update("a").update("bc");
+ok &= expect(fingerprint == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" && incremental.digest() == Sha256::hash("abc"),
+             "Sha256 hashed a message in one call and incrementally");
+````
+
+## Authors of this file
+
+- Christoph Dinh &lt;christoph.dinh@mne-cpp.org&gt;

@@ -201,7 +201,7 @@ A UTF-8 byte order mark is skipped. Nesting is limited to 1024 levels, as in Qt.
 
 ## Example
 
-- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+- Start here: [ex_base](../../examples/base/ex_base.mdx) — Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
 - Full source: [`src/examples/ex_base/main.cpp`](https://github.com/mne-tools/mne-cpp/tree/staging/src/examples/ex_base/main.cpp)
 - Build target: `ex_base` (runs under CTest)
 
@@ -209,9 +209,9 @@ A UTF-8 byte order mark is skipped. Nesting is limited to 1024 levels, as in Qt.
 
 ### [ex_base](../../examples/base/ex_base.mdx)
 
-Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
 
-````cpp title="src/examples/ex_base/main.cpp, line 137"
+````cpp title="src/examples/ex_base/main.cpp, line 138"
 //       cfg["channels"] = QJsonArray{"MEG 0113", "EEG 001"};
 //       QByteArray out = QJsonDocument(cfg).toJson(QJsonDocument::Compact);
 JsonParseError parseError;
