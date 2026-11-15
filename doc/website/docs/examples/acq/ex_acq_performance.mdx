@@ -1107,7 +1107,7 @@ int main(int argc, char* argv[])
     }
 
     std::printf("MNE-CPP acquisition (mne_acq %s) - standard C++20 only, no Qt, no Eigen on the data path\n",
-                mne::buildHash());
+                mne::acq_build_hash());
     const bool closedLoopOk = runClosedLoop(closedLoopSeconds);
     const bool throughputOk = runThroughput(rowSeconds);
     return closedLoopOk && throughputOk ? 0 : 1;

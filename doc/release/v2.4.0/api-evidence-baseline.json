@@ -4,7 +4,7 @@
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 484,
-    "exported_free_functions": 199,
+    "exported_free_functions": 136,
     "registered_classes": 576,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
@@ -295,17 +295,17 @@
       "library": "acq"
     },
     {
-      "name": "buildDateTime",
+      "name": "acq_build_date_time",
       "header": "acq/acq_global.h",
       "library": "acq"
     },
     {
-      "name": "buildHash",
+      "name": "acq_build_hash",
       "header": "acq/acq_global.h",
       "library": "acq"
     },
     {
-      "name": "buildHashLong",
+      "name": "acq_build_hash_long",
       "header": "acq/acq_global.h",
       "library": "acq"
     },
@@ -560,51 +560,6 @@
       "library": "base"
     },
     {
-      "name": "buildDateTime",
-      "header": "bids/bids_global.h",
-      "library": "bids"
-    },
-    {
-      "name": "buildHash",
-      "header": "bids/bids_global.h",
-      "library": "bids"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "bids/bids_global.h",
-      "library": "bids"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "channels/channels_global.h",
-      "library": "channels"
-    },
-    {
-      "name": "buildHash",
-      "header": "channels/channels_global.h",
-      "library": "channels"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "channels/channels_global.h",
-      "library": "channels"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "com/com_global.h",
-      "library": "com"
-    },
-    {
-      "name": "buildHash",
-      "header": "com/com_global.h",
-      "library": "com"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "com/com_global.h",
-      "library": "com"
-    },
-    {
       "name": "list_serial_ports",
       "header": "com/serial_port.h",
       "library": "com"
@@ -613,51 +568,6 @@
       "name": "compute_connectivity",
       "header": "connectivity/compute_connectivity.h",
       "library": "connectivity"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "connectivity/connectivity_global.h",
-      "library": "connectivity"
-    },
-    {
-      "name": "buildHash",
-      "header": "connectivity/connectivity_global.h",
-      "library": "connectivity"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "connectivity/connectivity_global.h",
-      "library": "connectivity"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "decoding/decoding_global.h",
-      "library": "decoding"
-    },
-    {
-      "name": "buildHash",
-      "header": "decoding/decoding_global.h",
-      "library": "decoding"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "decoding/decoding_global.h",
-      "library": "decoding"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "disp/disp_global.h",
-      "library": "disp"
-    },
-    {
-      "name": "buildHash",
-      "header": "disp/disp_global.h",
-      "library": "disp"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "disp/disp_global.h",
-      "library": "disp"
     },
     {
       "name": "getDefaultScalingValue",
@@ -752,21 +662,6 @@
     {
       "name": "computeBridgedElectrodes",
       "header": "dsp/bridged_electrodes.h",
-      "library": "dsp"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "dsp/dsp_global.h",
-      "library": "dsp"
-    },
-    {
-      "name": "buildHash",
-      "header": "dsp/dsp_global.h",
-      "library": "dsp"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "dsp/dsp_global.h",
       "library": "dsp"
     },
     {
@@ -925,66 +820,6 @@
       "library": "fiff"
     },
     {
-      "name": "buildDateTime",
-      "header": "fiff/fiff_global.h",
-      "library": "fiff"
-    },
-    {
-      "name": "buildHash",
-      "header": "fiff/fiff_global.h",
-      "library": "fiff"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "fiff/fiff_global.h",
-      "library": "fiff"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "fs/fs_global.h",
-      "library": "fs"
-    },
-    {
-      "name": "buildHash",
-      "header": "fs/fs_global.h",
-      "library": "fs"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "fs/fs_global.h",
-      "library": "fs"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "fwd/fwd_global.h",
-      "library": "fwd"
-    },
-    {
-      "name": "buildHash",
-      "header": "fwd/fwd_global.h",
-      "library": "fwd"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "fwd/fwd_global.h",
-      "library": "fwd"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "ieeg/ieeg_global.h",
-      "library": "ieeg"
-    },
-    {
-      "name": "buildHash",
-      "header": "ieeg/ieeg_global.h",
-      "library": "ieeg"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "ieeg/ieeg_global.h",
-      "library": "ieeg"
-    },
-    {
       "name": "apply_inverse_epochs",
       "header": "inv/inv_convenience.h",
       "library": "inv"
@@ -1020,21 +855,6 @@
       "library": "inv"
     },
     {
-      "name": "buildDateTime",
-      "header": "inv/inv_global.h",
-      "library": "inv"
-    },
-    {
-      "name": "buildHash",
-      "header": "inv/inv_global.h",
-      "library": "inv"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "inv/inv_global.h",
-      "library": "inv"
-    },
-    {
       "name": "tokenize",
       "header": "inv/inv_source_estimate_token.h",
       "library": "inv"
@@ -1043,21 +863,6 @@
       "name": "fromTokens",
       "header": "inv/inv_source_estimate_token.h",
       "library": "inv"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "lsl/lsl_global.h",
-      "library": "lsl"
-    },
-    {
-      "name": "buildHash",
-      "header": "lsl/lsl_global.h",
-      "library": "lsl"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "lsl/lsl_global.h",
-      "library": "lsl"
     },
     {
       "name": "discoveryGroups",
@@ -1090,66 +895,6 @@
       "library": "lsl"
     },
     {
-      "name": "buildDateTime",
-      "header": "math/math_global.h",
-      "library": "math"
-    },
-    {
-      "name": "buildHash",
-      "header": "math/math_global.h",
-      "library": "math"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "math/math_global.h",
-      "library": "math"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "ml/ml_global.h",
-      "library": "ml"
-    },
-    {
-      "name": "buildHash",
-      "header": "ml/ml_global.h",
-      "library": "ml"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "ml/ml_global.h",
-      "library": "ml"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "mna/mna_global.h",
-      "library": "mna"
-    },
-    {
-      "name": "buildHash",
-      "header": "mna/mna_global.h",
-      "library": "mna"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "mna/mna_global.h",
-      "library": "mna"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "mne/mne_global.h",
-      "library": "mne"
-    },
-    {
-      "name": "buildHash",
-      "header": "mne/mne_global.h",
-      "library": "mne"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "mne/mne_global.h",
-      "library": "mne"
-    },
-    {
       "name": "performIcp",
       "header": "mne/mne_icp.h",
       "library": "mne"
@@ -1165,36 +910,6 @@
       "library": "mne"
     },
     {
-      "name": "buildDateTime",
-      "header": "mri/mri_global.h",
-      "library": "mri"
-    },
-    {
-      "name": "buildHash",
-      "header": "mri/mri_global.h",
-      "library": "mri"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "mri/mri_global.h",
-      "library": "mri"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "pybridge/pybridge_global.h",
-      "library": "pybridge"
-    },
-    {
-      "name": "buildHash",
-      "header": "pybridge/pybridge_global.h",
-      "library": "pybridge"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "pybridge/pybridge_global.h",
-      "library": "pybridge"
-    },
-    {
       "name": "parse_progress_line",
       "header": "pybridge/python_runner.h",
       "library": "pybridge"
@@ -1208,36 +923,6 @@
       "name": "base64_encode",
       "header": "report/report.h",
       "library": "report"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "report/report_global.h",
-      "library": "report"
-    },
-    {
-      "name": "buildHash",
-      "header": "report/report_global.h",
-      "library": "report"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "report/report_global.h",
-      "library": "report"
-    },
-    {
-      "name": "buildDateTime",
-      "header": "sts/sts_global.h",
-      "library": "sts"
-    },
-    {
-      "name": "buildHash",
-      "header": "sts/sts_global.h",
-      "library": "sts"
-    },
-    {
-      "name": "buildHashLong",
-      "header": "sts/sts_global.h",
-      "library": "sts"
     }
   ],
   "classes": [
