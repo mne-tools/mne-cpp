@@ -556,6 +556,11 @@ aliases; replace the old spelling as below.
   `std::optional<std::chrono::sys_time<std::chrono::microseconds>>` instead of
   a `QDateTime`, empty for the all-zero placeholder. New
   `FiffInfo::set_meas_date(time)` sets the date from a UTC time point.
+- `BrainVisionReader` decodes `.vhdr` and `.vmrk` files like MNE-Python:
+  UTF-8, Windows-1252 for `Codepage=ANSI`, and Latin-1 when the bytes are
+  not valid in that encoding. Latin-1 headers from older recorders kept raw
+  bytes, so a `µV` unit was not recognised and those channels were read
+  10^6 times too large.
 - New `BASELIB::latin1_to_utf8(text)` and `BASELIB::is_utf8(text)` for
   headers stored in Latin-1 (EDF) or of unknown encoding.
 - The BIDS format readers use std types, and `mne_bids` no longer links Qt

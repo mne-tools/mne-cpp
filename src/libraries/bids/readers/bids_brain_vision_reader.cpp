@@ -27,6 +27,7 @@
 //=============================================================================================================
 
 #include <algorithm>
+#include <array>
 #include <bit>
 #include <charconv>
 #include <cstdint>
@@ -67,6 +68,46 @@ std::optional<std::chrono::sys_time<std::chrono::microseconds>> parseMarkerDate(
         return std::nullopt;
     }
     return sys_days{date} + hours(hour) + minutes(minute) + seconds(second) + microseconds(field(14, 6));
+}
+
+/**
+ * @return The header or marker file @p bytes in UTF-8, decoded like mne: as UTF-8, or as Windows-1252 for
+ *         "Codepage=ANSI", falling back to Latin-1 when the bytes are not valid in that encoding.
+ */
+std::string decodeText(std::string bytes)
+{
+    static const std::regex codepagePattern("^\\s*Codepage\\s*=\\s*(\\S+)", std::regex::icase | std::regex::multiline);
+    std::smatch codepage;
+    const bool ansi = std::regex_search(bytes, codepage, codepagePattern) && codepage[1] == "ANSI";
+    if (!ansi && BASELIB::is_utf8(bytes)) {
+        return bytes;
+    }
+    if (!ansi) {
+        return BASELIB::latin1_to_utf8(bytes);
+    }
+    // Windows-1252 0x80-0x9F; empty entries are undefined there
+    static constexpr std::array<std::string_view, 32> cp1252{
+        "\xE2\x82\xAC", "", "\xE2\x80\x9A", "\xC6\x92", "\xE2\x80\x9E", "\xE2\x80\xA6", "\xE2\x80\xA0", "\xE2\x80\xA1",
+        "\xCB\x86", "\xE2\x80\xB0", "\xC5\xA0", "\xE2\x80\xB9", "\xC5\x92", "", "\xC5\xBD", "",
+        "", "\xE2\x80\x98", "\xE2\x80\x99", "\xE2\x80\x9C", "\xE2\x80\x9D", "\xE2\x80\xA2", "\xE2\x80\x93", "\xE2\x80\x94",
+        "\xCB\x9C", "\xE2\x84\xA2", "\xC5\xA1", "\xE2\x80\xBA", "\xC5\x93", "", "\xC5\xBE", "\xC5\xB8"};
+    std::string utf8;
+    utf8.reserve(bytes.size());
+    for (const char c : bytes) {
+        const auto byte = static_cast<unsigned char>(c);
+        if (byte >= 0x80 && byte < 0xA0) {
+            if (cp1252[byte - 0x80].empty()) {
+                return BASELIB::latin1_to_utf8(bytes);
+            }
+            utf8 += cp1252[byte - 0x80];
+        } else if (byte >= 0x80) {
+            utf8.push_back(static_cast<char>(0xC0 | (byte >> 6)));
+            utf8.push_back(static_cast<char>(0x80 | (byte & 0x3F)));
+        } else {
+            utf8.push_back(c);
+        }
+    }
+    return utf8;
 }
 
 /** @return @p text with the BrainVision comma escape "\1" decoded. */
@@ -242,12 +283,13 @@ bool BrainVisionReader::open(const std::filesystem::path& path)
 
 bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
 {
-    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(vhdrPath);
+    BASELIB::Expected<std::string> text = BASELIB::read_text_file(vhdrPath);
     if (!text) {
         BASELIB::Log::warning("[BrainVisionReader::parse_header] Could not open header: {}", BASELIB::utf8FromPath(vhdrPath));
         return false;
     }
 
+    *text = decodeText(std::move(*text));
     const std::string_view firstLine = BASELIB::trimmed(std::string_view(*text).substr(0, text->find('\n')));
     static const std::regex versionPattern("Brain ?Vision( Core| V-Amp)? Data( Exchange)? Header File,? Version [12]\\.0", std::regex::icase);
     if (!std::regex_search(firstLine.begin(), firstLine.end(), versionPattern)) {
@@ -348,13 +390,14 @@ bool BrainVisionReader::parse_header(const std::filesystem::path& vhdrPath)
 
 bool BrainVisionReader::parse_markers(const std::filesystem::path& vmrkPath)
 {
-    const BASELIB::Expected<std::string> text = BASELIB::read_text_file(vmrkPath);
+    BASELIB::Expected<std::string> text = BASELIB::read_text_file(vmrkPath);
     if (!text) {
         BASELIB::Log::warning("[BrainVisionReader::parse_markers] Could not open marker file: {}", BASELIB::utf8FromPath(vmrkPath));
         return false;
     }
 
     // Mk<N>=<Type>,<Description>,<Position>,<Duration>,<Channel>[,<Date>]
+    *text = decodeText(std::move(*text));
     bool measDateFound = false;
     forEachEntry(*text, [this, &measDateFound](std::string_view section, std::string_view, std::string_view entry) {
         if (section != "Marker Infos") {

@@ -931,6 +931,32 @@ void TestBids::testBrainVisionReaderVariants()
         QVERIFY(!reader.markers()[0].date && reader.markers()[1].date);
         QCOMPARE(reader.info().meas_date[0], -1);
     }
+    // Header encodings as mne read_raw_brainvision: UTF-8 unless "Codepage=ANSI" (cp1252); Latin-1 if not valid UTF-8.
+    // mne 1.11 on these bytes: names Fpü, Cä / Fpü, E€; both channels eeg, data [[0, 2e-7], [1e-6, 3e-6]]
+    for (const auto& [base, codepage, second, expected] : {std::tuple<QByteArray, QByteArray, QByteArray, std::string>{"latin1", "", "C\xE4", "C\xC3\xA4"},
+                                                           {"ansi", "Codepage=ANSI\n", "E\x80", "E\xE2\x82\xAC"}}) {
+        QFile vhdr(dir.filePath(QString::fromLatin1(base) + ".vhdr"));
+        QVERIFY(vhdr.open(QIODevice::WriteOnly));
+        vhdr.write("Brain Vision Data Exchange Header File Version 1.0\n[Common Infos]\nDataFile=" + base + ".eeg\n" + codepage + "NumberOfChannels=2\nSamplingInterval=1000\n[Binary Infos]\nBinaryFormat=INT_16\n[Channel Infos]\n"
+                                                                                                                                  "Ch1=Fp\xFC,,0.1,\xB5V\nCh2=" +
+                   second + ",,1,\xB5V\n");
+        vhdr.close();
+        QFile eeg(dir.filePath(QString::fromLatin1(base) + ".eeg"));
+        QVERIFY(eeg.open(QIODevice::WriteOnly));
+        for (const qint16 v : {0, 1, 2, 3}) {
+            eeg.write(reinterpret_cast<const char*>(&v), sizeof(v));
+        }
+        eeg.close();
+        BrainVisionReader reader;
+        QVERIFY(reader.open(stdpath(vhdr.fileName())));
+        const FIFFLIB::FiffInfo info = reader.info();
+        QCOMPARE(info.ch_names, (std::vector<std::string>{"Fp\xC3\xBC", expected}));
+        QCOMPARE(info.chs[0].kind, FIFFV_EEG_CH);
+        QCOMPARE(reader.channel_infos()[0].unit, std::string("\xC2\xB5V"));
+        Eigen::MatrixXf expectedData(2, 2);
+        expectedData << 0.0f, 2e-7f, 1e-6f, 3e-6f;
+        QVERIFY2(reader.read_raw_segment(0, 2).isApprox(expectedData), base.constData());
+    }
     BrainVisionReader probe;
     QVERIFY(probe.supports_extension(".VHDR") && probe.supports_extension(".ahdr") && !probe.supports_extension(".edf"));
     QCOMPARE(probe.format_name(), std::string("BrainVision"));
