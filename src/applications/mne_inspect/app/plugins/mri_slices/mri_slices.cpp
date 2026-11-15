@@ -65,19 +65,6 @@ QImage sliceImageToQImage(const MriSliceImage& slice)
     return img;
 }
 
-DISP3DLIB::SliceOrientation toDispOrientation(MRILIB::SliceOrientation o)
-{
-    switch (o) {
-        case MRILIB::SliceOrientation::Axial:
-            return DISP3DLIB::SliceOrientation::Axial;
-        case MRILIB::SliceOrientation::Coronal:
-            return DISP3DLIB::SliceOrientation::Coronal;
-        case MRILIB::SliceOrientation::Sagittal:
-            return DISP3DLIB::SliceOrientation::Sagittal;
-    }
-    return DISP3DLIB::SliceOrientation::Axial;
-}
-
 } // anonymous namespace
 
 //=============================================================================================================
@@ -294,7 +281,7 @@ void MriSlicesPlugin::rebuildSlices()
         const MriSliceImage& src = ortho[i];
         auto so = std::make_unique<SliceObject>();
         so->setSliceToWorld(sliceImageToQImage(src),
-                            toDispOrientation(src.orientation),
+                            src.orientation,
                             src.sliceIndex,
                             src.sliceToRas.cast<double>());
         m_slices[i] = std::move(so);

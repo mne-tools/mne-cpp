@@ -168,6 +168,7 @@ set(MNE_LIBS_REQUIRED
     mne_mne
     mne_fwd
     mne_inv
+    mne_mri
     mne_disp
     mne_connectivity
 )

@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
     Matrix4d voxelToWorld = Matrix4d::Identity(); // 1 mm voxels, origin at the volume centre
     voxelToWorld.block<3, 1>(0, 3) = Vector3d(-128.0, -128.0, -128.0);
     SliceObject slice;
-    slice.setSlice(axial, SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
+    slice.setSlice(axial, MRILIB::SliceOrientation::Axial, 128, voxelToWorld); // the z = 0 mm plane
     slice.setWindowLevel(100.0f, 200.0f);
     QVector<float> quad; // 4 corners x (x, y, z, u, v)
     slice.generateQuadVertices(quad);

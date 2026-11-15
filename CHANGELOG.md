@@ -556,6 +556,11 @@ aliases; replace the old spelling as below.
   `std::optional<std::chrono::sys_time<std::chrono::microseconds>>` instead of
   a `QDateTime`, empty for the all-zero placeholder. New
   `FiffInfo::set_meas_date(time)` sets the date from a UTC time point.
+- `DISP3DLIB::SliceOrientation` is removed; `SliceObject` takes the
+  `MRILIB::SliceOrientation` that `MriSlicer` already returns (same
+  enumerators and values), so no conversion is needed between them.
+  Migration: replace `DISP3DLIB::SliceOrientation` with
+  `MRILIB::SliceOrientation`.
 - New `BASELIB::CborValue`, `CborArray`, `CborMap` and `CborParseError`
   (`base/cbor.h`): CBOR (RFC 8949) values in standard C++, the counterpart
   of Qt's `QCborValue`, `QCborArray` and `QCborMap`, with the same encoded

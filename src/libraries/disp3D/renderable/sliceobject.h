@@ -31,6 +31,8 @@
 
 #include "../disp3D_global.h"
 
+#include <mri/mri_slicer.h>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -52,21 +54,6 @@
 
 namespace DISP3DLIB
 {
-
-//=============================================================================================================
-/**
- * @brief Orientation for an orthogonal MRI slice.
- */
-enum class SliceOrientation
-{
-    Axial = 0,   /**< XY plane (Z = const). */
-    Coronal = 1, /**< XZ plane (Y = const). */
-    Sagittal = 2 /**< YZ plane (X = const). */
-};
-
-static_assert(static_cast<int>(SliceOrientation::Axial) == 0, "MRI axial slice slot must be 0");
-static_assert(static_cast<int>(SliceOrientation::Coronal) == 1, "MRI coronal slice slot must be 1");
-static_assert(static_cast<int>(SliceOrientation::Sagittal) == 2, "MRI sagittal slice slot must be 2");
 
 //=============================================================================================================
 /**
@@ -93,7 +80,7 @@ public:
      * @param[in] voxelToWorld  4×4 voxel-to-RAS transform from the MRI header.
      */
     void setSlice(const QImage& image,
-                  SliceOrientation orientation,
+                  MRILIB::SliceOrientation orientation,
                   int sliceIndex,
                   const Eigen::Matrix4d& voxelToWorld);
 
@@ -107,7 +94,7 @@ public:
      * @param[in] imageToWorld  4x4 transform from image coordinates (column, row, 0) to RAS.
      */
     void setSliceToWorld(const QImage& image,
-                         SliceOrientation orientation,
+                         MRILIB::SliceOrientation orientation,
                          int sliceIndex,
                          const Eigen::Matrix4d& imageToWorld);
 
@@ -115,7 +102,7 @@ public:
     /**
      * @return Current slice orientation.
      */
-    SliceOrientation orientation() const;
+    MRILIB::SliceOrientation orientation() const;
 
     //=========================================================================================================
     /**
@@ -186,7 +173,7 @@ public:
 
 private:
     QImage m_image;
-    SliceOrientation m_orientation = SliceOrientation::Axial;
+    MRILIB::SliceOrientation m_orientation = MRILIB::SliceOrientation::Axial;
     int m_sliceIndex = 0;
     Eigen::Matrix4d m_voxelToWorld = Eigen::Matrix4d::Identity();
     float m_windowCenter = 0.5f;

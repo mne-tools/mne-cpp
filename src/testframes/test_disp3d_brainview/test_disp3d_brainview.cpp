@@ -1502,7 +1502,7 @@ void TestDisp3dBrainView::brainRenderer_nullRhi()
     QImage mri(4, 3, QImage::Format_Grayscale8);
     mri.fill(128);
     SliceObject slice;
-    slice.setSlice(mri, SliceOrientation::Axial, 1, Eigen::Matrix4d::Identity());
+    slice.setSlice(mri, MRILIB::SliceOrientation::Axial, 1, Eigen::Matrix4d::Identity());
     VideoOverlay video;
     video.setEnabled(true);
     QImage frame(8, 4, QImage::Format_RGB32);
@@ -2539,8 +2539,8 @@ void TestDisp3dBrainView::sliceObject_cornersAndQuad()
 
     SliceObject slice;
     // Axial slice 5: columns along x, rows along y, at z = -30 + 2 * 5
-    slice.setSlice(image, SliceOrientation::Axial, 5, voxelToWorld);
-    QCOMPARE(slice.orientation(), SliceOrientation::Axial);
+    slice.setSlice(image, MRILIB::SliceOrientation::Axial, 5, voxelToWorld);
+    QCOMPARE(slice.orientation(), MRILIB::SliceOrientation::Axial);
     QCOMPARE(slice.sliceIndex(), 5);
     QCOMPARE(slice.image().size(), QSize(4, 3));
     QVector<QVector3D> points = corners(slice);
@@ -2552,17 +2552,17 @@ void TestDisp3dBrainView::sliceObject_cornersAndQuad()
     QCOMPARE(slice.sliceToWorld().map(QVector3D(1.0f, 1.0f, 0.0f)), points[3]);
 
     // Coronal: columns along x, rows along z; sagittal: columns along y, rows along z
-    slice.setSlice(image, SliceOrientation::Coronal, 1, voxelToWorld);
+    slice.setSlice(image, MRILIB::SliceOrientation::Coronal, 1, voxelToWorld);
     points = corners(slice);
     QCOMPARE(points[0], QVector3D(-10.0f, -18.0f, -30.0f));
     QCOMPARE(points[3], QVector3D(-2.0f, -18.0f, -24.0f));
-    slice.setSlice(image, SliceOrientation::Sagittal, 2, voxelToWorld);
+    slice.setSlice(image, MRILIB::SliceOrientation::Sagittal, 2, voxelToWorld);
     points = corners(slice);
     QCOMPARE(points[0], QVector3D(-6.0f, -20.0f, -30.0f));
     QCOMPARE(points[3], QVector3D(-6.0f, -12.0f, -24.0f));
 
     // An explicit image-to-world transform places the image plane directly
-    slice.setSliceToWorld(image, SliceOrientation::Axial, 0, voxelToWorld);
+    slice.setSliceToWorld(image, MRILIB::SliceOrientation::Axial, 0, voxelToWorld);
     points = corners(slice);
     QCOMPARE(points[3], QVector3D(-2.0f, -14.0f, -30.0f));
 

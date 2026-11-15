@@ -37,7 +37,7 @@ SliceObject::SliceObject()
 //=============================================================================================================
 
 void SliceObject::setSlice(const QImage& image,
-                           SliceOrientation orientation,
+                           MRILIB::SliceOrientation orientation,
                            int sliceIndex,
                            const Eigen::Matrix4d& voxelToWorld)
 {
@@ -60,21 +60,21 @@ void SliceObject::setSlice(const QImage& image,
     Eigen::Vector4d c11 = Eigen::Vector4d::Zero();
 
     switch (m_orientation) {
-        case SliceOrientation::Axial:
+        case MRILIB::SliceOrientation::Axial:
             //  u → X,  v → Y,  slice along Z
             c00 << 0, 0, sliceIndex, 1;
             c10 << w, 0, sliceIndex, 1;
             c01 << 0, h, sliceIndex, 1;
             c11 << w, h, sliceIndex, 1;
             break;
-        case SliceOrientation::Coronal:
+        case MRILIB::SliceOrientation::Coronal:
             //  u → X,  v → Z,  slice along Y
             c00 << 0, sliceIndex, 0, 1;
             c10 << w, sliceIndex, 0, 1;
             c01 << 0, sliceIndex, h, 1;
             c11 << w, sliceIndex, h, 1;
             break;
-        case SliceOrientation::Sagittal:
+        case MRILIB::SliceOrientation::Sagittal:
             //  u → Y,  v → Z,  slice along X
             c00 << sliceIndex, 0, 0, 1;
             c10 << sliceIndex, w, 0, 1;
@@ -98,7 +98,7 @@ void SliceObject::setSlice(const QImage& image,
 //=============================================================================================================
 
 void SliceObject::setSliceToWorld(const QImage& image,
-                                  SliceOrientation orientation,
+                                  MRILIB::SliceOrientation orientation,
                                   int sliceIndex,
                                   const Eigen::Matrix4d& imageToWorld)
 {
@@ -122,7 +122,7 @@ void SliceObject::setSliceToWorld(const QImage& image,
 
 //=============================================================================================================
 
-SliceOrientation SliceObject::orientation() const
+MRILIB::SliceOrientation SliceObject::orientation() const
 {
     return m_orientation;
 }

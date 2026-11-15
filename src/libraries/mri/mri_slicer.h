@@ -72,13 +72,13 @@ class MriVolData;
 
 //=============================================================================================================
 /**
- * Slice orientation for orthogonal MRI volume slicing.
+ * Slice orientation for orthogonal MRI volume slicing; the values are the slice slots of a three-slice view.
  */
 enum class SliceOrientation
 {
-    Axial,
-    Coronal,
-    Sagittal
+    Axial = 0,   /**< XY plane (Z = const). */
+    Coronal = 1, /**< XZ plane (Y = const). */
+    Sagittal = 2 /**< YZ plane (X = const). */
 };
 
 //=============================================================================================================
