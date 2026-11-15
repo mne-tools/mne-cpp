@@ -21,7 +21,7 @@ BrainVision is the most common format for iEEG (sEEG/ECoG) recordings in BIDS da
 
 ```cpp title="src/examples/ex_bids/main.cpp"
 BrainVisionReader brainVision;
-const bool bvOpen = brainVision.open(vhdr);
+const bool bvOpen = brainVision.open(QString::fromStdString(BASELIB::utf8FromPath(vhdr)));
 const MatrixXf bvHead = brainVision.readRawSegment(0, 200); // calibrated, volts
 ```
 
@@ -204,7 +204,7 @@ BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round 
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 121"
 BrainVisionReader brainVision;
-const bool bvOpen = brainVision.open(vhdr);
+const bool bvOpen = brainVision.open(QString::fromStdString(BASELIB::utf8FromPath(vhdr)));
 const MatrixXf bvHead = brainVision.readRawSegment(0, 200); // calibrated, volts
 // mne.io.read_raw_brainvision: 32 channels at 1000 Hz, 7900 samples; data[0, 0] = -23.5 uV, data[5, 100] = 38.5 uV
 ok &= expect(bvOpen && brainVision.getChannelCount() == 32 && brainVision.getSampleCount() == 7900 && brainVision.getFrequency() == 1000.0f && near(bvHead(0, 0), -2.35e-5, 1e-4) && near(bvHead(5, 100), 3.85e-5, 1e-4),

@@ -7,7 +7,7 @@ sidebar_position: 5
 
 # Class Members
 
-Index of 6544 public class members (functions, variables, typedefs, enums) across all documented classes.
+Index of 6543 public class members (functions, variables, typedefs, enums) across all documented classes.
 
 **Jump to:** [A](#a) · [B](#b) · [C](#c) · [D](#d) · [E](#e) · [F](#f) · [G](#g) · [H](#h) · [I](#i) · [J](#j) · [K](#k) · [L](#l) · [M](#m) · [N](#n) · [O](#o) · [P](#p) · [Q](#q) · [R](#r) · [S](#s) · [T](#t) · [U](#u) · [V](#v) · [W](#w) · [X](#x) · [Y](#y) · [Z](#z)
 
@@ -50,7 +50,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **acquire** `[fn]` in [AcqReader](/docs/api/acq/acq-reader) — Waits until at least `minSamples` are available (Latest: the newest `minSamples`), then returns a view of up to `maxSamples`.
 - **AcquiredPoints** `[fn]` in [AcquiredPoints](/docs/api/acq/acquired-points)
 - **acquiredPoints** `[fn]` in [PolhemusCoregistration](/docs/api/acq/polhemus-coregistration)
-- **acquisition** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Acquisition label.
+- **acquisition** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **AcqViewLease** `[fn]` in [AcqViewLease](/docs/api/acq/acq-view-lease)
 - **AcqViewLease** `[fn]` in [AcqViewLease](/docs/api/acq/acq-view-lease)
 - **AcqViewLease** `[fn]` in [AcqViewLease](/docs/api/acq/acq-view-lease)
@@ -365,11 +365,9 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **bg_color** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Background color (RGB).
 - **BIDSPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Constructs an empty [`BIDSPath`](/docs/api/bids/bids-path).
 - **BIDSPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Constructs a [`BIDSPath`](/docs/api/bids/bids-path) with the most common entities.
-- **BIDSPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Copy constructor.
 - **BidsRawData** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Default constructor.
 - **BidsRawData** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data)
 - **BidsRawData** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data)
-- **BidsTsv** `[fn]` in [BidsTsv](/docs/api/bids/bids-tsv)
 - **bidsVersion** `[var]` in [BidsDatasetDescription](/docs/api/bids/bids-dataset-description) — BIDS specification version, e.g.
 - **BidsView** `[fn]` in [BidsView](/docs/api/disp/bids-view) — Constructs the DataManagerView.
 - **BidsViewModel** `[fn]` in [BidsViewModel](/docs/api/disp/bids-view-model) — Constructs the Analyze Data Model.
@@ -596,6 +594,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **channels** `[fn]` in [IirStreamFilter](/docs/api/dsp/iir-stream-filter)
 - **channels** `[var]` in `NatusSimulation`
 - **channels** `[fn]` in `TmsiTransport`
+- **channels_tsv_path** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the channels.tsv sidecar.
 - **channelScrollRequested** `[signal]` in [ChannelLabelPanel](/docs/api/disp/channel-label-panel) — Emitted while the user drags vertically on the panel.
 - **channelSelectionChanged** `[fn]` in [AverageLayoutView](/docs/api/disp/average-layout-view) — Sets the currently viewable channels using the corrent name and location parameters.
 - **channelSelectionManagerChanged** `[fn]` in [AverageLayoutView](/docs/api/disp/average-layout-view) — call this whenever the external channel selection manager changes
@@ -603,7 +602,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **channelsMappedToLayout** `[signal]` in [ChannelInfoModel](/docs/api/disp/channel-info-model) — Emit this signal whenever channels where mapped to a layout.
 - **channelStride** `[var]` in [AcqExternalBuffer](/docs/api/acq/acq-external-buffer) — Planar buffers: bytes between channel rows; 0 = capacity * bytesPerSample.
 - **channelStride** `[var]` in [AcqPart](/docs/api/acq/acq-part) — Bytes between consecutive channels of one sample.
-- **channelsTsvPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the channels.tsv sidecar.
 - **chClass** `[var]` in [FiffCov](/docs/api/fiff/fiff-cov) — Channel classification vector.
 - **chdef** `[var]` in [MNEChSelection](/docs/api/mne/mne-ch-selection) — Channel definitions (may contain regular expressions).
 - **check_ch_names** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Verify that inverse-operator channels are present in the measurement info.
@@ -1022,7 +1020,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **coordFrame** `[var]` in `AcqFiffChannel` — FIFFV_COORD_*.
 - **coordinateSystem** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Coordinate system from *_coordsystem.json.
 - **coordinateSystem** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation)
-- **coordsystemJsonPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the coordsystem.json sidecar.
+- **coordsystem_json_path** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the coordsystem.json sidecar.
 - **copy_processing_history** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Copy the FIFF processing history block from one file to another.
 - **copy_realtime_file** `[fn]` in [FiffFileSharer](/docs/api/fiff/fiff-file-sharer) — Producer: copies an unfinished FIFF recording into the shared directory and closes its raw block.
 - **copy_tree** `[fn]` in [FiffDirNode](/docs/api/fiff/fiff-dir-node) — Copies directory subtrees from fidin to fidout.
@@ -1063,6 +1061,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **create_meg_coil** `[fn]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Create a MEG coil definition using a database of templates Change the coordinate frame if so desired.
 - **create_meg_coils** `[fn]` in [FwdCoilSet](/docs/api/fwd/fwd-coil-set) — Create a MEG coil set definition using a database of templates Change the coordinate frame if so desired.
 - **create_meg_multi_thread_duplicate** `[fn]` in [FwdThreadArg](/docs/api/fwd/fwd-thread-arg) — Create a thread-safe duplicate for MEG parallel forward computation.
+- **create_reader** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Create the appropriate format reader for a given file extension.
 - **create_source_space** `[fn]` in [MNESourceSpace](/docs/api/mne/mne-source-space) — Create a new source space with np vertices and all associated data initialized to defaults.
 - **create_sparse** `[fn]` in [MNECovMatrix](/docs/api/mne/mne-cov-matrix) — Create a sparse covariance matrix.
 - **create_sparse_rcs** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Create a sparse RCS matrix from row-based data.
@@ -1075,7 +1074,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **createFromData** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface) — Create surface from raw vertex, normal and triangle data.
 - **createInterpolationMat** `[fn]` in [Interpolation](/docs/api/disp3-d/interpolation) — createInterpolationMat Calculates the weight matrix for interpolation.
 - **createPlate** `[fn]` in [MeshFactory](/docs/api/disp3-d/mesh-factory) — Create a thin oriented rectangular plate (used for MEG magnetometers).
-- **createReader** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Create the appropriate format reader for a given file extension.
 - **createSphere** `[fn]` in [MeshFactory](/docs/api/disp3-d/mesh-factory) — Create a subdivided icosahedron sphere.
 - **critical** `[fn]` in [Log](/docs/api/base/log) — As `debug()`, at critical level.
 - **crop** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations)
@@ -1157,7 +1155,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **datasetName** `[var]` in [AcqBidsPath](/docs/api/acq/acq-bids-path) — Name in a newly created dataset_description.json.
 - **datasetName** `[var]` in `WriteOptions` — Name for dataset_description.json (defaults to "[Unspecified]").
 - **datasetType** `[var]` in [BidsDatasetDescription](/docs/api/bids/bids-dataset-description) — "raw" or "derivative" (RECOMMENDED).
-- **datatype** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — BIDS datatype string.
+- **datatype** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **dataUpdate** `[fn]` in [ButterflyView](/docs/api/disp/butterfly-view) — Perform a data update.
 - **date** `[var]` in [BrainVisionMarker](/docs/api/bids/brain-vision-marker) — Optional date/time (for New Segment markers).
 - **dBadPercent** `[var]` in [AnnotateAmplitudeParams](/docs/api/dsp/annotate-amplitude-params) — A channel above or below a threshold for at least this percentage of the recording is returned as bad.
@@ -1218,7 +1216,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **description** `[fn]` in `BabyMegTransport`
 - **description** `[var]` in [BidsChannel](/docs/api/bids/bids-channel) — Free-text description (OPTIONAL).
 - **description** `[var]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — Description of the coordinate system (RECOMMENDED).
-- **description** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Description label.
+- **description** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **description** `[fn]` in `BrainAmpTransport`
 - **description** `[fn]` in `BrainFlowLibrary`
 - **description** `[var]` in [BrainVisionMarker](/docs/api/bids/brain-vision-marker) — Description (e.g., "S253", "R255").
@@ -1489,7 +1487,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **electrodeContactClicked** `[signal]` in [BrainView](/docs/api/disp3-d/brain-view) — Emitted when a click lands on an electrode contact.
 - **ElectrodeObject** `[fn]` in [ElectrodeObject](/docs/api/disp3-d/electrode-object)
 - **electrodes** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Electrode positions from *_electrodes.tsv.
-- **electrodesTsvPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the electrodes.tsv sidecar.
+- **electrodes_tsv_path** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the electrodes.tsv sidecar.
 - **embedded** `[var]` in [MnaFileRef](/docs/api/mna/mna-file-ref) — Whether data is embedded in the container.
 - **emitChanged** `[fn]` in [AcquiredPoints](/docs/api/acq/acquired-points)
 - **empty** `[fn]` in [AcqBlockView](/docs/api/acq/acq-block-view)
@@ -1611,10 +1609,10 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **events** `[var]` in [CovDefinition](/docs/api/mne/cov-definition) — The interesting events.
 - **events** `[var]` in [FiffEvents](/docs/api/fiff/fiff-events) — Event matrix (nEvents x 3): [sample, before, after].
 - **events** `[var]` in [MNEEventList](/docs/api/mne/mne-event-list) — The events.
+- **events_tsv_path** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the events.tsv sidecar.
 - **eventSample** `[var]` in [MNEEpochData](/docs/api/mne/mne-epoch-data) — The sample index of the triggering event.
 - **eventsLost** `[var]` in [AcqReaderStats](/docs/api/acq/acq-reader-stats) — Events this reader did not receive: overwritten, attached to lost or overrun samples, or pushed after it had acquired their sample.
 - **eventsOutFiles** `[var]` in [ProcessingSettings](/docs/api/mne/processing-settings) — Save events to these files.
-- **eventsTsvPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the events.tsv sidecar.
 - **eventsVisible** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view)
 - **eventsVisible** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view)
 - **eventsVisibleToggled** `[signal]` in [ChannelDataView](/docs/api/disp/channel-data-view)
@@ -1638,7 +1636,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **executeNode** `[fn]` in [MnaGraphExecutor](/docs/api/mna/mna-graph-executor) — Execute a single node (for testing/debugging).
 - **executionOrder** `[var]` in `StreamContext` — Topological order used for startup/shutdown.
 - **exg** `[var]` in `TmsiSimulation` — ExG inputs; four bipolar and four auxiliary inputs, the digital word and the test ramp follow.
-- **exists** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Checks whether the file at `filePath()` exists on disk.
+- **exists** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Checks whether the file at `file_path()` exists on disk.
 - **exit_code** `[var]` in [PythonRunnerResult](/docs/api/pybridge/python-runner-result) — Process exit code (-1 if it never started).
 - **Expected** `[fn]` in [Expected](/docs/api/base/expected)
 - **experimenter** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — Experimenter name.
@@ -1647,7 +1645,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **exponent** `[var]` in `TmsiChannel` — See gain.
 - **expression** `[var]` in [MnaParamBinding](/docs/api/mna/mna-param-binding) — Formula string, e.g. "clamp(ref('noise_est_01/snr') * 0.1, 0.01, 1.0)".
 - **expression** `[var]` in [MnaVerificationCheck](/docs/api/mna/mna-verification-check) — [`MnaParamTree`](/docs/api/mna/mna-param-tree) expression over attributes, inputs and (post) outputs: "rank &gt; 0".
-- **extension** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — File extension.
+- **extension** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **extensions** `[var]` in [AcqStreamInfo](/docs/api/acq/acq-stream-info) — Bridge payloads for lossless round trips.
 - **extent** `[fn]` in [MNELayout](/docs/api/mne/mne-layout) — Returns the drawing area given on the first line of the file.
 - **external** `[var]` in [AcqStreamOptions](/docs/api/acq/acq-stream-options) — Adopt this buffer instead of allocating one.
@@ -1776,6 +1774,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **file** `[var]` in [FiffRawData](/docs/api/fiff/fiff-raw-data) — replaces fid.
 - **file** `[fn]` in [Log](/docs/api/base/log)
 - **file_id** `[var]` in [FiffInfo](/docs/api/fiff/fiff-info) — File ID.
+- **file_path** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Constructs the full file path: `directory()` / `basename()`.
 - **FileByteStream** `[fn]` in [FileByteStream](/docs/api/base/file-byte-stream)
 - **filename** `[var]` in [AverageDescription](/docs/api/fiff/average-description) — Output file.
 - **filename** `[var]` in [CovDescription](/docs/api/mne/cov-description) — Output file.
@@ -1793,7 +1792,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **fileName** `[var]` in [MriSlice](/docs/api/mri/mri-slice) — Source file name.
 - **fileName** `[var]` in [MriVolData](/docs/api/mri/mri-vol-data) — Name of the source file.
 - **fileNameChanged** `[signal]` in [ProjectSettingsView](/docs/api/disp/project-settings-view)
-- **filePath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Constructs the full file path: `directory()` + `basename()`.
 - **filePath** `[fn]` in [FsAnnotation](/docs/api/fs/fs-annotation) — annotation file path
 - **filePath** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — path to surf directuryt
 - **files** `[fn]` in [AcqRecorder](/docs/api/acq/acq-recorder)
@@ -2784,6 +2782,8 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **is_skip** `[var]` in [MNERawBufDef](/docs/api/mne/mne-raw-buf-def) — True if this buffer represents a data skip.
 - **is_string** `[fn]` in [JsonValue](/docs/api/base/json-value)
 - **is_undefined** `[fn]` in [JsonValue](/docs/api/base/json-value)
+- **is_valid** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Returns true if the data was loaded successfully.
+- **is_valid_entity_value** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Validates entity values: BIDS labels are alphanumeric ASCII.
 - **iSampleFreq** `[fn]` in [InvHpiModelParameters](/docs/api/inv/inv-hpi-model-parameters)
 - **isBad** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base)
 - **isBrainSurfaceKey** `[fn]` in [SubView](/docs/api/disp3-d/sub-view) — True when `key` identifies a brain-tissue surface (lh_/rh_) as opposed to BEM, sensor, digitizer, or source-space geometry.
@@ -2844,11 +2844,9 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **issueVideoOverlayDraw** `[fn]` in [BrainRenderer](/docs/api/disp3-d/brain-renderer) — Draw a video overlay prepared with `prepareVideoOverlayDraw()`.
 - **isValid** `[fn]` in [AcqReader](/docs/api/acq/acq-reader)
 - **isValid** `[fn]` in [AcqStream](/docs/api/acq/acq-stream)
-- **isValid** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Returns true if the data was loaded successfully.
 - **isValid** `[fn]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Returns true if this beamformer contains valid filter weights.
 - **isValid** `[fn]` in [MriVolData](/docs/api/mri/mri-vol-data) — Returns whether this volume contains valid data.
 - **isValidEeg** `[fn]` in [FiffChInfo](/docs/api/fiff/fiff-ch-info) — Check whether this channel has a valid EEG electrode position.
-- **isValidEntityValue** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Validates entity values: BIDS labels are alphanumeric ASCII.
 - **isVideoOverlayEnabled** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view)
 - **isView** `[fn]` in [MlTensor](/docs/api/ml/ml-tensor)
 - **isViewportEnabled** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Check if a multi-view viewport is enabled.
@@ -3888,7 +3886,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **operator=** `[fn]` in [AcqViewLease](/docs/api/acq/acq-view-lease)
 - **operator=** `[fn]` in [AcqWriter](/docs/api/acq/acq-writer)
 - **operator=** `[fn]` in [AcqWriter](/docs/api/acq/acq-writer)
-- **operator=** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **operator=** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data)
 - **operator=** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data)
 - **operator=** `[fn]` in [CircularBuffer](/docs/api/base/circular-buffer)
@@ -3939,6 +3936,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **operator=** `[fn]` in [ThreadPool](/docs/api/base/thread-pool)
 - **operator=** `[fn]` in [UdpSocket](/docs/api/com/udp-socket)
 - **operator=** `[fn]` in [UdpSocket](/docs/api/com/udp-socket)
+- **operator==** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **operator==** `[fn]` in [ChannelSelection](/docs/api/channels/channel-selection)
 - **operator==** `[fn]` in `EegoChannel`
 - **operator==** `[fn]` in [FiffAnnotation](/docs/api/fiff/fiff-annotation)
@@ -4265,7 +4263,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **probeStation** `[fn]` in [PolhemusCoregistration](/docs/api/acq/polhemus-coregistration)
 - **process** `[fn]` in [IirStreamFilter](/docs/api/dsp/iir-stream-filter) — Filters `block` (channels x samples) in place, continuing from the previous block.
 - **process** `[slot]` in [StcLoadingWorker](/docs/api/disp3-d/stc-loading-worker) — Perform the loading and computation work.
-- **processing** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Processing label.
+- **processing** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **processingDescription** `[var]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — How coordinates were obtained (RECOMMENDED).
 - **ProcessingMode** `[enum]` in [AbstractView](/docs/api/disp/abstract-view)
 - **procrustes_align** `[fn]` in [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) — Performs a Procrustes alignment between two sets of corresponding 3D points.
@@ -4495,6 +4493,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **read_from_node** `[fn]` in [MNEProjOp](/docs/api/mne/mne-proj-op) — Read all linear projection items from a FIFF tree node.
 - **read_from_node** `[fn]` in [MNESssData](/docs/api/mne/mne-sss-data) — Read the SSS data from the given node of an open fiff stream Refactored: mne_read_from_node (mne_sss_data.c).
 - **read_geometry** `[fn]` in [FsSurface](/docs/api/fs/fs-surface) — Reads the vertices and triangles of any FreeSurfer surface file (triangle or quad format), like nibabel.freesurfer.read_geometry but in meters; the file name need not name a hemisphere, so BEM surfaces such as inner_skull.surf can be read too.
+- **read_json** `[fn]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — Read a BIDS *_coordsystem.json file.
 - **read_json** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Reads annotations from a JSON file (\{"annotations": [\{"onset", "duration", "description", "channel_names", "comment", "extras"\}, ...]\}).
 - **read_label** `[fn]` in [MNESourceSpace](/docs/api/mne/mne-source-space) — Reads the vertex numbers of a FreeSurfer label file (MNE-C `read_label`).
 - **read_localite** `[fn]` in [FiffDigMontage](/docs/api/fiff/fiff-dig-montage) — Reads a Localite .csv file ("#,name,x,y,z" in millimetres after a header row), as mne.channels.read_dig_localite does.
@@ -4515,6 +4514,10 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **read_tag_data** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Reads the payload of a tag whose header `read_tag_info()` has read.
 - **read_tag_info** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Reads the header of the tag at the current position.
 - **read_text** `[fn]` in [MNEEventList](/docs/api/mne/mne-event-list) — Reads an MNE-C text event file (MNE-C `mne_load_events`).
+- **read_tsv** `[fn]` in [BidsChannel](/docs/api/bids/bids-channel) — Read a BIDS *_channels.tsv file.
+- **read_tsv** `[fn]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Read a BIDS *_electrodes.tsv file.
+- **read_tsv** `[fn]` in [BidsEvent](/docs/api/bids/bids-event) — Read a BIDS *_events.tsv file.
+- **read_tsv** `[fn]` in [BidsTsv](/docs/api/bids/bids-tsv) — Reads a TSV file into an ordered list of row maps.
 - **read_w** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Reads a .w file (one value per vertex), as mne.read_w does.
 - **readBadChannelsFromFile** `[fn]` in [FiffInfoBase](/docs/api/fiff/fiff-info-base) — Read bad channel names from a plain text file (one name per line, '#' comments skipped).
 - **readBids** `[fn]` in [IeegImplantation](/docs/api/ieeg/ieeg-implantation) — Read a BIDS iEEG `*_electrodes.tsv`.
@@ -4526,7 +4529,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **reader** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — The underlying format reader (keeps file open).
 - **readFilter** `[fn]` in [FilterIO](/docs/api/dsp/filter-io) — Reads a given txt file and scans it for filter coefficients.
 - **readHeadPos** `[fn]` in [MaxwellMovementComp](/docs/api/dsp/maxwell-movement-comp) — Read head positions from a file.
-- **readJson** `[fn]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — Read a BIDS *_coordsystem.json file.
 - **readMegEegChannels** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Read MEG and EEG channel information from a FIFF file, excluding bad channels.
 - **readMniTransform** `[fn]` in [FiffCoordTransSet](/docs/api/fiff/fiff-coord-trans-set) — Reads the scanner RAS -&gt; MNI Talairach transform of a FreeSurfer/MNI .xfm file (MNE-C read_mni_coord_transform_file).
 - **ReadMode** `[enum]` in [AcqReader](/docs/api/acq/acq-reader) — Consumption mode.
@@ -4535,10 +4537,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **readRawSegment** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Read a segment of raw data.
 - **readsLm** `[fn]` in [Warp](/docs/api/math/warp) — Read electrode positions from MRI Database.
 - **readText** `[fn]` in [MNEDerivSet](/docs/api/mne/mne-deriv-set) — Reads MNE-C's text syntax (`mne_make_derivations` in).
-- **readTsv** `[fn]` in [BidsChannel](/docs/api/bids/bids-channel) — Read a BIDS *_channels.tsv file.
-- **readTsv** `[fn]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Read a BIDS *_electrodes.tsv file.
-- **readTsv** `[fn]` in [BidsEvent](/docs/api/bids/bids-event) — Read a BIDS *_events.tsv file.
-- **readTsv** `[fn]` in [BidsTsv](/docs/api/bids/bids-tsv) — Reads a TSV file into an ordered list of row maps.
 - **realtime** `[var]` in `BabyMegSimulation`
 - **realtime** `[var]` in `BrainAmpSimulation`
 - **realtime** `[var]` in `EegoSimulation`
@@ -4556,7 +4554,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **recompStatusChanged** `[signal]` in [FwdSettingsView](/docs/api/disp/fwd-settings-view) — Emit this signal whenever recomputation checkbox changed.
 - **recomputeInterpolation** `[fn]` in [RtSourceDataController](/docs/api/disp3-d/rt-source-data-controller) — Trigger an asynchronous recomputation of the interpolation matrices.
 - **recomputeMapping** `[fn]` in [RtSensorDataController](/docs/api/disp3-d/rt-sensor-data-controller) — Trigger an asynchronous recomputation of the mapping matrix.
-- **recording** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Recording label.
+- **recording** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **recordings** `[var]` in [MnaSession](/docs/api/mna/mna-session) — Recordings in this session.
 - **recordingTimerStateChanged** `[signal]` in [ProjectSettingsView](/docs/api/disp/project-settings-view)
 - **recordingType** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — "continuous", "epoched", or "discontinuous" (RECOMMENDED).
@@ -4712,7 +4710,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **role** `[var]` in [MnaFileRef](/docs/api/mna/mna-file-ref) — Role of the file.
 - **roles** `[var]` in `BrainFlowDescription` — Rows by role, e.g.
 - **root** `[var]` in [AcqBidsPath](/docs/api/acq/acq-bids-path) — Dataset root; created if missing.
-- **root** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — BIDS dataset root path.
+- **root** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **root** `[var]` in `NeuromagDacq` — Directory with the server's sockets/, shmem/ and raw/.
 - **rot** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Rotation angles of the MRI (in radians).
 - **rot** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — Rotation angles of the MRI (in radians).
@@ -4765,7 +4763,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **RtSourceDataWorker** `[fn]` in [RtSourceDataWorker](/docs/api/disp3-d/rt-source-data-worker) — Constructor.
 - **RtSourceInterpolationMatWorker** `[fn]` in [RtSourceInterpolationMatWorker](/docs/api/disp3-d/rt-source-interpolation-mat-worker) — Constructor.
 - **run** `[var]` in [AcqBidsPath](/docs/api/acq/acq-bids-path) — Run label without "run-"; empty for none.
-- **run** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Run index.
+- **run** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **run** `[fn]` in [ICA](/docs/api/dsp/ica) — Fit FastICA on the given data matrix.
 - **run** `[fn]` in [MLTrainer](/docs/api/ml/ml-trainer) — Run a training script.
 - **run** `[fn]` in [PicardIca](/docs/api/dsp/picard-ica) — Run the Picard [`ICA`](/docs/api/dsp/ica) algorithm.
@@ -5007,9 +5005,10 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **serials** `[fn]` in `GusbampTransport`
 - **seriesCount** `[fn]` in [LinePlot](/docs/api/disp/line-plot) — Returns the number of series in the plot.
 - **session** `[var]` in [AcqBidsPath](/docs/api/acq/acq-bids-path) — Session label without "ses-"; empty for none.
-- **session** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Session label (without "ses-").
+- **session** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **sessions** `[var]` in [MnaSubject](/docs/api/mna/mna-subject) — Sessions for this subject.
 - **set** `[var]` in [FwdCompData](/docs/api/fwd/fwd-comp-data) — The compensation data set.
+- **set_acquisition** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the acquisition label.
 - **set_active** `[fn]` in [NetworkEdge](/docs/api/connectivity/network-edge) — Sets the active flag.
 - **set_array** `[fn]` in [JsonDocument](/docs/api/base/json-document)
 - **set_comp** `[fn]` in [MNECTFCompDataSet](/docs/api/mne/mnectf-comp-data-set) — Write the compensation grade into the upper 16 bits of coil_type for all MEG channels in the list.
@@ -5017,7 +5016,10 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **set_config** `[fn]` in [PythonRunner](/docs/api/pybridge/python-runner) — Replaces the configuration.
 - **set_current_comp** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Set the current compensation value in the channel info structures.
 - **set_current_comp** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — mne_set_current_comp
+- **set_datatype** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the BIDS datatype (e.g.
+- **set_description** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the description label.
 - **set_document_callback** `[fn]` in [JsonStreamParser](/docs/api/base/json-stream-parser) — Passes completed documents to `callback` instead of queueing them; call it between documents.
+- **set_extension** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the file extension including dot (e.g.
 - **set_fft_size** `[fn]` in [Network](/docs/api/connectivity/network)
 - **set_file** `[fn]` in [Log](/docs/api/base/log) — Additionally writes every message printed by `install_qt_message_handler()` to a log file, appended, one timestamped and level-tagged line per message.
 - **set_frequency_bins** `[fn]` in [NetworkEdge](/docs/api/connectivity/network-edge) — Sets the frequency-bin window and recomputes the scalar weight.
@@ -5029,15 +5031,25 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **set_little_endian** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Sets the byte order of the stream; FIFF files are big-endian, some raw data files little-endian.
 - **set_method** `[fn]` in [Network](/docs/api/connectivity/network)
 - **set_object** `[fn]` in [JsonDocument](/docs/api/base/json-document)
+- **set_processing** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the processing label.
 - **set_progress_callback** `[fn]` in [PythonRunner](/docs/api/pybridge/python-runner) — Sets the callback invoked for every progress line.
+- **set_recording** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the recording label.
+- **set_root** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the BIDS dataset root directory.
+- **set_run** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the run index (will be zero-padded to 2 digits).
 - **set_sampling_frequency** `[fn]` in [Network](/docs/api/connectivity/network)
+- **set_session** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the session label (without "ses-" prefix).
 - **set_shape** `[fn]` in [InvVolumeSourceEstimate](/docs/api/inv/inv-volume-source-estimate) — Set the 3D grid shape (nx, ny, nz) for volume reshaping.
 - **set_sink** `[fn]` in [Log](/docs/api/base/log) — Replaces the sink.
+- **set_space** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the space label.
+- **set_split** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the split index.
+- **set_subject** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the subject label (without "sub-" prefix).
+- **set_suffix** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the filename suffix (e.g.
+- **set_task** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the task label.
 - **set_threshold** `[fn]` in [Network](/docs/api/connectivity/network) — Sets the threshold and marks every edge with \|weight\| &gt;= threshold active.
 - **set_used_freq_bins** `[fn]` in [Network](/docs/api/connectivity/network)
+- **set_valid** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Marks the data as valid or invalid.
 - **set_visualization_info** `[fn]` in [Network](/docs/api/connectivity/network)
 - **set_weight** `[fn]` in [NetworkEdge](/docs/api/connectivity/network-edge) — Overrides the scalar weight.
-- **setAcquisition** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the acquisition label.
 - **setActivationPerAverage** `[fn]` in [AverageScene](/docs/api/disp/average-scene) — Set the activation per average map information.
 - **setActiveSurface** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Set the active surface type to search for (e.g.
 - **setAlpha** `[fn]` in [AbstractTreeItem](/docs/api/disp3-d/abstract-tree-item)
@@ -5148,7 +5160,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setData** `[fn]` in [ChannelInfoModel](/docs/api/disp/channel-info-model)
 - **setData** `[fn]` in [Spline](/docs/api/disp/spline) — creates a spline histogram from 2 vectors: class limits and class frequency
 - **setData** `[fn]` in [Spline](/docs/api/disp/spline)
-- **setDatatype** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the BIDS datatype (e.g.
 - **setDecimals** `[fn]` in [ScaleControl](/docs/api/disp/scale-control) — Set the number of decimals to show in the spinbox of the control.
 - **setDefaultColor** `[fn]` in [AverageSceneItem](/docs/api/disp/average-scene-item) — Sets the item color to the input parameter viewColor.
 - **setDelegate** `[fn]` in [Control3DView](/docs/api/disp/control3-d-view) — Set the delegate for the tree view.
@@ -5156,7 +5167,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setDepthFrame** `[fn]` in [VideoOverlay](/docs/api/disp3-d/video-overlay) — Push a new monocular depth map (single-channel or RGBA grayscale).
 - **setDepthScale** `[fn]` in [VideoOverlay](/docs/api/disp3-d/video-overlay)
 - **setDepthSteps** `[fn]` in [VideoOverlay](/docs/api/disp3-d/video-overlay)
-- **setDescription** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the description label.
 - **setDesignMethod** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
 - **setDetectedEpochs** `[fn]` in [AveragingSettingsView](/docs/api/disp/averaging-settings-view)
 - **setDetrendMode** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model)
@@ -5189,7 +5199,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setEvokedSet** `[fn]` in [EvokedSetModel](/docs/api/disp/evoked-set-model) — Sets corresponding evoked set.
 - **setEvokedSetModel** `[fn]` in [AverageLayoutView](/docs/api/disp/average-layout-view) — Sets the evoked set model.
 - **setEvokedSetModel** `[fn]` in [ButterflyView](/docs/api/disp/butterfly-view) — Set the evoked set model.
-- **setExtension** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the file extension including dot (e.g.
 - **setExtent** `[fn]` in [ImageSc](/docs/api/disp/image-sc) — Labels the axes in data units instead of column and row indices, as matplotlib's `imshow`(extent=...).
 - **setFftCoefficients** `[fn]` in [FilterKernel](/docs/api/dsp/filter-kernel)
 - **setFFTSize** `[fn]` in [ConnectivitySettings](/docs/api/connectivity/connectivity-settings)
@@ -5334,7 +5343,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setPreStim** `[fn]` in [RtAveragingWorker](/docs/api/dsp/rt-averaging-worker) — Sets the number of pre stimulus samples.
 - **setProbeStation** `[fn]` in [PolhemusCoregistration](/docs/api/acq/polhemus-coregistration)
 - **setProbeVisualization** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Show a catheter-style probe visualization (cylinder shaft + sphere tip with an optional pulsing glow aura).
-- **setProcessing** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the processing label.
 - **setProcessingMode** `[fn]` in [AbstractView](/docs/api/disp/abstract-view) — Sets the GUI of this view to a specific mode.
 - **setProgressCallback** `[fn]` in [MnaGraphExecutor](/docs/api/mna/mna-graph-executor) — Set a progress callback invoked for each node execution.
 - **setProjectionMatrix** `[fn]` in [RtHpi](/docs/api/dsp/rt-hpi) — Set the new projection matrix.
@@ -5348,7 +5356,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setRealtimeSensorInterval** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Set the streaming speed for sensor streaming (interval between frames).
 - **setRealtimeSensorLooping** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Enable or disable looping for real-time sensor streaming.
 - **setRecomputationStatus** `[fn]` in [FwdSettingsView](/docs/api/disp/fwd-settings-view) — Updates the clustering status (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Not Computed, 5 Finished).
-- **setRecording** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the recording label.
 - **setRecordingElapsedTime** `[fn]` in [ProjectSettingsView](/docs/api/disp/project-settings-view) — Sets elapsed time to input parameter.
 - **setReferenceMarkers** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Set the list of persistent sample/reference markers shown in the time ruler.
 - **setReferenceMarkers** `[fn]` in [TimeRulerWidget](/docs/api/disp/time-ruler-widget) — Set the list of persistent sample markers to display in the ruler.
@@ -5356,9 +5363,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setRemoveDC** `[fn]` in [ChannelDataModel](/docs/api/disp/channel-data-model) — Enable or disable DC (mean) removal applied on-the-fly during rendering.
 - **setRemoveDC** `[fn]` in [ChannelDataView](/docs/api/disp/channel-data-view) — Enable or disable DC (mean) removal applied at render time.
 - **setRMSE** `[fn]` in [CoregSettingsView](/docs/api/disp/coreg-settings-view) — Set the the Root-Mean-Square-Error (Digitizer-FsSurface) after icp.
-- **setRoot** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the BIDS dataset root directory.
 - **setRotation** `[fn]` in [CameraController](/docs/api/disp3-d/camera-controller) — Set user rotation for single-view.
-- **setRun** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the run index (will be zero-padded to 2 digits).
 - **sets** `[var]` in [MNEMeasData](/docs/api/mne/mne-meas-data) — All loaded data-set epochs.
 - **setSamplesPerPixel** `[fn]` in [ChannelRhiView](/docs/api/disp/channel-rhi-view) — Set the horizontal zoom (samples per screen pixel).
 - **setSamplesPerPixel** `[slot]` in [TimeRulerWidget](/docs/api/disp/time-ruler-widget) — Update the horizontal zoom and trigger a repaint.
@@ -5398,7 +5403,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setSensorFieldVisible** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Set visibility for sensor field maps.
 - **setSensorTransEnabled** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Set whether sensor transformations (if loaded) should be applied.
 - **setSensorVisible** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Toggle visibility of sensor groups.
-- **setSession** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the session label (without "ses-" prefix).
 - **setSettingsPath** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Set the path where to store the settings of this widget via QSettings.
 - **setSFreq** `[fn]` in [RtSensorDataController](/docs/api/disp3-d/rt-sensor-data-controller) — Set the sampling frequency of the incoming data.
 - **setSFreq** `[fn]` in [RtSensorDataWorker](/docs/api/disp3-d/rt-sensor-data-worker) — Set the sampling frequency of the incoming data.
@@ -5426,8 +5430,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setSourceColormap** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Set the colormap for source estimate visualization.
 - **setSourceSpaceVisible** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Toggle visibility of source space points.
 - **setSourceThresholds** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Set threshold values for source estimate visualization.
-- **setSpace** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the space label.
-- **setSplit** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the split index.
 - **setSplitX** `[fn]` in [MultiViewLayout](/docs/api/disp3-d/multi-view-layout)
 - **setSplitY** `[fn]` in [MultiViewLayout](/docs/api/disp3-d/multi-view-layout)
 - **setStaticMarkers** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Replace the set of static overlay markers (fiducials, acquired points).
@@ -5440,12 +5442,9 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setStreamSmoothedData** `[fn]` in [RtSensorDataWorker](/docs/api/disp3-d/rt-sensor-data-worker) — Toggle between emitting per-vertex color data (smoothed) and raw sensor values.
 - **setStreamSmoothedData** `[fn]` in [RtSourceDataController](/docs/api/disp3-d/rt-source-data-controller) — Toggle between emitting interpolated color data (smoothed) and raw source values split by hemisphere.
 - **setStreamSmoothedData** `[fn]` in [RtSourceDataWorker](/docs/api/disp3-d/rt-source-data-worker) — Toggle between emitting interpolated color data (smoothed) and raw source values split by hemisphere.
-- **setSubject** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the subject label (without "sub-" prefix).
-- **setSuffix** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the filename suffix (e.g.
 - **setSurfaceColor** `[fn]` in [RtSourceDataController](/docs/api/disp3-d/rt-source-data-controller) — Set the base surface colors for both hemispheres.
 - **setSurfaceColor** `[fn]` in [RtSourceDataWorker](/docs/api/disp3-d/rt-source-data-worker) — Set the base surface colors for both hemispheres.
 - **setSurfaceData** `[fn]` in [SurfaceTreeItem](/docs/api/disp3-d/surface-tree-item)
-- **setTask** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Set the task label.
 - **setTextStyleSheet** `[fn]` in [ProgressView](/docs/api/disp/progress-view) — Sets stylesheet parameters for the QLabels that display loading message.
 - **setThreshold** `[fn]` in [NetworkObject](/docs/api/disp3-d/network-object) — Update the threshold and regenerate visible edges/nodes.
 - **setThreshold** `[fn]` in [Spline](/docs/api/disp/spline) — setThreshold takes in QVector3D value and creates the corresponding lines in the histogram
@@ -5493,7 +5492,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **setUpHint** `[fn]` in [VideoOverlay](/docs/api/disp3-d/video-overlay)
 - **setUpperItemIndex** `[fn]` in [RtFiffRawViewDelegate](/docs/api/disp/rt-fiff-raw-view-delegate) — Set the new upper item index color.
 - **setUseDefaultColor** `[fn]` in [BrainSurface](/docs/api/disp3-d/brain-surface) — Set/Get whether to use the default surface color.
-- **setValid** `[fn]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Marks the data as valid or invalid.
 - **setValue** `[slot]` in [ScaleControl](/docs/api/disp/scale-control) — Set the value of the control.
 - **setVertical** `[fn]` in [ProgressView](/docs/api/disp/progress-view) — Sets message to appear under the loading bar.
 - **setVideoDepthEnabled** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Enable or disable depth-based parallax relief on the video overlay.
@@ -5579,7 +5577,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **showSelectedChannelsOnly** `[signal]` in [ChannelSelectionView](/docs/api/disp/channel-selection-view) — emit this signal whenever the user or group selection has changed
 - **showSelectedChannelsOnly** `[fn]` in [RtFiffRawView](/docs/api/disp/rt-fiff-raw-view) — Only shows the channels defined in the QStringList selectedChannels.
 - **showSingleView** `[slot]` in [BrainView](/docs/api/disp3-d/brain-view) — Switch to single-view mode (one viewport, interactive camera).
-- **sidecarJsonPath** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the sidecar JSON metadata file (e.g.
+- **sidecar_json_path** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns the path for the sidecar JSON metadata file (e.g.
 - **sigma** `[var]` in [FwdBemModel](/docs/api/fwd/fwd-bem-model) — Conductivity of each layer (length nsurf).
 - **sigma** `[var]` in [FwdEegSphereLayer](/docs/api/fwd/fwd-eeg-sphere-layer) — Conductivity.
 - **sigma** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Conductivity of a BEM compartment (-1 if not set).
@@ -5681,7 +5679,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **sourceThresholdsUpdated** `[signal]` in [BrainView](/docs/api/disp3-d/brain-view) — Emitted when auto-thresholds are set from loaded source estimate data.
 - **sourceUri** `[var]` in [MnaScript](/docs/api/mna/mna-script) — Optional authoring-time reference (e.g.
 - **space** `[fn]` in [AcqWriter](/docs/api/acq/acq-writer)
-- **space** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Space label.
+- **space** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **sparse** `[var]` in [MNEMshPicked](/docs/api/mne/mne-msh-picked) — Whether this is an isolated point.
 - **spatialDispersion** `[fn]` in [StatsSourceMetrics](/docs/api/sts/stats-source-metrics) — Spatial dispersion (amplitude-weighted mean distance from peak).
 - **spatialSpread** `[fn]` in [InvResolutionMatrix](/docs/api/inv/inv-resolution-matrix) — Compute spatial spread (peak-width) metric for each source.
@@ -5699,7 +5697,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **sphereVertexCount** `[fn]` in [MeshFactory](/docs/api/disp3-d/mesh-factory) — Number of vertices in a subdivided icosahedron (for picking calculations).
 - **spinFor** `[var]` in [AcqReaderOptions](/docs/api/acq/acq-reader-options) — Spin window of SpinThenBlock.
 - **Spline** `[fn]` in [Spline](/docs/api/disp/spline) — The constructor for [`Spline`](/docs/api/disp/spline).
-- **split** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Split index.
+- **split** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **split_name_list** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — fiff_split_name_list
 - **splitBytes** `[var]` in [AcqRecorderOptions](/docs/api/acq/acq-recorder-options) — Size at which the file is split, at most 2 GiB (FIFF positions are int32).
 - **splitLabel** `[fn]` in [FsLabelUtils](/docs/api/fs/fs-label-utils) — Split a label into connected components.
@@ -5837,7 +5835,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **subj** `[var]` in [MNEMshDisplaySurface](/docs/api/mne/mne-msh-display-surface) — Subject name in SUBJECTS_DIR.
 - **subj** `[var]` in [MNEMshDisplaySurfaceSet](/docs/api/mne/mne-msh-display-surface-set) — The name of the subject.
 - **subject** `[var]` in [AcqBidsPath](/docs/api/acq/acq-bids-path) — Subject label without "sub-".
-- **subject** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Subject label (without "sub-").
+- **subject** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **subject** `[var]` in [InvBeamformer](/docs/api/inv/inv-beamformer) — Subject identifier.
 - **subject** `[var]` in [MNESurfaceOrVolume](/docs/api/mne/mne-surface-or-volume) — Name (id) of the subject.
 - **subjects** `[var]` in [MnaProject](/docs/api/mna/mna-project) — Subjects in the project.
@@ -5845,7 +5843,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **subTicks** `[var]` in [AcqSyncMarker](/docs/api/acq/acq-sync-marker) — Edge position inside the reference sample, in domain ticks.
 - **subtractBaseline** `[fn]` in [FiffEvokedSet](/docs/api/fiff/fiff-evoked-set) — Subtract baseline from each channel of an epoch.
 - **success** `[var]` in [PythonRunnerResult](/docs/api/pybridge/python-runner-result) — True when the process exited normally with code 0.
-- **suffix** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Filename suffix.
+- **suffix** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **sum_solids** `[fn]` in [MNESurface](/docs/api/mne/mne-surface) — Sum the solid angles of all triangles as seen from a given point.
 - **sumd** `[var]` in [RegionDataOut](/docs/api/mne/region-data-out) — Sums of the distances to the centroid.
 - **sumd** `[var]` in [RegionMTOut](/docs/api/mne/region-mt-out) — Sum of distances to the assigned centroid.
@@ -5901,7 +5899,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **targetPath** `[var]` in [MnaParamBinding](/docs/api/mna/mna-param-binding) — Parameter to control: "nodeId/attrKey".
 - **targetSample** `[var]` in [AcqSyncMarker](/docs/api/acq/acq-sync-marker) — Sample of the edge in the target stream.
 - **task** `[var]` in [AcqBidsPath](/docs/api/acq/acq-bids-path) — Task label without "task-".
-- **task** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Task label.
+- **task** `[fn]` in [BIDSPath](/docs/api/bids/bids-path)
 - **taskDescription** `[var]` in [BidsRawData](/docs/api/bids/bids-raw-data) — Task description (OPTIONAL).
 - **taskType** `[fn]` in [MlModel](/docs/api/ml/ml-model)
 - **taskType** `[fn]` in [MlOnnxModel](/docs/api/ml/ml-onnx-model)
@@ -5996,6 +5994,8 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **to_dir_entry** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff DIR ENTRY
 - **to_double** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Double Fast access; Data are deleted if tag gets deleted, and vice versa
 - **to_double** `[fn]` in [JsonValue](/docs/api/base/json-value)
+- **to_fiff_coord_trans** `[fn]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — Convert parsed transform to a FiffCoordTrans.
+- **to_fiff_dig_points** `[fn]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Convert a list of BIDS electrodes to a FIFF digitizer point set.
 - **to_fiff_id** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to fiff ID
 - **to_fixed_ori** `[fn]` in [MNEForwardSolution](/docs/api/mne/mne-forward-solution) — Helper to convert the forward solution to fixed ori from free.
 - **to_float** `[fn]` in [FiffTag](/docs/api/fiff/fiff-tag) — to Float Fast access; Data are deleted if tag gets deleted, and vice versa
@@ -6038,8 +6038,6 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **toEigenSparse** `[fn]` in [FiffSparseMatrix](/docs/api/fiff/fiff-sparse-matrix) — Convert to Eigen::SparseMatrix&lt;double&gt; (cast from float).
 - **toFiffChInfo** `[fn]` in [BrainVisionChannelInfo](/docs/api/bids/brain-vision-channel-info)
 - **toFiffChInfo** `[fn]` in [EDFChannelInfo](/docs/api/bids/edf-channel-info)
-- **toFiffCoordTrans** `[fn]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — Convert parsed transform to a FiffCoordTrans.
-- **toFiffDigPoints** `[fn]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Convert a list of BIDS electrodes to a FIFF digitizer point set.
 - **toFiffRawData** `[fn]` in [AbstractFormatReader](/docs/api/bids/abstract-format-reader) — Convert the entire dataset to a FiffRawData structure.
 - **toFiffRawData** `[fn]` in [BrainVisionReader](/docs/api/bids/brain-vision-reader) — Convert the entire dataset to a FiffRawData structure.
 - **toFiffRawData** `[fn]` in [EDFReader](/docs/api/bids/edf-reader) — Convert the entire dataset to a FiffRawData structure.
@@ -6311,6 +6309,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **value** `[fn]` in [AcqExpected](/docs/api/acq/acq-expected)
 - **value** `[fn]` in [AcqInt24](/docs/api/acq/acq-int24)
 - **value** `[var]` in [BidsEvent](/docs/api/bids/bids-event) — Numeric event value / trigger code.
+- **value** `[fn]` in [BidsTsv](/docs/api/bids/bids-tsv)
 - **value** `[fn]` in [Expected](/docs/api/base/expected)
 - **value** `[fn]` in [Expected](/docs/api/base/expected)
 - **value** `[fn]` in [Expected](/docs/api/base/expected)
@@ -6472,7 +6471,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **WindowType** `[enum]` in [WelchPsd](/docs/api/dsp/welch-psd) — Window function applied to each segment before the FFT.
 - **windowTypeChanged** `[signal]` in [ConnectivitySettingsView](/docs/api/disp/connectivity-settings-view) — Emit signal whenever the window type changed.
 - **windowWidth** `[fn]` in [SliceObject](/docs/api/disp3-d/slice-object)
-- **withSuffix** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns a copy of this [`BIDSPath`](/docs/api/bids/bids-path) with updated suffix and extension.
+- **with_suffix** `[fn]` in [BIDSPath](/docs/api/bids/bids-path) — Returns a copy of this [`BIDSPath`](/docs/api/bids/bids-path) with updated suffix and extension.
 - **work** `[var]` in [FwdCompData](/docs/api/fwd/fwd-comp-data) — The work area.
 - **working_dir** `[var]` in [PythonRunnerConfig](/docs/api/pybridge/python-runner-config) — Working directory; empty inherits the caller's.
 - **workingDir** `[var]` in [ProcessingSettings](/docs/api/mne/processing-settings)
@@ -6536,6 +6535,7 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **write_info_base** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Write measurement info stored in forward solution.
 - **write_int** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — Writes a 32-bit integer tag to a fif file.
 - **write_int_matrix** `[fn]` in [FiffStream](/docs/api/fiff/fiff-stream) — fiff_write_int_matrix
+- **write_json** `[fn]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — Write a BIDS *_coordsystem.json file.
 - **write_json** `[fn]` in [FiffAnnotations](/docs/api/fiff/fiff-annotations) — Writes the annotations to a JSON file.
 - **write_lout** `[fn]` in [LayoutMaker](/docs/api/channels/layout-maker) — Writes channel boxes as an MNE-C .lout file.
 - **write_matrix** `[fn]` in [InvSourceEstimateIO](/docs/api/inv/inv-source-estimate-io) — Export source estimate as a tab-separated matrix for easy import.
@@ -6557,23 +6557,22 @@ Index of 6544 public class members (functions, variables, typedefs, enums) acros
 - **write_to_stream** `[fn]` in [MNEInverseOperator](/docs/api/mne/mne-inverse-operator) — Writes the inverse solution block into an open FIFF stream.
 - **write_to_stream** `[fn]` in [MNESourceSpaces](/docs/api/mne/mne-source-spaces) — Writes the source space blocks into an open FIFF stream (mne write_source_spaces_to_fid).
 - **write_to_stream** `[fn]` in [MNESurface](/docs/api/mne/mne-surface) — Writes the surface tags of a FIFFB_BEM_SURF block (MNE-C mne_write_bem_surfaces_block): conductivity if set, id, coordinate frame, vertices, triangles and normals.
+- **write_tsv** `[fn]` in [BidsChannel](/docs/api/bids/bids-channel) — Write a BIDS *_channels.tsv file.
+- **write_tsv** `[fn]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Write a BIDS *_electrodes.tsv file.
+- **write_tsv** `[fn]` in [BidsEvent](/docs/api/bids/bids-event) — Write a BIDS *_events.tsv file.
+- **write_tsv** `[fn]` in [BidsTsv](/docs/api/bids/bids-tsv) — Writes rows to a TSV file, writing "n/a" for empty and missing values.
 - **write_w** `[fn]` in [InvSourceEstimate](/docs/api/inv/inv-source-estimate) — Writes the first time point as a .w file, as mne.write_w does.
 - **writeBigEndian** `[fn]` in [ByteStream](/docs/api/base/byte-stream) — Writes `count` values in big-endian byte order.
 - **writeBigEndian** `[fn]` in [ByteStream](/docs/api/base/byte-stream)
 - **writeDefinitionFile** `[fn]` in [ChannelDerivation](/docs/api/dsp/channel-derivation) — Write derivation rules in MNE-C derivation text syntax, readable by readDefinitionFile and mne_make_derivations.
 - **writeFilter** `[fn]` in [FilterIO](/docs/api/dsp/filter-io) — Writes a given filter to txt file .
 - **writeHeadPos** `[fn]` in [MaxwellMovementComp](/docs/api/dsp/maxwell-movement-comp) — Write head positions to a file.
-- **writeJson** `[fn]` in [BidsCoordinateSystem](/docs/api/bids/bids-coordinate-system) — Write a BIDS *_coordsystem.json file.
 - **writePosition** `[fn]` in [AcqWriter](/docs/api/acq/acq-writer)
 - **writer** `[fn]` in [AcqStream](/docs/api/acq/acq-stream) — Takes the writer of an output stream (control path).
 - **writerWaits** `[var]` in [AcqStreamStats](/docs/api/acq/acq-stream-stats) — Output: beginWrite() calls that had to wait for space.
 - **writeToStream** `[fn]` in [FiffInfo](/docs/api/fiff/fiff-info) — Writes the fiff information to a FIF stream.
 - **writeToStream** `[fn]` in [MNEHemisphere](/docs/api/mne/mne-hemisphere) — mne_python _write_one_source_space
 - **writeToStream** `[fn]` in [MNESourceSpace](/docs/api/mne/mne-source-space) — Write this source space to a FIFF stream.
-- **writeTsv** `[fn]` in [BidsChannel](/docs/api/bids/bids-channel) — Write a BIDS *_channels.tsv file.
-- **writeTsv** `[fn]` in [BidsElectrode](/docs/api/bids/bids-electrode) — Write a BIDS *_electrodes.tsv file.
-- **writeTsv** `[fn]` in [BidsEvent](/docs/api/bids/bids-event) — Write a BIDS *_events.tsv file.
-- **writeTsv** `[fn]` in [BidsTsv](/docs/api/bids/bids-tsv) — Writes rows to a TSV file.
 
 ## X {#x}
 

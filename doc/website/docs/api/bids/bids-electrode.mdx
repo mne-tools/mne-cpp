@@ -18,42 +18,42 @@ struct BIDSLIB::BidsElectrode
 Electrode position record corresponding to one row in *_electrodes.tsv.
 
 ```cpp title="src/examples/ex_bids/main.cpp"
-const BidsDatasetDescription description = BidsDatasetDescription::read(root + "/dataset_description.json");
-const QList<BidsChannel> channels = BidsChannel::readTsv(channelsTsv);               // one row per channel
-const QList<BidsEvent> events = BidsEvent::readTsv(ieeg.eventsTsvPath().filePath()); // onset, duration, sample, value, trial_type
-const QList<BidsElectrode> electrodes = BidsElectrode::readTsv(ieeg.electrodesTsvPath().filePath());
-const BidsCoordinateSystem coords = BidsCoordinateSystem::readJson(ieeg.coordsystemJsonPath().filePath());
+const BidsDatasetDescription description = BidsDatasetDescription::read(root / "dataset_description.json");
+const std::vector<BidsChannel> channels = BidsChannel::read_tsv(channelsTsv);                  // one row per channel
+const std::vector<BidsEvent> events = BidsEvent::read_tsv(ieeg.events_tsv_path().file_path()); // onset, duration, sample, value, trial_type
+const std::vector<BidsElectrode> electrodes = BidsElectrode::read_tsv(ieeg.electrodes_tsv_path().file_path());
+const BidsCoordinateSystem coords = BidsCoordinateSystem::read_json(ieeg.coordsystem_json_path().file_path());
 ```
 
 ---
 
 ## Static Methods
 
-### readTsv(sFilePath)
+### read_tsv(path)
 
 Read a BIDS *_electrodes.tsv file.
 
 **Parameters:**
 
-- **sFilePath** : *const QString &*
+- **path** : *const std::filesystem::path &*
   Path to the electrodes.tsv file.
 
 **Returns:**
 
-- *QList&lt; [BidsElectrode](/docs/api/bids/bids-electrode) &gt;* — List of electrode records.
+- *std::vector&lt; [BidsElectrode](/docs/api/bids/bids-electrode) &gt;* — List of electrode records.
 
 ---
 
-### writeTsv(sFilePath, electrodes)
+### write_tsv(path, electrodes)
 
 Write a BIDS *_electrodes.tsv file.
 
 **Parameters:**
 
-- **sFilePath** : *const QString &*
+- **path** : *const std::filesystem::path &*
   Output path.
 
-- **electrodes** : *const QList&lt; [BidsElectrode](/docs/api/bids/bids-electrode) &gt; &*
+- **electrodes** : *std::span&lt; const [BidsElectrode](/docs/api/bids/bids-electrode) &gt;*
   List of electrode records.
 
 **Returns:**
@@ -62,7 +62,7 @@ Write a BIDS *_electrodes.tsv file.
 
 ---
 
-### toFiffDigPoints(electrodes, trans)
+### to_fiff_dig_points(electrodes, trans)
 
 Convert a list of BIDS electrodes to a FIFF digitizer point set.
 
@@ -72,7 +72,7 @@ If a coordinate transform is supplied, the positions are transformed from the BI
 
 **Parameters:**
 
-- **electrodes** : *const QList&lt; [BidsElectrode](/docs/api/bids/bids-electrode) &gt; &*
+- **electrodes** : *std::span&lt; const [BidsElectrode](/docs/api/bids/bids-electrode) &gt;*
   List of BIDS electrode records.
 
 - **trans** : *const [FiffCoordTrans](/docs/api/fiff/fiff-coord-trans) &*
@@ -97,12 +97,12 @@ If a coordinate transform is supplied, the positions are transformed from the BI
 BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 111"
-const BidsDatasetDescription description = BidsDatasetDescription::read(root + "/dataset_description.json");
-const QList<BidsChannel> channels = BidsChannel::readTsv(channelsTsv);               // one row per channel
-const QList<BidsEvent> events = BidsEvent::readTsv(ieeg.eventsTsvPath().filePath()); // onset, duration, sample, value, trial_type
-const QList<BidsElectrode> electrodes = BidsElectrode::readTsv(ieeg.electrodesTsvPath().filePath());
-const BidsCoordinateSystem coords = BidsCoordinateSystem::readJson(ieeg.coordsystemJsonPath().filePath());
-ok &= expect(description.name == "MNE-CPP Test Dataset" && description.bidsVersion == "1.9.0" && channels.size() == 32 && channels[0].name == "FP1" && channels[0].units == "µV" && events.size() == 4 && events[3].sample == 5250 && events[3].value == 3 && events[3].trialType == "feedback" && electrodes.size() == 10 && electrodes[0].name == "FP1" && electrodes[0].x == "-0.0254" && coords.system == "ACPC" && coords.units == "m",
+const BidsDatasetDescription description = BidsDatasetDescription::read(root / "dataset_description.json");
+const std::vector<BidsChannel> channels = BidsChannel::read_tsv(channelsTsv);                  // one row per channel
+const std::vector<BidsEvent> events = BidsEvent::read_tsv(ieeg.events_tsv_path().file_path()); // onset, duration, sample, value, trial_type
+const std::vector<BidsElectrode> electrodes = BidsElectrode::read_tsv(ieeg.electrodes_tsv_path().file_path());
+const BidsCoordinateSystem coords = BidsCoordinateSystem::read_json(ieeg.coordsystem_json_path().file_path());
+ok &= expect(description.name == "MNE-CPP Test Dataset" && description.bidsVersion == "1.9.0" && channels.size() == 32 && channels[0].name == "FP1" && channels[0].units == "\xC2\xB5V" && events.size() == 4 && events[3].sample == 5250 && events[3].value == 3 && events[3].trialType == "feedback" && electrodes.size() == 10 && electrodes[0].name == "FP1" && electrodes[0].x == "-0.0254" && coords.system == "ACPC" && coords.units == "m",
              "dataset_description, channels/events/electrodes.tsv and coordsystem.json read as written");
 ````
 

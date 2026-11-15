@@ -4,7 +4,7 @@
   "policy": "scripts/quality/api_evidence_policy.json",
   "summary": {
     "exported_classes": 480,
-    "exported_free_functions": 195,
+    "exported_free_functions": 197,
     "registered_classes": 572,
     "exported_not_registered": 2,
     "registered_function_modules": 14,
@@ -471,6 +471,16 @@
     },
     {
       "name": "read_file_bytes",
+      "header": "base/byte_stream.h",
+      "library": "base"
+    },
+    {
+      "name": "read_text_file",
+      "header": "base/byte_stream.h",
+      "library": "base"
+    },
+    {
+      "name": "write_text_file",
       "header": "base/byte_stream.h",
       "library": "base"
     },

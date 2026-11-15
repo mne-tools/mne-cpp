@@ -231,7 +231,8 @@
       "url": "/docs/examples/bids/ex_bids/",
       "library": "bids",
       "libraries": [
-        "bids"
+        "bids",
+        "base"
       ],
       "tasks": [
         "io"

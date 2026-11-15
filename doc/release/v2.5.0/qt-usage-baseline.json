@@ -34,7 +34,7 @@
       "ml",
       "report"
     ],
-    "tokens": 12704,
+    "tokens": 11868,
     "gui_outside_design": []
   },
   "libraries": {
@@ -71,11 +71,11 @@
       ]
     },
     "acq/fiff": {
-      "tokens": 43,
+      "tokens": 19,
       "by_category": {
         "files": 2,
         "global": 7,
-        "strings": 34
+        "strings": 10
       },
       "public_header_includes": 0,
       "q_object": 0,
@@ -109,17 +109,16 @@
       ]
     },
     "bids": {
-      "tokens": 1027,
+      "tokens": 218,
       "by_category": {
-        "containers": 82,
-        "files": 102,
-        "global": 32,
-        "json": 32,
-        "regex": 3,
-        "strings": 769,
+        "containers": 26,
+        "files": 18,
+        "global": 30,
+        "regex": 2,
+        "strings": 135,
         "time": 7
       },
-      "public_header_includes": 32,
+      "public_header_includes": 8,
       "q_object": 0,
       "files": 24,
       "modules": [
@@ -284,10 +283,8 @@
       ]
     },
     "ieeg": {
-      "tokens": 3,
-      "by_category": {
-        "strings": 3
-      },
+      "tokens": 0,
+      "by_category": {},
       "public_header_includes": 0,
       "q_object": 0,
       "files": 8,

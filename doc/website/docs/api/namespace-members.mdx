@@ -7,7 +7,7 @@ sidebar_position: 6
 
 # Namespace Members
 
-Index of 473 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
+Index of 475 namespace-level symbols (functions, typedefs, enums, variables) across all public namespaces.
 
 - **Accuracy** `[enum]` in [INVLIB](/docs/api/inv/)
 - **acqApplyThreadPolicy** `[fn]` in [ACQLIB](/docs/api/acq/) — Applies `policy` to the calling thread: CPUs first, then priority.
@@ -36,8 +36,6 @@ Index of 473 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **AcqWait** `[enum]` in [ACQLIB](/docs/api/acq/) — How a waiting reader or writer is woken.
 - **AcqWritePart** `[type]` in [ACQLIB](/docs/api/acq/) — Writable run.
 - **addReferenceChannels** `[fn]` in [DSPLIB](/docs/api/dsp/) — Add reference channel(s) back as zero-filled rows.
-- **allowedDatatypes** `[fn]` in [BIDSLIB](/docs/api/bids/) — All allowed BIDS datatypes.
-- **allowedElectrophysiologyDatatypes** `[fn]` in [BIDSLIB](/docs/api/bids/) — All allowed BIDS electrophysiology datatypes.
 - **annotateAmplitude** `[fn]` in [DSPLIB](/docs/api/dsp/) — Annotate spans where consecutive samples jump or stay flat, as mne.preprocessing.annotate_amplitude.
 - **annotateMusclZscore** `[fn]` in [DSPLIB](/docs/api/dsp/) — Detect muscle artifacts via high-frequency z-score and annotate bad segments.
 - **annotations_from_events** `[fn]` in [FIFFLIB](/docs/api/fiff/) — Converts events to annotations, like mne.annotations_from_events.
@@ -50,6 +48,7 @@ Index of 473 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **BeamformerInversion** `[enum]` in [INVLIB](/docs/api/inv/) — Method for inverting the beamformer denominator matrix G^H Cm^\{-1\} G.
 - **BeamformerPickOri** `[enum]` in [INVLIB](/docs/api/inv/) — Orientation picking mode for beamformer filters.
 - **BeamformerWeightNorm** `[enum]` in [INVLIB](/docs/api/inv/) — Weight normalization strategy for beamformer spatial filters.
+- **BIDS_COORD_TO_FIFF_FRAME** `[var]` in [BIDSLIB](/docs/api/bids/) — FIFF coordinate frame of each BIDS coordinate system name read from electrodes.tsv / coordsystem.json.
 - **BIDS_DATATYPE_ANAT** `[var]` in [BIDSLIB](/docs/api/bids/)
 - **BIDS_DATATYPE_BEH** `[var]` in [BIDSLIB](/docs/api/bids/)
 - **BIDS_DATATYPE_DWI** `[var]` in [BIDSLIB](/docs/api/bids/)
@@ -58,10 +57,15 @@ Index of 473 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **BIDS_DATATYPE_IEEG** `[var]` in [BIDSLIB](/docs/api/bids/)
 - **BIDS_DATATYPE_MEG** `[var]` in [BIDSLIB](/docs/api/bids/) — BIDS datatype strings used in directory and filename construction.
 - **BIDS_DATATYPE_PERF** `[var]` in [BIDSLIB](/docs/api/bids/)
-- **bidsCoordToFiffFrame** `[fn]` in [BIDSLIB](/docs/api/bids/) — Maps BIDS coordinate system names to FIFF coordinate frame constants.
-- **bidsEntityOrder** `[fn]` in [BIDSLIB](/docs/api/bids/) — Entity key ordering for BIDS filenames (per specification).
+- **BIDS_DATATYPES** `[var]` in [BIDSLIB](/docs/api/bids/) — All allowed BIDS datatypes (electrophysiology, imaging and behavioral).
+- **BIDS_EEG_EXTENSIONS** `[var]` in [BIDSLIB](/docs/api/bids/) — Supported raw data file extensions for EEG in BIDS, lowercase with the leading dot.
+- **BIDS_ELECTROPHYSIOLOGY_DATATYPES** `[var]` in [BIDSLIB](/docs/api/bids/) — All allowed BIDS electrophysiology datatypes: "meg", "eeg" and "ieeg".
+- **BIDS_ENTITY_ORDER** `[var]` in [BIDSLIB](/docs/api/bids/) — Entity keys in the order they must appear in a BIDS filename (per specification).
+- **BIDS_IEEG_COORD_SYSTEMS** `[var]` in [BIDSLIB](/docs/api/bids/) — Allowed coordinate systems for iEEG electrodes (BIDS-iEEG spec).
+- **BIDS_IEEG_EXTENSIONS** `[var]` in [BIDSLIB](/docs/api/bids/) — Supported raw data file extensions for iEEG in BIDS, lowercase with the leading dot.
+- **bids_lookup** `[fn]` in [BIDSLIB](/docs/api/bids/) — Looks a key up in one of the mapping tables above.
+- **BIDS_TYPE_TO_FIFF_KIND** `[var]` in [BIDSLIB](/docs/api/bids/) — FIFF channel kind of each BIDS channel type read from channels.tsv.
 - **BidsTsvRow** `[type]` in [BIDSLIB](/docs/api/bids/) — Represents a single row of a BIDS TSV file as a column-name → value map.
-- **bidsTypeToFiffKind** `[fn]` in [BIDSLIB](/docs/api/bids/) — Maps BIDS channel type strings back to FIFF channel kind constants.
 - **BIG_TIME** `[var]` in [INVLIB](/docs/api/inv/)
 - **buildDateTime** `[fn]` in [ACQLIB](/docs/api/acq/) — Returns build date and time.
 - **buildDateTime** `[fn]` in [BASELIB](/docs/api/base/) — Returns build date and time.
@@ -184,7 +188,6 @@ Index of 473 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **Direction** `[enum]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Selects which incident edges of a node count.
 - **discard3DPointOutliers** `[fn]` in [MNELIB](/docs/api/mne/) — Discard outliers compared to a given 3D surface.
 - **EdgeSet** `[enum]` in [CONNECTIVITYLIB](/docs/api/connectivity/) — Selects all edges or only those passing the threshold.
-- **eegAllowedExtensions** `[fn]` in [BIDSLIB](/docs/api/bids/) — Supported raw data file extensions for EEG in BIDS.
 - **encode** `[fn]` in [ACQLIB](/docs/api/acq/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).
 - **encode** `[fn]` in [ACQLIB](/docs/api/acq/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).
 - **encode** `[fn]` in [ACQLIB](/docs/api/acq/) — Encodes `in` into the reserved space of `view` (an output stream, or an input ring written by a backend that receives physical values).    For real formats the imaginary part must be 0, otherwise the element counts as clipped.
@@ -206,15 +209,15 @@ Index of 473 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **fiff_dau_pack16_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
 - **fiff_double_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
 - **fiff_float_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
+- **FIFF_FRAME_TO_BIDS_COORD** `[var]` in [BIDSLIB](/docs/api/bids/) — BIDS coordinate system name written for each FIFF coordinate frame.
 - **fiff_int_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
 - **fiff_julian_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
+- **FIFF_KIND_TO_BIDS_TYPE** `[var]` in [BIDSLIB](/docs/api/bids/) — BIDS channel type of each FIFF channel kind written to channels.tsv.
 - **fiff_long_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
 - **fiff_short_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
 - **fiff_uint_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
 - **fiff_ulong_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
 - **fiff_ushort_t** `[type]` in [FIFFLIB](/docs/api/fiff/)
-- **fiffFrameToBidsCoord** `[fn]` in [BIDSLIB](/docs/api/bids/) — Maps FIFF coordinate frame constants to BIDS coordinate system names.
-- **fiffKindToBidsType** `[fn]` in [BIDSLIB](/docs/api/bids/) — Maps FIFF channel kind constants to BIDS channel type strings.
 - **filterChannel** `[fn]` in [DSPLIB](/docs/api/dsp/) — This function is used to filter row-wise in parallel threads.
 - **filterChpi** `[fn]` in [DSPLIB](/docs/api/dsp/) — Remove cHPI excitation signals from MEG data by notch filtering.
 - **filterChpi** `[fn]` in [DSPLIB](/docs/api/dsp/) — Overload that attempts to extract cHPI frequencies from FiffInfo.
@@ -256,8 +259,6 @@ Index of 473 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **has_channel** `[fn]` in [FIFFLIB](/docs/api/fiff/)
 - **html_escape** `[fn]` in [REPORTLIB](/docs/api/report/) — Escapes the characters that are special in HTML text and attribute values: & &lt; &gt; " '.
 - **IcaComponentLabel** `[enum]` in [DECODINGLIB](/docs/api/decoding/) — Categorical label assigned to a single ICA component.
-- **ieegAllowedCoordSystems** `[fn]` in [BIDSLIB](/docs/api/bids/) — Allowed coordinate systems for iEEG electrodes (BIDS-iEEG spec).
-- **ieegAllowedExtensions** `[fn]` in [BIDSLIB](/docs/api/bids/) — Supported raw data file extensions for iEEG in BIDS.
 - **IeegLeadType** `[enum]` in [IEEGLIB](/docs/api/ieeg/) — Kind of lead a contact sits on.
 - **IeegSurfaceMapMode** `[enum]` in [IEEGLIB](/docs/api/ieeg/) — How the weights of contacts near one vertex combine; the modes of MNE-Python's stc_near_sensors.
 - **ImageFormat** `[enum]` in [REPORTLIB](/docs/api/report/) — Encoding of an embedded figure.
@@ -373,7 +374,6 @@ Index of 473 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **operator&lt;&lt;** `[fn]` in [FIFFLIB](/docs/api/fiff/)
 - **operator&lt;&lt;** `[fn]` in [MNELIB](/docs/api/mne/)
 - **operator&lt;&lt;** `[fn]` in [MNELIB](/docs/api/mne/)
-- **operator==** `[fn]` in [BIDSLIB](/docs/api/bids/)
 - **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/)
 - **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/)
 - **operator==** `[fn]` in [FIFFLIB](/docs/api/fiff/)
@@ -402,6 +402,7 @@ Index of 473 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **read_file_bytes** `[fn]` in [BASELIB](/docs/api/base/) — Reads a whole file, decompressing it if asked to.
 - **read_matrix** `[fn]` in [MATHLIB](/docs/api/math/) — Reads a matrix written by `write_matrix` (or `numpy.savetxt`).
 - **read_matrix** `[fn]` in [MATHLIB](/docs/api/math/) — Reads a matrix in the same text layout from a stream, e.g.
+- **read_text_file** `[fn]` in [BASELIB](/docs/api/base/) — Reads a whole file as text, byte for byte (no line-ending or encoding conversion).
 - **ref** `[fn]` in [ACQLIB](/docs/api/acq/)
 - **ref** `[fn]` in [ACQLIB](/docs/api/acq/)
 - **register_babymeg_scheme** `[fn]` in [ACQLIB](/docs/api/acq/) — Registers the babymeg:// scheme (the acquisition server of a BabyMEG system) with `AcqDeviceRegistry::instance()`, as `registerBrainAmpScheme()` does for brainamp://.
@@ -482,3 +483,4 @@ Index of 473 namespace-level symbols (functions, typedefs, enums, variables) acr
 - **visualizationModeName** `[fn]` in [DISP3DLIB](/docs/api/disp3-d/) — Convert a `VisualizationMode` enum to display string.
 - **write** `[fn]` in [ACQLIB](/docs/api/acq/) — Writes all columns of an Eigen matrix to an output stream: reserves, encodes, commits.
 - **write_matrix** `[fn]` in [MATHLIB](/docs/api/math/) — Writes a dense matrix as whitespace-separated text, one row per line.
+- **write_text_file** `[fn]` in [BASELIB](/docs/api/base/) — Replaces a file with the given text, byte for byte, so "\n" stays LF on every platform.

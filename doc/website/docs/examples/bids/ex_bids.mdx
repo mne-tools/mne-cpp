@@ -12,7 +12,7 @@ BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round 
 
 <ExampleFacts name="ex_bids" />
 
-**Libraries:** [BIDS](../../api/bids/index.mdx)
+**Libraries:** [BIDS](../../api/bids/index.mdx), [Base](../../api/base/index.mdx)
 
 ## What it demonstrates
 
@@ -105,6 +105,7 @@ The documented classes this example uses most:
 // INCLUDES
 //=============================================================================================================
 
+#include <base/string_utils.h>
 #include <bids/bids_channel.h>
 #include <bids/bids_coordinate_system.h>
 #include <bids/bids_dataset_description.h>
@@ -123,7 +124,6 @@ The documented classes this example uses most:
 
 #include <QCoreApplication>
 #include <QCommandLineParser>
-#include <QFileInfo>
 #include <QTemporaryDir>
 
 //=============================================================================================================
@@ -175,38 +175,38 @@ int main(int argc, char* argv[])
                                   QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/BIDS");
     parser.addOption(rootOption);
     parser.process(app);
-    const QString root = parser.value(rootOption);
+    const std::filesystem::path root = BASELIB::pathFromUtf8(parser.value(rootOption).toStdString());
     bool ok = true;
 
     //! [bids_path_usage]
-    BIDSPath ieeg(root, "01", "01", "rest", "ieeg", "ieeg", ".vhdr"); // root, sub, ses, task, datatype, suffix, ext
-    const QString vhdr = ieeg.filePath();                             // <root>/sub-01/ses-01/ieeg/sub-01_ses-01_task-rest_ieeg.vhdr
-    const QString channelsTsv = ieeg.channelsTsvPath().filePath();    // sibling sidecars share the entities
+    BIDSPath ieeg(root, "01", "01", "rest", "ieeg", "ieeg", ".vhdr");               // root, sub, ses, task, datatype, suffix, ext
+    const std::filesystem::path vhdr = ieeg.file_path();                            // <root>/sub-01/ses-01/ieeg/sub-01_ses-01_task-rest_ieeg.vhdr
+    const std::filesystem::path channelsTsv = ieeg.channels_tsv_path().file_path(); // sibling sidecars share the entities
     //! [bids_path_usage]
-    ok &= expect(ieeg.exists() && ieeg.basename() == "sub-01_ses-01_task-rest_ieeg.vhdr" && channelsTsv.endsWith("sub-01_ses-01_task-rest_channels.tsv"),
+    ok &= expect(ieeg.exists() && ieeg.basename() == "sub-01_ses-01_task-rest_ieeg.vhdr" && channelsTsv.filename() == "sub-01_ses-01_task-rest_channels.tsv",
                  "BIDSPath builds the entity filename and its channels.tsv sidecar");
 
     //! [bids_tsv_read]
-    QStringList headers;
-    const QList<BidsTsvRow> rows = BidsTsv::readTsv(ieeg.eventsTsvPath().filePath(), headers);
-    // each row maps column name -> cell text, e.g. rows[1]["trial_type"] == "response"
+    std::vector<std::string> headers;
+    const std::vector<BidsTsvRow> rows = BidsTsv::read_tsv(ieeg.events_tsv_path().file_path(), headers);
+    // each row maps column name -> cell text, e.g. rows[1].at("trial_type") == "response"
     //! [bids_tsv_read]
-    ok &= expect(headers == QStringList({"onset", "duration", "sample", "value", "trial_type"}) && rows.size() == 4 && rows[1]["trial_type"] == "response" && rows[3]["onset"] == "5.250000",
+    ok &= expect(headers == std::vector<std::string>{"onset", "duration", "sample", "value", "trial_type"} && rows.size() == 4 && rows[1].at("trial_type") == "response" && rows[3].at("onset") == "5.250000",
                  "BidsTsv reads the 5 event columns and 4 rows");
 
     //! [bids_sidecar_records]
-    const BidsDatasetDescription description = BidsDatasetDescription::read(root + "/dataset_description.json");
-    const QList<BidsChannel> channels = BidsChannel::readTsv(channelsTsv);               // one row per channel
-    const QList<BidsEvent> events = BidsEvent::readTsv(ieeg.eventsTsvPath().filePath()); // onset, duration, sample, value, trial_type
-    const QList<BidsElectrode> electrodes = BidsElectrode::readTsv(ieeg.electrodesTsvPath().filePath());
-    const BidsCoordinateSystem coords = BidsCoordinateSystem::readJson(ieeg.coordsystemJsonPath().filePath());
+    const BidsDatasetDescription description = BidsDatasetDescription::read(root / "dataset_description.json");
+    const std::vector<BidsChannel> channels = BidsChannel::read_tsv(channelsTsv);                  // one row per channel
+    const std::vector<BidsEvent> events = BidsEvent::read_tsv(ieeg.events_tsv_path().file_path()); // onset, duration, sample, value, trial_type
+    const std::vector<BidsElectrode> electrodes = BidsElectrode::read_tsv(ieeg.electrodes_tsv_path().file_path());
+    const BidsCoordinateSystem coords = BidsCoordinateSystem::read_json(ieeg.coordsystem_json_path().file_path());
     //! [bids_sidecar_records]
-    ok &= expect(description.name == "MNE-CPP Test Dataset" && description.bidsVersion == "1.9.0" && channels.size() == 32 && channels[0].name == "FP1" && channels[0].units == "µV" && events.size() == 4 && events[3].sample == 5250 && events[3].value == 3 && events[3].trialType == "feedback" && electrodes.size() == 10 && electrodes[0].name == "FP1" && electrodes[0].x == "-0.0254" && coords.system == "ACPC" && coords.units == "m",
+    ok &= expect(description.name == "MNE-CPP Test Dataset" && description.bidsVersion == "1.9.0" && channels.size() == 32 && channels[0].name == "FP1" && channels[0].units == "\xC2\xB5V" && events.size() == 4 && events[3].sample == 5250 && events[3].value == 3 && events[3].trialType == "feedback" && electrodes.size() == 10 && electrodes[0].name == "FP1" && electrodes[0].x == "-0.0254" && coords.system == "ACPC" && coords.units == "m",
                  "dataset_description, channels/events/electrodes.tsv and coordsystem.json read as written");
 
     //! [brain_vision_reader_usage]
     BrainVisionReader brainVision;
-    const bool bvOpen = brainVision.open(vhdr);
+    const bool bvOpen = brainVision.open(QString::fromStdString(BASELIB::utf8FromPath(vhdr)));
     const MatrixXf bvHead = brainVision.readRawSegment(0, 200); // calibrated, volts
     //! [brain_vision_reader_usage]
     // mne.io.read_raw_brainvision: 32 channels at 1000 Hz, 7900 samples; data[0, 0] = -23.5 uV, data[5, 100] = 38.5 uV
@@ -222,8 +222,8 @@ int main(int argc, char* argv[])
                  std::format("BrainVision metadata: {} channels, {} markers, S253 at sample {} (mne 0.486 s)", bvChannels.size(), markers.size(), markers.value(1).position));
 
     //! [edf_reader_usage]
-    std::unique_ptr<AbstractFormatReader> edf = BidsRawData::createReader(".edf"); // or construct EDFReader directly
-    const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").filePath());
+    std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
+    const bool edfOpen = edf->open(QString::fromStdString(BASELIB::utf8FromPath(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path())));
     const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
     const MatrixXf edfHead = edf->readRawSegment(0, 201);
     //! [edf_reader_usage]
@@ -241,24 +241,24 @@ int main(int argc, char* argv[])
     //! [bids_raw_data_read]
     BidsRawData data = BidsRawData::read(ieeg); // raw data plus channels, events, electrodes and sidecar metadata
     //! [bids_raw_data_read]
-    ok &= expect(data.isValid() && data.raw.info.nchan == 32 && data.raw.info.bads == std::vector<std::string>{"P4"} && data.events.size() == 4 && data.electrodes.size() == 10 && data.ieegReference == "Cz" && data.eventIdMap.value("feedback") == 3,
+    ok &= expect(data.is_valid() && data.raw.info.nchan == 32 && data.raw.info.bads == std::vector<std::string>{"P4"} && data.events.size() == 4 && data.electrodes.size() == 10 && data.ieegReference == "Cz" && data.eventIdMap.at("feedback") == 3,
                  "BidsRawData applies channels.tsv (bad P4), events.tsv, electrodes.tsv and the sidecar");
 
     //! [bids_raw_data_write]
     QTemporaryDir out;
     BidsRawData::WriteOptions options;
     options.datasetName = "ex_bids";
-    const BIDSPath written = data.write(BIDSPath(out.path(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
+    const BIDSPath written = data.write(BIDSPath(BASELIB::pathFromUtf8(out.path().toStdString()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
     const BidsRawData readBack = BidsRawData::read(written);
     //! [bids_raw_data_write]
     // every EEG channel gets an electrodes.tsv row; the 10 measured positions must come back under the same names
     int samePositions = 0;
     for (const BidsElectrode& before : data.electrodes) {
         for (const BidsElectrode& after : readBack.electrodes) {
-            samePositions += after.name == before.name && std::fabs(after.x.toDouble() - before.x.toDouble()) + std::fabs(after.y.toDouble() - before.y.toDouble()) + std::fabs(after.z.toDouble() - before.z.toDouble()) < 1e-6;
+            samePositions += after.name == before.name && std::fabs(*BASELIB::toDouble(after.x) - *BASELIB::toDouble(before.x)) + std::fabs(*BASELIB::toDouble(after.y) - *BASELIB::toDouble(before.y)) + std::fabs(*BASELIB::toDouble(after.z) - *BASELIB::toDouble(before.z)) < 1e-6;
         }
     }
-    ok &= expect(out.isValid() && QFileInfo::exists(written.filePath()) && readBack.isValid() && readBack.raw.info.bads == data.raw.info.bads && readBack.events.size() == 4 && samePositions == 10,
+    ok &= expect(out.isValid() && written.exists() && readBack.is_valid() && readBack.raw.info.bads == data.raw.info.bads && readBack.events.size() == 4 && samePositions == 10,
                  std::format("write() then read() keeps bads, events and {}/10 electrode positions", samePositions));
 
     std::println("{}", ok ? "All bids checks passed." : "bids checks FAILED.");

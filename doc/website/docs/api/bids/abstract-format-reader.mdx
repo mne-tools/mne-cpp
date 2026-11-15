@@ -20,8 +20,8 @@ The [`AbstractFormatReader`](/docs/api/bids/abstract-format-reader) class provid
 Subclasses implement format-specific parsing and expose the data uniformly as FIFF structures.
 
 ```cpp title="src/examples/ex_bids/main.cpp"
-std::unique_ptr<AbstractFormatReader> edf = BidsRawData::createReader(".edf"); // or construct EDFReader directly
-const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").filePath());
+std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
+const bool edfOpen = edf->open(QString::fromStdString(BASELIB::utf8FromPath(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path())));
 const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
 const MatrixXf edfHead = edf->readRawSegment(0, 201);
 ```
@@ -172,8 +172,8 @@ Check whether this reader can handle the given file extension.
 BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 138"
-std::unique_ptr<AbstractFormatReader> edf = BidsRawData::createReader(".edf"); // or construct EDFReader directly
-const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").filePath());
+std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
+const bool edfOpen = edf->open(QString::fromStdString(BASELIB::utf8FromPath(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path())));
 const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
 const MatrixXf edfHead = edf->readRawSegment(0, 201);
 // mne.io.read_raw_edf: 25 channels at 128 Hz, 1228 samples, first channel "EEG Fp1"; data[3, 200] = 0.1757724

@@ -36,7 +36,7 @@ BidsRawData data = BidsRawData::read(ieeg); // raw data plus channels, events, e
 QTemporaryDir out;
 BidsRawData::WriteOptions options;
 options.datasetName = "ex_bids";
-const BIDSPath written = data.write(BIDSPath(out.path(), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
+const BIDSPath written = data.write(BIDSPath(BASELIB::pathFromUtf8(out.path().toStdString()), "01", "01", "rest", "ieeg", "ieeg", ".vhdr"), vhdr, options);
 const BidsRawData readBack = BidsRawData::read(written);
 ```
 
@@ -104,7 +104,7 @@ dataset_description.json
 - **bidsPath** : *const [BIDSPath](/docs/api/bids/bids-path) &*
   Target [`BIDSPath`](/docs/api/bids/bids-path) (root, subject, task, datatype, suffix, extension).
 
-- **sourcePath** : *const QString &*
+- **sourcePath** : *const std::filesystem::path &*
   Path to the original raw data file to copy. If empty, the raw data file is not copied.
 
 - **options** : *const WriteOptions &*
@@ -125,7 +125,7 @@ Convenience overload — write with default options.
 - **bidsPath** : *const [BIDSPath](/docs/api/bids/bids-path) &*
   Target [`BIDSPath`](/docs/api/bids/bids-path) (root, subject, task, datatype, suffix, extension).
 
-- **sourcePath** : *const QString &*
+- **sourcePath** : *const std::filesystem::path &*
   Path to the original raw data file to copy; if empty, it is not copied.
 
 **Returns:**
@@ -134,7 +134,7 @@ Convenience overload — write with default options.
 
 ---
 
-### isValid()
+### is_valid()
 
 Returns true if the data was loaded successfully.
 
@@ -144,7 +144,7 @@ Returns true if the data was loaded successfully.
 
 ---
 
-### setValid(bValid)
+### set_valid(bValid)
 
 Marks the data as valid or invalid.
 
@@ -191,17 +191,17 @@ The [`BIDSPath`](/docs/api/bids/bids-path) must have at minimum: root, subject, 
 
 **Returns:**
 
-- *[BidsRawData](/docs/api/bids/bids-raw-data)* — Populated [`BidsRawData`](/docs/api/bids/bids-raw-data). Check `isValid()` to determine success.
+- *[BidsRawData](/docs/api/bids/bids-raw-data)* — Populated [`BidsRawData`](/docs/api/bids/bids-raw-data). Check `is_valid()` to determine success.
 
 ---
 
-### createReader(sExtension)
+### create_reader(sExtension)
 
 Create the appropriate format reader for a given file extension.
 
 **Parameters:**
 
-- **sExtension** : *const QString &*
+- **sExtension** : *std::string_view*
   File extension including dot (e.g. ".vhdr", ".edf").
 
 **Returns:**
@@ -224,8 +224,8 @@ Create the appropriate format reader for a given file extension.
 BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 138"
-std::unique_ptr<AbstractFormatReader> edf = BidsRawData::createReader(".edf"); // or construct EDFReader directly
-const bool edfOpen = edf->open(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").filePath());
+std::unique_ptr<AbstractFormatReader> edf = BidsRawData::create_reader(".edf"); // or construct EDFReader directly
+const bool edfOpen = edf->open(QString::fromStdString(BASELIB::utf8FromPath(BIDSPath(root, "02", "01", "rest", "eeg", "eeg", ".edf").file_path())));
 const FIFFLIB::FiffInfo edfInfo = edf->getInfo();
 const MatrixXf edfHead = edf->readRawSegment(0, 201);
 // mne.io.read_raw_edf: 25 channels at 128 Hz, 1228 samples, first channel "EEG Fp1"; data[3, 200] = 0.1757724

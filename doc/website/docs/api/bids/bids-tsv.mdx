@@ -28,61 +28,70 @@ Domain-specific TSV I/O (channels, electrodes, events) is handled by [`BidsChann
 Generic BIDS TSV file I/O.
 
 ```cpp title="src/examples/ex_bids/main.cpp"
-QStringList headers;
-const QList<BidsTsvRow> rows = BidsTsv::readTsv(ieeg.eventsTsvPath().filePath(), headers);
-// each row maps column name -> cell text, e.g. rows[1]["trial_type"] == "response"
+std::vector<std::string> headers;
+const std::vector<BidsTsvRow> rows = BidsTsv::read_tsv(ieeg.events_tsv_path().file_path(), headers);
+// each row maps column name -> cell text, e.g. rows[1].at("trial_type") == "response"
 ```
-
----
-
-## Public Methods
-
-### BidsTsv()
-
----
-
-### ~BidsTsv()
 
 ---
 
 ## Static Methods
 
-### readTsv(sFilePath, headers)
+### read_tsv(path, headers)
 
 Reads a TSV file into an ordered list of row maps.
 
 **Parameters:**
 
-- **sFilePath** : *const QString &*
+- **path** : *const std::filesystem::path &*
   Path to the TSV file.
 
-- **headers** : *QStringList &*
+- **headers** : *std::vector&lt; std::string &gt; &*
   Column names from the header row.
 
 **Returns:**
 
-- *QList&lt; BidsTsvRow &gt;* — List of rows, each row a map of column-name → value.
+- *std::vector&lt; BidsTsvRow &gt;* — List of rows, each row a map of column-name → value; empty if the file cannot be read.
 
 ---
 
-### writeTsv(sFilePath, headers, rows)
+### write_tsv(path, headers, rows)
 
-Writes rows to a TSV file.
+Writes rows to a TSV file, writing "n/a" for empty and missing values.
 
 **Parameters:**
 
-- **sFilePath** : *const QString &*
+- **path** : *const std::filesystem::path &*
   Output file path.
 
-- **headers** : *const QStringList &*
+- **headers** : *std::span&lt; const std::string &gt;*
   Column names (determines column order).
 
-- **rows** : *const QList&lt; BidsTsvRow &gt; &*
+- **rows** : *std::span&lt; const BidsTsvRow &gt;*
   Data rows.
 
 **Returns:**
 
 - *bool* — true on success, false on I/O error.
+
+---
+
+### value(row, column, fallback)
+
+**Parameters:**
+
+- **row** : *const BidsTsvRow &*
+  A row.
+
+- **column** : *std::string_view*
+  Column name.
+
+- **fallback** : *std::string_view*
+  Value if the row has no such column.
+
+**Returns:**
+
+- *std::string_view* — The value of `column`, valid while `row` is unchanged.
 
 ---
 
@@ -100,10 +109,10 @@ Writes rows to a TSV file.
 BIDS library: paths, sidecar TSVs, BrainVision/EDF readers and a raw-data round trip.
 
 ````cpp title="src/examples/ex_bids/main.cpp, line 103"
-QStringList headers;
-const QList<BidsTsvRow> rows = BidsTsv::readTsv(ieeg.eventsTsvPath().filePath(), headers);
-// each row maps column name -> cell text, e.g. rows[1]["trial_type"] == "response"
-ok &= expect(headers == QStringList({"onset", "duration", "sample", "value", "trial_type"}) && rows.size() == 4 && rows[1]["trial_type"] == "response" && rows[3]["onset"] == "5.250000",
+std::vector<std::string> headers;
+const std::vector<BidsTsvRow> rows = BidsTsv::read_tsv(ieeg.events_tsv_path().file_path(), headers);
+// each row maps column name -> cell text, e.g. rows[1].at("trial_type") == "response"
+ok &= expect(headers == std::vector<std::string>{"onset", "duration", "sample", "value", "trial_type"} && rows.size() == 4 && rows[1].at("trial_type") == "response" && rows[3].at("onset") == "5.250000",
              "BidsTsv reads the 5 event columns and 4 rows");
 ````
 

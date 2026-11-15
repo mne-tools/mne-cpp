@@ -2054,7 +2054,7 @@
     },
     {
       "source": "parity",
-      "mne_cpp": "BidsRawData::createReader",
+      "mne_cpp": "BidsRawData::create_reader",
       "python": "mne.io.read_raw",
       "claimed": "partial",
       "equivalence": null,
