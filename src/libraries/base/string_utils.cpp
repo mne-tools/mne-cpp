@@ -297,6 +297,20 @@ bool mne::is_utf8(std::string_view text)
 
 //=============================================================================================================
 
+std::string mne::to_hex(std::span<const std::byte> data)
+{
+    constexpr std::string_view digits = "0123456789abcdef";
+    std::string hex;
+    hex.reserve(2 * data.size());
+    for (const std::byte b : data) {
+        hex.push_back(digits[std::to_integer<std::size_t>(b >> 4)]);
+        hex.push_back(digits[std::to_integer<std::size_t>(b & std::byte{0x0F})]);
+    }
+    return hex;
+}
+
+//=============================================================================================================
+
 std::filesystem::path mne::executable_dir()
 {
     static const std::filesystem::path dir = [] {

@@ -66,6 +66,7 @@ private slots:
     void toDoubleIgnoresTheLocale();
     void utf8PathsRoundTrip();
     void latin1AndUtf8MatchQString();
+    void toHexMatchesQByteArray();
     void executableDirIsTheApplicationDir();
     void resourcePathPrefersTheInstalledResources();
 };
@@ -264,6 +265,20 @@ void TestUtilsStringUtils::latin1AndUtf8MatchQString()
     QVERIFY(!is_utf8("\xC0\xAF"));         // overlong
     QVERIFY(!is_utf8("\xED\xA0\x80"));     // surrogate
     QVERIFY(!is_utf8("\xF4\x90\x80\x80")); // above U+10FFFF
+}
+
+//=============================================================================================================
+
+void TestUtilsStringUtils::toHexMatchesQByteArray()
+{
+    std::vector<std::byte> every;
+    every.reserve(256);
+    for (int byte = 0; byte < 256; ++byte) {
+        every.push_back(static_cast<std::byte>(byte));
+    }
+    const QByteArray qt(reinterpret_cast<const char*>(every.data()), qsizetype(every.size()));
+    QCOMPARE(to_hex(every), qt.toHex().toStdString());
+    QCOMPARE(to_hex({}), std::string());
 }
 
 //=============================================================================================================

@@ -38,10 +38,11 @@
 
 #include "mna_graph_executor.h"
 #include <base/log.h>
+#include <base/sha256.h>
+#include <base/string_utils.h>
 #include "mna_graph.h"
 #include "mna_op_registry.h"
 
-#include <QCryptographicHash>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QSysInfo>
@@ -186,7 +187,7 @@ bool MnaGraphExecutor::runNode(MnaGraph& graph, MnaNode& node, Context& ctx)
     provenance.hostName = QSysInfo::machineHostName();
     provenance.resolvedAttributes = node.attributes;
     for (auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
-        provenance.inputHashes.insert(it.key(), QString::fromLatin1(QCryptographicHash::hash(it.value().toString().toUtf8(), QCryptographicHash::Sha256).toHex()));
+        provenance.inputHashes.insert(it.key(), QString::fromStdString(to_hex(Sha256::hash(it.value().toString().toStdString()))));
     }
 
     const auto failsHard = [](const QList<MnaVerificationResult>& results) {

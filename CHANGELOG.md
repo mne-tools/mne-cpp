@@ -600,6 +600,10 @@ aliases; replace the old spelling as below.
   of Qt's `QCborValue`, `QCborArray` and `QCborMap`, with the same encoded
   bytes and JSON conversion. Decoding rejects malformed input, trailing
   bytes and nesting deeper than 1024 without throwing.
+- New `mne::Sha256` (`base/sha256.h`) and `mne::to_hex()`
+  (`base/string_utils.h`): SHA-256 digests in one call or incrementally,
+  the counterpart of `QCryptographicHash::Sha256` and `QByteArray::toHex()`.
+  The MNA graph executor fingerprints node inputs with it.
 - `BrainVisionReader` decodes `.vhdr` and `.vmrk` files like MNE-Python:
   UTF-8, Windows-1252 for `Codepage=ANSI`, and Latin-1 when the bytes are
   not valid in that encoding. Latin-1 headers from older recorders kept raw

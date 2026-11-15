@@ -26,8 +26,10 @@
 // STL INCLUDES
 //=============================================================================================================
 
+#include <cstddef>
 #include <filesystem>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -132,6 +134,13 @@ BASESHARED_EXPORT std::string latin1_to_utf8(std::string_view latin1);
  * @return Whether @p text is well-formed UTF-8 (no overlong forms, surrogates or code points above U+10FFFF).
  */
 BASESHARED_EXPORT bool is_utf8(std::string_view text);
+
+/**
+ * @param[in] data   Any bytes.
+ *
+ * @return @p data as lowercase hex digits, two per byte, like QByteArray::toHex().
+ */
+BASESHARED_EXPORT std::string to_hex(std::span<const std::byte> data);
 
 /**
  * @return The directory of the running executable with symbolic links resolved, like

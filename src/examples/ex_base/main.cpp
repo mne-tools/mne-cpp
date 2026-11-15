@@ -7,7 +7,7 @@
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.5.0
  * @date     November 2026
- * @brief    Base library: logging, byte streams, string and path helpers, JSON, the thread pool and the circular buffer.
+ * @brief    Base library: logging, byte streams, string and path helpers, JSON, CBOR, SHA-256, the thread pool and the circular buffer.
  *
  * Every step checks its result and the example exits non-zero on a mismatch.
  * All files are written to a temporary directory.
@@ -23,6 +23,7 @@
 #include <base/json.h>
 #include <base/json_stream_parser.h>
 #include <base/log.h>
+#include <base/sha256.h>
 #include <base/string_utils.h>
 #include <base/thread_pool.h>
 
@@ -175,6 +176,15 @@ int main()
     }
     //! [json_stream_parser_usage]
     ok &= expect(latencies == std::vector<double>({1.5, 2.25, 3.0}), "JsonStreamParser emitted each event as it closed");
+
+    //! [sha256_usage]
+    // Qt:   QCryptographicHash::hash(text.toUtf8(), QCryptographicHash::Sha256).toHex()
+    const std::string fingerprint = to_hex(Sha256::hash("abc"));
+    Sha256 incremental; // or feed a large file block by block
+    incremental.update("a").update("bc");
+    //! [sha256_usage]
+    ok &= expect(fingerprint == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" && incremental.digest() == Sha256::hash("abc"),
+                 "Sha256 hashed a message in one call and incrementally");
 
     //! [circular_buffer_usage]
     CircularBuffer<double> buffer(4); // one thread pushes, another pops

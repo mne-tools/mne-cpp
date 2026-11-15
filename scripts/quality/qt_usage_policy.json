@@ -175,7 +175,7 @@
       "modules": []
     },
     "mna": {
-      "tokens": 1637,
+      "tokens": 1635,
       "public_header_includes": 84,
       "modules": [
         "Core"
